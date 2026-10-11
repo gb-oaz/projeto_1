@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CI e qualidade · boaz · v08</title>
+<title>Metodologia git · boaz · v05</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
-<meta name="boaz:documento" content="02_ci-qualidade">
-<meta name="boaz:caminho" content="1_Requisitos/02_ci-qualidade.html">
+<meta name="boaz:documento" content="02_metodologia-git">
+<meta name="boaz:caminho" content="1_Requisitos/02_metodologia-git.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v08">
-<meta name="boaz:data" content="2026-10-11 04:46">
+<meta name="boaz:versao" content="v05">
+<meta name="boaz:data" content="2026-10-11 15:15">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -787,12 +787,12 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 
 <header class="boaz-marca-topo">
   <p class="boaz-eyebrow">boaz · Transversal</p>
-  <h1>CI e qualidade</h1>
-  <p class="boaz-objetivo"><span>Objetivo</span>definir onde e quando o CI roda e quais testes e verificações de qualidade reprovam um build.</p>
+  <h1>Metodologia git</h1>
+  <p class="boaz-objetivo"><span>Objetivo</span>definir como cada atividade é desenvolvida em branch própria e chega à branch principal, que guarda só código homologado.</p>
   <dl class="boaz-carimbo">
-    <div><dt>Documento</dt><dd>02_ci-qualidade</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v08</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 04:46</dd></div>
+    <div><dt>Documento</dt><dd>02_metodologia-git</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v05</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 15:15</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -800,45 +800,43 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 <main>
   <section id="contexto">
     <h2>Contexto</h2>
-    <p>As ferramentas e versões do projeto estão em <a class="ref" href="01_stack-desenvolvimento.html">Stack de desenvolvimento</a>. Este documento define como o CI usa essas ferramentas: onde roda, quando cada build dispara e quais testes, verificações e coberturas reprovam o build. A geração e o envio das imagens Docker estão em <a class="ref" href="03_publicacao-imagens.html">Publicação das imagens</a>.</p>
-    <p>Os requisitos daqui foram aprovados em <code>01_stack-desenvolvimento</code> v04 e mudaram de documento sem alteração de conteúdo, com os mesmos IDs.</p>
+    <p>O projeto é um monorepo com backend, aplicações web e mobile (<a class="ref" href="01_stack-desenvolvimento.html">Stack de desenvolvimento</a>). A branch principal recebe só código homologado, porque é dela que saem as imagens enviadas ao Docker Hub (<a class="ref" href="04_publicacao-imagens.html">Publicação das imagens</a>).</p>
+    <p>Este documento define o caminho de uma atividade, da branch de tarefa até a principal. O que o CI roda em cada branch está em <a class="ref" href="03_ci-qualidade.html">CI e qualidade</a>.</p>
+  </section>
+
+  <section id="regras-de-negocio">
+    <h2>Regras de negócio</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Regra</th></tr></thead>
+      <tbody>
+        <tr id="RN-10"><td><code class="id">RN-10</code></td><td>A branch principal do repositório é a <code>master</code></td></tr>
+        <tr id="RN-05"><td><code class="id">RN-05</code></td><td>Toda atividade é desenvolvida numa branch própria, criada a partir da branch principal</td></tr>
+        <tr id="RN-06"><td><code class="id">RN-06</code></td><td>A branch segue o padrão <code>tarefa_&lt;numero&gt;-&lt;descricao&gt;</code> no desenvolvimento de um requisito (ex.: <code>tarefa_42-cadastro</code>) e <code>fix_&lt;numero&gt;-&lt;descricao&gt;</code> na correção de um bug (ex.: <code>fix_42-erro_cadastro</code>), em que <code>&lt;numero&gt;</code> identifica o requisito</td></tr>
+        <tr id="RN-09"><td><code class="id">RN-09</code></td><td>O padrão de nome é convenção do time: o CI não recusa pull request de branch fora dele</td></tr>
+        <tr id="RN-07"><td><code class="id">RN-07</code></td><td>Código entra na branch principal somente por pull request vindo de uma branch de tarefa ou de correção</td></tr>
+        <tr id="RN-08"><td><code class="id">RN-08</code></td><td>Branches de tarefa e de correção não geram nem publicam imagens Docker; isso acontece só na branch principal (<a class="ref" href="04_publicacao-imagens.html#RNF-31">Publicação das imagens <code class="id">RNF-31</code></a>)</td></tr>
+      </tbody>
+    </table>
   </section>
 
   <section id="requisitos-nao-funcionais">
     <h2>Requisitos não funcionais</h2>
     <table>
-      <caption>Execução do CI</caption>
       <thead><tr><th>ID</th><th>Frente</th><th>Requisito</th></tr></thead>
       <tbody>
-        <tr id="RNF-11"><td><code class="id">RNF-11</code></td><td><span class="tag">CI</span></td><td>O CI compila e testa backend, web e mobile (Android e iOS) com as versões de <a class="ref" href="01_stack-desenvolvimento.html#requisitos-nao-funcionais">Stack de desenvolvimento</a></td></tr>
-        <tr id="RNF-13"><td><code class="id">RNF-13</code></td><td><span class="tag">CI</span></td><td>O CI roda no GitHub Actions: executores Linux para backend, web e Android, e executor macOS hospedado para iOS</td></tr>
-        <tr id="RNF-23"><td><code class="id">RNF-23</code></td><td><span class="tag">CI</span></td><td>Backend, web e Android são compilados e testados a cada push e a cada merge, em qualquer branch</td></tr>
-        <tr id="RNF-24"><td><code class="id">RNF-24</code></td><td><span class="tag">CI</span></td><td>O build iOS roda somente em pull requests para a branch principal e no merge nela</td></tr>
-        <tr id="RNF-21"><td><code class="id">RNF-21</code></td><td><span class="tag">CI</span></td><td>O Dependabot abre pull requests de atualização de dependências, de imagens Docker e de <em>actions</em></td></tr>
+        <tr id="RNF-39"><td><code class="id">RNF-39</code></td><td><span class="tag">Git</span></td><td>A branch principal tem regra de proteção no GitHub que bloqueia push direto, push forçado e exclusão</td></tr>
+        <tr id="RNF-40"><td><code class="id">RNF-40</code></td><td><span class="tag">Git</span></td><td>O merge na branch principal exige pull request com o job agregador do CI aprovado (<a class="ref" href="03_ci-qualidade.html#RNF-36">CI e qualidade <code class="id">RNF-36</code></a>)</td></tr>
+        <tr id="RNF-41"><td><code class="id">RNF-41</code></td><td><span class="tag">Git</span></td><td>O pull request para a branch principal exige 1 aprovação de revisão, e um novo commit no pull request invalida a aprovação anterior</td></tr>
+        <tr id="RNF-42"><td><code class="id">RNF-42</code></td><td><span class="tag">Git</span></td><td>O merge na branch principal usa squash: cada pull request vira um único commit, com merge commit e rebase desabilitados</td></tr>
       </tbody>
     </table>
-    <table>
-      <caption>Testes e qualidade de código</caption>
-      <thead><tr><th>ID</th><th>Frente</th><th>Requisito</th></tr></thead>
-      <tbody>
-        <tr id="RNF-14"><td><code class="id">RNF-14</code></td><td><span class="tag">Backend · Mobile</span></td><td>Os testes automatizados usam xUnit, com cobertura medida pelo coverlet</td></tr>
-        <tr id="RNF-25"><td><code class="id">RNF-25</code></td><td><span class="tag">Backend · Web</span></td><td>O CI reprova o build quando a cobertura de linhas fica abaixo de 80 %</td></tr>
-        <tr id="RNF-26"><td><code class="id">RNF-26</code></td><td><span class="tag">Mobile</span></td><td>O CI mede e publica a cobertura de linhas do mobile, sem reprovar o build por ela</td></tr>
-        <tr id="RNF-15"><td><code class="id">RNF-15</code></td><td><span class="tag">Backend · Mobile</span></td><td>O CI reprova o build quando <code>dotnet format --verify-no-changes</code> encontra diferenças</td></tr>
-        <tr id="RNF-22"><td><code class="id">RNF-22</code></td><td><span class="tag">Backend · Mobile</span></td><td>Avisos dos analisadores de código são tratados como erros no build do CI</td></tr>
-        <tr id="RNF-16"><td><code class="id">RNF-16</code></td><td><span class="tag">Web</span></td><td>Os testes unitários usam Vitest com Vue Test Utils</td></tr>
-        <tr id="RNF-17"><td><code class="id">RNF-17</code></td><td><span class="tag">Web</span></td><td>O CI reprova o build quando ESLint, Prettier ou <code>vue-tsc</code> (checagem de tipos) apontam erro</td></tr>
-        <tr id="RNF-18"><td><code class="id">RNF-18</code></td><td><span class="tag">Web</span></td><td>Os testes de ponta a ponta usam Cypress</td></tr>
-      </tbody>
-    </table>
-    <aside class="destaque aviso"><p>O executor macOS do GitHub Actions custa mais por minuto que o Linux: por isso o build iOS roda só em pull requests para a branch principal e no merge (<code class="id">RNF-24</code>).</p></aside>
   </section>
 
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../3_Arquitetura/pipeline-ci_v03_20261011-0431.svg"><img src="../3_Arquitetura/pipeline-ci_v03_20261011-0431.svg" alt="Pipeline de CI: push e merge em qualquer branch disparam os jobs Linux, PR e merge na principal disparam iOS em macOS; com todos os jobs verdes, push, merge e tag na branch principal publicam as quatro imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub"></a>
-      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v03_20261011-0431.svg</code></figcaption>
+      <a href="../2_Diagramas/fluxo-git_v01_20261011-1510.svg"><img src="../2_Diagramas/fluxo-git_v01_20261011-1510.svg" alt="Diagrama de atividades de exemplo: a pessoa desenvolvedora cria a branch tarefa_42-cadastro ou fix_42-erro_cadastro a partir da master, faz commits e push e abre pull request; o CI do PR e 1 aprovação de revisão decidem: sem aprovação, novo commit; aprovado, merge por squash na master protegida e o CI publica as imagens dos componentes alterados; tag vX.Y.Z opcional publica as quatro imagens"></a>
+      <figcaption><strong>Fluxo de desenvolvimento git</strong><code>2_Diagramas/fluxo-git_v01_20261011-1510.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -848,19 +846,16 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v08</span></td><td>2026-10-11 04:46</td><td>Status → Aprovado</td></tr>
-      <tr><td>v07</td><td>2026-10-11 04:39</td><td>Visual atualizado para o tema v04</td></tr>
-      <tr><td>v06</td><td>2026-10-11 04:36</td><td>Documento dividido: <code class="id">RNF-27</code> a <code class="id">RNF-33</code> e a pendência do Docker Hub movidos para <code>03_publicacao-imagens</code></td></tr>
-      <tr><td>v05</td><td>2026-10-11 04:32</td><td>Pendências de DevOps respondidas: <code class="id">RNF-27</code> alterado (quatro imagens), <code class="id">RNF-32</code> e <code class="id">RNF-33</code> incluídos; 1 pendência nova; diagrama atualizado para <code>pipeline-ci_v03</code></td></tr>
-      <tr><td>v04</td><td>2026-10-11 03:49</td><td>Testes em qualquer push e merge e publicação só na branch principal: <code class="id">RNF-23</code>, <code class="id">RNF-29</code> e <code class="id">RNF-30</code> alterados, <code class="id">RNF-31</code> incluído; diagrama atualizado para <code>pipeline-ci_v02</code>; status → Em revisão</td></tr>
-      <tr><td>v03</td><td>2026-10-11 03:42</td><td>Publicação versionada no Docker Hub: <code class="id">RNF-27</code> a <code class="id">RNF-30</code> incluídos; 2 pendências novas; diagrama <code>pipeline-ci_v01</code> incluído; status mantido em Aprovado</td></tr>
-      <tr><td>v02</td><td>2026-10-11 03:22</td><td>Visual atualizado para o tema v03</td></tr>
-      <tr><td>v01</td><td>2026-10-11 03:16</td><td>Criação: <code class="id">RNF-11</code>, <code class="id">RNF-13</code> a <code class="id">RNF-18</code> e <code class="id">RNF-21</code> a <code class="id">RNF-26</code> movidos de <code>01_stack-desenvolvimento</code> v05, já aprovados</td></tr>
+      <tr><td><span class="boaz-versao">v05</span></td><td>2026-10-11 15:15</td><td>Status → Aprovado</td></tr>
+      <tr><td>v04</td><td>2026-10-11 15:11</td><td>Diagrama de exemplo incluído (<code>fluxo-git_v01</code>)</td></tr>
+      <tr><td>v03</td><td>2026-10-11 15:02</td><td>Pendência respondida: a branch principal continua <code>master</code>; <code class="id">RN-10</code> incluído; seção Em aberto removida</td></tr>
+      <tr><td>v02</td><td>2026-10-11 14:59</td><td>Pendências respondidas: <code class="id">RN-06</code>, <code class="id">RN-07</code> e <code class="id">RN-08</code> alterados (branches <code>tarefa_*</code> e <code>fix_*</code>), <code class="id">RN-09</code>, <code class="id">RNF-41</code> e <code class="id">RNF-42</code> incluídos</td></tr>
+      <tr><td>v01</td><td>2026-10-11 14:46</td><td>Criação</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v08 · 2026-10-11 04:46</span>
-    <span class="boaz-arquivo">1_Requisitos/02_ci-qualidade.html</span>
+    <span>boaz · v05 · 2026-10-11 15:15</span>
+    <span class="boaz-arquivo">1_Requisitos/02_metodologia-git.html</span>
   </div>
 </footer>
 

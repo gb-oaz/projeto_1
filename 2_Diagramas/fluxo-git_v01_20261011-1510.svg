@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 884" width="1600" height="884">
+  <title>Fluxo de desenvolvimento git</title>
+  <desc>Diagrama de atividades de exemplo conforme 1_Requisitos/02_metodologia-git.html: a pessoa desenvolvedora cria a branch tarefa_42-cadastro (ou fix_42-erro_cadastro, para bug) a partir da master, faz commits e push (o CI roda só o componente alterado e não gera imagem) e abre pull request para a master; o GitHub roda o CI do PR e exige o job agregador verde e 1 aprovação de revisão; sem isso, a pessoa ajusta com novo commit, que invalida a aprovação; com isso, o merge por squash vira um único commit na master protegida e o CI publica as imagens dos componentes alterados (sha-commit e master); uma tag vX.Y.Z opcional publica as quatro imagens. v01: criação.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1600" height="884"/>
+
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="1600" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="1600" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · DIAGRAMA DE ATIVIDADES</text>
+    <text class="title" x="40" y="72">Fluxo de desenvolvimento git</text>
+    <text class="subtitle" x="40" y="94">Exemplo: da branch tarefa_42-cadastro até a master e a publicação das imagens · 02_metodologia-git</text>
+    <text class="wm-meta-label" x="1312" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1312" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1336" y="71" text-anchor="middle">v01</text>
+    <line class="wm-sep" x1="1384" y1="32" x2="1384" y2="80"/>
+    <text class="wm-meta-label" x="1408" y="44">DATA</text>
+    <text class="wm-meta-value" x="1408" y="72">2026-10-11 · 15:10</text>
+  </g>
+
+  <g id="raias">
+    <rect class="boundary" x="40" y="152" width="1520" height="192" rx="14"/><text class="boundary-label" x="58" y="176">PESSOA DESENVOLVEDORA · BRANCH TAREFA_* OU FIX_*</text>
+    <rect class="boundary" x="40" y="344" width="1520" height="192" rx="14"/><text class="boundary-label" x="58" y="368">GITHUB · PULL REQUEST E CI</text>
+    <rect class="boundary" x="40" y="536" width="1520" height="192" rx="14"/><text class="boundary-label" x="58" y="560">MASTER · PROTEGIDA: SEM PUSH DIRETO, PUSH FORÇADO OU EXCLUSÃO</text>
+  </g>
+
+  <g id="inicio"><circle class="ink" cx="88" cy="268" r="9"/></g>
+  <g id="criar-branch" filter="url(#sombra)"><rect class="node-blue" x="136" y="216" width="232" height="104" rx="10"/><text class="label-strong" x="252" y="242" text-anchor="middle">Criar a branch</text><text class="mono" x="252" y="264" text-anchor="middle">tarefa_42-cadastro</text><text class="mono" x="252" y="282" text-anchor="middle">fix_42-erro_cadastro</text><text class="muted" x="252" y="302" text-anchor="middle">a partir da master</text></g>
+  <g id="commits" filter="url(#sombra)"><rect class="node-blue" x="424" y="216" width="232" height="104" rx="10"/><text class="label-strong" x="540" y="254" text-anchor="middle">Commits e push</text><text class="muted" x="540" y="278" text-anchor="middle">o CI roda só o componente</text><text class="muted" x="540" y="296" text-anchor="middle">alterado e não gera imagem</text></g>
+  <g id="abrir-pr" filter="url(#sombra)"><rect class="node-blue" x="712" y="216" width="232" height="104" rx="10"/><text class="label-strong" x="828" y="262" text-anchor="middle">Abrir pull request</text><text class="muted" x="828" y="286" text-anchor="middle">para a master</text></g>
+  <g id="nota-release"><rect class="node-note" x="1208" y="208" width="320" height="112" rx="10"/><text class="label-strong" x="1228" y="236">Release (opcional)</text><text class="muted" x="1228" y="258">tag vX.Y.Z num commit da master</text><text class="muted" x="1228" y="276">publica as quatro imagens:</text><text class="mono" x="1228" y="298">X.Y.Z · X.Y · latest</text></g>
+
+  <g id="ci-revisao" filter="url(#sombra)"><rect class="node-green" x="712" y="400" width="232" height="104" rx="10"/><text class="label-strong" x="828" y="430" text-anchor="middle">CI do PR e revisão</text><text class="muted" x="828" y="454" text-anchor="middle">job agregador do CI verde</text><text class="muted" x="828" y="472" text-anchor="middle">1 aprovação de revisão</text></g>
+  <g id="decisao"><path class="node" d="M1040,428 L1064,452 L1040,476 L1016,452 z"/></g>
+  <g id="publicar" filter="url(#sombra)"><rect class="node-purple" x="1208" y="400" width="232" height="104" rx="10"/><text class="label-strong" x="1324" y="430" text-anchor="middle">CI publica as imagens</text><text class="muted" x="1324" y="454" text-anchor="middle">só dos componentes alterados</text><text class="mono" x="1324" y="474" text-anchor="middle">sha-&lt;commit&gt; · master</text></g>
+  <g id="fim"><circle class="ink-ring" cx="1512" cy="452" r="11"/><circle class="ink" cx="1512" cy="452" r="6"/></g>
+
+  <g id="merge" filter="url(#sombra)"><rect class="node-purple" x="924" y="592" width="232" height="104" rx="10"/><text class="label-strong" x="1040" y="622" text-anchor="middle">Merge por squash</text><text class="muted" x="1040" y="646" text-anchor="middle">1 commit por pull request</text><text class="muted" x="1040" y="664" text-anchor="middle">na master</text></g>
+
+  <g id="arestas">
+    <line class="edge-accent" x1="97" y1="268" x2="134" y2="268" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="368" y1="268" x2="422" y2="268" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="656" y1="268" x2="710" y2="268" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="828" y1="320" x2="828" y2="398" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="944" y1="452" x2="1014" y2="452" marker-end="url(#seta-destaque)"/>
+    <path class="edge" d="M1040,428 V192 H540 V214" marker-end="url(#seta)"/>
+    <text class="muted" x="1052" y="290">[não] novo commit</text><text class="muted" x="1052" y="308">invalida a aprovação</text>
+    <line class="edge-accent" x1="1040" y1="476" x2="1040" y2="590" marker-end="url(#seta-destaque)"/>
+    <text class="muted" x="1052" y="520">[sim] verde e aprovado</text>
+    <path class="edge-accent" d="M1156,644 H1324 V506" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="1440" y1="452" x2="1499" y2="452" marker-end="url(#seta-destaque)"/>
+    <line class="edge edge-async" x1="1324" y1="320" x2="1324" y2="400"/>
+  </g>
+
+  <g id="marca-rodape" transform="translate(0,768)">
+    <rect class="wm-band" x="0" y="0" width="1600" height="116"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="1600" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">Trabalho na branch</text>
+    <rect class="node-green" x="210" y="47" width="14" height="14" rx="3"/><text class="label" x="232" y="58">CI e revisão</text>
+    <rect class="node-purple" x="346" y="47" width="14" height="14" rx="3"/><text class="label" x="368" y="58">Master e publicação</text>
+    <rect class="node-note" x="532" y="47" width="14" height="14" rx="3"/><text class="label" x="554" y="58">Nota</text>
+    <path class="node" d="M626,47 L633,54 L626,61 L619,54 z"/><text class="label" x="644" y="58">Decisão</text>
+    <line class="edge-accent" x1="728" y1="54" x2="756" y2="54" marker-end="url(#seta-destaque)"/><text class="label" x="768" y="58">fluxo principal</text>
+    <line class="edge" x1="898" y1="54" x2="926" y2="54" marker-end="url(#seta)"/><text class="label" x="938" y="58">retorno para ajuste</text>
+    <line class="edge edge-async" x1="1094" y1="54" x2="1122" y2="54"/><text class="label" x="1134" y="58">ligação da nota</text>
+    <line class="divider" x1="40" y1="76" x2="1560" y2="76"/>
+    <text class="footer" x="40" y="100">v01 · exemplo do fluxo git: branch de tarefa, pull request com CI e revisão, squash na master e publicação das imagens</text>
+    <text class="wm-file" x="1560" y="100" text-anchor="end">fluxo-git_v01_20261011-1510.svg</text>
+  </g>
+</svg>

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Publicação das imagens · boaz · v03</title>
+<title>Publicação das imagens · boaz · v07</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
-<meta name="boaz:documento" content="03_publicacao-imagens">
-<meta name="boaz:caminho" content="1_Requisitos/03_publicacao-imagens.html">
+<meta name="boaz:documento" content="04_publicacao-imagens">
+<meta name="boaz:caminho" content="1_Requisitos/04_publicacao-imagens.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v03">
-<meta name="boaz:data" content="2026-10-11 04:46">
+<meta name="boaz:versao" content="v07">
+<meta name="boaz:data" content="2026-10-11 15:15">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -790,9 +790,9 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <h1>Publicação das imagens</h1>
   <p class="boaz-objetivo"><span>Objetivo</span>definir quais imagens Docker o CI gera, quando e com quais tags elas são enviadas ao Docker Hub e como o CI se autentica.</p>
   <dl class="boaz-carimbo">
-    <div><dt>Documento</dt><dd>03_publicacao-imagens</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v03</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 04:46</dd></div>
+    <div><dt>Documento</dt><dd>04_publicacao-imagens</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v07</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 15:15</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -800,8 +800,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 <main>
   <section id="contexto">
     <h2>Contexto</h2>
-    <p>O CI de <a class="ref" href="02_ci-qualidade.html">CI e qualidade</a> compila e testa o código em qualquer branch. Este documento define a etapa seguinte: com todos os jobs verdes e somente a partir da branch principal, o CI gera as imagens Docker e as envia versionadas ao Docker Hub.</p>
-    <p>Os requisitos daqui vieram de <code>02_ci-qualidade</code> v05, sem alteração de conteúdo, com os mesmos IDs.</p>
+    <p>O CI de <a class="ref" href="03_ci-qualidade.html">CI e qualidade</a> compila e testa o código em qualquer branch, inclusive nas branches de tarefa da <a class="ref" href="02_metodologia-git.html">Metodologia git</a>. Este documento define a etapa seguinte: com todos os jobs verdes e somente a partir da branch principal, o CI gera as imagens Docker e as envia versionadas ao Docker Hub.</p>
+    <p>Como o CI roda só os componentes alterados (<a class="ref" href="03_ci-qualidade.html#RNF-34">CI e qualidade <code class="id">RNF-34</code></a>), só eles ganham imagem nova a cada merge.</p>
   </section>
 
   <section id="requisitos-nao-funcionais">
@@ -810,10 +810,11 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <thead><tr><th>ID</th><th>Frente</th><th>Requisito</th></tr></thead>
       <tbody>
         <tr id="RNF-27"><td><code class="id">RNF-27</code></td><td><span class="tag">Publicação</span></td><td>O CI gera quatro imagens Docker: a da API backend (<code>backend-mono</code>) e as das aplicações web <code>frontend-hub</code>, <code>frontend-landing-page</code> e <code>frontend-quest</code> (build do Vite servido como conteúdo estático)</td></tr>
-        <tr id="RNF-28"><td><code class="id">RNF-28</code></td><td><span class="tag">Publicação</span></td><td>As imagens são enviadas ao Docker Hub somente quando todos os jobs de build, testes e qualidade passam</td></tr>
-        <tr id="RNF-29"><td><code class="id">RNF-29</code></td><td><span class="tag">Publicação</span></td><td>Um push ou merge na branch principal publica as imagens com as tags <code>sha-&lt;commit&gt;</code> e <code>main</code></td></tr>
+        <tr id="RNF-28"><td><code class="id">RNF-28</code></td><td><span class="tag">Publicação</span></td><td>As imagens são enviadas ao Docker Hub somente quando todos os jobs disparados de build, testes e qualidade passam</td></tr>
+        <tr id="RNF-29"><td><code class="id">RNF-29</code></td><td><span class="tag">Publicação</span></td><td>Um push ou merge na branch principal publica as imagens com as tags <code>sha-&lt;commit&gt;</code> e <code>master</code></td></tr>
         <tr id="RNF-30"><td><code class="id">RNF-30</code></td><td><span class="tag">Publicação</span></td><td>A tag git <code>vX.Y.Z</code> (SemVer) num commit da branch principal publica as imagens com as tags <code>X.Y.Z</code>, <code>X.Y</code> e <code>latest</code></td></tr>
-        <tr id="RNF-31"><td><code class="id">RNF-31</code></td><td><span class="tag">Publicação</span></td><td>Push e merge em branches que não são a principal executam build e testes, sem publicar imagens</td></tr>
+        <tr id="RNF-38"><td><code class="id">RNF-38</code></td><td><span class="tag">Publicação</span></td><td>Um push ou merge na branch principal gera e publica só as imagens dos componentes alterados; a tag <code>vX.Y.Z</code> gera e publica as quatro imagens</td></tr>
+        <tr id="RNF-31"><td><code class="id">RNF-31</code></td><td><span class="tag">Publicação</span></td><td>Push e pull request em branches que não são a principal, como as de tarefa (<code>tarefa_*</code>) e de correção (<code>fix_*</code>), executam build e testes sem gerar nem publicar imagens</td></tr>
         <tr id="RNF-32"><td><code class="id">RNF-32</code></td><td><span class="tag">Publicação</span></td><td>As imagens são publicadas nos repositórios públicos do Docker Hub <code>gustavoboaz/backend-mono</code>, <code>gustavoboaz/frontend-hub</code>, <code>gustavoboaz/frontend-landing-page</code> e <code>gustavoboaz/frontend-quest</code></td></tr>
         <tr id="RNF-33"><td><code class="id">RNF-33</code></td><td><span class="tag">Publicação</span></td><td>O CI se autentica no Docker Hub com um token de acesso pessoal da conta <code>gustavoboaz</code>, com permissão de leitura e escrita, guardado em <code>DOCKERHUB_USERNAME</code> e <code>DOCKERHUB_TOKEN</code> num environment do GitHub restrito à branch principal</td></tr>
       </tbody>
@@ -823,8 +824,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../3_Arquitetura/pipeline-ci_v03_20261011-0431.svg"><img src="../3_Arquitetura/pipeline-ci_v03_20261011-0431.svg" alt="Pipeline de CI: push e merge em qualquer branch disparam os jobs Linux, PR e merge na principal disparam iOS em macOS; com todos os jobs verdes, push, merge e tag na branch principal publicam as quatro imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub"></a>
-      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v03_20261011-0431.svg</code></figcaption>
+      <a href="../3_Arquitetura/pipeline-ci_v06_20261011-1502.svg"><img src="../3_Arquitetura/pipeline-ci_v06_20261011-1502.svg" alt="Pipeline de CI no monorepo: push e pull request em qualquer branch passam pela detecção de mudanças, que dispara só os jobs Linux dos componentes alterados, com testes unitários e de integração; PR e merge na principal disparam iOS em macOS; com os jobs disparados verdes, merge e tag na branch principal publicam as imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub; branches de tarefa e de correção não geram imagem"></a>
+      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v06_20261011-1502.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -834,14 +835,18 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v03</span></td><td>2026-10-11 04:46</td><td>Pendência respondida: <code>gustavoboaz</code> é conta pessoal; <code class="id">RNF-33</code> alterado (token de acesso pessoal); seção Em aberto removida; status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v07</span></td><td>2026-10-11 15:15</td><td>Status → Aprovado</td></tr>
+      <tr><td>v06</td><td>2026-10-11 15:02</td><td><code class="id">RNF-29</code> alterado: tag de imagem <code>master</code> no lugar de <code>main</code>; diagrama atualizado para <code>pipeline-ci_v06</code></td></tr>
+      <tr><td>v05</td><td>2026-10-11 14:59</td><td><code class="id">RNF-31</code> alterado (branches <code>tarefa_*</code> e <code>fix_*</code>); diagrama atualizado para <code>pipeline-ci_v05</code></td></tr>
+      <tr><td>v04</td><td>2026-10-11 14:46</td><td>Renumerado de <code>03_publicacao-imagens</code> para <code>04_publicacao-imagens</code>; imagem só dos componentes alterados e nenhuma nas branches de tarefa: <code class="id">RNF-28</code> e <code class="id">RNF-31</code> alterados, <code class="id">RNF-38</code> incluído; diagrama atualizado para <code>pipeline-ci_v04</code>; status → Em revisão</td></tr>
+      <tr><td>v03</td><td>2026-10-11 04:46</td><td>Pendência respondida: <code>gustavoboaz</code> é conta pessoal; <code class="id">RNF-33</code> alterado (token de acesso pessoal); seção Em aberto removida; status → Aprovado</td></tr>
       <tr><td>v02</td><td>2026-10-11 04:39</td><td>Visual atualizado para o tema v04</td></tr>
       <tr><td>v01</td><td>2026-10-11 04:36</td><td>Criação: <code class="id">RNF-27</code> a <code class="id">RNF-33</code> e a pendência do Docker Hub movidos de <code>02_ci-qualidade</code> v05</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v03 · 2026-10-11 04:46</span>
-    <span class="boaz-arquivo">1_Requisitos/03_publicacao-imagens.html</span>
+    <span>boaz · v07 · 2026-10-11 15:15</span>
+    <span class="boaz-arquivo">1_Requisitos/04_publicacao-imagens.html</span>
   </div>
 </footer>
 
