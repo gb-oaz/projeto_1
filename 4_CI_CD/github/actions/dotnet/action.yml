@@ -1,0 +1,166 @@
+name: CI .NET
+description: >-
+  Compila, verifica formatação, testa (xUnit + coverlet) e mede a cobertura de um
+  componente .NET (serviço de backend ou app .NET MAUI). Requisito 03_ci-qualidade.
+
+inputs:
+  projeto:
+    description: Diretório do componente (contém .slnx, .sln ou .csproj)
+    required: true
+  testes:
+    description: Diretório dos testes do componente em 5_DEV/qa/
+    required: true
+  nome:
+    description: Nome usado nos artefatos de teste e cobertura
+    required: true
+  cobertura-minima:
+    description: Cobertura de linhas mínima em %; 0 só mede e publica (RNF-26)
+    required: false
+    default: "80"
+  workload:
+    description: "Workload do .NET a instalar (ex.: maui-android, maui-ios)"
+    required: false
+    default: ""
+  framework:
+    description: "TargetFramework a compilar no componente (ex.: net10.0-android)"
+    required: false
+    default: ""
+  args-build:
+    description: Argumentos extras de MSBuild para o build do componente
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    # RNF-01 / RNF-19: versão do SDK fixada no global.json; 10.0.x enquanto ele não existir
+    - if: hashFiles('global.json') != ''
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+    - if: hashFiles('global.json') == ''
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+
+    - if: inputs.workload != ''
+      name: Instalar workload ${{ inputs.workload }}
+      shell: bash
+      run: dotnet workload install ${{ inputs.workload }}
+
+    - name: Localizar projeto e testes
+      id: alvo
+      shell: bash
+      env:
+        PROJETO: ${{ inputs.projeto }}
+        TESTES: ${{ inputs.testes }}
+      run: |
+        alvo="$(find "$PROJETO" -maxdepth 1 \( -name '*.slnx' -o -name '*.sln' \) | sort | head -n 1)"
+        if [ -z "$alvo" ]; then
+          # sem mapfile: o bash do executor macOS é 3.2
+          csprojs="$(find "$PROJETO" -name '*.csproj' | sort)"
+          qtd="$(printf '%s' "$csprojs" | grep -c . || true)"
+          if [ "$qtd" -ne 1 ]; then
+            echo "::error::$PROJETO precisa de um .slnx/.sln na raiz ou de um único .csproj (encontrados: $qtd)"
+            exit 1
+          fi
+          alvo="$csprojs"
+        fi
+        echo "projeto=$alvo" >>"$GITHUB_OUTPUT"
+        testes=""
+        if [ -d "$TESTES" ]; then
+          testes="$(find "$TESTES" -name '*.csproj' | sort | tr '\n' ' ')"
+        fi
+        echo "testes=$testes" >>"$GITHUB_OUTPUT"
+        echo "Projeto: $alvo"
+        echo "Testes: ${testes:-nenhum}"
+
+    - name: Restaurar
+      shell: bash
+      env:
+        PROJETO: ${{ steps.alvo.outputs.projeto }}
+        TESTES: ${{ steps.alvo.outputs.testes }}
+        FRAMEWORK: ${{ inputs.framework }}
+      run: |
+        tf=()
+        if [ -n "$FRAMEWORK" ]; then tf=(-p:TargetFrameworks="$FRAMEWORK"); fi
+        dotnet restore "$PROJETO" "${tf[@]}"
+        for t in $TESTES; do dotnet restore "$t"; done
+
+    # RNF-15: reprova quando dotnet format encontra diferenças
+    - name: Verificar formatação (dotnet format)
+      shell: bash
+      env:
+        PROJETO: ${{ steps.alvo.outputs.projeto }}
+        TESTES: ${{ steps.alvo.outputs.testes }}
+      run: |
+        dotnet format "$PROJETO" --verify-no-changes --no-restore
+        for t in $TESTES; do dotnet format "$t" --verify-no-changes --no-restore; done
+
+    # RNF-22: avisos dos analisadores viram erro
+    - name: Compilar
+      shell: bash
+      env:
+        PROJETO: ${{ steps.alvo.outputs.projeto }}
+        FRAMEWORK: ${{ inputs.framework }}
+        ARGS_BUILD: ${{ inputs.args-build }}
+      run: |
+        tf=()
+        if [ -n "$FRAMEWORK" ]; then tf=(-p:TargetFrameworks="$FRAMEWORK"); fi
+        # shellcheck disable=SC2086
+        dotnet build "$PROJETO" -c Release --no-restore -warnaserror \
+          -p:TreatWarningsAsErrors=true -p:EnforceCodeStyleInBuild=true "${tf[@]}" $ARGS_BUILD
+
+    # RNF-14 / RNF-23: testes unitários e de integração com xUnit, cobertura pelo coverlet
+    - name: Testar
+      shell: bash
+      env:
+        TESTES: ${{ steps.alvo.outputs.testes }}
+        MINIMA: ${{ inputs.cobertura-minima }}
+      run: |
+        if [ -z "$TESTES" ]; then
+          if [ "$MINIMA" != "0" ]; then
+            echo "::error::Nenhum projeto de teste em ${{ inputs.testes }}: sem testes a cobertura é 0% (mínimo $MINIMA%)"
+            exit 1
+          fi
+          echo "::warning::Nenhum projeto de teste em ${{ inputs.testes }}"
+          exit 0
+        fi
+        for t in $TESTES; do
+          dotnet test "$t" -c Release --no-restore \
+            -p:TreatWarningsAsErrors=true -warnaserror \
+            --collect:"XPlat Code Coverage" \
+            --results-directory "$RUNNER_TEMP/resultados" \
+            --logger "trx;LogFilePrefix=$(basename "$t" .csproj)"
+        done
+
+    - name: Relatório de cobertura
+      if: steps.alvo.outputs.testes != ''
+      shell: bash
+      env:
+        MINIMA: ${{ inputs.cobertura-minima }}
+      run: |
+        dotnet tool install --global dotnet-reportgenerator-globaltool >/dev/null
+        reportgenerator \
+          -reports:"$RUNNER_TEMP/resultados/**/coverage.cobertura.xml" \
+          -targetdir:"$RUNNER_TEMP/cobertura" \
+          -reporttypes:"Cobertura;JsonSummary;MarkdownSummaryGithub" \
+          -title:"${{ inputs.nome }}"
+        cat "$RUNNER_TEMP/cobertura/SummaryGithub.md" >>"$GITHUB_STEP_SUMMARY"
+        linhas="$(jq -r '.summary.linecoverage // 0' "$RUNNER_TEMP/cobertura/Summary.json")"
+        echo "Cobertura de linhas: $linhas% (mínimo: $MINIMA%)"
+        # RNF-25 reprova abaixo do mínimo; RNF-26 (mínimo 0) só publica
+        if awk -v c="$linhas" -v m="$MINIMA" 'BEGIN { exit !(c + 0 < m + 0) }'; then
+          echo "::error::Cobertura de linhas $linhas% abaixo do mínimo de $MINIMA%"
+          exit 1
+        fi
+
+    - name: Publicar resultados
+      if: always() && steps.alvo.outputs.testes != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: testes-${{ inputs.nome }}
+        path: |
+          ${{ runner.temp }}/resultados/**/*.trx
+          ${{ runner.temp }}/cobertura/
+        if-no-files-found: ignore

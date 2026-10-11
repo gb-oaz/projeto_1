@@ -1,0 +1,108 @@
+name: CI Web
+description: >-
+  Instala, verifica (ESLint, Prettier, vue-tsc), testa (Vitest + Vue Test Utils,
+  Cypress) e compila uma aplicação web Vue + Vite. Requisito 03_ci-qualidade.
+
+inputs:
+  app:
+    description: Diretório da aplicação (contém package.json e pnpm-lock.yaml)
+    required: true
+  nome:
+    description: Nome usado nos artefatos de teste e cobertura
+    required: true
+  cobertura-minima:
+    description: Cobertura de linhas mínima em % (RNF-25)
+    required: false
+    default: "80"
+
+runs:
+  using: composite
+  steps:
+    # RNF-04 / RNF-19: Node.js fixado no .nvmrc; 24 enquanto ele não existir
+    - if: hashFiles('.nvmrc') != ''
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+    - if: hashFiles('.nvmrc') == ''
+      uses: actions/setup-node@v4
+      with:
+        node-version: "24"
+
+    # RNF-12: pnpm pelo Corepack, na versão do campo packageManager
+    - name: Ativar pnpm (Corepack)
+      id: pnpm
+      shell: bash
+      working-directory: ${{ inputs.app }}
+      run: |
+        npm install --global corepack@latest >/dev/null
+        corepack enable
+        echo "store=$(pnpm store path --silent)" >>"$GITHUB_OUTPUT"
+
+    - uses: actions/cache@v4
+      with:
+        path: |
+          ${{ steps.pnpm.outputs.store }}
+          ~/.cache/Cypress
+        key: pnpm-${{ runner.os }}-${{ inputs.nome }}-${{ hashFiles(format('{0}/pnpm-lock.yaml', inputs.app)) }}
+        restore-keys: pnpm-${{ runner.os }}-${{ inputs.nome }}-
+
+    - name: Instalar dependências
+      shell: bash
+      working-directory: ${{ inputs.app }}
+      run: pnpm install --frozen-lockfile
+
+    # RNF-17: ESLint, Prettier e vue-tsc reprovam o build
+    - name: ESLint
+      shell: bash
+      working-directory: ${{ inputs.app }}
+      run: pnpm exec eslint . --max-warnings 0
+
+    - name: Prettier
+      shell: bash
+      working-directory: ${{ inputs.app }}
+      run: pnpm exec prettier --check .
+
+    - name: Checagem de tipos (vue-tsc)
+      shell: bash
+      working-directory: ${{ inputs.app }}
+      run: pnpm exec vue-tsc --build --force
+
+    # RNF-16 / RNF-25: Vitest com cobertura; abaixo do mínimo reprova
+    - name: Testes unitários e de integração (Vitest)
+      shell: bash
+      working-directory: ${{ inputs.app }}
+      env:
+        MINIMA: ${{ inputs.cobertura-minima }}
+      run: |
+        pnpm exec vitest run \
+          --coverage.enabled \
+          --coverage.reporter=text-summary --coverage.reporter=json-summary --coverage.reporter=cobertura \
+          --coverage.reportsDirectory="$RUNNER_TEMP/cobertura" \
+          --coverage.thresholds.lines="$MINIMA"
+
+    - name: Compilar (Vite)
+      shell: bash
+      working-directory: ${{ inputs.app }}
+      run: pnpm run build
+
+    # RNF-18: ponta a ponta com Cypress, pelo script test:e2e da aplicação
+    - name: Testes de ponta a ponta (Cypress)
+      shell: bash
+      working-directory: ${{ inputs.app }}
+      run: |
+        if ! jq -e '.scripts["test:e2e"]' package.json >/dev/null; then
+          echo "::error::package.json precisa do script test:e2e (Cypress), ex.: start-server-and-test preview http://localhost:4173 'cypress run --e2e'"
+          exit 1
+        fi
+        pnpm run test:e2e
+
+    - name: Publicar resultados
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: testes-${{ inputs.nome }}
+        path: |
+          ${{ runner.temp }}/cobertura/
+          ${{ inputs.app }}/cypress/screenshots/
+          ${{ inputs.app }}/cypress/videos/
+        if-no-files-found: ignore

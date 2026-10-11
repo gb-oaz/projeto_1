@@ -1,0 +1,175 @@
+# CI e qualidade — requisito 1_Requisitos/03_ci-qualidade.html
+#
+# O GitHub só lê workflows de .github/workflows/, por isso este arquivo fica aqui
+# e só orquestra. A lógica (detecção de componentes e passos de cada frente)
+# vive em 4_CI_CD/github/. Veja 4_CI_CD/README.md.
+name: CI
+
+on:
+  push: # RNF-23: qualquer branch
+  pull_request: # RNF-23: qualquer branch
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  BRANCH_PRINCIPAL: master
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # RNF-25: cobertura mínima de linhas que reprova o build
+  COBERTURA_MINIMA: 80
+
+jobs:
+  # RNF-34 / RNF-35 / RNF-24: decide quais componentes rodam
+  detectar:
+    name: Detectar componentes alterados
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.detectar.outputs.backend }}
+      web: ${{ steps.detectar.outputs.web }}
+      android: ${{ steps.detectar.outputs.android }}
+      ios: ${{ steps.detectar.outputs.ios }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: detectar
+        name: Detectar
+        env:
+          EVENTO: ${{ github.event_name }}
+          REF_ALVO: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # workflow_dispatch não tem "before": roda tudo
+          if [ "$EVENTO" = "workflow_dispatch" ]; then BASE=""; fi
+          # PR: compara com o ponto em que a branch saiu da base
+          if [ "$EVENTO" = "pull_request" ]; then BASE="$(git merge-base "$BASE" "$HEAD")"; fi
+          bash 4_CI_CD/github/scripts/detectar-componentes.sh "$BASE" "$HEAD"
+
+  backend:
+    name: Backend · ${{ matrix.servico }}
+    needs: detectar
+    if: needs.detectar.outputs.backend != '[]'
+    runs-on: ubuntu-latest # RNF-13
+    strategy:
+      fail-fast: false
+      matrix:
+        servico: ${{ fromJSON(needs.detectar.outputs.backend) }}
+    # RNF-37: MongoDB e Redis nas versões de 01_stack-desenvolvimento, em contêineres do job
+    services:
+      mongodb:
+        image: mongo:8.0
+        ports: ["27017:27017"]
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:8.0
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s --health-timeout 5s --health-retries 10
+    env:
+      ConnectionStrings__MongoDb: mongodb://localhost:27017
+      ConnectionStrings__Redis: localhost:6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./4_CI_CD/github/actions/dotnet
+        with:
+          projeto: 5_DEV/backend/${{ matrix.servico }}
+          testes: 5_DEV/qa/backend/${{ matrix.servico }}
+          nome: backend-${{ matrix.servico }}
+          cobertura-minima: ${{ env.COBERTURA_MINIMA }} # RNF-25
+
+  web:
+    name: Web · ${{ matrix.app }}
+    needs: detectar
+    if: needs.detectar.outputs.web != '[]'
+    runs-on: ubuntu-latest # RNF-13
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.detectar.outputs.web) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./4_CI_CD/github/actions/web
+        with:
+          app: 5_DEV/frontend/${{ matrix.app }}
+          nome: ${{ matrix.app }}
+          cobertura-minima: ${{ env.COBERTURA_MINIMA }} # RNF-25
+
+  android:
+    name: Android · ${{ matrix.app }}
+    needs: detectar
+    if: needs.detectar.outputs.android != '[]'
+    runs-on: ubuntu-latest # RNF-13
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.detectar.outputs.android) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: microsoft
+          java-version: "17"
+      - uses: ./4_CI_CD/github/actions/dotnet
+        with:
+          projeto: 5_DEV/frontend/${{ matrix.app }}
+          testes: 5_DEV/qa/frontend/${{ matrix.app }}
+          nome: ${{ matrix.app }}
+          workload: maui-android
+          framework: net10.0-android
+          cobertura-minima: "0" # RNF-26: mede e publica, não reprova
+
+  ios:
+    name: iOS · ${{ matrix.app }}
+    needs: detectar
+    # RNF-24: a lista só vem preenchida em PR para a master e em push (merge) na master
+    if: needs.detectar.outputs.ios != '[]'
+    runs-on: macos-latest # RNF-13: executor macOS hospedado
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.detectar.outputs.ios) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: ./4_CI_CD/github/actions/dotnet
+        with:
+          projeto: 5_DEV/frontend/${{ matrix.app }}
+          testes: 5_DEV/qa/frontend/${{ matrix.app }}
+          nome: ${{ matrix.app }}
+          workload: maui-ios
+          framework: net10.0-ios
+          # build para o simulador: não exige certificado de assinatura
+          args-build: -p:RuntimeIdentifier=iossimulator-arm64
+          cobertura-minima: "0" # RNF-26
+
+  # RNF-36: único job exigido pela proteção da master.
+  # Falha se algum job disparado falhar; jobs pulados (componente sem mudança) não bloqueiam.
+  resultado:
+    name: CI · resultado
+    needs: [detectar, backend, web, android, ios]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Avaliar jobs
+        env:
+          RESULTADOS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTADOS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+          falhas="$(echo "$RESULTADOS" | jq -r '[to_entries[] | select(.value.result == "failure" or .value.result == "cancelled") | .key] | join(", ")')"
+          if [ -n "$falhas" ]; then
+            echo "::error::Jobs com falha: $falhas"
+            exit 1
+          fi
+          echo "Todos os jobs disparados passaram."
