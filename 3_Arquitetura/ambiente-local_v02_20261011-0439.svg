@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 820" width="1440" height="820">
+  <title>Ambiente local de desenvolvimento</title>
+  <desc>Interação das ferramentas da stack de desenvolvimento (1_Requisitos/01_stack-desenvolvimento.html v04) na máquina da pessoa desenvolvedora: navegador e emulador/simulador consomem as três aplicações web (Vite: frontend-hub, frontend-landing-page e frontend-quest) e o backend (.NET) rodando na IDE; o Docker Compose sobe MongoDB e Redis, RabbitMQ quando houver mensageria e, com o perfil app, backend e aplicações web em contêiner. v01: criação. v02: três aplicações web.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+    <symbol id="ic-web" viewBox="0 0 24 24"><rect class="ico" x="2" y="4" width="20" height="16" rx="2"/><path class="ico" d="M2,9 H22"/><circle class="ico-fill" cx="5" cy="6.5" r="0.9"/><circle class="ico-fill" cx="7.8" cy="6.5" r="0.9"/></symbol>
+    <symbol id="ic-mobile" viewBox="0 0 24 24"><rect class="ico" x="6" y="2" width="12" height="20" rx="2"/><path class="ico" d="M10.5,18.5 H13.5"/></symbol>
+    <symbol id="ic-servico" viewBox="0 0 24 24"><rect class="ico" x="3" y="4" width="18" height="7" rx="1.5"/><rect class="ico" x="3" y="13" width="18" height="7" rx="1.5"/><circle class="ico-fill" cx="6.5" cy="7.5" r="0.9"/><circle class="ico-fill" cx="6.5" cy="16.5" r="0.9"/><path class="ico" d="M10,7.5 H17 M10,16.5 H17"/></symbol>
+    <symbol id="ic-conteiner" viewBox="0 0 24 24"><path class="ico" d="M12,2.5 L20.5,7 V17 L12,21.5 L3.5,17 V7 Z M3.5,7 L12,11.5 L20.5,7 M12,11.5 V21.5"/></symbol>
+    <symbol id="ic-vm" viewBox="0 0 24 24"><rect class="ico" x="2" y="3" width="20" height="13" rx="1.5"/><rect class="ico" x="6" y="6.5" width="12" height="6" rx="1" stroke-dasharray="2 2"/><path class="ico" d="M8,21 H16 M12,16 V21"/></symbol>
+    <symbol id="ic-banco-nosql" viewBox="0 0 24 24"><rect class="ico" x="7" y="2" width="14" height="16" rx="1.5"/><path class="ico" d="M4,6 V20.5 C4,21.3 4.7,22 5.5,22 H16 M10,7 H18 M10,10.5 H18 M10,14 H15"/></symbol>
+    <symbol id="ic-cache" viewBox="0 0 24 24"><rect class="ico" x="5" y="5" width="14" height="14" rx="2"/><path class="ico" d="M9,2 V5 M15,2 V5 M9,19 V22 M15,19 V22 M2,9 H5 M2,15 H5 M19,9 H22 M19,15 H22"/><path class="ico-fill" d="M13,7.5 L9.5,12.6 H12 L11,16.5 L14.5,11.4 H12 Z"/></symbol>
+    <symbol id="ic-fila" viewBox="0 0 24 24"><rect class="ico" x="2" y="7" width="20" height="10" rx="1.5"/><path class="ico" d="M7.5,7 V17 M12,7 V17 M16.5,7 V17"/></symbol>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1440" height="820"/>
+
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="1440" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="1440" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · C4 CONTÊINER · AMBIENTE LOCAL</text>
+    <text class="title" x="40" y="72">Ambiente local de desenvolvimento</text>
+    <text class="subtitle" x="40" y="94">Como as ferramentas da stack conversam na máquina de quem desenvolve · 01_stack-desenvolvimento</text>
+    <text class="wm-meta-label" x="1152" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1152" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1176" y="71" text-anchor="middle">v02</text>
+    <line class="wm-sep" x1="1224" y1="32" x2="1224" y2="80"/>
+    <text class="wm-meta-label" x="1248" y="44">DATA</text>
+    <text class="wm-meta-value" x="1248" y="72">2026-10-11 · 04:39</text>
+  </g>
+
+  <g id="fronteiras">
+    <rect class="boundary" x="40" y="152" width="1360" height="512" rx="14"/><text class="boundary-label" x="58" y="176">MÁQUINA DE DESENVOLVIMENTO · LOCALHOST</text>
+    <rect class="boundary" x="64" y="392" width="288" height="176" rx="14"/><text class="boundary-label" x="82" y="416">EMULADOR ANDROID · SIMULADOR iOS</text>
+    <rect class="boundary" x="416" y="192" width="352" height="440" rx="14"/><text class="boundary-label" x="434" y="216">IDE · RECARGA AUTOMÁTICA (PADRÃO)</text>
+    <rect class="boundary" x="856" y="192" width="512" height="440" rx="14"/><text class="boundary-label" x="874" y="216">DOCKER COMPOSE V2 · docker compose up</text>
+    <rect class="boundary" x="864" y="472" width="256" height="136" rx="14"/><text class="boundary-label" x="882" y="496">OPCIONAL · SÓ COM MENSAGERIA</text>
+    <rect class="boundary" x="1144" y="232" width="208" height="376" rx="14"/><text class="boundary-label" x="1162" y="256">--profile app</text>
+  </g>
+
+  <g id="navegador" filter="url(#sombra)"><rect class="node-external" x="72" y="232" width="272" height="80" rx="10"/><use href="#ic-web" x="88" y="248" width="24" height="24"/><text class="label-strong" x="124" y="262">Navegador</text><text class="mono" x="124" y="282">[localhost]</text><text class="muted" x="124" y="300">abre as aplicações web</text></g>
+  <g id="app-mobile" filter="url(#sombra)"><rect class="node-blue" x="80" y="440" width="256" height="80" rx="10"/><use href="#ic-mobile" x="96" y="456" width="24" height="24"/><text class="label-strong" x="132" y="470">App mobile</text><text class="mono" x="132" y="490">[.NET MAUI 10 · C#]</text><text class="muted" x="132" y="508">um código, Android e iOS</text></g>
+  <text class="muted" x="82" y="552">iOS: só em macOS com Xcode</text>
+
+  <g id="web" filter="url(#sombra)"><rect class="node-blue" x="440" y="232" width="304" height="112" rx="10"/><use href="#ic-web" x="456" y="248" width="24" height="24"/><text class="label-strong" x="492" y="262">Aplicações web (3)</text><text class="mono" x="492" y="282">[Vue 3 · TypeScript · Vite]</text><text class="muted" x="492" y="300">hub · landing-page · quest</text><text class="muted" x="492" y="318">um Vite dev server por app</text><text class="muted" x="492" y="336">Node 24 · pnpm</text></g>
+  <g id="backend" filter="url(#sombra)"><rect class="node-blue" x="440" y="440" width="304" height="80" rx="10"/><use href="#ic-servico" x="456" y="456" width="24" height="24"/><text class="label-strong" x="492" y="470">API backend</text><text class="mono" x="492" y="490">[.NET 10 · C#]</text><text class="muted" x="492" y="508">regras e dados · dotnet watch</text></g>
+
+  <g id="mongodb" filter="url(#sombra)"><rect class="node-green" x="880" y="232" width="224" height="80" rx="10"/><use href="#ic-banco-nosql" x="896" y="248" width="24" height="24"/><text class="label-strong" x="932" y="262">MongoDB</text><text class="mono" x="932" y="282">[mongo:8.0]</text><text class="muted" x="932" y="300">documentos · :27017</text></g>
+  <g id="redis" filter="url(#sombra)"><rect class="node-green" x="880" y="360" width="224" height="80" rx="10"/><use href="#ic-cache" x="896" y="376" width="24" height="24"/><text class="label-strong" x="932" y="390">Redis</text><text class="mono" x="932" y="410">[redis:8]</text><text class="muted" x="932" y="428">cache · :6379</text></g>
+  <g id="rabbitmq" filter="url(#sombra)"><rect class="node-purple" x="880" y="512" width="224" height="80" rx="10"/><use href="#ic-fila" x="896" y="528" width="24" height="24"/><text class="label-strong" x="932" y="542">RabbitMQ</text><text class="mono" x="932" y="562">[rabbitmq:4]</text><text class="muted" x="932" y="580">mensagens · :5672</text></g>
+
+  <g id="backend-conteiner" filter="url(#sombra)"><rect class="node-blue" x="1160" y="280" width="176" height="64" rx="10"/><use href="#ic-conteiner" x="1176" y="300" width="24" height="24"/><text class="label-strong" x="1212" y="309">API backend</text><text class="mono" x="1212" y="327">[contêiner]</text></g>
+  <g id="web-conteiner" filter="url(#sombra)"><rect class="node-blue" x="1160" y="376" width="176" height="64" rx="10"/><use href="#ic-conteiner" x="1176" y="396" width="24" height="24"/><text class="label-strong" x="1212" y="405">Aplicações web</text><text class="mono" x="1212" y="423">[3 contêineres]</text></g>
+  <g id="nota-perfil"><rect class="node-note" x="1160" y="472" width="176" height="120" rx="10"/><text class="muted" x="1176" y="500">Com --profile app,</text><text class="muted" x="1176" y="520">backend e webs sobem</text><text class="muted" x="1176" y="540">em contêiner, no lugar</text><text class="muted" x="1176" y="560">dos processos da IDE</text></g>
+
+  <g id="arestas">
+    <line class="edge-accent" x1="344" y1="272" x2="438" y2="272" marker-end="url(#seta-destaque)"/>
+    <rect class="edge-label-bg" x="364" y="252" width="56" height="16"/><text class="muted" x="392" y="264" text-anchor="middle">HTTP</text>
+    <line class="edge-accent" x1="592" y1="344" x2="592" y2="438" marker-end="url(#seta-destaque)"/>
+    <text class="muted" x="604" y="396">/api · proxy do Vite</text>
+    <line class="edge-accent" x1="336" y1="480" x2="438" y2="480" marker-end="url(#seta-destaque)"/>
+    <rect class="edge-label-bg" x="356" y="460" width="56" height="16"/><text class="muted" x="384" y="472" text-anchor="middle">HTTP</text>
+    <path class="edge" d="M744,456 H784 V272 H878" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="796" y="252" width="56" height="16"/><text class="muted" x="824" y="264" text-anchor="middle">driver</text>
+    <path class="edge" d="M744,480 H800 V400 H878" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="812" y="380" width="40" height="16"/><text class="muted" x="832" y="392" text-anchor="middle">RESP</text>
+    <path class="edge edge-async" d="M744,504 H816 V552 H878" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="824" y="532" width="40" height="16"/><text class="muted" x="844" y="544" text-anchor="middle">AMQP</text>
+  </g>
+
+  <g id="marca-rodape" transform="translate(0,704)">
+    <rect class="wm-band" x="0" y="0" width="1440" height="116"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="1440" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">Código do projeto</text>
+    <rect class="node-green" x="208" y="47" width="14" height="14" rx="3"/><text class="label" x="230" y="58">Dados</text>
+    <rect class="node-purple" x="296" y="47" width="14" height="14" rx="3"/><text class="label" x="318" y="58">Mensageria</text>
+    <rect class="node-external" x="418" y="47" width="14" height="14" rx="3"/><text class="label" x="440" y="58">Ferramenta de execução</text>
+    <rect class="node-note" x="616" y="47" width="14" height="14" rx="3"/><text class="label" x="638" y="58">Nota</text>
+    <line class="edge-accent" x1="696" y1="54" x2="724" y2="54" marker-end="url(#seta-destaque)"/><text class="label" x="736" y="58">requisição principal</text>
+    <line class="edge" x1="892" y1="54" x2="920" y2="54" marker-end="url(#seta)"/><text class="label" x="932" y="58">síncrono</text>
+    <line class="edge edge-async" x1="1014" y1="54" x2="1042" y2="54" marker-end="url(#seta)"/><text class="label" x="1054" y="58">mensagem assíncrona (opcional)</text>
+    <line class="divider" x1="40" y1="76" x2="1400" y2="76"/>
+    <text class="footer" x="40" y="100">v02 · três aplicações web (frontend-hub, frontend-landing-page e frontend-quest) no lugar de uma</text>
+    <text class="wm-file" x="1400" y="100" text-anchor="end">ambiente-local_v02_20261011-0439.svg</text>
+  </g>
+</svg>

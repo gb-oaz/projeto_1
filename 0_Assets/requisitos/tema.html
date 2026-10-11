@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tema dos documentos de requisito · boaz · v02</title>
+<title>Tema dos documentos de requisito · boaz · v04</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="tema">
 <meta name="boaz:caminho" content="0_Assets/requisitos/tema.html">
 <meta name="boaz:tipo" content="Tema">
-<meta name="boaz:versao" content="v02">
-<meta name="boaz:data" content="2026-10-11 16:00">
+<meta name="boaz:versao" content="v04">
+<meta name="boaz:data" content="2026-10-11 04:38">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v02
+   boaz · tema dos documentos de requisito · v04
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
    ════════════════════════════════════════════════════════════ */
@@ -638,19 +638,24 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   .boaz-carimbo { margin: 7mm -8mm 0; }
   .boaz-carimbo > div:first-child { padding-left: 8mm; }
   .boaz-carimbo > div:last-child { padding-right: 8mm; }
-  .boaz-marca-rodape { margin-top: 10mm; padding: 7mm 8mm 6mm; border-radius: 0 0 8px 8px; break-inside: avoid; }
+  .boaz-marca-rodape { margin-top: 10mm; padding: 7mm 8mm 6mm; border-radius: 0 0 8px 8px; }
+  .boaz-marca-rodape > .boaz-eyebrow { break-after: avoid; }
+  .boaz-rodape-linha { break-inside: avoid; break-before: avoid; }
   .boaz-barra, .sumario, details.boaz-snippet { display: none !important; }
   body[data-marca]::after { font-size: 92px; }
   h2 { margin-top: 9mm; break-after: avoid; }
   h3 { break-after: avoid; }
   .boaz-tabela { overflow: visible; }
+  caption, thead { break-after: avoid; }
+  tbody > tr:first-child { break-before: avoid; }
+  figure.diagrama:not(.recorte) img { width: auto; max-width: 100%; max-height: 75mm; margin: 0 auto; }
   tr, pre, .persona, .metrica, ul.pendencias > li { break-inside: avoid; }
   a { color: inherit; text-decoration: none; }
   a.ref { color: var(--accent); }
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v02 — tema (claro/sistema/escuro), PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v04 — tema (claro/sistema/escuro), PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
@@ -801,8 +806,8 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
   <p class="boaz-objetivo"><span>Objetivo</span>padronizar marca d'água, tipografia, formato e estilo de todo documento <code>.html</code> de <code>1_Requisitos/</code> e mostrar, renderizado, cada componente que um documento pode usar.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>tema</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v02</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 16:00</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v04</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 04:38</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -1237,12 +1242,14 @@ Cenário: código expirado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v02</span></td><td>2026-10-11 16:00</td><td>Rolagem lateral: tabelas largas rolam dentro do documento, código longo quebra a linha e nada mais é cortado na borda da página</td></tr>
+      <tr><td><span class="boaz-versao">v04</span></td><td>2026-10-11 04:38</td><td>Impressão: diagrama com no máximo 75 mm de altura (era 85 mm), para caber no fim da página em vez de abrir uma nova</td></tr>
+      <tr><td>v03</td><td>2026-10-11 03:21</td><td>Impressão: o histórico do rodapé pode quebrar entre páginas (sem página quase vazia só para ele) e a legenda e o cabeçalho de uma tabela não ficam separados das linhas; diagrama com no máximo 85 mm de altura</td></tr>
+      <tr><td>v02</td><td>2026-10-11 16:00</td><td>Rolagem lateral: tabelas largas rolam dentro do documento, código longo quebra a linha e nada mais é cortado na borda da página</td></tr>
       <tr><td><span class="boaz-versao">v01</span></td><td>2026-10-11 15:00</td><td>Criação: documentos de requisito em <code>.html</code>, com temas claro, sistema e escuro e exportação para PDF</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v02 · 2026-10-11 16:00</span>
+    <span>boaz · v04 · 2026-10-11 04:38</span>
     <span class="boaz-arquivo">0_Assets/requisitos/tema.html</span>
   </div>
 </footer>
