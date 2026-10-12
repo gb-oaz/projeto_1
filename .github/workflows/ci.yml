@@ -1,5 +1,6 @@
 # =============================================================================
 # CI e qualidade — requisito 1_Requisitos/03_ci-qualidade.html
+# Publicação das imagens — requisito 1_Requisitos/04_publicacao-imagens.html
 # =============================================================================
 #
 # Visão geral do fluxo:
@@ -17,10 +18,20 @@
 #          ▼
 #     ┌───────────┐
 #     │ resultado │  veredito único exigido pela proteção da master
-#     └───────────┘
+#     └────┬──────┘
+#          │  só na master ou na tag vX.Y.Z, com tudo verde e imagem a gerar
+#          ▼
+#     ┌───────────┐
+#     │ aprovacao │  abre uma issue e espera alguém comentar "approve"
+#     └────┬──────┘
+#          ▼
+#     ┌──────────────────────┐
+#     │ publicar · <imagem>  │  build da imagem e envio ao Docker Hub
+#     └──────────────────────┘
 #
 # Frente sem mudança recebe lista vazia ([]) e o job dela é pulado.
 # Enquanto não houver código em 5_DEV/, só "mudancas" e "resultado" rodam.
+# Branches de tarefa/correção e pull requests nunca chegam à aprovação (RNF-31).
 #
 # Convenções das pastas de 5_DEV/ (o CI depende delas):
 #   backend/<servico>/        .sln/.slnx na raiz, incluindo os testes de qa/backend/<servico>/
@@ -28,26 +39,40 @@
 #   frontend/mob_and_<app>/   .sln/.csproj do app Android (.NET MAUI) e seus testes
 #   frontend/mob_ios_<app>/   .sln/.csproj do app iOS (.NET MAUI) e seus testes
 #   raiz do repositório       global.json (SDK .NET) e .nvmrc (Node.js) — RNF-19
+#   5_DEV/backend/Dockerfile          imagem backend-mono (todo o backend)
+#   5_DEV/frontend/web_<app>/Dockerfile   imagem frontend-<app> (_ vira -),
+#                                         ex.: web_landing_page → frontend-landing-page
+#
+# Configuração no GitHub (Settings → Environments → dockerhub), RNF-33:
+#   - secrets DOCKERHUB_USERNAME e DOCKERHUB_TOKEN (token de leitura e escrita)
+#   - Deployment branches and tags: branch "master" e tag "v*"
 # =============================================================================
 
 name: CI
 
 # -----------------------------------------------------------------------------
-# Gatilhos — RNF-23: o CI roda a cada push e a cada pull request, em qualquer
-# branch (tarefa_*, fix_*, master...). Sem filtro de branch de propósito.
+# Gatilhos
+#   push em qualquer branch e pull request (RNF-23): build e testes
+#   push na master (merge): também publica as imagens alteradas (RNF-29)
+#   tag vX.Y.Z: testa tudo e publica as quatro imagens (RNF-30, RNF-38)
+# Com "tags" declarado, "branches: ['**']" mantém o disparo em todas as branches.
 # -----------------------------------------------------------------------------
 on:
   push:
+    branches: ["**"]
+    tags: ["v*.*.*"]
   pull_request:
 
 # -----------------------------------------------------------------------------
 # Concorrência — um novo push na mesma branch cancela a execução anterior
 # ainda em andamento, para não gastar minutos com um commit já superado.
 # Push e pull request ficam em grupos separados (event_name no nome do grupo).
+# Na master e nas tags não cancela: cada merge publica só o que ele mudou, e
+# cancelar um deles deixaria imagens sem publicar; as execuções entram em fila.
 # -----------------------------------------------------------------------------
 concurrency:
   group: ci-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' && github.ref_type != 'tag' }}
 
 # -----------------------------------------------------------------------------
 # Permissões do token do GitHub — só leitura.
@@ -58,10 +83,12 @@ permissions:
   contents: read
   pull-requests: read
 
-# Variáveis para todos os jobs: deixa a saída do dotnet limpa e sem telemetria.
+# Variáveis para todos os jobs: deixa a saída do dotnet limpa e sem telemetria
+# e define a conta do Docker Hub que recebe as imagens (RNF-32).
 env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOCKERHUB_NAMESPACE: gustavoboaz
 
 jobs:
   # ===========================================================================
@@ -69,6 +96,8 @@ jobs:
   # ---------------------------------------------------------------------------
   # Saídas: uma lista JSON de pastas por frente, por exemplo
   #   backend=["usuarios","pagamentos"]  web=["web_hub"]  android=[]  ios=[]
+  # e a lista de imagens a gerar (RNF-27, RNF-38), por exemplo
+  #   imagens=[{"nome":"backend-mono","contexto":"5_DEV/backend"}]
   # Os jobs seguintes usam essas listas como matriz.
   # ===========================================================================
   mudancas:
@@ -79,6 +108,7 @@ jobs:
       web: ${{ steps.pastas.outputs.web }}
       android: ${{ steps.pastas.outputs.android }}
       ios: ${{ steps.pastas.outputs.ios }}
+      imagens: ${{ steps.pastas.outputs.imagens }}
     steps:
       - uses: actions/checkout@v4
 
@@ -89,7 +119,9 @@ jobs:
       #   - push em outra branch: compara com a master (tudo o que a branch mudou)
       # "comum" é uma âncora YAML (&comum) reaproveitada em todas as frentes:
       # mudar um arquivo comum liga todas elas (RNF-35).
+      # Na tag vX.Y.Z o filtro não roda: todas as frentes são ligadas no passo 2.
       - uses: dorny/paths-filter@v3
+        if: github.ref_type != 'tag'
         id: filtro
         with:
           filters: |
@@ -123,23 +155,51 @@ jobs:
       #                                       de projeto (pasta vazia fica de fora)
       # Ex.: 5_DEV/backend/usuarios/Usuarios.slnx → "usuarios" (3º trecho do caminho)
       # nullglob: um padrão sem correspondência some, em vez de virar texto literal.
+      #
+      # Imagens (RNF-27, RNF-38): o backend inteiro gera a imagem backend-mono e
+      # cada web_<app> gera frontend-<app>, só nas frentes da lista e só quando
+      # a pasta já tem Dockerfile (sem ele, um aviso aparece no resumo do job).
       - id: pastas
         env:
+          TAG: ${{ github.ref_type == 'tag' }}
           BACKEND: ${{ steps.filtro.outputs.backend }}
           WEB: ${{ steps.filtro.outputs.web }}
           ANDROID: ${{ steps.filtro.outputs.android }}
           IOS: ${{ steps.filtro.outputs.ios }}
         run: |
           shopt -s nullglob
+          if [ "$TAG" = true ]; then BACKEND=true WEB=true ANDROID=true IOS=true; fi
           pastas() { # $1 = frente mudou?  $2... = arquivos de projeto encontrados
             if [ "$1" != true ] || [ $# -lt 2 ]; then echo '[]'; return; fi
             shift; printf '%s\n' "$@" | cut -d/ -f3 | sort -u | jq -R . | jq -sc .
           }
+          backend="$(pastas "$BACKEND" 5_DEV/backend/*/*.sln 5_DEV/backend/*/*.slnx 5_DEV/backend/*/*.csproj)"
+          web="$(pastas "$WEB" 5_DEV/frontend/web_*/package.json)"
+          android="$(pastas "$ANDROID" 5_DEV/frontend/mob_and*/*.sln 5_DEV/frontend/mob_and*/*.slnx 5_DEV/frontend/mob_and*/*.csproj)"
+          ios="$(pastas "$IOS" 5_DEV/frontend/mob_ios_*/*.sln 5_DEV/frontend/mob_ios_*/*.slnx 5_DEV/frontend/mob_ios_*/*.csproj)"
+
+          imagens="$(
+            {
+              [ "$backend" = '[]' ] || echo "backend-mono 5_DEV/backend"
+              for app in $(jq -r '.[]' <<<"$web"); do
+                echo "frontend-$(tr _ - <<<"${app#web_}") 5_DEV/frontend/$app"
+              done
+            } | while read -r nome contexto; do
+              if [ -f "$contexto/Dockerfile" ]; then
+                jq -nc --arg nome "$nome" --arg contexto "$contexto" '$ARGS.named'
+              else
+                echo "::warning::$contexto não tem Dockerfile: a imagem $nome não será gerada" >>"$RUNNER_TEMP/avisos"
+              fi
+            done | jq -sc .
+          )"
+          cat "$RUNNER_TEMP/avisos" 2>/dev/null || true
+
           {
-            echo "backend=$(pastas "$BACKEND" 5_DEV/backend/*/*.sln 5_DEV/backend/*/*.slnx 5_DEV/backend/*/*.csproj)"
-            echo "web=$(pastas "$WEB" 5_DEV/frontend/web_*/package.json)"
-            echo "android=$(pastas "$ANDROID" 5_DEV/frontend/mob_and*/*.sln 5_DEV/frontend/mob_and*/*.slnx 5_DEV/frontend/mob_and*/*.csproj)"
-            echo "ios=$(pastas "$IOS" 5_DEV/frontend/mob_ios_*/*.sln 5_DEV/frontend/mob_ios_*/*.slnx 5_DEV/frontend/mob_ios_*/*.csproj)"
+            echo "backend=$backend"
+            echo "web=$web"
+            echo "android=$android"
+            echo "ios=$ios"
+            echo "imagens=$imagens"
           } | tee -a "$GITHUB_OUTPUT"
 
   # ===========================================================================
@@ -331,3 +391,126 @@ jobs:
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: exit 1
+
+  # ===========================================================================
+  # JOB 7 · aprovacao — pede aprovação manual antes de publicar (04_publicacao-imagens)
+  # ---------------------------------------------------------------------------
+  # Só roda quando há o que publicar e é permitido publicar:
+  #   - push na master (merge) ou tag vX.Y.Z (RNF-29, RNF-30); nunca em
+  #     branches de tarefa/correção nem em pull requests (RNF-31)
+  #   - "resultado" passou, ou seja, todos os jobs disparados passaram (RNF-28)
+  #   - a lista de imagens não está vazia
+  # A action trstringer/manual-approval (Manual Workflow Approval) abre uma issue
+  # no repositório listando as imagens e espera um aprovador comentar
+  # "approve" (aprova) ou "deny" (nega). Negar, ou o tempo acabar, falha o job e
+  # nada é publicado. Enquanto espera, o job ocupa um executor Linux.
+  # ===========================================================================
+  aprovacao:
+    name: Aprovar publicação
+    needs: [mudancas, resultado]
+    if: >-
+      needs.resultado.result == 'success' &&
+      needs.mudancas.outputs.imagens != '[]' &&
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/master' || github.ref_type == 'tag')
+    runs-on: ubuntu-latest
+    timeout-minutes: 120 # sem resposta em 2 h, a publicação é cancelada
+    permissions:
+      contents: read
+      issues: write # a action abre e fecha a issue de aprovação
+    steps:
+      # RNF-30: a tag só publica se o commit dela estiver na master.
+      - if: github.ref_type == 'tag'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - if: github.ref_type == 'tag'
+        name: Conferir se a tag está na master
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/master; then
+            echo "::error::A tag $GITHUB_REF_NAME aponta para um commit fora da master"
+            exit 1
+          fi
+
+      # Monta a lista de imagens que vai no corpo da issue.
+      - id: lista
+        env:
+          IMAGENS: ${{ needs.mudancas.outputs.imagens }}
+        run: |
+          {
+            echo 'texto<<FIM'
+            jq -r --arg ns "$DOCKERHUB_NAMESPACE" '.[] | "- `\($ns)/\(.nome)`"' <<<"$IMAGENS"
+            echo 'FIM'
+          } >>"$GITHUB_OUTPUT"
+
+      # approvers: quem pode aprovar (usuários do GitHub separados por vírgula);
+      # o dono do repositório por padrão. O próprio autor do push pode aprovar.
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: ${{ github.repository_owner }}
+          minimum-approvals: 1
+          exclude-workflow-initiator-as-approver: false
+          issue-title: "Publicar imagens no Docker Hub · ${{ github.ref_name }} · ${{ github.sha }}"
+          issue-body: |
+            O CI de `${{ github.ref_name }}` passou e as imagens abaixo estão prontas para publicação no Docker Hub:
+
+            ${{ steps.lista.outputs.texto }}
+
+            Execução: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Comente **approve** para publicar ou **deny** para cancelar.
+
+  # ===========================================================================
+  # JOB 8 · publicar — gera e envia cada imagem ao Docker Hub (RNF-27 a RNF-33)
+  # ---------------------------------------------------------------------------
+  # Uma execução por imagem da lista, só depois da aprovação.
+  # Tags geradas (docker/metadata-action):
+  #   push na master   sha-<commit curto> e master                (RNF-29)
+  #   tag vX.Y.Z       X.Y.Z, X.Y e latest                        (RNF-30)
+  # As credenciais vêm do environment "dockerhub", restrito à master e às
+  # tags v* (RNF-33).
+  # ===========================================================================
+  publicar:
+    name: Publicar · ${{ matrix.imagem.nome }}
+    needs: [mudancas, aprovacao]
+    runs-on: ubuntu-latest
+    environment: dockerhub
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        imagem: ${{ fromJSON(needs.mudancas.outputs.imagens) }}
+    steps:
+      - uses: actions/checkout@v4
+      # Buildx: builder do Docker com cache entre execuções.
+      - uses: docker/setup-buildx-action@v3
+      # RNF-33: login com o token de acesso pessoal da conta gustavoboaz.
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # Calcula o nome completo e as tags da imagem conforme o evento.
+      # flavor latest=false: "latest" só sai da regra explícita da tag vX.Y.Z.
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKERHUB_NAMESPACE }}/${{ matrix.imagem.nome }}
+          flavor: latest=false
+          tags: |
+            type=sha,prefix=sha-,enable=${{ github.ref_type == 'branch' }}
+            type=raw,value=master,enable=${{ github.ref_type == 'branch' }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
+      # Build com o Dockerfile da pasta do componente e envio ao Docker Hub.
+      # O cache do GitHub Actions (type=gha) acelera os próximos builds.
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.imagem.contexto }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.imagem.nome }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.imagem.nome }}
