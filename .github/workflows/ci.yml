@@ -1,0 +1,333 @@
+# =============================================================================
+# CI e qualidade — requisito 1_Requisitos/03_ci-qualidade.html
+# =============================================================================
+#
+# Visão geral do fluxo:
+#
+#   push / pull request
+#           │
+#           ▼
+#     ┌──────────┐  1. descobre quais frentes mudaram (dorny/paths-filter)
+#     │ mudancas │  2. lista as pastas de projeto dessas frentes
+#     └────┬─────┘
+#          ├──► backend · <servico>   Linux, uma execução por serviço
+#          ├──► web · <app>           Linux, uma execução por app web_*
+#          ├──► android · <app>       Linux, uma execução por app mob_and*
+#          ├──► ios · <app>           macOS, só em PR/merge na master
+#          ▼
+#     ┌───────────┐
+#     │ resultado │  veredito único exigido pela proteção da master
+#     └───────────┘
+#
+# Frente sem mudança recebe lista vazia ([]) e o job dela é pulado.
+# Enquanto não houver código em 5_DEV/, só "mudancas" e "resultado" rodam.
+#
+# Convenções das pastas de 5_DEV/ (o CI depende delas):
+#   backend/<servico>/        .sln/.slnx na raiz, incluindo os testes de qa/backend/<servico>/
+#   frontend/web_<app>/       package.json + pnpm-lock.yaml; testes em qa/frontend/web_<app>/
+#   frontend/mob_and_<app>/   .sln/.csproj do app Android (.NET MAUI) e seus testes
+#   frontend/mob_ios_<app>/   .sln/.csproj do app iOS (.NET MAUI) e seus testes
+#   raiz do repositório       global.json (SDK .NET) e .nvmrc (Node.js) — RNF-19
+# =============================================================================
+
+name: CI
+
+# -----------------------------------------------------------------------------
+# Gatilhos — RNF-23: o CI roda a cada push e a cada pull request, em qualquer
+# branch (tarefa_*, fix_*, master...). Sem filtro de branch de propósito.
+# -----------------------------------------------------------------------------
+on:
+  push:
+  pull_request:
+
+# -----------------------------------------------------------------------------
+# Concorrência — um novo push na mesma branch cancela a execução anterior
+# ainda em andamento, para não gastar minutos com um commit já superado.
+# Push e pull request ficam em grupos separados (event_name no nome do grupo).
+# -----------------------------------------------------------------------------
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# -----------------------------------------------------------------------------
+# Permissões do token do GitHub — só leitura.
+#   contents       checkout do código
+#   pull-requests  o paths-filter consulta a API para listar os arquivos do PR
+# -----------------------------------------------------------------------------
+permissions:
+  contents: read
+  pull-requests: read
+
+# Variáveis para todos os jobs: deixa a saída do dotnet limpa e sem telemetria.
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  # ===========================================================================
+  # JOB 1 · mudancas — decide O QUE roda (RNF-34, RNF-35)
+  # ---------------------------------------------------------------------------
+  # Saídas: uma lista JSON de pastas por frente, por exemplo
+  #   backend=["usuarios","pagamentos"]  web=["web_hub"]  android=[]  ios=[]
+  # Os jobs seguintes usam essas listas como matriz.
+  # ===========================================================================
+  mudancas:
+    name: Detectar mudanças
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.pastas.outputs.backend }}
+      web: ${{ steps.pastas.outputs.web }}
+      android: ${{ steps.pastas.outputs.android }}
+      ios: ${{ steps.pastas.outputs.ios }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Passo 1 · paths-filter: para cada filtro abaixo responde "true" se algum
+      # arquivo alterado casa com os padrões.
+      #   - pull request: compara com a branch base do PR
+      #   - push na master: compara com o commit anterior ao push
+      #   - push em outra branch: compara com a master (tudo o que a branch mudou)
+      # "comum" é uma âncora YAML (&comum) reaproveitada em todas as frentes:
+      # mudar um arquivo comum liga todas elas (RNF-35).
+      - uses: dorny/paths-filter@v3
+        id: filtro
+        with:
+          filters: |
+            comum: &comum
+              - '.github/**'
+              - 'global.json'
+              - '.nvmrc'
+              - '**/docker-compose*.yml'
+              - '**/compose*.yml'
+            backend:
+              - *comum
+              - '5_DEV/backend/**'
+              - '5_DEV/qa/backend/**'
+            web:
+              - *comum
+              - '5_DEV/frontend/web_*/**'
+              - '5_DEV/qa/frontend/web_*/**'
+            android:
+              - *comum
+              - '5_DEV/frontend/mob_and*/**'
+              - '5_DEV/qa/frontend/mob_and*/**'
+            ios:
+              - *comum
+              - '5_DEV/frontend/mob_ios_*/**'
+              - '5_DEV/qa/frontend/mob_ios_*/**'
+
+      # Passo 2 · pastas: o paths-filter só diz "mudou ou não"; aqui viram a
+      # lista de pastas que a matriz precisa.
+      #   - frente que não mudou            → []
+      #   - frente que mudou                → nomes das pastas que têm arquivo
+      #                                       de projeto (pasta vazia fica de fora)
+      # Ex.: 5_DEV/backend/usuarios/Usuarios.slnx → "usuarios" (3º trecho do caminho)
+      # nullglob: um padrão sem correspondência some, em vez de virar texto literal.
+      - id: pastas
+        env:
+          BACKEND: ${{ steps.filtro.outputs.backend }}
+          WEB: ${{ steps.filtro.outputs.web }}
+          ANDROID: ${{ steps.filtro.outputs.android }}
+          IOS: ${{ steps.filtro.outputs.ios }}
+        run: |
+          shopt -s nullglob
+          pastas() { # $1 = frente mudou?  $2... = arquivos de projeto encontrados
+            if [ "$1" != true ] || [ $# -lt 2 ]; then echo '[]'; return; fi
+            shift; printf '%s\n' "$@" | cut -d/ -f3 | sort -u | jq -R . | jq -sc .
+          }
+          {
+            echo "backend=$(pastas "$BACKEND" 5_DEV/backend/*/*.sln 5_DEV/backend/*/*.slnx 5_DEV/backend/*/*.csproj)"
+            echo "web=$(pastas "$WEB" 5_DEV/frontend/web_*/package.json)"
+            echo "android=$(pastas "$ANDROID" 5_DEV/frontend/mob_and*/*.sln 5_DEV/frontend/mob_and*/*.slnx 5_DEV/frontend/mob_and*/*.csproj)"
+            echo "ios=$(pastas "$IOS" 5_DEV/frontend/mob_ios_*/*.sln 5_DEV/frontend/mob_ios_*/*.slnx 5_DEV/frontend/mob_ios_*/*.csproj)"
+          } | tee -a "$GITHUB_OUTPUT"
+
+  # ===========================================================================
+  # JOB 2 · backend — um job por serviço de 5_DEV/backend/ (RNF-11, RNF-13)
+  # ---------------------------------------------------------------------------
+  # Sequência: format → build → testes com cobertura → mínimo de 80 %.
+  # Qualquer passo que falhar reprova o build do serviço.
+  # ===========================================================================
+  backend:
+    name: Backend · ${{ matrix.servico }}
+    needs: mudancas
+    if: needs.mudancas.outputs.backend != '[]' # lista vazia = job pulado
+    runs-on: ubuntu-latest
+    # Matriz: o GitHub cria uma execução paralela por serviço da lista.
+    # fail-fast: false → a falha de um serviço não cancela os outros.
+    strategy:
+      fail-fast: false
+      matrix:
+        servico: ${{ fromJSON(needs.mudancas.outputs.backend) }}
+    # RNF-37: MongoDB e Redis sobem como contêineres ao lado do job, nas versões
+    # de 01_stack-desenvolvimento, para os testes de integração.
+    services:
+      mongodb:
+        image: mongo:8.0
+        ports: ["27017:27017"]
+      redis:
+        image: redis:8.0
+        ports: ["6379:6379"]
+    # Strings de conexão lidas pelo .NET (ConnectionStrings:MongoDb / :Redis).
+    env:
+      ConnectionStrings__MongoDb: mongodb://localhost:27017
+      ConnectionStrings__Redis: localhost:6379
+    # Todos os comandos "run" executam dentro da pasta do serviço.
+    defaults:
+      run:
+        working-directory: 5_DEV/backend/${{ matrix.servico }}
+    steps:
+      - uses: actions/checkout@v4
+      # SDK .NET na versão exata fixada no global.json (RNF-01, RNF-19).
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      # RNF-15: falha se o código não estiver formatado conforme o .editorconfig.
+      - run: dotnet format --verify-no-changes
+      # RNF-22: avisos dos analisadores viram erro.
+      - run: dotnet build -c Release -warnaserror
+      # RNF-14: testes xUnit da solution (unitários e de integração); o coverlet
+      # grava a cobertura em cobertura/**/coverage.cobertura.xml.
+      - run: dotnet test -c Release --no-build --collect:"XPlat Code Coverage" --results-directory "$GITHUB_WORKSPACE/cobertura"
+      # RNF-25: soma a cobertura e reprova abaixo de 80 % de linhas
+      # (thresholds "80 90" = mínimo 80, faixa "saudável" a partir de 90).
+      # Sem testes não há arquivo de cobertura e o passo também falha.
+      - uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: cobertura/**/coverage.cobertura.xml
+          fail_below_min: true
+          thresholds: "80 90"
+          format: markdown
+          output: both
+
+  # ===========================================================================
+  # JOB 3 · web — um job por app 5_DEV/frontend/web_* (RNF-11, RNF-13)
+  # ---------------------------------------------------------------------------
+  # Sequência: install → lint → formatação → tipos → testes + cobertura →
+  # build → ponta a ponta. Os comandos rodam com pnpm exec, usando as versões
+  # das ferramentas fixadas no package.json do app.
+  # ===========================================================================
+  web:
+    name: Web · ${{ matrix.app }}
+    needs: mudancas
+    if: needs.mudancas.outputs.web != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.mudancas.outputs.web) }}
+    defaults:
+      run:
+        working-directory: 5_DEV/frontend/${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      # Node.js na versão do .nvmrc (RNF-04, RNF-19).
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      # RNF-12: o Corepack ativa o pnpm na versão do campo packageManager.
+      - run: corepack enable
+      # --frozen-lockfile: falha se o pnpm-lock.yaml não bater com o package.json.
+      - run: pnpm install --frozen-lockfile
+      # RNF-17: ESLint (nenhum aviso permitido), Prettier e vue-tsc reprovam o build.
+      - run: pnpm exec eslint . --max-warnings 0
+      - run: pnpm exec prettier --check .
+      - run: pnpm exec vue-tsc --build --force
+      # RNF-16 / RNF-25: Vitest + Vue Test Utils; cobertura de linhas < 80 % reprova.
+      - run: pnpm exec vitest run --coverage.enabled --coverage.thresholds.lines=80
+      # Build de produção do Vite (garante que o app compila).
+      - run: pnpm run build
+      # RNF-18: Cypress pelo script test:e2e do package.json do app.
+      - run: pnpm run test:e2e
+
+  # ===========================================================================
+  # JOB 4 · android — um job por app 5_DEV/frontend/mob_and* (RNF-11, RNF-13)
+  # ---------------------------------------------------------------------------
+  # Mesma sequência do backend, com o workload MAUI Android e o JDK.
+  # A cobertura é medida e publicada, sem reprovar (RNF-26).
+  # ===========================================================================
+  android:
+    name: Android · ${{ matrix.app }}
+    needs: mudancas
+    if: needs.mudancas.outputs.android != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.mudancas.outputs.android) }}
+    defaults:
+      run:
+        working-directory: 5_DEV/frontend/${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      # JDK exigido pelo build Android do .NET MAUI.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: microsoft
+          java-version: "17"
+      - run: dotnet workload install maui-android
+      - run: dotnet format --verify-no-changes # RNF-15
+      - run: dotnet build -c Release -warnaserror # RNF-22
+      - run: dotnet test -c Release --no-build --collect:"XPlat Code Coverage" --results-directory "$GITHUB_WORKSPACE/cobertura" # RNF-14
+      # RNF-26: a cobertura vira artefato para download na página da execução.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-${{ matrix.app }}
+          path: cobertura/
+
+  # ===========================================================================
+  # JOB 5 · ios — um job por app 5_DEV/frontend/mob_ios_* (RNF-11, RNF-13)
+  # ---------------------------------------------------------------------------
+  # Roda em macOS (o build iOS exige Xcode), que custa mais por minuto; por isso
+  # só em pull request para a master e no merge nela (RNF-24).
+  # ===========================================================================
+  ios:
+    name: iOS · ${{ matrix.app }}
+    needs: mudancas
+    if: >-
+      needs.mudancas.outputs.ios != '[]' && (
+        (github.event_name == 'pull_request' && github.base_ref == 'master') ||
+        (github.event_name == 'push' && github.ref == 'refs/heads/master'))
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.mudancas.outputs.ios) }}
+    defaults:
+      run:
+        working-directory: 5_DEV/frontend/${{ matrix.app }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet workload install maui-ios
+      - run: dotnet format --verify-no-changes # RNF-15
+      # Debug compila para o simulador, que não exige certificado de assinatura.
+      - run: dotnet build -c Debug -warnaserror # RNF-22
+      - run: dotnet test -c Debug --no-build --collect:"XPlat Code Coverage" --results-directory "$GITHUB_WORKSPACE/cobertura" # RNF-14
+      - uses: actions/upload-artifact@v4 # RNF-26
+        with:
+          name: cobertura-${{ matrix.app }}
+          path: cobertura/
+
+  # ===========================================================================
+  # JOB 6 · resultado — veredito único do CI (RNF-36)
+  # ---------------------------------------------------------------------------
+  # É o único status check exigido na proteção da master. Como os jobs que rodam
+  # mudam a cada PR, a regra da branch não pode listar todos; este job os resume.
+  #   if: always()  → roda mesmo quando algum job anterior falhou ou foi pulado
+  #   success / skipped     → passa (frente sem mudança não bloqueia o merge)
+  #   failure / cancelled   → falha
+  # ===========================================================================
+  resultado:
+    name: CI · resultado
+    needs: [mudancas, backend, web, android, ios]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1

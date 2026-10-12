@@ -1,4 +1,6 @@
 # 4_CI_CD
 
-Estruturas de entrega: pipelines de build/teste/deploy, manifests e scripts
-de release. A ferramenta é escolhida pelo projeto.
+Reservada para o CI local (rodar na máquina as mesmas verificações do
+GitHub Actions), a ser construído.
+
+O CI do GitHub Actions fica em [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
