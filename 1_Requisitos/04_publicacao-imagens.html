@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Publicação das imagens · boaz · v07</title>
+<title>Publicação das imagens · boaz · v09</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="04_publicacao-imagens">
 <meta name="boaz:caminho" content="1_Requisitos/04_publicacao-imagens.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v07">
-<meta name="boaz:data" content="2026-10-11 15:15">
+<meta name="boaz:versao" content="v09">
+<meta name="boaz:data" content="2026-10-11 22:24">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -788,11 +788,11 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 <header class="boaz-marca-topo">
   <p class="boaz-eyebrow">boaz · Transversal</p>
   <h1>Publicação das imagens</h1>
-  <p class="boaz-objetivo"><span>Objetivo</span>definir quais imagens Docker o CI gera, quando e com quais tags elas são enviadas ao Docker Hub e como o CI se autentica.</p>
+  <p class="boaz-objetivo"><span>Objetivo</span>definir quais imagens Docker o CI gera, quando e com quais tags elas são enviadas ao Docker Hub, quem aprova o envio e como o CI se autentica.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>04_publicacao-imagens</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v07</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 15:15</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 22:24</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -800,7 +800,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 <main>
   <section id="contexto">
     <h2>Contexto</h2>
-    <p>O CI de <a class="ref" href="03_ci-qualidade.html">CI e qualidade</a> compila e testa o código em qualquer branch, inclusive nas branches de tarefa da <a class="ref" href="02_metodologia-git.html">Metodologia git</a>. Este documento define a etapa seguinte: com todos os jobs verdes e somente a partir da branch principal, o CI gera as imagens Docker e as envia versionadas ao Docker Hub.</p>
+    <p>O CI de <a class="ref" href="03_ci-qualidade.html">CI e qualidade</a> compila e testa o código em qualquer branch, inclusive nas branches de tarefa da <a class="ref" href="02_metodologia-git.html">Metodologia git</a>. Este documento define a etapa seguinte: com todos os jobs verdes e somente a partir da branch principal, o CI pede aprovação manual e, aprovado, gera as imagens Docker e as envia versionadas ao Docker Hub.</p>
+    <p>A aprovação acontece numa issue que o CI abre no repositório: nenhuma imagem chega ao Docker Hub sem que uma pessoa autorizada confirme o envio.</p>
     <p>Como o CI roda só os componentes alterados (<a class="ref" href="03_ci-qualidade.html#RNF-34">CI e qualidade <code class="id">RNF-34</code></a>), só eles ganham imagem nova a cada merge.</p>
   </section>
 
@@ -816,7 +817,11 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RNF-38"><td><code class="id">RNF-38</code></td><td><span class="tag">Publicação</span></td><td>Um push ou merge na branch principal gera e publica só as imagens dos componentes alterados; a tag <code>vX.Y.Z</code> gera e publica as quatro imagens</td></tr>
         <tr id="RNF-31"><td><code class="id">RNF-31</code></td><td><span class="tag">Publicação</span></td><td>Push e pull request em branches que não são a principal, como as de tarefa (<code>tarefa_*</code>) e de correção (<code>fix_*</code>), executam build e testes sem gerar nem publicar imagens</td></tr>
         <tr id="RNF-32"><td><code class="id">RNF-32</code></td><td><span class="tag">Publicação</span></td><td>As imagens são publicadas nos repositórios públicos do Docker Hub <code>gustavoboaz/backend-mono</code>, <code>gustavoboaz/frontend-hub</code>, <code>gustavoboaz/frontend-landing-page</code> e <code>gustavoboaz/frontend-quest</code></td></tr>
-        <tr id="RNF-33"><td><code class="id">RNF-33</code></td><td><span class="tag">Publicação</span></td><td>O CI se autentica no Docker Hub com um token de acesso pessoal da conta <code>gustavoboaz</code>, com permissão de leitura e escrita, guardado em <code>DOCKERHUB_USERNAME</code> e <code>DOCKERHUB_TOKEN</code> num environment do GitHub restrito à branch principal</td></tr>
+        <tr id="RNF-43"><td><code class="id">RNF-43</code></td><td><span class="tag">Publicação</span></td><td>Depois que todos os jobs disparados passam, o CI pede aprovação manual antes de gerar e enviar as imagens, abrindo no repositório uma issue com a lista das imagens a publicar e o link da execução</td></tr>
+        <tr id="RNF-44"><td><code class="id">RNF-44</code></td><td><span class="tag">Publicação</span></td><td>A publicação segue quando o dono do repositório comenta <code>approve</code> na issue de aprovação; basta 1 aprovação, e o autor do push pode aprovar</td></tr>
+        <tr id="RNF-45"><td><code class="id">RNF-45</code></td><td><span class="tag">Publicação</span></td><td>O comentário <code>deny</code> na issue, ou 2 horas sem resposta, cancela a publicação sem enviar nenhuma imagem</td></tr>
+        <tr id="RNF-46"><td><code class="id">RNF-46</code></td><td><span class="tag">Publicação</span></td><td>Na tag <code>vX.Y.Z</code>, o CI confere que o commit da tag está na branch principal antes de pedir aprovação; fora dela, a execução falha sem publicar</td></tr>
+        <tr id="RNF-33"><td><code class="id">RNF-33</code></td><td><span class="tag">Publicação</span></td><td>O CI se autentica no Docker Hub com um token de acesso pessoal da conta <code>gustavoboaz</code>, com permissão de leitura e escrita, guardado em <code>DOCKERHUB_USERNAME</code> e <code>DOCKERHUB_TOKEN</code> no environment <code>dockerhub</code> do GitHub, restrito à branch principal e às tags <code>v*</code></td></tr>
       </tbody>
     </table>
   </section>
@@ -824,8 +829,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../3_Arquitetura/pipeline-ci_v06_20261011-1502.svg"><img src="../3_Arquitetura/pipeline-ci_v06_20261011-1502.svg" alt="Pipeline de CI no monorepo: push e pull request em qualquer branch passam pela detecção de mudanças, que dispara só os jobs Linux dos componentes alterados, com testes unitários e de integração; PR e merge na principal disparam iOS em macOS; com os jobs disparados verdes, merge e tag na branch principal publicam as imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub; branches de tarefa e de correção não geram imagem"></a>
-      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v06_20261011-1502.svg</code></figcaption>
+      <a href="../3_Arquitetura/pipeline-ci_v07_20261011-2220.svg"><img src="../3_Arquitetura/pipeline-ci_v07_20261011-2220.svg" alt="Pipeline de CI no monorepo: push e pull request em qualquer branch passam pela detecção de mudanças, que dispara só os jobs Linux dos componentes alterados, com testes unitários e de integração; PR e merge na principal disparam iOS em macOS; com os jobs disparados verdes, merge e tag na branch principal pedem aprovação manual por issue no repositório e, aprovados, geram e publicam as imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub; branches de tarefa e de correção não geram imagem"></a>
+      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v07_20261011-2220.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -835,7 +840,9 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v07</span></td><td>2026-10-11 15:15</td><td>Status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v09</span></td><td>2026-10-11 22:24</td><td>Status → Aprovado</td></tr>
+      <tr><td>v08</td><td>2026-10-11 22:21</td><td>Aprovação manual antes da publicação: <code class="id">RNF-43</code> a <code class="id">RNF-46</code> incluídos; <code class="id">RNF-33</code> alterado (environment <code>dockerhub</code> também nas tags <code>v*</code>); diagrama atualizado para <code>pipeline-ci_v07</code>; status → Em revisão</td></tr>
+      <tr><td>v07</td><td>2026-10-11 15:15</td><td>Status → Aprovado</td></tr>
       <tr><td>v06</td><td>2026-10-11 15:02</td><td><code class="id">RNF-29</code> alterado: tag de imagem <code>master</code> no lugar de <code>main</code>; diagrama atualizado para <code>pipeline-ci_v06</code></td></tr>
       <tr><td>v05</td><td>2026-10-11 14:59</td><td><code class="id">RNF-31</code> alterado (branches <code>tarefa_*</code> e <code>fix_*</code>); diagrama atualizado para <code>pipeline-ci_v05</code></td></tr>
       <tr><td>v04</td><td>2026-10-11 14:46</td><td>Renumerado de <code>03_publicacao-imagens</code> para <code>04_publicacao-imagens</code>; imagem só dos componentes alterados e nenhuma nas branches de tarefa: <code class="id">RNF-28</code> e <code class="id">RNF-31</code> alterados, <code class="id">RNF-38</code> incluído; diagrama atualizado para <code>pipeline-ci_v04</code>; status → Em revisão</td></tr>
@@ -845,7 +852,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v07 · 2026-10-11 15:15</span>
+    <span>boaz · v09 · 2026-10-11 22:24</span>
     <span class="boaz-arquivo">1_Requisitos/04_publicacao-imagens.html</span>
   </div>
 </footer>
