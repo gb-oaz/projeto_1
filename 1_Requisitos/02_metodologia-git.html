@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Metodologia git · boaz · v05</title>
+<title>Metodologia git · boaz · v07</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="02_metodologia-git">
 <meta name="boaz:caminho" content="1_Requisitos/02_metodologia-git.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v05">
-<meta name="boaz:data" content="2026-10-11 15:15">
+<meta name="boaz:versao" content="v07">
+<meta name="boaz:data" content="2026-10-11 23:31">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -788,11 +788,11 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 <header class="boaz-marca-topo">
   <p class="boaz-eyebrow">boaz · Transversal</p>
   <h1>Metodologia git</h1>
-  <p class="boaz-objetivo"><span>Objetivo</span>definir como cada atividade é desenvolvida em branch própria e chega à branch principal, que guarda só código homologado.</p>
+  <p class="boaz-objetivo"><span>Objetivo</span>definir como cada atividade é desenvolvida em branch própria e chega à branch principal, que guarda só código homologado, e como uma versão oficial é marcada.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>02_metodologia-git</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v05</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 15:15</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v07</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 23:31</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -802,6 +802,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     <h2>Contexto</h2>
     <p>O projeto é um monorepo com backend, aplicações web e mobile (<a class="ref" href="01_stack-desenvolvimento.html">Stack de desenvolvimento</a>). A branch principal recebe só código homologado, porque é dela que saem as imagens enviadas ao Docker Hub (<a class="ref" href="04_publicacao-imagens.html">Publicação das imagens</a>).</p>
     <p>Este documento define o caminho de uma atividade, da branch de tarefa até a principal. O que o CI roda em cada branch está em <a class="ref" href="03_ci-qualidade.html">CI e qualidade</a>.</p>
+    <p>Cada merge na principal publica as imagens de desenvolvimento dos componentes alterados. Uma versão oficial é outra decisão: o time marca um commit da principal com uma tag de versão, e o CI publica as quatro imagens com o número dessa versão (<a class="ref" href="04_publicacao-imagens.html#RNF-30">Publicação das imagens <code class="id">RNF-30</code></a>).</p>
   </section>
 
   <section id="regras-de-negocio">
@@ -815,8 +816,25 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RN-09"><td><code class="id">RN-09</code></td><td>O padrão de nome é convenção do time: o CI não recusa pull request de branch fora dele</td></tr>
         <tr id="RN-07"><td><code class="id">RN-07</code></td><td>Código entra na branch principal somente por pull request vindo de uma branch de tarefa ou de correção</td></tr>
         <tr id="RN-08"><td><code class="id">RN-08</code></td><td>Branches de tarefa e de correção não geram nem publicam imagens Docker; isso acontece só na branch principal (<a class="ref" href="04_publicacao-imagens.html#RNF-31">Publicação das imagens <code class="id">RNF-31</code></a>)</td></tr>
+        <tr id="RN-11"><td><code class="id">RN-11</code></td><td>Uma versão oficial é marcada com uma tag git anotada no padrão <code>vX.Y.Z</code> (SemVer: <code>MAJOR.MINOR.PATCH</code>), criada num commit da branch principal</td></tr>
+        <tr id="RN-12"><td><code class="id">RN-12</code></td><td>O número sobe a partir da última tag: <code>PATCH</code> quando só houve correções (<code>v1.2.3</code> → <code>v1.2.4</code>), <code>MINOR</code> quando houve funcionalidade nova compatível, zerando o <code>PATCH</code> (<code>v1.2.3</code> → <code>v1.3.0</code>), e <code>MAJOR</code> quando houve mudança que quebra compatibilidade, zerando os demais (<code>v1.2.3</code> → <code>v2.0.0</code>)</td></tr>
+        <tr id="RN-13"><td><code class="id">RN-13</code></td><td>Antes do primeiro lançamento as versões começam em <code>v0.1.0</code> e sobem o <code>MINOR</code>; a <code>v1.0.0</code> marca o primeiro lançamento</td></tr>
+        <tr id="RN-14"><td><code class="id">RN-14</code></td><td>A tag de versão é criada quando o time decide lançar uma versão oficial; merge na branch principal não cria tag</td></tr>
+        <tr id="RN-15"><td><code class="id">RN-15</code></td><td>Um número de versão publicado não é reaproveitado: tag criada por engano só é apagada se a publicação dela foi negada, e a correção de uma versão publicada sai na próxima versão <code>PATCH</code></td></tr>
+        <tr id="RN-16"><td><code class="id">RN-16</code></td><td>A tag é enviada sozinha, com <code>git push origin vX.Y.Z</code>; o envio de todas as tags locais de uma vez (<code>git push --tags</code>) não é usado</td></tr>
       </tbody>
     </table>
+    <aside class="destaque nota">
+      <p>Exemplo: lançar a versão <code>v1.3.0</code> a partir da branch principal. Depois do envio, o CI testa tudo, abre a issue de aprovação e, com o comentário <code>approve</code>, publica as quatro imagens com as tags <code>1.3.0</code>, <code>1.3</code> e <code>latest</code>.</p>
+<pre><code>git checkout master
+git pull
+git describe --tags --abbrev=0                    # última versão, ex.: v1.2.3
+git tag -a v1.3.0 -m "v1.3.0 - cadastro de usuário"
+git push origin v1.3.0</code></pre>
+      <p>Tag criada por engano: comentar <code>deny</code> na issue de aprovação e apagar a tag local e a remota.</p>
+<pre><code>git tag -d v1.3.0
+git push origin :refs/tags/v1.3.0</code></pre>
+    </aside>
   </section>
 
   <section id="requisitos-nao-funcionais">
@@ -846,7 +864,9 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v05</span></td><td>2026-10-11 15:15</td><td>Status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v07</span></td><td>2026-10-11 23:31</td><td>Status → Aprovado</td></tr>
+      <tr><td>v06</td><td>2026-10-11 23:22</td><td>Versão oficial por tag git <code>vX.Y.Z</code>: <code class="id">RN-11</code> a <code class="id">RN-16</code> incluídos, com exemplo de comandos; status → Em revisão</td></tr>
+      <tr><td>v05</td><td>2026-10-11 15:15</td><td>Status → Aprovado</td></tr>
       <tr><td>v04</td><td>2026-10-11 15:11</td><td>Diagrama de exemplo incluído (<code>fluxo-git_v01</code>)</td></tr>
       <tr><td>v03</td><td>2026-10-11 15:02</td><td>Pendência respondida: a branch principal continua <code>master</code>; <code class="id">RN-10</code> incluído; seção Em aberto removida</td></tr>
       <tr><td>v02</td><td>2026-10-11 14:59</td><td>Pendências respondidas: <code class="id">RN-06</code>, <code class="id">RN-07</code> e <code class="id">RN-08</code> alterados (branches <code>tarefa_*</code> e <code>fix_*</code>), <code class="id">RN-09</code>, <code class="id">RNF-41</code> e <code class="id">RNF-42</code> incluídos</td></tr>
@@ -854,7 +874,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v05 · 2026-10-11 15:15</span>
+    <span>boaz · v07 · 2026-10-11 23:31</span>
     <span class="boaz-arquivo">1_Requisitos/02_metodologia-git.html</span>
   </div>
 </footer>
