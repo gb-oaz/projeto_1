@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2112 1004" width="2112" height="1004">
+  <title>Pipeline de CD</title>
+  <desc>Pipeline de CD no GitHub Actions, conforme 1_Requisitos/05_cd-implantacao.html: o fim com sucesso do job publicar do CI dispara o cd.yml por workflow_run; merge na master implanta em homologação e tag vX.Y.Z em produção, uma implantação por ambiente por vez; login na Azure por OIDC, terraform plan com o estado em rg-boaz-tfstate, aprovação manual por issue (approve, deny ou 2 h), terraform apply do plano aprovado e verificação de /health em até 5 min. v01: criação.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+    <symbol id="az-assinatura" viewBox="0 0 18 18"><defs><radialGradient id="az-assinatura-a445c717-9d75-44c7-ba6b-0d8f2383e560" cx="-36.63" cy="17.12" r="11.18" gradientTransform="translate(41.88 -7.4) scale(0.94 0.94)" gradientUnits="userSpaceOnUse"><stop offset="0.27" stop-color="#ffd70f" /><stop offset="0.49" stop-color="#ffcb12" /><stop offset="0.88" stop-color="#feac19" /><stop offset="1" stop-color="#fea11b" /></radialGradient></defs><path id="az-assinatura-e3d1e58c-f78e-4fb5-9857-0c9331da9979" d="M13.56,7.19a2.07,2.07,0,0,0,0-2.93h0L10,.69a2.06,2.06,0,0,0-2.92,0h0L3.52,4.26a2.09,2.09,0,0,0,0,2.93l3,3a.61.61,0,0,1,.17.41v5.52a.7.7,0,0,0,.2.5l1.35,1.35a.45.45,0,0,0,.66,0l1.31-1.31h0l.77-.77a.26.26,0,0,0,0-.38l-.55-.56a.29.29,0,0,1,0-.42l.55-.56a.26.26,0,0,0,0-.38L10.4,13a.28.28,0,0,1,0-.41L11,12a.26.26,0,0,0,0-.38l-.77-.78v-.28Zm-5-5.64A1.18,1.18,0,1,1,7.37,2.73,1.17,1.17,0,0,1,8.54,1.55Z" fill="url(#az-assinatura-a445c717-9d75-44c7-ba6b-0d8f2383e560)" /><path id="az-assinatura-a21a8f7a-61cc-4035-8449-e5c8fe4d4d5e" d="M7.62,16.21h0A.25.25,0,0,0,8,16V11.55a.27.27,0,0,0-.11-.22h0a.25.25,0,0,0-.39.22V16A.27.27,0,0,0,7.62,16.21Z" fill="#ff9300" opacity="0.75" /><rect id="az-assinatura-ecd3189c-fb1e-4a0e-a2b6-ba2f11dda484" x="5.69" y="5.45" width="5.86" height="0.69" rx="0.32" fill="#ff9300" opacity="0.75" /><rect id="az-assinatura-a1949a3c-4818-4bd1-b236-0d970b92fc62" x="5.69" y="6.57" width="5.86" height="0.69" rx="0.32" fill="#ff9300" opacity="0.75" /></symbol>
+    <symbol id="az-entra" viewBox="0 0 18 18"><defs><linearGradient id="az-entra-efeb8e96-2af0-4681-9a6a-45f9b0262f19" x1="-6518.78" y1="1118.86" x2="-6518.78" y2="1090.06" gradientTransform="matrix(0.5, 0, 0, -0.5, 3267.42, 559.99)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#5ea0ef" /><stop offset="0.18" stop-color="#589eed" /><stop offset="0.41" stop-color="#4897e9" /><stop offset="0.66" stop-color="#2e8ce1" /><stop offset="0.94" stop-color="#0a7cd7" /><stop offset="1" stop-color="#0078d4" /></linearGradient></defs><path d="M5.67,10.61H10v4.32H5.67Zm-5-5.76H5V.53H1.23a.6.6,0,0,0-.6.6Zm.6,10.08H5V10.61H.63v3.72A.6.6,0,0,0,1.23,14.93Zm-.6-5H5V5.57H.63Zm10.08,5h3.72a.6.6,0,0,0,.6-.6V10.61H10.71Zm-5-5H10V5.57H5.67Zm5,0H15V5.57H10.71Zm0-9.36V4.85H15V1.13a.6.6,0,0,0-.6-.6Zm-5,4.32H10V.53H5.67Z" fill="url(#az-entra-efeb8e96-2af0-4681-9a6a-45f9b0262f19)" /><polygon points="17.37 10.7 17.37 15.21 13.5 17.47 13.5 12.96 17.37 10.7" fill="#32bedd" /><polygon points="17.37 10.7 13.5 12.97 9.63 10.7 13.5 8.44 17.37 10.7" fill="#9cebff" /><polygon points="13.5 12.97 13.5 17.47 9.63 15.21 9.63 10.7 13.5 12.97" fill="#50e6ff" /><polygon points="9.63 15.21 13.5 12.96 13.5 17.47 9.63 15.21" fill="#9cebff" /><polygon points="17.37 15.21 13.5 12.96 13.5 17.47 17.37 15.21" fill="#50e6ff" /></symbol>
+    <symbol id="az-rg" viewBox="0 0 18 18"><g><g><path d="M.5,15.08a.16.16,0,0,0,.08.14l1.16.65L3.7,17a.17.17,0,0,0,.23-.06l.66-1.12a.16.16,0,0,0-.06-.21l-2.3-1.3a.17.17,0,0,1-.08-.14V3.85a.16.16,0,0,1,.08-.14l2.3-1.3a.16.16,0,0,0,.06-.21L3.93,1.08A.17.17,0,0,0,3.7,1L1.78,2.11l-1.2.67a.16.16,0,0,0-.08.14V15.08Z" fill="#949494" /><path d="M2.14,3.77l.06-.06,2.3-1.3a.14.14,0,0,0,.06-.21L3.9,1.08A.15.15,0,0,0,3.68,1L1.75,2.11.56,2.78s-.05,0-.06.06l.9.51Z" fill="#a3a3a3" /><path d="M4.5,15.59l-2.3-1.3a.22.22,0,0,1-.07-.09l-1.62,1,.05,0,1.15.65,2,1.11a.15.15,0,0,0,.22-.06l.66-1.12A.14.14,0,0,0,4.5,15.59Z" fill="#a3a3a3" /></g><path d="M17.5,15.08a.16.16,0,0,1-.08.14l-1.16.65L14.3,17a.17.17,0,0,1-.23-.06l-.66-1.12a.16.16,0,0,1,.06-.21l2.3-1.3a.17.17,0,0,0,.08-.14V3.85a.16.16,0,0,0-.08-.14l-2.3-1.3a.16.16,0,0,1-.06-.21l.66-1.12A.17.17,0,0,1,14.3,1l1.92,1.09,1.2.67a.16.16,0,0,1,.08.14V15.08Z" fill="#949494" /><path d="M15.86,3.77l-.06-.06-2.3-1.3a.14.14,0,0,1-.06-.21l.66-1.12A.15.15,0,0,1,14.32,1l1.93,1.09,1.19.67s0,0,.06.06l-.9.51Z" fill="#a3a3a3" /><path d="M13.5,15.59l2.3-1.3a.22.22,0,0,0,.07-.09l1.62,1,0,0-1.15.65-2,1.11a.15.15,0,0,1-.22-.06l-.66-1.12A.14.14,0,0,1,13.5,15.59Z" fill="#a3a3a3" /><polygon points="14.31 5.93 14.31 12.07 8.99 15.16 8.99 9.01 14.31 5.93" fill="#32bedd" /><polygon points="14.31 5.93 9 9.02 3.68 5.93 9 2.84 14.31 5.93" fill="#9cebff" /><polygon points="8.99 9.02 8.99 15.16 3.68 12.07 3.68 5.93 8.99 9.02" fill="#50e6ff" /><polygon points="3.68 12.07 8.99 9.01 8.99 15.16 3.68 12.07" fill="#9cebff" /><polygon points="14.31 12.07 8.99 9.01 8.99 15.16 14.31 12.07" fill="#50e6ff" /></g></symbol>
+    <symbol id="az-storage" viewBox="0 0 18 18"><defs><linearGradient id="az-storage-ad4c4f96-09aa-4f91-ba10-5cb8ad530f74" x1="9" y1="15.83" x2="9" y2="5.79" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#b3b3b3" /><stop offset="0.26" stop-color="#c1c1c1" /><stop offset="1" stop-color="#e6e6e6" /></linearGradient></defs><path d="M.5,5.79h17a0,0,0,0,1,0,0v9.48a.57.57,0,0,1-.57.57H1.07a.57.57,0,0,1-.57-.57V5.79A0,0,0,0,1,.5,5.79Z" fill="url(#az-storage-ad4c4f96-09aa-4f91-ba10-5cb8ad530f74)" /><path d="M1.07,2.17H16.93a.57.57,0,0,1,.57.57V5.79a0,0,0,0,1,0,0H.5a0,0,0,0,1,0,0V2.73A.57.57,0,0,1,1.07,2.17Z" fill="#37c2b1" /><path d="M2.81,6.89H15.18a.27.27,0,0,1,.26.27v1.4a.27.27,0,0,1-.26.27H2.81a.27.27,0,0,1-.26-.27V7.16A.27.27,0,0,1,2.81,6.89Z" fill="#fff" /><path d="M2.82,9.68H15.19a.27.27,0,0,1,.26.27v1.41a.27.27,0,0,1-.26.27H2.82a.27.27,0,0,1-.26-.27V10A.27.27,0,0,1,2.82,9.68Z" fill="#37c2b1" /><path d="M2.82,12.5H15.19a.27.27,0,0,1,.26.27v1.41a.27.27,0,0,1-.26.27H2.82a.27.27,0,0,1-.26-.27V12.77A.27.27,0,0,1,2.82,12.5Z" fill="#258277" /></symbol>
+    <symbol id="ic-ator" viewBox="0 0 24 24"><circle class="ico" cx="12" cy="8" r="4"/><path class="ico" d="M4,21 C4,16.5 7.6,14 12,14 C16.4,14 20,16.5 20,21"/></symbol>
+    <symbol id="ic-eventos" viewBox="0 0 24 24"><circle class="ico-fill" cx="12" cy="12" r="2.5"/><path class="ico" d="M7.5,7.5 A6.4,6.4 0 0 0 7.5,16.5 M16.5,7.5 A6.4,6.4 0 0 1 16.5,16.5 M4.5,4.5 A10.6,10.6 0 0 0 4.5,19.5 M19.5,4.5 A10.6,10.6 0 0 1 19.5,19.5"/></symbol>
+    <symbol id="ic-identidade" viewBox="0 0 24 24"><rect class="ico" x="3" y="4" width="18" height="16" rx="2"/><circle class="ico" cx="9" cy="10.5" r="2.5"/><path class="ico" d="M5.5,17 C6,15.2 7.3,14.5 9,14.5 C10.7,14.5 12,15.2 12.5,17 M15,10 H18.5 M15,13.5 H18.5"/></symbol>
+    <symbol id="ic-observabilidade" viewBox="0 0 24 24"><rect class="ico" x="2.5" y="3.5" width="19" height="17" rx="2"/><polyline class="ico" points="5,14 8.5,14 10.5,8.5 13.5,17 15.5,11.5 19,11.5"/></symbol>
+    <symbol id="ic-registro" viewBox="0 0 24 24"><path class="ico" d="M12,3 L21,7.5 L12,12 L3,7.5 Z M3,12 L12,16.5 L21,12 M3,16.5 L12,21 L21,16.5"/></symbol>
+    <symbol id="ic-servico" viewBox="0 0 24 24"><rect class="ico" x="3" y="4" width="18" height="7" rx="1.5"/><rect class="ico" x="3" y="13" width="18" height="7" rx="1.5"/><circle class="ico-fill" cx="6.5" cy="7.5" r="0.9"/><circle class="ico-fill" cx="6.5" cy="16.5" r="0.9"/><path class="ico" d="M10,7.5 H17 M10,16.5 H17"/></symbol>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="2112" height="1004"/>
+
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="2112" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="2112" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · PIPELINE DE CD</text>
+    <text class="title" x="40" y="72">Pipeline de CD</text>
+    <text class="subtitle" x="40" y="94">Do fim do CI, com as imagens publicadas, à implantação aprovada em homologação ou produção na Azure · 05_cd-implantacao</text>
+    <text class="wm-meta-label" x="1824" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1824" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1848" y="71" text-anchor="middle">v01</text>
+    <line class="wm-sep" x1="1896" y1="32" x2="1896" y2="80"/>
+    <text class="wm-meta-label" x="1920" y="44">DATA</text>
+    <text class="wm-meta-value" x="1920" y="72">2026-10-13 · 22:56</text>
+  </g>
+
+  <g id="fronteiras">
+    <rect class="boundary" x="320" y="304" width="1744" height="248" rx="14"/><text class="boundary-label" x="338" y="328">GITHUB ACTIONS · CD · .github/workflows/cd.yml</text>
+    <rect class="boundary" x="608" y="600" width="1456" height="208" rx="14"/><use href="#az-assinatura" x="624" y="609" width="18" height="18"/><text class="boundary-label" x="650" y="623">ASSINATURA AZURE</text>
+  </g>
+
+  <g id="ci" filter="url(#sombra)"><rect class="node-green" x="40" y="360" width="216" height="160" rx="10"/><use href="#ic-eventos" x="56" y="376" width="24" height="24"/><text class="label-strong" x="92" y="390">CI · ci.yml</text><text class="mono" x="92" y="410">[publicar: sucesso]</text><text class="muted" x="56" y="436">master → sha-&lt;commit&gt;</text><text class="muted" x="56" y="454">tag vX.Y.Z → X.Y.Z</text><text class="muted" x="56" y="472">imagens publicadas</text></g>
+  <g id="gatilho" filter="url(#sombra)"><rect class="node-green" x="352" y="360" width="240" height="160" rx="10"/><use href="#ic-eventos" x="368" y="376" width="24" height="24"/><text class="label-strong" x="404" y="390">Gatilho</text><text class="mono" x="404" y="410">[workflow_run]</text><text class="muted" x="368" y="436">master → homologação</text><text class="muted" x="368" y="454">tag vX.Y.Z → produção</text><text class="muted" x="368" y="472">fila: 1 por ambiente</text></g>
+  <g id="login" filter="url(#sombra)"><rect class="node-blue" x="640" y="360" width="240" height="160" rx="10"/><use href="#ic-identidade" x="656" y="376" width="24" height="24"/><text class="label-strong" x="692" y="390">Login na Azure</text><text class="mono" x="692" y="410">[OIDC · sem segredo]</text><text class="muted" x="656" y="436">environment azure-hml</text><text class="muted" x="656" y="454">ou azure-prd</text></g>
+  <g id="plan" filter="url(#sombra)"><rect class="node-blue" x="928" y="360" width="240" height="160" rx="10"/><use href="#ic-servico" x="944" y="376" width="24" height="24"/><text class="label-strong" x="980" y="390">terraform plan</text><text class="mono" x="980" y="410">[&lt;amb&gt;.tfvars]</text><text class="muted" x="944" y="436">tags novas + já implantadas</text><text class="muted" x="944" y="454">plano salvo como artefato</text></g>
+  <g id="aprovacao" filter="url(#sombra)"><rect class="node-green" x="1216" y="360" width="240" height="160" rx="10"/><use href="#ic-identidade" x="1232" y="376" width="24" height="24"/><text class="label-strong" x="1268" y="390">Aprovação manual</text><text class="mono" x="1268" y="410">[issue no repositório]</text><text class="muted" x="1232" y="436">ambiente · imagens · plano</text><text class="muted" x="1232" y="454">approve: segue</text><text class="muted" x="1232" y="472">deny ou 2 h: cancela</text></g>
+  <g id="apply" filter="url(#sombra)"><rect class="node-blue" x="1504" y="360" width="240" height="160" rx="10"/><use href="#ic-servico" x="1520" y="376" width="24" height="24"/><text class="label-strong" x="1556" y="390">terraform apply</text><text class="mono" x="1556" y="410">[plano aprovado]</text><text class="muted" x="1520" y="436">estado mudou: falha</text><text class="muted" x="1520" y="454">nova revisão por aplicação</text></g>
+  <g id="verificacao" filter="url(#sombra)"><rect class="node-green" x="1792" y="360" width="240" height="160" rx="10"/><use href="#ic-observabilidade" x="1808" y="376" width="24" height="24"/><text class="label-strong" x="1844" y="390">Verificação</text><text class="mono" x="1844" y="410">[/health · ≤ 5 min]</text><text class="muted" x="1808" y="436">pronta: recebe tráfego</text><text class="muted" x="1808" y="454">falhou: anterior segue</text><text class="muted" x="1808" y="472">execução falha</text></g>
+  <g id="dono" filter="url(#sombra)"><rect class="node-external" x="1216" y="152" width="240" height="112" rx="10"/><use href="#ic-ator" x="1232" y="168" width="24" height="24"/><text class="label-strong" x="1268" y="182">Dono do repositório</text><text class="mono" x="1268" y="202">[GitHub]</text><text class="muted" x="1232" y="228">comenta approve ou deny</text></g>
+  <g id="entra" filter="url(#sombra)"><rect class="node-purple" x="640" y="648" width="240" height="128" rx="10"/><use href="#az-entra" x="656" y="664" width="24" height="24"/><text class="label-strong" x="692" y="678">Entra ID</text><text class="mono" x="692" y="698">[credencial federada]</text><text class="muted" x="656" y="724">1 identidade por ambiente</text></g>
+  <g id="tfstate" filter="url(#sombra)"><rect class="node-purple" x="928" y="648" width="240" height="128" rx="10"/><use href="#az-storage" x="944" y="664" width="24" height="24"/><text class="label-strong" x="980" y="678">Storage account</text><text class="mono" x="980" y="698">[rg-boaz-tfstate]</text><text class="muted" x="944" y="724">hml.tfstate · prd.tfstate</text><text class="muted" x="944" y="742">trava por lease</text></g>
+  <g id="rg-hml" filter="url(#sombra)"><rect class="node-purple" x="1504" y="648" width="240" height="128" rx="10"/><use href="#az-rg" x="1520" y="664" width="24" height="24"/><text class="label-strong" x="1556" y="678">rg-boaz-hml</text><text class="mono" x="1556" y="698">[homologação]</text><text class="muted" x="1520" y="724">Container Apps 1–2</text><text class="muted" x="1520" y="742">réplicas</text></g>
+  <g id="rg-prd" filter="url(#sombra)"><rect class="node-purple" x="1792" y="648" width="240" height="128" rx="10"/><use href="#az-rg" x="1808" y="664" width="24" height="24"/><text class="label-strong" x="1844" y="678">rg-boaz-prd</text><text class="mono" x="1844" y="698">[produção]</text><text class="muted" x="1808" y="724">Container Apps 1–5</text><text class="muted" x="1808" y="742">réplicas</text></g>
+  <g id="docker-hub" filter="url(#sombra)"><rect class="node-external" x="40" y="648" width="216" height="128" rx="10"/><use href="#ic-registro" x="56" y="664" width="24" height="24"/><text class="label-strong" x="92" y="678">Docker Hub</text><text class="mono" x="92" y="698">[gustavoboaz]</text><text class="muted" x="56" y="724">4 repositórios públicos</text></g>
+
+  <g id="arestas">
+    <line class="edge-accent" x1="256" y1="440" x2="350" y2="440" marker-end="url(#seta-destaque)"/>
+    <rect class="edge-label-bg" x="257" y="416" width="92" height="16"/><text class="muted" x="303" y="428" text-anchor="middle">workflow_run</text>
+    <line class="edge-accent" x1="592" y1="440" x2="638" y2="440" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="880" y1="440" x2="926" y2="440" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="1168" y1="440" x2="1214" y2="440" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="1456" y1="440" x2="1502" y2="440" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="1744" y1="440" x2="1790" y2="440" marker-end="url(#seta-destaque)"/>
+    <rect class="edge-label-bg" x="1451" y="416" width="58" height="16"/><text class="muted" x="1480" y="428" text-anchor="middle">approve</text>
+    <line class="edge" x1="148" y1="520" x2="148" y2="646" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="155" y="576" width="120" height="16"/><text class="muted" x="160" y="588">push das imagens</text>
+    <line class="edge" x1="820" y1="520" x2="820" y2="646" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="827" y="568" width="79" height="16"/><text class="muted" x="832" y="580">token OIDC</text>
+    <line class="edge" x1="1048" y1="520" x2="1048" y2="646" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="1055" y="568" width="106" height="16"/><text class="muted" x="1060" y="580">estado · trava</text>
+    <line class="edge" x1="1300" y1="360" x2="1300" y2="266" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="1214" y="276" width="79" height="16"/><text class="muted" x="1288" y="288" text-anchor="end">abre issue</text>
+    <line class="edge edge-async" x1="1372" y1="264" x2="1372" y2="358" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="1379" y="276" width="106" height="16"/><text class="muted" x="1384" y="288">approve · deny</text>
+    <line class="edge" x1="1600" y1="520" x2="1600" y2="646" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="1607" y="608" width="113" height="16"/><text class="muted" x="1612" y="620">merge na master</text>
+    <path class="edge" d="M1696,520 V576 H1856 V646" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="1863" y="560" width="79" height="16"/><text class="muted" x="1868" y="572">tag vX.Y.Z</text>
+    <path class="edge edge-data" d="M148,776 V848 H1912 V778" marker-end="url(#seta)"/>
+    <line class="edge edge-data" x1="1624" y1="848" x2="1624" y2="778" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="923" y="840" width="410" height="16"/><text class="muted" x="928" y="852">pull das imagens pelo Container Apps, com token de leitura</text>
+  </g>
+
+  <g id="marca-rodape" transform="translate(0,888)">
+    <rect class="wm-band" x="0" y="0" width="2112" height="116"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="2112" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-green" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">Controle do pipeline</text>
+    <rect class="node-blue" x="232" y="47" width="14" height="14" rx="3"/><text class="label" x="254" y="58">Terraform na Azure</text>
+    <rect class="node-purple" x="409" y="47" width="14" height="14" rx="3"/><text class="label" x="431" y="58">Recurso Azure</text>
+    <rect class="node-external" x="551" y="47" width="14" height="14" rx="3"/><text class="label" x="573" y="58">Pessoa ou serviço externo</text>
+    <line class="edge-accent" x1="778" y1="54" x2="806" y2="54" marker-end="url(#seta-destaque)"/><text class="label" x="818" y="58">fluxo do CD</text>
+    <line class="edge" x1="924" y1="54" x2="952" y2="54" marker-end="url(#seta)"/><text class="label" x="964" y="58">chamada ou implantação</text>
+    <line class="edge edge-async" x1="1148" y1="54" x2="1176" y2="54" marker-end="url(#seta)"/><text class="label" x="1188" y="58">resposta da aprovação</text>
+    <line class="edge edge-data" x1="1365" y1="54" x2="1393" y2="54" marker-end="url(#seta)"/><text class="label" x="1405" y="58">pull das imagens</text>
+    <line class="divider" x1="40" y1="76" x2="2072" y2="76"/>
+    <text class="footer" x="40" y="100">v01 · CD disparado pelo CI; plan, aprovação manual por issue, apply e verificação por ambiente</text>
+    <text class="wm-file" x="2072" y="100" text-anchor="end">pipeline-cd_v01_20261013-2256.svg</text>
+  </g>
+</svg>
