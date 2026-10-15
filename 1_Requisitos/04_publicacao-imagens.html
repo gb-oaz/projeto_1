@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Publicação das imagens · boaz · v09</title>
+<title>Publicação das imagens · boaz · v10</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="04_publicacao-imagens">
 <meta name="boaz:caminho" content="1_Requisitos/04_publicacao-imagens.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v09">
-<meta name="boaz:data" content="2026-10-11 22:24">
+<meta name="boaz:versao" content="v10">
+<meta name="boaz:data" content="2026-10-15 00:19">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -791,8 +791,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir quais imagens Docker o CI gera, quando e com quais tags elas são enviadas ao Docker Hub, quem aprova o envio e como o CI se autentica.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>04_publicacao-imagens</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 22:24</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v10</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-15 · 00:19</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -821,7 +821,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RNF-44"><td><code class="id">RNF-44</code></td><td><span class="tag">Publicação</span></td><td>A publicação segue quando o dono do repositório comenta <code>approve</code> na issue de aprovação; basta 1 aprovação, e o autor do push pode aprovar</td></tr>
         <tr id="RNF-45"><td><code class="id">RNF-45</code></td><td><span class="tag">Publicação</span></td><td>O comentário <code>deny</code> na issue, ou 2 horas sem resposta, cancela a publicação sem enviar nenhuma imagem</td></tr>
         <tr id="RNF-46"><td><code class="id">RNF-46</code></td><td><span class="tag">Publicação</span></td><td>Na tag <code>vX.Y.Z</code>, o CI confere que o commit da tag está na branch principal antes de pedir aprovação; fora dela, a execução falha sem publicar</td></tr>
-        <tr id="RNF-33"><td><code class="id">RNF-33</code></td><td><span class="tag">Publicação</span></td><td>O CI se autentica no Docker Hub com um token de acesso pessoal da conta <code>gustavoboaz</code>, com permissão de leitura e escrita, guardado em <code>DOCKERHUB_USERNAME</code> e <code>DOCKERHUB_TOKEN</code> no environment <code>dockerhub</code> do GitHub, restrito à branch principal e às tags <code>v*</code></td></tr>
+        <tr id="RNF-33"><td><code class="id">RNF-33</code></td><td><span class="tag">Publicação</span></td><td>O CI se autentica no Docker Hub com um token de acesso pessoal da conta <code>gustavoboaz</code>, com permissão de leitura e escrita, guardado em <code>DOCKERHUB_USERNAME</code> e <code>DOCKERHUB_TOKEN</code> no environment <code>dockerhub-publish</code> do GitHub, restrito à branch principal e às tags <code>v*</code></td></tr>
       </tbody>
     </table>
   </section>
@@ -829,8 +829,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../3_Arquitetura/pipeline-ci_v07_20261011-2220.svg"><img src="../3_Arquitetura/pipeline-ci_v07_20261011-2220.svg" alt="Pipeline de CI no monorepo: push e pull request em qualquer branch passam pela detecção de mudanças, que dispara só os jobs Linux dos componentes alterados, com testes unitários e de integração; PR e merge na principal disparam iOS em macOS; com os jobs disparados verdes, merge e tag na branch principal pedem aprovação manual por issue no repositório e, aprovados, geram e publicam as imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub; branches de tarefa e de correção não geram imagem"></a>
-      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v07_20261011-2220.svg</code></figcaption>
+      <a href="../3_Arquitetura/pipeline-ci_v08_20261015-0019.svg"><img src="../3_Arquitetura/pipeline-ci_v08_20261015-0019.svg" alt="Pipeline de CI no monorepo: push e pull request em qualquer branch passam pela detecção de mudanças, que dispara só os jobs Linux dos componentes alterados, com testes unitários e de integração; PR e merge na principal disparam iOS em macOS; com os jobs disparados verdes, merge e tag na branch principal pedem aprovação manual por issue no repositório e, aprovados, geram e publicam as imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub; branches de tarefa e de correção não geram imagem"></a>
+      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v08_20261015-0019.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -840,7 +840,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v09</span></td><td>2026-10-11 22:24</td><td>Status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v10</span></td><td>2026-10-15 00:19</td><td><code class="id">RNF-33</code> alterado: environment <code>dockerhub-publish</code>, o nome existente no GitHub e usado pelo CI; diagrama atualizado para <code>pipeline-ci_v08</code></td></tr>
+      <tr><td>v09</td><td>2026-10-11 22:24</td><td>Status → Aprovado</td></tr>
       <tr><td>v08</td><td>2026-10-11 22:21</td><td>Aprovação manual antes da publicação: <code class="id">RNF-43</code> a <code class="id">RNF-46</code> incluídos; <code class="id">RNF-33</code> alterado (environment <code>dockerhub</code> também nas tags <code>v*</code>); diagrama atualizado para <code>pipeline-ci_v07</code>; status → Em revisão</td></tr>
       <tr><td>v07</td><td>2026-10-11 15:15</td><td>Status → Aprovado</td></tr>
       <tr><td>v06</td><td>2026-10-11 15:02</td><td><code class="id">RNF-29</code> alterado: tag de imagem <code>master</code> no lugar de <code>main</code>; diagrama atualizado para <code>pipeline-ci_v06</code></td></tr>
@@ -852,7 +853,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v09 · 2026-10-11 22:24</span>
+    <span>boaz · v10 · 2026-10-15 00:19</span>
     <span class="boaz-arquivo">1_Requisitos/04_publicacao-imagens.html</span>
   </div>
 </footer>

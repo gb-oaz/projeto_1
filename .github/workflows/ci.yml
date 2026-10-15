@@ -43,7 +43,7 @@
 #   5_DEV/frontend/web_<app>/Dockerfile   imagem frontend-<app> (_ vira -),
 #                                         ex.: web_landing_page → frontend-landing-page
 #
-# Configuração no GitHub (Settings → Environments → dockerhub), RNF-33:
+# Configuração no GitHub (Settings → Environments → dockerhub-publish), RNF-33:
 #   - secrets DOCKERHUB_USERNAME e DOCKERHUB_TOKEN (token de leitura e escrita)
 #   - Deployment branches and tags: branch "master" e tag "v*"
 # =============================================================================
@@ -468,14 +468,14 @@ jobs:
   # Tags geradas (docker/metadata-action):
   #   push na master   sha-<commit curto> e master                (RNF-29)
   #   tag vX.Y.Z       X.Y.Z, X.Y e latest                        (RNF-30)
-  # As credenciais vêm do environment "dockerhub", restrito à master e às
+  # As credenciais vêm do environment "dockerhub-publish", restrito à master e às
   # tags v* (RNF-33).
   # ===========================================================================
   publicar:
     name: Publicar · ${{ matrix.imagem.nome }}
     needs: [mudancas, aprovacao]
     runs-on: ubuntu-latest
-    environment: dockerhub
+    environment: dockerhub-publish
     permissions:
       contents: read
     strategy:

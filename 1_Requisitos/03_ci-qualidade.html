@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CI e qualidade · boaz · v14</title>
+<title>CI e qualidade · boaz · v15</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="03_ci-qualidade">
 <meta name="boaz:caminho" content="1_Requisitos/03_ci-qualidade.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v14">
-<meta name="boaz:data" content="2026-10-11 22:23">
+<meta name="boaz:versao" content="v15">
+<meta name="boaz:data" content="2026-10-15 00:21">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -791,8 +791,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir onde e quando o CI roda e quais testes e verificações de qualidade reprovam um build.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>03_ci-qualidade</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v14</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 22:23</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v15</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-15 · 00:21</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -841,8 +841,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../3_Arquitetura/pipeline-ci_v07_20261011-2220.svg"><img src="../3_Arquitetura/pipeline-ci_v07_20261011-2220.svg" alt="Pipeline de CI no monorepo: push e pull request em qualquer branch passam pela detecção de mudanças, que dispara só os jobs Linux dos componentes alterados, com testes unitários e de integração; PR e merge na principal disparam iOS em macOS; com os jobs disparados verdes, merge e tag na branch principal pedem aprovação manual por issue no repositório e, aprovados, publicam as imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub; branches de tarefa e de correção não geram imagem"></a>
-      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v07_20261011-2220.svg</code></figcaption>
+      <a href="../3_Arquitetura/pipeline-ci_v08_20261015-0019.svg"><img src="../3_Arquitetura/pipeline-ci_v08_20261015-0019.svg" alt="Pipeline de CI no monorepo: push e pull request em qualquer branch passam pela detecção de mudanças, que dispara só os jobs Linux dos componentes alterados, com testes unitários e de integração; PR e merge na principal disparam iOS em macOS; com os jobs disparados verdes, merge e tag na branch principal pedem aprovação manual por issue no repositório e, aprovados, publicam as imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub; branches de tarefa e de correção não geram imagem"></a>
+      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v08_20261015-0019.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -852,7 +852,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v14</span></td><td>2026-10-11 22:23</td><td>Diagrama atualizado para <code>pipeline-ci_v07</code> (aprovação manual antes da publicação, <a class="ref" href="04_publicacao-imagens.html#RNF-43">Publicação das imagens <code class="id">RNF-43</code></a>); status mantido Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v15</span></td><td>2026-10-15 00:21</td><td>Diagrama atualizado para <code>pipeline-ci_v08</code> (environment do token do Docker Hub: <code>dockerhub-publish</code>)</td></tr>
+      <tr><td>v14</td><td>2026-10-11 22:23</td><td>Diagrama atualizado para <code>pipeline-ci_v07</code> (aprovação manual antes da publicação, <a class="ref" href="04_publicacao-imagens.html#RNF-43">Publicação das imagens <code class="id">RNF-43</code></a>); status mantido Aprovado</td></tr>
       <tr><td>v13</td><td>2026-10-11 15:15</td><td>Status → Aprovado</td></tr>
       <tr><td>v12</td><td>2026-10-11 15:02</td><td>Diagrama atualizado para <code>pipeline-ci_v06</code> (tag de imagem <code>master</code>)</td></tr>
       <tr><td>v11</td><td>2026-10-11 14:59</td><td>Diagrama atualizado para <code>pipeline-ci_v05</code> (branches <code>tarefa_*</code> e <code>fix_*</code>)</td></tr>
@@ -861,11 +862,10 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <tr><td>v08</td><td>2026-10-11 04:46</td><td>Status → Aprovado</td></tr>
       <tr><td>v07</td><td>2026-10-11 04:39</td><td>Visual atualizado para o tema v04</td></tr>
       <tr><td>v06</td><td>2026-10-11 04:36</td><td>Documento dividido: <code class="id">RNF-27</code> a <code class="id">RNF-33</code> e a pendência do Docker Hub movidos para <code>03_publicacao-imagens</code></td></tr>
-      <tr><td>v05</td><td>2026-10-11 04:32</td><td>Pendências de DevOps respondidas: <code class="id">RNF-27</code> alterado (quatro imagens), <code class="id">RNF-32</code> e <code class="id">RNF-33</code> incluídos; 1 pendência nova; diagrama atualizado para <code>pipeline-ci_v03</code></td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v14 · 2026-10-11 22:23</span>
+    <span>boaz · v15 · 2026-10-15 00:21</span>
     <span class="boaz-arquivo">1_Requisitos/03_ci-qualidade.html</span>
   </div>
 </footer>
