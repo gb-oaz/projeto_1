@@ -1,0 +1,163 @@
+# =============================================================================
+# CD · implantação num ambiente — chamado por cd.yml
+# Requisito 1_Requisitos/05_cd-implantacao.html: RNF-48 a RNF-54, RN-21
+#
+#   terraform plan → issue de aprovação → terraform apply → verificação
+#
+# Tudo roda no mesmo job: o plano fica só no disco do executor e é aplicado
+# exatamente como aprovado (RNF-51). Ele não vira artefato porque contém os
+# segredos que o Terraform grava no Key Vault e o repositório é público (RNF-48).
+# =============================================================================
+
+name: CD · ambiente
+
+on:
+  workflow_call:
+    inputs:
+      ambiente:
+        description: hml ou prd
+        type: string
+        required: true
+      tag:
+        description: tag das imagens publicadas (sha-<commit> ou X.Y.Z)
+        type: string
+        required: true
+      imagens:
+        description: lista JSON das imagens publicadas na execução do CI
+        type: string
+        required: true
+      sha:
+        description: commit implantado
+        type: string
+        required: true
+
+jobs:
+  implantar:
+    name: Implantar · ${{ inputs.ambiente }}
+    runs-on: ubuntu-latest
+    environment: azure-${{ inputs.ambiente }}
+    # Uma implantação por ambiente por vez; a seguinte espera (RNF-53)
+    concurrency:
+      group: cd-${{ inputs.ambiente }}
+      cancel-in-progress: false
+    timeout-minutes: 180 # 2 h de aprovação + plan, apply e verificação
+    permissions:
+      contents: read
+      id-token: write
+      issues: write
+    env:
+      AMB: ${{ inputs.ambiente }}
+      RG: deb-boaz-app-${{ inputs.ambiente }}_rg
+      TF_IN_AUTOMATION: "true"
+      # Login OIDC, sem segredo de cliente (RNF-52)
+      ARM_USE_OIDC: "true"
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      # Segredo só como variável de ambiente; o Terraform o grava no Key Vault (RN-24)
+      TF_VAR_dockerhub_token: ${{ secrets.DOCKERHUB_READ_TOKEN }}
+      TF_VAR_alerta_email: ${{ vars.ALERTA_EMAIL }}
+    defaults:
+      run:
+        working-directory: 4_CI_CD/terraform/infra # módulo raiz; valores em ../ambientes/<amb>/
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.sha }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.6 # RNF-57, igual a infra/versions.tf
+          terraform_wrapper: false
+
+      - name: terraform init
+        run: terraform init -input=false -backend-config="../ambientes/$AMB/backend.hcl"
+
+      # RN-21: quem tem imagem nova recebe a tag desta execução; os demais
+      # mantêm a tag que já está implantada (saída "imagens" do estado)
+      - name: Tags das imagens
+        env:
+          TAG: ${{ inputs.tag }}
+          IMAGENS: ${{ inputs.imagens }}
+        run: |
+          atuais=$(terraform output -json imagens 2>/dev/null || echo '{}')
+          jq -n --argjson atuais "$atuais" --argjson novas "$IMAGENS" --arg tag "$TAG" \
+            '{imagens: ($atuais + ([$novas[] | {key: ., value: $tag}] | from_entries))}' \
+            | tee imagens.auto.tfvars.json
+
+      - name: terraform plan
+        id: plan
+        run: |
+          terraform plan -input=false -lock-timeout=10m -var-file="../ambientes/$AMB/variaveis.tfvars" -out=tfplan
+          # Resumo sem valores, para a issue de aprovação
+          {
+            echo 'resumo<<FIM'
+            terraform show -no-color tfplan | grep -E '^Plan:|^No changes' || true
+            echo
+            terraform show -no-color tfplan | grep -E '^  # ' | sed 's/^  # /- `/; s/ will be /` será /; s/ must be /` precisa ser /' || true
+            echo 'FIM'
+          } >>"$GITHUB_OUTPUT"
+
+      # RNF-49 e RNF-50: issue com ambiente, imagens e plano; approve, deny ou 2 h
+      - name: Aprovação manual
+        uses: trstringer/manual-approval@v1
+        timeout-minutes: 120
+        with:
+          secret: ${{ github.token }}
+          approvers: ${{ vars.APROVADORES || 'GustavoBoaz' }}
+          minimum-approvals: 1
+          exclude-workflow-initiator-as-approver: false
+          issue-title: "Implantar em ${{ inputs.ambiente }} · ${{ inputs.tag }}"
+          issue-body: |
+            O CI publicou as imagens e o plano do Terraform para **${{ inputs.ambiente }}** está pronto.
+
+            **Imagens com a tag `${{ inputs.tag }}`:** `${{ inputs.imagens }}`
+
+            **Plano**
+
+            ${{ steps.plan.outputs.resumo }}
+
+            Commit: ${{ inputs.sha }}
+            Execução: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Comente **approve** para implantar ou **deny** para cancelar.
+
+      # RNF-51: aplica o plano aprovado; se o estado mudou depois dele, falha
+      - name: terraform apply
+        run: terraform apply -input=false -lock-timeout=10m tfplan
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      # RNF-54: a revisão nova de cada aplicação implantada fica pronta em até
+      # 5 min; senão, a anterior segue atendendo e a execução falha
+      - name: Verificação
+        env:
+          IMAGENS: ${{ inputs.imagens }}
+        run: |
+          falhou=0
+          for app in $(jq -r '.[]' <<<"$IMAGENS"); do
+            pronta=""
+            for _ in $(seq 1 30); do
+              read -r ultima pronta_rev < <(az containerapp show -n "$app" -g "$RG" \
+                --query "[properties.latestRevisionName, properties.latestReadyRevisionName]" -o tsv | tr '\n' ' ')
+              if [ -n "$ultima" ] && [ "$ultima" = "$pronta_rev" ]; then pronta=1; break; fi
+              sleep 10
+            done
+            if [ -n "$pronta" ]; then
+              echo "✔ $app: revisão $ultima pronta"
+            else
+              echo "::error::$app: revisão $ultima não ficou pronta em 5 min; a anterior continua atendendo"
+              falhou=1
+            fi
+          done
+          exit $falhou
+
+      - name: Endereços
+        if: always()
+        run: |
+          terraform output -json enderecos 2>/dev/null \
+            | jq -r 'to_entries[] | "- \(.key): \(.value)"' >>"$GITHUB_STEP_SUMMARY" || true

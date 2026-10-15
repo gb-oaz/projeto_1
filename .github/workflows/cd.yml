@@ -1,0 +1,129 @@
+# =============================================================================
+# CD — requisito 1_Requisitos/05_cd-implantacao.html
+# =============================================================================
+#
+# Visão geral do fluxo:
+#
+#   CI concluído com sucesso (workflow_run)          RNF-47
+#           │
+#           ▼
+#     ┌──────────┐  1. confere se algum job "Publicar · <imagem>" passou
+#     │ preparar │  2. merge na master → tag sha-<commit>   (RN-18)
+#     └────┬─────┘     tag vX.Y.Z      → tag X.Y.Z          (RN-19)
+#          ▼
+#     ┌──────────────┐  plan → aprovação (issue) → apply → verificação
+#     │ homologacao  │  (.github/workflows/cd-ambiente.yml)
+#     └────┬─────────┘
+#          │  só na tag vX.Y.Z, depois de homologação implantada e
+#          ▼  verificada (RN-25)
+#     ┌──────────────┐
+#     │  producao    │  mesmas etapas, com aprovação própria (RN-20)
+#     └──────────────┘
+#
+# Configuração no GitHub (Settings → Environments), RNF-52:
+#   azure-hml e azure-prd: variáveis AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID e
+#   AZURE_CLIENT_ID; secret DOCKERHUB_READ_TOKEN; Deployment branches: master
+#   (o workflow_run sempre roda a partir da branch principal).
+#   Variável do repositório ALERTA_EMAIL (orçamento, RNF-84).
+#   A identidade de cada ambiente é criada por 4_CI_CD/terraform/scripts/bootstrap.sh.
+# =============================================================================
+
+name: CD
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  # ===========================================================================
+  # JOB 1 · preparar — decide se há o que implantar, com qual tag e onde
+  # ===========================================================================
+  preparar:
+    name: Preparar
+    # Só push na master ou tag, com o CI verde (o CI só publica nesses casos)
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read # lê os jobs da execução do CI
+    outputs:
+      imagens: ${{ steps.info.outputs.imagens }}
+      tag: ${{ steps.info.outputs.tag }}
+      producao: ${{ steps.info.outputs.producao }}
+      implantar: ${{ steps.info.outputs.implantar }}
+    steps:
+      - id: info
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          REF: ${{ github.event.workflow_run.head_branch }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          # Imagens publicadas nesta execução: jobs "Publicar · <imagem>" com sucesso
+          imagens=$(gh api --paginate "repos/$REPO/actions/runs/$RUN_ID/jobs?per_page=100" \
+            --jq '[.jobs[] | select(.name | startswith("Publicar · ")) | select(.conclusion == "success") | .name | sub("^Publicar · "; "")]' \
+            | jq -cs 'add // []')
+          echo "imagens=$imagens" >>"$GITHUB_OUTPUT"
+
+          if [[ "$REF" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "tag=${BASH_REMATCH[1]}" >>"$GITHUB_OUTPUT"   # RN-19
+            echo "producao=true" >>"$GITHUB_OUTPUT"
+          elif [ "$REF" = master ]; then
+            echo "tag=sha-${SHA::7}" >>"$GITHUB_OUTPUT"         # RN-18
+            echo "producao=false" >>"$GITHUB_OUTPUT"
+          else
+            echo "::notice::$REF não é a master nem uma tag vX.Y.Z: nada a implantar"
+            echo "implantar=false" >>"$GITHUB_OUTPUT"; exit 0
+          fi
+
+          if [ "$imagens" = "[]" ]; then
+            echo "::notice::Nenhuma imagem publicada nesta execução: nada a implantar"
+            echo "implantar=false" >>"$GITHUB_OUTPUT"
+          else
+            echo "::notice::Imagens a implantar: $imagens"
+            echo "implantar=true" >>"$GITHUB_OUTPUT"
+          fi
+
+  # ===========================================================================
+  # JOB 2 · homologacao — merge na master e primeira etapa da tag
+  # ===========================================================================
+  homologacao:
+    name: Homologação
+    needs: preparar
+    if: needs.preparar.outputs.implantar == 'true'
+    uses: ./.github/workflows/cd-ambiente.yml
+    permissions:
+      contents: read
+      id-token: write # login OIDC na Azure
+      issues: write   # issue de aprovação
+    with:
+      ambiente: hml
+      tag: ${{ needs.preparar.outputs.tag }}
+      imagens: ${{ needs.preparar.outputs.imagens }}
+      sha: ${{ github.event.workflow_run.head_sha }}
+    secrets: inherit
+
+  # ===========================================================================
+  # JOB 3 · producao — segunda etapa da tag, só com homologação verificada
+  # ===========================================================================
+  producao:
+    name: Produção
+    needs: [preparar, homologacao]
+    if: needs.preparar.outputs.producao == 'true'
+    uses: ./.github/workflows/cd-ambiente.yml
+    permissions:
+      contents: read
+      id-token: write
+      issues: write
+    with:
+      ambiente: prd
+      tag: ${{ needs.preparar.outputs.tag }}
+      imagens: ${{ needs.preparar.outputs.imagens }}
+      sha: ${{ github.event.workflow_run.head_sha }}
+    secrets: inherit

@@ -3,8 +3,8 @@
 # Preparação única de um ambiente na Azure, antes do primeiro terraform apply
 # Requisito: 1_Requisitos/05_cd-implantacao.html (RNF-52, RNF-56, RNF-90)
 #
-# Uso:   ./4_CI_CD/terraform/bootstrap.sh hml
-#        ./4_CI_CD/terraform/bootstrap.sh prd
+# Uso:   ./4_CI_CD/terraform/scripts/bootstrap.sh hml
+#        ./4_CI_CD/terraform/scripts/bootstrap.sh prd
 #
 # Pré-requisito: az login com uma conta Owner da assinatura e com permissão de
 # criar App Registrations no Entra ID. A assinatura e o grupo de recursos já
@@ -22,13 +22,15 @@ set -euo pipefail
 
 AMB="${1:-}"
 case "$AMB" in
-  hml) SUB=19c9cb64-187f-4ae4-8d7e-efb8551a58c1 ;;
-  prd) SUB=355d8687-8dd2-49ff-ac99-58fb43852843 ;;
+  hml | prd) ;;
   *) echo "uso: $0 hml|prd" >&2; exit 1 ;;
 esac
 
-TENANT=131c5e9b-191f-4b06-b998-f893a1f7a898
-REPO=gb-oaz/projeto_1
+# Nenhum ID fica no repositório: tudo vem do az login e do git remote
+SUB=$(az account list --query "[?name=='deb-boaz-app-$AMB'].id | [0]" -o tsv)
+[ -n "$SUB" ] || { echo "assinatura deb-boaz-app-$AMB não encontrada no az login" >&2; exit 1; }
+TENANT=$(az account list --query "[?id=='$SUB'].tenantId | [0]" -o tsv)
+REPO=$(git config --get remote.origin.url | sed -E 's#^(git@github.com:|https://github.com/)##; s#\.git$##')
 REGIAO=brazilsouth
 RG="deb-boaz-app-${AMB}_rg"
 ST="debboazapp${AMB}tfstate"
