@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2112 1004" width="2112" height="1004">
   <title>Pipeline de CD</title>
-  <desc>Pipeline de CD no GitHub Actions, conforme 1_Requisitos/05_cd-implantacao.html: o fim com sucesso do job publicar do CI dispara o cd.yml por workflow_run; merge na master implanta em homologação e tag vX.Y.Z em homologação e depois em produção, uma implantação por ambiente por vez; login na Azure por OIDC, terraform plan com o estado em storage account de cada assinatura, aprovação manual por issue (approve, deny ou 2 h), terraform apply do plano aprovado e verificação de /health em até 5 min. v01: criação. v02: a tag vX.Y.Z implanta primeiro em homologação e, verificada, em produção, com uma aprovação por ambiente. v03: assinaturas deb-boaz-app-hml e deb-boaz-app-prd, grupos deb-boaz-app-&lt;amb&gt;_rg e estado do Terraform em cada assinatura.</desc>
+  <desc>Pipeline de CD no GitHub Actions, conforme 1_Requisitos/05_cd-implantacao.html: o fim com sucesso do job publicar do CI dispara o cd.yml por workflow_run; merge na master implanta em homologação e tag vX.Y.Z em homologação e depois em produção, uma implantação por ambiente por vez; login na Azure por OIDC, terraform plan com o estado em storage account de cada assinatura, aprovação manual por issue (approve, deny ou 2 h), terraform apply do plano aprovado e verificação de /health em até 5 min. v01: criação. v02: a tag vX.Y.Z implanta primeiro em homologação e, verificada, em produção, com uma aprovação por ambiente. v03: assinaturas deb-boaz-app-hml e deb-boaz-app-prd, grupos deb-boaz-app-&lt;amb&gt;_rg e estado do Terraform em cada assinatura. v04: plano guardado só no executor, no mesmo job da aprovação e do apply; environments restritos à master. v05: valores de cada ambiente em 4_CI_CD/terraform/ambientes/&lt;amb&gt;/.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -128,10 +128,10 @@
     <text class="title" x="40" y="72">Pipeline de CD</text>
     <text class="subtitle" x="40" y="94">Do fim do CI, com as imagens publicadas, à implantação aprovada em homologação ou produção na Azure · 05_cd-implantacao</text>
     <text class="wm-meta-label" x="1824" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1824" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1848" y="71" text-anchor="middle">v03</text>
+    <rect class="wm-badge" x="1824" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1848" y="71" text-anchor="middle">v05</text>
     <line class="wm-sep" x1="1896" y1="32" x2="1896" y2="80"/>
     <text class="wm-meta-label" x="1920" y="44">DATA</text>
-    <text class="wm-meta-value" x="1920" y="72">2026-10-14 · 23:13</text>
+    <text class="wm-meta-value" x="1920" y="72">2026-10-15 · 01:16</text>
   </g>
 
   <g id="fronteiras">
@@ -141,8 +141,8 @@
 
   <g id="ci" filter="url(#sombra)"><rect class="node-green" x="40" y="360" width="216" height="160" rx="10"/><use href="#ic-eventos" x="56" y="376" width="24" height="24"/><text class="label-strong" x="92" y="390">CI · ci.yml</text><text class="mono" x="92" y="410">[publicar: sucesso]</text><text class="muted" x="56" y="436">master → sha-&lt;commit&gt;</text><text class="muted" x="56" y="454">tag vX.Y.Z → X.Y.Z</text><text class="muted" x="56" y="472">imagens publicadas</text></g>
   <g id="gatilho" filter="url(#sombra)"><rect class="node-green" x="352" y="360" width="240" height="160" rx="10"/><use href="#ic-eventos" x="368" y="376" width="24" height="24"/><text class="label-strong" x="404" y="390">Gatilho</text><text class="mono" x="404" y="410">[workflow_run]</text><text class="muted" x="368" y="436">master → homologação</text><text class="muted" x="368" y="454">tag: hml, depois prd</text><text class="muted" x="368" y="472">fila: 1 por ambiente</text></g>
-  <g id="login" filter="url(#sombra)"><rect class="node-blue" x="640" y="360" width="240" height="160" rx="10"/><use href="#ic-identidade" x="656" y="376" width="24" height="24"/><text class="label-strong" x="692" y="390">Login na Azure</text><text class="mono" x="692" y="410">[OIDC · sem segredo]</text><text class="muted" x="656" y="436">environment azure-hml</text><text class="muted" x="656" y="454">ou azure-prd</text></g>
-  <g id="plan" filter="url(#sombra)"><rect class="node-blue" x="928" y="360" width="240" height="160" rx="10"/><use href="#ic-servico" x="944" y="376" width="24" height="24"/><text class="label-strong" x="980" y="390">terraform plan</text><text class="mono" x="980" y="410">[&lt;amb&gt;.tfvars]</text><text class="muted" x="944" y="436">tags novas + já implantadas</text><text class="muted" x="944" y="454">plano salvo como artefato</text></g>
+  <g id="login" filter="url(#sombra)"><rect class="node-blue" x="640" y="360" width="240" height="160" rx="10"/><use href="#ic-identidade" x="656" y="376" width="24" height="24"/><text class="label-strong" x="692" y="390">Login na Azure</text><text class="mono" x="692" y="410">[OIDC · sem segredo]</text><text class="muted" x="656" y="436">environment azure-hml</text><text class="muted" x="656" y="454">ou azure-prd (só master)</text></g>
+  <g id="plan" filter="url(#sombra)"><rect class="node-blue" x="928" y="360" width="240" height="160" rx="10"/><use href="#ic-servico" x="944" y="376" width="24" height="24"/><text class="label-strong" x="980" y="390">terraform plan</text><text class="mono" x="980" y="410">[ambientes/&lt;amb&gt;]</text><text class="muted" x="944" y="436">tags novas + já implantadas</text><text class="muted" x="944" y="454">plano só no executor</text></g>
   <g id="aprovacao" filter="url(#sombra)"><rect class="node-green" x="1216" y="360" width="240" height="160" rx="10"/><use href="#ic-identidade" x="1232" y="376" width="24" height="24"/><text class="label-strong" x="1268" y="390">Aprovação manual</text><text class="mono" x="1268" y="410">[issue no repositório]</text><text class="muted" x="1232" y="436">1 por ambiente: imagens · plano</text><text class="muted" x="1232" y="454">approve: segue</text><text class="muted" x="1232" y="472">deny ou 2 h: cancela</text></g>
   <g id="apply" filter="url(#sombra)"><rect class="node-blue" x="1504" y="360" width="240" height="160" rx="10"/><use href="#ic-servico" x="1520" y="376" width="24" height="24"/><text class="label-strong" x="1556" y="390">terraform apply</text><text class="mono" x="1556" y="410">[plano aprovado]</text><text class="muted" x="1520" y="436">estado mudou: falha</text><text class="muted" x="1520" y="454">nova revisão por aplicação</text></g>
   <g id="verificacao" filter="url(#sombra)"><rect class="node-green" x="1792" y="360" width="240" height="160" rx="10"/><use href="#ic-observabilidade" x="1808" y="376" width="24" height="24"/><text class="label-strong" x="1844" y="390">Verificação</text><text class="mono" x="1844" y="410">[/health · ≤ 5 min]</text><text class="muted" x="1808" y="436">pronta: recebe tráfego</text><text class="muted" x="1808" y="454">falhou: anterior segue</text><text class="muted" x="1808" y="472">tag ok em hml → etapa prd</text></g>
@@ -194,7 +194,7 @@
     <line class="edge edge-async" x1="1148" y1="54" x2="1176" y2="54" marker-end="url(#seta)"/><text class="label" x="1188" y="58">resposta da aprovação</text>
     <line class="edge edge-data" x1="1365" y1="54" x2="1393" y2="54" marker-end="url(#seta)"/><text class="label" x="1405" y="58">pull das imagens</text>
     <line class="divider" x1="40" y1="76" x2="2072" y2="76"/>
-    <text class="footer" x="40" y="100">v03 · assinaturas deb-boaz-app-hml e deb-boaz-app-prd, grupos deb-boaz-app-&lt;amb&gt;_rg e estado do Terraform em cada assinatura</text>
-    <text class="wm-file" x="2072" y="100" text-anchor="end">pipeline-cd_v03_20261014-2313.svg</text>
+    <text class="footer" x="40" y="100">v05 · valores de cada ambiente em 4_CI_CD/terraform/ambientes/&lt;amb&gt;/; módulo raiz em infra/</text>
+    <text class="wm-file" x="2072" y="100" text-anchor="end">pipeline-cd_v05_20261015-0116.svg</text>
   </g>
 </svg>

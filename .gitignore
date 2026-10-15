@@ -1,0 +1,85 @@
+# =============================================================================
+# boaz · arquivos que ficam só na máquina de cada pessoa
+# O repositório é público: segredo, credencial e estado nunca entram nele.
+# =============================================================================
+
+# ── segredos e credenciais ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+*.crt
+*.cer
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+secrets.json
+*.secret.*
+*.secrets.*
+local.settings.json
+appsettings.*.local.json
+.azure/
+.docker/config.json
+
+# ── Terraform: estado, planos e variáveis locais ─────────────────────────────
+# (os .tfvars de 4_CI_CD/terraform/ambientes/ não têm segredo e são versionados;
+#  valores locais vão num *.local.tfvars)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+*.local.tfvars
+*.auto.tfvars
+*.auto.tfvars.json
+.terraformrc
+terraform.rc
+
+# ── .NET ─────────────────────────────────────────────────────────────────────
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# ── Node / web ───────────────────────────────────────────────────────────────
+node_modules/
+dist/
+.vite/
+*.local
+npm-debug.log*
+pnpm-debug.log*
+cypress/videos/
+cypress/screenshots/
+
+# ── mobile (.NET MAUI) ───────────────────────────────────────────────────────
+*.apk
+*.aab
+*.ipa
+*.dSYM/
+
+# ── sistema e editores ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# ── Claude Code: preferências locais ─────────────────────────────────────────
+.claude/settings.local.json
