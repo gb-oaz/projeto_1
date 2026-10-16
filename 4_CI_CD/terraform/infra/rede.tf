@@ -163,13 +163,14 @@ resource "azurerm_private_dns_zone_virtual_network_link" "zona" {
   tags                = local.tags
 }
 
-# Um private endpoint por serviço (RNF-61): _pe-kv, _pe-cosmos, _pe-redis
+# Um private endpoint por serviço (RNF-61): _pe-kv, _pe-cosmos, _pe-redis.
+# Desligado, nenhum: cobram por hora e as aplicações estão em zero (RN-26)
 locals {
-  private_endpoints = {
+  private_endpoints = var.ligado ? {
     kv     = { recurso = azurerm_key_vault.kv.id, subrecurso = "vault" }
     cosmos = { recurso = azurerm_cosmosdb_account.cosmos.id, subrecurso = "MongoDB" }
-    redis  = { recurso = azurerm_managed_redis.redis.id, subrecurso = "redisEnterprise" }
-  }
+    redis  = { recurso = azurerm_managed_redis.redis[0].id, subrecurso = "redisEnterprise" }
+  } : {}
 }
 
 resource "azurerm_private_endpoint" "pe" {

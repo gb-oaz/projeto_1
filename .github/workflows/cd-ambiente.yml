@@ -18,10 +18,14 @@ on:
         description: hml ou prd
         type: string
         required: true
-      tag:
-        description: tag das imagens publicadas (sha-<commit> ou X.Y.Z)
+      acao:
+        description: implantar, ligar ou desligar (os dois últimos só em hml, RN-26)
         type: string
-        required: true
+        default: implantar
+      tag:
+        description: tag das imagens publicadas (sha-<commit> ou X.Y.Z); vazia no disparo manual
+        type: string
+        default: ""
       imagens:
         description: lista JSON das imagens publicadas na execução do CI
         type: string
@@ -74,15 +78,22 @@ jobs:
         run: terraform init -input=false -backend-config="../ambientes/$AMB/backend.hcl"
 
       # RN-21: quem tem imagem nova recebe a tag desta execução; os demais
-      # mantêm a tag que já está implantada (saída "imagens" do estado)
-      - name: Tags das imagens
+      # mantêm a tag que já está implantada (saída "imagens" do estado).
+      # RN-26: ligado/desligado segue o estado atual, salvo no disparo manual
+      - name: Tags das imagens e estado do ambiente
         env:
           TAG: ${{ inputs.tag }}
           IMAGENS: ${{ inputs.imagens }}
+          ACAO: ${{ inputs.acao }}
         run: |
           atuais=$(terraform output -json imagens 2>/dev/null || echo '{}')
-          jq -n --argjson atuais "$atuais" --argjson novas "$IMAGENS" --arg tag "$TAG" \
-            '{imagens: ($atuais + ([$novas[] | {key: ., value: $tag}] | from_entries))}' \
+          case "$ACAO" in
+            ligar) ligado=true ;;
+            desligar) ligado=false ;;
+            *) ligado=$(terraform output -json ligado 2>/dev/null || echo true) ;;
+          esac
+          jq -n --argjson atuais "$atuais" --argjson novas "$IMAGENS" --arg tag "$TAG" --argjson ligado "$ligado" \
+            '{imagens: ($atuais + ([$novas[] | {key: ., value: $tag}] | from_entries)), ligado: $ligado}' \
             | tee imagens.auto.tfvars.json
 
       - name: terraform plan
@@ -107,9 +118,9 @@ jobs:
           approvers: ${{ vars.APROVADORES || 'GustavoBoaz' }}
           minimum-approvals: 1
           exclude-workflow-initiator-as-approver: false
-          issue-title: "Implantar em ${{ inputs.ambiente }} · ${{ inputs.tag }}"
+          issue-title: "CD ${{ inputs.ambiente }} · ${{ inputs.acao }} · ${{ inputs.tag || 'sem imagem nova' }}"
           issue-body: |
-            O CI publicou as imagens e o plano do Terraform para **${{ inputs.ambiente }}** está pronto.
+            Ação **${{ inputs.acao }}** em **${{ inputs.ambiente }}**: o plano do Terraform está pronto.
 
             **Imagens com a tag `${{ inputs.tag }}`:** `${{ inputs.imagens }}`
 
@@ -138,6 +149,9 @@ jobs:
         env:
           IMAGENS: ${{ inputs.imagens }}
         run: |
+          if [ "$(terraform output -json ligado)" = false ]; then
+            echo "::notice::$AMB desligado: aplicações em zero réplica, nada a verificar (RN-26)"; exit 0
+          fi
           falhou=0
           for app in $(jq -r '.[]' <<<"$IMAGENS"); do
             pronta=""

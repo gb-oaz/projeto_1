@@ -49,8 +49,13 @@ resource "time_sleep" "rbac_kv" {
 # Segredos gravados pelo Terraform a partir dos recursos que ele cria (RNF-69)
 locals {
   segredos = {
-    "cosmos-conexao"  = azurerm_cosmosdb_account.cosmos.primary_mongodb_connection_string
-    "redis-conexao"   = "${azurerm_managed_redis.redis.hostname}:${azurerm_managed_redis.redis.default_database[0].port},password=${azurerm_managed_redis.redis.default_database[0].primary_access_key},ssl=True,abortConnect=False"
+    "cosmos-conexao" = azurerm_cosmosdb_account.cosmos.primary_mongodb_connection_string
+    # Desligado, o segredo continua existindo para as aplicações (em zero réplica)
+    "redis-conexao" = var.ligado ? join("", [
+      azurerm_managed_redis.redis[0].hostname, ":", azurerm_managed_redis.redis[0].default_database[0].port,
+      ",password=", azurerm_managed_redis.redis[0].default_database[0].primary_access_key,
+      ",ssl=True,abortConnect=False",
+    ]) : "desligado"
     "dockerhub-token" = var.dockerhub_token
   }
 }

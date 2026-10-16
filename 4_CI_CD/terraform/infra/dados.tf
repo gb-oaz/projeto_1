@@ -48,8 +48,10 @@ resource "azurerm_cosmosdb_mongo_database" "boaz" {
   }
 }
 
-# Azure Managed Redis no menor SKU (RNF-71)
+# Azure Managed Redis no menor SKU (RNF-71). Não tem pausa: desligado, é
+# removido e volta vazio ao religar — é cache (RN-26)
 resource "azurerm_managed_redis" "redis" {
+  count                     = var.ligado ? 1 : 0
   name                      = "${local.n}-redis"
   location                  = var.regiao
   resource_group_name       = data.azurerm_resource_group.rg.name

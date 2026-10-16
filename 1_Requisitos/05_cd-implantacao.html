@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CD e implantação na Azure · boaz · v05</title>
+<title>CD e implantação na Azure · boaz · v06</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="05_cd-implantacao">
 <meta name="boaz:caminho" content="1_Requisitos/05_cd-implantacao.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v05">
-<meta name="boaz:data" content="2026-10-15 01:16">
+<meta name="boaz:versao" content="v06">
+<meta name="boaz:data" content="2026-10-15 23:58">
 <meta name="boaz:status" content="Rascunho">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -791,8 +791,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir como as imagens publicadas pelo CI chegam, após aprovação manual, aos ambientes de homologação e produção na Azure, descritos em Terraform e com custo mínimo.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>05_cd-implantacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v05</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-15 · 01:16</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v06</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-15 · 23:58</dd></div>
     <div><dt>Status</dt><dd><span class="status status-rascunho">Rascunho</span></dd></div>
   </dl>
 </header>
@@ -817,10 +817,11 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RN-17"><td><code class="id">RN-17</code></td><td>Existem dois ambientes, cada um numa assinatura Azure própria com um grupo de recursos: homologação na assinatura <code>deb-boaz-app-hml</code> (grupo <code>deb-boaz-app-hml_rg</code>) e produção na <code>deb-boaz-app-prd</code> (grupo <code>deb-boaz-app-prd_rg</code>)</td></tr>
         <tr id="RN-18"><td><code class="id">RN-18</code></td><td>Um merge na branch principal implanta em homologação as imagens <code>sha-&lt;commit&gt;</code> publicadas por ele</td></tr>
         <tr id="RN-19"><td><code class="id">RN-19</code></td><td>Uma tag <code>vX.Y.Z</code> implanta as imagens <code>X.Y.Z</code> publicadas por ela primeiro em homologação e, depois, em produção</td></tr>
+        <tr id="RN-26"><td><code class="id">RN-26</code></td><td>Homologação pode ser desligada e religada sob demanda, para não gerar custo parada; desligada, mantém os dados e a configuração, e as implantações automáticas atualizam as imagens sem religá-la</td></tr>
         <tr id="RN-25"><td><code class="id">RN-25</code></td><td>A etapa de produção de uma tag só começa depois que a mesma tag foi implantada e verificada em homologação; se a etapa de homologação falhar ou for negada, a tag não chega a produção</td></tr>
         <tr id="RN-20"><td><code class="id">RN-20</code></td><td>Nenhuma implantação acontece sem aprovação manual, pedida somente depois que as imagens foram publicadas; cada ambiente tem a sua aprovação, inclusive nas duas etapas de uma tag</td></tr>
         <tr id="RN-21"><td><code class="id">RN-21</code></td><td>Componente sem imagem nova na execução mantém a imagem que já está implantada</td></tr>
-        <tr id="RN-22"><td><code class="id">RN-22</code></td><td>Homologação valida uma unidade de cada componente: nunca escala a zero e não é dimensionada para carga</td></tr>
+        <tr id="RN-22"><td><code class="id">RN-22</code></td><td>Homologação valida uma unidade de cada componente: ligada, nunca escala a zero e não é dimensionada para carga</td></tr>
         <tr id="RN-23"><td><code class="id">RN-23</code></td><td>Toda mudança de infraestrutura passa pelo Terraform do repositório; alteração manual no portal é desfeita na implantação seguinte</td></tr>
         <tr id="RN-24"><td><code class="id">RN-24</code></td><td>Segredo nunca fica no código, nos arquivos de variáveis do Terraform nem em texto no workflow: fica no Key Vault do ambiente</td></tr>
       </tbody>
@@ -834,6 +835,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <thead><tr><th>ID</th><th>Frente</th><th>Requisito</th></tr></thead>
       <tbody>
         <tr id="RNF-47"><td><code class="id">RNF-47</code></td><td><span class="tag">CD</span></td><td>O CD é o workflow <code>.github/workflows/cd.yml</code>, disparado pelo fim do CI (<code>workflow_run</code>) somente quando o job de publicação de imagens terminou com sucesso na branch principal ou numa tag <code>vX.Y.Z</code></td></tr>
+        <tr id="RNF-91"><td><code class="id">RNF-91</code></td><td><span class="tag">CD</span></td><td>O <code>cd.yml</code> tem disparo manual (<code>workflow_dispatch</code>), só na branch principal e só para homologação, com as ações <code>implantar</code>, <code>ligar</code> e <code>desligar</code>, todas com a aprovação de <code class="id">RNF-50</code></td></tr>
+        <tr id="RNF-92"><td><code class="id">RNF-92</code></td><td><span class="tag">CD</span></td><td>Desligar homologação remove o Azure Managed Redis e os <em>private endpoints</em> e leva as aplicações a zero réplica; Cosmos DB, Key Vault, Log Analytics e a rede continuam</td></tr>
         <tr id="RNF-48"><td><code class="id">RNF-48</code></td><td><span class="tag">CD</span></td><td>O CD roda <code>terraform plan</code> antes de pedir aprovação e guarda o plano só no executor, no mesmo job da aprovação e da aplicação; o plano não vira artefato porque contém segredos e o repositório é público</td></tr>
         <tr id="RNF-49"><td><code class="id">RNF-49</code></td><td><span class="tag">CD</span></td><td>O CD pede aprovação abrindo uma issue por ambiente, com o ambiente, as imagens e tags a implantar, o resumo do plano (recursos criados, alterados e destruídos) e o link da execução</td></tr>
         <tr id="RNF-50"><td><code class="id">RNF-50</code></td><td><span class="tag">CD</span></td><td>A implantação segue quando o dono do repositório comenta <code>approve</code> na issue; <code>deny</code> ou 2 horas sem resposta cancelam sem alterar nada na Azure</td></tr>
@@ -955,8 +958,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <figcaption><strong>Implantação · produção</strong><code>3_Arquitetura/implantacao-prd_v03_20261014-2313.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../3_Arquitetura/pipeline-cd_v05_20261015-0116.svg"><img src="../3_Arquitetura/pipeline-cd_v05_20261015-0116.svg" alt="Pipeline de CD no GitHub Actions: o fim do CI com as imagens publicadas dispara o cd.yml; login na Azure por OIDC, terraform plan com estado numa storage account de cada assinatura, aprovação manual por issue pelo dono do repositório, terraform apply em deb-boaz-app-hml_rg no merge na master e na tag vX.Y.Z, e depois em deb-boaz-app-prd_rg na tag, e verificação de /health; o Container Apps baixa as imagens do Docker Hub"></a>
-      <figcaption><strong>Pipeline de CD</strong><code>3_Arquitetura/pipeline-cd_v05_20261015-0116.svg</code></figcaption>
+      <a href="../3_Arquitetura/pipeline-cd_v06_20261015-2357.svg"><img src="../3_Arquitetura/pipeline-cd_v06_20261015-2357.svg" alt="Pipeline de CD no GitHub Actions: o fim do CI com as imagens publicadas dispara o cd.yml; login na Azure por OIDC, terraform plan com estado numa storage account de cada assinatura, aprovação manual por issue pelo dono do repositório, terraform apply em deb-boaz-app-hml_rg no merge na master e na tag vX.Y.Z, e depois em deb-boaz-app-prd_rg na tag, e verificação de /health; o Container Apps baixa as imagens do Docker Hub"></a>
+      <figcaption><strong>Pipeline de CD</strong><code>3_Arquitetura/pipeline-cd_v06_20261015-2357.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -966,7 +969,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v05</span></td><td>2026-10-15 01:16</td><td>Estrutura do Terraform: módulo raiz em <code>infra/</code>, valores em <code>ambientes/&lt;amb&gt;/</code> e bootstrap em <code>scripts/</code>, sem IDs da Azure no repositório (<code class="id">RNF-55</code> alterado); diagrama <code>pipeline-cd</code> atualizado para v05</td></tr>
+      <tr><td><span class="boaz-versao">v06</span></td><td>2026-10-15 23:58</td><td>Ligar e desligar homologação sob demanda: <code class="id">RN-26</code>, <code class="id">RNF-91</code> e <code class="id">RNF-92</code> incluídos, <code class="id">RN-22</code> alterado; diagrama <code>pipeline-cd</code> atualizado para v06</td></tr>
+      <tr><td>v05</td><td>2026-10-15 01:16</td><td>Estrutura do Terraform: módulo raiz em <code>infra/</code>, valores em <code>ambientes/&lt;amb&gt;/</code> e bootstrap em <code>scripts/</code>, sem IDs da Azure no repositório (<code class="id">RNF-55</code> alterado); diagrama <code>pipeline-cd</code> atualizado para v05</td></tr>
       <tr><td>v04</td><td>2026-10-15 01:00</td><td>Ajustes da implementação: plano guardado só no executor, sem artefato (<code class="id">RNF-48</code> e <code class="id">RNF-51</code> alterados); environments <code>azure-hml</code> e <code>azure-prd</code> restritos à branch principal (<code class="id">RNF-52</code> alterado); diagrama <code>pipeline-cd</code> atualizado para v04</td></tr>
       <tr><td>v03</td><td>2026-10-14 23:15</td><td>Assinaturas <code>deb-boaz-app-hml</code> e <code>deb-boaz-app-prd</code> e grupos <code>deb-boaz-app-&lt;amb&gt;_rg</code> (<code class="id">RN-17</code> e <code class="id">RNF-52</code> alterados); estado do Terraform em cada assinatura (<code class="id">RNF-56</code> alterado); nomenclatura dos recursos (<code class="id">RNF-88</code> a <code class="id">RNF-90</code> incluídos); diagramas atualizados para v03</td></tr>
       <tr><td>v02</td><td>2026-10-13 23:55</td><td>Pendências respondidas: homologação sem Application Gateway confirmada; região Brazil South (<code class="id">RNF-86</code>); tag de versão passa por homologação antes de produção (<code class="id">RN-19</code>, <code class="id">RN-20</code>, <code class="id">RNF-49</code> e <code class="id">RNF-52</code> alterados, <code class="id">RN-25</code> incluído); Swagger de homologação aberto (<code class="id">RNF-72</code>); escala a partir de 30 requisições simultâneas (<code class="id">RNF-66</code>); WAF com 100 requisições/min por IP (<code class="id">RNF-79</code>); orçamentos de R$ 300,00 e R$ 1.500,00 (<code class="id">RNF-84</code>); versões do Cosmos DB e do Redis (<code class="id">RNF-87</code>); diagramas atualizados para v02</td></tr>
@@ -974,7 +978,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v05 · 2026-10-15 01:16</span>
+    <span>boaz · v06 · 2026-10-15 23:58</span>
     <span class="boaz-arquivo">1_Requisitos/05_cd-implantacao.html</span>
   </div>
 </footer>
