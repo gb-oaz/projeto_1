@@ -104,6 +104,10 @@ az role assignment create --assignee-object-id "$EU" --assignee-principal-type U
 papel "Contributor" "$SCOPE"                                   # cria os recursos do grupo
 papel "Role Based Access Control Administrator" "$SCOPE"       # dá papéis às identidades das aplicações
 papel "Storage Blob Data Contributor" "$ST_ID"                 # lê e trava o estado
+papel "Key Vault Secrets Officer" "$SCOPE"                     # grava os segredos no Key Vault
+# Quem roda o bootstrap lê os segredos, para conferir planos localmente
+az role assignment create --assignee-object-id "$EU" --assignee-principal-type User \
+  --role "Key Vault Secrets User" --scope "$SCOPE" -o none 2>/dev/null || true
 
 if ! az storage container show -n tfstate --account-name "$ST" --auth-mode login -o none 2>/dev/null; then
   echo "  aguardando a propagação do papel no estado…"

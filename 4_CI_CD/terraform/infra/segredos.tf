@@ -26,12 +26,9 @@ resource "azurerm_key_vault" "kv" {
   tags                          = local.tags
 }
 
-# Quem roda o Terraform (o CD) grava os segredos
-resource "azurerm_role_assignment" "kv_terraform" {
-  scope                = azurerm_key_vault.kv.id
-  role_definition_name = "Key Vault Secrets Officer"
-  principal_id         = data.azurerm_client_config.atual.object_id
-}
+# Quem grava os segredos (a identidade do CD, Key Vault Secrets Officer) recebe o
+# papel no grupo de recursos pelo scripts/bootstrap.sh, e não aqui: dado pelo
+# Terraform, o papel mudaria de dono conforme quem rodasse o plano.
 
 # As aplicações e o Application Gateway só leem (RNF-68)
 resource "azurerm_role_assignment" "kv_aplicacoes" {
@@ -42,7 +39,7 @@ resource "azurerm_role_assignment" "kv_aplicacoes" {
 
 # O papel leva alguns minutos para valer depois de criado
 resource "time_sleep" "rbac_kv" {
-  depends_on      = [azurerm_role_assignment.kv_terraform, azurerm_role_assignment.kv_aplicacoes]
+  depends_on      = [azurerm_role_assignment.kv_aplicacoes]
   create_duration = "90s"
 }
 
