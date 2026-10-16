@@ -83,7 +83,7 @@ resource "azurerm_container_app" "app" {
   }
 
   template {
-    min_replicas = var.escala.min_replicas
+    min_replicas = var.ligado ? var.escala.min_replicas : 0 # desligado: escala a zero (RN-26)
     max_replicas = var.escala.max_replicas
 
     http_scale_rule {

@@ -20,6 +20,16 @@ variable "regiao" {
   default     = "brazilsouth"
 }
 
+variable "ligado" {
+  description = "false = homologação desligada: sem Redis, sem private endpoints e aplicações em zero réplica; dados mantidos (RN-26)"
+  type        = bool
+  default     = true
+  validation {
+    condition     = var.ligado || var.ambiente == "hml"
+    error_message = "Só homologação pode ser desligada."
+  }
+}
+
 # ── rede (RNF-59, RNF-60) ─────────────────────────────────────────────────────
 
 variable "vnet_cidr" {

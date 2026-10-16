@@ -69,6 +69,22 @@ terraform -chdir=4_CI_CD/terraform/infra init -reconfigure -backend-config=../am
 terraform -chdir=4_CI_CD/terraform/infra plan -var-file=../ambientes/$AMB/variaveis.tfvars
 ```
 
+## Ligar e desligar homologação
+
+Para não pagar homologação parada (RN-26): **Actions → CD → Run workflow**, na
+`master`, com a ação `desligar` (ou `ligar`). Passa pela mesma aprovação por issue.
+
+| Desligado | O que acontece |
+|---|---|
+| Azure Managed Redis | removido (não tem pausa); volta vazio ao religar |
+| Private endpoints | removidos |
+| Aplicações | escalam a zero réplica |
+| Cosmos DB, Key Vault, Log Analytics, rede | mantidos, com os dados |
+
+As implantações automáticas (merge na `master`) mantêm o estado atual: com
+homologação desligada, atualizam as imagens sem religar. A ação `implantar`
+reaplica o Terraform sem mudar nada além do que estiver diferente.
+
 ## O que as imagens precisam oferecer
 
 - escutar HTTP na porta de `var.porta` (8080 por padrão)

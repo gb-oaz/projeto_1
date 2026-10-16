@@ -5,6 +5,8 @@
 # Visão geral do fluxo:
 #
 #   CI concluído com sucesso (workflow_run)          RNF-47
+#   ou disparo manual em homologação (workflow_dispatch): implantar,
+#   ligar ou desligar o ambiente                     RN-26, RNF-91
 #           │
 #           ▼
 #     ┌──────────┐  1. confere se algum job "Publicar · <imagem>" passou
@@ -34,6 +36,14 @@ on:
   workflow_run:
     workflows: [CI]
     types: [completed]
+  # Manual, só em homologação: Actions → CD → Run workflow (na master)
+  workflow_dispatch:
+    inputs:
+      acao:
+        description: "Homologação: implantar (reaplica o Terraform), ligar ou desligar (RN-26)"
+        type: choice
+        options: [implantar, ligar, desligar]
+        default: implantar
 
 permissions:
   contents: read
@@ -44,20 +54,35 @@ jobs:
   # ===========================================================================
   preparar:
     name: Preparar
-    # Só push na master ou tag, com o CI verde (o CI só publica nesses casos)
+    # Manual, ou push na master/tag com o CI verde (o CI só publica nesses casos)
     if: >-
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push'
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     permissions:
       actions: read # lê os jobs da execução do CI
     outputs:
-      imagens: ${{ steps.info.outputs.imagens }}
-      tag: ${{ steps.info.outputs.tag }}
-      producao: ${{ steps.info.outputs.producao }}
-      implantar: ${{ steps.info.outputs.implantar }}
+      imagens: ${{ steps.manual.outputs.imagens || steps.automatico.outputs.imagens }}
+      tag: ${{ steps.manual.outputs.tag || steps.automatico.outputs.tag }}
+      producao: ${{ steps.manual.outputs.producao || steps.automatico.outputs.producao }}
+      implantar: ${{ steps.manual.outputs.implantar || steps.automatico.outputs.implantar }}
     steps:
-      - id: info
+      # Manual: só homologação, sem imagem nova; as tags implantadas são mantidas
+      - id: manual
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          REF: ${{ github.ref_name }}
+        run: |
+          if [ "$REF" != master ]; then
+            echo "::error::Rode o CD manual a partir da master (environment azure-hml)"; exit 1
+          fi
+          {
+            echo "imagens=[]"; echo "tag="; echo "producao=false"; echo "implantar=true"
+          } >>"$GITHUB_OUTPUT"
+
+      - id: automatico
+        if: github.event_name == 'workflow_run'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -104,9 +129,10 @@ jobs:
       issues: write   # issue de aprovação
     with:
       ambiente: hml
+      acao: ${{ inputs.acao || 'implantar' }}
       tag: ${{ needs.preparar.outputs.tag }}
       imagens: ${{ needs.preparar.outputs.imagens }}
-      sha: ${{ github.event.workflow_run.head_sha }}
+      sha: ${{ github.event.workflow_run.head_sha || github.sha }}
     secrets: inherit
 
   # ===========================================================================
