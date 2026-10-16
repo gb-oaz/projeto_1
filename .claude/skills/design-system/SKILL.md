@@ -22,7 +22,9 @@ Você é designer de produto e mantém o design system. A identidade visual do b
 │   ├── web/tokens.css  web/tipografia.css  web/tokens.ts                      Vue
 │   └── maui/Tokens.xaml                                                        .NET MAUI
 ├── design-system.html          catálogo vivo; o bloco design:tokens é gerado, o resto é editado
+├── tema.svg                    quadro visual de todos os componentes, claro e escuro      (gerado)
 ├── scripts/gerar.mjs           gerador (@material/material-color-utilities, a biblioteca do M3)
+├── scripts/tema-svg.mjs        desenho do tema.svg: uma função por componente
 └── package.json                pnpm run gerar · pnpm run conferir
 ```
 
@@ -71,8 +73,9 @@ Leia `design-system.html` (regras e catálogo) e os JSON antes de mudar algo. Pa
 - Componente novo ou alterado:
   1. tokens em `tokens/componentes.json` (`md.comp.<componente>.*`), só com `{md.sys.*}` ou medidas em dp — o gerador recusa referências inexistentes;
   2. implementação de referência no `<style id="design-componentes">` do catálogo (classes `md-<componente>`, só `var(--md-comp-…)`/`var(--md-sys-…)`, com estados hover/foco/pressionado/desabilitado e alvo de 48dp), mais um exemplo na seção **Componentes**;
-  3. se for usado no app, um estilo em `Tokens.xaml` (no gerador, como os botões).
-- Rode `pnpm run gerar`. Nunca edite `cores.json`, `plataformas/*` nem o bloco `design:tokens` à mão: `pnpm run conferir` falha se estiverem diferentes do gerado.
+  3. desenho no `tema.svg`: uma entrada em `COMPONENTES` de `scripts/tema-svg.mjs` (título, descrição, altura do conteúdo e a função que desenha num esquema), usando só os tokens (`num`, `cor`, `canto`, `tipoDe`, `nivel`) e as primitivas do arquivo; ícones novos entram em `ICONES` (Material Icons, viewBox 24);
+  4. se for usado no app, um estilo em `Tokens.xaml` (no gerador, como os botões).
+- Rode `pnpm run gerar`. Nunca edite `cores.json`, `plataformas/*`, `tema.svg` nem o bloco `design:tokens` à mão: `pnpm run conferir` falha se estiverem diferentes do gerado.
 
 ## Usar no código (`5_DEV/`)
 
@@ -82,7 +85,7 @@ Leia `design-system.html` (regras e catálogo) e os JSON antes de mudar algo. Pa
 
 ## Versionamento
 
-O catálogo é a documentação: cada mudança no design system (identidade, tokens, componentes, regras) é uma versão nova de `design-system.html`:
+O catálogo é a documentação (o `tema.svg` herda dele a versão e a data): cada mudança no design system (identidade, tokens, componentes, regras) é uma versão nova de `design-system.html`:
 - `vNN` + 1 e data/hora (`date '+%Y-%m-%d %H:%M'`) no `<title>`, nos `<meta name="design:versao|data">`, no carimbo (chips Versão e Data) e na linha final do rodapé;
 - linha nova no **topo** do histórico (até 10 linhas) dizendo o que mudou;
 - `<meta name="design:status">` e o chip de status: `Identidade provisória` até a marca ser definida, depois `Identidade definida`.
@@ -91,7 +94,8 @@ Arquivos gerados e o catálogo vão no mesmo commit que a mudança de origem.
 ## Revisão (antes de entregar)
 
 - `pnpm run conferir` passa (nada desatualizado).
-- `xmllint --noout plataformas/maui/Tokens.xaml`.
+- `xmllint --noout plataformas/maui/Tokens.xaml tema.svg`.
+- Renderize o `tema.svg` (Chrome headless, em fatias de ~1450px com `<img>` e `margin-top` negativo) e **olhe**: nada vazando dos painéis, textos sem sobreposição, claro e escuro coerentes.
 - Sem cor solta fora do bloco gerado: `awk '/design:tokens:inicio/{s=1} /design:tokens:fim/{s=0} !s' design-system.html | grep -nE ':\s*#[0-9a-fA-F]{3,8}\b'` sai vazio.
 - Abra o catálogo no Chrome headless em 1440px e num iframe de 390px (o headless não desce de 500px de janela) e **olhe**: claro e escuro, nada cortado, sem rolagem horizontal da página.
 

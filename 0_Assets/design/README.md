@@ -17,7 +17,8 @@ design/
 │   ├── web/               tokens.css, tipografia.css, tokens.ts   (Vue)
 │   └── maui/              Tokens.xaml                             (.NET MAUI)
 ├── design-system.html     catálogo (o bloco design:tokens é gerado)
-└── scripts/gerar.mjs      gerador
+├── tema.svg               gerado: quadro visual com cores, tipos, layout e componentes
+└── scripts/               gerar.mjs (gerador) e tema-svg.mjs (desenho do tema.svg)
 ```
 
 Para mudar a identidade ou um token, edite `identidade/marca.json` ou
@@ -26,7 +27,7 @@ Para mudar a identidade ou um token, edite `identidade/marca.json` ou
 ```bash
 cd 0_Assets/design
 corepack enable && pnpm install
-pnpm run gerar      # escreve cores.json, plataformas/* e o bloco do catálogo
+pnpm run gerar      # escreve cores.json, plataformas/*, tema.svg e o bloco do catálogo
 pnpm run conferir   # falha se algum arquivo gerado estiver desatualizado
 ```
 

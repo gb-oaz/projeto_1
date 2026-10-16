@@ -8,6 +8,7 @@
 //                         plataformas/web/tipografia.css  classes .md-typescale-*
 //                         plataformas/web/tokens.ts    tokens tipados e janelas
 //                         plataformas/maui/Tokens.xaml ResourceDictionary (.NET MAUI)
+//                         tema.svg                     quadro visual (cores, tipos, componentes)
 //                         design-system.html           só o bloco entre os marcadores
 //                                                      design:tokens:inicio/fim
 //   pnpm run conferir   não escreve nada; falha se algum arquivo gerado estiver
@@ -25,6 +26,7 @@ import {
   SchemeTonalSpot, SchemeFidelity, SchemeContent, SchemeVibrant, SchemeExpressive,
   SchemeNeutral, SchemeMonochrome, SchemeRainbow, SchemeFruitSalad,
 } from '@material/material-color-utilities';
+import { temaSvg } from './tema-svg.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONFERIR = process.argv.includes('--conferir');
@@ -375,7 +377,15 @@ const iconeCss = `.material-symbols { font-family: "${ic.familia}"; font-weight:
 const novoBloco = `${html.slice(i, html.indexOf('\n', i) + 1)}${linkFontes.join('\n')}\n<style id="design-tokens">\n${css}\n${tipografiaCss}\n${iconeCss}\n</style>\n<script id="design-dados" type="application/json">${JSON.stringify({ semente: c.semente.toUpperCase(), variante: c.variante, status: marca.status, fontes: { marca: fonte.brand.familia, texto: fonte.plain.familia }, icones: ic.familia, extras: EXTRAS.map(([n]) => n), papeis: Object.keys(ESQUEMAS.light), paletas: Object.fromEntries(Object.entries(paletas).map(([n, p]) => [n, Object.keys(p).map(Number)])), tipos, janelas })}</script>\n`;
 const htmlNovo = html.slice(0, i) + novoBloco + html.slice(f);
 
-// ── 7. escrever ou conferir ─────────────────────────────────────────────────
+// ── 7. quadro visual tema.svg (versão e data vêm do catálogo) ──────────────
+const meta = (n) => (html.match(new RegExp(`<meta name="design:${n}" content="([^"]*)"`)) || [])[1];
+const svg = temaSvg({
+  esquemas: { light: ESQUEMAS.light, dark: ESQUEMAS.dark }, tipos, cantos, janelas, tokensComp, fonte,
+  versao: meta('versao'), data: meta('data'), status: marca.status, semente: c.semente.toUpperCase(), variante: c.variante,
+  extras: EXTRAS.map(([n]) => n),
+});
+
+// ── 8. escrever ou conferir ─────────────────────────────────────────────────
 const saidas = {
   'tokens/cores.json': JSON.stringify(cores, null, 2) + '\n',
   'plataformas/web/tokens.css': css,
@@ -383,6 +393,7 @@ const saidas = {
   'plataformas/web/tokens.ts': ts,
   'plataformas/maui/Tokens.xaml': xaml,
   [htmlArq]: htmlNovo,
+  'tema.svg': svg,
 };
 let diferentes = 0;
 for (const [arq, conteudo] of Object.entries(saidas)) {
