@@ -71,13 +71,25 @@ if [ -z "$APP_ID" ]; then
 fi
 az ad sp show --id "$APP_ID" -o none 2>/dev/null || az ad sp create --id "$APP_ID" -o none
 SP_ID=$(az ad sp show --id "$APP_ID" --query id -o tsv)
-if [ -z "$(az ad app federated-credential list --id "$APP_ID" --query "[?name=='github-$ENV_GH'].name" -o tsv)" ]; then
-  az ad app federated-credential create --id "$APP_ID" -o none --parameters "{
-    \"name\": \"github-$ENV_GH\",
-    \"issuer\": \"https://token.actions.githubusercontent.com\",
-    \"subject\": \"repo:$REPO:environment:$ENV_GH\",
-    \"audiences\": [\"api://AzureADTokenExchange\"]
-  }"
+# Subject do token OIDC. O repositório usa o formato imutável do GitHub
+# (repo:<org>@<id>/<repo>@<id>:environment:<env>); o prefixo vem da API.
+# O formato antigo (repo:<org>/<repo>:...) fica cadastrado também, por garantia.
+PREFIXO=$(gh api "repos/$REPO/actions/oidc/customization/sub" --jq .sub_claim_prefix 2>/dev/null || true)
+credencial() { # <nome> <subject>
+  if [ -z "$(az ad app federated-credential list --id "$APP_ID" --query "[?name=='$1'].name" -o tsv)" ]; then
+    az ad app federated-credential create --id "$APP_ID" -o none --parameters "{
+      \"name\": \"$1\",
+      \"issuer\": \"https://token.actions.githubusercontent.com\",
+      \"subject\": \"$2\",
+      \"audiences\": [\"api://AzureADTokenExchange\"]
+    }"
+  fi
+}
+credencial "github-$ENV_GH" "repo:${REPO}:environment:${ENV_GH}"
+if [ -n "$PREFIXO" ]; then
+  credencial "github-$ENV_GH-imutavel" "${PREFIXO}:environment:${ENV_GH}"
+else
+  echo "  ⚠ gh indisponível: confira o subject em repos/$REPO/actions/oidc/customization/sub"
 fi
 
 echo "▶ 4/4 papéis"
@@ -92,6 +104,10 @@ az role assignment create --assignee-object-id "$EU" --assignee-principal-type U
 papel "Contributor" "$SCOPE"                                   # cria os recursos do grupo
 papel "Role Based Access Control Administrator" "$SCOPE"       # dá papéis às identidades das aplicações
 papel "Storage Blob Data Contributor" "$ST_ID"                 # lê e trava o estado
+papel "Key Vault Secrets Officer" "$SCOPE"                     # grava os segredos no Key Vault
+# Quem roda o bootstrap lê os segredos, para conferir planos localmente
+az role assignment create --assignee-object-id "$EU" --assignee-principal-type User \
+  --role "Key Vault Secrets User" --scope "$SCOPE" -o none 2>/dev/null || true
 
 if ! az storage container show -n tfstate --account-name "$ST" --auth-mode login -o none 2>/dev/null; then
   echo "  aguardando a propagação do papel no estado…"

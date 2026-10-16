@@ -9,6 +9,7 @@ resource "azurerm_container_app_environment" "cae" {
   name                           = "${local.n}-cae"
   location                       = var.regiao
   resource_group_name            = data.azurerm_resource_group.rg.name
+  logs_destination               = "log-analytics" # azurerm 5: obrigatório junto com o workspace
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.log.id
   infrastructure_subnet_id       = azurerm_subnet.aca.id
   internal_load_balancer_enabled = local.prd
