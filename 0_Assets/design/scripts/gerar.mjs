@@ -62,6 +62,13 @@ const TONS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100];
 const TONS_NEUTROS = [0, 4, 6, 10, 12, 17, 20, 22, 24, 30, 40, 50, 60, 70, 80, 87, 90, 92, 94, 95, 96, 98, 99, 100];
 const paletaDe = (h) => (h ? TonalPalette.fromInt(argbFromHex(h)) : null);
 
+// Contraste WCAG entre duas cores #RRGGBB
+const luminancia = (h) => {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contraste = (a, b) => { const [x, y] = [luminancia(a), luminancia(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+
 // Um tema de cor: esquemas claro/escuro/alto contraste e paletas tonais
 function gerarTema(id, t) {
   if (!kebabOk(id)) throw new Error(`cores.temas: nome "${id}" deve ser kebab-case`);
@@ -84,8 +91,8 @@ function gerarTema(id, t) {
   // extras (sucesso, aviso…) harmonizados com a semente deste tema
   const extras = Object.entries(cfg.extras ?? {}).filter(([k]) => !k.startsWith('$'))
     .map(([nome, e]) => [nome, customColor(semente, { name: nome, value: argbFromHex(e.cor), blend: !!e.harmonizar })]);
-  const papeis = (escuro, contraste) => {
-    const s = esquema(escuro, contraste);
+  const papeis = (escuro, nivel) => {
+    const s = esquema(escuro, nivel);
     const r = Object.fromEntries(PAPEIS.map((k) => [kebab(k), hex(MaterialDynamicColors[k].getArgb(s))]));
     for (const [nome, cc] of extras) {
       const g = escuro ? cc.dark : cc.light;
@@ -93,6 +100,24 @@ function gerarTema(id, t) {
         [nome]: hex(g.color), [`on-${nome}`]: hex(g.onColor),
         [`${nome}-container`]: hex(g.colorContainer), [`on-${nome}-container`]: hex(g.onColorContainer),
       });
+    }
+    // ajustes: papéis fixados à mão neste modo (ex.: superfície branca pura);
+    // valem também no alto contraste e precisam manter o contraste dos pares
+    const aj = Object.entries(t.ajustes?.[escuro ? 'dark' : 'light'] ?? {});
+    for (const [k, v] of aj) {
+      if (!(k in r)) throw new Error(`cores.temas.${id}.ajustes: papel "${k}" não existe`);
+      if (!/^#[0-9a-fA-F]{6}$/.test(v)) throw new Error(`cores.temas.${id}.ajustes.${k}: use #RRGGBB`);
+      r[k] = v.toUpperCase();
+    }
+    if (aj.length) {
+      const minimo = nivel > 0 ? 7 : 4.5, mudou = new Set(aj.map(([k]) => k));
+      const pares = Object.keys(r).filter((k) => k.startsWith('on-') && !k.endsWith('-variant') && r[k.slice(3)]).map((k) => [k, k.slice(3)]);
+      for (const sup of Object.keys(r).filter((k) => k === 'background' || k.startsWith('surface') && !k.endsWith('-variant') && k !== 'surface-tint')) pares.push(['on-surface', sup]);
+      for (const [a, b] of pares) {
+        if (!mudou.has(a) && !mudou.has(b)) continue;
+        const q = contraste(r[a], r[b]);
+        if (q < minimo) throw new Error(`cores.temas.${id}.ajustes (${escuro ? 'dark' : 'light'}${nivel > 0 ? ', alto contraste' : ''}): ${a} sobre ${b} tem contraste ${q.toFixed(2)}:1, mínimo ${minimo}:1`);
+      }
     }
     return r;
   };
@@ -106,7 +131,7 @@ function gerarTema(id, t) {
   return {
     id, nome: t.nome ?? id, descricao: t.descricao ?? '', harmonia: t.harmonia ?? '',
     semente: t.semente.toUpperCase(), terciaria: t.terciaria?.toUpperCase() ?? null, variante: t.variante,
-    extras: extras.map(([n]) => n),
+    extras: extras.map(([n]) => n), modo: t.modo_preferido ?? null,
     esquemas: { light: papeis(false, 0), dark: papeis(true, 0), 'light-high-contrast': papeis(false, 1), 'dark-high-contrast': papeis(true, 1) },
     paletas: Object.fromEntries(Object.entries(fontes).map(([n, [p, tons]]) => [n, Object.fromEntries(tons.map((x) => [x, hex(p.tone(x))]))])),
   };
@@ -303,7 +328,7 @@ export const defaultPalette: PaletteId = '${PADRAO.id}';
 
 /** Temas de cor: aplique na web com document.documentElement.dataset.paleta = id. */
 export const palettes = ${JSON.stringify(Object.fromEntries(Object.values(TEMAS).map((t) => [t.id, {
-  name: t.nome, description: t.descricao, harmony: t.harmonia, seed: t.semente,
+  name: t.nome, description: t.descricao, harmony: t.harmonia, seed: t.semente, preferredMode: t.modo,
   colors: Object.fromEntries(Object.entries(t.esquemas).map(([n, e]) => [camel(n), objCamel(e)])),
 }])), null, 2)} as const;
 
@@ -439,7 +464,7 @@ const i = html.indexOf(INI);
 const f = html.indexOf(FIM);
 if (i < 0 || f < 0) throw new Error(`${htmlArq}: marcadores ${INI} … ${FIM} não encontrados`);
 const iconeCss = `.material-symbols { font-family: "${ic.familia}"; font-weight: normal; font-style: normal; font-size: var(--md-sys-layout-icon-size); line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-variation-settings: "FILL" ${ic.preenchimento}, "wght" ${ic.peso}, "GRAD" ${ic.grau}, "opsz" ${ic.tamanho_otico}; }`;
-const novoBloco = `${html.slice(i, html.indexOf('\n', i) + 1)}${linkFontes.join('\n')}\n<style id="design-tokens">\n${css}\n${tipografiaCss}\n${iconeCss}\n</style>\n<script id="design-dados" type="application/json">${JSON.stringify({ semente: c.semente.toUpperCase(), variante: c.variante, status: marca.status, fontes: { marca: fonte.brand.familia, texto: fonte.plain.familia }, icones: ic.familia, extras: EXTRAS.map(([n]) => n), temas: Object.values(TEMAS).map((t) => ({ id: t.id, nome: t.nome, descricao: t.descricao, harmonia: t.harmonia, semente: t.semente, terciaria: t.terciaria, padrao: t === PADRAO })), papeis: Object.keys(ESQUEMAS.light), paletas: Object.fromEntries(Object.entries(paletas).map(([n, p]) => [n, Object.keys(p).map(Number)])), tipos, janelas })}</script>\n`;
+const novoBloco = `${html.slice(i, html.indexOf('\n', i) + 1)}${linkFontes.join('\n')}\n<style id="design-tokens">\n${css}\n${tipografiaCss}\n${iconeCss}\n</style>\n<script id="design-dados" type="application/json">${JSON.stringify({ semente: c.semente.toUpperCase(), variante: c.variante, status: marca.status, fontes: { marca: fonte.brand.familia, texto: fonte.plain.familia }, icones: ic.familia, extras: EXTRAS.map(([n]) => n), temas: Object.values(TEMAS).map((t) => ({ id: t.id, nome: t.nome, descricao: t.descricao, harmonia: t.harmonia, semente: t.semente, terciaria: t.terciaria, modo: t.modo, padrao: t === PADRAO })), papeis: Object.keys(ESQUEMAS.light), paletas: Object.fromEntries(Object.entries(paletas).map(([n, p]) => [n, Object.keys(p).map(Number)])), tipos, janelas })}</script>\n`;
 const htmlNovo = html.slice(0, i) + novoBloco + html.slice(f);
 
 // ── 7. quadro visual tema.svg (versão e data vêm do catálogo) ──────────────

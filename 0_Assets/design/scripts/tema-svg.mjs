@@ -352,9 +352,10 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     const cx = M + (i % 3) * (CW + 24), cy = y + Math.floor(i / 3) * (CH + 24), clip = `tema-${t.id}`;
     const C = t.esquemas.light, D = t.esquemas.dark;
     let g = `<clipPath id="${clip}">${rect(cx, cy, CW, CH, cantos.large, '#000000')}</clipPath><g clip-path="url(#${clip})">`;
-    g += rect(cx, cy, CW, CAB + LADO, 0, C['surface-container-low']) + rect(cx, cy + CAB + LADO, CW, LADO, 0, D['surface-container-low']);
+    g += rect(cx, cy, CW, CAB + LADO, 0, C.surface) + rect(cx, cy + CAB + LADO, CW, LADO, 0, D.surface);
     g += txt(cx + 16, cy + 28, t.nome + (t.padrao ? ' · padrão' : ''), 'title-medium', C['on-surface']);
-    g += mono(cx + CW - 16, cy + 28, t.semente + (t.terciaria ? ' + ' + t.terciaria : ''), C['on-surface-variant'], 'end');
+    const modo = t.modo ? ` · melhor no ${t.modo === 'dark' ? 'escuro' : 'claro'}` : '';
+    g += mono(cx + CW - 16, cy + 28, (t.variante === 'monochrome' ? 'monocromático' : t.semente + (t.terciaria ? ' + ' + t.terciaria : '')) + modo, C['on-surface-variant'], 'end');
     quebrar(`${t.descricao} Harmonia: ${t.harmonia}.`, CW - 32, 'body-small').slice(0, 3).forEach((l, k) => { g += txt(cx + 16, cy + 50 + k * 16, l, 'body-small', C['on-surface-variant']); });
     for (const [e, oy] of [[C, cy + CAB], [D, cy + CAB + LADO]]) {
       const papeis = ['primary', 'primary-container', 'secondary', 'secondary-container', 'tertiary', 'tertiary-container'];

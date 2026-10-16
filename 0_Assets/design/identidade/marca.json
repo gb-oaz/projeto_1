@@ -115,6 +115,56 @@
         "neutra": null,
         "erro": "#8E0052",
         "variante": "fidelity"
+      },
+      "branco": {
+        "nome": "Branco",
+        "descricao": "Minimalista e luminoso: superfícies brancas puras, botões pretos, cor só no conteúdo (fotos, ilustrações).",
+        "harmonia": "monocromática clara (branco + preto)",
+        "semente": "#808080",
+        "secundaria": null,
+        "terciaria": null,
+        "neutra": null,
+        "erro": null,
+        "variante": "monochrome",
+        "modo_preferido": "light",
+        "ajustes": {
+          "light": {
+            "surface": "#FFFFFF",
+            "background": "#FFFFFF",
+            "surface-bright": "#FFFFFF",
+            "surface-container-lowest": "#FFFFFF",
+            "surface-container-low": "#FAFAFA",
+            "surface-container": "#F5F5F5",
+            "surface-container-high": "#EFEFEF",
+            "surface-container-highest": "#E8E8E8",
+            "on-primary": "#FFFFFF"
+          }
+        }
+      },
+      "preto": {
+        "nome": "Preto",
+        "descricao": "Elegante e imersivo: fundo preto absoluto (economiza bateria em telas OLED), botões brancos, cor só no conteúdo.",
+        "harmonia": "monocromática escura (preto + branco)",
+        "semente": "#808080",
+        "secundaria": null,
+        "terciaria": null,
+        "neutra": null,
+        "erro": null,
+        "variante": "monochrome",
+        "modo_preferido": "dark",
+        "ajustes": {
+          "dark": {
+            "surface": "#000000",
+            "background": "#000000",
+            "surface-dim": "#000000",
+            "surface-container-lowest": "#000000",
+            "surface-container-low": "#0D0D0D",
+            "surface-container": "#141414",
+            "surface-container-high": "#1C1C1C",
+            "surface-container-highest": "#262626",
+            "on-primary": "#000000"
+          }
+        }
       }
     },
     "$variantes": "tonal-spot (padrão do M3, discreto) · fidelity e content (mantêm a cor da marca fiel à semente) · vibrant · expressive · neutral · monochrome · rainbow · fruit-salad",

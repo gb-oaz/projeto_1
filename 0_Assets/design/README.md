@@ -35,7 +35,7 @@ pnpm run conferir   # falha se algum arquivo gerado estiver desatualizado
 
 `identidade/marca.json` → `cores.temas` define as combinações de cor (hoje:
 roxo (padrão), oceano, floresta, aurora, grafite, magenta, sol, girassol,
-rubi e cereja), cada uma com
+rubi, cereja, branco e preto), cada uma com
 semente, terciária, harmonia e variante do M3; `cores.tema_padrao` escolhe o
 padrão. Todas geram os mesmos papéis (`primary`, `surface`…), então trocar de
 tema não muda componente nenhum:
