@@ -32,7 +32,7 @@ const ICONES = {
   evento: 'M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z',
 };
 
-export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras }) {
+export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas }) {
   const L = 1600, M = 40, GAP = 40, PW = (L - 2 * M - GAP) / 2, PAD = 24;
   const fundo = esquemas.dark; // o quadro é escuro, como o tema dos diagramas
   const comp = Object.fromEntries(tokensComp.map((t) => [t.nome, t]));
@@ -45,6 +45,12 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
   const nivel = (n) => { const t = comp[n]; return t?.ref?.grupo === 'elevation' ? t.ref.nome : 'level0'; };
 
   // ── primitivas ──
+  // quebra um texto em linhas que caibam em `max` px no papel tipográfico dado
+  const quebrar = (texto, max, papel) => texto.split(' ').reduce((ls, p) => {
+    const u = ls[ls.length - 1];
+    if (u && largura(u + ' ' + p, papel) <= max) ls[ls.length - 1] = u + ' ' + p; else ls.push(p);
+    return ls;
+  }, []);
   const largura = (s, papel) => String(s).length * tipos[papel].size * (tipos[papel].weight >= 500 ? 0.58 : 0.55);
   const rect = (x, y, w, h, r, fill, extra = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(r, h / 2, w / 2)}"${fill ? ` fill="${fill}"` : ' fill="none"'}${extra ? ' ' + extra : ''}/>`;
   const sombra = (n) => (n && n !== 'level0' ? ` filter="url(#el-${n})"` : '');
@@ -338,6 +344,29 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     return rect(sx, sy, SW, SH, cantos.small, e[n], n.startsWith('surface') ? `stroke="${e['outline-variant']}"` : '')
       + txt(sx + 10, sy + 22, n, n.length > 22 ? 'label-small' : 'label-medium', par(e, n)) + mono(sx + 10, sy + 42, e[n], par(e, n));
   }).join('')).join(''));
+
+  // temas de cor
+  secao('Temas de cor', `${temas.length} combinações prontas; cada uma gera os mesmos papéis de cor (troque o tema sem mudar componentes). Padrão: ${temas.find((t) => t.padrao).nome}.`);
+  const CW = (L - 2 * M - 2 * 24) / 3, CAB = 84, LADO = 104, CH = CAB + 2 * LADO;
+  temas.forEach((t, i) => {
+    const cx = M + (i % 3) * (CW + 24), cy = y + Math.floor(i / 3) * (CH + 24), clip = `tema-${t.id}`;
+    const C = t.esquemas.light, D = t.esquemas.dark;
+    let g = `<clipPath id="${clip}">${rect(cx, cy, CW, CH, cantos.large, '#000000')}</clipPath><g clip-path="url(#${clip})">`;
+    g += rect(cx, cy, CW, CAB + LADO, 0, C['surface-container-low']) + rect(cx, cy + CAB + LADO, CW, LADO, 0, D['surface-container-low']);
+    g += txt(cx + 16, cy + 28, t.nome + (t.padrao ? ' · padrão' : ''), 'title-medium', C['on-surface']);
+    g += mono(cx + CW - 16, cy + 28, t.semente + (t.terciaria ? ' + ' + t.terciaria : ''), C['on-surface-variant'], 'end');
+    quebrar(`${t.descricao} Harmonia: ${t.harmonia}.`, CW - 32, 'body-small').slice(0, 3).forEach((l, k) => { g += txt(cx + 16, cy + 50 + k * 16, l, 'body-small', C['on-surface-variant']); });
+    for (const [e, oy] of [[C, cy + CAB], [D, cy + CAB + LADO]]) {
+      const papeis = ['primary', 'primary-container', 'secondary', 'secondary-container', 'tertiary', 'tertiary-container'];
+      const fw = (CW - 32) / papeis.length;
+      papeis.forEach((n, k) => { g += `<rect x="${cx + 16 + k * fw}" y="${oy + 8}" width="${fw}" height="28" fill="${e[n]}"/>`; });
+      g += fila([(x0, y0) => botao(e, x0, y0, 'Filled', 'filled'), (x0, y0) => botao(e, x0, y0, 'Tonal', 'tonal'),
+        (x0, y0) => chip(e, x0, y0 + 4, 'Chip', { selecionado: true }), (x0, y0) => fab(e, x0, y0, 'small')], cx + 16, oy + 48, 10);
+    }
+    g += '</g>' + rect(cx + 0.5, cy + 0.5, CW - 1, CH - 1, cantos.large, null, `stroke="${fundo['outline-variant']}"`);
+    partes.push(g);
+  });
+  y += Math.ceil(temas.length / 3) * (CH + 24) - 24;
 
   // tipografia
   secao('Tipografia', `Marca: ${fonte.brand.familia} (display, headline, title-large) · Texto: ${fonte.plain.familia} (o resto). Tamanho / altura de linha · peso · tracking.`);

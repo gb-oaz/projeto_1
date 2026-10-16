@@ -12,15 +12,15 @@ Você é designer de produto e mantém o design system. A identidade visual do b
 ```
 0_Assets/design/
 ├── identidade/                 a marca — o que muda quando a identidade chegar
-│   ├── marca.json              cores-semente, variante do esquema, fontes, ícones   (edite)
+│   ├── marca.json              temas de cor, fontes, ícones                         (edite)
 │   ├── logos/ icones/ imagens/ animacoes/ fontes/                                   (arquivos)
 ├── tokens/
 │   ├── fundamentos.json        tipografia, forma, elevação, espaçamento, layout, movimento, estados (edite)
 │   ├── componentes.json        tokens md.comp.* — só referências {md.sys.*} ou medidas em dp      (edite)
-│   └── cores.json              paletas e esquemas claro/escuro/alto contraste                   (gerado)
+│   └── cores.json              paletas e esquemas claro/escuro/alto contraste por tema          (gerado)
 ├── plataformas/                                                                                  (gerado)
 │   ├── web/tokens.css  web/tipografia.css  web/tokens.ts                      Vue
-│   └── maui/Tokens.xaml                                                        .NET MAUI
+│   └── maui/Tokens.xaml  maui/paletas/Paleta<Tema>.xaml                         .NET MAUI
 ├── design-system.html          catálogo vivo; o bloco design:tokens é gerado, o resto é editado
 ├── tema.svg                    quadro visual de todos os componentes, claro e escuro      (gerado)
 ├── scripts/gerar.mjs           gerador (@material/material-color-utilities, a biblioteca do M3)
@@ -42,14 +42,16 @@ Leia `design-system.html` (regras e catálogo) e os JSON antes de mudar algo. Pa
 ## Mudar a identidade (cores, fontes, ícones)
 
 1. Edite `identidade/marca.json`:
-   - `cores.semente` (`#RRGGBB`) gera todo o esquema; `secundaria`, `terciaria`, `neutra`, `erro` são opcionais (null = derivadas).
-   - `cores.variante`: `tonal-spot` é o padrão; use `fidelity` ou `content` quando a cor da marca tiver de aparecer fiel no `primary`.
-   - `cores.extras`: cores fora dos papéis do M3 (ex.: `sucesso`, `aviso`), harmonizadas com a semente; geram `X`, `on-X`, `X-container` e `on-X-container`.
+   - `cores.temas.<id>`: um tema de cor (paleta) por entrada, com `nome`, `descricao` (para que serve), `harmonia` (análoga, complementar, triádica…), `semente` (`#RRGGBB`, gera o esquema), `secundaria`/`terciaria`/`neutra`/`erro` opcionais (null = derivadas pelo M3; a `terciaria` define a combinação) e `variante`. `cores.tema_padrao` é o tema aplicado sem escolha.
+   - `variante`: `fidelity` mantém a cor da marca reconhecível (a semente vira o `primary-container`); `tonal-spot` é o padrão discreto do M3 (dessatura a semente); `neutral` para temas sóbrios (grafite).
+   - Todos os temas geram os **mesmos papéis**: componente nunca sabe o tema. Web troca com `<html data-paleta="<id>">` (ou `class="md-paleta-<id>"` num trecho); MAUI com `plataformas/maui/paletas/Paleta<Tema>.xaml` depois de `Tokens.xaml`.
+   - Tema novo: escolha a combinação por harmonia, confira no catálogo (seção **Temas de cor**, claro e escuro) e no `tema.svg`; os pares `on-X`/`X` saem com contraste garantido, mas olhe se a cor da marca continua reconhecível.
+   - `cores.extras`: cores fora dos papéis do M3 (ex.: `sucesso`, `aviso`), harmonizadas com a semente de cada tema; geram `X`, `on-X`, `X-container` e `on-X-container`.
    - `tipografia.marca` / `tipografia.texto`: família, alternativas, `google_fonts` (só a web carrega do Google; o app embute) e `arquivos` por peso em `identidade/fontes/` (aliases MAUI `MarcaRegular`, `TextoMedium`…).
    - `icones`: Material Symbols e seus eixos (preenchimento, peso, grau, tamanho ótico).
    - Ao receber a identidade definitiva, mude `status` para `"definida"`.
 2. Rode em `0_Assets/design/`: `corepack enable && pnpm install && pnpm run gerar` (Node 24).
-3. Abra o catálogo e confira os dois esquemas: contraste dos pares, cores extras e tipografia.
+3. Abra o catálogo e confira cada tema (seção **Temas de cor**) nos dois esquemas: contraste dos pares, cores extras e tipografia.
 4. Nova versão do catálogo (ver **Versionamento**).
 
 ## Adicionar arquivos de marca
@@ -94,7 +96,7 @@ Arquivos gerados e o catálogo vão no mesmo commit que a mudança de origem.
 ## Revisão (antes de entregar)
 
 - `pnpm run conferir` passa (nada desatualizado).
-- `xmllint --noout plataformas/maui/Tokens.xaml tema.svg`.
+- `xmllint --noout plataformas/maui/*.xaml plataformas/maui/paletas/*.xaml tema.svg`.
 - Renderize o `tema.svg` (Chrome headless, em fatias de ~1450px com `<img>` e `margin-top` negativo) e **olhe**: nada vazando dos painéis, textos sem sobreposição, claro e escuro coerentes.
 - Sem cor solta fora do bloco gerado: `awk '/design:tokens:inicio/{s=1} /design:tokens:fim/{s=0} !s' design-system.html | grep -nE ':\s*#[0-9a-fA-F]{3,8}\b'` sai vazio.
 - Abra o catálogo no Chrome headless em 1440px e num iframe de 390px (o headless não desce de 500px de janela) e **olhe**: claro e escuro, nada cortado, sem rolagem horizontal da página.

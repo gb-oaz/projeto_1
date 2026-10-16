@@ -5,6 +5,7 @@
 
   Uso: em App.xaml, <ResourceDictionary Source="Tokens.xaml" /> dentro de MergedDictionaries.
   Cores: <Papel>Light e <Papel>Dark; use com AppThemeBinding, como nos estilos abaixo.
+  As cores abaixo são do tema padrão (roxo); os outros temas estão em paletas/Paleta<Tema>.xaml.
   Fontes: registre em MauiProgram.ConfigureFonts os aliases MarcaRegular, TextoMedium, TextoRegular
   (arquivos em 0_Assets/design/identidade/fontes/, listados em marca.json).
   Medidas em unidades independentes de dispositivo (= dp). Alto contraste e easing ficam só na web.

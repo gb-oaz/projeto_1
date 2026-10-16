@@ -8,6 +8,7 @@
 //                         plataformas/web/tipografia.css  classes .md-typescale-*
 //                         plataformas/web/tokens.ts    tokens tipados e janelas
 //                         plataformas/maui/Tokens.xaml ResourceDictionary (.NET MAUI)
+//                         plataformas/maui/paletas/    um dicionário de cores por tema
 //                         tema.svg                     quadro visual (cores, tipos, componentes)
 //                         design-system.html           só o bloco entre os marcadores
 //                                                      design:tokens:inicio/fim
@@ -17,7 +18,7 @@
 // Cores: @material/material-color-utilities (a biblioteca oficial do M3, HCT).
 // Nada aqui é editado à mão: mude a identidade ou os tokens e rode de novo.
 // =============================================================================
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -53,73 +54,85 @@ const VARIANTES = {
   vibrant: SchemeVibrant, expressive: SchemeExpressive, neutral: SchemeNeutral,
   monochrome: SchemeMonochrome, rainbow: SchemeRainbow, 'fruit-salad': SchemeFruitSalad,
 };
-const c = marca.cores;
-const Variante = VARIANTES[c.variante];
-if (!Variante) throw new Error(`cores.variante "${c.variante}" inválida: use ${Object.keys(VARIANTES).join(', ')}`);
-const semente = argbFromHex(c.semente);
-const paletaDe = (h) => (h ? TonalPalette.fromInt(argbFromHex(h)) : null);
-
-function esquema(escuro, contraste) {
-  const base = new Variante(Hct.fromInt(semente), escuro, contraste);
-  const s = new DynamicScheme({
-    sourceColorArgb: semente, variant: base.variant, contrastLevel: contraste, isDark: escuro,
-    primaryPalette: base.primaryPalette,
-    secondaryPalette: paletaDe(c.secundaria) ?? base.secondaryPalette,
-    tertiaryPalette: paletaDe(c.terciaria) ?? base.tertiaryPalette,
-    neutralPalette: paletaDe(c.neutra) ?? base.neutralPalette,
-    neutralVariantPalette: base.neutralVariantPalette,
-  });
-  if (c.erro) s.errorPalette = paletaDe(c.erro);
-  return s;
-}
-
-// Papéis de cor do M3, na ordem da biblioteca (sem as cores-chave das paletas)
+const cfg = marca.cores;
+const kebabOk = (n) => /^[a-z][a-z0-9-]*$/.test(n);
 const PAPEIS = Object.getOwnPropertyNames(MaterialDynamicColors)
   .filter((k) => MaterialDynamicColors[k] instanceof DynamicColor && !k.endsWith('PaletteKeyColor'));
-
-const EXTRAS = Object.entries(c.extras ?? {}).filter(([k]) => !k.startsWith('$'))
-  .map(([nome, e]) => [nome, customColor(semente, { name: nome, value: argbFromHex(e.cor), blend: !!e.harmonizar })]);
-
-function papeis(escuro, contraste) {
-  const s = esquema(escuro, contraste);
-  const r = Object.fromEntries(PAPEIS.map((k) => [kebab(k), hex(MaterialDynamicColors[k].getArgb(s))]));
-  for (const [nome, cc] of EXTRAS) {
-    const g = escuro ? cc.dark : cc.light;
-    Object.assign(r, {
-      [nome]: hex(g.color), [`on-${nome}`]: hex(g.onColor),
-      [`${nome}-container`]: hex(g.colorContainer), [`on-${nome}-container`]: hex(g.onColorContainer),
-    });
-  }
-  return r;
-}
-
-const ESQUEMAS = {
-  light: papeis(false, 0),
-  dark: papeis(true, 0),
-  'light-high-contrast': papeis(false, 1),
-  'dark-high-contrast': papeis(true, 1),
-};
-
 const TONS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100];
 const TONS_NEUTROS = [0, 4, 6, 10, 12, 17, 20, 22, 24, 30, 40, 50, 60, 70, 80, 87, 90, 92, 94, 95, 96, 98, 99, 100];
-const ref = esquema(false, 0);
-const PALETAS = {
-  primary: [ref.primaryPalette, TONS], secondary: [ref.secondaryPalette, TONS],
-  tertiary: [ref.tertiaryPalette, TONS], neutral: [ref.neutralPalette, TONS_NEUTROS],
-  'neutral-variant': [ref.neutralVariantPalette, TONS], error: [ref.errorPalette, TONS],
-  ...Object.fromEntries(EXTRAS.map(([nome, cc]) => [nome, [TonalPalette.fromInt(cc.value), TONS]])),
-};
-const paletas = Object.fromEntries(Object.entries(PALETAS)
-  .map(([nome, [p, tons]]) => [nome, Object.fromEntries(tons.map((t) => [t, hex(p.tone(t))]))]));
+const paletaDe = (h) => (h ? TonalPalette.fromInt(argbFromHex(h)) : null);
 
+// Um tema de cor: esquemas claro/escuro/alto contraste e paletas tonais
+function gerarTema(id, t) {
+  if (!kebabOk(id)) throw new Error(`cores.temas: nome "${id}" deve ser kebab-case`);
+  const Variante = VARIANTES[t.variante];
+  if (!Variante) throw new Error(`cores.temas.${id}.variante "${t.variante}" inválida: use ${Object.keys(VARIANTES).join(', ')}`);
+  const semente = argbFromHex(t.semente);
+  const esquema = (escuro, contraste) => {
+    const base = new Variante(Hct.fromInt(semente), escuro, contraste);
+    const s = new DynamicScheme({
+      sourceColorArgb: semente, variant: base.variant, contrastLevel: contraste, isDark: escuro,
+      primaryPalette: base.primaryPalette,
+      secondaryPalette: paletaDe(t.secundaria) ?? base.secondaryPalette,
+      tertiaryPalette: paletaDe(t.terciaria) ?? base.tertiaryPalette,
+      neutralPalette: paletaDe(t.neutra) ?? base.neutralPalette,
+      neutralVariantPalette: base.neutralVariantPalette,
+    });
+    if (t.erro) s.errorPalette = paletaDe(t.erro);
+    return s;
+  };
+  // extras (sucesso, aviso…) harmonizados com a semente deste tema
+  const extras = Object.entries(cfg.extras ?? {}).filter(([k]) => !k.startsWith('$'))
+    .map(([nome, e]) => [nome, customColor(semente, { name: nome, value: argbFromHex(e.cor), blend: !!e.harmonizar })]);
+  const papeis = (escuro, contraste) => {
+    const s = esquema(escuro, contraste);
+    const r = Object.fromEntries(PAPEIS.map((k) => [kebab(k), hex(MaterialDynamicColors[k].getArgb(s))]));
+    for (const [nome, cc] of extras) {
+      const g = escuro ? cc.dark : cc.light;
+      Object.assign(r, {
+        [nome]: hex(g.color), [`on-${nome}`]: hex(g.onColor),
+        [`${nome}-container`]: hex(g.colorContainer), [`on-${nome}-container`]: hex(g.onColorContainer),
+      });
+    }
+    return r;
+  };
+  const ref = esquema(false, 0);
+  const fontes = {
+    primary: [ref.primaryPalette, TONS], secondary: [ref.secondaryPalette, TONS],
+    tertiary: [ref.tertiaryPalette, TONS], neutral: [ref.neutralPalette, TONS_NEUTROS],
+    'neutral-variant': [ref.neutralVariantPalette, TONS], error: [ref.errorPalette, TONS],
+    ...Object.fromEntries(extras.map(([nome, cc]) => [nome, [TonalPalette.fromInt(cc.value), TONS]])),
+  };
+  return {
+    id, nome: t.nome ?? id, descricao: t.descricao ?? '', harmonia: t.harmonia ?? '',
+    semente: t.semente.toUpperCase(), terciaria: t.terciaria?.toUpperCase() ?? null, variante: t.variante,
+    extras: extras.map(([n]) => n),
+    esquemas: { light: papeis(false, 0), dark: papeis(true, 0), 'light-high-contrast': papeis(false, 1), 'dark-high-contrast': papeis(true, 1) },
+    paletas: Object.fromEntries(Object.entries(fontes).map(([n, [p, tons]]) => [n, Object.fromEntries(tons.map((x) => [x, hex(p.tone(x))]))])),
+  };
+}
+
+const TEMAS = Object.fromEntries(Object.entries(cfg.temas).filter(([k]) => !k.startsWith('$')).map(([id, t]) => [id, gerarTema(id, t)]));
+const PADRAO = TEMAS[cfg.tema_padrao];
+if (!PADRAO) throw new Error(`cores.tema_padrao "${cfg.tema_padrao}" não está em cores.temas`);
+const OUTROS = Object.values(TEMAS).filter((t) => t !== PADRAO);
+// o tema padrão alimenta os nomes sem prefixo (--md-sys-color-*, PrimaryLight, colors)
+const ESQUEMAS = PADRAO.esquemas;
+const paletas = PADRAO.paletas;
+const EXTRAS = PADRAO.extras.map((n) => [n]);
+const c = { semente: PADRAO.semente, variante: PADRAO.variante };
+
+const dtcg = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, { $type: 'color', $value: v }]));
 const cores = {
-  $descricao: `${AVISO} Esquema ${c.variante} da semente ${c.semente.toUpperCase()}.`,
-  md: {
-    ref: { palette: Object.fromEntries(Object.entries(paletas).map(([n, p]) =>
-      [n, Object.fromEntries(Object.entries(p).map(([t, v]) => [t, { $type: 'color', $value: v }]))])) },
-    sys: { color: Object.fromEntries(Object.entries(ESQUEMAS).map(([n, e]) =>
-      [n, Object.fromEntries(Object.entries(e).map(([k, v]) => [k, { $type: 'color', $value: v }]))])) },
-  },
+  $descricao: `${AVISO} Um grupo por tema de cor; o padrão é "${PADRAO.id}".`,
+  padrao: PADRAO.id,
+  temas: Object.fromEntries(Object.values(TEMAS).map((t) => [t.id, {
+    $descricao: `${t.nome}: ${t.descricao} Harmonia ${t.harmonia}. Semente ${t.semente}, esquema ${t.variante}.`,
+    md: {
+      ref: { palette: Object.fromEntries(Object.entries(t.paletas).map(([n, p]) => [n, dtcg(p)])) },
+      sys: { color: Object.fromEntries(Object.entries(t.esquemas).map(([n, e]) => [n, dtcg(e)])) },
+    },
+  }])),
 };
 
 // ── 2. tokens resolvidos ─────────────────────────────────────────────────────
@@ -217,18 +230,38 @@ const janelaVars = (j, n) => [
 ];
 const [primeira, ...demais] = Object.entries(janelas);
 
+// Blocos de cor de um tema. O padrão usa :root; os outros, <html data-paleta="id">.
+// Trechos da página: .md-paleta-<id> (claro) e .md-paleta-<id>.md-scheme-dark (escuro);
+// .md-scheme-light/.md-scheme-dark sozinhos usam o tema padrão.
+const varsRef = (t) => Object.entries(t.paletas).flatMap(([n, p]) => Object.entries(p).map(([x, v]) => `--md-ref-palette-${n}${x}: ${v};`));
+function cssCores(t) {
+  const padrao = t === PADRAO;
+  const raiz = padrao ? ':root' : `:root[data-paleta="${t.id}"]`;
+  const claro = padrao ? [raiz, '.md-scheme-light', `.md-paleta-${t.id}`] : [raiz, `.md-paleta-${t.id}`];
+  const escuro = padrao ? ['.md-scheme-dark', `.md-paleta-${t.id}.md-scheme-dark`] : [`.md-paleta-${t.id}.md-scheme-dark`];
+  const E = t.esquemas, sel = (a, recuo = '') => a.join(`,\n${recuo}`);
+  const media = (q, ...blocos) => `@media ${q} {\n${blocos.join('\n')}\n}`;
+  return [
+    `/* ── tema de cor: ${t.nome} (${t.id})${padrao ? ' · padrão' : ''} — ${t.harmonia} ── */`,
+    bloco(sel(claro), ['color-scheme: light;', ...(padrao ? [] : varsRef(t)), ...varsCor(E.light)]),
+    bloco(sel(escuro), ['color-scheme: dark;', ...varsCor(E.dark)]),
+    media('(prefers-color-scheme: dark)', bloco(`${raiz}:not([data-theme="light"])`, ['color-scheme: dark;', ...varsCor(E.dark)], '  ')),
+    bloco(`${raiz}[data-theme="dark"]`, ['color-scheme: dark;', ...varsCor(E.dark)]),
+    media('(prefers-contrast: more)', bloco(sel(claro, '  '), varsCor(E['light-high-contrast']), '  '), bloco(sel(escuro, '  '), varsCor(E['dark-high-contrast']), '  ')),
+    media('(prefers-contrast: more) and (prefers-color-scheme: dark)', bloco(`${raiz}:not([data-theme="light"])`, varsCor(E['dark-high-contrast']), '  ')),
+    media('(prefers-contrast: more)', bloco(`${raiz}[data-theme="dark"]`, varsCor(E['dark-high-contrast']), '  ')),
+  ];
+}
+
 const css = [
-  `/* boaz · tokens do design system (Material Design 3)\n * ${AVISO}\n *\n * Esquema claro por padrão; escuro pelo sistema ou por <html data-theme="dark">\n * (data-theme="light" força o claro). Alto contraste segue prefers-contrast: more.\n * .md-scheme-light / .md-scheme-dark aplicam um esquema só a um trecho da página. */`,
+  `/* boaz · tokens do design system (Material Design 3)\n * ${AVISO}\n *\n * Esquema claro por padrão; escuro pelo sistema ou por <html data-theme="dark">\n * (data-theme="light" força o claro). Alto contraste segue prefers-contrast: more.\n * .md-scheme-light / .md-scheme-dark aplicam um esquema só a um trecho da página.
+ *
+ * Temas de cor: ${Object.values(TEMAS).map((t) => t.id + (t === PADRAO ? ' (padrão)' : '')).join(', ')}.
+ * Troque com <html data-paleta="<id>">; num trecho, class="md-paleta-<id>" (+ md-scheme-dark). */`,
   bloco(':root', [...raiz, '', '/* janela compact (padrão, celular) */', ...janelaVars(primeira[1], primeira[0])]),
-  bloco(':root,\n.md-scheme-light,\n.md-scheme-dark', dependentes),
+  bloco([':root', '.md-scheme-light', '.md-scheme-dark', ...Object.keys(TEMAS).map((id) => `.md-paleta-${id}`)].join(',\n'), dependentes),
   ...demais.map(([n, j]) => `@media (min-width: ${j.min}px) {\n${bloco(':root', janelaVars(j, n), '  ')}\n}`),
-  bloco(':root,\n.md-scheme-light', ['color-scheme: light;', ...varsCor(ESQUEMAS.light)]),
-  bloco('.md-scheme-dark', ['color-scheme: dark;', ...varsCor(ESQUEMAS.dark)]),
-  `@media (prefers-color-scheme: dark) {\n${bloco(':root:not([data-theme="light"])', ['color-scheme: dark;', ...varsCor(ESQUEMAS.dark)], '  ')}\n}`,
-  bloco(':root[data-theme="dark"]', ['color-scheme: dark;', ...varsCor(ESQUEMAS.dark)]),
-  `@media (prefers-contrast: more) {\n${bloco(':root,\n  .md-scheme-light', varsCor(ESQUEMAS['light-high-contrast']), '  ')}\n${bloco('.md-scheme-dark', varsCor(ESQUEMAS['dark-high-contrast']), '  ')}\n}`,
-  `@media (prefers-contrast: more) and (prefers-color-scheme: dark) {\n${bloco(':root:not([data-theme="light"])', varsCor(ESQUEMAS['dark-high-contrast']), '  ')}\n}`,
-  `@media (prefers-contrast: more) {\n${bloco(':root[data-theme="dark"]', varsCor(ESQUEMAS['dark-high-contrast']), '  ')}\n}`,
+  ...Object.values(TEMAS).flatMap(cssCores),
   `@media (prefers-reduced-motion: reduce) {\n${bloco(':root', Object.keys(duracoes).map((n) => `--md-sys-motion-duration-${n}: 0ms;`), '  ')}\n}`,
 ].join('\n\n') + '\n';
 
@@ -263,6 +296,18 @@ ${Object.entries(janelas).reverse().map(([n, j]) => `  if (width >= ${j.min}) re
 export const windowMedia: Record<WindowClass, string> = ${JSON.stringify(Object.fromEntries(Object.entries(janelas).map(([n, j]) =>
   [n, j.max == null ? `(min-width: ${j.min}px)` : j.min === 0 ? `(max-width: ${j.max}px)` : `(min-width: ${j.min}px) and (max-width: ${j.max}px)`])), null, 2)};
 
+export type PaletteId = ${Object.keys(TEMAS).map((id) => `'${id}'`).join(' | ')};
+
+/** Tema de cor padrão (o que vale sem <html data-paleta>). */
+export const defaultPalette: PaletteId = '${PADRAO.id}';
+
+/** Temas de cor: aplique na web com document.documentElement.dataset.paleta = id. */
+export const palettes = ${JSON.stringify(Object.fromEntries(Object.values(TEMAS).map((t) => [t.id, {
+  name: t.nome, description: t.descricao, harmony: t.harmonia, seed: t.semente,
+  colors: Object.fromEntries(Object.entries(t.esquemas).map(([n, e]) => [camel(n), objCamel(e)])),
+}])), null, 2)} as const;
+
+/** Cores do tema padrão. */
 export const colors = ${JSON.stringify(Object.fromEntries(Object.entries(ESQUEMAS).map(([n, e]) => [camel(n), objCamel(e)])), null, 2)} as const;
 
 export const typeface = ${JSON.stringify({ brand: pilhaFonte(fonte.brand), plain: pilhaFonte(fonte.plain) }, null, 2)} as const;
@@ -298,6 +343,7 @@ const xaml = `<?xml version="1.0" encoding="UTF-8" ?>
 
   Uso: em App.xaml, <ResourceDictionary Source="Tokens.xaml" /> dentro de MergedDictionaries.
   Cores: <Papel>Light e <Papel>Dark; use com AppThemeBinding, como nos estilos abaixo.
+  As cores abaixo são do tema padrão (${PADRAO.id}); os outros temas estão em paletas/Paleta<Tema>.xaml.
   Fontes: registre em MauiProgram.ConfigureFonts os aliases ${[...new Set(Object.values(tipos).map(aliasFonte))].join(', ')}
   (arquivos em 0_Assets/design/identidade/fontes/, listados em marca.json).
   Medidas em unidades independentes de dispositivo (= dp). Alto contraste e easing ficam só na web.
@@ -359,6 +405,25 @@ ${Object.entries(BOTOES).map(([n, v]) => [
 </ResourceDictionary>
 `;
 
+// MAUI: um dicionário por tema de cor, com as mesmas chaves das cores de Tokens.xaml
+const xamlPaleta = (t) => `<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  boaz · tema de cor ${t.nome} (${t.id})${t === PADRAO ? ' · padrão' : ''} — ${t.harmonia}
+  ${AVISO}
+
+  Mesmas chaves de cor de Tokens.xaml (<Papel>Light / <Papel>Dark). Para usar este tema, inclua
+  este arquivo DEPOIS de Tokens.xaml em MergedDictionaries; para trocar em tempo de execução,
+  substitua o dicionário e recrie as páginas (os estilos usam StaticResource).
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+${Object.keys(t.esquemas.light).flatMap((k) => [
+  `  <Color x:Key="${pascal(k)}Light">${t.esquemas.light[k]}</Color>`,
+  `  <Color x:Key="${pascal(k)}Dark">${t.esquemas.dark[k]}</Color>`,
+]).join('\n')}
+</ResourceDictionary>
+`;
+
 // ── 6. catálogo: bloco de tokens embutido no design-system.html ─────────────
 const fontesGoogle = [...new Set([fonte.brand, fonte.plain].filter((f) => f.google_fonts).map((f) => f.familia))];
 const ic = marca.icones;
@@ -374,7 +439,7 @@ const i = html.indexOf(INI);
 const f = html.indexOf(FIM);
 if (i < 0 || f < 0) throw new Error(`${htmlArq}: marcadores ${INI} … ${FIM} não encontrados`);
 const iconeCss = `.material-symbols { font-family: "${ic.familia}"; font-weight: normal; font-style: normal; font-size: var(--md-sys-layout-icon-size); line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-variation-settings: "FILL" ${ic.preenchimento}, "wght" ${ic.peso}, "GRAD" ${ic.grau}, "opsz" ${ic.tamanho_otico}; }`;
-const novoBloco = `${html.slice(i, html.indexOf('\n', i) + 1)}${linkFontes.join('\n')}\n<style id="design-tokens">\n${css}\n${tipografiaCss}\n${iconeCss}\n</style>\n<script id="design-dados" type="application/json">${JSON.stringify({ semente: c.semente.toUpperCase(), variante: c.variante, status: marca.status, fontes: { marca: fonte.brand.familia, texto: fonte.plain.familia }, icones: ic.familia, extras: EXTRAS.map(([n]) => n), papeis: Object.keys(ESQUEMAS.light), paletas: Object.fromEntries(Object.entries(paletas).map(([n, p]) => [n, Object.keys(p).map(Number)])), tipos, janelas })}</script>\n`;
+const novoBloco = `${html.slice(i, html.indexOf('\n', i) + 1)}${linkFontes.join('\n')}\n<style id="design-tokens">\n${css}\n${tipografiaCss}\n${iconeCss}\n</style>\n<script id="design-dados" type="application/json">${JSON.stringify({ semente: c.semente.toUpperCase(), variante: c.variante, status: marca.status, fontes: { marca: fonte.brand.familia, texto: fonte.plain.familia }, icones: ic.familia, extras: EXTRAS.map(([n]) => n), temas: Object.values(TEMAS).map((t) => ({ id: t.id, nome: t.nome, descricao: t.descricao, harmonia: t.harmonia, semente: t.semente, terciaria: t.terciaria, padrao: t === PADRAO })), papeis: Object.keys(ESQUEMAS.light), paletas: Object.fromEntries(Object.entries(paletas).map(([n, p]) => [n, Object.keys(p).map(Number)])), tipos, janelas })}</script>\n`;
 const htmlNovo = html.slice(0, i) + novoBloco + html.slice(f);
 
 // ── 7. quadro visual tema.svg (versão e data vêm do catálogo) ──────────────
@@ -383,6 +448,7 @@ const svg = temaSvg({
   esquemas: { light: ESQUEMAS.light, dark: ESQUEMAS.dark }, tipos, cantos, janelas, tokensComp, fonte,
   versao: meta('versao'), data: meta('data'), status: marca.status, semente: c.semente.toUpperCase(), variante: c.variante,
   extras: EXTRAS.map(([n]) => n),
+  temas: Object.values(TEMAS).map((t) => ({ ...t, padrao: t === PADRAO })),
 });
 
 // ── 8. escrever ou conferir ─────────────────────────────────────────────────
@@ -392,6 +458,7 @@ const saidas = {
   'plataformas/web/tipografia.css': tipografiaCss,
   'plataformas/web/tokens.ts': ts,
   'plataformas/maui/Tokens.xaml': xaml,
+  ...Object.fromEntries(Object.values(TEMAS).map((t) => [`plataformas/maui/paletas/Paleta${pascal(t.id)}.xaml`, xamlPaleta(t)])),
   [htmlArq]: htmlNovo,
   'tema.svg': svg,
 };
@@ -403,7 +470,7 @@ for (const [arq, conteudo] of Object.entries(saidas)) {
   if (atual === conteudo) { console.log(`  = ${arq}`); continue; }
   diferentes++;
   if (CONFERIR) console.log(`  ✖ ${arq} desatualizado`);
-  else { writeFileSync(caminho, conteudo); console.log(`  ✔ ${arq}`); }
+  else { mkdirSync(dirname(caminho), { recursive: true }); writeFileSync(caminho, conteudo); console.log(`  ✔ ${arq}`); }
 }
 if (CONFERIR && diferentes) {
   console.error(`\n${diferentes} arquivo(s) desatualizado(s): rode \`pnpm run gerar\` em ${relative(process.cwd(), RAIZ) || '.'}`);

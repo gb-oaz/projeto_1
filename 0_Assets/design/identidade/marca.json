@@ -2,39 +2,127 @@
   "$descricao": "Identidade visual do boaz: as sementes de cor, as fontes e o estilo de ícones. É o único arquivo a editar para trocar cor ou fonte da marca; depois rode `pnpm run gerar` em 0_Assets/design/.",
   "status": "provisoria",
   "nome": "boaz",
-
   "cores": {
-    "$descricao": "Cores em #RRGGBB. `semente` gera todo o esquema (Material Design 3, HCT). As demais são opcionais: null deixa o M3 derivá-las da semente; preenchida, a paleta daquele papel passa a seguir a cor informada.",
-    "semente": "#6750A4",
-    "secundaria": null,
-    "terciaria": null,
-    "neutra": null,
-    "erro": null,
-    "variante": "tonal-spot",
+    "$descricao": "Temas de cor (paletas) da identidade. Cada tema gera seus esquemas claro, escuro e de alto contraste a partir da `semente` (Material Design 3, HCT). `secundaria`, `terciaria`, `neutra` e `erro` são opcionais: null deixa o M3 derivá-las; preenchida, a paleta daquele papel segue a cor informada. `tema_padrao` é o tema aplicado sem escolha explícita (web: sem data-paleta; MAUI: Tokens.xaml).",
+    "tema_padrao": "roxo",
+    "temas": {
+      "roxo": {
+        "nome": "Roxo",
+        "descricao": "Referência do Material 3: neutro, tecnológico, seguro para começar.",
+        "harmonia": "tonal (terciária rosada derivada pelo M3)",
+        "semente": "#6750A4",
+        "secundaria": null,
+        "terciaria": null,
+        "neutra": null,
+        "erro": null,
+        "variante": "tonal-spot"
+      },
+      "oceano": {
+        "nome": "Oceano",
+        "descricao": "Azul de confiança com verde-água: produtos de serviço, finanças, saúde.",
+        "harmonia": "análoga fria (azul + verde-água)",
+        "semente": "#0B5FA5",
+        "secundaria": null,
+        "terciaria": "#00897B",
+        "neutra": null,
+        "erro": null,
+        "variante": "fidelity"
+      },
+      "floresta": {
+        "nome": "Floresta",
+        "descricao": "Verde de crescimento com âmbar: educação, progresso, sustentabilidade.",
+        "harmonia": "complementar suave (verde + âmbar)",
+        "semente": "#2E7D32",
+        "secundaria": null,
+        "terciaria": "#C77700",
+        "neutra": null,
+        "erro": null,
+        "variante": "fidelity"
+      },
+      "aurora": {
+        "nome": "Aurora",
+        "descricao": "Laranja energético com índigo: criativo, jogos, comunidade.",
+        "harmonia": "complementar (laranja + índigo)",
+        "semente": "#D9480F",
+        "secundaria": null,
+        "terciaria": "#3F51B5",
+        "neutra": null,
+        "erro": null,
+        "variante": "fidelity"
+      },
+      "grafite": {
+        "nome": "Grafite",
+        "descricao": "Cinza-azulado sóbrio com ciano de destaque: corporativo, painéis, ferramentas.",
+        "harmonia": "neutra com acento (grafite + ciano)",
+        "semente": "#455A64",
+        "secundaria": null,
+        "terciaria": "#0097A7",
+        "neutra": null,
+        "erro": null,
+        "variante": "neutral"
+      },
+      "magenta": {
+        "nome": "Magenta",
+        "descricao": "Magenta vibrante com verde-azulado: jovem, expressivo, entretenimento.",
+        "harmonia": "triádica (magenta + verde-azulado)",
+        "semente": "#B0177F",
+        "secundaria": null,
+        "terciaria": "#00796B",
+        "neutra": null,
+        "erro": null,
+        "variante": "fidelity"
+      }
+    },
     "$variantes": "tonal-spot (padrão do M3, discreto) · fidelity e content (mantêm a cor da marca fiel à semente) · vibrant · expressive · neutral · monochrome · rainbow · fruit-salad",
     "extras": {
       "$descricao": "Cores fora dos papéis do M3 (custom colors). `harmonizar` puxa a matiz levemente para a da semente, para combinar com o resto.",
-      "sucesso": { "cor": "#2E7D32", "harmonizar": true },
-      "aviso": { "cor": "#ED6C02", "harmonizar": true }
+      "sucesso": {
+        "cor": "#2E7D32",
+        "harmonizar": true
+      },
+      "aviso": {
+        "cor": "#ED6C02",
+        "harmonizar": true
+      }
     }
   },
-
   "tipografia": {
     "$descricao": "`marca` (brand) vai nos papéis display, headline e title-large; `texto` (plain) no resto. `arquivos` são os .ttf/.otf em identidade/fontes/, por peso, usados no app MAUI (alias <Papel><Peso>, ex.: TextoMedium).",
     "marca": {
       "familia": "Roboto",
-      "alternativas": ["system-ui", "-apple-system", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+      "alternativas": [
+        "system-ui",
+        "-apple-system",
+        "Segoe UI",
+        "Helvetica Neue",
+        "Arial",
+        "sans-serif"
+      ],
       "google_fonts": true,
-      "arquivos": { "regular": null, "medium": null, "bold": null }
+      "arquivos": {
+        "regular": null,
+        "medium": null,
+        "bold": null
+      }
     },
     "texto": {
       "familia": "Roboto",
-      "alternativas": ["system-ui", "-apple-system", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+      "alternativas": [
+        "system-ui",
+        "-apple-system",
+        "Segoe UI",
+        "Helvetica Neue",
+        "Arial",
+        "sans-serif"
+      ],
       "google_fonts": true,
-      "arquivos": { "regular": null, "medium": null, "bold": null }
+      "arquivos": {
+        "regular": null,
+        "medium": null,
+        "bold": null
+      }
     }
   },
-
   "icones": {
     "$descricao": "Material Symbols (fonte variável). Eixos: preenchimento 0|1, peso 100–700, grau -25|0|200, tamanho ótico 20–48.",
     "familia": "Material Symbols Rounded",
