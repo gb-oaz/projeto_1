@@ -1,0 +1,17 @@
+{
+  "name": "boaz-design",
+  "private": true,
+  "description": "Gerador dos tokens do design system do boaz (Material Design 3)",
+  "type": "module",
+  "packageManager": "pnpm@12.8.2",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "gerar": "node scripts/gerar.mjs",
+    "conferir": "node scripts/gerar.mjs --conferir"
+  },
+  "dependencies": {
+    "@material/material-color-utilities": "0.3.0"
+  }
+}

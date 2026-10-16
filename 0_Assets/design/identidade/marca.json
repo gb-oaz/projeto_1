@@ -1,0 +1,46 @@
+{
+  "$descricao": "Identidade visual do boaz: as sementes de cor, as fontes e o estilo de ícones. É o único arquivo a editar para trocar cor ou fonte da marca; depois rode `pnpm run gerar` em 0_Assets/design/.",
+  "status": "provisoria",
+  "nome": "boaz",
+
+  "cores": {
+    "$descricao": "Cores em #RRGGBB. `semente` gera todo o esquema (Material Design 3, HCT). As demais são opcionais: null deixa o M3 derivá-las da semente; preenchida, a paleta daquele papel passa a seguir a cor informada.",
+    "semente": "#6750A4",
+    "secundaria": null,
+    "terciaria": null,
+    "neutra": null,
+    "erro": null,
+    "variante": "tonal-spot",
+    "$variantes": "tonal-spot (padrão do M3, discreto) · fidelity e content (mantêm a cor da marca fiel à semente) · vibrant · expressive · neutral · monochrome · rainbow · fruit-salad",
+    "extras": {
+      "$descricao": "Cores fora dos papéis do M3 (custom colors). `harmonizar` puxa a matiz levemente para a da semente, para combinar com o resto.",
+      "sucesso": { "cor": "#2E7D32", "harmonizar": true },
+      "aviso": { "cor": "#ED6C02", "harmonizar": true }
+    }
+  },
+
+  "tipografia": {
+    "$descricao": "`marca` (brand) vai nos papéis display, headline e title-large; `texto` (plain) no resto. `arquivos` são os .ttf/.otf em identidade/fontes/, por peso, usados no app MAUI (alias <Papel><Peso>, ex.: TextoMedium).",
+    "marca": {
+      "familia": "Roboto",
+      "alternativas": ["system-ui", "-apple-system", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+      "google_fonts": true,
+      "arquivos": { "regular": null, "medium": null, "bold": null }
+    },
+    "texto": {
+      "familia": "Roboto",
+      "alternativas": ["system-ui", "-apple-system", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+      "google_fonts": true,
+      "arquivos": { "regular": null, "medium": null, "bold": null }
+    }
+  },
+
+  "icones": {
+    "$descricao": "Material Symbols (fonte variável). Eixos: preenchimento 0|1, peso 100–700, grau -25|0|200, tamanho ótico 20–48.",
+    "familia": "Material Symbols Rounded",
+    "preenchimento": 0,
+    "peso": 400,
+    "grau": 0,
+    "tamanho_otico": 24
+  }
+}

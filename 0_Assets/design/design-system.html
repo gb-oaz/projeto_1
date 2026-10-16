@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design system · boaz · v01</title>
+<meta name="design:projeto" content="boaz">
+<meta name="design:versao" content="v01">
+<meta name="design:data" content="2026-10-16 11:52">
+<meta name="design:status" content="Identidade provisória">
+<!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block">
+<style id="design-tokens">
+/* boaz · tokens do design system (Material Design 3)
+ * Gerado por 0_Assets/design/scripts/gerar.mjs a partir de identidade/marca.json e tokens/*.json — não edite à mão.
+ *
+ * Esquema claro por padrão; escuro pelo sistema ou por <html data-theme="dark">
+ * (data-theme="light" força o claro). Alto contraste segue prefers-contrast: more.
+ * .md-scheme-light / .md-scheme-dark aplicam um esquema só a um trecho da página. */
+
+:root {
+  /* referência: fontes e paletas tonais */
+  --md-ref-typeface-brand: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --md-ref-typeface-plain: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --md-ref-typeface-weight-regular: 400;
+  --md-ref-typeface-weight-medium: 500;
+  --md-ref-typeface-weight-bold: 700;
+  --md-ref-palette-primary0: #000000;
+  --md-ref-palette-primary10: #201047;
+  --md-ref-palette-primary20: #36275D;
+  --md-ref-palette-primary30: #4D3D75;
+  --md-ref-palette-primary40: #65558F;
+  --md-ref-palette-primary50: #7E6EA9;
+  --md-ref-palette-primary60: #9887C5;
+  --md-ref-palette-primary70: #B3A2E1;
+  --md-ref-palette-primary80: #CFBDFE;
+  --md-ref-palette-primary90: #E9DDFF;
+  --md-ref-palette-primary95: #F6EEFF;
+  --md-ref-palette-primary99: #FFFBFF;
+  --md-ref-palette-primary100: #FFFFFF;
+  --md-ref-palette-secondary0: #000000;
+  --md-ref-palette-secondary10: #1E192B;
+  --md-ref-palette-secondary20: #332D41;
+  --md-ref-palette-secondary30: #4A4458;
+  --md-ref-palette-secondary40: #625B71;
+  --md-ref-palette-secondary50: #7B748A;
+  --md-ref-palette-secondary60: #958DA4;
+  --md-ref-palette-secondary70: #B0A7C0;
+  --md-ref-palette-secondary80: #CBC2DB;
+  --md-ref-palette-secondary90: #E8DEF8;
+  --md-ref-palette-secondary95: #F6EEFF;
+  --md-ref-palette-secondary99: #FFFBFF;
+  --md-ref-palette-secondary100: #FFFFFF;
+  --md-ref-palette-tertiary0: #000000;
+  --md-ref-palette-tertiary10: #31101D;
+  --md-ref-palette-tertiary20: #4A2532;
+  --md-ref-palette-tertiary30: #633B48;
+  --md-ref-palette-tertiary40: #7E5260;
+  --md-ref-palette-tertiary50: #996A79;
+  --md-ref-palette-tertiary60: #B58392;
+  --md-ref-palette-tertiary70: #D29DAD;
+  --md-ref-palette-tertiary80: #EFB8C8;
+  --md-ref-palette-tertiary90: #FFD9E3;
+  --md-ref-palette-tertiary95: #FFECF0;
+  --md-ref-palette-tertiary99: #FFFBFF;
+  --md-ref-palette-tertiary100: #FFFFFF;
+  --md-ref-palette-neutral0: #000000;
+  --md-ref-palette-neutral4: #0F0D13;
+  --md-ref-palette-neutral6: #141218;
+  --md-ref-palette-neutral10: #1D1B20;
+  --md-ref-palette-neutral12: #211F24;
+  --md-ref-palette-neutral17: #2B292F;
+  --md-ref-palette-neutral20: #322F35;
+  --md-ref-palette-neutral22: #36343A;
+  --md-ref-palette-neutral24: #3B383E;
+  --md-ref-palette-neutral30: #48464C;
+  --md-ref-palette-neutral40: #605D64;
+  --md-ref-palette-neutral50: #79767D;
+  --md-ref-palette-neutral60: #938F96;
+  --md-ref-palette-neutral70: #AEA9B1;
+  --md-ref-palette-neutral80: #CAC5CC;
+  --md-ref-palette-neutral87: #DED8E0;
+  --md-ref-palette-neutral90: #E6E0E9;
+  --md-ref-palette-neutral92: #ECE6EE;
+  --md-ref-palette-neutral94: #F2ECF4;
+  --md-ref-palette-neutral95: #F5EFF7;
+  --md-ref-palette-neutral96: #F8F2FA;
+  --md-ref-palette-neutral98: #FDF7FF;
+  --md-ref-palette-neutral99: #FFFBFF;
+  --md-ref-palette-neutral100: #FFFFFF;
+  --md-ref-palette-neutral-variant0: #000000;
+  --md-ref-palette-neutral-variant10: #1D1A22;
+  --md-ref-palette-neutral-variant20: #322F38;
+  --md-ref-palette-neutral-variant30: #49454E;
+  --md-ref-palette-neutral-variant40: #615D66;
+  --md-ref-palette-neutral-variant50: #7A757F;
+  --md-ref-palette-neutral-variant60: #948F99;
+  --md-ref-palette-neutral-variant70: #AFA9B4;
+  --md-ref-palette-neutral-variant80: #CAC4CF;
+  --md-ref-palette-neutral-variant90: #E7E0EB;
+  --md-ref-palette-neutral-variant95: #F5EEFA;
+  --md-ref-palette-neutral-variant99: #FFFBFF;
+  --md-ref-palette-neutral-variant100: #FFFFFF;
+  --md-ref-palette-error0: #000000;
+  --md-ref-palette-error10: #410002;
+  --md-ref-palette-error20: #690005;
+  --md-ref-palette-error30: #93000A;
+  --md-ref-palette-error40: #BA1A1A;
+  --md-ref-palette-error50: #DE3730;
+  --md-ref-palette-error60: #FF5449;
+  --md-ref-palette-error70: #FF897D;
+  --md-ref-palette-error80: #FFB4AB;
+  --md-ref-palette-error90: #FFDAD6;
+  --md-ref-palette-error95: #FFEDEA;
+  --md-ref-palette-error99: #FFFBFF;
+  --md-ref-palette-error100: #FFFFFF;
+  --md-ref-palette-sucesso0: #000000;
+  --md-ref-palette-sucesso10: #002111;
+  --md-ref-palette-sucesso20: #003920;
+  --md-ref-palette-sucesso30: #005231;
+  --md-ref-palette-sucesso40: #006D43;
+  --md-ref-palette-sucesso50: #188857;
+  --md-ref-palette-sucesso60: #3CA26F;
+  --md-ref-palette-sucesso70: #5ABE88;
+  --md-ref-palette-sucesso80: #76DAA1;
+  --md-ref-palette-sucesso90: #92F7BC;
+  --md-ref-palette-sucesso95: #C0FFD6;
+  --md-ref-palette-sucesso99: #F5FFF5;
+  --md-ref-palette-sucesso100: #FFFFFF;
+  --md-ref-palette-aviso0: #000000;
+  --md-ref-palette-aviso10: #3C0700;
+  --md-ref-palette-aviso20: #621200;
+  --md-ref-palette-aviso30: #8A1D00;
+  --md-ref-palette-aviso40: #AD3212;
+  --md-ref-palette-aviso50: #D04A28;
+  --md-ref-palette-aviso60: #F2633F;
+  --md-ref-palette-aviso70: #FF8B6D;
+  --md-ref-palette-aviso80: #FFB4A2;
+  --md-ref-palette-aviso90: #FFDAD2;
+  --md-ref-palette-aviso95: #FFEDE9;
+  --md-ref-palette-aviso99: #FFFBFF;
+  --md-ref-palette-aviso100: #FFFFFF;
+  
+  /* tipografia: tamanhos em rem (acompanham o tamanho de fonte escolhido pela pessoa) */
+  --md-sys-typescale-display-large-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-display-large-size: 3.5625rem;
+  --md-sys-typescale-display-large-line-height: 4rem;
+  --md-sys-typescale-display-large-tracking: -0.0044em;
+  --md-sys-typescale-display-large-weight: 400;
+  --md-sys-typescale-display-medium-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-display-medium-size: 2.8125rem;
+  --md-sys-typescale-display-medium-line-height: 3.25rem;
+  --md-sys-typescale-display-medium-tracking: 0em;
+  --md-sys-typescale-display-medium-weight: 400;
+  --md-sys-typescale-display-small-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-display-small-size: 2.25rem;
+  --md-sys-typescale-display-small-line-height: 2.75rem;
+  --md-sys-typescale-display-small-tracking: 0em;
+  --md-sys-typescale-display-small-weight: 400;
+  --md-sys-typescale-headline-large-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-headline-large-size: 2rem;
+  --md-sys-typescale-headline-large-line-height: 2.5rem;
+  --md-sys-typescale-headline-large-tracking: 0em;
+  --md-sys-typescale-headline-large-weight: 400;
+  --md-sys-typescale-headline-medium-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-headline-medium-size: 1.75rem;
+  --md-sys-typescale-headline-medium-line-height: 2.25rem;
+  --md-sys-typescale-headline-medium-tracking: 0em;
+  --md-sys-typescale-headline-medium-weight: 400;
+  --md-sys-typescale-headline-small-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-headline-small-size: 1.5rem;
+  --md-sys-typescale-headline-small-line-height: 2rem;
+  --md-sys-typescale-headline-small-tracking: 0em;
+  --md-sys-typescale-headline-small-weight: 400;
+  --md-sys-typescale-title-large-font: var(--md-ref-typeface-brand);
+  --md-sys-typescale-title-large-size: 1.375rem;
+  --md-sys-typescale-title-large-line-height: 1.75rem;
+  --md-sys-typescale-title-large-tracking: 0em;
+  --md-sys-typescale-title-large-weight: 400;
+  --md-sys-typescale-title-medium-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-title-medium-size: 1rem;
+  --md-sys-typescale-title-medium-line-height: 1.5rem;
+  --md-sys-typescale-title-medium-tracking: 0.0094em;
+  --md-sys-typescale-title-medium-weight: 500;
+  --md-sys-typescale-title-small-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-title-small-size: 0.875rem;
+  --md-sys-typescale-title-small-line-height: 1.25rem;
+  --md-sys-typescale-title-small-tracking: 0.0071em;
+  --md-sys-typescale-title-small-weight: 500;
+  --md-sys-typescale-body-large-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-body-large-size: 1rem;
+  --md-sys-typescale-body-large-line-height: 1.5rem;
+  --md-sys-typescale-body-large-tracking: 0.0313em;
+  --md-sys-typescale-body-large-weight: 400;
+  --md-sys-typescale-body-medium-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-body-medium-size: 0.875rem;
+  --md-sys-typescale-body-medium-line-height: 1.25rem;
+  --md-sys-typescale-body-medium-tracking: 0.0179em;
+  --md-sys-typescale-body-medium-weight: 400;
+  --md-sys-typescale-body-small-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-body-small-size: 0.75rem;
+  --md-sys-typescale-body-small-line-height: 1rem;
+  --md-sys-typescale-body-small-tracking: 0.0333em;
+  --md-sys-typescale-body-small-weight: 400;
+  --md-sys-typescale-label-large-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-label-large-size: 0.875rem;
+  --md-sys-typescale-label-large-line-height: 1.25rem;
+  --md-sys-typescale-label-large-tracking: 0.0071em;
+  --md-sys-typescale-label-large-weight: 500;
+  --md-sys-typescale-label-medium-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-label-medium-size: 0.75rem;
+  --md-sys-typescale-label-medium-line-height: 1rem;
+  --md-sys-typescale-label-medium-tracking: 0.0417em;
+  --md-sys-typescale-label-medium-weight: 500;
+  --md-sys-typescale-label-small-font: var(--md-ref-typeface-plain);
+  --md-sys-typescale-label-small-size: 0.6875rem;
+  --md-sys-typescale-label-small-line-height: 1rem;
+  --md-sys-typescale-label-small-tracking: 0.0455em;
+  --md-sys-typescale-label-small-weight: 500;
+  
+  /* forma e espaçamento */
+  --md-sys-shape-corner-none: 0px;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-large-increased: 20px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-extra-large-increased: 32px;
+  --md-sys-shape-corner-extra-extra-large: 48px;
+  --md-sys-shape-corner-full: 9999px;
+  --md-sys-spacing-0: 0px;
+  --md-sys-spacing-1: 4px;
+  --md-sys-spacing-2: 8px;
+  --md-sys-spacing-3: 12px;
+  --md-sys-spacing-4: 16px;
+  --md-sys-spacing-5: 20px;
+  --md-sys-spacing-6: 24px;
+  --md-sys-spacing-8: 32px;
+  --md-sys-spacing-10: 40px;
+  --md-sys-spacing-12: 48px;
+  --md-sys-spacing-14: 56px;
+  --md-sys-spacing-16: 64px;
+  --md-sys-spacing-20: 80px;
+  --md-sys-spacing-24: 96px;
+  
+  /* layout (os valores por janela estão nas media queries abaixo) */
+  --md-sys-layout-pane-spacer: 24px;
+  --md-sys-layout-content-max-width: 1040px;
+  --md-sys-layout-touch-target: 48px;
+  --md-sys-layout-icon-size: 24px;
+  
+  /* movimento e estados */
+  --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-standard-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --md-sys-motion-easing-standard-decelerate: cubic-bezier(0, 0, 0, 1);
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --md-sys-motion-duration-short1: 50ms;
+  --md-sys-motion-duration-short2: 100ms;
+  --md-sys-motion-duration-short3: 150ms;
+  --md-sys-motion-duration-short4: 200ms;
+  --md-sys-motion-duration-medium1: 250ms;
+  --md-sys-motion-duration-medium2: 300ms;
+  --md-sys-motion-duration-medium3: 350ms;
+  --md-sys-motion-duration-medium4: 400ms;
+  --md-sys-motion-duration-long1: 450ms;
+  --md-sys-motion-duration-long2: 500ms;
+  --md-sys-motion-duration-long3: 550ms;
+  --md-sys-motion-duration-long4: 600ms;
+  --md-sys-motion-duration-extra-long1: 700ms;
+  --md-sys-motion-duration-extra-long2: 800ms;
+  --md-sys-motion-duration-extra-long3: 900ms;
+  --md-sys-motion-duration-extra-long4: 1000ms;
+  --md-sys-state-hover-opacity: 0.08;
+  --md-sys-state-focus-opacity: 0.1;
+  --md-sys-state-pressed-opacity: 0.1;
+  --md-sys-state-dragged-opacity: 0.16;
+  --md-sys-state-disabled-content-opacity: 0.38;
+  --md-sys-state-disabled-container-opacity: 0.12;
+  --md-sys-state-focus-indicator-thickness: 3px;
+  --md-sys-state-focus-indicator-offset: 2px;
+  
+  /* janela compact (padrão, celular) */
+  --md-sys-layout-window: compact;
+  --md-sys-layout-margin: 16px;
+  --md-sys-layout-columns: 4;
+  --md-sys-layout-gutter: 16px;
+  --md-sys-layout-panes: 1;
+}
+
+:root,
+.md-scheme-light,
+.md-scheme-dark {
+  /* elevação (a cor da sombra vem do esquema) */
+  --md-sys-elevation-level0: none;
+  --md-sys-elevation-level1: 0 1px 2px 0px color-mix(in srgb, var(--md-sys-color-shadow) 30%, transparent), 0 1px 3px 1px color-mix(in srgb, var(--md-sys-color-shadow) 15%, transparent);
+  --md-sys-elevation-level2: 0 1px 2px 0px color-mix(in srgb, var(--md-sys-color-shadow) 30%, transparent), 0 2px 6px 2px color-mix(in srgb, var(--md-sys-color-shadow) 15%, transparent);
+  --md-sys-elevation-level3: 0 1px 3px 0px color-mix(in srgb, var(--md-sys-color-shadow) 30%, transparent), 0 4px 8px 3px color-mix(in srgb, var(--md-sys-color-shadow) 15%, transparent);
+  --md-sys-elevation-level4: 0 2px 3px 0px color-mix(in srgb, var(--md-sys-color-shadow) 30%, transparent), 0 6px 10px 4px color-mix(in srgb, var(--md-sys-color-shadow) 15%, transparent);
+  --md-sys-elevation-level5: 0 4px 4px 0px color-mix(in srgb, var(--md-sys-color-shadow) 30%, transparent), 0 8px 12px 6px color-mix(in srgb, var(--md-sys-color-shadow) 15%, transparent);
+  
+  /* componentes */
+  --md-comp-button-height: 40px;
+  --md-comp-button-min-width: 48px;
+  --md-comp-button-padding: 24px;
+  --md-comp-button-padding-with-icon: 16px;
+  --md-comp-button-icon-size: 18px;
+  --md-comp-button-gap: 8px;
+  --md-comp-button-shape: var(--md-sys-shape-corner-full);
+  --md-comp-button-label-font: var(--md-sys-typescale-label-large-font);
+  --md-comp-button-label-size: var(--md-sys-typescale-label-large-size);
+  --md-comp-button-label-line-height: var(--md-sys-typescale-label-large-line-height);
+  --md-comp-button-label-tracking: var(--md-sys-typescale-label-large-tracking);
+  --md-comp-button-label-weight: var(--md-sys-typescale-label-large-weight);
+  --md-comp-button-filled-container-color: var(--md-sys-color-primary);
+  --md-comp-button-filled-label-color: var(--md-sys-color-on-primary);
+  --md-comp-button-filled-elevation: var(--md-sys-elevation-level0);
+  --md-comp-button-filled-hover-elevation: var(--md-sys-elevation-level1);
+  --md-comp-button-tonal-container-color: var(--md-sys-color-secondary-container);
+  --md-comp-button-tonal-label-color: var(--md-sys-color-on-secondary-container);
+  --md-comp-button-tonal-elevation: var(--md-sys-elevation-level0);
+  --md-comp-button-tonal-hover-elevation: var(--md-sys-elevation-level1);
+  --md-comp-button-elevated-container-color: var(--md-sys-color-surface-container-low);
+  --md-comp-button-elevated-label-color: var(--md-sys-color-primary);
+  --md-comp-button-elevated-elevation: var(--md-sys-elevation-level1);
+  --md-comp-button-elevated-hover-elevation: var(--md-sys-elevation-level2);
+  --md-comp-button-outlined-outline-color: var(--md-sys-color-outline-variant);
+  --md-comp-button-outlined-outline-width: 1px;
+  --md-comp-button-outlined-label-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-button-text-label-color: var(--md-sys-color-primary);
+  --md-comp-button-text-padding: 12px;
+  --md-comp-icon-button-size: 40px;
+  --md-comp-icon-button-icon-size: 24px;
+  --md-comp-icon-button-shape: var(--md-sys-shape-corner-full);
+  --md-comp-icon-button-icon-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-icon-button-selected-icon-color: var(--md-sys-color-primary);
+  --md-comp-fab-size: 56px;
+  --md-comp-fab-icon-size: 24px;
+  --md-comp-fab-shape: var(--md-sys-shape-corner-large);
+  --md-comp-fab-container-color: var(--md-sys-color-primary-container);
+  --md-comp-fab-icon-color: var(--md-sys-color-on-primary-container);
+  --md-comp-fab-elevation: var(--md-sys-elevation-level3);
+  --md-comp-fab-hover-elevation: var(--md-sys-elevation-level4);
+  --md-comp-fab-small-size: 40px;
+  --md-comp-fab-small-shape: var(--md-sys-shape-corner-medium);
+  --md-comp-fab-large-size: 96px;
+  --md-comp-fab-large-icon-size: 36px;
+  --md-comp-fab-large-shape: var(--md-sys-shape-corner-extra-large);
+  --md-comp-fab-extended-padding: 16px;
+  --md-comp-fab-extended-label-font: var(--md-sys-typescale-label-large-font);
+  --md-comp-fab-extended-label-size: var(--md-sys-typescale-label-large-size);
+  --md-comp-fab-extended-label-line-height: var(--md-sys-typescale-label-large-line-height);
+  --md-comp-fab-extended-label-tracking: var(--md-sys-typescale-label-large-tracking);
+  --md-comp-fab-extended-label-weight: var(--md-sys-typescale-label-large-weight);
+  --md-comp-chip-height: 32px;
+  --md-comp-chip-padding: 16px;
+  --md-comp-chip-padding-with-icon: 8px;
+  --md-comp-chip-icon-size: 18px;
+  --md-comp-chip-shape: var(--md-sys-shape-corner-small);
+  --md-comp-chip-label-font: var(--md-sys-typescale-label-large-font);
+  --md-comp-chip-label-size: var(--md-sys-typescale-label-large-size);
+  --md-comp-chip-label-line-height: var(--md-sys-typescale-label-large-line-height);
+  --md-comp-chip-label-tracking: var(--md-sys-typescale-label-large-tracking);
+  --md-comp-chip-label-weight: var(--md-sys-typescale-label-large-weight);
+  --md-comp-chip-outline-color: var(--md-sys-color-outline-variant);
+  --md-comp-chip-label-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-chip-selected-container-color: var(--md-sys-color-secondary-container);
+  --md-comp-chip-selected-label-color: var(--md-sys-color-on-secondary-container);
+  --md-comp-card-shape: var(--md-sys-shape-corner-medium);
+  --md-comp-card-padding: 16px;
+  --md-comp-card-elevated-container-color: var(--md-sys-color-surface-container-low);
+  --md-comp-card-elevated-elevation: var(--md-sys-elevation-level1);
+  --md-comp-card-filled-container-color: var(--md-sys-color-surface-container-highest);
+  --md-comp-card-outlined-container-color: var(--md-sys-color-surface);
+  --md-comp-card-outlined-outline-color: var(--md-sys-color-outline-variant);
+  --md-comp-card-title-font: var(--md-sys-typescale-title-medium-font);
+  --md-comp-card-title-size: var(--md-sys-typescale-title-medium-size);
+  --md-comp-card-title-line-height: var(--md-sys-typescale-title-medium-line-height);
+  --md-comp-card-title-tracking: var(--md-sys-typescale-title-medium-tracking);
+  --md-comp-card-title-weight: var(--md-sys-typescale-title-medium-weight);
+  --md-comp-card-body-font: var(--md-sys-typescale-body-medium-font);
+  --md-comp-card-body-size: var(--md-sys-typescale-body-medium-size);
+  --md-comp-card-body-line-height: var(--md-sys-typescale-body-medium-line-height);
+  --md-comp-card-body-tracking: var(--md-sys-typescale-body-medium-tracking);
+  --md-comp-card-body-weight: var(--md-sys-typescale-body-medium-weight);
+  --md-comp-text-field-height: 56px;
+  --md-comp-text-field-padding: 16px;
+  --md-comp-text-field-label-font: var(--md-sys-typescale-body-large-font);
+  --md-comp-text-field-label-size: var(--md-sys-typescale-body-large-size);
+  --md-comp-text-field-label-line-height: var(--md-sys-typescale-body-large-line-height);
+  --md-comp-text-field-label-tracking: var(--md-sys-typescale-body-large-tracking);
+  --md-comp-text-field-label-weight: var(--md-sys-typescale-body-large-weight);
+  --md-comp-text-field-populated-label-font: var(--md-sys-typescale-body-small-font);
+  --md-comp-text-field-populated-label-size: var(--md-sys-typescale-body-small-size);
+  --md-comp-text-field-populated-label-line-height: var(--md-sys-typescale-body-small-line-height);
+  --md-comp-text-field-populated-label-tracking: var(--md-sys-typescale-body-small-tracking);
+  --md-comp-text-field-populated-label-weight: var(--md-sys-typescale-body-small-weight);
+  --md-comp-text-field-supporting-text-font: var(--md-sys-typescale-body-small-font);
+  --md-comp-text-field-supporting-text-size: var(--md-sys-typescale-body-small-size);
+  --md-comp-text-field-supporting-text-line-height: var(--md-sys-typescale-body-small-line-height);
+  --md-comp-text-field-supporting-text-tracking: var(--md-sys-typescale-body-small-tracking);
+  --md-comp-text-field-supporting-text-weight: var(--md-sys-typescale-body-small-weight);
+  --md-comp-text-field-input-color: var(--md-sys-color-on-surface);
+  --md-comp-text-field-label-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-text-field-focus-color: var(--md-sys-color-primary);
+  --md-comp-text-field-error-color: var(--md-sys-color-error);
+  --md-comp-text-field-filled-container-color: var(--md-sys-color-surface-container-highest);
+  --md-comp-text-field-filled-shape: var(--md-sys-shape-corner-extra-small);
+  --md-comp-text-field-filled-indicator-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-text-field-outlined-shape: var(--md-sys-shape-corner-extra-small);
+  --md-comp-text-field-outlined-outline-color: var(--md-sys-color-outline);
+  --md-comp-list-one-line-height: 56px;
+  --md-comp-list-two-line-height: 72px;
+  --md-comp-list-three-line-height: 88px;
+  --md-comp-list-padding: 16px;
+  --md-comp-list-headline-font: var(--md-sys-typescale-body-large-font);
+  --md-comp-list-headline-size: var(--md-sys-typescale-body-large-size);
+  --md-comp-list-headline-line-height: var(--md-sys-typescale-body-large-line-height);
+  --md-comp-list-headline-tracking: var(--md-sys-typescale-body-large-tracking);
+  --md-comp-list-headline-weight: var(--md-sys-typescale-body-large-weight);
+  --md-comp-list-headline-color: var(--md-sys-color-on-surface);
+  --md-comp-list-supporting-text-font: var(--md-sys-typescale-body-medium-font);
+  --md-comp-list-supporting-text-size: var(--md-sys-typescale-body-medium-size);
+  --md-comp-list-supporting-text-line-height: var(--md-sys-typescale-body-medium-line-height);
+  --md-comp-list-supporting-text-tracking: var(--md-sys-typescale-body-medium-tracking);
+  --md-comp-list-supporting-text-weight: var(--md-sys-typescale-body-medium-weight);
+  --md-comp-list-supporting-text-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-list-divider-color: var(--md-sys-color-outline-variant);
+  --md-comp-top-app-bar-height: 64px;
+  --md-comp-top-app-bar-medium-height: 112px;
+  --md-comp-top-app-bar-large-height: 152px;
+  --md-comp-top-app-bar-container-color: var(--md-sys-color-surface);
+  --md-comp-top-app-bar-scrolled-container-color: var(--md-sys-color-surface-container);
+  --md-comp-top-app-bar-title-font: var(--md-sys-typescale-title-large-font);
+  --md-comp-top-app-bar-title-size: var(--md-sys-typescale-title-large-size);
+  --md-comp-top-app-bar-title-line-height: var(--md-sys-typescale-title-large-line-height);
+  --md-comp-top-app-bar-title-tracking: var(--md-sys-typescale-title-large-tracking);
+  --md-comp-top-app-bar-title-weight: var(--md-sys-typescale-title-large-weight);
+  --md-comp-top-app-bar-medium-title-font: var(--md-sys-typescale-headline-small-font);
+  --md-comp-top-app-bar-medium-title-size: var(--md-sys-typescale-headline-small-size);
+  --md-comp-top-app-bar-medium-title-line-height: var(--md-sys-typescale-headline-small-line-height);
+  --md-comp-top-app-bar-medium-title-tracking: var(--md-sys-typescale-headline-small-tracking);
+  --md-comp-top-app-bar-medium-title-weight: var(--md-sys-typescale-headline-small-weight);
+  --md-comp-top-app-bar-large-title-font: var(--md-sys-typescale-headline-medium-font);
+  --md-comp-top-app-bar-large-title-size: var(--md-sys-typescale-headline-medium-size);
+  --md-comp-top-app-bar-large-title-line-height: var(--md-sys-typescale-headline-medium-line-height);
+  --md-comp-top-app-bar-large-title-tracking: var(--md-sys-typescale-headline-medium-tracking);
+  --md-comp-top-app-bar-large-title-weight: var(--md-sys-typescale-headline-medium-weight);
+  --md-comp-top-app-bar-title-color: var(--md-sys-color-on-surface);
+  --md-comp-top-app-bar-icon-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-navigation-bar-height: 80px;
+  --md-comp-navigation-bar-container-color: var(--md-sys-color-surface-container);
+  --md-comp-navigation-bar-indicator-width: 64px;
+  --md-comp-navigation-bar-indicator-height: 32px;
+  --md-comp-navigation-bar-indicator-shape: var(--md-sys-shape-corner-full);
+  --md-comp-navigation-bar-indicator-color: var(--md-sys-color-secondary-container);
+  --md-comp-navigation-bar-icon-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-navigation-bar-active-icon-color: var(--md-sys-color-on-secondary-container);
+  --md-comp-navigation-bar-label-font: var(--md-sys-typescale-label-medium-font);
+  --md-comp-navigation-bar-label-size: var(--md-sys-typescale-label-medium-size);
+  --md-comp-navigation-bar-label-line-height: var(--md-sys-typescale-label-medium-line-height);
+  --md-comp-navigation-bar-label-tracking: var(--md-sys-typescale-label-medium-tracking);
+  --md-comp-navigation-bar-label-weight: var(--md-sys-typescale-label-medium-weight);
+  --md-comp-navigation-bar-label-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-navigation-bar-active-label-color: var(--md-sys-color-on-surface);
+  --md-comp-navigation-rail-width: 80px;
+  --md-comp-navigation-rail-container-color: var(--md-sys-color-surface);
+  --md-comp-navigation-rail-indicator-width: 56px;
+  --md-comp-navigation-rail-indicator-height: 32px;
+  --md-comp-navigation-rail-indicator-shape: var(--md-sys-shape-corner-full);
+  --md-comp-navigation-rail-indicator-color: var(--md-sys-color-secondary-container);
+  --md-comp-navigation-rail-label-font: var(--md-sys-typescale-label-medium-font);
+  --md-comp-navigation-rail-label-size: var(--md-sys-typescale-label-medium-size);
+  --md-comp-navigation-rail-label-line-height: var(--md-sys-typescale-label-medium-line-height);
+  --md-comp-navigation-rail-label-tracking: var(--md-sys-typescale-label-medium-tracking);
+  --md-comp-navigation-rail-label-weight: var(--md-sys-typescale-label-medium-weight);
+  --md-comp-navigation-drawer-width: 360px;
+  --md-comp-navigation-drawer-container-color: var(--md-sys-color-surface-container-low);
+  --md-comp-navigation-drawer-shape: var(--md-sys-shape-corner-large);
+  --md-comp-navigation-drawer-item-height: 56px;
+  --md-comp-navigation-drawer-item-shape: var(--md-sys-shape-corner-full);
+  --md-comp-navigation-drawer-indicator-color: var(--md-sys-color-secondary-container);
+  --md-comp-navigation-drawer-label-font: var(--md-sys-typescale-label-large-font);
+  --md-comp-navigation-drawer-label-size: var(--md-sys-typescale-label-large-size);
+  --md-comp-navigation-drawer-label-line-height: var(--md-sys-typescale-label-large-line-height);
+  --md-comp-navigation-drawer-label-tracking: var(--md-sys-typescale-label-large-tracking);
+  --md-comp-navigation-drawer-label-weight: var(--md-sys-typescale-label-large-weight);
+  --md-comp-navigation-drawer-headline-font: var(--md-sys-typescale-title-small-font);
+  --md-comp-navigation-drawer-headline-size: var(--md-sys-typescale-title-small-size);
+  --md-comp-navigation-drawer-headline-line-height: var(--md-sys-typescale-title-small-line-height);
+  --md-comp-navigation-drawer-headline-tracking: var(--md-sys-typescale-title-small-tracking);
+  --md-comp-navigation-drawer-headline-weight: var(--md-sys-typescale-title-small-weight);
+  --md-comp-dialog-shape: var(--md-sys-shape-corner-extra-large);
+  --md-comp-dialog-container-color: var(--md-sys-color-surface-container-high);
+  --md-comp-dialog-elevation: var(--md-sys-elevation-level3);
+  --md-comp-dialog-padding: 24px;
+  --md-comp-dialog-min-width: 280px;
+  --md-comp-dialog-max-width: 560px;
+  --md-comp-dialog-headline-font: var(--md-sys-typescale-headline-small-font);
+  --md-comp-dialog-headline-size: var(--md-sys-typescale-headline-small-size);
+  --md-comp-dialog-headline-line-height: var(--md-sys-typescale-headline-small-line-height);
+  --md-comp-dialog-headline-tracking: var(--md-sys-typescale-headline-small-tracking);
+  --md-comp-dialog-headline-weight: var(--md-sys-typescale-headline-small-weight);
+  --md-comp-dialog-headline-color: var(--md-sys-color-on-surface);
+  --md-comp-dialog-body-font: var(--md-sys-typescale-body-medium-font);
+  --md-comp-dialog-body-size: var(--md-sys-typescale-body-medium-size);
+  --md-comp-dialog-body-line-height: var(--md-sys-typescale-body-medium-line-height);
+  --md-comp-dialog-body-tracking: var(--md-sys-typescale-body-medium-tracking);
+  --md-comp-dialog-body-weight: var(--md-sys-typescale-body-medium-weight);
+  --md-comp-dialog-body-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-dialog-scrim-opacity: 0.32;
+  --md-comp-snackbar-min-height: 48px;
+  --md-comp-snackbar-shape: var(--md-sys-shape-corner-extra-small);
+  --md-comp-snackbar-container-color: var(--md-sys-color-inverse-surface);
+  --md-comp-snackbar-label-color: var(--md-sys-color-inverse-on-surface);
+  --md-comp-snackbar-action-color: var(--md-sys-color-inverse-primary);
+  --md-comp-snackbar-elevation: var(--md-sys-elevation-level3);
+  --md-comp-snackbar-label-font: var(--md-sys-typescale-body-medium-font);
+  --md-comp-snackbar-label-size: var(--md-sys-typescale-body-medium-size);
+  --md-comp-snackbar-label-line-height: var(--md-sys-typescale-body-medium-line-height);
+  --md-comp-snackbar-label-tracking: var(--md-sys-typescale-body-medium-tracking);
+  --md-comp-snackbar-label-weight: var(--md-sys-typescale-body-medium-weight);
+}
+
+@media (min-width: 600px) {
+  :root {
+    --md-sys-layout-window: medium;
+    --md-sys-layout-margin: 24px;
+    --md-sys-layout-columns: 8;
+    --md-sys-layout-gutter: 24px;
+    --md-sys-layout-panes: 1;
+  }
+}
+
+@media (min-width: 840px) {
+  :root {
+    --md-sys-layout-window: expanded;
+    --md-sys-layout-margin: 24px;
+    --md-sys-layout-columns: 12;
+    --md-sys-layout-gutter: 24px;
+    --md-sys-layout-panes: 2;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --md-sys-layout-window: large;
+    --md-sys-layout-margin: 24px;
+    --md-sys-layout-columns: 12;
+    --md-sys-layout-gutter: 24px;
+    --md-sys-layout-panes: 2;
+  }
+}
+
+@media (min-width: 1600px) {
+  :root {
+    --md-sys-layout-window: extra-large;
+    --md-sys-layout-margin: 24px;
+    --md-sys-layout-columns: 12;
+    --md-sys-layout-gutter: 24px;
+    --md-sys-layout-panes: 3;
+  }
+}
+
+:root,
+.md-scheme-light {
+  color-scheme: light;
+  --md-sys-color-background: #FDF7FF;
+  --md-sys-color-on-background: #1D1B20;
+  --md-sys-color-surface: #FDF7FF;
+  --md-sys-color-surface-dim: #DED8E0;
+  --md-sys-color-surface-bright: #FDF7FF;
+  --md-sys-color-surface-container-lowest: #FFFFFF;
+  --md-sys-color-surface-container-low: #F8F2FA;
+  --md-sys-color-surface-container: #F2ECF4;
+  --md-sys-color-surface-container-high: #ECE6EE;
+  --md-sys-color-surface-container-highest: #E6E0E9;
+  --md-sys-color-on-surface: #1D1B20;
+  --md-sys-color-surface-variant: #E7E0EB;
+  --md-sys-color-on-surface-variant: #49454E;
+  --md-sys-color-inverse-surface: #322F35;
+  --md-sys-color-inverse-on-surface: #F5EFF7;
+  --md-sys-color-outline: #7A757F;
+  --md-sys-color-outline-variant: #CAC4CF;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-surface-tint: #65558F;
+  --md-sys-color-primary: #65558F;
+  --md-sys-color-on-primary: #FFFFFF;
+  --md-sys-color-primary-container: #E9DDFF;
+  --md-sys-color-on-primary-container: #4D3D75;
+  --md-sys-color-inverse-primary: #CFBDFE;
+  --md-sys-color-secondary: #625B71;
+  --md-sys-color-on-secondary: #FFFFFF;
+  --md-sys-color-secondary-container: #E8DEF8;
+  --md-sys-color-on-secondary-container: #4A4458;
+  --md-sys-color-tertiary: #7E5260;
+  --md-sys-color-on-tertiary: #FFFFFF;
+  --md-sys-color-tertiary-container: #FFD9E3;
+  --md-sys-color-on-tertiary-container: #633B48;
+  --md-sys-color-error: #BA1A1A;
+  --md-sys-color-on-error: #FFFFFF;
+  --md-sys-color-error-container: #FFDAD6;
+  --md-sys-color-on-error-container: #93000A;
+  --md-sys-color-primary-fixed: #E9DDFF;
+  --md-sys-color-primary-fixed-dim: #CFBDFE;
+  --md-sys-color-on-primary-fixed: #201047;
+  --md-sys-color-on-primary-fixed-variant: #4D3D75;
+  --md-sys-color-secondary-fixed: #E8DEF8;
+  --md-sys-color-secondary-fixed-dim: #CBC2DB;
+  --md-sys-color-on-secondary-fixed: #1E192B;
+  --md-sys-color-on-secondary-fixed-variant: #4A4458;
+  --md-sys-color-tertiary-fixed: #FFD9E3;
+  --md-sys-color-tertiary-fixed-dim: #EFB8C8;
+  --md-sys-color-on-tertiary-fixed: #31101D;
+  --md-sys-color-on-tertiary-fixed-variant: #633B48;
+  --md-sys-color-sucesso: #006D43;
+  --md-sys-color-on-sucesso: #FFFFFF;
+  --md-sys-color-sucesso-container: #92F7BC;
+  --md-sys-color-on-sucesso-container: #002111;
+  --md-sys-color-aviso: #AD3212;
+  --md-sys-color-on-aviso: #FFFFFF;
+  --md-sys-color-aviso-container: #FFDAD2;
+  --md-sys-color-on-aviso-container: #3C0700;
+}
+
+.md-scheme-dark {
+  color-scheme: dark;
+  --md-sys-color-background: #141218;
+  --md-sys-color-on-background: #E6E0E9;
+  --md-sys-color-surface: #141218;
+  --md-sys-color-surface-dim: #141218;
+  --md-sys-color-surface-bright: #3B383E;
+  --md-sys-color-surface-container-lowest: #0F0D13;
+  --md-sys-color-surface-container-low: #1D1B20;
+  --md-sys-color-surface-container: #211F24;
+  --md-sys-color-surface-container-high: #2B292F;
+  --md-sys-color-surface-container-highest: #36343A;
+  --md-sys-color-on-surface: #E6E0E9;
+  --md-sys-color-surface-variant: #49454E;
+  --md-sys-color-on-surface-variant: #CAC4CF;
+  --md-sys-color-inverse-surface: #E6E0E9;
+  --md-sys-color-inverse-on-surface: #322F35;
+  --md-sys-color-outline: #948F99;
+  --md-sys-color-outline-variant: #49454E;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-surface-tint: #CFBDFE;
+  --md-sys-color-primary: #CFBDFE;
+  --md-sys-color-on-primary: #36275D;
+  --md-sys-color-primary-container: #4D3D75;
+  --md-sys-color-on-primary-container: #E9DDFF;
+  --md-sys-color-inverse-primary: #65558F;
+  --md-sys-color-secondary: #CBC2DB;
+  --md-sys-color-on-secondary: #332D41;
+  --md-sys-color-secondary-container: #4A4458;
+  --md-sys-color-on-secondary-container: #E8DEF8;
+  --md-sys-color-tertiary: #EFB8C8;
+  --md-sys-color-on-tertiary: #4A2532;
+  --md-sys-color-tertiary-container: #633B48;
+  --md-sys-color-on-tertiary-container: #FFD9E3;
+  --md-sys-color-error: #FFB4AB;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #93000A;
+  --md-sys-color-on-error-container: #FFDAD6;
+  --md-sys-color-primary-fixed: #E9DDFF;
+  --md-sys-color-primary-fixed-dim: #CFBDFE;
+  --md-sys-color-on-primary-fixed: #201047;
+  --md-sys-color-on-primary-fixed-variant: #4D3D75;
+  --md-sys-color-secondary-fixed: #E8DEF8;
+  --md-sys-color-secondary-fixed-dim: #CBC2DB;
+  --md-sys-color-on-secondary-fixed: #1E192B;
+  --md-sys-color-on-secondary-fixed-variant: #4A4458;
+  --md-sys-color-tertiary-fixed: #FFD9E3;
+  --md-sys-color-tertiary-fixed-dim: #EFB8C8;
+  --md-sys-color-on-tertiary-fixed: #31101D;
+  --md-sys-color-on-tertiary-fixed-variant: #633B48;
+  --md-sys-color-sucesso: #76DAA1;
+  --md-sys-color-on-sucesso: #003920;
+  --md-sys-color-sucesso-container: #005231;
+  --md-sys-color-on-sucesso-container: #92F7BC;
+  --md-sys-color-aviso: #FFB4A2;
+  --md-sys-color-on-aviso: #621200;
+  --md-sys-color-aviso-container: #8A1D00;
+  --md-sys-color-on-aviso-container: #FFDAD2;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --md-sys-color-background: #141218;
+    --md-sys-color-on-background: #E6E0E9;
+    --md-sys-color-surface: #141218;
+    --md-sys-color-surface-dim: #141218;
+    --md-sys-color-surface-bright: #3B383E;
+    --md-sys-color-surface-container-lowest: #0F0D13;
+    --md-sys-color-surface-container-low: #1D1B20;
+    --md-sys-color-surface-container: #211F24;
+    --md-sys-color-surface-container-high: #2B292F;
+    --md-sys-color-surface-container-highest: #36343A;
+    --md-sys-color-on-surface: #E6E0E9;
+    --md-sys-color-surface-variant: #49454E;
+    --md-sys-color-on-surface-variant: #CAC4CF;
+    --md-sys-color-inverse-surface: #E6E0E9;
+    --md-sys-color-inverse-on-surface: #322F35;
+    --md-sys-color-outline: #948F99;
+    --md-sys-color-outline-variant: #49454E;
+    --md-sys-color-shadow: #000000;
+    --md-sys-color-scrim: #000000;
+    --md-sys-color-surface-tint: #CFBDFE;
+    --md-sys-color-primary: #CFBDFE;
+    --md-sys-color-on-primary: #36275D;
+    --md-sys-color-primary-container: #4D3D75;
+    --md-sys-color-on-primary-container: #E9DDFF;
+    --md-sys-color-inverse-primary: #65558F;
+    --md-sys-color-secondary: #CBC2DB;
+    --md-sys-color-on-secondary: #332D41;
+    --md-sys-color-secondary-container: #4A4458;
+    --md-sys-color-on-secondary-container: #E8DEF8;
+    --md-sys-color-tertiary: #EFB8C8;
+    --md-sys-color-on-tertiary: #4A2532;
+    --md-sys-color-tertiary-container: #633B48;
+    --md-sys-color-on-tertiary-container: #FFD9E3;
+    --md-sys-color-error: #FFB4AB;
+    --md-sys-color-on-error: #690005;
+    --md-sys-color-error-container: #93000A;
+    --md-sys-color-on-error-container: #FFDAD6;
+    --md-sys-color-primary-fixed: #E9DDFF;
+    --md-sys-color-primary-fixed-dim: #CFBDFE;
+    --md-sys-color-on-primary-fixed: #201047;
+    --md-sys-color-on-primary-fixed-variant: #4D3D75;
+    --md-sys-color-secondary-fixed: #E8DEF8;
+    --md-sys-color-secondary-fixed-dim: #CBC2DB;
+    --md-sys-color-on-secondary-fixed: #1E192B;
+    --md-sys-color-on-secondary-fixed-variant: #4A4458;
+    --md-sys-color-tertiary-fixed: #FFD9E3;
+    --md-sys-color-tertiary-fixed-dim: #EFB8C8;
+    --md-sys-color-on-tertiary-fixed: #31101D;
+    --md-sys-color-on-tertiary-fixed-variant: #633B48;
+    --md-sys-color-sucesso: #76DAA1;
+    --md-sys-color-on-sucesso: #003920;
+    --md-sys-color-sucesso-container: #005231;
+    --md-sys-color-on-sucesso-container: #92F7BC;
+    --md-sys-color-aviso: #FFB4A2;
+    --md-sys-color-on-aviso: #621200;
+    --md-sys-color-aviso-container: #8A1D00;
+    --md-sys-color-on-aviso-container: #FFDAD2;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --md-sys-color-background: #141218;
+  --md-sys-color-on-background: #E6E0E9;
+  --md-sys-color-surface: #141218;
+  --md-sys-color-surface-dim: #141218;
+  --md-sys-color-surface-bright: #3B383E;
+  --md-sys-color-surface-container-lowest: #0F0D13;
+  --md-sys-color-surface-container-low: #1D1B20;
+  --md-sys-color-surface-container: #211F24;
+  --md-sys-color-surface-container-high: #2B292F;
+  --md-sys-color-surface-container-highest: #36343A;
+  --md-sys-color-on-surface: #E6E0E9;
+  --md-sys-color-surface-variant: #49454E;
+  --md-sys-color-on-surface-variant: #CAC4CF;
+  --md-sys-color-inverse-surface: #E6E0E9;
+  --md-sys-color-inverse-on-surface: #322F35;
+  --md-sys-color-outline: #948F99;
+  --md-sys-color-outline-variant: #49454E;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-surface-tint: #CFBDFE;
+  --md-sys-color-primary: #CFBDFE;
+  --md-sys-color-on-primary: #36275D;
+  --md-sys-color-primary-container: #4D3D75;
+  --md-sys-color-on-primary-container: #E9DDFF;
+  --md-sys-color-inverse-primary: #65558F;
+  --md-sys-color-secondary: #CBC2DB;
+  --md-sys-color-on-secondary: #332D41;
+  --md-sys-color-secondary-container: #4A4458;
+  --md-sys-color-on-secondary-container: #E8DEF8;
+  --md-sys-color-tertiary: #EFB8C8;
+  --md-sys-color-on-tertiary: #4A2532;
+  --md-sys-color-tertiary-container: #633B48;
+  --md-sys-color-on-tertiary-container: #FFD9E3;
+  --md-sys-color-error: #FFB4AB;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #93000A;
+  --md-sys-color-on-error-container: #FFDAD6;
+  --md-sys-color-primary-fixed: #E9DDFF;
+  --md-sys-color-primary-fixed-dim: #CFBDFE;
+  --md-sys-color-on-primary-fixed: #201047;
+  --md-sys-color-on-primary-fixed-variant: #4D3D75;
+  --md-sys-color-secondary-fixed: #E8DEF8;
+  --md-sys-color-secondary-fixed-dim: #CBC2DB;
+  --md-sys-color-on-secondary-fixed: #1E192B;
+  --md-sys-color-on-secondary-fixed-variant: #4A4458;
+  --md-sys-color-tertiary-fixed: #FFD9E3;
+  --md-sys-color-tertiary-fixed-dim: #EFB8C8;
+  --md-sys-color-on-tertiary-fixed: #31101D;
+  --md-sys-color-on-tertiary-fixed-variant: #633B48;
+  --md-sys-color-sucesso: #76DAA1;
+  --md-sys-color-on-sucesso: #003920;
+  --md-sys-color-sucesso-container: #005231;
+  --md-sys-color-on-sucesso-container: #92F7BC;
+  --md-sys-color-aviso: #FFB4A2;
+  --md-sys-color-on-aviso: #621200;
+  --md-sys-color-aviso-container: #8A1D00;
+  --md-sys-color-on-aviso-container: #FFDAD2;
+}
+
+@media (prefers-contrast: more) {
+  :root,
+  .md-scheme-light {
+    --md-sys-color-background: #FDF7FF;
+    --md-sys-color-on-background: #1D1B20;
+    --md-sys-color-surface: #FDF7FF;
+    --md-sys-color-surface-dim: #BCB7BF;
+    --md-sys-color-surface-bright: #FDF7FF;
+    --md-sys-color-surface-container-lowest: #FFFFFF;
+    --md-sys-color-surface-container-low: #F5EFF7;
+    --md-sys-color-surface-container: #E6E0E9;
+    --md-sys-color-surface-container-high: #D8D2DA;
+    --md-sys-color-surface-container-highest: #CAC5CC;
+    --md-sys-color-on-surface: #000000;
+    --md-sys-color-surface-variant: #E7E0EB;
+    --md-sys-color-on-surface-variant: #000000;
+    --md-sys-color-inverse-surface: #322F35;
+    --md-sys-color-inverse-on-surface: #FFFFFF;
+    --md-sys-color-outline: #2E2B33;
+    --md-sys-color-outline-variant: #4B4851;
+    --md-sys-color-shadow: #000000;
+    --md-sys-color-scrim: #000000;
+    --md-sys-color-surface-tint: #65558F;
+    --md-sys-color-primary: #312259;
+    --md-sys-color-on-primary: #FFFFFF;
+    --md-sys-color-primary-container: #4F4078;
+    --md-sys-color-on-primary-container: #FFFFFF;
+    --md-sys-color-inverse-primary: #CFBDFE;
+    --md-sys-color-secondary: #2F293C;
+    --md-sys-color-on-secondary: #FFFFFF;
+    --md-sys-color-secondary-container: #4C465B;
+    --md-sys-color-on-secondary-container: #FFFFFF;
+    --md-sys-color-tertiary: #45212E;
+    --md-sys-color-on-tertiary: #FFFFFF;
+    --md-sys-color-tertiary-container: #663D4B;
+    --md-sys-color-on-tertiary-container: #FFFFFF;
+    --md-sys-color-error: #600004;
+    --md-sys-color-on-error: #FFFFFF;
+    --md-sys-color-error-container: #98000A;
+    --md-sys-color-on-error-container: #FFFFFF;
+    --md-sys-color-primary-fixed: #4F4078;
+    --md-sys-color-primary-fixed-dim: #382960;
+    --md-sys-color-on-primary-fixed: #FFFFFF;
+    --md-sys-color-on-primary-fixed-variant: #FFFFFF;
+    --md-sys-color-secondary-fixed: #4C465B;
+    --md-sys-color-secondary-fixed-dim: #353043;
+    --md-sys-color-on-secondary-fixed: #FFFFFF;
+    --md-sys-color-on-secondary-fixed-variant: #FFFFFF;
+    --md-sys-color-tertiary-fixed: #663D4B;
+    --md-sys-color-tertiary-fixed-dim: #4C2734;
+    --md-sys-color-on-tertiary-fixed: #FFFFFF;
+    --md-sys-color-on-tertiary-fixed-variant: #FFFFFF;
+    --md-sys-color-sucesso: #006D43;
+    --md-sys-color-on-sucesso: #FFFFFF;
+    --md-sys-color-sucesso-container: #92F7BC;
+    --md-sys-color-on-sucesso-container: #002111;
+    --md-sys-color-aviso: #AD3212;
+    --md-sys-color-on-aviso: #FFFFFF;
+    --md-sys-color-aviso-container: #FFDAD2;
+    --md-sys-color-on-aviso-container: #3C0700;
+  }
+  .md-scheme-dark {
+    --md-sys-color-background: #141218;
+    --md-sys-color-on-background: #E6E0E9;
+    --md-sys-color-surface: #141218;
+    --md-sys-color-surface-dim: #141218;
+    --md-sys-color-surface-bright: #524F55;
+    --md-sys-color-surface-container-lowest: #000000;
+    --md-sys-color-surface-container-low: #211F24;
+    --md-sys-color-surface-container: #322F35;
+    --md-sys-color-surface-container-high: #3D3A41;
+    --md-sys-color-surface-container-highest: #48464C;
+    --md-sys-color-on-surface: #FFFFFF;
+    --md-sys-color-surface-variant: #49454E;
+    --md-sys-color-on-surface-variant: #FFFFFF;
+    --md-sys-color-inverse-surface: #E6E0E9;
+    --md-sys-color-inverse-on-surface: #000000;
+    --md-sys-color-outline: #F4EEF9;
+    --md-sys-color-outline-variant: #C6C0CB;
+    --md-sys-color-shadow: #000000;
+    --md-sys-color-scrim: #000000;
+    --md-sys-color-surface-tint: #CFBDFE;
+    --md-sys-color-primary: #F5EDFF;
+    --md-sys-color-on-primary: #000000;
+    --md-sys-color-primary-container: #CBB9FA;
+    --md-sys-color-on-primary-container: #0F0033;
+    --md-sys-color-inverse-primary: #4E3F77;
+    --md-sys-color-secondary: #F5EDFF;
+    --md-sys-color-on-secondary: #000000;
+    --md-sys-color-secondary-container: #C8BFD8;
+    --md-sys-color-on-secondary-container: #0D081A;
+    --md-sys-color-tertiary: #FFEBEF;
+    --md-sys-color-on-tertiary: #000000;
+    --md-sys-color-tertiary-container: #EBB4C4;
+    --md-sys-color-on-tertiary-container: #1D020D;
+    --md-sys-color-error: #FFECE9;
+    --md-sys-color-on-error: #000000;
+    --md-sys-color-error-container: #FFAEA4;
+    --md-sys-color-on-error-container: #220001;
+    --md-sys-color-primary-fixed: #E9DDFF;
+    --md-sys-color-primary-fixed-dim: #CFBDFE;
+    --md-sys-color-on-primary-fixed: #000000;
+    --md-sys-color-on-primary-fixed-variant: #16033D;
+    --md-sys-color-secondary-fixed: #E8DEF8;
+    --md-sys-color-secondary-fixed-dim: #CBC2DB;
+    --md-sys-color-on-secondary-fixed: #000000;
+    --md-sys-color-on-secondary-fixed-variant: #130E20;
+    --md-sys-color-tertiary-fixed: #FFD9E3;
+    --md-sys-color-tertiary-fixed-dim: #EFB8C8;
+    --md-sys-color-on-tertiary-fixed: #000000;
+    --md-sys-color-on-tertiary-fixed-variant: #240613;
+    --md-sys-color-sucesso: #76DAA1;
+    --md-sys-color-on-sucesso: #003920;
+    --md-sys-color-sucesso-container: #005231;
+    --md-sys-color-on-sucesso-container: #92F7BC;
+    --md-sys-color-aviso: #FFB4A2;
+    --md-sys-color-on-aviso: #621200;
+    --md-sys-color-aviso-container: #8A1D00;
+    --md-sys-color-on-aviso-container: #FFDAD2;
+  }
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --md-sys-color-background: #141218;
+    --md-sys-color-on-background: #E6E0E9;
+    --md-sys-color-surface: #141218;
+    --md-sys-color-surface-dim: #141218;
+    --md-sys-color-surface-bright: #524F55;
+    --md-sys-color-surface-container-lowest: #000000;
+    --md-sys-color-surface-container-low: #211F24;
+    --md-sys-color-surface-container: #322F35;
+    --md-sys-color-surface-container-high: #3D3A41;
+    --md-sys-color-surface-container-highest: #48464C;
+    --md-sys-color-on-surface: #FFFFFF;
+    --md-sys-color-surface-variant: #49454E;
+    --md-sys-color-on-surface-variant: #FFFFFF;
+    --md-sys-color-inverse-surface: #E6E0E9;
+    --md-sys-color-inverse-on-surface: #000000;
+    --md-sys-color-outline: #F4EEF9;
+    --md-sys-color-outline-variant: #C6C0CB;
+    --md-sys-color-shadow: #000000;
+    --md-sys-color-scrim: #000000;
+    --md-sys-color-surface-tint: #CFBDFE;
+    --md-sys-color-primary: #F5EDFF;
+    --md-sys-color-on-primary: #000000;
+    --md-sys-color-primary-container: #CBB9FA;
+    --md-sys-color-on-primary-container: #0F0033;
+    --md-sys-color-inverse-primary: #4E3F77;
+    --md-sys-color-secondary: #F5EDFF;
+    --md-sys-color-on-secondary: #000000;
+    --md-sys-color-secondary-container: #C8BFD8;
+    --md-sys-color-on-secondary-container: #0D081A;
+    --md-sys-color-tertiary: #FFEBEF;
+    --md-sys-color-on-tertiary: #000000;
+    --md-sys-color-tertiary-container: #EBB4C4;
+    --md-sys-color-on-tertiary-container: #1D020D;
+    --md-sys-color-error: #FFECE9;
+    --md-sys-color-on-error: #000000;
+    --md-sys-color-error-container: #FFAEA4;
+    --md-sys-color-on-error-container: #220001;
+    --md-sys-color-primary-fixed: #E9DDFF;
+    --md-sys-color-primary-fixed-dim: #CFBDFE;
+    --md-sys-color-on-primary-fixed: #000000;
+    --md-sys-color-on-primary-fixed-variant: #16033D;
+    --md-sys-color-secondary-fixed: #E8DEF8;
+    --md-sys-color-secondary-fixed-dim: #CBC2DB;
+    --md-sys-color-on-secondary-fixed: #000000;
+    --md-sys-color-on-secondary-fixed-variant: #130E20;
+    --md-sys-color-tertiary-fixed: #FFD9E3;
+    --md-sys-color-tertiary-fixed-dim: #EFB8C8;
+    --md-sys-color-on-tertiary-fixed: #000000;
+    --md-sys-color-on-tertiary-fixed-variant: #240613;
+    --md-sys-color-sucesso: #76DAA1;
+    --md-sys-color-on-sucesso: #003920;
+    --md-sys-color-sucesso-container: #005231;
+    --md-sys-color-on-sucesso-container: #92F7BC;
+    --md-sys-color-aviso: #FFB4A2;
+    --md-sys-color-on-aviso: #621200;
+    --md-sys-color-aviso-container: #8A1D00;
+    --md-sys-color-on-aviso-container: #FFDAD2;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root[data-theme="dark"] {
+    --md-sys-color-background: #141218;
+    --md-sys-color-on-background: #E6E0E9;
+    --md-sys-color-surface: #141218;
+    --md-sys-color-surface-dim: #141218;
+    --md-sys-color-surface-bright: #524F55;
+    --md-sys-color-surface-container-lowest: #000000;
+    --md-sys-color-surface-container-low: #211F24;
+    --md-sys-color-surface-container: #322F35;
+    --md-sys-color-surface-container-high: #3D3A41;
+    --md-sys-color-surface-container-highest: #48464C;
+    --md-sys-color-on-surface: #FFFFFF;
+    --md-sys-color-surface-variant: #49454E;
+    --md-sys-color-on-surface-variant: #FFFFFF;
+    --md-sys-color-inverse-surface: #E6E0E9;
+    --md-sys-color-inverse-on-surface: #000000;
+    --md-sys-color-outline: #F4EEF9;
+    --md-sys-color-outline-variant: #C6C0CB;
+    --md-sys-color-shadow: #000000;
+    --md-sys-color-scrim: #000000;
+    --md-sys-color-surface-tint: #CFBDFE;
+    --md-sys-color-primary: #F5EDFF;
+    --md-sys-color-on-primary: #000000;
+    --md-sys-color-primary-container: #CBB9FA;
+    --md-sys-color-on-primary-container: #0F0033;
+    --md-sys-color-inverse-primary: #4E3F77;
+    --md-sys-color-secondary: #F5EDFF;
+    --md-sys-color-on-secondary: #000000;
+    --md-sys-color-secondary-container: #C8BFD8;
+    --md-sys-color-on-secondary-container: #0D081A;
+    --md-sys-color-tertiary: #FFEBEF;
+    --md-sys-color-on-tertiary: #000000;
+    --md-sys-color-tertiary-container: #EBB4C4;
+    --md-sys-color-on-tertiary-container: #1D020D;
+    --md-sys-color-error: #FFECE9;
+    --md-sys-color-on-error: #000000;
+    --md-sys-color-error-container: #FFAEA4;
+    --md-sys-color-on-error-container: #220001;
+    --md-sys-color-primary-fixed: #E9DDFF;
+    --md-sys-color-primary-fixed-dim: #CFBDFE;
+    --md-sys-color-on-primary-fixed: #000000;
+    --md-sys-color-on-primary-fixed-variant: #16033D;
+    --md-sys-color-secondary-fixed: #E8DEF8;
+    --md-sys-color-secondary-fixed-dim: #CBC2DB;
+    --md-sys-color-on-secondary-fixed: #000000;
+    --md-sys-color-on-secondary-fixed-variant: #130E20;
+    --md-sys-color-tertiary-fixed: #FFD9E3;
+    --md-sys-color-tertiary-fixed-dim: #EFB8C8;
+    --md-sys-color-on-tertiary-fixed: #000000;
+    --md-sys-color-on-tertiary-fixed-variant: #240613;
+    --md-sys-color-sucesso: #76DAA1;
+    --md-sys-color-on-sucesso: #003920;
+    --md-sys-color-sucesso-container: #005231;
+    --md-sys-color-on-sucesso-container: #92F7BC;
+    --md-sys-color-aviso: #FFB4A2;
+    --md-sys-color-on-aviso: #621200;
+    --md-sys-color-aviso-container: #8A1D00;
+    --md-sys-color-on-aviso-container: #FFDAD2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --md-sys-motion-duration-short1: 0ms;
+    --md-sys-motion-duration-short2: 0ms;
+    --md-sys-motion-duration-short3: 0ms;
+    --md-sys-motion-duration-short4: 0ms;
+    --md-sys-motion-duration-medium1: 0ms;
+    --md-sys-motion-duration-medium2: 0ms;
+    --md-sys-motion-duration-medium3: 0ms;
+    --md-sys-motion-duration-medium4: 0ms;
+    --md-sys-motion-duration-long1: 0ms;
+    --md-sys-motion-duration-long2: 0ms;
+    --md-sys-motion-duration-long3: 0ms;
+    --md-sys-motion-duration-long4: 0ms;
+    --md-sys-motion-duration-extra-long1: 0ms;
+    --md-sys-motion-duration-extra-long2: 0ms;
+    --md-sys-motion-duration-extra-long3: 0ms;
+    --md-sys-motion-duration-extra-long4: 0ms;
+  }
+}
+
+/* boaz · classes da escala tipográfica (Material Design 3)
+ * Gerado por 0_Assets/design/scripts/gerar.mjs a partir de identidade/marca.json e tokens/*.json — não edite à mão.
+ * Requer tokens.css. Uso: <h1 class="md-typescale-headline-large">. */
+
+.md-typescale-display-large {
+  font-family: var(--md-sys-typescale-display-large-font);
+  font-size: var(--md-sys-typescale-display-large-size);
+  line-height: var(--md-sys-typescale-display-large-line-height);
+  letter-spacing: var(--md-sys-typescale-display-large-tracking);
+  font-weight: var(--md-sys-typescale-display-large-weight);
+}
+
+.md-typescale-display-medium {
+  font-family: var(--md-sys-typescale-display-medium-font);
+  font-size: var(--md-sys-typescale-display-medium-size);
+  line-height: var(--md-sys-typescale-display-medium-line-height);
+  letter-spacing: var(--md-sys-typescale-display-medium-tracking);
+  font-weight: var(--md-sys-typescale-display-medium-weight);
+}
+
+.md-typescale-display-small {
+  font-family: var(--md-sys-typescale-display-small-font);
+  font-size: var(--md-sys-typescale-display-small-size);
+  line-height: var(--md-sys-typescale-display-small-line-height);
+  letter-spacing: var(--md-sys-typescale-display-small-tracking);
+  font-weight: var(--md-sys-typescale-display-small-weight);
+}
+
+.md-typescale-headline-large {
+  font-family: var(--md-sys-typescale-headline-large-font);
+  font-size: var(--md-sys-typescale-headline-large-size);
+  line-height: var(--md-sys-typescale-headline-large-line-height);
+  letter-spacing: var(--md-sys-typescale-headline-large-tracking);
+  font-weight: var(--md-sys-typescale-headline-large-weight);
+}
+
+.md-typescale-headline-medium {
+  font-family: var(--md-sys-typescale-headline-medium-font);
+  font-size: var(--md-sys-typescale-headline-medium-size);
+  line-height: var(--md-sys-typescale-headline-medium-line-height);
+  letter-spacing: var(--md-sys-typescale-headline-medium-tracking);
+  font-weight: var(--md-sys-typescale-headline-medium-weight);
+}
+
+.md-typescale-headline-small {
+  font-family: var(--md-sys-typescale-headline-small-font);
+  font-size: var(--md-sys-typescale-headline-small-size);
+  line-height: var(--md-sys-typescale-headline-small-line-height);
+  letter-spacing: var(--md-sys-typescale-headline-small-tracking);
+  font-weight: var(--md-sys-typescale-headline-small-weight);
+}
+
+.md-typescale-title-large {
+  font-family: var(--md-sys-typescale-title-large-font);
+  font-size: var(--md-sys-typescale-title-large-size);
+  line-height: var(--md-sys-typescale-title-large-line-height);
+  letter-spacing: var(--md-sys-typescale-title-large-tracking);
+  font-weight: var(--md-sys-typescale-title-large-weight);
+}
+
+.md-typescale-title-medium {
+  font-family: var(--md-sys-typescale-title-medium-font);
+  font-size: var(--md-sys-typescale-title-medium-size);
+  line-height: var(--md-sys-typescale-title-medium-line-height);
+  letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+  font-weight: var(--md-sys-typescale-title-medium-weight);
+}
+
+.md-typescale-title-small {
+  font-family: var(--md-sys-typescale-title-small-font);
+  font-size: var(--md-sys-typescale-title-small-size);
+  line-height: var(--md-sys-typescale-title-small-line-height);
+  letter-spacing: var(--md-sys-typescale-title-small-tracking);
+  font-weight: var(--md-sys-typescale-title-small-weight);
+}
+
+.md-typescale-body-large {
+  font-family: var(--md-sys-typescale-body-large-font);
+  font-size: var(--md-sys-typescale-body-large-size);
+  line-height: var(--md-sys-typescale-body-large-line-height);
+  letter-spacing: var(--md-sys-typescale-body-large-tracking);
+  font-weight: var(--md-sys-typescale-body-large-weight);
+}
+
+.md-typescale-body-medium {
+  font-family: var(--md-sys-typescale-body-medium-font);
+  font-size: var(--md-sys-typescale-body-medium-size);
+  line-height: var(--md-sys-typescale-body-medium-line-height);
+  letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+  font-weight: var(--md-sys-typescale-body-medium-weight);
+}
+
+.md-typescale-body-small {
+  font-family: var(--md-sys-typescale-body-small-font);
+  font-size: var(--md-sys-typescale-body-small-size);
+  line-height: var(--md-sys-typescale-body-small-line-height);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking);
+  font-weight: var(--md-sys-typescale-body-small-weight);
+}
+
+.md-typescale-label-large {
+  font-family: var(--md-sys-typescale-label-large-font);
+  font-size: var(--md-sys-typescale-label-large-size);
+  line-height: var(--md-sys-typescale-label-large-line-height);
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
+  font-weight: var(--md-sys-typescale-label-large-weight);
+}
+
+.md-typescale-label-medium {
+  font-family: var(--md-sys-typescale-label-medium-font);
+  font-size: var(--md-sys-typescale-label-medium-size);
+  line-height: var(--md-sys-typescale-label-medium-line-height);
+  letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+  font-weight: var(--md-sys-typescale-label-medium-weight);
+}
+
+.md-typescale-label-small {
+  font-family: var(--md-sys-typescale-label-small-font);
+  font-size: var(--md-sys-typescale-label-small-size);
+  line-height: var(--md-sys-typescale-label-small-line-height);
+  letter-spacing: var(--md-sys-typescale-label-small-tracking);
+  font-weight: var(--md-sys-typescale-label-small-weight);
+}
+
+.material-symbols { font-family: "Material Symbols Rounded"; font-weight: normal; font-style: normal; font-size: var(--md-sys-layout-icon-size); line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+</style>
+<script id="design-dados" type="application/json">{"semente":"#6750A4","variante":"tonal-spot","status":"provisoria","fontes":{"marca":"Roboto","texto":"Roboto"},"icones":"Material Symbols Rounded","extras":["sucesso","aviso"],"papeis":["background","on-background","surface","surface-dim","surface-bright","surface-container-lowest","surface-container-low","surface-container","surface-container-high","surface-container-highest","on-surface","surface-variant","on-surface-variant","inverse-surface","inverse-on-surface","outline","outline-variant","shadow","scrim","surface-tint","primary","on-primary","primary-container","on-primary-container","inverse-primary","secondary","on-secondary","secondary-container","on-secondary-container","tertiary","on-tertiary","tertiary-container","on-tertiary-container","error","on-error","error-container","on-error-container","primary-fixed","primary-fixed-dim","on-primary-fixed","on-primary-fixed-variant","secondary-fixed","secondary-fixed-dim","on-secondary-fixed","on-secondary-fixed-variant","tertiary-fixed","tertiary-fixed-dim","on-tertiary-fixed","on-tertiary-fixed-variant","sucesso","on-sucesso","sucesso-container","on-sucesso-container","aviso","on-aviso","aviso-container","on-aviso-container"],"paletas":{"primary":[0,10,20,30,40,50,60,70,80,90,95,99,100],"secondary":[0,10,20,30,40,50,60,70,80,90,95,99,100],"tertiary":[0,10,20,30,40,50,60,70,80,90,95,99,100],"neutral":[0,4,6,10,12,17,20,22,24,30,40,50,60,70,80,87,90,92,94,95,96,98,99,100],"neutral-variant":[0,10,20,30,40,50,60,70,80,90,95,99,100],"error":[0,10,20,30,40,50,60,70,80,90,95,99,100],"sucesso":[0,10,20,30,40,50,60,70,80,90,95,99,100],"aviso":[0,10,20,30,40,50,60,70,80,90,95,99,100]},"tipos":{"display-large":{"font":"brand","size":57,"line-height":64,"tracking":-0.25,"weight":400},"display-medium":{"font":"brand","size":45,"line-height":52,"tracking":0,"weight":400},"display-small":{"font":"brand","size":36,"line-height":44,"tracking":0,"weight":400},"headline-large":{"font":"brand","size":32,"line-height":40,"tracking":0,"weight":400},"headline-medium":{"font":"brand","size":28,"line-height":36,"tracking":0,"weight":400},"headline-small":{"font":"brand","size":24,"line-height":32,"tracking":0,"weight":400},"title-large":{"font":"brand","size":22,"line-height":28,"tracking":0,"weight":400},"title-medium":{"font":"plain","size":16,"line-height":24,"tracking":0.15,"weight":500},"title-small":{"font":"plain","size":14,"line-height":20,"tracking":0.1,"weight":500},"body-large":{"font":"plain","size":16,"line-height":24,"tracking":0.5,"weight":400},"body-medium":{"font":"plain","size":14,"line-height":20,"tracking":0.25,"weight":400},"body-small":{"font":"plain","size":12,"line-height":16,"tracking":0.4,"weight":400},"label-large":{"font":"plain","size":14,"line-height":20,"tracking":0.1,"weight":500},"label-medium":{"font":"plain","size":12,"line-height":16,"tracking":0.5,"weight":500},"label-small":{"font":"plain","size":11,"line-height":16,"tracking":0.5,"weight":500}},"janelas":{"compact":{"min":0,"max":599,"margin":16,"columns":4,"gutter":16,"panes":1,"navigation":"navigation-bar","exemplos":"celular em pé"},"medium":{"min":600,"max":839,"margin":24,"columns":8,"gutter":24,"panes":1,"navigation":"navigation-rail","exemplos":"tablet em pé, celular dobrável aberto"},"expanded":{"min":840,"max":1199,"margin":24,"columns":12,"gutter":24,"panes":2,"navigation":"navigation-rail","exemplos":"tablet deitado, notebook pequeno"},"large":{"min":1200,"max":1599,"margin":24,"columns":12,"gutter":24,"panes":2,"navigation":"navigation-drawer","exemplos":"desktop"},"extra-large":{"min":1600,"max":null,"margin":24,"columns":12,"gutter":24,"panes":3,"navigation":"navigation-drawer","exemplos":"monitor grande"}}}</script>
+<!-- design:tokens:fim -->
+<style id="design-componentes">
+/* =============================================================================
+   Componentes de referência (Material Design 3) — só tokens md.comp/md.sys.
+   Os componentes Vue e MAUI reproduzem estes: mesmas medidas, cores e estados.
+   ============================================================================= */
+.material-symbols { user-select: none; }
+
+/* camada de estado: cor do conteúdo por cima do contêiner (hover, foco, toque) */
+.md-estado { position: relative; isolation: isolate; }
+.md-estado::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: currentColor; opacity: 0;
+  transition: opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+.md-estado:hover::before { opacity: var(--md-sys-state-hover-opacity); }
+.md-estado:focus-visible::before { opacity: var(--md-sys-state-focus-opacity); }
+.md-estado:active::before { opacity: var(--md-sys-state-pressed-opacity); }
+.md-estado:focus-visible {
+  outline: var(--md-sys-state-focus-indicator-thickness) solid var(--md-sys-color-secondary);
+  outline-offset: var(--md-sys-state-focus-indicator-offset);
+}
+/* área tocável mínima de 48dp, mesmo quando o desenho é menor */
+.md-alvo::after {
+  content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  min-width: var(--md-sys-layout-touch-target); min-height: var(--md-sys-layout-touch-target);
+  width: 100%; height: 100%;
+}
+
+/* ── botões ── */
+.md-button {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--md-comp-button-gap);
+  height: var(--md-comp-button-height); min-width: var(--md-comp-button-min-width);
+  padding: 0 var(--md-comp-button-padding); border: 0; border-radius: var(--md-comp-button-shape);
+  font-family: var(--md-comp-button-label-font); font-size: var(--md-comp-button-label-size);
+  line-height: var(--md-comp-button-label-line-height); letter-spacing: var(--md-comp-button-label-tracking);
+  font-weight: var(--md-comp-button-label-weight); background: transparent; cursor: pointer; text-decoration: none;
+  transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+.md-button .material-symbols { font-size: var(--md-comp-button-icon-size); margin-left: calc(var(--md-comp-button-padding-with-icon) - var(--md-comp-button-padding)); }
+.md-button--filled { background: var(--md-comp-button-filled-container-color); color: var(--md-comp-button-filled-label-color); box-shadow: var(--md-comp-button-filled-elevation); }
+.md-button--filled:hover { box-shadow: var(--md-comp-button-filled-hover-elevation); }
+.md-button--tonal { background: var(--md-comp-button-tonal-container-color); color: var(--md-comp-button-tonal-label-color); box-shadow: var(--md-comp-button-tonal-elevation); }
+.md-button--tonal:hover { box-shadow: var(--md-comp-button-tonal-hover-elevation); }
+.md-button--elevated { background: var(--md-comp-button-elevated-container-color); color: var(--md-comp-button-elevated-label-color); box-shadow: var(--md-comp-button-elevated-elevation); }
+.md-button--elevated:hover { box-shadow: var(--md-comp-button-elevated-hover-elevation); }
+.md-button--outlined { color: var(--md-comp-button-outlined-label-color); border: var(--md-comp-button-outlined-outline-width) solid var(--md-comp-button-outlined-outline-color); }
+.md-button--text { color: var(--md-comp-button-text-label-color); padding: 0 var(--md-comp-button-text-padding); }
+.md-button:disabled, .md-icon-button:disabled, .md-fab:disabled {
+  color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-container-opacity) * 100%), transparent);
+  border-color: transparent; box-shadow: none; cursor: default;
+}
+.md-button--text:disabled, .md-button--outlined:disabled { background: transparent; }
+.md-button--outlined:disabled { border-color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-container-opacity) * 100%), transparent); }
+.md-button:disabled::before, .md-icon-button:disabled::before { display: none; }
+
+/* ── botão de ícone ── */
+.md-icon-button {
+  display: inline-grid; place-items: center; width: var(--md-comp-icon-button-size); height: var(--md-comp-icon-button-size);
+  padding: 0; border: 0; border-radius: var(--md-comp-icon-button-shape); background: transparent;
+  color: var(--md-comp-icon-button-icon-color); cursor: pointer;
+}
+.md-icon-button .material-symbols { font-size: var(--md-comp-icon-button-icon-size); }
+.md-icon-button[aria-pressed="true"] { color: var(--md-comp-icon-button-selected-icon-color); }
+.md-icon-button--filled { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.md-icon-button--tonal { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.md-icon-button--outlined { border: 1px solid var(--md-sys-color-outline-variant); }
+
+/* ── FAB ── */
+.md-fab {
+  display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+  width: var(--md-comp-fab-size); height: var(--md-comp-fab-size); padding: 0; border: 0;
+  border-radius: var(--md-comp-fab-shape); background: var(--md-comp-fab-container-color);
+  color: var(--md-comp-fab-icon-color); box-shadow: var(--md-comp-fab-elevation); cursor: pointer;
+  transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+.md-fab:hover { box-shadow: var(--md-comp-fab-hover-elevation); }
+.md-fab .material-symbols { font-size: var(--md-comp-fab-icon-size); }
+.md-fab--small { width: var(--md-comp-fab-small-size); height: var(--md-comp-fab-small-size); border-radius: var(--md-comp-fab-small-shape); }
+.md-fab--large { width: var(--md-comp-fab-large-size); height: var(--md-comp-fab-large-size); border-radius: var(--md-comp-fab-large-shape); }
+.md-fab--large .material-symbols { font-size: var(--md-comp-fab-large-icon-size); }
+.md-fab--extended {
+  width: auto; padding: 0 var(--md-comp-fab-extended-padding) 0 var(--md-comp-fab-extended-padding);
+  font-family: var(--md-comp-fab-extended-label-font); font-size: var(--md-comp-fab-extended-label-size);
+  letter-spacing: var(--md-comp-fab-extended-label-tracking); font-weight: var(--md-comp-fab-extended-label-weight);
+}
+.md-fab--extended span:last-child { padding-right: 4px; }
+
+/* ── chips ── */
+.md-chip {
+  display: inline-flex; align-items: center; gap: 8px; height: var(--md-comp-chip-height);
+  padding: 0 var(--md-comp-chip-padding); border: 1px solid var(--md-comp-chip-outline-color);
+  border-radius: var(--md-comp-chip-shape); background: transparent; color: var(--md-comp-chip-label-color);
+  font-family: var(--md-comp-chip-label-font); font-size: var(--md-comp-chip-label-size);
+  letter-spacing: var(--md-comp-chip-label-tracking); font-weight: var(--md-comp-chip-label-weight); cursor: pointer;
+}
+.md-chip .material-symbols { font-size: var(--md-comp-chip-icon-size); margin-left: calc(var(--md-comp-chip-padding-with-icon) - var(--md-comp-chip-padding)); }
+.md-chip[aria-pressed="true"] { background: var(--md-comp-chip-selected-container-color); color: var(--md-comp-chip-selected-label-color); border-color: transparent; }
+
+/* ── cards ── */
+.md-card { border-radius: var(--md-comp-card-shape); padding: var(--md-comp-card-padding); color: var(--md-sys-color-on-surface); }
+.md-card--elevated { background: var(--md-comp-card-elevated-container-color); box-shadow: var(--md-comp-card-elevated-elevation); }
+.md-card--filled { background: var(--md-comp-card-filled-container-color); }
+.md-card--outlined { background: var(--md-comp-card-outlined-container-color); border: 1px solid var(--md-comp-card-outlined-outline-color); }
+.md-card h4 {
+  margin: 0 0 4px; font-family: var(--md-comp-card-title-font); font-size: var(--md-comp-card-title-size);
+  line-height: var(--md-comp-card-title-line-height); letter-spacing: var(--md-comp-card-title-tracking); font-weight: var(--md-comp-card-title-weight);
+}
+.md-card p {
+  margin: 0; color: var(--md-sys-color-on-surface-variant); font-family: var(--md-comp-card-body-font); font-size: var(--md-comp-card-body-size);
+  line-height: var(--md-comp-card-body-line-height); letter-spacing: var(--md-comp-card-body-tracking);
+}
+
+/* ── campos de texto (rótulo flutuante com :placeholder-shown) ── */
+.md-text-field { position: relative; display: block; min-width: 0; }
+.md-text-field input {
+  box-sizing: border-box; width: 100%; height: var(--md-comp-text-field-height); padding: 24px var(--md-comp-text-field-padding) 8px;
+  border: 0; outline: 0; background: transparent; color: var(--md-comp-text-field-input-color); caret-color: var(--md-comp-text-field-focus-color);
+  font-family: var(--md-comp-text-field-label-font); font-size: var(--md-comp-text-field-label-size); letter-spacing: var(--md-comp-text-field-label-tracking);
+}
+.md-text-field label {
+  position: absolute; left: var(--md-comp-text-field-padding); top: 50%; transform: translateY(-50%); pointer-events: none;
+  color: var(--md-comp-text-field-label-color); font-family: var(--md-comp-text-field-label-font); font-size: var(--md-comp-text-field-label-size);
+  transition: all var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+.md-text-field input:focus + label, .md-text-field input:not(:placeholder-shown) + label {
+  top: 8px; transform: none; font-size: var(--md-comp-text-field-populated-label-size); line-height: var(--md-comp-text-field-populated-label-line-height);
+}
+.md-text-field input:focus + label { color: var(--md-comp-text-field-focus-color); }
+.md-text-field small {
+  display: block; padding: 4px var(--md-comp-text-field-padding) 0; color: var(--md-comp-text-field-label-color);
+  font-size: var(--md-comp-text-field-supporting-text-size); line-height: var(--md-comp-text-field-supporting-text-line-height);
+  letter-spacing: var(--md-comp-text-field-supporting-text-tracking);
+}
+.md-text-field--filled .md-text-field__caixa {
+  background: var(--md-comp-text-field-filled-container-color); border-radius: var(--md-comp-text-field-filled-shape) var(--md-comp-text-field-filled-shape) 0 0;
+  box-shadow: inset 0 -1px 0 var(--md-comp-text-field-filled-indicator-color); position: relative;
+}
+.md-text-field--filled .md-text-field__caixa:focus-within { box-shadow: inset 0 -2px 0 var(--md-comp-text-field-focus-color); }
+.md-text-field--outlined .md-text-field__caixa {
+  border-radius: var(--md-comp-text-field-outlined-shape); box-shadow: inset 0 0 0 1px var(--md-comp-text-field-outlined-outline-color); position: relative;
+}
+.md-text-field--outlined .md-text-field__caixa:focus-within { box-shadow: inset 0 0 0 2px var(--md-comp-text-field-focus-color); }
+.md-text-field--erro .md-text-field__caixa { box-shadow: inset 0 -2px 0 var(--md-comp-text-field-error-color); }
+.md-text-field--erro label, .md-text-field--erro small { color: var(--md-comp-text-field-error-color); }
+.md-text-field--outlined.md-text-field--erro .md-text-field__caixa { box-shadow: inset 0 0 0 2px var(--md-comp-text-field-error-color); }
+
+/* ── listas ── */
+.md-list { list-style: none; margin: 0; padding: 8px 0; }
+.md-list li {
+  display: flex; align-items: center; gap: var(--md-comp-list-padding); min-height: var(--md-comp-list-one-line-height);
+  padding: 0 var(--md-comp-list-padding); color: var(--md-comp-list-headline-color);
+}
+.md-list li.duas-linhas { min-height: var(--md-comp-list-two-line-height); }
+.md-list li + li { border-top: 1px solid var(--md-comp-list-divider-color); }
+.md-list .titulo {
+  display: block; font-family: var(--md-comp-list-headline-font); font-size: var(--md-comp-list-headline-size);
+  line-height: var(--md-comp-list-headline-line-height); letter-spacing: var(--md-comp-list-headline-tracking);
+}
+.md-list .apoio {
+  display: block; color: var(--md-comp-list-supporting-text-color); font-family: var(--md-comp-list-supporting-text-font);
+  font-size: var(--md-comp-list-supporting-text-size); line-height: var(--md-comp-list-supporting-text-line-height); letter-spacing: var(--md-comp-list-supporting-text-tracking);
+}
+.md-list .material-symbols { color: var(--md-sys-color-on-surface-variant); }
+.md-list .avatar {
+  display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: var(--md-sys-shape-corner-full);
+  background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
+  font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); font-weight: var(--md-sys-typescale-title-medium-weight);
+}
+
+/* ── top app bar ── */
+.md-top-app-bar {
+  display: flex; align-items: center; gap: 4px; height: var(--md-comp-top-app-bar-height); padding: 0 4px;
+  background: var(--md-comp-top-app-bar-container-color); color: var(--md-comp-top-app-bar-icon-color);
+}
+.md-top-app-bar--rolada { background: var(--md-comp-top-app-bar-scrolled-container-color); }
+.md-top-app-bar h3 {
+  flex: 1; margin: 0 0 0 4px; color: var(--md-comp-top-app-bar-title-color); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  font-family: var(--md-comp-top-app-bar-title-font); font-size: var(--md-comp-top-app-bar-title-size);
+  line-height: var(--md-comp-top-app-bar-title-line-height); font-weight: var(--md-comp-top-app-bar-title-weight);
+}
+
+/* ── navegação: barra (compact), trilho (medium/expanded), gaveta (large+) ── */
+.md-nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0; border: 0; background: none; cursor: pointer;
+  color: var(--md-comp-navigation-bar-label-color); text-decoration: none;
+  font-family: var(--md-comp-navigation-bar-label-font); font-size: var(--md-comp-navigation-bar-label-size);
+  line-height: var(--md-comp-navigation-bar-label-line-height); letter-spacing: var(--md-comp-navigation-bar-label-tracking); font-weight: var(--md-comp-navigation-bar-label-weight);
+}
+.md-nav-item__indicador {
+  display: grid; place-items: center; width: var(--md-comp-navigation-bar-indicator-width); height: var(--md-comp-navigation-bar-indicator-height);
+  border-radius: var(--md-comp-navigation-bar-indicator-shape); color: var(--md-comp-navigation-bar-icon-color);
+}
+.md-nav-item[aria-current="page"] { color: var(--md-comp-navigation-bar-active-label-color); }
+.md-nav-item[aria-current="page"] .md-nav-item__indicador { background: var(--md-comp-navigation-bar-indicator-color); color: var(--md-comp-navigation-bar-active-icon-color); }
+.md-nav-item[aria-current="page"] .material-symbols { font-variation-settings: "FILL" 1; }
+.md-navigation-bar {
+  display: flex; justify-content: space-around; align-items: center; height: var(--md-comp-navigation-bar-height);
+  background: var(--md-comp-navigation-bar-container-color);
+}
+.md-navigation-bar .md-nav-item { flex: 1; }
+.md-navigation-rail {
+  display: flex; flex-direction: column; align-items: center; gap: 12px; width: var(--md-comp-navigation-rail-width); padding: 12px 0;
+  background: var(--md-comp-navigation-rail-container-color);
+}
+.md-navigation-rail .md-nav-item__indicador { width: var(--md-comp-navigation-rail-indicator-width); }
+.md-navigation-rail .md-fab { margin-bottom: 16px; }
+.md-navigation-drawer {
+  box-sizing: border-box; width: min(var(--md-comp-navigation-drawer-width), 100%); padding: 12px;
+  background: var(--md-comp-navigation-drawer-container-color); border-radius: 0 var(--md-comp-navigation-drawer-shape) var(--md-comp-navigation-drawer-shape) 0;
+}
+.md-navigation-drawer h5 {
+  margin: 0; padding: 18px 16px; color: var(--md-sys-color-on-surface-variant);
+  font-family: var(--md-comp-navigation-drawer-headline-font); font-size: var(--md-comp-navigation-drawer-headline-size); font-weight: var(--md-comp-navigation-drawer-headline-weight);
+}
+.md-drawer-item {
+  display: flex; align-items: center; gap: 12px; height: var(--md-comp-navigation-drawer-item-height); padding: 0 24px 0 16px;
+  border-radius: var(--md-comp-navigation-drawer-item-shape); color: var(--md-sys-color-on-surface-variant); text-decoration: none;
+  font-family: var(--md-comp-navigation-drawer-label-font); font-size: var(--md-comp-navigation-drawer-label-size);
+  letter-spacing: var(--md-comp-navigation-drawer-label-tracking); font-weight: var(--md-comp-navigation-drawer-label-weight);
+}
+.md-drawer-item[aria-current="page"] { background: var(--md-comp-navigation-drawer-indicator-color); color: var(--md-sys-color-on-secondary-container); }
+
+/* ── diálogo e snackbar ── */
+.md-dialog {
+  box-sizing: border-box; min-width: var(--md-comp-dialog-min-width); max-width: min(var(--md-comp-dialog-max-width), calc(100vw - 48px));
+  padding: var(--md-comp-dialog-padding); border: 0; border-radius: var(--md-comp-dialog-shape);
+  background: var(--md-comp-dialog-container-color); color: var(--md-comp-dialog-body-color); box-shadow: var(--md-comp-dialog-elevation);
+}
+.md-dialog::backdrop { background: color-mix(in srgb, var(--md-sys-color-scrim) calc(var(--md-comp-dialog-scrim-opacity) * 100%), transparent); }
+.md-dialog h3 {
+  margin: 0 0 16px; color: var(--md-comp-dialog-headline-color); font-family: var(--md-comp-dialog-headline-font);
+  font-size: var(--md-comp-dialog-headline-size); line-height: var(--md-comp-dialog-headline-line-height); font-weight: var(--md-comp-dialog-headline-weight);
+}
+.md-dialog p { margin: 0; font-family: var(--md-comp-dialog-body-font); font-size: var(--md-comp-dialog-body-size); line-height: var(--md-comp-dialog-body-line-height); letter-spacing: var(--md-comp-dialog-body-tracking); }
+.md-dialog .acoes { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; }
+.md-snackbar {
+  display: flex; align-items: center; gap: 4px; box-sizing: border-box; min-height: var(--md-comp-snackbar-min-height); max-width: 560px;
+  padding: 4px 8px 4px 16px; border-radius: var(--md-comp-snackbar-shape); background: var(--md-comp-snackbar-container-color);
+  color: var(--md-comp-snackbar-label-color); box-shadow: var(--md-comp-snackbar-elevation);
+  font-family: var(--md-comp-snackbar-label-font); font-size: var(--md-comp-snackbar-label-size); line-height: var(--md-comp-snackbar-label-line-height); letter-spacing: var(--md-comp-snackbar-label-tracking);
+}
+.md-snackbar span { flex: 1; padding: 10px 0; }
+.md-snackbar .md-button--text { color: var(--md-comp-snackbar-action-color); }
+.md-snackbar .md-icon-button { color: var(--md-comp-snackbar-label-color); }
+</style>
+<style id="design-catalogo">
+/* =============================================================================
+   Só desta página (layout do catálogo). Também usa apenas tokens.
+   ============================================================================= */
+* { box-sizing: border-box; }
+html { scroll-padding-top: 80px; }
+body {
+  margin: 0; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface);
+  font-family: var(--md-sys-typescale-body-large-font); font-size: var(--md-sys-typescale-body-large-size);
+  line-height: var(--md-sys-typescale-body-large-line-height); letter-spacing: var(--md-sys-typescale-body-large-tracking);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--md-sys-color-primary); }
+code, .mono { font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .85em; letter-spacing: 0; }
+code { padding: 1px 6px; border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-surface-container-high); }
+
+/* moldura: barra no topo + gaveta modal até large; gaveta fixa em large+ */
+.app-bar { position: sticky; top: 0; z-index: 20; }
+.gaveta { position: fixed; z-index: 40; inset: 0 auto 0 0; overflow-y: auto; transform: translateX(-105%); box-shadow: var(--md-sys-elevation-level1);
+  transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate); }
+.gaveta.aberta { transform: none; }
+.veu { position: fixed; inset: 0; z-index: 30; background: color-mix(in srgb, var(--md-sys-color-scrim) 32%, transparent); display: none; }
+.veu.visivel { display: block; }
+.so-gaveta-fixa { display: none; }
+@media (min-width: 1200px) {
+  .app-bar .menu { display: none; }
+  .gaveta { transform: none; box-shadow: none; width: 300px; border-radius: 0; background: var(--md-sys-color-surface-container-low); }
+  .veu { display: none !important; }
+  .conteudo, .app-bar { margin-left: 300px; }
+  .so-gaveta-fixa { display: block; }
+}
+.conteudo { padding: 0 var(--md-sys-layout-margin) 96px; }
+.coluna { max-width: var(--md-sys-layout-content-max-width); margin: 0 auto; }
+
+/* marca de topo */
+.marca {
+  margin-top: 8px; padding: 32px var(--md-sys-layout-margin) 24px; border-radius: var(--md-sys-shape-corner-extra-large);
+  background: var(--md-sys-color-surface-container-low);
+}
+.marca .eyebrow { margin: 0 0 8px; color: var(--md-sys-color-primary); text-transform: uppercase; letter-spacing: .12em;
+  font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-label-medium-weight); }
+.marca h1 { margin: 0 0 8px; }
+.marca .objetivo { margin: 0 0 20px; color: var(--md-sys-color-on-surface-variant); max-width: 720px; }
+.carimbo { display: flex; flex-wrap: wrap; gap: 8px; }
+.carimbo .md-chip { cursor: default; }
+.carimbo .md-chip b { font-weight: 700; }
+
+section { padding-top: 48px; }
+section > h2 { margin: 0 0 8px; }
+section > .lead { margin: 0 0 24px; color: var(--md-sys-color-on-surface-variant); max-width: 760px; }
+h3.sub { margin: 32px 0 12px; }
+.grade { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+.linha { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.palco { padding: 24px; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
+.palco + .palco { margin-top: 12px; }
+.rotulo { display: block; margin: 0 0 12px; color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-label-medium-weight); letter-spacing: var(--md-sys-typescale-label-medium-tracking); }
+.nota { padding: 16px; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }
+.nota p { margin: 0; }
+.nota p + p { margin-top: 8px; }
+
+/* tabelas rolam sozinhas; a página nunca rola na horizontal */
+.tabela { overflow-x: auto; border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--md-sys-shape-corner-medium); }
+table { width: 100%; border-collapse: collapse; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+th, td { padding: 10px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
+th { background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface-variant); font-weight: 500; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+
+/* identidade */
+.vaga { display: grid; place-items: center; gap: 8px; min-height: 160px; padding: 16px; text-align: center;
+  border: 2px dashed var(--md-sys-color-outline-variant); border-radius: var(--md-sys-shape-corner-large); color: var(--md-sys-color-on-surface-variant); }
+.vaga .material-symbols { font-size: 36px; color: var(--md-sys-color-outline); }
+.vaga b { color: var(--md-sys-color-on-surface); }
+.vaga small { font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+
+/* cores */
+.esquemas { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 840px) { .esquemas { grid-template-columns: 1fr 1fr; } }
+.esquema { padding: 16px; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface);
+  border: 1px solid var(--md-sys-color-outline-variant); }
+.esquema > h4 { margin: 0 0 12px; font-size: var(--md-sys-typescale-title-medium-size); font-weight: 500; }
+.familia { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 6px; }
+@media (min-width: 600px) { .familia { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 840px) and (max-width: 1399px) { .familia { grid-template-columns: repeat(2, 1fr); } }
+.amostra { min-height: 72px; padding: 10px; border-radius: var(--md-sys-shape-corner-small); cursor: copy;
+  font-size: var(--md-sys-typescale-label-medium-size); line-height: 16px; letter-spacing: .2px; border: 1px solid transparent; }
+.amostra b { display: block; font-weight: 500; overflow-wrap: anywhere; }
+.amostra span { opacity: .85; font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 11px; }
+.amostra.contorno { border-color: var(--md-sys-color-outline-variant); }
+.paleta { display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: 8px; margin-bottom: 6px; }
+.paleta > b { font-size: var(--md-sys-typescale-label-large-size); font-weight: 500; }
+.tons { display: flex; overflow-x: auto; border-radius: var(--md-sys-shape-corner-small); }
+.tom { flex: 1 0 34px; height: 40px; display: grid; place-items: center; font-size: 10px; font-family: ui-monospace, Menlo, monospace; cursor: copy; }
+@media (max-width: 599px) { .paleta { grid-template-columns: 1fr; gap: 4px; } }
+
+/* tipografia */
+.especime { display: grid; grid-template-columns: 1fr; gap: 4px 24px; padding: 16px 0; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
+.especime:last-child { border-bottom: 0; }
+.especime .exemplo { overflow-wrap: anywhere; }
+.especime .spec { color: var(--md-sys-color-on-surface-variant); font-size: 12px; line-height: 16px; }
+@media (min-width: 840px) { .especime { grid-template-columns: 200px 1fr; align-items: baseline; } }
+
+/* forma, elevação, espaçamento */
+.forma { display: grid; place-items: center; height: 96px; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
+  font-size: var(--md-sys-typescale-label-medium-size); text-align: center; }
+.nivel { display: grid; place-items: center; height: 96px; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-low);
+  text-align: center; font-size: var(--md-sys-typescale-label-large-size); }
+.espaco { display: grid; grid-template-columns: 160px 1fr; align-items: center; gap: 12px; margin: 6px 0; font-size: var(--md-sys-typescale-body-small-size); }
+.espaco i { display: block; height: 16px; background: var(--md-sys-color-primary); border-radius: 2px; }
+
+/* layout: indicador de janela e colunas */
+.janela-atual { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; }
+.colunas { display: grid; grid-template-columns: repeat(var(--md-sys-layout-columns), 1fr); gap: var(--md-sys-layout-gutter);
+  padding: 0 var(--md-sys-layout-margin); height: 96px; border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface-container); }
+.colunas i { background: color-mix(in srgb, var(--md-sys-color-tertiary) 22%, transparent); }
+
+/* demonstração responsiva da navegação (container queries com as mesmas larguras) */
+.moldura-ctrl { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.moldura { container-type: inline-size; resize: horizontal; overflow: hidden; width: 100%; min-width: 320px; max-width: 100%; height: 420px;
+  border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+.app-demo { display: grid; grid-template: "nav topo" auto "nav corpo" 1fr "barra barra" auto / auto 1fr; height: 100%; }
+.app-demo .md-top-app-bar { grid-area: topo; }
+.app-demo .corpo { grid-area: corpo; overflow: auto; padding: 0 16px 16px; display: grid; gap: 12px; align-content: start;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+.app-demo .md-navigation-bar { grid-area: barra; }
+.app-demo .md-navigation-rail, .app-demo .md-navigation-drawer { grid-area: nav; }
+.app-demo .md-navigation-rail, .app-demo .md-navigation-drawer { display: none; }
+.app-demo .md-navigation-drawer { width: 280px; border-radius: 0; }
+.app-demo .janela-tag { position: absolute; right: 12px; bottom: 12px; }
+@container (min-width: 600px) {
+  .app-demo .md-navigation-bar { display: none; }
+  .app-demo .md-navigation-rail { display: flex; }
+  .app-demo .corpo { padding: 0 24px 24px; }
+}
+@container (min-width: 1200px) {
+  .app-demo .md-navigation-rail { display: none; }
+  .app-demo .md-navigation-drawer { display: block; }
+}
+
+/* movimento */
+.trilho-mov { position: relative; height: 40px; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-high); }
+.trilho-mov i { position: absolute; left: 4px; top: 4px; width: 32px; height: 32px; border-radius: 50%; background: var(--md-sys-color-primary); }
+.trilho-mov.ir i { left: calc(100% - 36px); }
+
+/* snackbar flutuante da demonstração */
+.snack-demo { position: fixed; left: 50%; bottom: 24px; z-index: 50; transform: translate(-50%, 160%); width: calc(100% - 32px); max-width: 560px;
+  transition: transform var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-emphasized-decelerate); }
+.snack-demo.visivel { transform: translate(-50%, 0); }
+
+/* rodapé com histórico */
+.rodape { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--md-sys-color-outline-variant); color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+.rodape .linha-final { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<header class="app-bar md-top-app-bar" id="app-bar">
+  <button class="md-icon-button md-estado md-alvo menu" id="abrir-gaveta" aria-label="Abrir navegação"><span class="material-symbols">menu</span></button>
+  <h3>Design system · boaz</h3>
+  <div class="linha" role="group" aria-label="Tema">
+    <button class="md-icon-button md-estado md-alvo" data-tema="light" aria-label="Tema claro" title="Claro"><span class="material-symbols">light_mode</span></button>
+    <button class="md-icon-button md-estado md-alvo" data-tema="system" aria-label="Tema do sistema" title="Sistema"><span class="material-symbols">contrast</span></button>
+    <button class="md-icon-button md-estado md-alvo" data-tema="dark" aria-label="Tema escuro" title="Escuro"><span class="material-symbols">dark_mode</span></button>
+  </div>
+</header>
+
+<div class="veu" id="veu"></div>
+<nav class="gaveta md-navigation-drawer" id="gaveta" aria-label="Seções">
+  <h5>boaz · design system</h5>
+  <a class="md-drawer-item md-estado" href="#principios"><span class="material-symbols">flag</span>Princípios</a>
+  <a class="md-drawer-item md-estado" href="#identidade"><span class="material-symbols">verified</span>Identidade</a>
+  <a class="md-drawer-item md-estado" href="#cor"><span class="material-symbols">palette</span>Cor</a>
+  <a class="md-drawer-item md-estado" href="#tipografia"><span class="material-symbols">text_fields</span>Tipografia</a>
+  <a class="md-drawer-item md-estado" href="#forma"><span class="material-symbols">rounded_corner</span>Forma e elevação</a>
+  <a class="md-drawer-item md-estado" href="#layout"><span class="material-symbols">devices</span>Layout responsivo</a>
+  <a class="md-drawer-item md-estado" href="#movimento"><span class="material-symbols">animation</span>Movimento e estados</a>
+  <a class="md-drawer-item md-estado" href="#componentes"><span class="material-symbols">widgets</span>Componentes</a>
+  <a class="md-drawer-item md-estado" href="#acessibilidade"><span class="material-symbols">accessibility_new</span>Acessibilidade</a>
+  <a class="md-drawer-item md-estado" href="#plataformas"><span class="material-symbols">code</span>Web e mobile</a>
+  <a class="md-drawer-item md-estado" href="#historico"><span class="material-symbols">history</span>Histórico</a>
+</nav>
+
+<main class="conteudo">
+  <div class="coluna">
+
+    <header class="marca">
+      <p class="eyebrow">boaz · Design system</p>
+      <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
+      <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
+      <div class="carimbo">
+        <span class="md-chip">Versão&nbsp;<b>v01</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-16 · 11:52</b></span>
+        <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
+      </div>
+    </header>
+
+    <section id="principios">
+      <h2 class="md-typescale-headline-medium">Princípios</h2>
+      <p class="lead">Os componentes seguem o Material Design 3. A identidade do boaz entra por cima, sem mudar a estrutura: troca-se a semente de cor, as fontes, os logos e as imagens, e todo o resto se ajusta.</p>
+      <div class="grade">
+        <article class="md-card md-card--outlined"><h4>Tokens, nunca valores soltos</h4><p>Cor, tamanho, canto, sombra e tempo vêm de um token (<code>md.sys.*</code> ou <code>md.comp.*</code>). Um <code>#hex</code> ou <code>px</code> solto num componente é erro.</p></article>
+        <article class="md-card md-card--outlined"><h4>Cor por papel</h4><p>Usa-se <code>primary</code>, <code>surface</code>, <code>on-surface</code>… e nunca o tom da paleta. Assim claro, escuro e alto contraste saem certos de graça.</p></article>
+        <article class="md-card md-card--outlined"><h4>Celular primeiro</h4><p>Cada tela é desenhada para a janela compact (até 599dp) e cresce por classe de janela: margem, colunas, painéis e navegação mudam juntos.</p></article>
+        <article class="md-card md-card--outlined"><h4>Acessível por padrão</h4><p>Contraste mínimo de 4,5:1 no texto, alvo de toque de 48dp, fonte que acompanha a preferência da pessoa e movimento reduzido quando pedido.</p></article>
+      </div>
+    </section>
+
+    <section id="identidade">
+      <h2 class="md-typescale-headline-medium">Identidade</h2>
+      <p class="lead">Fica em <code>0_Assets/design/identidade/</code>. Cores e fontes em <code>marca.json</code>; arquivos visuais nas pastas abaixo. Enquanto a identidade não chega, o esquema usa a semente de referência do Material 3.</p>
+      <div class="linha palco" id="resumo-marca"></div>
+      <h3 class="sub md-typescale-title-large">Arquivos esperados</h3>
+      <div class="grade">
+        <div class="vaga"><span class="material-symbols">hexagon</span><b>Logo principal</b><small><code>logos/logo-principal.svg</code><br>+ <code>logo-principal-negativo.svg</code> para fundos escuros</small></div>
+        <div class="vaga"><span class="material-symbols">token</span><b>Símbolo</b><small><code>logos/simbolo.svg</code><br>a marca sem o nome, para espaços pequenos</small></div>
+        <div class="vaga"><span class="material-symbols">apps</span><b>Ícone do app e favicon</b><small><code>icones/app-icone.svg</code> (1024×1024, com área segura)<br><code>icones/favicon.svg</code></small></div>
+        <div class="vaga"><span class="material-symbols">font_download</span><b>Fontes</b><small><code>fontes/&lt;familia&gt;-&lt;peso&gt;.ttf</code><br>regular, medium e bold</small></div>
+        <div class="vaga"><span class="material-symbols">image</span><b>Imagens e ilustrações</b><small><code>imagens/&lt;nome&gt;.svg|webp</code><br>estados vazios, onboarding, telas de erro</small></div>
+        <div class="vaga"><span class="material-symbols">motion_photos_on</span><b>Animações</b><small><code>animacoes/&lt;nome&gt;.json|webp|gif</code><br>carregamento, sucesso, splash</small></div>
+      </div>
+    </section>
+
+    <section id="cor">
+      <h2 class="md-typescale-headline-medium">Cor</h2>
+      <p class="lead">O esquema é gerado da semente em HCT (o espaço de cor do M3), com papéis para claro, escuro e alto contraste. Clique numa amostra para copiar a variável CSS.</p>
+      <div class="esquemas">
+        <div class="esquema md-scheme-light" data-esquema="Claro"></div>
+        <div class="esquema md-scheme-dark" data-esquema="Escuro"></div>
+      </div>
+      <h3 class="sub md-typescale-title-large">Paletas tonais</h3>
+      <p class="md-typescale-body-medium">Tom 0 é preto e 100 é branco. Os papéis acima apontam para tons destas paletas (ex.: <code>primary</code> = primary 40 no claro e 80 no escuro).</p>
+      <div id="paletas"></div>
+    </section>
+
+    <section id="tipografia">
+      <h2 class="md-typescale-headline-medium">Tipografia</h2>
+      <p class="lead">Quinze papéis em cinco grupos. Display e headline usam a fonte da marca; o resto usa a fonte de texto. Os tamanhos não mudam com a tela: no celular usa-se um papel menor (ex.: <code>headline-small</code> no lugar de <code>display-small</code>). Na web, os tamanhos são em <code>rem</code> e acompanham o zoom e a fonte preferida da pessoa.</p>
+      <div id="especimes"></div>
+      <h3 class="sub md-typescale-title-large">Qual papel usar</h3>
+      <div class="tabela"><table>
+        <thead><tr><th>Grupo</th><th>Para</th><th>compact</th><th>expanded+</th></tr></thead>
+        <tbody>
+          <tr><td>Display</td><td>Números e frases de destaque, capa da landing page</td><td>display-small</td><td>display-large</td></tr>
+          <tr><td>Headline</td><td>Título da tela ou da seção</td><td>headline-small</td><td>headline-large</td></tr>
+          <tr><td>Title</td><td>Barra do topo, título de card e de diálogo</td><td>title-large / medium</td><td>title-large</td></tr>
+          <tr><td>Body</td><td>Texto corrido e descrições</td><td>body-large / medium</td><td>body-large</td></tr>
+          <tr><td>Label</td><td>Botões, chips, abas, rótulos de navegação</td><td>label-large / medium</td><td>label-large</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="forma">
+      <h2 class="md-typescale-headline-medium">Forma e elevação</h2>
+      <p class="lead">Cantos arredondados em escala fixa. Quanto maior o elemento, maior o canto. A elevação aparece sobretudo pela cor do contêiner (<code>surface-container-*</code>); a sombra é complemento.</p>
+      <div class="grade" id="formas"></div>
+      <h3 class="sub md-typescale-title-large">Níveis de elevação</h3>
+      <div class="grade" id="niveis"></div>
+    </section>
+
+    <section id="layout">
+      <h2 class="md-typescale-headline-medium">Layout responsivo</h2>
+      <p class="lead">A tela se adapta pela <b>classe de janela</b> (largura disponível, não o tipo de aparelho). Cada classe define margem, colunas, espaço entre colunas, quantos painéis cabem lado a lado e qual navegação usar. Espaçamentos seguem a grade de 4dp.</p>
+      <div class="janela-atual"><span class="md-chip" aria-pressed="true" id="janela-chip"></span><span class="md-typescale-body-medium" id="janela-texto"></span></div>
+      <div class="tabela"><table id="tabela-janelas">
+        <thead><tr><th>Janela</th><th>Largura</th><th>Margem</th><th>Colunas</th><th>Painéis</th><th>Navegação</th><th>Exemplos</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <h3 class="sub md-typescale-title-large">Colunas da janela atual</h3>
+      <div class="colunas" id="colunas"></div>
+      <h3 class="sub md-typescale-title-large">Navegação por janela</h3>
+      <p class="md-typescale-body-medium">Arraste o canto da moldura ou escolha uma largura: barra de navegação no celular, trilho em tablets e gaveta fixa no desktop.</p>
+      <div class="moldura-ctrl" id="moldura-ctrl">
+        <button class="md-chip" data-largura="360">360 · compact</button>
+        <button class="md-chip" data-largura="720">720 · medium</button>
+        <button class="md-chip" data-largura="1000">1000 · expanded</button>
+        <button class="md-chip" data-largura="1280">1280 · large</button>
+      </div>
+      <div class="moldura" id="moldura">
+        <div class="app-demo">
+          <nav class="md-navigation-rail" aria-label="Trilho de navegação">
+            <button class="md-fab md-fab--small md-estado" aria-label="Novo"><span class="material-symbols">edit</span></button>
+            <a class="md-nav-item" aria-current="page" href="#layout"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">home</span></span>Início</a>
+            <a class="md-nav-item" href="#layout"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">search</span></span>Buscar</a>
+            <a class="md-nav-item" href="#layout"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">bookmark</span></span>Salvos</a>
+            <a class="md-nav-item" href="#layout"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">person</span></span>Perfil</a>
+          </nav>
+          <nav class="md-navigation-drawer" aria-label="Gaveta de navegação">
+            <h5>boaz</h5>
+            <a class="md-drawer-item md-estado" aria-current="page" href="#layout"><span class="material-symbols">home</span>Início</a>
+            <a class="md-drawer-item md-estado" href="#layout"><span class="material-symbols">search</span>Buscar</a>
+            <a class="md-drawer-item md-estado" href="#layout"><span class="material-symbols">bookmark</span>Salvos</a>
+            <a class="md-drawer-item md-estado" href="#layout"><span class="material-symbols">person</span>Perfil</a>
+          </nav>
+          <header class="md-top-app-bar">
+            <button class="md-icon-button md-estado md-alvo" aria-label="Voltar"><span class="material-symbols">arrow_back</span></button>
+            <h3>Início</h3>
+            <button class="md-icon-button md-estado md-alvo" aria-label="Mais"><span class="material-symbols">more_vert</span></button>
+          </header>
+          <div class="corpo">
+            <article class="md-card md-card--filled"><h4>Card</h4><p>O conteúdo se reorganiza em colunas.</p></article>
+            <article class="md-card md-card--filled"><h4>Card</h4><p>Mesmo código, outra janela.</p></article>
+            <article class="md-card md-card--filled"><h4>Card</h4><p>Margem de 16 ou 24dp.</p></article>
+            <article class="md-card md-card--filled"><h4>Card</h4><p>Navegação muda sozinha.</p></article>
+          </div>
+          <nav class="md-navigation-bar" aria-label="Barra de navegação">
+            <a class="md-nav-item" aria-current="page" href="#layout"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">home</span></span>Início</a>
+            <a class="md-nav-item" href="#layout"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">search</span></span>Buscar</a>
+            <a class="md-nav-item" href="#layout"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">bookmark</span></span>Salvos</a>
+            <a class="md-nav-item" href="#layout"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">person</span></span>Perfil</a>
+          </nav>
+        </div>
+      </div>
+      <h3 class="sub md-typescale-title-large">Espaçamento (grade de 4dp)</h3>
+      <div id="espacos"></div>
+    </section>
+
+    <section id="movimento">
+      <h2 class="md-typescale-headline-medium">Movimento e estados</h2>
+      <p class="lead">Transições usam as curvas e durações do M3: elementos que entram desaceleram (<code>emphasized-decelerate</code>), os que saem aceleram. Com “reduzir movimento” ligado no sistema, as durações viram zero.</p>
+      <div class="palco">
+        <span class="rotulo">Clique para comparar as curvas (duração medium4 · 400ms)</span>
+        <div id="curvas"></div>
+      </div>
+      <h3 class="sub md-typescale-title-large">Camadas de estado</h3>
+      <p class="md-typescale-body-medium">Passar o mouse, focar pelo teclado e tocar sobrepõem a cor do conteúdo ao contêiner com 8%, 10% e 10% de opacidade. O foco ganha também um anel de 3dp na cor <code>secondary</code>. Desabilitado: conteúdo a 38% e contêiner a 12%.</p>
+      <div class="palco linha">
+        <button class="md-button md-button--filled md-estado">Normal</button>
+        <button class="md-button md-button--filled md-estado">Passe o mouse</button>
+        <button class="md-button md-button--filled md-estado">Tab para focar</button>
+        <button class="md-button md-button--filled md-estado" disabled>Desabilitado</button>
+      </div>
+    </section>
+
+    <section id="componentes">
+      <h2 class="md-typescale-headline-medium">Componentes</h2>
+      <p class="lead">Implementação de referência, só com tokens <code>md.comp.*</code>. Os componentes Vue (<code>5_DEV/frontend</code>) e MAUI reproduzem medidas, cores e estados daqui. Para conferir no escuro, troque o tema no topo.</p>
+
+      <h3 class="sub md-typescale-title-large">Botões</h3>
+      <div class="palco">
+        <span class="rotulo">Ênfase decrescente: filled → tonal → elevated → outlined → text. Uma ação filled por tela.</span>
+        <div class="linha">
+          <button class="md-button md-button--filled md-estado">Filled</button>
+          <button class="md-button md-button--tonal md-estado">Tonal</button>
+          <button class="md-button md-button--elevated md-estado">Elevated</button>
+          <button class="md-button md-button--outlined md-estado">Outlined</button>
+          <button class="md-button md-button--text md-estado">Text</button>
+        </div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Com ícone · desabilitado</span>
+        <div class="linha">
+          <button class="md-button md-button--filled md-estado"><span class="material-symbols">add</span>Criar</button>
+          <button class="md-button md-button--tonal md-estado"><span class="material-symbols">upload</span>Enviar</button>
+          <button class="md-button md-button--outlined md-estado"><span class="material-symbols">share</span>Compartilhar</button>
+          <button class="md-button md-button--filled md-estado" disabled>Filled</button>
+          <button class="md-button md-button--outlined md-estado" disabled>Outlined</button>
+        </div>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Botões de ícone e FAB</h3>
+      <div class="palco linha">
+        <button class="md-icon-button md-estado md-alvo" aria-label="Favoritar"><span class="material-symbols">favorite</span></button>
+        <button class="md-icon-button md-estado md-alvo" aria-pressed="true" aria-label="Favorito"><span class="material-symbols">bookmark</span></button>
+        <button class="md-icon-button md-icon-button--filled md-estado md-alvo" aria-label="Configurar"><span class="material-symbols">settings</span></button>
+        <button class="md-icon-button md-icon-button--tonal md-estado md-alvo" aria-label="Editar"><span class="material-symbols">edit</span></button>
+        <button class="md-icon-button md-icon-button--outlined md-estado md-alvo" aria-label="Apagar"><span class="material-symbols">delete</span></button>
+        <span class="linha" style="gap: var(--md-sys-spacing-4); margin-left: auto">
+          <button class="md-fab md-fab--small md-estado" aria-label="Novo"><span class="material-symbols">add</span></button>
+          <button class="md-fab md-estado" aria-label="Novo"><span class="material-symbols">add</span></button>
+          <button class="md-fab md-fab--extended md-estado"><span class="material-symbols">edit</span><span>Nova tarefa</span></button>
+          <button class="md-fab md-fab--large md-estado" aria-label="Novo"><span class="material-symbols">add</span></button>
+        </span>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Chips</h3>
+      <div class="palco linha" id="chips">
+        <button class="md-chip md-estado"><span class="material-symbols">event</span>Agendar</button>
+        <button class="md-chip md-estado" aria-pressed="true"><span class="material-symbols">check</span>Filtro ativo</button>
+        <button class="md-chip md-estado" aria-pressed="false">Filtro</button>
+        <button class="md-chip md-estado" aria-pressed="false">Outro filtro</button>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Cards</h3>
+      <div class="grade">
+        <article class="md-card md-card--elevated"><h4>Elevated</h4><p>surface-container-low com sombra de nível 1. Para destacar do fundo.</p></article>
+        <article class="md-card md-card--filled"><h4>Filled</h4><p>surface-container-highest, sem sombra. Para agrupar sem chamar atenção.</p></article>
+        <article class="md-card md-card--outlined"><h4>Outlined</h4><p>surface com contorno outline-variant. Para listas de itens iguais.</p></article>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Campos de texto</h3>
+      <div class="grade">
+        <div class="md-text-field md-text-field--filled"><div class="md-text-field__caixa"><input id="tf1" placeholder=" "><label for="tf1">Nome (filled)</label></div><small>Texto de apoio</small></div>
+        <div class="md-text-field md-text-field--outlined"><div class="md-text-field__caixa"><input id="tf2" placeholder=" " value="maria@exemplo.com"><label for="tf2">E-mail (outlined)</label></div><small>Usado para entrar</small></div>
+        <div class="md-text-field md-text-field--filled md-text-field--erro"><div class="md-text-field__caixa"><input id="tf3" placeholder=" " value="12"><label for="tf3">Idade</label></div><small>Informe um número de 18 a 120</small></div>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Lista</h3>
+      <div class="md-card md-card--outlined" style="padding: 0">
+        <ul class="md-list">
+          <li class="duas-linhas"><span class="avatar">A</span><span><span class="titulo">Ana Souza</span><span class="apoio">Duas linhas: título e texto de apoio</span></span></li>
+          <li class="duas-linhas"><span class="avatar">B</span><span><span class="titulo">Bruno Lima</span><span class="apoio">Altura mínima de 72dp</span></span></li>
+          <li><span class="material-symbols">notifications</span><span class="titulo">Uma linha · 56dp</span></li>
+        </ul>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Diálogo e snackbar</h3>
+      <div class="palco linha">
+        <button class="md-button md-button--tonal md-estado" id="abrir-dialogo">Abrir diálogo</button>
+        <button class="md-button md-button--outlined md-estado" id="abrir-snack">Mostrar snackbar</button>
+      </div>
+      <dialog class="md-dialog" id="dialogo">
+        <h3>Descartar rascunho?</h3>
+        <p>O texto que você escreveu será perdido. Esta ação não pode ser desfeita.</p>
+        <div class="acoes">
+          <button class="md-button md-button--text md-estado" data-fechar>Cancelar</button>
+          <button class="md-button md-button--text md-estado" data-fechar>Descartar</button>
+        </div>
+      </dialog>
+    </section>
+
+    <section id="acessibilidade">
+      <h2 class="md-typescale-headline-medium">Acessibilidade</h2>
+      <p class="lead">Regras que valem para toda tela, web e mobile.</p>
+      <div class="tabela"><table>
+        <thead><tr><th>Regra</th><th>Como cumprir</th></tr></thead>
+        <tbody>
+          <tr><td>Contraste de texto ≥ 4,5:1 (3:1 para texto grande e bordas de componentes)</td><td>Use sempre o par de papéis: texto <code>on-X</code> sobre fundo <code>X</code>. O gerador garante o contraste dos pares; o alto contraste entra com <code>prefers-contrast: more</code>.</td></tr>
+          <tr><td>Alvo de toque ≥ 48×48dp</td><td>Elementos menores (botão de ícone de 40dp, chip de 32dp) ganham área tocável invisível (<code>.md-alvo</code>, <code>MinimumHeightRequest</code>).</td></tr>
+          <tr><td>Texto escalável até 200%</td><td>Web em <code>rem</code>; MAUI com <code>FontAutoScalingEnabled</code> (padrão). Nenhum texto em altura fixa que corte.</td></tr>
+          <tr><td>Foco visível</td><td>Anel de 3dp em <code>secondary</code> com <code>:focus-visible</code>; ordem de foco igual à ordem visual.</td></tr>
+          <tr><td>Cor não é a única pista</td><td>Erro tem cor, ícone e texto; seleção tem cor e ícone de marcação.</td></tr>
+          <tr><td>Movimento reduzido</td><td>Durações viram 0 com <code>prefers-reduced-motion</code>; no MAUI, checar a preferência do sistema antes de animar.</td></tr>
+          <tr><td>Ícone sem texto tem nome</td><td><code>aria-label</code> na web; <code>SemanticProperties.Description</code> no MAUI.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="plataformas">
+      <h2 class="md-typescale-headline-medium">Web e mobile</h2>
+      <p class="lead">Os tokens são gerados para as duas frentes a partir da mesma fonte. Nunca edite os arquivos gerados: mude <code>identidade/marca.json</code> ou <code>tokens/*.json</code> e rode <code>pnpm run gerar</code> em <code>0_Assets/design/</code>.</p>
+      <div class="tabela"><table>
+        <thead><tr><th>Arquivo</th><th>Para</th><th>Uso</th></tr></thead>
+        <tbody>
+          <tr><td><code>plataformas/web/tokens.css</code></td><td>Vue (hub, landing page, quest)</td><td>Importado uma vez no <code>main.ts</code>; componentes usam <code>var(--md-sys-…)</code> e <code>var(--md-comp-…)</code>. Tema por <code>&lt;html data-theme&gt;</code>.</td></tr>
+          <tr><td><code>plataformas/web/tipografia.css</code></td><td>Vue</td><td>Classes <code>.md-typescale-*</code> para texto.</td></tr>
+          <tr><td><code>plataformas/web/tokens.ts</code></td><td>Vue / TypeScript</td><td><code>windowClassOf(largura)</code>, <code>windowMedia</code> e os valores para lógica (ex.: escolher a navegação).</td></tr>
+          <tr><td><code>plataformas/maui/Tokens.xaml</code></td><td>.NET MAUI (Android e iOS)</td><td>Em <code>App.xaml</code> como <code>MergedDictionaries</code>; cores com <code>AppThemeBinding</code>, estilos <code>BodyLarge</code>, <code>ButtonFilled</code>…</td></tr>
+          <tr><td><code>tokens/cores.json</code></td><td>Referência / outras ferramentas</td><td>Paletas e esquemas em JSON no estilo DTCG.</td></tr>
+        </tbody>
+      </table></div>
+      <h3 class="sub md-typescale-title-large">Unidades</h3>
+      <p class="md-typescale-body-medium">1dp = 1px CSS = 1 unidade do MAUI. Na web, texto em <code>rem</code> (16px = 1rem) e o resto em <code>px</code>; no MAUI, tudo em unidades independentes de dispositivo.</p>
+    </section>
+
+    <footer class="rodape" id="historico">
+      <h2 class="md-typescale-title-large">Histórico</h2>
+      <div class="tabela"><table>
+        <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
+        <tbody>
+          <tr><td>v01</td><td>2026-10-16 11:52</td><td>Criação: fundamentos do Material Design 3 (cor, tipografia, forma, elevação, layout por janela, movimento, estados), 12 componentes de referência e identidade provisória</td></tr>
+        </tbody>
+      </table></div>
+      <div class="linha-final"><span>boaz · v01 · 2026-10-16 11:52</span><span class="mono">0_Assets/design/design-system.html</span></div>
+    </footer>
+  </div>
+</main>
+
+<div class="snack-demo" id="snack" role="status">
+  <div class="md-snackbar"><span>Rascunho salvo</span><button class="md-button md-button--text md-estado">Desfazer</button><button class="md-icon-button md-estado md-alvo" aria-label="Fechar" data-fechar-snack><span class="material-symbols">close</span></button></div>
+</div>
+
+<script>
+(() => {
+  const dados = JSON.parse(document.getElementById('design-dados').textContent);
+  const $ = (s, el = document) => el.querySelector(s);
+  const el = (tag, attrs = {}, ...filhos) => {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) k === 'style' ? e.style.cssText = v : e.setAttribute(k, v);
+    for (const f of filhos) e.append(f);
+    return e;
+  };
+  const copiar = (texto, alvo) => {
+    try { navigator.clipboard.writeText(texto); } catch (_) {}
+    if (alvo) alvo.title = 'Copiado: ' + texto;
+  };
+
+  // ── tema (claro / sistema / escuro), lembrado neste navegador ──
+  const raiz = document.documentElement;
+  const aplicarTema = (t) => {
+    if (t === 'system') raiz.removeAttribute('data-theme'); else raiz.setAttribute('data-theme', t);
+    document.querySelectorAll('[data-tema]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tema === t)));
+    try { localStorage.setItem('design-tema', t); } catch (_) {}
+  };
+  let tema = 'system';
+  try { tema = localStorage.getItem('design-tema') || 'system'; } catch (_) {}
+  aplicarTema(tema);
+  document.querySelectorAll('[data-tema]').forEach((b) => b.addEventListener('click', () => aplicarTema(b.dataset.tema)));
+
+  // ── gaveta modal (janelas menores que large) ──
+  const gaveta = $('#gaveta'), veu = $('#veu');
+  const gavetaAberta = (s) => { gaveta.classList.toggle('aberta', s); veu.classList.toggle('visivel', s); };
+  $('#abrir-gaveta').addEventListener('click', () => gavetaAberta(true));
+  veu.addEventListener('click', () => gavetaAberta(false));
+  gaveta.addEventListener('click', (e) => { if (e.target.closest('a')) gavetaAberta(false); });
+  const links = [...gaveta.querySelectorAll('a')];
+  const marcarSecao = () => {
+    let atual = links[0];
+    for (const a of links) { const s = $(a.getAttribute('href')); if (s && s.getBoundingClientRect().top < 120) atual = a; }
+    links.forEach((a) => (a === atual ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
+    $('#app-bar').classList.toggle('md-top-app-bar--rolada', scrollY > 8);
+  };
+  addEventListener('scroll', marcarSecao, { passive: true });
+
+  // ── identidade ──
+  const chip = (icone, texto) => el('span', { class: 'md-chip' }, el('span', { class: 'material-symbols' }, icone), texto);
+  $('#resumo-marca').append(
+    el('span', { class: 'md-chip', 'aria-pressed': 'true' }, el('span', { class: 'material-symbols', style: 'color: var(--md-sys-color-primary); font-variation-settings: "FILL" 1' }, 'circle'), 'Semente ' + dados.semente),
+    chip('tune', 'Esquema ' + dados.variante),
+    chip('title', 'Marca: ' + dados.fontes.marca),
+    chip('notes', 'Texto: ' + dados.fontes.texto),
+    chip('interests', 'Ícones: ' + dados.icones),
+    chip(dados.status === 'provisoria' ? 'pending' : 'verified', dados.status === 'provisoria' ? 'Identidade provisória' : 'Identidade definida'),
+  );
+
+  // ── cores: papéis agrupados ──
+  const p = new Set(dados.papeis);
+  const familias = [
+    ['primary', 'on-primary', 'primary-container', 'on-primary-container'],
+    ['secondary', 'on-secondary', 'secondary-container', 'on-secondary-container'],
+    ['tertiary', 'on-tertiary', 'tertiary-container', 'on-tertiary-container'],
+    ['error', 'on-error', 'error-container', 'on-error-container'],
+    ...dados.extras.map((n) => [n, 'on-' + n, n + '-container', 'on-' + n + '-container']),
+    ['surface-dim', 'surface', 'surface-bright'],
+    ['surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'],
+    ['on-surface', 'on-surface-variant', 'outline', 'outline-variant'],
+    ['inverse-surface', 'inverse-on-surface', 'inverse-primary', 'scrim', 'shadow'],
+    ['primary-fixed', 'primary-fixed-dim', 'on-primary-fixed', 'on-primary-fixed-variant'],
+  ];
+  // Cor do texto sobre cada amostra: o par do papel (on-X ↔ X) ou o que contrasta
+  const parDe = (n) => {
+    const fixos = { 'inverse-surface': 'inverse-on-surface', 'inverse-on-surface': 'inverse-surface', 'inverse-primary': 'inverse-surface',
+      outline: 'surface', 'outline-variant': 'on-surface',
+      'on-surface': 'surface', 'on-surface-variant': 'surface', 'primary-fixed-dim': 'on-primary-fixed', 'on-primary-fixed-variant': 'primary-fixed' };
+    if (fixos[n]) return fixos[n];
+    if (n.startsWith('surface')) return 'on-surface';
+    if (n.startsWith('on-')) return p.has(n.slice(3)) ? n.slice(3) : 'surface';
+    return p.has('on-' + n) ? 'on-' + n : 'on-surface';
+  };
+  const amostras = [];
+  document.querySelectorAll('.esquema').forEach((box) => {
+    box.append(el('h4', {}, box.dataset.esquema));
+    for (const f of familias) {
+      const linha = el('div', { class: 'familia' });
+      for (const n of f.filter((x) => p.has(x))) {
+        const a = el('div', { class: 'amostra' + (n.startsWith('surface') ? ' contorno' : ''), title: '--md-sys-color-' + n },
+          el('b', {}, n), el('span', {}, ''));
+        a.style.background = `var(--md-sys-color-${n})`;
+        // scrim e shadow são pretos nos dois esquemas: texto branco da paleta neutra
+        a.style.color = n === 'scrim' || n === 'shadow' ? 'var(--md-ref-palette-neutral100)' : `var(--md-sys-color-${parDe(n)})`;
+        a.addEventListener('click', () => copiar(`var(--md-sys-color-${n})`, a));
+        amostras.push([a, n, box]);
+        linha.append(a);
+      }
+      box.append(linha);
+    }
+  });
+  const atualizarHex = () => amostras.forEach(([a, n, box]) => {
+    a.lastChild.textContent = getComputedStyle(box).getPropertyValue('--md-sys-color-' + n).trim();
+  });
+  atualizarHex();
+  matchMedia('(prefers-contrast: more)').addEventListener('change', atualizarHex);
+
+  // ── paletas tonais ──
+  for (const [nome, tons] of Object.entries(dados.paletas)) {
+    const faixa = el('div', { class: 'tons' });
+    for (const t of tons) {
+      const v = `--md-ref-palette-${nome}${t}`;
+      const c = el('span', { class: 'tom', title: v, style: `background: var(${v}); color: var(--md-ref-palette-${nome}${t > 50 ? 10 : 100})` }, String(t));
+      c.addEventListener('click', () => copiar(`var(${v})`, c));
+      faixa.append(c);
+    }
+    $('#paletas').append(el('div', { class: 'paleta' }, el('b', {}, nome), faixa));
+  }
+
+  // ── tipografia ──
+  for (const [n, t] of Object.entries(dados.tipos)) {
+    $('#especimes').append(el('div', { class: 'especime' },
+      el('div', {}, el('div', { class: 'md-typescale-label-large' }, n),
+        el('div', { class: 'spec mono' }, `${t.size}/${t['line-height']} · ${t.weight} · ${t.tracking} · ${t.font}`)),
+      el('div', { class: 'exemplo md-typescale-' + n }, n.startsWith('display') ? 'Aa Boaz 123' : 'Tudo pronto para começar')));
+  }
+
+  // ── forma e elevação ──
+  for (const n of ['none', 'extra-small', 'small', 'medium', 'large', 'large-increased', 'extra-large', 'extra-large-increased', 'extra-extra-large', 'full']) {
+    const v = getComputedStyle(raiz).getPropertyValue('--md-sys-shape-corner-' + n).trim();
+    $('#formas').append(el('div', { class: 'forma', style: `border-radius: var(--md-sys-shape-corner-${n})` }, el('span', {}, n, el('br'), n === 'full' ? '50%' : v)));
+  }
+  [0, 1, 2, 3, 4, 5].forEach((i) => $('#niveis').append(el('div', { class: 'nivel', style: `box-shadow: var(--md-sys-elevation-level${i})` },
+    el('span', {}, 'level' + i, el('br'), el('small', { class: 'mono' }, ['0', '1', '3', '6', '8', '12'][i] + 'dp')))));
+
+  // ── layout: tabela, janela atual, colunas, espaçamento ──
+  const tbody = $('#tabela-janelas tbody');
+  for (const [n, j] of Object.entries(dados.janelas)) {
+    tbody.append(el('tr', { 'data-janela': n }, el('td', {}, el('b', {}, n)), el('td', { class: 'mono' }, j.max == null ? `≥ ${j.min}` : `${j.min}–${j.max}`),
+      el('td', {}, j.margin + 'dp'), el('td', {}, String(j.columns)), el('td', {}, String(j.panes)), el('td', {}, j.navigation), el('td', {}, j.exemplos)));
+  }
+  const janelaDe = (w) => Object.entries(dados.janelas).reverse().find(([, j]) => w >= j.min)[0];
+  const atualizarJanela = () => {
+    const w = innerWidth, n = janelaDe(w);
+    $('#janela-chip').textContent = 'Janela atual: ' + n;
+    $('#janela-texto').textContent = `${w}px de largura · ${dados.janelas[n].columns} colunas · margem ${dados.janelas[n].margin}dp`;
+    tbody.querySelectorAll('tr').forEach((tr) => tr.classList.toggle('atual', tr.dataset.janela === n));
+    const cols = $('#colunas'); cols.replaceChildren(...Array.from({ length: dados.janelas[n].columns }, () => el('i')));
+  };
+  addEventListener('resize', atualizarJanela);
+  atualizarJanela();
+  for (const n of ['1', '2', '3', '4', '5', '6', '8', '10', '12', '16', '24']) {
+    const v = getComputedStyle(raiz).getPropertyValue('--md-sys-spacing-' + n).trim();
+    $('#espacos').append(el('div', { class: 'espaco' }, el('span', { class: 'mono' }, `spacing-${n} · ${v}`), el('i', { style: `width: var(--md-sys-spacing-${n})` })));
+  }
+  const moldura = $('#moldura');
+  $('#moldura-ctrl').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-largura]'); if (!b) return;
+    moldura.style.width = Math.min(+b.dataset.largura, moldura.parentElement.clientWidth) + 'px';
+    $('#moldura-ctrl').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  });
+
+  // ── movimento ──
+  for (const n of ['standard', 'emphasized-decelerate', 'emphasized-accelerate', 'standard-decelerate']) {
+    const t = el('div', { class: 'trilho-mov', style: `margin-bottom: 8px` }, el('i', { style: `transition: left var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-${n})` }));
+    $('#curvas').append(el('span', { class: 'rotulo', style: 'margin: 12px 0 6px' }, n), t);
+  }
+  $('#curvas').addEventListener('click', () => $('#curvas').querySelectorAll('.trilho-mov').forEach((t) => t.classList.toggle('ir')));
+
+  // ── chips, diálogo, snackbar ──
+  $('#chips').addEventListener('click', (e) => {
+    const c = e.target.closest('[aria-pressed]'); if (!c) return;
+    const on = c.getAttribute('aria-pressed') !== 'true';
+    c.setAttribute('aria-pressed', String(on));
+    const ic = c.querySelector('.material-symbols');
+    if (on && !ic) c.prepend(el('span', { class: 'material-symbols' }, 'check'));
+    if (!on && ic && ic.textContent === 'check') ic.remove();
+  });
+  const dialogo = $('#dialogo');
+  $('#abrir-dialogo').addEventListener('click', () => dialogo.showModal());
+  dialogo.addEventListener('click', (e) => { if (e.target.closest('[data-fechar]') || e.target === dialogo) dialogo.close(); });
+  const snack = $('#snack'); let tSnack;
+  $('#abrir-snack').addEventListener('click', () => { snack.classList.add('visivel'); clearTimeout(tSnack); tSnack = setTimeout(() => snack.classList.remove('visivel'), 4000); });
+  snack.addEventListener('click', (e) => { if (e.target.closest('button')) snack.classList.remove('visivel'); });
+
+  marcarSecao();
+})();
+</script>
+</body>
+</html>

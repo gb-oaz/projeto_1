@@ -4,7 +4,8 @@ Recursos reutilizáveis do projeto e dos diagramas.
 
 ```
 0_Assets/
-├── projeto/      # marca, logos, imagens, fontes, mockups — usados no produto e nos documentos
+├── design/       # identidade visual e design system (Material Design 3): marca, tokens, componentes
+├── projeto/      # material do projeto que não é identidade: mockups, capturas, referências
 ├── requisitos/   # tema.html: marca d'água, estilo, formato e componentes dos documentos de requisito
 └── diagramas/    # tema.svg (estilo padrão), ícones de cloud/tecnologias, logos de integrações
 ```
@@ -22,3 +23,7 @@ Recursos reutilizáveis do projeto e dos diagramas.
   d'água, estilo, formato e componentes). Abra-o no navegador para ver o catálogo;
   para mudar o visual use a skill `/requisito-estilo` — cada documento adota o
   tema novo quando for atualizado por ela.
+- `design/` é a identidade visual do produto: cores, tipografia, logos, ícones,
+  imagens, animações, tokens e componentes (Material Design 3) para web e
+  mobile. Abra `design/design-system.html`; para mudar, use a skill
+  `/design-system`.

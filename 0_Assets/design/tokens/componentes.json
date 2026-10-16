@@ -1,0 +1,198 @@
+{
+  "$descricao": "Tokens de componente (md.comp.*), no padrão do Material Design 3. Só referenciam tokens de sistema ({md.sys.*}) ou trazem medidas em dp. Um componente nunca usa uma cor ou um tamanho que não esteja aqui.",
+  "md": {
+    "comp": {
+      "button": {
+        "height": { "$value": 40 },
+        "min-width": { "$value": 48 },
+        "padding": { "$value": 24 },
+        "padding-with-icon": { "$value": 16, "$descricao": "lado do ícone" },
+        "icon-size": { "$value": 18 },
+        "gap": { "$value": 8 },
+        "shape": { "$value": "{md.sys.shape.corner.full}" },
+        "label": { "$value": "{md.sys.typescale.label-large}" },
+        "filled": {
+          "container-color": { "$value": "{md.sys.color.primary}" },
+          "label-color": { "$value": "{md.sys.color.on-primary}" },
+          "elevation": { "$value": "{md.sys.elevation.level0}" },
+          "hover-elevation": { "$value": "{md.sys.elevation.level1}" }
+        },
+        "tonal": {
+          "container-color": { "$value": "{md.sys.color.secondary-container}" },
+          "label-color": { "$value": "{md.sys.color.on-secondary-container}" },
+          "elevation": { "$value": "{md.sys.elevation.level0}" },
+          "hover-elevation": { "$value": "{md.sys.elevation.level1}" }
+        },
+        "elevated": {
+          "container-color": { "$value": "{md.sys.color.surface-container-low}" },
+          "label-color": { "$value": "{md.sys.color.primary}" },
+          "elevation": { "$value": "{md.sys.elevation.level1}" },
+          "hover-elevation": { "$value": "{md.sys.elevation.level2}" }
+        },
+        "outlined": {
+          "outline-color": { "$value": "{md.sys.color.outline-variant}" },
+          "outline-width": { "$value": 1 },
+          "label-color": { "$value": "{md.sys.color.on-surface-variant}" }
+        },
+        "text": {
+          "label-color": { "$value": "{md.sys.color.primary}" },
+          "padding": { "$value": 12 }
+        }
+      },
+
+      "icon-button": {
+        "size": { "$value": 40 },
+        "icon-size": { "$value": 24 },
+        "shape": { "$value": "{md.sys.shape.corner.full}" },
+        "icon-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "selected-icon-color": { "$value": "{md.sys.color.primary}" }
+      },
+
+      "fab": {
+        "size": { "$value": 56 },
+        "icon-size": { "$value": 24 },
+        "shape": { "$value": "{md.sys.shape.corner.large}" },
+        "container-color": { "$value": "{md.sys.color.primary-container}" },
+        "icon-color": { "$value": "{md.sys.color.on-primary-container}" },
+        "elevation": { "$value": "{md.sys.elevation.level3}" },
+        "hover-elevation": { "$value": "{md.sys.elevation.level4}" },
+        "small-size": { "$value": 40 },
+        "small-shape": { "$value": "{md.sys.shape.corner.medium}" },
+        "large-size": { "$value": 96 },
+        "large-icon-size": { "$value": 36 },
+        "large-shape": { "$value": "{md.sys.shape.corner.extra-large}" },
+        "extended-padding": { "$value": 16 },
+        "extended-label": { "$value": "{md.sys.typescale.label-large}" }
+      },
+
+      "chip": {
+        "height": { "$value": 32 },
+        "padding": { "$value": 16 },
+        "padding-with-icon": { "$value": 8 },
+        "icon-size": { "$value": 18 },
+        "shape": { "$value": "{md.sys.shape.corner.small}" },
+        "label": { "$value": "{md.sys.typescale.label-large}" },
+        "outline-color": { "$value": "{md.sys.color.outline-variant}" },
+        "label-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "selected-container-color": { "$value": "{md.sys.color.secondary-container}" },
+        "selected-label-color": { "$value": "{md.sys.color.on-secondary-container}" }
+      },
+
+      "card": {
+        "shape": { "$value": "{md.sys.shape.corner.medium}" },
+        "padding": { "$value": 16 },
+        "elevated-container-color": { "$value": "{md.sys.color.surface-container-low}" },
+        "elevated-elevation": { "$value": "{md.sys.elevation.level1}" },
+        "filled-container-color": { "$value": "{md.sys.color.surface-container-highest}" },
+        "outlined-container-color": { "$value": "{md.sys.color.surface}" },
+        "outlined-outline-color": { "$value": "{md.sys.color.outline-variant}" },
+        "title": { "$value": "{md.sys.typescale.title-medium}" },
+        "body": { "$value": "{md.sys.typescale.body-medium}" }
+      },
+
+      "text-field": {
+        "height": { "$value": 56 },
+        "padding": { "$value": 16 },
+        "label": { "$value": "{md.sys.typescale.body-large}" },
+        "populated-label": { "$value": "{md.sys.typescale.body-small}" },
+        "supporting-text": { "$value": "{md.sys.typescale.body-small}" },
+        "input-color": { "$value": "{md.sys.color.on-surface}" },
+        "label-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "focus-color": { "$value": "{md.sys.color.primary}" },
+        "error-color": { "$value": "{md.sys.color.error}" },
+        "filled-container-color": { "$value": "{md.sys.color.surface-container-highest}" },
+        "filled-shape": { "$value": "{md.sys.shape.corner.extra-small}", "$descricao": "só os cantos de cima" },
+        "filled-indicator-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "outlined-shape": { "$value": "{md.sys.shape.corner.extra-small}" },
+        "outlined-outline-color": { "$value": "{md.sys.color.outline}" }
+      },
+
+      "list": {
+        "one-line-height": { "$value": 56 },
+        "two-line-height": { "$value": 72 },
+        "three-line-height": { "$value": 88 },
+        "padding": { "$value": 16 },
+        "headline": { "$value": "{md.sys.typescale.body-large}" },
+        "headline-color": { "$value": "{md.sys.color.on-surface}" },
+        "supporting-text": { "$value": "{md.sys.typescale.body-medium}" },
+        "supporting-text-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "divider-color": { "$value": "{md.sys.color.outline-variant}" }
+      },
+
+      "top-app-bar": {
+        "height": { "$value": 64 },
+        "medium-height": { "$value": 112 },
+        "large-height": { "$value": 152 },
+        "container-color": { "$value": "{md.sys.color.surface}" },
+        "scrolled-container-color": { "$value": "{md.sys.color.surface-container}" },
+        "title": { "$value": "{md.sys.typescale.title-large}" },
+        "medium-title": { "$value": "{md.sys.typescale.headline-small}" },
+        "large-title": { "$value": "{md.sys.typescale.headline-medium}" },
+        "title-color": { "$value": "{md.sys.color.on-surface}" },
+        "icon-color": { "$value": "{md.sys.color.on-surface-variant}" }
+      },
+
+      "navigation-bar": {
+        "$descricao": "Navegação principal na janela compact (celular).",
+        "height": { "$value": 80 },
+        "container-color": { "$value": "{md.sys.color.surface-container}" },
+        "indicator-width": { "$value": 64 },
+        "indicator-height": { "$value": 32 },
+        "indicator-shape": { "$value": "{md.sys.shape.corner.full}" },
+        "indicator-color": { "$value": "{md.sys.color.secondary-container}" },
+        "icon-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "active-icon-color": { "$value": "{md.sys.color.on-secondary-container}" },
+        "label": { "$value": "{md.sys.typescale.label-medium}" },
+        "label-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "active-label-color": { "$value": "{md.sys.color.on-surface}" }
+      },
+
+      "navigation-rail": {
+        "$descricao": "Navegação principal nas janelas medium e expanded.",
+        "width": { "$value": 80 },
+        "container-color": { "$value": "{md.sys.color.surface}" },
+        "indicator-width": { "$value": 56 },
+        "indicator-height": { "$value": 32 },
+        "indicator-shape": { "$value": "{md.sys.shape.corner.full}" },
+        "indicator-color": { "$value": "{md.sys.color.secondary-container}" },
+        "label": { "$value": "{md.sys.typescale.label-medium}" }
+      },
+
+      "navigation-drawer": {
+        "$descricao": "Navegação principal nas janelas large e extra-large (fixa) ou modal nas menores.",
+        "width": { "$value": 360 },
+        "container-color": { "$value": "{md.sys.color.surface-container-low}" },
+        "shape": { "$value": "{md.sys.shape.corner.large}", "$descricao": "só no lado de fora" },
+        "item-height": { "$value": 56 },
+        "item-shape": { "$value": "{md.sys.shape.corner.full}" },
+        "indicator-color": { "$value": "{md.sys.color.secondary-container}" },
+        "label": { "$value": "{md.sys.typescale.label-large}" },
+        "headline": { "$value": "{md.sys.typescale.title-small}" }
+      },
+
+      "dialog": {
+        "shape": { "$value": "{md.sys.shape.corner.extra-large}" },
+        "container-color": { "$value": "{md.sys.color.surface-container-high}" },
+        "elevation": { "$value": "{md.sys.elevation.level3}" },
+        "padding": { "$value": 24 },
+        "min-width": { "$value": 280 },
+        "max-width": { "$value": 560 },
+        "headline": { "$value": "{md.sys.typescale.headline-small}" },
+        "headline-color": { "$value": "{md.sys.color.on-surface}" },
+        "body": { "$value": "{md.sys.typescale.body-medium}" },
+        "body-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "scrim-opacity": { "$value": 0.32 }
+      },
+
+      "snackbar": {
+        "min-height": { "$value": 48 },
+        "shape": { "$value": "{md.sys.shape.corner.extra-small}" },
+        "container-color": { "$value": "{md.sys.color.inverse-surface}" },
+        "label-color": { "$value": "{md.sys.color.inverse-on-surface}" },
+        "action-color": { "$value": "{md.sys.color.inverse-primary}" },
+        "elevation": { "$value": "{md.sys.elevation.level3}" },
+        "label": { "$value": "{md.sys.typescale.body-medium}" }
+      }
+    }
+  }
+}

@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  boaz · tokens do design system (Material Design 3) para .NET MAUI
+  Gerado por 0_Assets/design/scripts/gerar.mjs a partir de identidade/marca.json e tokens/*.json — não edite à mão.
+
+  Uso: em App.xaml, <ResourceDictionary Source="Tokens.xaml" /> dentro de MergedDictionaries.
+  Cores: <Papel>Light e <Papel>Dark; use com AppThemeBinding, como nos estilos abaixo.
+  Fontes: registre em MauiProgram.ConfigureFonts os aliases MarcaRegular, TextoMedium, TextoRegular
+  (arquivos em 0_Assets/design/identidade/fontes/, listados em marca.json).
+  Medidas em unidades independentes de dispositivo (= dp). Alto contraste e easing ficam só na web.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+  <!-- ── cores ── -->
+  <Color x:Key="BackgroundLight">#FDF7FF</Color>
+  <Color x:Key="BackgroundDark">#141218</Color>
+  <Color x:Key="OnBackgroundLight">#1D1B20</Color>
+  <Color x:Key="OnBackgroundDark">#E6E0E9</Color>
+  <Color x:Key="SurfaceLight">#FDF7FF</Color>
+  <Color x:Key="SurfaceDark">#141218</Color>
+  <Color x:Key="SurfaceDimLight">#DED8E0</Color>
+  <Color x:Key="SurfaceDimDark">#141218</Color>
+  <Color x:Key="SurfaceBrightLight">#FDF7FF</Color>
+  <Color x:Key="SurfaceBrightDark">#3B383E</Color>
+  <Color x:Key="SurfaceContainerLowestLight">#FFFFFF</Color>
+  <Color x:Key="SurfaceContainerLowestDark">#0F0D13</Color>
+  <Color x:Key="SurfaceContainerLowLight">#F8F2FA</Color>
+  <Color x:Key="SurfaceContainerLowDark">#1D1B20</Color>
+  <Color x:Key="SurfaceContainerLight">#F2ECF4</Color>
+  <Color x:Key="SurfaceContainerDark">#211F24</Color>
+  <Color x:Key="SurfaceContainerHighLight">#ECE6EE</Color>
+  <Color x:Key="SurfaceContainerHighDark">#2B292F</Color>
+  <Color x:Key="SurfaceContainerHighestLight">#E6E0E9</Color>
+  <Color x:Key="SurfaceContainerHighestDark">#36343A</Color>
+  <Color x:Key="OnSurfaceLight">#1D1B20</Color>
+  <Color x:Key="OnSurfaceDark">#E6E0E9</Color>
+  <Color x:Key="SurfaceVariantLight">#E7E0EB</Color>
+  <Color x:Key="SurfaceVariantDark">#49454E</Color>
+  <Color x:Key="OnSurfaceVariantLight">#49454E</Color>
+  <Color x:Key="OnSurfaceVariantDark">#CAC4CF</Color>
+  <Color x:Key="InverseSurfaceLight">#322F35</Color>
+  <Color x:Key="InverseSurfaceDark">#E6E0E9</Color>
+  <Color x:Key="InverseOnSurfaceLight">#F5EFF7</Color>
+  <Color x:Key="InverseOnSurfaceDark">#322F35</Color>
+  <Color x:Key="OutlineLight">#7A757F</Color>
+  <Color x:Key="OutlineDark">#948F99</Color>
+  <Color x:Key="OutlineVariantLight">#CAC4CF</Color>
+  <Color x:Key="OutlineVariantDark">#49454E</Color>
+  <Color x:Key="ShadowLight">#000000</Color>
+  <Color x:Key="ShadowDark">#000000</Color>
+  <Color x:Key="ScrimLight">#000000</Color>
+  <Color x:Key="ScrimDark">#000000</Color>
+  <Color x:Key="SurfaceTintLight">#65558F</Color>
+  <Color x:Key="SurfaceTintDark">#CFBDFE</Color>
+  <Color x:Key="PrimaryLight">#65558F</Color>
+  <Color x:Key="PrimaryDark">#CFBDFE</Color>
+  <Color x:Key="OnPrimaryLight">#FFFFFF</Color>
+  <Color x:Key="OnPrimaryDark">#36275D</Color>
+  <Color x:Key="PrimaryContainerLight">#E9DDFF</Color>
+  <Color x:Key="PrimaryContainerDark">#4D3D75</Color>
+  <Color x:Key="OnPrimaryContainerLight">#4D3D75</Color>
+  <Color x:Key="OnPrimaryContainerDark">#E9DDFF</Color>
+  <Color x:Key="InversePrimaryLight">#CFBDFE</Color>
+  <Color x:Key="InversePrimaryDark">#65558F</Color>
+  <Color x:Key="SecondaryLight">#625B71</Color>
+  <Color x:Key="SecondaryDark">#CBC2DB</Color>
+  <Color x:Key="OnSecondaryLight">#FFFFFF</Color>
+  <Color x:Key="OnSecondaryDark">#332D41</Color>
+  <Color x:Key="SecondaryContainerLight">#E8DEF8</Color>
+  <Color x:Key="SecondaryContainerDark">#4A4458</Color>
+  <Color x:Key="OnSecondaryContainerLight">#4A4458</Color>
+  <Color x:Key="OnSecondaryContainerDark">#E8DEF8</Color>
+  <Color x:Key="TertiaryLight">#7E5260</Color>
+  <Color x:Key="TertiaryDark">#EFB8C8</Color>
+  <Color x:Key="OnTertiaryLight">#FFFFFF</Color>
+  <Color x:Key="OnTertiaryDark">#4A2532</Color>
+  <Color x:Key="TertiaryContainerLight">#FFD9E3</Color>
+  <Color x:Key="TertiaryContainerDark">#633B48</Color>
+  <Color x:Key="OnTertiaryContainerLight">#633B48</Color>
+  <Color x:Key="OnTertiaryContainerDark">#FFD9E3</Color>
+  <Color x:Key="ErrorLight">#BA1A1A</Color>
+  <Color x:Key="ErrorDark">#FFB4AB</Color>
+  <Color x:Key="OnErrorLight">#FFFFFF</Color>
+  <Color x:Key="OnErrorDark">#690005</Color>
+  <Color x:Key="ErrorContainerLight">#FFDAD6</Color>
+  <Color x:Key="ErrorContainerDark">#93000A</Color>
+  <Color x:Key="OnErrorContainerLight">#93000A</Color>
+  <Color x:Key="OnErrorContainerDark">#FFDAD6</Color>
+  <Color x:Key="PrimaryFixedLight">#E9DDFF</Color>
+  <Color x:Key="PrimaryFixedDark">#E9DDFF</Color>
+  <Color x:Key="PrimaryFixedDimLight">#CFBDFE</Color>
+  <Color x:Key="PrimaryFixedDimDark">#CFBDFE</Color>
+  <Color x:Key="OnPrimaryFixedLight">#201047</Color>
+  <Color x:Key="OnPrimaryFixedDark">#201047</Color>
+  <Color x:Key="OnPrimaryFixedVariantLight">#4D3D75</Color>
+  <Color x:Key="OnPrimaryFixedVariantDark">#4D3D75</Color>
+  <Color x:Key="SecondaryFixedLight">#E8DEF8</Color>
+  <Color x:Key="SecondaryFixedDark">#E8DEF8</Color>
+  <Color x:Key="SecondaryFixedDimLight">#CBC2DB</Color>
+  <Color x:Key="SecondaryFixedDimDark">#CBC2DB</Color>
+  <Color x:Key="OnSecondaryFixedLight">#1E192B</Color>
+  <Color x:Key="OnSecondaryFixedDark">#1E192B</Color>
+  <Color x:Key="OnSecondaryFixedVariantLight">#4A4458</Color>
+  <Color x:Key="OnSecondaryFixedVariantDark">#4A4458</Color>
+  <Color x:Key="TertiaryFixedLight">#FFD9E3</Color>
+  <Color x:Key="TertiaryFixedDark">#FFD9E3</Color>
+  <Color x:Key="TertiaryFixedDimLight">#EFB8C8</Color>
+  <Color x:Key="TertiaryFixedDimDark">#EFB8C8</Color>
+  <Color x:Key="OnTertiaryFixedLight">#31101D</Color>
+  <Color x:Key="OnTertiaryFixedDark">#31101D</Color>
+  <Color x:Key="OnTertiaryFixedVariantLight">#633B48</Color>
+  <Color x:Key="OnTertiaryFixedVariantDark">#633B48</Color>
+  <Color x:Key="SucessoLight">#006D43</Color>
+  <Color x:Key="SucessoDark">#76DAA1</Color>
+  <Color x:Key="OnSucessoLight">#FFFFFF</Color>
+  <Color x:Key="OnSucessoDark">#003920</Color>
+  <Color x:Key="SucessoContainerLight">#92F7BC</Color>
+  <Color x:Key="SucessoContainerDark">#005231</Color>
+  <Color x:Key="OnSucessoContainerLight">#002111</Color>
+  <Color x:Key="OnSucessoContainerDark">#92F7BC</Color>
+  <Color x:Key="AvisoLight">#AD3212</Color>
+  <Color x:Key="AvisoDark">#FFB4A2</Color>
+  <Color x:Key="OnAvisoLight">#FFFFFF</Color>
+  <Color x:Key="OnAvisoDark">#621200</Color>
+  <Color x:Key="AvisoContainerLight">#FFDAD2</Color>
+  <Color x:Key="AvisoContainerDark">#8A1D00</Color>
+  <Color x:Key="OnAvisoContainerLight">#3C0700</Color>
+  <Color x:Key="OnAvisoContainerDark">#FFDAD2</Color>
+
+  <!-- ── forma, espaçamento, layout, movimento ── -->
+  <CornerRadius x:Key="ShapeCornerNone">0</CornerRadius>
+  <CornerRadius x:Key="ShapeCornerExtraSmall">4</CornerRadius>
+  <CornerRadius x:Key="ShapeCornerSmall">8</CornerRadius>
+  <CornerRadius x:Key="ShapeCornerMedium">12</CornerRadius>
+  <CornerRadius x:Key="ShapeCornerLarge">16</CornerRadius>
+  <CornerRadius x:Key="ShapeCornerLargeIncreased">20</CornerRadius>
+  <CornerRadius x:Key="ShapeCornerExtraLarge">28</CornerRadius>
+  <CornerRadius x:Key="ShapeCornerExtraLargeIncreased">32</CornerRadius>
+  <CornerRadius x:Key="ShapeCornerExtraExtraLarge">48</CornerRadius>
+  <CornerRadius x:Key="ShapeCornerFull">9999</CornerRadius>
+  <x:Double x:Key="Spacing0">0</x:Double>
+  <x:Double x:Key="Spacing1">4</x:Double>
+  <x:Double x:Key="Spacing2">8</x:Double>
+  <x:Double x:Key="Spacing3">12</x:Double>
+  <x:Double x:Key="Spacing4">16</x:Double>
+  <x:Double x:Key="Spacing5">20</x:Double>
+  <x:Double x:Key="Spacing6">24</x:Double>
+  <x:Double x:Key="Spacing8">32</x:Double>
+  <x:Double x:Key="Spacing10">40</x:Double>
+  <x:Double x:Key="Spacing12">48</x:Double>
+  <x:Double x:Key="Spacing14">56</x:Double>
+  <x:Double x:Key="Spacing16">64</x:Double>
+  <x:Double x:Key="Spacing20">80</x:Double>
+  <x:Double x:Key="Spacing24">96</x:Double>
+  <x:Double x:Key="LayoutPaneSpacer">24</x:Double>
+  <x:Double x:Key="LayoutContentMaxWidth">1040</x:Double>
+  <x:Double x:Key="LayoutTouchTarget">48</x:Double>
+  <x:Double x:Key="LayoutIconSize">24</x:Double>
+  <x:Double x:Key="WindowCompactMin">0</x:Double>
+  <x:Double x:Key="WindowCompactMargin">16</x:Double>
+  <x:Double x:Key="WindowMediumMin">600</x:Double>
+  <x:Double x:Key="WindowMediumMargin">24</x:Double>
+  <x:Double x:Key="WindowExpandedMin">840</x:Double>
+  <x:Double x:Key="WindowExpandedMargin">24</x:Double>
+  <x:Double x:Key="WindowLargeMin">1200</x:Double>
+  <x:Double x:Key="WindowLargeMargin">24</x:Double>
+  <x:Double x:Key="WindowExtraLargeMin">1600</x:Double>
+  <x:Double x:Key="WindowExtraLargeMargin">24</x:Double>
+  <x:UInt32 x:Key="MotionDurationShort1">50</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationShort2">100</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationShort3">150</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationShort4">200</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationMedium1">250</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationMedium2">300</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationMedium3">350</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationMedium4">400</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationLong1">450</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationLong2">500</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationLong3">550</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationLong4">600</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationExtraLong1">700</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationExtraLong2">800</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationExtraLong3">900</x:UInt32>
+  <x:UInt32 x:Key="MotionDurationExtraLong4">1000</x:UInt32>
+  <Shadow x:Key="ElevationLevel1" Brush="Black" Opacity="0.25" Radius="3" Offset="0,1" />
+  <Shadow x:Key="ElevationLevel2" Brush="Black" Opacity="0.25" Radius="6" Offset="0,2" />
+  <Shadow x:Key="ElevationLevel3" Brush="Black" Opacity="0.25" Radius="8" Offset="0,4" />
+  <Shadow x:Key="ElevationLevel4" Brush="Black" Opacity="0.25" Radius="10" Offset="0,6" />
+  <Shadow x:Key="ElevationLevel5" Brush="Black" Opacity="0.25" Radius="12" Offset="0,8" />
+
+  <!-- ── componentes: medidas (as cores seguem o papel indicado em tokens/componentes.json) ── -->
+  <x:Double x:Key="ButtonHeight">40</x:Double>
+  <x:Double x:Key="ButtonMinWidth">48</x:Double>
+  <x:Double x:Key="ButtonPadding">24</x:Double>
+  <x:Double x:Key="ButtonPaddingWithIcon">16</x:Double>
+  <x:Double x:Key="ButtonIconSize">18</x:Double>
+  <x:Double x:Key="ButtonGap">8</x:Double>
+  <x:Double x:Key="ButtonOutlinedOutlineWidth">1</x:Double>
+  <x:Double x:Key="ButtonTextPadding">12</x:Double>
+  <x:Double x:Key="IconButtonSize">40</x:Double>
+  <x:Double x:Key="IconButtonIconSize">24</x:Double>
+  <x:Double x:Key="FabSize">56</x:Double>
+  <x:Double x:Key="FabIconSize">24</x:Double>
+  <x:Double x:Key="FabSmallSize">40</x:Double>
+  <x:Double x:Key="FabLargeSize">96</x:Double>
+  <x:Double x:Key="FabLargeIconSize">36</x:Double>
+  <x:Double x:Key="FabExtendedPadding">16</x:Double>
+  <x:Double x:Key="ChipHeight">32</x:Double>
+  <x:Double x:Key="ChipPadding">16</x:Double>
+  <x:Double x:Key="ChipPaddingWithIcon">8</x:Double>
+  <x:Double x:Key="ChipIconSize">18</x:Double>
+  <x:Double x:Key="CardPadding">16</x:Double>
+  <x:Double x:Key="TextFieldHeight">56</x:Double>
+  <x:Double x:Key="TextFieldPadding">16</x:Double>
+  <x:Double x:Key="ListOneLineHeight">56</x:Double>
+  <x:Double x:Key="ListTwoLineHeight">72</x:Double>
+  <x:Double x:Key="ListThreeLineHeight">88</x:Double>
+  <x:Double x:Key="ListPadding">16</x:Double>
+  <x:Double x:Key="TopAppBarHeight">64</x:Double>
+  <x:Double x:Key="TopAppBarMediumHeight">112</x:Double>
+  <x:Double x:Key="TopAppBarLargeHeight">152</x:Double>
+  <x:Double x:Key="NavigationBarHeight">80</x:Double>
+  <x:Double x:Key="NavigationBarIndicatorWidth">64</x:Double>
+  <x:Double x:Key="NavigationBarIndicatorHeight">32</x:Double>
+  <x:Double x:Key="NavigationRailWidth">80</x:Double>
+  <x:Double x:Key="NavigationRailIndicatorWidth">56</x:Double>
+  <x:Double x:Key="NavigationRailIndicatorHeight">32</x:Double>
+  <x:Double x:Key="NavigationDrawerWidth">360</x:Double>
+  <x:Double x:Key="NavigationDrawerItemHeight">56</x:Double>
+  <x:Double x:Key="DialogPadding">24</x:Double>
+  <x:Double x:Key="DialogMinWidth">280</x:Double>
+  <x:Double x:Key="DialogMaxWidth">560</x:Double>
+  <x:Double x:Key="DialogScrimOpacity">0.32</x:Double>
+  <x:Double x:Key="SnackbarMinHeight">48</x:Double>
+
+  <!-- ── tipografia: um estilo de Label por papel (x:Key = papel em PascalCase) ── -->
+  <Style x:Key="DisplayLarge" TargetType="Label">
+    <Setter Property="FontFamily" Value="MarcaRegular" />
+    <Setter Property="FontSize" Value="57" />
+    <Setter Property="LineHeight" Value="1.123" />
+    <Setter Property="CharacterSpacing" Value="-0.25" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="DisplayMedium" TargetType="Label">
+    <Setter Property="FontFamily" Value="MarcaRegular" />
+    <Setter Property="FontSize" Value="45" />
+    <Setter Property="LineHeight" Value="1.156" />
+    <Setter Property="CharacterSpacing" Value="0" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="DisplaySmall" TargetType="Label">
+    <Setter Property="FontFamily" Value="MarcaRegular" />
+    <Setter Property="FontSize" Value="36" />
+    <Setter Property="LineHeight" Value="1.222" />
+    <Setter Property="CharacterSpacing" Value="0" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="HeadlineLarge" TargetType="Label">
+    <Setter Property="FontFamily" Value="MarcaRegular" />
+    <Setter Property="FontSize" Value="32" />
+    <Setter Property="LineHeight" Value="1.25" />
+    <Setter Property="CharacterSpacing" Value="0" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="HeadlineMedium" TargetType="Label">
+    <Setter Property="FontFamily" Value="MarcaRegular" />
+    <Setter Property="FontSize" Value="28" />
+    <Setter Property="LineHeight" Value="1.286" />
+    <Setter Property="CharacterSpacing" Value="0" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="HeadlineSmall" TargetType="Label">
+    <Setter Property="FontFamily" Value="MarcaRegular" />
+    <Setter Property="FontSize" Value="24" />
+    <Setter Property="LineHeight" Value="1.333" />
+    <Setter Property="CharacterSpacing" Value="0" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="TitleLarge" TargetType="Label">
+    <Setter Property="FontFamily" Value="MarcaRegular" />
+    <Setter Property="FontSize" Value="22" />
+    <Setter Property="LineHeight" Value="1.273" />
+    <Setter Property="CharacterSpacing" Value="0" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="TitleMedium" TargetType="Label">
+    <Setter Property="FontFamily" Value="TextoMedium" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="LineHeight" Value="1.5" />
+    <Setter Property="CharacterSpacing" Value="0.15" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="TitleSmall" TargetType="Label">
+    <Setter Property="FontFamily" Value="TextoMedium" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="LineHeight" Value="1.429" />
+    <Setter Property="CharacterSpacing" Value="0.1" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="BodyLarge" TargetType="Label">
+    <Setter Property="FontFamily" Value="TextoRegular" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="LineHeight" Value="1.5" />
+    <Setter Property="CharacterSpacing" Value="0.5" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="BodyMedium" TargetType="Label">
+    <Setter Property="FontFamily" Value="TextoRegular" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="LineHeight" Value="1.429" />
+    <Setter Property="CharacterSpacing" Value="0.25" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="BodySmall" TargetType="Label">
+    <Setter Property="FontFamily" Value="TextoRegular" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="LineHeight" Value="1.333" />
+    <Setter Property="CharacterSpacing" Value="0.4" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="LabelLarge" TargetType="Label">
+    <Setter Property="FontFamily" Value="TextoMedium" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="LineHeight" Value="1.429" />
+    <Setter Property="CharacterSpacing" Value="0.1" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="LabelMedium" TargetType="Label">
+    <Setter Property="FontFamily" Value="TextoMedium" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="LineHeight" Value="1.333" />
+    <Setter Property="CharacterSpacing" Value="0.5" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+  <Style x:Key="LabelSmall" TargetType="Label">
+    <Setter Property="FontFamily" Value="TextoMedium" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="LineHeight" Value="1.455" />
+    <Setter Property="CharacterSpacing" Value="0.5" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+  </Style>
+
+  <!-- ── botões (Material 3): Style="{StaticResource Button<Variante>}" ── -->
+  <Style x:Key="ButtonFilled" TargetType="Button">
+    <Setter Property="MinimumHeightRequest" Value="40" />
+    <Setter Property="MinimumWidthRequest" Value="48" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="Padding" Value="24,0" />
+    <Setter Property="FontFamily" Value="TextoMedium" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="CharacterSpacing" Value="0.1" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnPrimaryLight}, Dark={StaticResource OnPrimaryDark}}" />
+    <Setter Property="BorderWidth" Value="0" />
+  </Style>
+  <Style x:Key="ButtonTonal" TargetType="Button">
+    <Setter Property="MinimumHeightRequest" Value="40" />
+    <Setter Property="MinimumWidthRequest" Value="48" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="Padding" Value="24,0" />
+    <Setter Property="FontFamily" Value="TextoMedium" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="CharacterSpacing" Value="0.1" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SecondaryContainerLight}, Dark={StaticResource SecondaryContainerDark}}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSecondaryContainerLight}, Dark={StaticResource OnSecondaryContainerDark}}" />
+    <Setter Property="BorderWidth" Value="0" />
+  </Style>
+  <Style x:Key="ButtonElevated" TargetType="Button">
+    <Setter Property="MinimumHeightRequest" Value="40" />
+    <Setter Property="MinimumWidthRequest" Value="48" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="Padding" Value="24,0" />
+    <Setter Property="FontFamily" Value="TextoMedium" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="CharacterSpacing" Value="0.1" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SurfaceContainerLowLight}, Dark={StaticResource SurfaceContainerLowDark}}" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
+    <Setter Property="BorderWidth" Value="0" />
+    <Setter Property="Shadow" Value="{StaticResource ElevationLevel1}" />
+  </Style>
+  <Style x:Key="ButtonOutlined" TargetType="Button">
+    <Setter Property="MinimumHeightRequest" Value="40" />
+    <Setter Property="MinimumWidthRequest" Value="48" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="Padding" Value="24,0" />
+    <Setter Property="FontFamily" Value="TextoMedium" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="CharacterSpacing" Value="0.1" />
+    <Setter Property="BackgroundColor" Value="Transparent" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+    <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource OutlineVariantLight}, Dark={StaticResource OutlineVariantDark}}" />
+    <Setter Property="BorderWidth" Value="1" />
+  </Style>
+  <Style x:Key="ButtonText" TargetType="Button">
+    <Setter Property="MinimumHeightRequest" Value="40" />
+    <Setter Property="MinimumWidthRequest" Value="48" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="FontFamily" Value="TextoMedium" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="CharacterSpacing" Value="0.1" />
+    <Setter Property="BackgroundColor" Value="Transparent" />
+    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
+    <Setter Property="BorderWidth" Value="0" />
+  </Style>
+
+</ResourceDictionary>

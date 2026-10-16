@@ -1,0 +1,131 @@
+{
+  "$descricao": "Fundamentos do design system (Material Design 3): tipografia, forma, elevação, espaçamento, layout responsivo, movimento e estados. Editado à mão. Medidas em dp (1dp = 1px CSS = 1 unidade do MAUI). As cores ficam em cores.json, gerado a partir de identidade/marca.json.",
+  "md": {
+    "ref": {
+      "typeface": {
+        "weight-regular": { "$type": "fontWeight", "$value": 400 },
+        "weight-medium": { "$type": "fontWeight", "$value": 500 },
+        "weight-bold": { "$type": "fontWeight", "$value": 700 }
+      }
+    },
+    "sys": {
+      "typescale": {
+        "$descricao": "Escala tipográfica do M3: 5 papéis × 3 tamanhos. Tamanho e altura de linha em dp; tracking (espaçamento entre letras) em dp no tamanho indicado. Não muda com a largura da tela: o que muda é o papel escolhido (ex.: headline no celular, display no desktop).",
+        "display-large": { "$type": "typography", "$value": { "font": "brand", "size": 57, "line-height": 64, "tracking": -0.25, "weight": 400 } },
+        "display-medium": { "$type": "typography", "$value": { "font": "brand", "size": 45, "line-height": 52, "tracking": 0, "weight": 400 } },
+        "display-small": { "$type": "typography", "$value": { "font": "brand", "size": 36, "line-height": 44, "tracking": 0, "weight": 400 } },
+        "headline-large": { "$type": "typography", "$value": { "font": "brand", "size": 32, "line-height": 40, "tracking": 0, "weight": 400 } },
+        "headline-medium": { "$type": "typography", "$value": { "font": "brand", "size": 28, "line-height": 36, "tracking": 0, "weight": 400 } },
+        "headline-small": { "$type": "typography", "$value": { "font": "brand", "size": 24, "line-height": 32, "tracking": 0, "weight": 400 } },
+        "title-large": { "$type": "typography", "$value": { "font": "brand", "size": 22, "line-height": 28, "tracking": 0, "weight": 400 } },
+        "title-medium": { "$type": "typography", "$value": { "font": "plain", "size": 16, "line-height": 24, "tracking": 0.15, "weight": 500 } },
+        "title-small": { "$type": "typography", "$value": { "font": "plain", "size": 14, "line-height": 20, "tracking": 0.1, "weight": 500 } },
+        "body-large": { "$type": "typography", "$value": { "font": "plain", "size": 16, "line-height": 24, "tracking": 0.5, "weight": 400 } },
+        "body-medium": { "$type": "typography", "$value": { "font": "plain", "size": 14, "line-height": 20, "tracking": 0.25, "weight": 400 } },
+        "body-small": { "$type": "typography", "$value": { "font": "plain", "size": 12, "line-height": 16, "tracking": 0.4, "weight": 400 } },
+        "label-large": { "$type": "typography", "$value": { "font": "plain", "size": 14, "line-height": 20, "tracking": 0.1, "weight": 500 } },
+        "label-medium": { "$type": "typography", "$value": { "font": "plain", "size": 12, "line-height": 16, "tracking": 0.5, "weight": 500 } },
+        "label-small": { "$type": "typography", "$value": { "font": "plain", "size": 11, "line-height": 16, "tracking": 0.5, "weight": 500 } }
+      },
+
+      "shape": {
+        "corner": {
+          "none": { "$type": "dimension", "$value": 0 },
+          "extra-small": { "$type": "dimension", "$value": 4 },
+          "small": { "$type": "dimension", "$value": 8 },
+          "medium": { "$type": "dimension", "$value": 12 },
+          "large": { "$type": "dimension", "$value": 16 },
+          "large-increased": { "$type": "dimension", "$value": 20 },
+          "extra-large": { "$type": "dimension", "$value": 28 },
+          "extra-large-increased": { "$type": "dimension", "$value": 32 },
+          "extra-extra-large": { "$type": "dimension", "$value": 48 },
+          "full": { "$type": "dimension", "$value": 9999 }
+        }
+      },
+
+      "elevation": {
+        "$descricao": "Nível em dp. No M3 a elevação aparece mais pela cor do contêiner (surface-container-*) do que pela sombra; a sombra é gerada para a web.",
+        "level0": { "$type": "dimension", "$value": 0 },
+        "level1": { "$type": "dimension", "$value": 1 },
+        "level2": { "$type": "dimension", "$value": 3 },
+        "level3": { "$type": "dimension", "$value": 6 },
+        "level4": { "$type": "dimension", "$value": 8 },
+        "level5": { "$type": "dimension", "$value": 12 }
+      },
+
+      "spacing": {
+        "$descricao": "Grade de 4dp. O nome é o múltiplo de 4 (spacing-4 = 16dp).",
+        "0": { "$type": "dimension", "$value": 0 },
+        "1": { "$type": "dimension", "$value": 4 },
+        "2": { "$type": "dimension", "$value": 8 },
+        "3": { "$type": "dimension", "$value": 12 },
+        "4": { "$type": "dimension", "$value": 16 },
+        "5": { "$type": "dimension", "$value": 20 },
+        "6": { "$type": "dimension", "$value": 24 },
+        "8": { "$type": "dimension", "$value": 32 },
+        "10": { "$type": "dimension", "$value": 40 },
+        "12": { "$type": "dimension", "$value": 48 },
+        "14": { "$type": "dimension", "$value": 56 },
+        "16": { "$type": "dimension", "$value": 64 },
+        "20": { "$type": "dimension", "$value": 80 },
+        "24": { "$type": "dimension", "$value": 96 }
+      },
+
+      "layout": {
+        "$descricao": "Classes de tamanho de janela do M3 (pela largura disponível). Cada uma define margem, colunas, espaço entre colunas, painéis e o componente de navegação.",
+        "window": {
+          "compact": { "$type": "window", "$value": { "min": 0, "max": 599, "margin": 16, "columns": 4, "gutter": 16, "panes": 1, "navigation": "navigation-bar", "exemplos": "celular em pé" } },
+          "medium": { "$type": "window", "$value": { "min": 600, "max": 839, "margin": 24, "columns": 8, "gutter": 24, "panes": 1, "navigation": "navigation-rail", "exemplos": "tablet em pé, celular dobrável aberto" } },
+          "expanded": { "$type": "window", "$value": { "min": 840, "max": 1199, "margin": 24, "columns": 12, "gutter": 24, "panes": 2, "navigation": "navigation-rail", "exemplos": "tablet deitado, notebook pequeno" } },
+          "large": { "$type": "window", "$value": { "min": 1200, "max": 1599, "margin": 24, "columns": 12, "gutter": 24, "panes": 2, "navigation": "navigation-drawer", "exemplos": "desktop" } },
+          "extra-large": { "$type": "window", "$value": { "min": 1600, "max": null, "margin": 24, "columns": 12, "gutter": 24, "panes": 3, "navigation": "navigation-drawer", "exemplos": "monitor grande" } }
+        },
+        "pane-spacer": { "$type": "dimension", "$value": 24 },
+        "content-max-width": { "$type": "dimension", "$value": 1040, "$descricao": "Largura máxima de uma coluna de leitura (linhas longas cansam)." },
+        "touch-target": { "$type": "dimension", "$value": 48, "$descricao": "Área mínima tocável de qualquer elemento interativo, mesmo que o desenho seja menor." },
+        "icon-size": { "$type": "dimension", "$value": 24 }
+      },
+
+      "motion": {
+        "easing": {
+          "standard": { "$type": "cubicBezier", "$value": [0.2, 0, 0, 1] },
+          "standard-accelerate": { "$type": "cubicBezier", "$value": [0.3, 0, 1, 1] },
+          "standard-decelerate": { "$type": "cubicBezier", "$value": [0, 0, 0, 1] },
+          "emphasized": { "$type": "cubicBezier", "$value": [0.2, 0, 0, 1] },
+          "emphasized-accelerate": { "$type": "cubicBezier", "$value": [0.3, 0, 0.8, 0.15] },
+          "emphasized-decelerate": { "$type": "cubicBezier", "$value": [0.05, 0.7, 0.1, 1] }
+        },
+        "duration": {
+          "short1": { "$type": "duration", "$value": 50 },
+          "short2": { "$type": "duration", "$value": 100 },
+          "short3": { "$type": "duration", "$value": 150 },
+          "short4": { "$type": "duration", "$value": 200 },
+          "medium1": { "$type": "duration", "$value": 250 },
+          "medium2": { "$type": "duration", "$value": 300 },
+          "medium3": { "$type": "duration", "$value": 350 },
+          "medium4": { "$type": "duration", "$value": 400 },
+          "long1": { "$type": "duration", "$value": 450 },
+          "long2": { "$type": "duration", "$value": 500 },
+          "long3": { "$type": "duration", "$value": 550 },
+          "long4": { "$type": "duration", "$value": 600 },
+          "extra-long1": { "$type": "duration", "$value": 700 },
+          "extra-long2": { "$type": "duration", "$value": 800 },
+          "extra-long3": { "$type": "duration", "$value": 900 },
+          "extra-long4": { "$type": "duration", "$value": 1000 }
+        }
+      },
+
+      "state": {
+        "$descricao": "Opacidade da camada de estado (cor do conteúdo por cima do contêiner) e dos elementos desabilitados.",
+        "hover-opacity": { "$type": "number", "$value": 0.08 },
+        "focus-opacity": { "$type": "number", "$value": 0.10 },
+        "pressed-opacity": { "$type": "number", "$value": 0.10 },
+        "dragged-opacity": { "$type": "number", "$value": 0.16 },
+        "disabled-content-opacity": { "$type": "number", "$value": 0.38 },
+        "disabled-container-opacity": { "$type": "number", "$value": 0.12 },
+        "focus-indicator-thickness": { "$type": "dimension", "$value": 3 },
+        "focus-indicator-offset": { "$type": "dimension", "$value": 2 }
+      }
+    }
+  }
+}
