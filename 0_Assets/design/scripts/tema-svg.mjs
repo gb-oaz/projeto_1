@@ -347,7 +347,7 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
 
   // temas de cor
   secao('Temas de cor', `${temas.length} combinações prontas; cada uma gera os mesmos papéis de cor (troque o tema sem mudar componentes). Padrão: ${temas.find((t) => t.padrao).nome}.`);
-  const CW = (L - 2 * M - 2 * 24) / 3, CAB = 84, LADO = 104, CH = CAB + 2 * LADO;
+  const CW = (L - 2 * M - 2 * 24) / 3, CAB = 104, LADO = 104, CH = CAB + 2 * LADO;
   temas.forEach((t, i) => {
     const cx = M + (i % 3) * (CW + 24), cy = y + Math.floor(i / 3) * (CH + 24), clip = `tema-${t.id}`;
     const C = t.esquemas.light, D = t.esquemas.dark;

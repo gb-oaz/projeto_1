@@ -71,6 +71,50 @@
         "neutra": null,
         "erro": null,
         "variante": "fidelity"
+      },
+      "sol": {
+        "nome": "Sol",
+        "descricao": "Amarelo ouro com azul-marinho: alegre e confiável, ótimo para destaques e chamadas.",
+        "harmonia": "complementar (amarelo + azul-marinho)",
+        "semente": "#F2B705",
+        "secundaria": null,
+        "terciaria": "#1E3A8A",
+        "neutra": null,
+        "erro": null,
+        "variante": "fidelity"
+      },
+      "girassol": {
+        "nome": "Girassol",
+        "descricao": "Amarelo quente com laranja-telha: acolhedor, energético, comunidade e comida.",
+        "harmonia": "análoga quente (amarelo + laranja)",
+        "semente": "#FFC300",
+        "secundaria": null,
+        "terciaria": "#C2410C",
+        "neutra": null,
+        "erro": null,
+        "variante": "fidelity"
+      },
+      "rubi": {
+        "nome": "Rubi",
+        "descricao": "Vermelho profundo com dourado: marcante, premium, esportes e eventos. Erro em tom carmim distinto da marca.",
+        "harmonia": "análoga quente (vermelho + dourado)",
+        "semente": "#B71C1C",
+        "secundaria": null,
+        "terciaria": "#B8860B",
+        "neutra": null,
+        "erro": "#8E0052",
+        "variante": "fidelity"
+      },
+      "cereja": {
+        "nome": "Cereja",
+        "descricao": "Vermelho vivo com verde-azulado: intenso e moderno, entretenimento e promoções. Erro em tom carmim distinto da marca.",
+        "harmonia": "complementar (vermelho + verde-azulado)",
+        "semente": "#E53935",
+        "secundaria": null,
+        "terciaria": "#00796B",
+        "neutra": null,
+        "erro": "#8E0052",
+        "variante": "fidelity"
       }
     },
     "$variantes": "tonal-spot (padrão do M3, discreto) · fidelity e content (mantêm a cor da marca fiel à semente) · vibrant · expressive · neutral · monochrome · rainbow · fruit-salad",

@@ -46,6 +46,7 @@ Leia `design-system.html` (regras e catálogo) e os JSON antes de mudar algo. Pa
    - `variante`: `fidelity` mantém a cor da marca reconhecível (a semente vira o `primary-container`); `tonal-spot` é o padrão discreto do M3 (dessatura a semente); `neutral` para temas sóbrios (grafite).
    - Todos os temas geram os **mesmos papéis**: componente nunca sabe o tema. Web troca com `<html data-paleta="<id>">` (ou `class="md-paleta-<id>"` num trecho); MAUI com `plataformas/maui/paletas/Paleta<Tema>.xaml` depois de `Tokens.xaml`.
    - Tema novo: escolha a combinação por harmonia, confira no catálogo (seção **Temas de cor**, claro e escuro) e no `tema.svg`; os pares `on-X`/`X` saem com contraste garantido, mas olhe se a cor da marca continua reconhecível.
+   - Amarelo como semente: no claro o `primary` vira dourado-escuro (texto branco precisa de contraste); o amarelo vivo aparece em `primary-container` com `fidelity`. Vermelho como semente: defina `erro` com outra matiz (ex.: carmim `#8E0052`) para erro não se confundir com a marca.
    - `cores.extras`: cores fora dos papéis do M3 (ex.: `sucesso`, `aviso`), harmonizadas com a semente de cada tema; geram `X`, `on-X`, `X-container` e `on-X-container`.
    - `tipografia.marca` / `tipografia.texto`: família, alternativas, `google_fonts` (só a web carrega do Google; o app embute) e `arquivos` por peso em `identidade/fontes/` (aliases MAUI `MarcaRegular`, `TextoMedium`…).
    - `icones`: Material Symbols e seus eixos (preenchimento, peso, grau, tamanho ótico).
