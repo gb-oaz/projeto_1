@@ -1,6 +1,6 @@
 ---
 name: design-system
-description: Cuida da identidade visual e do design system do boaz em 0_Assets/design/ — tokens no padrão Material Design 3 (cor, tipografia, forma, elevação, layout responsivo por classe de janela, movimento, estados), componentes de referência, identidade da marca (cores-semente, fontes, logos, ícones, imagens, gifs e animações) e a geração dos tokens para web (Vue) e mobile (.NET MAUI). Use quando pedirem para mudar ou consultar cores, fontes, logos, tema claro/escuro, tamanhos, espaçamentos, breakpoints, responsividade, um componente visual, ou quando qualquer tela, componente ou estilo for criado em 5_DEV/frontend (web ou mobile).
+description: Cuida da identidade visual e do design system do boaz em 0_Assets/design/ — tokens no padrão Material Design 3 (cor, tipografia, forma, elevação, layout responsivo por classe de janela, movimento, estados), componentes de referência, identidade da marca (cores-semente, fontes, logos, ícones, imagens e animações), os mascotes (personagens com rosto expressivo: expressões, formas, proporções, movimentos) e a geração dos tokens para web (Vue) e mobile (.NET MAUI). Use quando pedirem para mudar ou consultar cores, fontes, logos, mascotes, carinhas, expressões, tema claro/escuro, tamanhos, espaçamentos, breakpoints, responsividade, um componente visual, ou quando qualquer tela, componente ou estilo for criado em 5_DEV/frontend (web ou mobile).
 ---
 
 # Design system → `0_Assets/design/`
@@ -20,11 +20,15 @@ Você é designer de produto e mantém o design system. A identidade visual do b
 │   └── cores.json              paletas e esquemas claro/escuro/alto contraste por tema          (gerado)
 ├── plataformas/                                                                                  (gerado)
 │   ├── web/tokens.css  web/tipografia.css  web/tokens.ts                      Vue
+│   ├── web/mascotes.mjs  web/mascotes-temas.json                              Vue (mascotes)
 │   └── maui/Tokens.xaml  maui/paletas/Paleta<Tema>.xaml                         .NET MAUI
+├── mascotes/                   exemplos prontos dos mascotes (estáticos, animados, só o rosto, …)  (gerado)
 ├── design-system.html          catálogo vivo; o bloco design:tokens é gerado, o resto é editado
-├── tema.svg                    quadro visual de todos os componentes, claro e escuro      (gerado)
+├── tema.svg                    quadro visual de todos os componentes e mascotes, claro e escuro (gerado)
 ├── scripts/gerar.mjs           gerador (@material/material-color-utilities, a biblioteca do M3)
 ├── scripts/tema-svg.mjs        desenho do tema.svg: uma função por componente
+├── scripts/mascotes.mjs        núcleo dos mascotes (sem Node: roda também no navegador)       (edite)
+├── scripts/mascotes-arquivos.mjs  o que vai para mascotes/ e plataformas/web/mascotes.mjs
 └── package.json                pnpm run gerar · pnpm run conferir
 ```
 
@@ -81,11 +85,31 @@ Leia `design-system.html` (regras e catálogo) e os JSON antes de mudar algo. Pa
   4. se for usado no app, um estilo em `Tokens.xaml` (no gerador, como os botões).
 - Rode `pnpm run gerar`. Nunca edite `cores.json`, `plataformas/*`, `tema.svg` nem o bloco `design:tokens` à mão: `pnpm run conferir` falha se estiverem diferentes do gerado.
 
+## Mascotes
+
+Personagens com rosto expressivo da identidade (regras de produto em `1_Requisitos/06_design-system-telas.html`, RN-34 a RN-38 e RNF-110 a RNF-115; catálogo em `design-system.html#mascotes`). Um mascote é a combinação de:
+
+| Eixo | Onde (em `scripts/mascotes.mjs`) | Hoje |
+|---|---|---|
+| Expressão | `EXPRESSOES` (nome, uso, cor própria, duração, desenho) | 30, por situação: boas-vindas, acerto, erro, dúvida, espera, social |
+| Forma | `FORMAS` (+ `GLIFOS` para números, letras e sinais) | planas, setas, 3D, glifos, `rosto` (só o rosto), `cartao`, `cartaoHorizontal` |
+| Proporção | `PROPORCOES` | normal, alto, baixo, gordo, magro |
+| Movimento | `MOVIMENTOS`; lista = sequência (`sequencia`) | direções, frente/trás, flutuar, pular, balançar, dançar, tremer, girar, comemorar |
+| Cor | `CORES`, `#hex` ou a do tema (`coresDosTemas`) | tema colorido → cor do tema; monocromático → cor da expressão |
+
+- **Código**: `animado(expressao, { forma, proporcao, cor, movimento })` e `estatico(…)` devolvem o SVG; `embutir(svg, prefixo, x, y, w, h)` coloca um mascote dentro de outro SVG (usado no `tema.svg`). Tudo que se move é transform/opacity de um grupo (`P(conteudo, mov, pivô)`), amostrado em laço SMIL.
+- **Nova expressão**: uma entrada em `EXPRESSOES` com `rosto(c, conteudo, movCabeça, centro)` + enfeites (use `olho`, `sobrancelha`, `bocaAberta`, `traco`, `bochechas`, `gota`, `brilhinho`, `coracao`, `espiral`…), a linha na tabela "Quando usar" do catálogo e do requisito 06.
+- **Nova forma**: em `FORMAS` com `unid` (polígono unitário) e `canto`; o encaixe acha a escala que contém o rosto (`livreX`/`livreY` deixam o rosto ir para o lado). 3D: `faces(pol)` com tons `claro`/`escuro`/`sombra`. Glifo: linha central em `GLIFOS` (caixa 100×140) e o ponto do traço onde fica o rosto.
+- **Novo movimento**: em `MOVIMENTOS` com `corpo(t)` (t de 0 a 1, voltando ao repouso em t = 1) e `pivo` (`base` ou `centro`).
+- Depois: `pnpm run gerar` (grava `mascotes/`, o `tema.svg` e as cópias), confira no catálogo (claro, escuro, um tema colorido, 390px) e faça versão nova do catálogo.
+- Regras de uso: sempre com texto ao lado; erro com expressão acolhedora; um animado por vez; parado com movimento reduzido; mínimo 24dp (só o rosto) e 40dp (com corpo); decorativo para leitor de tela (`alt=""`).
+
 ## Usar no código (`5_DEV/`)
 
 Regras completas em `1_Requisitos/06_design-system-telas.html` (vista antes do código, sem biblioteca externa de estilização, componentes comuns). O build de cada imagem só enxerga a pasta da aplicação, por isso `pnpm run gerar` também escreve **cópias** versionadas (`scripts/sincronizar.mjs`): `plataformas/web/*` → `5_DEV/frontend/web_<app>/src/design/`; `5_DEV/frontend/web_comum/**` (componentes comuns da web) → `web_<app>/src/comum/`; `plataformas/maui/*` → `5_DEV/frontend/mob_*/Resources/Styles/Design/`. As aplicações importam as cópias; ninguém as edita (o `conferir` acusa). Mudou um componente comum em `web_comum`? Rode `pnpm run gerar`.
 
 - **Web (Vue)**: importar `tokens.css` e `tipografia.css` uma vez; componentes usam `var(--md-comp-…)`/`var(--md-sys-…)`; tema por `<html data-theme="light|dark">` (sem o atributo, segue o sistema); responsividade com as media queries das janelas (`windowMedia`/`windowClassOf` de `tokens.ts`) ou container queries com as mesmas larguras.
+- **Mascotes (web)**: `import { animado, estatico } from './design/mascotes.mjs'` e `mascotes-temas.json` (cor por tema); `img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)`; `estatico` com `prefers-reduced-motion`. No app, os SVG parados de `mascotes/estaticos/`.
 - **Mobile (.NET MAUI)**: `Tokens.xaml` em `App.xaml` (`MergedDictionaries`); cores com `AppThemeBinding` (`{StaticResource PrimaryLight}`/`PrimaryDark`), textos com os estilos `BodyLarge`, `TitleMedium`…, botões com `ButtonFilled`, `ButtonTonal`…; fontes registradas em `MauiProgram` com os aliases do comentário do arquivo.
 - Ao revisar código de tela: valor solto de cor/tamanho/fonte é defeito — troque pelo token. Faltou token? Crie-o aqui primeiro.
 
@@ -103,6 +127,8 @@ Arquivos gerados e o catálogo vão no mesmo commit que a mudança de origem.
 - `xmllint --noout plataformas/maui/*.xaml plataformas/maui/paletas/*.xaml tema.svg`.
 - Renderize o `tema.svg` (Chrome headless, em fatias de ~1450px com `<img>` e `margin-top` negativo) e **olhe**: nada vazando dos painéis, textos sem sobreposição, claro e escuro coerentes.
 - Sem cor solta fora do bloco gerado: `awk '/design:tokens:inicio/{s=1} /design:tokens:fim/{s=0} !s' design-system.html | grep -nE ':\s*#[0-9a-fA-F]{3,8}\b'` sai vazio.
+- Mascotes: `for f in $(find mascotes -name '*.svg'); do xmllint --noout $f; done` e, se mexeu no núcleo, renderize as expressões ou formas tocadas (parado e alguns quadros de `quadros(…)`) e **olhe**.
+- Capturas de uma seção do catálogo: esconda as outras (`section:not(#id){display:none}`) em vez de rolar — rolar no headless sai preto.
 - Abra o catálogo no Chrome headless em 1440px e num iframe de 390px (o headless não desce de 500px de janela) e **olhe**: claro e escuro, nada cortado, sem rolagem horizontal da página.
 
 ## Resposta

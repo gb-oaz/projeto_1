@@ -2,7 +2,7 @@
 
 Identidade visual e design system do boaz, no padrão do **Material Design 3**.
 Abra [`design-system.html`](design-system.html) no navegador: é o catálogo vivo
-(regras, cores, tipografia, layout responsivo e componentes de referência).
+(regras, cores, tipografia, layout responsivo, componentes de referência e mascotes).
 A skill `design-system` (`.claude/skills/design-system/`) cuida desta pasta.
 
 ```
@@ -14,11 +14,13 @@ design/
 │   ├── componentes.json   tokens dos componentes (md.comp.*)
 │   └── cores.json         gerado: paletas e esquemas claro/escuro/alto contraste de cada tema
 ├── plataformas/           gerado
-│   ├── web/               tokens.css, tipografia.css, tokens.ts   (Vue)
+│   ├── web/               tokens.css, tipografia.css, tokens.ts, mascotes.mjs (Vue)
 │   └── maui/              Tokens.xaml + paletas/Paleta<Tema>.xaml (.NET MAUI)
+├── mascotes/              gerado: exemplos dos mascotes (estáticos para o app, animados, só o rosto, cartões…)
 ├── design-system.html     catálogo (o bloco design:tokens é gerado)
-├── tema.svg               gerado: quadro visual com cores, tipos, layout e componentes
-└── scripts/               gerar.mjs (gerador) e tema-svg.mjs (desenho do tema.svg)
+├── tema.svg               gerado: quadro visual com cores, tipos, layout, componentes e mascotes
+└── scripts/               gerar.mjs (gerador), tema-svg.mjs (desenho do tema.svg) e
+                           mascotes.mjs (núcleo dos mascotes)
 ```
 
 Para mudar a identidade ou um token, edite `identidade/marca.json` ou
