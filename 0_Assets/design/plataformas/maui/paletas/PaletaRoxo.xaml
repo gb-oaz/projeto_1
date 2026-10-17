@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-  boaz · tema de cor Roxo (roxo) · padrão — tonal (terciária rosada derivada pelo M3)
+  boaz · tema de cor Roxo (roxo) — tonal (terciária rosada derivada pelo M3)
   Gerado por 0_Assets/design/scripts/gerar.mjs a partir de identidade/marca.json e tokens/*.json — não edite à mão.
 
   Mesmas chaves de cor de Tokens.xaml (<Papel>Light / <Papel>Dark). Para usar este tema, inclua

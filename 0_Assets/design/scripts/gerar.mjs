@@ -137,9 +137,26 @@ function gerarTema(id, t) {
   };
 }
 
-const TEMAS = Object.fromEntries(Object.entries(cfg.temas).filter(([k]) => !k.startsWith('$')).map(([id, t]) => [id, gerarTema(id, t)]));
-const PADRAO = TEMAS[cfg.tema_padrao];
-if (!PADRAO) throw new Error(`cores.tema_padrao "${cfg.tema_padrao}" não está em cores.temas`);
+let TEMAS = Object.fromEntries(Object.entries(cfg.temas).filter(([k]) => !k.startsWith('$')).map(([id, t]) => [id, gerarTema(id, t)]));
+// tema_padrao: o id de um tema, ou { claro, escuro } — um tema em cada modo, combinado
+let PADRAO;
+if (typeof cfg.tema_padrao === 'string') {
+  PADRAO = TEMAS[cfg.tema_padrao];
+  if (!PADRAO) throw new Error(`cores.tema_padrao "${cfg.tema_padrao}" não está em cores.temas`);
+} else {
+  const { claro, escuro } = cfg.tema_padrao ?? {};
+  const C = TEMAS[claro], E = TEMAS[escuro];
+  if (!C || !E) throw new Error(`cores.tema_padrao: "claro" e "escuro" precisam ser temas de cores.temas`);
+  PADRAO = {
+    id: `${claro}-${escuro}`, nome: `${C.nome} e ${E.nome}`,
+    descricao: `${C.nome} no modo claro e ${E.nome} no escuro, acompanhando o sistema.`,
+    harmonia: C.harmonia === E.harmonia ? C.harmonia : `${C.harmonia} / ${E.harmonia}`,
+    semente: C.semente, terciaria: C.terciaria, variante: C.variante, extras: C.extras, modo: null,
+    esquemas: { light: C.esquemas.light, dark: E.esquemas.dark, 'light-high-contrast': C.esquemas['light-high-contrast'], 'dark-high-contrast': E.esquemas['dark-high-contrast'] },
+    paletas: C.paletas,
+  };
+  TEMAS = { [PADRAO.id]: PADRAO, ...TEMAS };
+}
 const OUTROS = Object.values(TEMAS).filter((t) => t !== PADRAO);
 // o tema padrão alimenta os nomes sem prefixo (--md-sys-color-*, PrimaryLight, colors)
 const ESQUEMAS = PADRAO.esquemas;

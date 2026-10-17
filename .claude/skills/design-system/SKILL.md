@@ -42,7 +42,7 @@ Leia `design-system.html` (regras e catálogo) e os JSON antes de mudar algo. Pa
 ## Mudar a identidade (cores, fontes, ícones)
 
 1. Edite `identidade/marca.json`:
-   - `cores.temas.<id>`: um tema de cor (paleta) por entrada, com `nome`, `descricao` (para que serve), `harmonia` (análoga, complementar, triádica…), `semente` (`#RRGGBB`, gera o esquema), `secundaria`/`terciaria`/`neutra`/`erro` opcionais (null = derivadas pelo M3; a `terciaria` define a combinação) e `variante`. `cores.tema_padrao` é o tema aplicado sem escolha.
+   - `cores.temas.<id>`: um tema de cor (paleta) por entrada, com `nome`, `descricao` (para que serve), `harmonia` (análoga, complementar, triádica…), `semente` (`#RRGGBB`, gera o esquema), `secundaria`/`terciaria`/`neutra`/`erro` opcionais (null = derivadas pelo M3; a `terciaria` define a combinação) e `variante`. `cores.tema_padrao` é o tema aplicado sem escolha: o id de um tema ou `{ "claro": <id>, "escuro": <id> }` (um tema em cada modo, gerado como o tema combinado `<claro>-<escuro>`). Hoje é branco no claro e preto no escuro.
    - `variante`: `fidelity` mantém a cor da marca reconhecível (a semente vira o `primary-container`); `tonal-spot` é o padrão discreto do M3 (dessatura a semente); `neutral` para temas sóbrios (grafite).
    - Todos os temas geram os **mesmos papéis**: componente nunca sabe o tema. Web troca com `<html data-paleta="<id>">` (ou `class="md-paleta-<id>"` num trecho); MAUI com `plataformas/maui/paletas/Paleta<Tema>.xaml` depois de `Tokens.xaml`.
    - Tema novo: escolha a combinação por harmonia, confira no catálogo (seção **Temas de cor**, claro e escuro) e no `tema.svg`; os pares `on-X`/`X` saem com contraste garantido, mas olhe se a cor da marca continua reconhecível.

@@ -3,8 +3,11 @@
   "status": "provisoria",
   "nome": "boaz",
   "cores": {
-    "$descricao": "Temas de cor (paletas) da identidade. Cada tema gera seus esquemas claro, escuro e de alto contraste a partir da `semente` (Material Design 3, HCT). `secundaria`, `terciaria`, `neutra` e `erro` são opcionais: null deixa o M3 derivá-las; preenchida, a paleta daquele papel segue a cor informada. `tema_padrao` é o tema aplicado sem escolha explícita (web: sem data-paleta; MAUI: Tokens.xaml).",
-    "tema_padrao": "roxo",
+    "$descricao": "Temas de cor (paletas) da identidade. Cada tema gera seus esquemas claro, escuro e de alto contraste a partir da `semente` (Material Design 3, HCT). `secundaria`, `terciaria`, `neutra` e `erro` são opcionais: null deixa o M3 derivá-las; preenchida, a paleta daquele papel segue a cor informada. `tema_padrao` é o tema aplicado sem escolha explícita (web: sem data-paleta; MAUI: Tokens.xaml): o id de um tema, ou { \"claro\": <id>, \"escuro\": <id> } para usar um tema em cada modo (vira o tema combinado <claro>-<escuro>).",
+    "tema_padrao": {
+      "claro": "branco",
+      "escuro": "preto"
+    },
     "temas": {
       "roxo": {
         "nome": "Roxo",

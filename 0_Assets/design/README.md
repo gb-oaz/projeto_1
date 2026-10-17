@@ -34,10 +34,11 @@ pnpm run conferir   # falha se algum arquivo gerado estiver desatualizado
 ## Temas de cor
 
 `identidade/marca.json` → `cores.temas` define as combinações de cor (hoje:
-roxo (padrão), oceano, floresta, aurora, grafite, magenta, sol, girassol,
+roxo, oceano, floresta, aurora, grafite, magenta, sol, girassol,
 rubi, cereja, branco e preto), cada uma com
 semente, terciária, harmonia e variante do M3; `cores.tema_padrao` escolhe o
-padrão. Todas geram os mesmos papéis (`primary`, `surface`…), então trocar de
+padrão — hoje `{ "claro": "branco", "escuro": "preto" }`: branco no modo
+claro e preto no escuro (tema combinado `branco-preto`). Todas geram os mesmos papéis (`primary`, `surface`…), então trocar de
 tema não muda componente nenhum:
 
 - web: `<html data-paleta="oceano">` (sem o atributo, vale o padrão); num
@@ -46,4 +47,5 @@ tema não muda componente nenhum:
   dele para usar outro.
 
 Nunca edite à mão os arquivos gerados. A identidade atual é **provisória**
-(semente de referência do M3 e Roboto) até a marca do boaz ser definida.
+(tema de cor branco e preto, fonte Roboto, sem logos) até a marca do boaz
+ser definida.
