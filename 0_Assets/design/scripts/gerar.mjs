@@ -12,6 +12,7 @@
 //                         tema.svg                     quadro visual (cores, tipos, componentes)
 //                         design-system.html           só o bloco entre os marcadores
 //                                                      design:tokens:inicio/fim
+//                         + cópias em cada aplicação de 5_DEV/frontend (sincronizar.mjs)
 //   pnpm run conferir   não escreve nada; falha se algum arquivo gerado estiver
 //                       diferente do que seria gerado agora
 //
@@ -28,6 +29,7 @@ import {
   SchemeNeutral, SchemeMonochrome, SchemeRainbow, SchemeFruitSalad,
 } from '@material/material-color-utilities';
 import { temaSvg } from './tema-svg.mjs';
+import { copiasSincronizadas } from './sincronizar.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONFERIR = process.argv.includes('--conferir');
@@ -504,6 +506,7 @@ const saidas = {
   [htmlArq]: htmlNovo,
   'tema.svg': svg,
 };
+Object.assign(saidas, copiasSincronizadas(RAIZ, saidas));
 let diferentes = 0;
 for (const [arq, conteudo] of Object.entries(saidas)) {
   const caminho = join(RAIZ, arq);

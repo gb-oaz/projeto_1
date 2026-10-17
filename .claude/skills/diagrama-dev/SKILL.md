@@ -1,6 +1,6 @@
 ---
 name: diagrama-dev
-description: Cria ou altera diagramas de desenvolvimento (backend e frontend) como SVG versionado em 2_Diagramas/. Use para diagramas UML — classes, objetos, pacotes, componentes internos, estrutura composta, perfil, casos de uso, atividades, sequência, comunicação, visão geral de interação, estados e tempo — além de entidade-relacionamento, navegação de telas e contratos de API, ou quando pedirem para alterar um diagrama existente dessa pasta.
+description: Cria ou altera diagramas de desenvolvimento (backend e frontend) como SVG versionado em 2_Diagramas/. Use para diagramas UML — classes, objetos, pacotes, componentes internos, estrutura composta, perfil, casos de uso, atividades, sequência, comunicação, visão geral de interação, estados e tempo — além de entidade-relacionamento, navegação de telas, contratos de API e vistas de tela (o desenho da UI de uma tela antes do código, requisito 06), ou quando pedirem para alterar um diagrama existente dessa pasta.
 ---
 
 # Diagrama de desenvolvimento → `2_Diagramas/`
@@ -33,6 +33,7 @@ Se o pedido nomear o tipo, use-o. Senão, escolha pela pergunta que o diagrama r
 | Quais estados um objeto atravessa? | Estados |
 | Quanto tempo cada estado/mensagem pode levar? | Tempo |
 | Como o usuário navega entre telas? / Qual o contrato de um endpoint? | Navegação de telas / Contrato de API |
+| Como uma tela vai ficar, antes de ser programada? | Vista (ver **Vista de tela**) |
 
 Prefira **um tipo por arquivo**. Se o pedido cobrir duas perguntas, gere dois diagramas (legendas distintas) e avise.
 
@@ -102,6 +103,21 @@ Antes de desenhar, rode `ls 0_Assets/projeto 0_Assets/diagramas` e reaproveite o
   - `.png`/`.jpg`/`.webp`: `<image href="data:image/png;base64,..."/>` gerado com `base64 < arquivo | tr -d '\n'`. Evite arquivos acima de ~200 KB.
 - Ícone é apoio, não substitui o texto: a caixa continua com nome e tecnologia escritos. Tamanho uniforme (24–32px), sempre no mesmo lugar da caixa (padrão do tema: à esquerda, nome e tecnologia alinhados depois dele).
 - Faltou um ícone? Use a forma neutra `#ic-*` do tema que mais se aproxima (ou a forma simples da notação) e mencione na resposta qual asset poderia ser adicionado em `0_Assets/diagramas/`.
+
+## Vista de tela
+
+A vista é o desenho de uma tela antes do código (`1_Requisitos/06_design-system-telas.html`, RN-27, RN-33, RNF-102 a RNF-105). Vale tudo desta skill (versionamento, marca d'água, revisão), com estas diferenças:
+
+- **Nome**: `vista-<aplicacao>-<tela>` (ex.: `vista-hub-inicio`), em `2_Diagramas/`.
+- **Quadro × tela**: o quadro (fundo, marca d'água, legenda, anotações) segue o tema dos diagramas; **dentro das molduras das telas** vale o design system de `0_Assets/design/`, não o tema dos diagramas. Lá dentro, cores e medidas literais são permitidas, mas só as do design system:
+  - cores do tema de cor padrão em `0_Assets/design/tokens/cores.json` (`padrao` → `temas.<id>.md.sys.color.light|dark`), sempre pelo papel (`surface`, `primary`, `on-surface`…);
+  - tipografia: copie de `0_Assets/design/tema.svg` as regras `.t-<papel>` do `<style>` e use `class="t-body-large"` etc.;
+  - componentes: copie os desenhos dos grupos `<g id="comp-<componente>-claro|escuro">` de `0_Assets/design/tema.svg` (botões, chips, cards, campos, lista, barras de topo e navegação, trilho, gaveta, diálogo, snackbar), mudando só texto e posição; ícones de `<symbol id="i-*">`;
+  - identidade: logos, imagens e animações de `0_Assets/design/identidade/`, embutidos como manda **Assets**. Arquivo que não existir: um retângulo tracejado `outline` com o caminho esperado (`identidade/logos/logo-principal.svg`).
+  - componente que não existe no design system: **pare** e crie-o antes pela skill `design-system` (RN-28); a vista não inventa componente.
+- **Molduras**: uma por classe de janela e modo (RNF-103): compact 360×800 sempre; nas aplicações web também medium 840×800 e expanded 1280×800 (escala 0,5 se preciso). Linha de cima no modo claro, linha de baixo no escuro. Cantos de 24px, rótulo embaixo (`compact · 360dp · claro`). A navegação muda com a janela: barra (compact), trilho (medium/expanded), gaveta (large+).
+- **Anotações** (RNF-104): marcadores numerados (círculo `chip` + número) em cada bloco da tela claro de compact, e uma lista no rodapé: `1 · barra de navegação · comum`, `2 · logo-principal.svg · identidade/logos/`, `3 · card do resultado · do módulo quiz` (comum, do módulo ou composto).
+- **Aprovação** (RN-33): a vista vai num pull request revisado e aprovado antes do código da tela; mudança de tela depois disso é nova versão da vista (RNF-105).
 
 ## Visual (obrigatório)
 

@@ -83,6 +83,8 @@ Leia `design-system.html` (regras e catálogo) e os JSON antes de mudar algo. Pa
 
 ## Usar no código (`5_DEV/`)
 
+Regras completas em `1_Requisitos/06_design-system-telas.html` (vista antes do código, sem biblioteca externa de estilização, componentes comuns). O build de cada imagem só enxerga a pasta da aplicação, por isso `pnpm run gerar` também escreve **cópias** versionadas (`scripts/sincronizar.mjs`): `plataformas/web/*` → `5_DEV/frontend/web_<app>/src/design/`; `5_DEV/frontend/web_comum/**` (componentes comuns da web) → `web_<app>/src/comum/`; `plataformas/maui/*` → `5_DEV/frontend/mob_*/Resources/Styles/Design/`. As aplicações importam as cópias; ninguém as edita (o `conferir` acusa). Mudou um componente comum em `web_comum`? Rode `pnpm run gerar`.
+
 - **Web (Vue)**: importar `tokens.css` e `tipografia.css` uma vez; componentes usam `var(--md-comp-…)`/`var(--md-sys-…)`; tema por `<html data-theme="light|dark">` (sem o atributo, segue o sistema); responsividade com as media queries das janelas (`windowMedia`/`windowClassOf` de `tokens.ts`) ou container queries com as mesmas larguras.
 - **Mobile (.NET MAUI)**: `Tokens.xaml` em `App.xaml` (`MergedDictionaries`); cores com `AppThemeBinding` (`{StaticResource PrimaryLight}`/`PrimaryDark`), textos com os estilos `BodyLarge`, `TitleMedium`…, botões com `ButtonFilled`, `ButtonTonal`…; fontes registradas em `MauiProgram` com os aliases do comentário do arquivo.
 - Ao revisar código de tela: valor solto de cor/tamanho/fonte é defeito — troque pelo token. Faltou token? Crie-o aqui primeiro.

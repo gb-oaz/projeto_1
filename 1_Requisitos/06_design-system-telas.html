@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system nas telas · boaz · v01</title>
+<title>Design system nas telas · boaz · v02</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="06_design-system-telas">
 <meta name="boaz:caminho" content="1_Requisitos/06_design-system-telas.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v01">
-<meta name="boaz:data" content="2026-10-16 22:02">
+<meta name="boaz:versao" content="v02">
+<meta name="boaz:data" content="2026-10-16 22:10">
 <meta name="boaz:status" content="Rascunho">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -790,8 +790,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>garantir que toda tela, do desenho ao código, no app e nas três aplicações web, seja construída só com a identidade visual e os componentes do design system do projeto.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>06_design-system-telas</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v01</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-16 · 22:02</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v02</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-16 · 22:10</dd></div>
     <div><dt>Status</dt><dd><span class="status status-rascunho">Rascunho</span></dd></div>
   </dl>
 </header>
@@ -806,7 +806,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <li><strong>Componentes compostos</strong>: blocos que juntam componentes e elementos de identidade, como uma barra de navegação com o logo, botões padrão e imagens da marca.</li>
       <li><strong>Vista</strong>: o desenho da tela inteira, feito antes do código, com os componentes e a identidade que ela vai apresentar.</li>
     </ol>
-    <p>Os componentes nascem conforme os módulos precisam deles; os que mais de um módulo usa viram componentes comuns.</p>
+    <p>Os componentes nascem conforme os módulos precisam deles; os que mais de um módulo usa viram componentes comuns. Os termos <a class="ref" href="99_glossario.html#vista">vista</a>, <a class="ref" href="99_glossario.html#componente-comum">componente comum</a>, <a class="ref" href="99_glossario.html#componente-composto">componente composto</a>, <a class="ref" href="99_glossario.html#modulo">módulo</a> e <a class="ref" href="99_glossario.html#tema-de-cor">tema de cor</a> estão no <a class="ref" href="99_glossario.html">Glossário</a>.</p>
     <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-16: nenhuma frente usa biblioteca externa de estilização ou de componentes visuais; a identidade e os componentes vêm só do design system do projeto.</p></aside>
   </section>
 
@@ -821,6 +821,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RN-30"><td><code class="id">RN-30</code></td><td>Um componente usado por um único módulo pertence a esse módulo; ao ser usado por um segundo módulo, passa a ser um <strong>componente comum</strong>, com uma única implementação compartilhada</td></tr>
         <tr id="RN-31"><td><code class="id">RN-31</code></td><td>Um <strong>componente composto</strong> junta componentes do design system e elementos de identidade visual num bloco reutilizável: por exemplo, uma barra de navegação com o logo, botões padrão e imagens da marca</td></tr>
         <tr id="RN-32"><td><code class="id">RN-32</code></td><td>Uma mesma tela no app e na web usa os mesmos componentes e tokens, mudando só a disposição conforme a classe de janela (compact, medium, expanded, large, extra-large)</td></tr>
+        <tr id="RN-33"><td><code class="id">RN-33</code></td><td>A vista é aprovada na revisão de um pull request para a branch principal, e o código da tela só começa depois dessa aprovação</td></tr>
       </tbody>
     </table>
   </section>
@@ -833,43 +834,37 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RNF-93"><td><code class="id">RNF-93</code></td><td><span class="tag">Design system</span></td><td>A fonte única de identidade visual e de tokens é <code>0_Assets/design/</code>: cores e temas de cor, tipografia, forma, elevação, espaçamento, layout por janela, movimento e estados de todas as telas vêm de lá</td></tr>
         <tr id="RNF-94"><td><code class="id">RNF-94</code></td><td><span class="tag">Design system</span></td><td>As aplicações web usam os arquivos gerados em <code>0_Assets/design/plataformas/web/</code> (<code>tokens.css</code>, <code>tipografia.css</code>, <code>tokens.ts</code>) e o app usa os de <code>0_Assets/design/plataformas/maui/</code> (<code>Tokens.xaml</code> e <code>paletas/</code>)</td></tr>
         <tr id="RNF-95"><td><code class="id">RNF-95</code></td><td><span class="tag">Design system</span></td><td>Nenhuma frente edita os arquivos gerados do design system: a mudança é feita em <code>identidade/marca.json</code> ou <code>tokens/*.json</code> e gerada de novo com <code>pnpm run gerar</code></td></tr>
+        <tr id="RNF-108"><td><code class="id">RNF-108</code></td><td><span class="tag">Design system</span></td><td>Os arquivos gerados chegam às aplicações como cópias versionadas, escritas por <code>pnpm run gerar</code> em <code>0_Assets/design/</code>: <code>src/design/</code> em cada aplicação web (<code>5_DEV/frontend/web_&lt;app&gt;/</code>) e <code>Resources/Styles/Design/</code> em cada projeto do app (<code>5_DEV/frontend/mob_*/</code>); as cópias nunca são editadas à mão</td></tr>
         <tr id="RNF-96"><td><code class="id">RNF-96</code></td><td><span class="tag">Estilização</span></td><td>Nenhuma tela ou componente usa cor, fonte, tamanho, espaçamento, canto, sombra ou duração fora dos tokens: valores soltos como <code>#hex</code>, <code>px</code>, <code>ms</code> ou nomes de fonte são proibidos no código das telas</td></tr>
         <tr id="RNF-97"><td><code class="id">RNF-97</code></td><td><span class="tag">Estilização</span></td><td>Nenhuma frente usa biblioteca externa de estilização ou de componentes visuais: na web, por exemplo, Tailwind, Bootstrap, Vuetify, Quasar, PrimeVue ou Element Plus; no app, bibliotecas de controles visuais de terceiros</td></tr>
         <tr id="RNF-98"><td><code class="id">RNF-98</code></td><td><span class="tag">Estilização</span></td><td>Ficam permitidos só os recursos que o próprio design system declara: as fontes da identidade e os ícones Material Symbols definidos em <code>identidade/marca.json</code>; bibliotecas sem visual próprio (roteamento, estado, testes, comunicação) não são afetadas por <code>RNF-97</code></td></tr>
         <tr id="RNF-99"><td><code class="id">RNF-99</code></td><td><span class="tag">Componentes</span></td><td>Todo componente segue a anatomia e os estados do Material Design 3 do catálogo <code>0_Assets/design/design-system.html</code>: normal, hover, foco visível, pressionado e desabilitado, com alvo de toque de no mínimo 48dp</td></tr>
         <tr id="RNF-100"><td><code class="id">RNF-100</code></td><td><span class="tag">Componentes</span></td><td>Um componente comum novo entra no design system no mesmo pull request em que é implementado: tokens em <code>tokens/componentes.json</code>, referência no catálogo <code>design-system.html</code> e desenho no <code>tema.svg</code></td></tr>
         <tr id="RNF-101"><td><code class="id">RNF-101</code></td><td><span class="tag">Componentes</span></td><td>Cada componente comum tem uma única implementação por frente, reutilizada por todas as aplicações daquela frente (as três aplicações web compartilham a mesma)</td></tr>
-        <tr id="RNF-102"><td><code class="id">RNF-102</code></td><td><span class="tag">Vistas</span></td><td>A vista é um <code>.svg</code> versionado em <code>2_Diagramas/</code> com o nome <code>vista-&lt;aplicacao&gt;-&lt;tela&gt;_vNN_&lt;AAAAMMDD-HHMM&gt;.svg</code>, desenhado com os componentes e a identidade do <code>0_Assets/design/tema.svg</code></td></tr>
+        <tr id="RNF-109"><td><code class="id">RNF-109</code></td><td><span class="tag">Componentes</span></td><td>Os componentes comuns da web têm a implementação única em <code>5_DEV/frontend/web_comum/</code> e chegam a <code>src/comum/</code> de cada aplicação web pela mesma cópia sincronizada de <code>RNF-108</code></td></tr>
+        <tr id="RNF-102"><td><code class="id">RNF-102</code></td><td><span class="tag">Vistas</span></td><td>A vista é um <code>.svg</code> versionado em <code>2_Diagramas/</code> com o nome <code>vista-&lt;aplicacao&gt;-&lt;tela&gt;_vNN_&lt;AAAAMMDD-HHMM&gt;.svg</code>, desenhado pela skill <code>diagrama-dev</code> (tipo Vista) com os componentes e a identidade do <code>0_Assets/design/tema.svg</code></td></tr>
         <tr id="RNF-103"><td><code class="id">RNF-103</code></td><td><span class="tag">Vistas</span></td><td>A vista mostra a tela na janela compact e, nas aplicações web, também nas janelas medium e expanded, nos modos claro e escuro do tema de cor padrão</td></tr>
         <tr id="RNF-104"><td><code class="id">RNF-104</code></td><td><span class="tag">Vistas</span></td><td>A vista indica, para cada bloco da tela, o componente usado (comum, do módulo ou composto) e os elementos de identidade (logos, imagens, animações) com o caminho do arquivo</td></tr>
         <tr id="RNF-105"><td><code class="id">RNF-105</code></td><td><span class="tag">Vistas</span></td><td>A revisão do pull request compara a tela implementada com a vista; se a implementação precisar divergir, a vista é atualizada primeiro, numa nova versão</td></tr>
         <tr id="RNF-106"><td><code class="id">RNF-106</code></td><td><span class="tag">Identidade</span></td><td>Logos, ícones, imagens e animações usados nas telas vêm de <code>0_Assets/design/identidade/</code>; um arquivo novo entra lá antes de ser usado</td></tr>
-        <tr id="RNF-107"><td><code class="id">RNF-107</code></td><td><span class="tag">Verificação</span></td><td>O CI falha quando os arquivos gerados do design system estão desatualizados (<code>pnpm run conferir</code>) ou quando o código das telas tem cor, fonte ou medida fora dos tokens</td></tr>
+        <tr id="RNF-107"><td><code class="id">RNF-107</code></td><td><span class="tag">Verificação</span></td><td>O CI falha quando os arquivos gerados do design system, ou as cópias deles nas aplicações, estão desatualizados (<code>pnpm run conferir</code>), ou quando o código das telas tem cor, fonte ou medida fora dos tokens</td></tr>
       </tbody>
     </table>
     <aside class="destaque nota"><p>O tema de cor padrão hoje é Branco e Preto (branco no modo claro, preto no escuro); a identidade definitiva, com logos e fontes, ainda é provisória em <code>0_Assets/design/identidade/</code>.</p></aside>
   </section>
 
-  <section id="em-aberto">
-    <h2>Em aberto</h2>
-    <ul class="pendencias">
-      <li>Quem aprova a vista antes de o código começar: a pessoa dona do produto, a revisão do pull request ou ambas <span class="tag dono">Produto</span></li>
-      <li>Como os tokens e os componentes comuns chegam a cada aplicação web no build da imagem Docker, que hoje só enxerga a pasta da aplicação: cópia sincronizada em cada aplicação, verificada pelo CI, ou build a partir da raiz do repositório <span class="tag dono">Arquitetura</span></li>
-      <li>Ajuste da skill diagrama-dev para desenhar vistas com os componentes e a identidade do design system, e não com o tema escuro dos diagramas <span class="tag dono">Design</span></li>
-      <li>Termos novos (vista, componente comum, componente composto, módulo) para um glossário do projeto, que ainda não existe <span class="tag dono">Produto</span></li>
-    </ul>
-  </section>
 </main>
 <footer class="boaz-marca-rodape">
   <p class="boaz-eyebrow">Histórico</p>
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v01</span></td><td>2026-10-16 22:02</td><td>Criação: <code class="id">RN-27</code> a <code class="id">RN-32</code> e <code class="id">RNF-93</code> a <code class="id">RNF-107</code></td></tr>
+      <tr><td><span class="boaz-versao">v02</span></td><td>2026-10-16 22:10</td><td>Pendências respondidas: <code class="id">RN-33</code> (vista aprovada na revisão do pull request), <code class="id">RNF-108</code> e <code class="id">RNF-109</code> (cópias sincronizadas dos tokens e dos componentes comuns) incluídos; <code class="id">RNF-102</code> (vista pela skill diagrama-dev) e <code class="id">RNF-107</code> (CI confere as cópias) alterados; termos ligados ao Glossário; seção Em aberto removida</td></tr>
+      <tr><td>v01</td><td>2026-10-16 22:02</td><td>Criação: <code class="id">RN-27</code> a <code class="id">RN-32</code> e <code class="id">RNF-93</code> a <code class="id">RNF-107</code></td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v01 · 2026-10-16 22:02</span>
+    <span>boaz · v02 · 2026-10-16 22:10</span>
     <span class="boaz-arquivo">1_Requisitos/06_design-system-telas.html</span>
   </div>
 </footer>

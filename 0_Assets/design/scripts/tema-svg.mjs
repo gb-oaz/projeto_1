@@ -297,12 +297,14 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     if (rotulo) partes.push(txt(x + w - PAD, y + 28, rotulo, 'label-medium', e['on-surface-variant'], 'end'));
   };
   // h = altura do conteúdo; o painel soma o rótulo do esquema e as margens
-  const duplo = (conteudo, desenho) => {
+  // id do grupo: comp-<slug>-claro|escuro, para copiar o desenho para uma vista
+  const slug = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const duplo = (conteudo, desenho, titulo) => {
     const h = PAD + 24 + conteudo + PAD;
-    for (const [i, e, r] of [[0, esquemas.light, 'CLARO'], [1, esquemas.dark, 'ESCURO']]) {
+    for (const [i, e, r, m] of [[0, esquemas.light, 'CLARO', 'claro'], [1, esquemas.dark, 'ESCURO', 'escuro']]) {
       const x = M + i * (PW + GAP);
       painel(x, PW, h, e, r);
-      partes.push(`<g>${desenho(e, x + PAD, y + PAD + 24)}</g>`);
+      partes.push(`<g id="comp-${slug(titulo)}-${m}">${desenho(e, x + PAD, y + PAD + 24)}</g>`);
     }
     y += h;
   };
@@ -343,7 +345,7 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     const sx = x + ci * (SW + 8), sy = y0 + li * (SH + 8);
     return rect(sx, sy, SW, SH, cantos.small, e[n], n.startsWith('surface') ? `stroke="${e['outline-variant']}"` : '')
       + txt(sx + 10, sy + 22, n, n.length > 22 ? 'label-small' : 'label-medium', par(e, n)) + mono(sx + 10, sy + 42, e[n], par(e, n));
-  }).join('')).join(''));
+  }).join('')).join(''), 'Cores');
 
   // temas de cor
   secao('Temas de cor', `${temas.length} combinações prontas; cada uma gera os mesmos papéis de cor (troque o tema sem mudar componentes). Padrão: ${temas.find((t) => t.padrao).nome}.`);
@@ -431,7 +433,7 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
   y += FH + 2 * PAD;
 
   // componentes
-  for (const [titulo, desc, h, desenho] of COMPONENTES) { secao(titulo, desc); duplo(h, desenho); }
+  for (const [titulo, desc, h, desenho] of COMPONENTES) { secao(titulo, desc); duplo(h, desenho, titulo); }
 
   // marca d'água de rodapé
   y += 48;
