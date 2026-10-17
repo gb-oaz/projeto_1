@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="16.2 17.2 223.6 223.6" width="256" height="256" role="img" aria-label="Uau!">
+<title>Uau!</title>
+<defs>
+<radialGradient id="g-corpo" gradientUnits="userSpaceOnUse" cx="94.4" cy="76.72" r="184.8">
+<stop offset="0" stop-color="#FAB67B"/><stop offset="0.45" stop-color="#F7892A"/><stop offset="1" stop-color="#C16B21"/></radialGradient>
+
+<radialGradient id="g-olho" cx="0.4" cy="0.35" r="0.75"><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9DEE6"/></radialGradient>
+<radialGradient id="g-iris" cx="0.45" cy="0.6" r="0.6"><stop offset="0" stop-color="#F9A75F"/><stop offset="0.7" stop-color="#B96720"/><stop offset="1" stop-color="#6F3E13"/></radialGradient>
+<linearGradient id="g-lingua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FAB"/><stop offset="1" stop-color="#E5547A"/></linearGradient>
+<linearGradient id="g-gota" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F7FF"/><stop offset="1" stop-color="#7CC8F2"/></linearGradient>
+<linearGradient id="g-estrela" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF176"/><stop offset="1" stop-color="#FFB300"/></linearGradient>
+<radialGradient id="g-esfera" cx="0.36" cy="0.3" r="0.78"><stop offset="0.5" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.38"/></radialGradient>
+<filter id="f-adesivo" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/><feFlood flood-color="#FFFFFF" flood-opacity="0.92"/><feComposite in2="d" operator="in" result="borda"/><feMerge><feMergeNode in="borda"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="f-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="f-sombra" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
+</defs>
+<g filter="url(#f-adesivo)"><g transform="translate(128 236) scale(1.05 1.06) translate(-128 -236)">
+<g transform="translate(0 -7.8)"><path d="M66 62 Q90 44 112 56" fill="none" stroke="#3A2A22" stroke-width="11" stroke-linecap="round"/><path d="M144 56 Q166 44 190 62" fill="none" stroke="#3A2A22" stroke-width="11" stroke-linecap="round"/></g>
+<g><g>
+<ellipse cx="92" cy="113" rx="35" ry="38" fill="#A1591B" opacity="0.45" filter="url(#f-sombra)"/>
+<clipPath id="clip-olho-1"><ellipse cx="92" cy="110" rx="30" ry="33"/></clipPath>
+<ellipse cx="92" cy="110" rx="30" ry="33" fill="url(#g-olho)"/>
+<g clip-path="url(#clip-olho-1)"><circle cx="92" cy="112" r="9" fill="url(#g-iris)"/><circle cx="92" cy="112" r="4.95" fill="#111111"/><circle cx="88.58" cy="108.22" r="3" fill="#FFFFFF"/><circle cx="94.7" cy="115.15" r="1.5" fill="#FFFFFF" opacity="0.8"/><g transform="rotate(0 92 71)"><rect x="32" y="-35" width="120" height="106" fill="url(#g-corpo)"/><line x1="32" y1="71" x2="152" y2="71" stroke="#7C4515" stroke-width="4"/></g></g>
+<ellipse cx="92" cy="110" rx="30" ry="33" fill="none" stroke="#7C4515" stroke-width="2" opacity="0.55"/>
+</g></g><g opacity="0"><path d="M64 114 Q92 126 120 114" fill="none" stroke="#3A2A22" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g><g>
+<ellipse cx="164" cy="113" rx="35" ry="38" fill="#A1591B" opacity="0.45" filter="url(#f-sombra)"/>
+<clipPath id="clip-olho-2"><ellipse cx="164" cy="110" rx="30" ry="33"/></clipPath>
+<ellipse cx="164" cy="110" rx="30" ry="33" fill="url(#g-olho)"/>
+<g clip-path="url(#clip-olho-2)"><circle cx="164" cy="112" r="9" fill="url(#g-iris)"/><circle cx="164" cy="112" r="4.95" fill="#111111"/><circle cx="160.58" cy="108.22" r="3" fill="#FFFFFF"/><circle cx="166.7" cy="115.15" r="1.5" fill="#FFFFFF" opacity="0.8"/><g transform="rotate(0 164 71)"><rect x="104" y="-35" width="120" height="106" fill="url(#g-corpo)"/><line x1="104" y1="71" x2="224" y2="71" stroke="#7C4515" stroke-width="4"/></g></g>
+<ellipse cx="164" cy="110" rx="30" ry="33" fill="none" stroke="#7C4515" stroke-width="2" opacity="0.55"/>
+</g></g><g opacity="0"><path d="M136 114 Q164 126 192 114" fill="none" stroke="#3A2A22" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g transform="translate(128 180) scale(1.15 1.19) translate(-128 -180)"><ellipse cx="128" cy="180" rx="20" ry="24" fill="#4A1616" stroke="#A1591B" stroke-width="3"/><ellipse cx="128" cy="194" rx="12" ry="7" fill="url(#g-lingua)"/></g></g></g>
+</svg>

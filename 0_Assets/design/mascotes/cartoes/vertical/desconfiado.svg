@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 -84 320 426.67" width="256" height="341" role="img" aria-label="Desconfiado">
+<title>Desconfiado</title>
+<defs>
+<radialGradient id="g-corpo" gradientUnits="userSpaceOnUse" cx="64" cy="9.87" r="448">
+<stop offset="0" stop-color="#79E4EC"/><stop offset="0.45" stop-color="#27D3E0"/><stop offset="1" stop-color="#1EA5AF"/></radialGradient>
+
+<radialGradient id="g-olho" cx="0.4" cy="0.35" r="0.75"><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9DEE6"/></radialGradient>
+<radialGradient id="g-iris" cx="0.45" cy="0.6" r="0.6"><stop offset="0" stop-color="#5DDEE8"/><stop offset="0.7" stop-color="#1D9EA8"/><stop offset="1" stop-color="#125F65"/></radialGradient>
+<linearGradient id="g-lingua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FAB"/><stop offset="1" stop-color="#E5547A"/></linearGradient>
+<linearGradient id="g-gota" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F7FF"/><stop offset="1" stop-color="#7CC8F2"/></linearGradient>
+<linearGradient id="g-estrela" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF176"/><stop offset="1" stop-color="#FFB300"/></linearGradient>
+<radialGradient id="g-esfera" cx="0.36" cy="0.3" r="0.78"><stop offset="0.5" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.38"/></radialGradient>
+<filter id="f-adesivo" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/><feFlood flood-color="#FFFFFF" flood-opacity="0.92"/><feComposite in2="d" operator="in" result="borda"/><feMerge><feMergeNode in="borda"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="f-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="f-sombra" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
+</defs>
+<clipPath id="clip-cartao-4"><path d="M-4 -84 H260 A28 28 0 0 1 288 -56 V314.67 A28 28 0 0 1 260 342.67 H-4 A28 28 0 0 1 -32 314.67 V-56 A28 28 0 0 1 -4 -84 Z"/></clipPath><g clip-path="url(#clip-cartao-4)"><path d="M-4 -84 H260 A28 28 0 0 1 288 -56 V314.67 A28 28 0 0 1 260 342.67 H-4 A28 28 0 0 1 -32 314.67 V-56 A28 28 0 0 1 -4 -84 Z" fill="url(#g-corpo)"/><clipPath id="clip-forma-3"><path d="M-4 -84 H260 A28 28 0 0 1 288 -56 V314.67 A28 28 0 0 1 260 342.67 H-4 A28 28 0 0 1 -32 314.67 V-56 A28 28 0 0 1 -4 -84 Z"/></clipPath><g clip-path="url(#clip-forma-3)"><ellipse cx="70.4" cy="-2.93" rx="70.4" ry="35.2" fill="#FFFFFF" opacity="0.18" filter="url(#f-suave)" transform="rotate(-24 70.4 -2.93)"/></g>
+<path d="M70 70 Q82 64 94 68" fill="none" stroke="#3A2A22" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><g><animateTransform attributeName="transform" type="translate" dur="2.8s" repeatCount="indefinite" values="0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 -0.52;0 -1.44;0 -2.33;0 -3.16;0 -3.92;0 -4.58;0 -5.12;0 -5.55;0 -5.84;0 -5.98;0 -5.98;0 -5.84;0 -5.55;0 -5.12;0 -4.58;0 -3.92;0 -3.16;0 -2.33;0 -1.44;0 -0.52;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0;0 0"/><path d="M160 82 Q172 72 184 74" fill="none" stroke="#3A2A22" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g>
+<ellipse cx="92" cy="119" rx="31" ry="33" fill="#198992" opacity="0.45" filter="url(#f-sombra)"/>
+<clipPath id="clip-olho-1"><ellipse cx="92" cy="116" rx="26" ry="28"/></clipPath>
+<ellipse cx="92" cy="116" rx="26" ry="28" fill="url(#g-olho)"/>
+<g clip-path="url(#clip-olho-1)"><g><animateTransform attributeName="transform" type="translate" dur="2.8s" repeatCount="indefinite" values="9 6;9 6;9 6;9 6;9 6;9 6;9 6;8.96 6;8.27 6;6.77 6;4.62 6;2.02 6;-0.77 6;-3.49 6;-5.87 6;-7.69 6;-8.75 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-8.47 6;-7.13 6;-5.09 6;-2.57 6;0.21 6;2.97 6;5.44 6;7.38 6;8.61 6;9 6;9 6;9 6;9 6;9 6;9 6;9 6;9 6;9 6;9 6;9 6"/><circle cx="92" cy="118" r="17" fill="#141414"/><circle cx="85.54" cy="110.86" r="4.08" fill="#FFFFFF"/><circle cx="97.1" cy="123.95" r="1.7" fill="#FFFFFF" opacity="0.8"/></g><g transform="rotate(8 92 111.52)"><rect x="36" y="15.52" width="112" height="96" fill="url(#g-corpo)"/><line x1="36" y1="111.52" x2="148" y2="111.52" stroke="#146A70" stroke-width="4"/></g></g>
+<ellipse cx="92" cy="116" rx="26" ry="28" fill="none" stroke="#146A70" stroke-width="2" opacity="0.55"/>
+</g>
+<g>
+<ellipse cx="164" cy="119" rx="31" ry="33" fill="#198992" opacity="0.45" filter="url(#f-sombra)"/>
+<clipPath id="clip-olho-2"><ellipse cx="164" cy="116" rx="26" ry="28"/></clipPath>
+<ellipse cx="164" cy="116" rx="26" ry="28" fill="url(#g-olho)"/>
+<g clip-path="url(#clip-olho-2)"><g><animateTransform attributeName="transform" type="translate" dur="2.8s" repeatCount="indefinite" values="9 6;9 6;9 6;9 6;9 6;9 6;9 6;8.96 6;8.27 6;6.77 6;4.62 6;2.02 6;-0.77 6;-3.49 6;-5.87 6;-7.69 6;-8.75 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-9 6;-8.47 6;-7.13 6;-5.09 6;-2.57 6;0.21 6;2.97 6;5.44 6;7.38 6;8.61 6;9 6;9 6;9 6;9 6;9 6;9 6;9 6;9 6;9 6;9 6;9 6"/><circle cx="164" cy="118" r="17" fill="#141414"/><circle cx="157.54" cy="110.86" r="4.08" fill="#FFFFFF"/><circle cx="169.1" cy="123.95" r="1.7" fill="#FFFFFF" opacity="0.8"/></g><g transform="rotate(-6 164 116)"><rect x="108" y="20" width="112" height="96" fill="url(#g-corpo)"/><line x1="108" y1="116" x2="220" y2="116" stroke="#146A70" stroke-width="4"/></g></g>
+<ellipse cx="164" cy="116" rx="26" ry="28" fill="none" stroke="#146A70" stroke-width="2" opacity="0.55"/>
+</g>
+<path d="M114 176 Q132 182 148 168" fill="none" stroke="#3A2A22" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg>

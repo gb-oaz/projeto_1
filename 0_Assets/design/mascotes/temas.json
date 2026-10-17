@@ -1,0 +1,54 @@
+{
+  "branco-preto": {
+    "nome": "Branco / Preto",
+    "cor": null
+  },
+  "roxo": {
+    "nome": "Roxo",
+    "cor": "#9887C5"
+  },
+  "oceano": {
+    "nome": "Oceano",
+    "cor": "#5593DD"
+  },
+  "floresta": {
+    "nome": "Floresta",
+    "cor": "#53A252"
+  },
+  "aurora": {
+    "nome": "Aurora",
+    "cor": "#D9480F"
+  },
+  "grafite": {
+    "nome": "Grafite",
+    "cor": "#84939B"
+  },
+  "magenta": {
+    "nome": "Magenta",
+    "cor": "#F053B4"
+  },
+  "sol": {
+    "nome": "Sol",
+    "cor": "#F2B705"
+  },
+  "girassol": {
+    "nome": "Girassol",
+    "cor": "#FFC300"
+  },
+  "rubi": {
+    "nome": "Rubi",
+    "cor": "#FF544A"
+  },
+  "cereja": {
+    "nome": "Cereja",
+    "cor": "#E53935"
+  },
+  "branco": {
+    "nome": "Branco",
+    "cor": null
+  },
+  "preto": {
+    "nome": "Preto",
+    "cor": null
+  }
+}

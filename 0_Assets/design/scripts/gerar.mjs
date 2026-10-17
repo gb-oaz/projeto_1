@@ -9,7 +9,9 @@
 //                         plataformas/web/tokens.ts    tokens tipados e janelas
 //                         plataformas/maui/Tokens.xaml ResourceDictionary (.NET MAUI)
 //                         plataformas/maui/paletas/    um dicionário de cores por tema
-//                         tema.svg                     quadro visual (cores, tipos, componentes)
+//                         tema.svg                     quadro visual (cores, tipos, componentes, mascotes)
+//                         mascotes/                    exemplos dos mascotes (scripts/mascotes-arquivos.mjs)
+//                         plataformas/web/mascotes.mjs núcleo dos mascotes para as telas
 //                         design-system.html           só o bloco entre os marcadores
 //                                                      design:tokens:inicio/fim
 //                         + cópias em cada aplicação de 5_DEV/frontend (sincronizar.mjs)
@@ -19,7 +21,7 @@
 // Cores: @material/material-color-utilities (a biblioteca oficial do M3, HCT).
 // Nada aqui é editado à mão: mude a identidade ou os tokens e rode de novo.
 // =============================================================================
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, readdirSync, statSync, rmSync, existsSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -30,6 +32,9 @@ import {
 } from '@material/material-color-utilities';
 import { temaSvg } from './tema-svg.mjs';
 import { copiasSincronizadas } from './sincronizar.mjs';
+import { arquivosMascotes, temasDosMascotes } from './mascotes-arquivos.mjs';
+import { estatico as mascoteEstatico, embutir, EXPRESSOES as M_EXPR, FORMAS as M_FORMAS, PROPORCOES as M_PROP } from './mascotes.mjs';
+import { VITRINE as M_VITRINE } from './mascotes-arquivos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CONFERIR = process.argv.includes('--conferir');
@@ -484,7 +489,9 @@ const f = html.indexOf(FIM);
 if (i < 0 || f < 0) throw new Error(`${htmlArq}: marcadores ${INI} … ${FIM} não encontrados`);
 const iconeCss = `.material-symbols { font-family: "${ic.familia}"; font-weight: normal; font-style: normal; font-size: var(--md-sys-layout-icon-size); line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-variation-settings: "FILL" ${ic.preenchimento}, "wght" ${ic.peso}, "GRAD" ${ic.grau}, "opsz" ${ic.tamanho_otico}; }`;
 const novoBloco = `${html.slice(i, html.indexOf('\n', i) + 1)}${linkFontes.join('\n')}\n<style id="design-tokens">\n${css}\n${tipografiaCss}\n${iconeCss}\n</style>\n<script id="design-dados" type="application/json">${JSON.stringify({ semente: c.semente.toUpperCase(), variante: c.variante, status: marca.status, fontes: { marca: fonte.brand.familia, texto: fonte.plain.familia }, icones: ic.familia, extras: EXTRAS.map(([n]) => n), temas: Object.values(TEMAS).map((t) => ({ id: t.id, nome: t.nome, descricao: t.descricao, harmonia: t.harmonia, semente: t.semente, terciaria: t.terciaria, modo: t.modo, padrao: t === PADRAO })), papeis: Object.keys(ESQUEMAS.light), paletas: Object.fromEntries(Object.entries(paletas).map(([n, p]) => [n, Object.keys(p).map(Number)])), tipos, janelas })}</script>\n`;
-const htmlNovo = html.slice(0, i) + novoBloco + html.slice(f);
+const nucleoMascotes = readFileSync(join(RAIZ, 'scripts', 'mascotes.mjs'), 'utf8');
+const blocoMascotes = `<script type="module" id="design-mascotes">\n${nucleoMascotes}\nwindow.boazMascotes = { EXPRESSOES, FORMAS, PROPORCOES, MOVIMENTOS, CORES, estatico, animado, sequencia, temas: ${JSON.stringify(temasDosMascotes(cores, marca))} };\nwindow.dispatchEvent(new Event('boaz-mascotes'));\n</script>\n`;
+const htmlNovo = html.slice(0, i) + novoBloco + blocoMascotes + html.slice(f);
 
 // ── 7. quadro visual tema.svg (versão e data vêm do catálogo) ──────────────
 const meta = (n) => (html.match(new RegExp(`<meta name="design:${n}" content="([^"]*)"`)) || [])[1];
@@ -493,6 +500,13 @@ const svg = temaSvg({
   versao: meta('versao'), data: meta('data'), status: marca.status, semente: c.semente.toUpperCase(), variante: c.variante,
   extras: EXTRAS.map(([n]) => n),
   temas: Object.values(TEMAS).map((t) => ({ ...t, padrao: t === PADRAO })),
+  mascote: (id, op, prefixo, x, y, largura, altura) => embutir(mascoteEstatico(id, op), prefixo, x, y, largura, altura),
+  mascotes: {
+    expressoes: Object.entries(M_EXPR).map(([k, v]) => [k, v.nome]),
+    formas: [['bolha', 'feliz'], ...Object.entries(M_VITRINE.formas)].map(([k, e]) => [k, M_FORMAS[k].nome, e]),
+    glifos: Object.entries(M_FORMAS).filter(([, v]) => v.tipo === 'glifo').map(([k, v]) => [k, v.nome.replace(/^(Número|Letra) /, '')]),
+    proporcoes: Object.entries(M_PROP).map(([k, v]) => [k, v.nome]),
+  },
 });
 
 // ── 8. escrever ou conferir ─────────────────────────────────────────────────
@@ -505,6 +519,7 @@ const saidas = {
   ...Object.fromEntries(Object.values(TEMAS).map((t) => [`plataformas/maui/paletas/Paleta${pascal(t.id)}.xaml`, xamlPaleta(t)])),
   [htmlArq]: htmlNovo,
   'tema.svg': svg,
+  ...arquivosMascotes(cores, marca),
 };
 Object.assign(saidas, copiasSincronizadas(RAIZ, saidas));
 let diferentes = 0;
@@ -516,6 +531,13 @@ for (const [arq, conteudo] of Object.entries(saidas)) {
   diferentes++;
   if (CONFERIR) console.log(`  ✖ ${arq} desatualizado`);
   else { mkdirSync(dirname(caminho), { recursive: true }); writeFileSync(caminho, conteudo); console.log(`  ✔ ${arq}`); }
+}
+// mascotes/: arquivo que o gerador não produz mais é sobra (apagado ao gerar, acusado ao conferir)
+const listar = (d) => (existsSync(d) ? readdirSync(d).flatMap((n) => (statSync(join(d, n)).isDirectory() ? listar(join(d, n)) : [join(d, n)])) : []);
+for (const arq of listar(join(RAIZ, 'mascotes')).map((p) => relative(RAIZ, p)).filter((p) => !(p in saidas))) {
+  diferentes++;
+  if (CONFERIR) console.log(`  ✖ ${arq} sobrando`);
+  else { rmSync(join(RAIZ, arq)); console.log(`  ✖ ${arq} removido`); }
 }
 if (CONFERIR && diferentes) {
   console.error(`\n${diferentes} arquivo(s) desatualizado(s): rode \`pnpm run gerar\` em ${relative(process.cwd(), RAIZ) || '.'}`);

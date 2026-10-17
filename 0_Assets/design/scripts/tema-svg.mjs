@@ -32,7 +32,9 @@ const ICONES = {
   evento: 'M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z',
 };
 
-export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas }) {
+export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes }) {
+  let nm = 0; // prefixo único de cada mascote embutido
+  const masc = (id, op, x, y, w, h) => mascote(id, op, `m${++nm}-`, x, y, w, h);
   const L = 1600, M = 40, GAP = 40, PW = (L - 2 * M - GAP) / 2, PAD = 24;
   const fundo = esquemas.dark; // o quadro é escuro, como o tema dos diagramas
   const comp = Object.fromEntries(tokensComp.map((t) => [t.nome, t]));
@@ -61,10 +63,11 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
   const meio = (y, h, papel) => y + h / 2 + tipos[papel].size * 0.35;
 
   // ── componentes ──
-  function botao(e, x, y, rotulo, variante, { icon, desabilitado } = {}) {
+  function botao(e, x, y, rotulo, variante, { icon, desabilitado, mascote: mx } = {}) {
     const h = num('button-height'), papel = tipoDe('button-label');
     const pad = variante === 'text' ? num('button-text-padding') : num('button-padding');
     const padIc = num('button-padding-with-icon'), tamIc = num('button-icon-size'), gap = num('button-gap');
+    if (mx) icon = 'mascote';
     const w = Math.round(largura(rotulo, papel) + (icon ? padIc + tamIc + gap + pad : 2 * pad));
     const r = canto('button-shape', h);
     const V = {
@@ -85,7 +88,7 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     const caixa = bg && desabilitado ? rect(x, y, w, h, r, bg, 'fill-opacity="0.12"') : rect(x, y, w, h, r, bg, borda + sombra(el));
     const tx = icon ? x + padIc + tamIc + gap : x + w / 2;
     return {
-      w, svg: `<g>${caixa}<g${op}>${icon ? icone(icon, x + padIc, y + (h - tamIc) / 2, tamIc, fg) : ''}${txt(tx, meio(y, h, papel), rotulo, papel, fg, icon ? 'start' : 'middle')}</g></g>`,
+      w, svg: `<g>${caixa}<g${op}>${mx ? masc(mx[0], mx[1], x + padIc - 6, y + (h - tamIc) / 2 - 6, tamIc + 12) : icon ? icone(icon, x + padIc, y + (h - tamIc) / 2, tamIc, fg) : ''}${txt(tx, meio(y, h, papel), rotulo, papel, fg, icon ? 'start' : 'middle')}</g></g>`,
     };
   }
   const fila = (itens, x, y, gap = 12) => { let cx = x; return itens.map((f) => { const r = f(cx, y); cx += r.w + gap; return r.svg; }).join(''); };
@@ -434,6 +437,88 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
 
   // componentes
   for (const [titulo, desc, h, desenho] of COMPONENTES) { secao(titulo, desc); duplo(h, desenho, titulo); }
+
+  // ── mascotes ──
+  const LW = L - 2 * M;
+  const grade = (itens, cols, cw, ch, desenhar) => { itens.forEach((it, i) => desenhar(it, M + PAD + (i % cols) * cw, y + PAD + Math.floor(i / cols) * ch, i)); return PAD * 2 + Math.ceil(itens.length / cols) * ch; };
+  const rotuloM = (x, yy, w, s) => partes.push(txt(x + w / 2, yy, s, 'label-medium', fundo['on-surface-variant'], 'middle'));
+
+  secao('Mascotes · expressões', `${mascotes.expressoes.length} expressões para dar retorno: acerto, erro, dúvida, espera, progresso, social. Cor própria de cada expressão nos temas monocromáticos; cor do tema nos coloridos.`);
+  {
+    const cols = 10, cw = (LW - 2 * PAD) / cols, ch = 132;
+    const h = 2 * PAD + Math.ceil(mascotes.expressoes.length / cols) * ch;
+    partes.push(`<g id="mascotes-expressoes">` + rect(M, y, LW, h, cantos.large, fundo.surface, `stroke="${fundo['outline-variant']}"`));
+    grade(mascotes.expressoes, cols, cw, ch, ([id, nome], x, yy) => { partes.push(masc(id, {}, x + (cw - 92) / 2, yy, 92)); rotuloM(x, yy + 112, cw, nome); });
+    partes.push('</g>');
+    y += h;
+  }
+
+  secao('Mascotes · formas', `Planas, setas e 3D (${mascotes.formas.length}); números, letras e sinais (${mascotes.glifos.length}). O rosto é encaixado em cada forma; qualquer expressão serve em qualquer forma.`);
+  {
+    const cols = 11, cw = (LW - 2 * PAD) / cols, ch = 128;
+    const linhasF = Math.ceil(mascotes.formas.length / cols);
+    const gc = 21, gw = (LW - 2 * PAD) / gc, gh = 92;
+    const h = 2 * PAD + linhasF * ch + 16 + Math.ceil(mascotes.glifos.length / gc) * gh;
+    partes.push(`<g id="mascotes-formas">` + rect(M, y, LW, h, cantos.large, fundo.surface, `stroke="${fundo['outline-variant']}"`));
+    grade(mascotes.formas, cols, cw, ch, ([id, nome, e], x, yy) => { partes.push(masc(e, { forma: id }, x + (cw - 96) / 2, yy, 96, 96)); rotuloM(x, yy + 112, cw, nome); });
+    const y0 = y + PAD + linhasF * ch + 16;
+    const cores8 = ['amarelo', 'verde', 'laranja', 'rosa', 'roxo', 'azul', 'ciano', 'vermelho'];
+    mascotes.glifos.forEach(([id], i) => { const x = M + PAD + (i % gc) * gw, yy = y0 + Math.floor(i / gc) * gh; partes.push(masc('feliz', { forma: id, cor: cores8[i % 8] }, x + 2, yy, gw - 4, gh - 8)); });
+    partes.push('</g>');
+    y += h;
+  }
+
+  secao('Mascotes · proporções, só o rosto e cartões', 'Proporção muda o corpo (o rosto se ajusta). Só o rosto tem contorno de adesivo e lê em fundo claro e escuro. No cartão, o fundo fica parado e só o rosto se move.');
+  {
+    const h = 2 * PAD + 220;
+    partes.push(`<g id="mascotes-variacoes">` + rect(M, y, LW, h, cantos.large, fundo.surface, `stroke="${fundo['outline-variant']}"`));
+    let x = M + PAD;
+    for (const [id, nome] of mascotes.proporcoes) { partes.push(masc('feliz', { forma: 'circulo', proporcao: id }, x, y + PAD, 112, 160)); rotuloM(x, y + PAD + 186, 112, nome); x += 124; }
+    x += 24;
+    const claro = esquemas.light;
+    partes.push(rect(x, y + PAD, 296, 160, cantos.medium, claro.surface) + rect(x + 148, y + PAD, 148, 160, cantos.medium, '#000000'));
+    ['acertou', 'duvida', 'errou', 'estrela'].forEach((id, i) => partes.push(masc(id, { forma: 'rosto' }, x + 6 + i * 72 + (i > 1 ? 4 : 0), y + PAD + 44, 64, 72)));
+    rotuloM(x, y + PAD + 186, 296, 'Só o rosto · claro e escuro');
+    x += 320;
+    partes.push(masc('feliz', { forma: 'cartao' }, x, y + PAD, 120, 160));
+    partes.push(masc('acertou', { forma: 'cartaoHorizontal' }, x + 136, y + PAD + 20, 160, 120));
+    rotuloM(x, y + PAD + 186, 296, 'Cartão vertical e horizontal');
+    partes.push('</g>');
+    y += h;
+  }
+
+  secao('Mascotes nos componentes', 'Botão com o mascote no lugar do ícone (só o rosto), card com cartão, lista com avatar, snackbar de retorno, chip e estado vazio. O mascote nunca é a única mensagem: sempre vem com texto.');
+  duplo(372, (e, x, yy) => {
+    let s = fila([(cx, cy) => botao(e, cx, cy, 'Acertou!', 'filled', { mascote: ['acertou', { forma: 'rosto' }] }),
+      (cx, cy) => botao(e, cx, cy, 'Pedir dica', 'tonal', { mascote: ['duvida', { forma: 'rosto' }] }),
+      (cx, cy) => botao(e, cx, cy, 'Tentar de novo', 'outlined', { mascote: ['errou', { forma: 'rosto' }] })], x, yy);
+    const y1 = yy + 64;
+    // card com cartão horizontal
+    const cw = 300;
+    s += rect(x, y1, cw, 308, canto('card-shape', 308), cor(e, 'card-elevated-container-color'), sombra(nivel('card-elevated-elevation')));
+    s += masc('estrela', { forma: 'cartaoHorizontal' }, x + 12, y1 + 12, cw - 24, (cw - 24) * 0.75);
+    s += txt(x + 16, y1 + 252, 'Sequência de 7 dias!', tipoDe('card-title'), e['on-surface']);
+    s += txt(x + 16, y1 + 276, 'Você estudou todos os dias da semana.', tipoDe('card-body'), e['on-surface-variant']);
+    // lista com avatar
+    const lx = x + cw + 24, lw = PW - 2 * PAD - cw - 24;
+    s += rect(lx, y1, lw, 144, cantos.medium, null, `stroke="${e['outline-variant']}"`);
+    [['orgulhoso', 'Frações', 'Concluído · 10/10', 'amarelo'], ['pensando', 'Geometria', 'Em andamento · 4/12', 'ciano']].forEach(([id, t1, t2, c], i) => {
+      const ry = y1 + 8 + i * 64;
+      s += masc(id, { cor: c }, lx + 16, ry + 8, 44);
+      s += txt(lx + 76, ry + 28, t1, 'body-large', e['on-surface']) + txt(lx + 76, ry + 48, t2, 'body-medium', e['on-surface-variant']);
+      if (i) s += `<rect x="${lx}" y="${y1 + 72}" width="${lw}" height="1" fill="${e['outline-variant']}"/>`;
+    });
+    // snackbar de retorno
+    const sy = y1 + 164;
+    s += rect(lx, sy, lw, 56, cantos.extraSmall ?? cantos['extra-small'] ?? 4, e['inverse-surface'], sombra('level3'));
+    s += masc('rindo', { forma: 'rosto' }, lx + 12, sy + 10, 36);
+    s += txt(lx + 56, sy + 34, 'Boa! +10 pontos', 'body-medium', e['inverse-on-surface']) + txt(lx + lw - 16, sy + 34, 'Ver', 'label-large', e['inverse-primary'], 'end');
+    // chip e estado vazio
+    const cy2 = sy + 76;
+    s += rect(lx, cy2, 148, 32, cantos.small, e['secondary-container']) + masc('piscadinha', { forma: 'rosto' }, lx + 8, cy2 + 4, 24) + txt(lx + 38, cy2 + 21, 'Você consegue', 'label-large', e['on-secondary-container']);
+    s += masc('sonolento', { forma: 'nuvem' }, lx + 160, cy2 - 8, 56, 48) + txt(lx + 224, cy2 + 14, 'Nada por aqui ainda', 'label-large', e['on-surface']) + txt(lx + 224, cy2 + 32, 'Comece uma trilha', 'body-small', e['on-surface-variant']);
+    return s;
+  }, 'Mascotes nos componentes');
 
   // marca d'água de rodapé
   y += 48;

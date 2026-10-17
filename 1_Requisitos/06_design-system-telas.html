@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system nas telas · boaz · v02</title>
+<title>Design system nas telas · boaz · v03</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="06_design-system-telas">
 <meta name="boaz:caminho" content="1_Requisitos/06_design-system-telas.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v02">
-<meta name="boaz:data" content="2026-10-16 22:10">
+<meta name="boaz:versao" content="v03">
+<meta name="boaz:data" content="2026-10-17 03:14">
 <meta name="boaz:status" content="Rascunho">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -790,8 +790,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>garantir que toda tela, do desenho ao código, no app e nas três aplicações web, seja construída só com a identidade visual e os componentes do design system do projeto.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>06_design-system-telas</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v02</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-16 · 22:10</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v03</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-17 · 03:14</dd></div>
     <div><dt>Status</dt><dd><span class="status status-rascunho">Rascunho</span></dd></div>
   </dl>
 </header>
@@ -806,6 +806,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <li><strong>Componentes compostos</strong>: blocos que juntam componentes e elementos de identidade, como uma barra de navegação com o logo, botões padrão e imagens da marca.</li>
       <li><strong>Vista</strong>: o desenho da tela inteira, feito antes do código, com os componentes e a identidade que ela vai apresentar.</li>
     </ol>
+    <p>A identidade visual também tem <strong>mascotes</strong>: personagens com rosto expressivo que dão retorno emocional ao usuário — crianças, jovens e adultos — em acertos, erros, dúvidas, esperas, progresso e despedidas. Cada mascote combina uma <a class="ref" href="99_glossario.html#expressao">expressão</a>, uma forma (geométrica, 3D, número, letra, sinal, <a class="ref" href="99_glossario.html#so-o-rosto">só o rosto</a> ou <a class="ref" href="99_glossario.html#cartao-do-mascote">cartão</a>), uma <a class="ref" href="99_glossario.html#proporcao">proporção</a>, um movimento ou uma <a class="ref" href="99_glossario.html#sequencia-de-movimentos">sequência de movimentos</a>, e a cor. O catálogo e os exemplos de uso em botões, cards, listas e mensagens estão em <code>0_Assets/design/design-system.html#mascotes</code> e no <code>tema.svg</code>.</p>
     <p>Os componentes nascem conforme os módulos precisam deles; os que mais de um módulo usa viram componentes comuns. Os termos <a class="ref" href="99_glossario.html#vista">vista</a>, <a class="ref" href="99_glossario.html#componente-comum">componente comum</a>, <a class="ref" href="99_glossario.html#componente-composto">componente composto</a>, <a class="ref" href="99_glossario.html#modulo">módulo</a> e <a class="ref" href="99_glossario.html#tema-de-cor">tema de cor</a> estão no <a class="ref" href="99_glossario.html">Glossário</a>.</p>
     <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-16: nenhuma frente usa biblioteca externa de estilização ou de componentes visuais; a identidade e os componentes vêm só do design system do projeto.</p></aside>
   </section>
@@ -822,6 +823,22 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RN-31"><td><code class="id">RN-31</code></td><td>Um <strong>componente composto</strong> junta componentes do design system e elementos de identidade visual num bloco reutilizável: por exemplo, uma barra de navegação com o logo, botões padrão e imagens da marca</td></tr>
         <tr id="RN-32"><td><code class="id">RN-32</code></td><td>Uma mesma tela no app e na web usa os mesmos componentes e tokens, mudando só a disposição conforme a classe de janela (compact, medium, expanded, large, extra-large)</td></tr>
         <tr id="RN-33"><td><code class="id">RN-33</code></td><td>A vista é aprovada na revisão de um pull request para a branch principal, e o código da tela só começa depois dessa aprovação</td></tr>
+        <tr id="RN-34"><td><code class="id">RN-34</code></td><td>Telas que dão retorno ao usuário (acerto, erro, dúvida, espera, progresso, boas-vindas e despedida) podem usar um <a class="ref" href="99_glossario.html#mascote">mascote</a> do design system; nenhuma tela usa personagem ou ilustração de rosto de fora dele</td></tr>
+        <tr id="RN-35"><td><code class="id">RN-35</code></td><td>Um mascote é sempre uma combinação de expressão, forma, proporção, movimento e cor existentes no design system; expressão, forma, proporção ou movimento novos entram no design system antes de aparecer numa vista</td></tr>
+        <tr id="RN-36"><td><code class="id">RN-36</code></td><td>A cor do mascote acompanha o tema de cor ativo; nos temas monocromáticos (Branco e Preto, Branco, Preto) cada expressão mantém a própria cor</td></tr>
+        <tr id="RN-37"><td><code class="id">RN-37</code></td><td>O mascote reforça uma mensagem escrita e nunca é a única forma de informar algo ao usuário: “Acertou!”, “Quase!” ou “Carregando…” aparecem em texto junto dele</td></tr>
+        <tr id="RN-38"><td><code class="id">RN-38</code></td><td>A expressão segue a situação da tabela abaixo; em resposta a um erro do usuário, o mascote usa expressão acolhedora (errou, ops, preocupado, envergonhado) e nunca riso ou deboche (rindo muito, brincalhão)</td></tr>
+      </tbody>
+    </table>
+    <table>
+      <thead><tr><th>Situação</th><th>Expressões do mascote</th></tr></thead>
+      <tbody>
+        <tr><td>Boas-vindas, início, despedida</td><td>feliz, tchau, piscadinha</td></tr>
+        <tr><td>Acerto, conquista, progresso</td><td>acertou, arrasou, orgulhoso, rindo muito, apaixonado, aliviado</td></tr>
+        <tr><td>Erro e dificuldade</td><td>errou, ops, envergonhado, preocupado, frustrado, chorando, tonto, bravo</td></tr>
+        <tr><td>Dúvida, dica, atenção</td><td>dúvida, pensando, curioso, desconfiado, concentrado, uau</td></tr>
+        <tr><td>Espera e tempo</td><td>esperando, com pressa, sonolento</td></tr>
+        <tr><td>Social e cuidado</td><td>beijo, silêncio, doente, brincalhão</td></tr>
       </tbody>
     </table>
   </section>
@@ -847,10 +864,23 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RNF-104"><td><code class="id">RNF-104</code></td><td><span class="tag">Vistas</span></td><td>A vista indica, para cada bloco da tela, o componente usado (comum, do módulo ou composto) e os elementos de identidade (logos, imagens, animações) com o caminho do arquivo</td></tr>
         <tr id="RNF-105"><td><code class="id">RNF-105</code></td><td><span class="tag">Vistas</span></td><td>A revisão do pull request compara a tela implementada com a vista; se a implementação precisar divergir, a vista é atualizada primeiro, numa nova versão</td></tr>
         <tr id="RNF-106"><td><code class="id">RNF-106</code></td><td><span class="tag">Identidade</span></td><td>Logos, ícones, imagens e animações usados nas telas vêm de <code>0_Assets/design/identidade/</code>; um arquivo novo entra lá antes de ser usado</td></tr>
+        <tr id="RNF-110"><td><code class="id">RNF-110</code></td><td><span class="tag">Mascotes</span></td><td>Os mascotes vêm só do núcleo <code>0_Assets/design/scripts/mascotes.mjs</code>: as aplicações web usam a cópia <code>plataformas/web/mascotes.mjs</code> (com <code>mascotes-temas.json</code>), sincronizada em <code>src/design/</code> como em <code>RNF-108</code>; o app usa os mascotes parados de <code>0_Assets/design/mascotes/estaticos/</code></td></tr>
+        <tr id="RNF-111"><td><code class="id">RNF-111</code></td><td><span class="tag">Mascotes</span></td><td>Uma expressão, forma, proporção ou movimento novo entra no núcleo junto com uma versão nova do catálogo <code>design-system.html</code> e do <code>tema.svg</code>, no mesmo pull request</td></tr>
+        <tr id="RNF-112"><td><code class="id">RNF-112</code></td><td><span class="tag">Mascotes</span></td><td>Com a preferência de movimento reduzido do sistema ativa, todos os mascotes aparecem parados; sem ela, no máximo um mascote animado por vez na área de foco da tela</td></tr>
+        <tr id="RNF-113"><td><code class="id">RNF-113</code></td><td><span class="tag">Mascotes</span></td><td>O mascote é decorativo para leitores de tela (a mensagem está no texto ao lado, <code>RN-37</code>) e não recebe foco</td></tr>
+        <tr id="RNF-114"><td><code class="id">RNF-114</code></td><td><span class="tag">Mascotes</span></td><td>Tamanho mínimo de 24dp para só o rosto (em botões, chips, texto corrido) e de 40dp para mascote com corpo; só o rosto mantém o contorno de adesivo para ser lido em fundo claro e escuro</td></tr>
+        <tr id="RNF-115"><td><code class="id">RNF-115</code></td><td><span class="tag">Vistas</span></td><td>A vista indica, para cada mascote, a expressão, a forma, a proporção e o movimento usados, além do texto que o acompanha</td></tr>
         <tr id="RNF-107"><td><code class="id">RNF-107</code></td><td><span class="tag">Verificação</span></td><td>O CI falha quando os arquivos gerados do design system, ou as cópias deles nas aplicações, estão desatualizados (<code>pnpm run conferir</code>), ou quando o código das telas tem cor, fonte ou medida fora dos tokens</td></tr>
       </tbody>
     </table>
     <aside class="destaque nota"><p>O tema de cor padrão hoje é Branco e Preto (branco no modo claro, preto no escuro); a identidade definitiva, com logos e fontes, ainda é provisória em <code>0_Assets/design/identidade/</code>.</p></aside>
+  </section>
+
+  <section id="em-aberto">
+    <h2>Em aberto</h2>
+    <ul class="pendencias">
+      <li>Como o app anima os mascotes (hoje usa só as versões paradas de <code>RNF-110</code>)? <span class="tag dono">Mobile</span></li>
+    </ul>
   </section>
 
 </main>
@@ -859,12 +889,13 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v02</span></td><td>2026-10-16 22:10</td><td>Pendências respondidas: <code class="id">RN-33</code> (vista aprovada na revisão do pull request), <code class="id">RNF-108</code> e <code class="id">RNF-109</code> (cópias sincronizadas dos tokens e dos componentes comuns) incluídos; <code class="id">RNF-102</code> (vista pela skill diagrama-dev) e <code class="id">RNF-107</code> (CI confere as cópias) alterados; termos ligados ao Glossário; seção Em aberto removida</td></tr>
+      <tr><td><span class="boaz-versao">v03</span></td><td>2026-10-17 03:14</td><td>Mascotes na identidade visual: <code class="id">RN-34</code> a <code class="id">RN-38</code> e <code class="id">RNF-110</code> a <code class="id">RNF-115</code> incluídos; tabela de situações e expressões; termos ligados ao Glossário; seção Em aberto com a animação no app</td></tr>
+      <tr><td>v02</td><td>2026-10-16 22:10</td><td>Pendências respondidas: <code class="id">RN-33</code> (vista aprovada na revisão do pull request), <code class="id">RNF-108</code> e <code class="id">RNF-109</code> (cópias sincronizadas dos tokens e dos componentes comuns) incluídos; <code class="id">RNF-102</code> (vista pela skill diagrama-dev) e <code class="id">RNF-107</code> (CI confere as cópias) alterados; termos ligados ao Glossário; seção Em aberto removida</td></tr>
       <tr><td>v01</td><td>2026-10-16 22:02</td><td>Criação: <code class="id">RN-27</code> a <code class="id">RN-32</code> e <code class="id">RNF-93</code> a <code class="id">RNF-107</code></td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v02 · 2026-10-16 22:10</span>
+    <span>boaz · v03 · 2026-10-17 03:14</span>
     <span class="boaz-arquivo">1_Requisitos/06_design-system-telas.html</span>
   </div>
 </footer>

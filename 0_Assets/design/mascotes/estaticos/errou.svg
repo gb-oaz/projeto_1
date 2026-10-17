@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-23.4 -20.4 302.8 302.8" width="256" height="256" role="img" aria-label="Errou">
+<title>Errou</title>
+<defs>
+<radialGradient id="g-corpo" gradientUnits="userSpaceOnUse" cx="84.8" cy="67.52" r="226.8">
+<stop offset="0" stop-color="#8FC9F6"/><stop offset="0.45" stop-color="#4AA8F0"/><stop offset="1" stop-color="#3A83BB"/></radialGradient>
+
+<radialGradient id="g-olho" cx="0.4" cy="0.35" r="0.75"><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9DEE6"/></radialGradient>
+<radialGradient id="g-iris" cx="0.45" cy="0.6" r="0.6"><stop offset="0" stop-color="#77BEF4"/><stop offset="0.7" stop-color="#387EB4"/><stop offset="1" stop-color="#214C6C"/></radialGradient>
+<linearGradient id="g-lingua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FAB"/><stop offset="1" stop-color="#E5547A"/></linearGradient>
+<linearGradient id="g-gota" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F7FF"/><stop offset="1" stop-color="#7CC8F2"/></linearGradient>
+<linearGradient id="g-estrela" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF176"/><stop offset="1" stop-color="#FFB300"/></linearGradient>
+<radialGradient id="g-esfera" cx="0.36" cy="0.3" r="0.78"><stop offset="0.5" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.38"/></radialGradient>
+<filter id="f-adesivo" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/><feFlood flood-color="#FFFFFF" flood-opacity="0.92"/><feComposite in2="d" operator="in" result="borda"/><feMerge><feMergeNode in="borda"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="f-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="f-sombra" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
+</defs>
+<g transform="translate(0 2.97)"><path d="M112 20 H144 A92 92 0 0 1 236 112 V144 A92 92 0 0 1 144 236 H112 A92 92 0 0 1 20 144 V112 A92 92 0 0 1 112 20 Z" fill="#000000" opacity="0.14" filter="url(#f-suave)" transform="translate(0 6)"/><path d="M112 20 H144 A92 92 0 0 1 236 112 V144 A92 92 0 0 1 144 236 H112 A92 92 0 0 1 20 144 V112 A92 92 0 0 1 112 20 Z" fill="url(#g-corpo)"/><clipPath id="clip-forma-3"><path d="M112 20 H144 A92 92 0 0 1 236 112 V144 A92 92 0 0 1 144 236 H112 A92 92 0 0 1 20 144 V112 A92 92 0 0 1 112 20 Z"/></clipPath><g clip-path="url(#clip-forma-3)"><ellipse cx="89.12" cy="61.04" rx="47.52" ry="21.6" fill="#FFFFFF" opacity="0.28" filter="url(#f-suave)" transform="rotate(-24 89.12 61.04)"/></g>
+<path d="M70 80 Q92 76 112 62" fill="none" stroke="#3A2A22" stroke-width="11" stroke-linecap="round"/><path d="M144 62 Q164 76 186 80" fill="none" stroke="#3A2A22" stroke-width="11" stroke-linecap="round"/>
+<g><g>
+<ellipse cx="92" cy="115" rx="31" ry="33" fill="#306D9C" opacity="0.45" filter="url(#f-sombra)"/>
+<clipPath id="clip-olho-1"><ellipse cx="92" cy="112" rx="26" ry="28"/></clipPath>
+<ellipse cx="92" cy="112" rx="26" ry="28" fill="url(#g-olho)"/>
+<g clip-path="url(#clip-olho-1)"><g transform="translate(3 6)"><circle cx="92" cy="114" r="15" fill="url(#g-iris)"/><circle cx="92" cy="114" r="8.25" fill="#111111"/><circle cx="86.3" cy="107.7" r="3.6" fill="#FFFFFF"/><circle cx="96.5" cy="119.25" r="1.5" fill="#FFFFFF" opacity="0.8"/></g><g transform="rotate(-14 92 100.8)"><rect x="36" y="4.8" width="112" height="96" fill="url(#g-corpo)"/><line x1="36" y1="100.8" x2="148" y2="100.8" stroke="#255478" stroke-width="4"/></g></g>
+<ellipse cx="92" cy="112" rx="26" ry="28" fill="none" stroke="#255478" stroke-width="2" opacity="0.55"/>
+</g></g><g opacity="0"><path d="M68 116 Q92 128 116 116" fill="none" stroke="#3A2A22" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g><g>
+<ellipse cx="164" cy="115" rx="31" ry="33" fill="#306D9C" opacity="0.45" filter="url(#f-sombra)"/>
+<clipPath id="clip-olho-2"><ellipse cx="164" cy="112" rx="26" ry="28"/></clipPath>
+<ellipse cx="164" cy="112" rx="26" ry="28" fill="url(#g-olho)"/>
+<g clip-path="url(#clip-olho-2)"><g transform="translate(-3 6)"><circle cx="164" cy="114" r="15" fill="url(#g-iris)"/><circle cx="164" cy="114" r="8.25" fill="#111111"/><circle cx="158.3" cy="107.7" r="3.6" fill="#FFFFFF"/><circle cx="168.5" cy="119.25" r="1.5" fill="#FFFFFF" opacity="0.8"/></g><g transform="rotate(14 164 100.8)"><rect x="108" y="4.8" width="112" height="96" fill="url(#g-corpo)"/><line x1="108" y1="100.8" x2="220" y2="100.8" stroke="#255478" stroke-width="4"/></g></g>
+<ellipse cx="164" cy="112" rx="26" ry="28" fill="none" stroke="#255478" stroke-width="2" opacity="0.55"/>
+</g></g><g opacity="0"><path d="M140 116 Q164 128 188 116" fill="none" stroke="#3A2A22" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g>
+<path d="M98 184 Q128 160 158 184" fill="none" stroke="#3A2A22" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g><g><path d="M182 136 C191 149 193 156 182 161 C171 156 173 149 182 136 Z" fill="url(#g-gota)" stroke="#4B9CD3" stroke-width="2"/><ellipse cx="179" cy="153" rx="2.5" ry="4" fill="#FFFFFF" opacity="0.9"/></g>
+</svg>
