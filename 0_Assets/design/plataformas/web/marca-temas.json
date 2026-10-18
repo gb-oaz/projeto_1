@@ -1,0 +1,288 @@
+{
+  "branco-preto": {
+    "nome": "Branco / Preto",
+    "mono": true,
+    "claro": {
+      "anel": "#1B1B1B",
+      "b": "#1B1B1B",
+      "d": "#1B1B1B",
+      "de": "#1B1B1B",
+      "boaz": "#1B1B1B",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E2E2E2",
+      "b": "#E2E2E2",
+      "d": "#E2E2E2",
+      "de": "#E2E2E2",
+      "boaz": "#E2E2E2",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    }
+  },
+  "roxo": {
+    "nome": "Roxo",
+    "mono": false,
+    "claro": {
+      "anel": "#7E5260",
+      "b": "#65558F",
+      "d": "#625B71",
+      "de": "#625B71",
+      "boaz": "#65558F",
+      "iconeFundo": "#65558F",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#EFB8C8",
+      "b": "#CFBDFE",
+      "d": "#CBC2DB",
+      "de": "#CBC2DB",
+      "boaz": "#CFBDFE",
+      "iconeFundo": "#CFBDFE",
+      "iconeCor": "#36275D"
+    }
+  },
+  "oceano": {
+    "nome": "Oceano",
+    "mono": false,
+    "claro": {
+      "anel": "#004F46",
+      "b": "#00477F",
+      "d": "#4B607C",
+      "de": "#4B607C",
+      "boaz": "#00477F",
+      "iconeFundo": "#00477F",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#70D8C8",
+      "b": "#A2C9FF",
+      "d": "#B2C8E9",
+      "de": "#B2C8E9",
+      "boaz": "#A2C9FF",
+      "iconeFundo": "#A2C9FF",
+      "iconeCor": "#00315B"
+    }
+  },
+  "floresta": {
+    "nome": "Floresta",
+    "mono": false,
+    "claro": {
+      "anel": "#7D4900",
+      "b": "#0D631B",
+      "d": "#476644",
+      "de": "#476644",
+      "boaz": "#0D631B",
+      "iconeFundo": "#0D631B",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFB86E",
+      "b": "#88D982",
+      "d": "#ADD0A6",
+      "de": "#ADD0A6",
+      "boaz": "#88D982",
+      "iconeFundo": "#88D982",
+      "iconeCor": "#003909"
+    }
+  },
+  "aurora": {
+    "nome": "Aurora",
+    "mono": false,
+    "claro": {
+      "anel": "#4153B7",
+      "b": "#A93200",
+      "d": "#98462A",
+      "de": "#98462A",
+      "boaz": "#A93200",
+      "iconeFundo": "#A93200",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#BAC3FF",
+      "b": "#FFB59E",
+      "d": "#FFB59E",
+      "de": "#FFB59E",
+      "boaz": "#FFB59E",
+      "iconeFundo": "#FFB59E",
+      "iconeCor": "#5D1800"
+    }
+  },
+  "grafite": {
+    "nome": "Grafite",
+    "mono": false,
+    "claro": {
+      "anel": "#006874",
+      "b": "#526068",
+      "d": "#586064",
+      "de": "#586064",
+      "boaz": "#526068",
+      "iconeFundo": "#526068",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#66D6E7",
+      "b": "#BAC9D1",
+      "d": "#C0C8CD",
+      "de": "#C0C8CD",
+      "boaz": "#BAC9D1",
+      "iconeFundo": "#BAC9D1",
+      "iconeCor": "#253239"
+    }
+  },
+  "magenta": {
+    "nome": "Magenta",
+    "mono": false,
+    "claro": {
+      "anel": "#005147",
+      "b": "#8A0062",
+      "d": "#914370",
+      "de": "#914370",
+      "boaz": "#8A0062",
+      "iconeFundo": "#8A0062",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#7AD7C6",
+      "b": "#FFAFD7",
+      "d": "#FFAFD7",
+      "de": "#FFAFD7",
+      "boaz": "#FFAFD7",
+      "iconeFundo": "#FFAFD7",
+      "iconeCor": "#620044"
+    }
+  },
+  "sol": {
+    "nome": "Sol",
+    "mono": false,
+    "claro": {
+      "anel": "#4059AA",
+      "b": "#785900",
+      "d": "#745B21",
+      "de": "#745B21",
+      "boaz": "#785900",
+      "iconeFundo": "#785900",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#D4DBFF",
+      "b": "#FFD782",
+      "d": "#E3C27E",
+      "de": "#E3C27E",
+      "boaz": "#FFD782",
+      "iconeFundo": "#FFD782",
+      "iconeCor": "#3F2E00"
+    }
+  },
+  "girassol": {
+    "nome": "Girassol",
+    "mono": false,
+    "claro": {
+      "anel": "#AC3400",
+      "b": "#785A00",
+      "d": "#735B1E",
+      "de": "#735B1E",
+      "boaz": "#785A00",
+      "iconeFundo": "#785A00",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFE2DA",
+      "b": "#FFE5B2",
+      "d": "#E3C37B",
+      "de": "#E3C37B",
+      "boaz": "#FFE5B2",
+      "iconeFundo": "#FFE5B2",
+      "iconeCor": "#3F2E00"
+    }
+  },
+  "rubi": {
+    "nome": "Rubi",
+    "mono": false,
+    "claro": {
+      "anel": "#5C4100",
+      "b": "#91000A",
+      "d": "#9E4038",
+      "de": "#9E4038",
+      "boaz": "#91000A",
+      "iconeFundo": "#91000A",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#F7BD48",
+      "b": "#FFB4AB",
+      "d": "#FFB4AB",
+      "de": "#FFB4AB",
+      "boaz": "#FFB4AB",
+      "iconeFundo": "#FFB4AB",
+      "iconeCor": "#690005"
+    }
+  },
+  "cereja": {
+    "nome": "Cereja",
+    "mono": false,
+    "claro": {
+      "anel": "#00685C",
+      "b": "#B7131A",
+      "d": "#A13D36",
+      "de": "#A13D36",
+      "boaz": "#B7131A",
+      "iconeFundo": "#B7131A",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#7AD7C6",
+      "b": "#FFB4AC",
+      "d": "#FFB4AC",
+      "de": "#FFB4AC",
+      "boaz": "#FFB4AC",
+      "iconeFundo": "#FFB4AC",
+      "iconeCor": "#690006"
+    }
+  },
+  "branco": {
+    "nome": "Branco",
+    "mono": true,
+    "claro": {
+      "anel": "#1B1B1B",
+      "b": "#1B1B1B",
+      "d": "#1B1B1B",
+      "de": "#1B1B1B",
+      "boaz": "#1B1B1B",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E2E2E2",
+      "b": "#E2E2E2",
+      "d": "#E2E2E2",
+      "de": "#E2E2E2",
+      "boaz": "#E2E2E2",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    }
+  },
+  "preto": {
+    "nome": "Preto",
+    "mono": true,
+    "claro": {
+      "anel": "#1B1B1B",
+      "b": "#1B1B1B",
+      "d": "#1B1B1B",
+      "de": "#1B1B1B",
+      "boaz": "#1B1B1B",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E2E2E2",
+      "b": "#E2E2E2",
+      "d": "#E2E2E2",
+      "de": "#E2E2E2",
+      "boaz": "#E2E2E2",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    }
+  }
+}

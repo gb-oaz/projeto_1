@@ -10,7 +10,7 @@
 
 :root {
   /* referência: fontes e paletas tonais */
-  --md-ref-typeface-brand: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --md-ref-typeface-brand: Fredoka, Nunito, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --md-ref-typeface-plain: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --md-ref-typeface-weight-regular: 400;
   --md-ref-typeface-weight-medium: 500;

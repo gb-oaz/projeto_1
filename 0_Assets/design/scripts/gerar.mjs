@@ -12,6 +12,9 @@
 //                         tema.svg                     quadro visual (cores, tipos, componentes, mascotes)
 //                         mascotes/                    exemplos dos mascotes (scripts/mascotes-arquivos.mjs)
 //                         plataformas/web/mascotes.mjs núcleo dos mascotes para as telas
+//                         identidade/logos, identidade/icones  símbolo, logo, ícone e favicon (scripts/marca-arquivos.mjs)
+//                         plataformas/web/marca.mjs    núcleo da marca (logo em qualquer cor) e marca-temas.json
+//                         identidade/imagens/fundos    fundos oficiais; plataformas/web/fundos.mjs (scripts/fundos-arquivos.mjs)
 //                         design-system.html           só o bloco entre os marcadores
 //                                                      design:tokens:inicio/fim
 //                         + cópias em cada aplicação de 5_DEV/frontend (sincronizar.mjs)
@@ -33,6 +36,8 @@ import {
 import { temaSvg } from './tema-svg.mjs';
 import { copiasSincronizadas } from './sincronizar.mjs';
 import { arquivosMascotes, temasDosMascotes } from './mascotes-arquivos.mjs';
+import { arquivosMarca } from './marca-arquivos.mjs';
+import { arquivosFundos } from './fundos-arquivos.mjs';
 import { estatico as mascoteEstatico, embutir, EXPRESSOES as M_EXPR, FORMAS as M_FORMAS, PROPORCOES as M_PROP } from './mascotes.mjs';
 import { VITRINE as M_VITRINE } from './mascotes-arquivos.mjs';
 
@@ -490,8 +495,12 @@ if (i < 0 || f < 0) throw new Error(`${htmlArq}: marcadores ${INI} … ${FIM} n�
 const iconeCss = `.material-symbols { font-family: "${ic.familia}"; font-weight: normal; font-style: normal; font-size: var(--md-sys-layout-icon-size); line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-variation-settings: "FILL" ${ic.preenchimento}, "wght" ${ic.peso}, "GRAD" ${ic.grau}, "opsz" ${ic.tamanho_otico}; }`;
 const novoBloco = `${html.slice(i, html.indexOf('\n', i) + 1)}${linkFontes.join('\n')}\n<style id="design-tokens">\n${css}\n${tipografiaCss}\n${iconeCss}\n</style>\n<script id="design-dados" type="application/json">${JSON.stringify({ semente: c.semente.toUpperCase(), variante: c.variante, status: marca.status, fontes: { marca: fonte.brand.familia, texto: fonte.plain.familia }, icones: ic.familia, extras: EXTRAS.map(([n]) => n), temas: Object.values(TEMAS).map((t) => ({ id: t.id, nome: t.nome, descricao: t.descricao, harmonia: t.harmonia, semente: t.semente, terciaria: t.terciaria, modo: t.modo, padrao: t === PADRAO })), papeis: Object.keys(ESQUEMAS.light), paletas: Object.fromEntries(Object.entries(paletas).map(([n, p]) => [n, Object.keys(p).map(Number)])), tipos, janelas })}</script>\n`;
 const nucleoMascotes = readFileSync(join(RAIZ, 'scripts', 'mascotes.mjs'), 'utf8');
-const blocoMascotes = `<script type="module" id="design-mascotes">\n${nucleoMascotes}\nwindow.boazMascotes = { EXPRESSOES, FORMAS, PROPORCOES, MOVIMENTOS, CORES, estatico, animado, sequencia, temas: ${JSON.stringify(temasDosMascotes(cores, marca))} };\nwindow.dispatchEvent(new Event('boaz-mascotes'));\n</script>\n`;
-const htmlNovo = html.slice(0, i) + novoBloco + blocoMascotes + html.slice(f);
+const blocoMascotes = `<script type="module" id="design-mascotes">\n${nucleoMascotes}\nwindow.boazMascotes = { EXPRESSOES, FORMAS, PROPORCOES, MOVIMENTOS, CORES, estatico, animado, sequencia, embutir, temas: ${JSON.stringify(temasDosMascotes(cores, marca))} };\nwindow.dispatchEvent(new Event('boaz-mascotes'));\n</script>\n`;
+const arqMarca = arquivosMarca(cores, marca);
+const blocoMarca = `<script type="module" id="design-marca">\n${arqMarca['plataformas/web/marca.mjs']}\nwindow.boazMarca = { marca, FRENTES, VARIANTES, geometria, pecas, temas: ${arqMarca['plataformas/web/marca-temas.json'].trim()} };\nwindow.dispatchEvent(new Event('boaz-marca'));\n</script>\n`;
+const arqFundos = arquivosFundos(cores, marca);
+const blocoFundos = `<script type="module" id="design-fundos">\n${readFileSync(join(RAIZ, 'scripts', 'fundos.mjs'), 'utf8')}\nconst { marca: M, geometria: GEO, pecas: PC } = window.boazMarca;\nwindow.boazFundos = { ...criarFundos({ marca: M, geometria: GEO, pecas: PC, mascotes: window.boazMascotes }), CONCEITOS, FORMATOS, temas: ${arqFundos['plataformas/web/fundos-temas.json'].trim()} };\nwindow.dispatchEvent(new Event('boaz-fundos'));\n</script>\n`;
+const htmlNovo = html.slice(0, i) + novoBloco + blocoMascotes + blocoMarca + blocoFundos + html.slice(f);
 
 // ── 7. quadro visual tema.svg (versão e data vêm do catálogo) ──────────────
 const meta = (n) => (html.match(new RegExp(`<meta name="design:${n}" content="([^"]*)"`)) || [])[1];
@@ -520,6 +529,8 @@ const saidas = {
   [htmlArq]: htmlNovo,
   'tema.svg': svg,
   ...arquivosMascotes(cores, marca),
+  ...arqMarca,
+  ...arqFundos,
 };
 Object.assign(saidas, copiasSincronizadas(RAIZ, saidas));
 let diferentes = 0;
