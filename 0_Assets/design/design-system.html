@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v06</title>
+<title>Design system · boaz · v16</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v06">
-<meta name="design:data" content="2026-10-17 03:08">
+<meta name="design:versao" content="v16">
+<meta name="design:data" content="2026-10-17 23:07">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block">
 <style id="design-tokens">
@@ -24,7 +25,7 @@
 
 :root {
   /* referência: fontes e paletas tonais */
-  --md-ref-typeface-brand: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --md-ref-typeface-brand: Fredoka, Nunito, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --md-ref-typeface-plain: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --md-ref-typeface-weight-regular: 400;
   --md-ref-typeface-weight-medium: 500;
@@ -8547,7 +8548,7 @@
 
 .material-symbols { font-family: "Material Symbols Rounded"; font-weight: normal; font-style: normal; font-size: var(--md-sys-layout-icon-size); line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
 </style>
-<script id="design-dados" type="application/json">{"semente":"#808080","variante":"monochrome","status":"provisoria","fontes":{"marca":"Roboto","texto":"Roboto"},"icones":"Material Symbols Rounded","extras":["sucesso","aviso"],"temas":[{"id":"branco-preto","nome":"Branco e Preto","descricao":"Branco no modo claro e Preto no escuro, acompanhando o sistema.","harmonia":"monocromática clara (branco + preto) / monocromática escura (preto + branco)","semente":"#808080","terciaria":null,"modo":null,"padrao":true},{"id":"roxo","nome":"Roxo","descricao":"Referência do Material 3: neutro, tecnológico, seguro para começar.","harmonia":"tonal (terciária rosada derivada pelo M3)","semente":"#6750A4","terciaria":null,"modo":null,"padrao":false},{"id":"oceano","nome":"Oceano","descricao":"Azul de confiança com verde-água: produtos de serviço, finanças, saúde.","harmonia":"análoga fria (azul + verde-água)","semente":"#0B5FA5","terciaria":"#00897B","modo":null,"padrao":false},{"id":"floresta","nome":"Floresta","descricao":"Verde de crescimento com âmbar: educação, progresso, sustentabilidade.","harmonia":"complementar suave (verde + âmbar)","semente":"#2E7D32","terciaria":"#C77700","modo":null,"padrao":false},{"id":"aurora","nome":"Aurora","descricao":"Laranja energético com índigo: criativo, jogos, comunidade.","harmonia":"complementar (laranja + índigo)","semente":"#D9480F","terciaria":"#3F51B5","modo":null,"padrao":false},{"id":"grafite","nome":"Grafite","descricao":"Cinza-azulado sóbrio com ciano de destaque: corporativo, painéis, ferramentas.","harmonia":"neutra com acento (grafite + ciano)","semente":"#455A64","terciaria":"#0097A7","modo":null,"padrao":false},{"id":"magenta","nome":"Magenta","descricao":"Magenta vibrante com verde-azulado: jovem, expressivo, entretenimento.","harmonia":"triádica (magenta + verde-azulado)","semente":"#B0177F","terciaria":"#00796B","modo":null,"padrao":false},{"id":"sol","nome":"Sol","descricao":"Amarelo ouro com azul-marinho: alegre e confiável, ótimo para destaques e chamadas.","harmonia":"complementar (amarelo + azul-marinho)","semente":"#F2B705","terciaria":"#1E3A8A","modo":null,"padrao":false},{"id":"girassol","nome":"Girassol","descricao":"Amarelo quente com laranja-telha: acolhedor, energético, comunidade e comida.","harmonia":"análoga quente (amarelo + laranja)","semente":"#FFC300","terciaria":"#C2410C","modo":null,"padrao":false},{"id":"rubi","nome":"Rubi","descricao":"Vermelho profundo com dourado: marcante, premium, esportes e eventos. Erro em tom carmim distinto da marca.","harmonia":"análoga quente (vermelho + dourado)","semente":"#B71C1C","terciaria":"#B8860B","modo":null,"padrao":false},{"id":"cereja","nome":"Cereja","descricao":"Vermelho vivo com verde-azulado: intenso e moderno, entretenimento e promoções. Erro em tom carmim distinto da marca.","harmonia":"complementar (vermelho + verde-azulado)","semente":"#E53935","terciaria":"#00796B","modo":null,"padrao":false},{"id":"branco","nome":"Branco","descricao":"Minimalista e luminoso: superfícies brancas puras, botões pretos, cor só no conteúdo (fotos, ilustrações).","harmonia":"monocromática clara (branco + preto)","semente":"#808080","terciaria":null,"modo":"light","padrao":false},{"id":"preto","nome":"Preto","descricao":"Elegante e imersivo: fundo preto absoluto (economiza bateria em telas OLED), botões brancos, cor só no conteúdo.","harmonia":"monocromática escura (preto + branco)","semente":"#808080","terciaria":null,"modo":"dark","padrao":false}],"papeis":["background","on-background","surface","surface-dim","surface-bright","surface-container-lowest","surface-container-low","surface-container","surface-container-high","surface-container-highest","on-surface","surface-variant","on-surface-variant","inverse-surface","inverse-on-surface","outline","outline-variant","shadow","scrim","surface-tint","primary","on-primary","primary-container","on-primary-container","inverse-primary","secondary","on-secondary","secondary-container","on-secondary-container","tertiary","on-tertiary","tertiary-container","on-tertiary-container","error","on-error","error-container","on-error-container","primary-fixed","primary-fixed-dim","on-primary-fixed","on-primary-fixed-variant","secondary-fixed","secondary-fixed-dim","on-secondary-fixed","on-secondary-fixed-variant","tertiary-fixed","tertiary-fixed-dim","on-tertiary-fixed","on-tertiary-fixed-variant","sucesso","on-sucesso","sucesso-container","on-sucesso-container","aviso","on-aviso","aviso-container","on-aviso-container"],"paletas":{"primary":[0,10,20,30,40,50,60,70,80,90,95,99,100],"secondary":[0,10,20,30,40,50,60,70,80,90,95,99,100],"tertiary":[0,10,20,30,40,50,60,70,80,90,95,99,100],"neutral":[0,4,6,10,12,17,20,22,24,30,40,50,60,70,80,87,90,92,94,95,96,98,99,100],"neutral-variant":[0,10,20,30,40,50,60,70,80,90,95,99,100],"error":[0,10,20,30,40,50,60,70,80,90,95,99,100],"sucesso":[0,10,20,30,40,50,60,70,80,90,95,99,100],"aviso":[0,10,20,30,40,50,60,70,80,90,95,99,100]},"tipos":{"display-large":{"font":"brand","size":57,"line-height":64,"tracking":-0.25,"weight":400},"display-medium":{"font":"brand","size":45,"line-height":52,"tracking":0,"weight":400},"display-small":{"font":"brand","size":36,"line-height":44,"tracking":0,"weight":400},"headline-large":{"font":"brand","size":32,"line-height":40,"tracking":0,"weight":400},"headline-medium":{"font":"brand","size":28,"line-height":36,"tracking":0,"weight":400},"headline-small":{"font":"brand","size":24,"line-height":32,"tracking":0,"weight":400},"title-large":{"font":"brand","size":22,"line-height":28,"tracking":0,"weight":400},"title-medium":{"font":"plain","size":16,"line-height":24,"tracking":0.15,"weight":500},"title-small":{"font":"plain","size":14,"line-height":20,"tracking":0.1,"weight":500},"body-large":{"font":"plain","size":16,"line-height":24,"tracking":0.5,"weight":400},"body-medium":{"font":"plain","size":14,"line-height":20,"tracking":0.25,"weight":400},"body-small":{"font":"plain","size":12,"line-height":16,"tracking":0.4,"weight":400},"label-large":{"font":"plain","size":14,"line-height":20,"tracking":0.1,"weight":500},"label-medium":{"font":"plain","size":12,"line-height":16,"tracking":0.5,"weight":500},"label-small":{"font":"plain","size":11,"line-height":16,"tracking":0.5,"weight":500}},"janelas":{"compact":{"min":0,"max":599,"margin":16,"columns":4,"gutter":16,"panes":1,"navigation":"navigation-bar","exemplos":"celular em pé"},"medium":{"min":600,"max":839,"margin":24,"columns":8,"gutter":24,"panes":1,"navigation":"navigation-rail","exemplos":"tablet em pé, celular dobrável aberto"},"expanded":{"min":840,"max":1199,"margin":24,"columns":12,"gutter":24,"panes":2,"navigation":"navigation-rail","exemplos":"tablet deitado, notebook pequeno"},"large":{"min":1200,"max":1599,"margin":24,"columns":12,"gutter":24,"panes":2,"navigation":"navigation-drawer","exemplos":"desktop"},"extra-large":{"min":1600,"max":null,"margin":24,"columns":12,"gutter":24,"panes":3,"navigation":"navigation-drawer","exemplos":"monitor grande"}}}</script>
+<script id="design-dados" type="application/json">{"semente":"#808080","variante":"monochrome","status":"provisoria","fontes":{"marca":"Fredoka","texto":"Roboto"},"icones":"Material Symbols Rounded","extras":["sucesso","aviso"],"temas":[{"id":"branco-preto","nome":"Branco e Preto","descricao":"Branco no modo claro e Preto no escuro, acompanhando o sistema.","harmonia":"monocromática clara (branco + preto) / monocromática escura (preto + branco)","semente":"#808080","terciaria":null,"modo":null,"padrao":true},{"id":"roxo","nome":"Roxo","descricao":"Referência do Material 3: neutro, tecnológico, seguro para começar.","harmonia":"tonal (terciária rosada derivada pelo M3)","semente":"#6750A4","terciaria":null,"modo":null,"padrao":false},{"id":"oceano","nome":"Oceano","descricao":"Azul de confiança com verde-água: produtos de serviço, finanças, saúde.","harmonia":"análoga fria (azul + verde-água)","semente":"#0B5FA5","terciaria":"#00897B","modo":null,"padrao":false},{"id":"floresta","nome":"Floresta","descricao":"Verde de crescimento com âmbar: educação, progresso, sustentabilidade.","harmonia":"complementar suave (verde + âmbar)","semente":"#2E7D32","terciaria":"#C77700","modo":null,"padrao":false},{"id":"aurora","nome":"Aurora","descricao":"Laranja energético com índigo: criativo, jogos, comunidade.","harmonia":"complementar (laranja + índigo)","semente":"#D9480F","terciaria":"#3F51B5","modo":null,"padrao":false},{"id":"grafite","nome":"Grafite","descricao":"Cinza-azulado sóbrio com ciano de destaque: corporativo, painéis, ferramentas.","harmonia":"neutra com acento (grafite + ciano)","semente":"#455A64","terciaria":"#0097A7","modo":null,"padrao":false},{"id":"magenta","nome":"Magenta","descricao":"Magenta vibrante com verde-azulado: jovem, expressivo, entretenimento.","harmonia":"triádica (magenta + verde-azulado)","semente":"#B0177F","terciaria":"#00796B","modo":null,"padrao":false},{"id":"sol","nome":"Sol","descricao":"Amarelo ouro com azul-marinho: alegre e confiável, ótimo para destaques e chamadas.","harmonia":"complementar (amarelo + azul-marinho)","semente":"#F2B705","terciaria":"#1E3A8A","modo":null,"padrao":false},{"id":"girassol","nome":"Girassol","descricao":"Amarelo quente com laranja-telha: acolhedor, energético, comunidade e comida.","harmonia":"análoga quente (amarelo + laranja)","semente":"#FFC300","terciaria":"#C2410C","modo":null,"padrao":false},{"id":"rubi","nome":"Rubi","descricao":"Vermelho profundo com dourado: marcante, premium, esportes e eventos. Erro em tom carmim distinto da marca.","harmonia":"análoga quente (vermelho + dourado)","semente":"#B71C1C","terciaria":"#B8860B","modo":null,"padrao":false},{"id":"cereja","nome":"Cereja","descricao":"Vermelho vivo com verde-azulado: intenso e moderno, entretenimento e promoções. Erro em tom carmim distinto da marca.","harmonia":"complementar (vermelho + verde-azulado)","semente":"#E53935","terciaria":"#00796B","modo":null,"padrao":false},{"id":"branco","nome":"Branco","descricao":"Minimalista e luminoso: superfícies brancas puras, botões pretos, cor só no conteúdo (fotos, ilustrações).","harmonia":"monocromática clara (branco + preto)","semente":"#808080","terciaria":null,"modo":"light","padrao":false},{"id":"preto","nome":"Preto","descricao":"Elegante e imersivo: fundo preto absoluto (economiza bateria em telas OLED), botões brancos, cor só no conteúdo.","harmonia":"monocromática escura (preto + branco)","semente":"#808080","terciaria":null,"modo":"dark","padrao":false}],"papeis":["background","on-background","surface","surface-dim","surface-bright","surface-container-lowest","surface-container-low","surface-container","surface-container-high","surface-container-highest","on-surface","surface-variant","on-surface-variant","inverse-surface","inverse-on-surface","outline","outline-variant","shadow","scrim","surface-tint","primary","on-primary","primary-container","on-primary-container","inverse-primary","secondary","on-secondary","secondary-container","on-secondary-container","tertiary","on-tertiary","tertiary-container","on-tertiary-container","error","on-error","error-container","on-error-container","primary-fixed","primary-fixed-dim","on-primary-fixed","on-primary-fixed-variant","secondary-fixed","secondary-fixed-dim","on-secondary-fixed","on-secondary-fixed-variant","tertiary-fixed","tertiary-fixed-dim","on-tertiary-fixed","on-tertiary-fixed-variant","sucesso","on-sucesso","sucesso-container","on-sucesso-container","aviso","on-aviso","aviso-container","on-aviso-container"],"paletas":{"primary":[0,10,20,30,40,50,60,70,80,90,95,99,100],"secondary":[0,10,20,30,40,50,60,70,80,90,95,99,100],"tertiary":[0,10,20,30,40,50,60,70,80,90,95,99,100],"neutral":[0,4,6,10,12,17,20,22,24,30,40,50,60,70,80,87,90,92,94,95,96,98,99,100],"neutral-variant":[0,10,20,30,40,50,60,70,80,90,95,99,100],"error":[0,10,20,30,40,50,60,70,80,90,95,99,100],"sucesso":[0,10,20,30,40,50,60,70,80,90,95,99,100],"aviso":[0,10,20,30,40,50,60,70,80,90,95,99,100]},"tipos":{"display-large":{"font":"brand","size":57,"line-height":64,"tracking":-0.25,"weight":400},"display-medium":{"font":"brand","size":45,"line-height":52,"tracking":0,"weight":400},"display-small":{"font":"brand","size":36,"line-height":44,"tracking":0,"weight":400},"headline-large":{"font":"brand","size":32,"line-height":40,"tracking":0,"weight":400},"headline-medium":{"font":"brand","size":28,"line-height":36,"tracking":0,"weight":400},"headline-small":{"font":"brand","size":24,"line-height":32,"tracking":0,"weight":400},"title-large":{"font":"brand","size":22,"line-height":28,"tracking":0,"weight":400},"title-medium":{"font":"plain","size":16,"line-height":24,"tracking":0.15,"weight":500},"title-small":{"font":"plain","size":14,"line-height":20,"tracking":0.1,"weight":500},"body-large":{"font":"plain","size":16,"line-height":24,"tracking":0.5,"weight":400},"body-medium":{"font":"plain","size":14,"line-height":20,"tracking":0.25,"weight":400},"body-small":{"font":"plain","size":12,"line-height":16,"tracking":0.4,"weight":400},"label-large":{"font":"plain","size":14,"line-height":20,"tracking":0.1,"weight":500},"label-medium":{"font":"plain","size":12,"line-height":16,"tracking":0.5,"weight":500},"label-small":{"font":"plain","size":11,"line-height":16,"tracking":0.5,"weight":500}},"janelas":{"compact":{"min":0,"max":599,"margin":16,"columns":4,"gutter":16,"panes":1,"navigation":"navigation-bar","exemplos":"celular em pé"},"medium":{"min":600,"max":839,"margin":24,"columns":8,"gutter":24,"panes":1,"navigation":"navigation-rail","exemplos":"tablet em pé, celular dobrável aberto"},"expanded":{"min":840,"max":1199,"margin":24,"columns":12,"gutter":24,"panes":2,"navigation":"navigation-rail","exemplos":"tablet deitado, notebook pequeno"},"large":{"min":1200,"max":1599,"margin":24,"columns":12,"gutter":24,"panes":2,"navigation":"navigation-drawer","exemplos":"desktop"},"extra-large":{"min":1600,"max":null,"margin":24,"columns":12,"gutter":24,"panes":3,"navigation":"navigation-drawer","exemplos":"monitor grande"}}}</script>
 <script type="module" id="design-mascotes">
 // =============================================================================
 // boaz · mascotes: personagens com rosto expressivo da identidade visual
@@ -9527,8 +9528,1132 @@ export function embutir(svgTexto, prefixo, x, y, largura, altura = largura) {
   return `<svg x="${f(x + (largura - w) / 2)}" y="${f(y + (altura - h) / 2)}" width="${f(w)}" height="${f(h)}" viewBox="${vx} ${vy} ${vw} ${vh}">${corpo}</svg>`;
 }
 
-window.boazMascotes = { EXPRESSOES, FORMAS, PROPORCOES, MOVIMENTOS, CORES, estatico, animado, sequencia, temas: {"branco-preto":{"nome":"Branco / Preto","cor":null},"roxo":{"nome":"Roxo","cor":"#9887C5"},"oceano":{"nome":"Oceano","cor":"#5593DD"},"floresta":{"nome":"Floresta","cor":"#53A252"},"aurora":{"nome":"Aurora","cor":"#D9480F"},"grafite":{"nome":"Grafite","cor":"#84939B"},"magenta":{"nome":"Magenta","cor":"#F053B4"},"sol":{"nome":"Sol","cor":"#F2B705"},"girassol":{"nome":"Girassol","cor":"#FFC300"},"rubi":{"nome":"Rubi","cor":"#FF544A"},"cereja":{"nome":"Cereja","cor":"#E53935"},"branco":{"nome":"Branco","cor":null},"preto":{"nome":"Preto","cor":null}} };
+window.boazMascotes = { EXPRESSOES, FORMAS, PROPORCOES, MOVIMENTOS, CORES, estatico, animado, sequencia, embutir, temas: {"branco-preto":{"nome":"Branco / Preto","cor":null},"roxo":{"nome":"Roxo","cor":"#9887C5"},"oceano":{"nome":"Oceano","cor":"#5593DD"},"floresta":{"nome":"Floresta","cor":"#53A252"},"aurora":{"nome":"Aurora","cor":"#D9480F"},"grafite":{"nome":"Grafite","cor":"#84939B"},"magenta":{"nome":"Magenta","cor":"#F053B4"},"sol":{"nome":"Sol","cor":"#F2B705"},"girassol":{"nome":"Girassol","cor":"#FFC300"},"rubi":{"nome":"Rubi","cor":"#FF544A"},"cereja":{"nome":"Cereja","cor":"#E53935"},"branco":{"nome":"Branco","cor":null},"preto":{"nome":"Preto","cor":null}} };
 window.dispatchEvent(new Event('boaz-mascotes'));
+</script>
+<script type="module" id="design-marca">
+// =============================================================================
+// boaz · núcleo da marca deboaz: símbolo, logo e ícone, em qualquer cor
+//
+// O símbolo é um b e um d: uma barriga redonda com uma antena de cada lado
+// (haste de 116, barriga de raio 270, topo da haste em elipse 58 × 40), separadas
+// do anel por um vão de 22 que acompanha a curva dele.
+//   longo  hastes longas — landing page e hub (público adulto e profissional)
+//   curto  hastes curtas — quest (crianças, jovens, estudantes e funcionários)
+//
+// O oficial é monocromático (preto no claro, branco no escuro). Num tema de cor,
+// o anel fica na terciária, a antena do b na primária e a do d na secundária, e
+// o logo usa símbolo na terciária, "de" na secundária e "boaz" na primária
+// (coresDaMarca). O nome sai em contorno da fonte da marca (Fredoka Medium):
+// o gerador mede os glifos e entrega os caminhos em `nome` (criarMarca).
+//
+// Este módulo não usa nada do Node, então também roda no navegador. O gerador
+// (scripts/gerar.mjs) grava os arquivos oficiais em identidade/logos e
+// identidade/icones e copia o núcleo, já com o nome, para plataformas/web/marca.mjs.
+//
+// Uso na tela (web):
+//   import { marca, FRENTES } from '../design/marca.mjs';
+//   import temas from '../design/marca-temas.json';
+//   const c = temas[paleta][modo];            // modo: 'claro' | 'escuro'
+//   el.innerHTML = marca.logo(FRENTES.hub, c);
+// Regras de uso: 1_Requisitos/90_identidade-visual.html.
+// =============================================================================
+
+/** Variação do símbolo: onde a haste começa (0 = longa). */
+export const VARIANTES = {
+  longo: { nome: 'Hastes longas', topo: 0 },
+  curto: { nome: 'Hastes curtas', topo: 180 },
+};
+/** Variação de cada frente do produto. */
+export const FRENTES = { landing: 'longo', hub: 'longo', quest: 'curto' };
+
+const HW = 116, R = 270, r = R - HW, CX = 270, CY = 523, CAP = 40, LARG = 540, BASE = 793;
+// vão entre as antenas e o anel: a base de cada antena é um arco concêntrico ao anel, VAO além dele
+const VAO = 22, RV = R + VAO;
+const n = (v) => Math.round(v * 100) / 100;
+const yVao = (x) => CY - Math.sqrt(RV * RV - (x - CX) ** 2);
+const haste = (x, topo) => `M${x} ${topo + CAP}A58 ${CAP} 0 0 1 ${x + HW} ${topo + CAP}V${n(yVao(x + HW))}A${RV} ${RV} 0 0 0 ${x} ${n(yVao(x))}Z`;
+// sentido: 1 = horário (como as hastes), 0 = anti-horário (abre o miolo com fill-rule nonzero)
+const circ = (raio, sentido) => `M${CX + raio} ${CY}A${raio} ${raio} 0 1 ${sentido} ${CX - raio} ${CY}A${raio} ${raio} 0 1 ${sentido} ${CX + raio} ${CY}Z`;
+const anelCheio = () => circ(R, 1) + circ(r, 0);
+const hastes = (variante) => { const topo = VARIANTES[variante].topo; return haste(0, topo) + haste(LARG - HW, topo); };
+/** Peças do símbolo separadas (para o app desenhar cada uma na sua cor): { anel, b, d, y, altura }. */
+export const geometria = (variante = 'longo') => {
+  const topo = VARIANTES[variante].topo;
+  return { anel: anelCheio(), b: haste(0, topo), d: haste(LARG - HW, topo), y: topo, altura: BASE - topo, largura: LARG };
+};
+/** Caminho do símbolo, no quadro 0..540 × topo..793. */
+export const caminhoSimbolo = (variante = 'longo') => hastes(variante) + anelCheio();
+const caixa = (variante) => { const topo = VARIANTES[variante].topo; return { y: topo, h: BASE - topo }; };
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const cab = (vb, titulo, extra = '') => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}"${extra} role="img" aria-label="${esc(titulo)}">`;
+
+const lum = (h) => {
+  const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+};
+/** Razão de contraste entre duas cores #RRGGBB. */
+export const contraste = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+
+/**
+ * Funções de desenho. `nome` = { de, boaz, x, largura }: caminhos do nome em
+ * contorno, medidos pelo gerador no mesmo quadro do símbolo (baseline em 783).
+ */
+/**
+ * Cores das peças do símbolo: { anel, b, d } (b = antena da esquerda, d = da direita).
+ * Aceita uma cor só (string), { simbolo } (tudo nela) ou as peças separadas.
+ */
+export const pecas = (cor = 'currentColor') => {
+  if (typeof cor === 'string') return { anel: cor, b: cor, d: cor };
+  const base = cor.simbolo ?? 'currentColor';
+  return { anel: cor.anel ?? base, b: cor.b ?? base, d: cor.d ?? base };
+};
+const desenho = (variante, cor) => {
+  const p = pecas(cor), topo = VARIANTES[variante].topo;
+  return `<path fill="${p.anel}" d="${anelCheio()}"/><path fill="${p.b}" d="${haste(0, topo)}"/><path fill="${p.d}" d="${haste(LARG - HW, topo)}"/>`;
+};
+
+export function criarMarca(nome) {
+  /** Símbolo; cor = uma cor ou { anel, b, d }. */
+  const simbolo = (variante = 'longo', cor = 'currentColor', titulo = 'deboaz') => {
+    const { y, h } = caixa(variante);
+    return `${cab(`0 ${y} ${LARG} ${h}`, titulo)}${desenho(variante, cor)}</svg>`;
+  };
+  /** Logo principal: símbolo + nome. cores = { anel, b, d, de, boaz } (ou { simbolo, de, boaz }; padrão: currentColor). */
+  const logo = (variante = 'longo', cores = {}) => {
+    const { y, h } = caixa(variante);
+    const c = { simbolo: 'currentColor', de: 'currentColor', boaz: 'currentColor', ...cores };
+    return `${cab(`0 ${y} ${n(nome.largura)} ${h}`, 'deboaz')}${desenho(variante, c)}` +
+      `<path fill="${c.de}" d="${nome.de}"/><path fill="${c.boaz}" d="${nome.boaz}"/></svg>`;
+  };
+  /**
+   * Ícone quadrado de 1024: fundo liso e o símbolo centralizado.
+   * area = altura do símbolo (660 cabe na área segura de 66 %); raio = canto do quadrado.
+   * fundo null = só o símbolo, com fundo transparente (frente do ícone adaptativo).
+   */
+  const icone = (variante = 'longo', { fundo = '#000000', cor = '#FFFFFF', area = 660, raio = 0, titulo = 'deboaz' } = {}) => {
+    const { y, h } = caixa(variante), k = area / h, ox = (1024 - LARG * k) / 2, oy = (1024 - h * k) / 2 - y * k;
+    return `${cab('0 0 1024 1024', titulo, ' width="1024" height="1024"')}` +
+      (fundo ? `<rect width="1024" height="1024"${raio ? ` rx="${raio}"` : ''} fill="${fundo}"/>` : '') +
+      `<g transform="translate(${n(ox)} ${n(oy)}) scale(${n(k * 1e4) / 1e4})">${desenho(variante, cor)}</g></svg>`;
+  };
+  /** Favicon: quadrado de cantos arredondados, símbolo maior para ler em 16 px. */
+  const favicon = (variante = 'longo', { fundo = '#000000', cor = '#FFFFFF' } = {}) => icone(variante, { fundo, cor, area: 800, raio: 224 });
+  // ── animações (SMIL: tocam também dentro de <img>) ──────────────────────────
+  // O anel em traço: círculo de raio 212 com traço de 116 (= barriga de 154 a 270).
+  // As antenas são as mesmas do símbolo parado, reveladas ou movidas por recorte.
+  const RM = (R + r) / 2, VOLTA = 2 * Math.PI * RM;
+  // ids únicos por desenho: vários SVGs embutidos na mesma página não podem dividir recortes
+  let seq = 0;
+  const antena = (variante, i) => haste(i ? LARG - HW : 0, VARIANTES[variante].topo);
+  /**
+   * Abertura: o anel se desenha a partir de baixo, as antenas brotam do vão e sobem
+   * e, com nome, "de" e "boaz" entram em seguida. Toca uma vez (≈ 2 s) e para no
+   * logo. cores = { simbolo, de, boaz }.
+   */
+  const abertura = (variante = 'longo', cores = {}, { nome: comNome = true } = {}) => {
+    const c = { simbolo: 'currentColor', de: 'currentColor', boaz: 'currentColor', ...cores }, p = pecas(c);
+    const { y, h } = caixa(variante), largura = comNome ? n(nome.largura) : LARG;
+    const fz = 'fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.3 0 0.2 1"';
+    const anel = `<circle cx="${CX}" cy="${CY}" r="${RM}" fill="none" stroke="${p.anel}" stroke-width="${HW}" stroke-dasharray="${n(VOLTA)}" stroke-dashoffset="${n(VOLTA)}" transform="rotate(90 ${CX} ${CY})">` +
+      `<animate attributeName="stroke-dashoffset" from="${n(VOLTA)}" to="0" begin="0s" dur="0.8s" ${fz}/></circle>`;
+    const baixo = Math.ceil(yVao(0)), id = `marca-ab-${variante}-${++seq}`;
+    const defs = [0, 1].map((i) => `<clipPath id="${id}-${i}"><rect x="0" y="${baixo}" width="${LARG}" height="${BASE}">` +
+      `<animate attributeName="y" from="${baixo}" to="${y}" begin="${0.6 + i * 0.15}s" dur="0.55s" ${fz}/></rect></clipPath>`).join('');
+    const antenas = [0, 1].map((i) => `<path fill="${i ? p.d : p.b}" d="${antena(variante, i)}" clip-path="url(#${id}-${i})"/>`).join('');
+    const entra = (d, cor, t) => `<path fill="${cor}" d="${d}" opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${t}s" dur="0.35s" fill="freeze"/>` +
+      `<animateTransform attributeName="transform" type="translate" from="0 60" to="0 0" begin="${t}s" dur="0.45s" ${fz}/></path>`;
+    return `${cab(`0 ${y} ${largura} ${h}`, 'deboaz')}<defs>${defs}</defs>${anel}${antenas}` +
+      (comNome ? entra(nome.de, c.de, 1.2) + entra(nome.boaz, c.boaz, 1.4) : '') + '</svg>';
+  };
+  /**
+   * Carregamento: um arco corre pelo anel sobre um trilho claro e as antenas descem
+   * para dentro do vão e voltam, alternadas. Laço de 1,6 s. cor = uma cor ou { anel, b, d }.
+   */
+  const carregamento = (variante = 'longo', cor = 'currentColor') => {
+    const p = pecas(cor), { y, h } = caixa(variante), arco = n(VOLTA * 0.3), desce = 110, vao = `marca-vao-${variante}-${++seq}`;
+    const anel = `<g fill="none" stroke="${p.anel}" stroke-width="${HW}"><circle cx="${CX}" cy="${CY}" r="${RM}" opacity="0.18"/>` +
+      `<circle cx="${CX}" cy="${CY}" r="${RM}" stroke-dasharray="${arco} ${n(VOLTA - arco)}">` +
+      `<animateTransform attributeName="transform" type="rotate" from="90 ${CX} ${CY}" to="450 ${CX} ${CY}" dur="1.6s" repeatCount="indefinite"/></circle></g>`;
+    // a máscara esconde o que entra no vão: as antenas somem ao descer
+    const mascara = `<mask id="${vao}"><rect x="0" y="${y}" width="${LARG}" height="${h}" fill="#fff"/><circle cx="${CX}" cy="${CY}" r="${RV}" fill="#000"/></mask>`;
+    const antenas = [0, 1].map((i) => `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 ${desce};0 0" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.4 0 0.2 1;0.4 0 0.2 1" begin="${-i * 0.8}s" dur="1.6s" repeatCount="indefinite"/>` +
+      `<path fill="${i ? p.d : p.b}" d="${antena(variante, i)}"/></g>`).join('');
+    return `${cab(`0 ${y} ${LARG} ${h}`, 'Carregando')}<defs>${mascara}</defs>${anel}<g mask="url(#${vao})">${antenas}</g></svg>`;
+  };
+  /**
+   * Linha do tempo de abrir e/ou fechar o logo. Abrir: o anel se desenha, as antenas
+   * brotam do vão e o nome entra. Fechar (o inverso): o nome sai, as antenas
+   * recolhem para o vão e o anel se apaga. Devolve os tempos (s) de cada peça.
+   */
+  const LINHA = (abrir, fechar, laco) => {
+    const t = { abrir, fechar, laco };
+    const fimAbrir = abrir ? 1.8 : 0, F = fimAbrir + (abrir && fechar ? (laco ? 1.6 : 0.4) : 0.15);
+    t.anel = abrir ? [0, 0.8] : null;                 // desenha
+    t.antena = (i) => abrir ? [0.6 + i * 0.15, 0.6 + i * 0.15 + 0.55] : null;
+    t.nome = (i) => abrir ? [1.2 + i * 0.2, 1.2 + i * 0.2 + 0.45] : null;
+    t.nomeSai = (i) => fechar ? [F + (1 - i) * 0.12, F + (1 - i) * 0.12 + 0.35] : null;
+    t.antenaSai = (i) => fechar ? [F + 0.35 + (1 - i) * 0.15, F + 0.35 + (1 - i) * 0.15 + 0.5] : null;
+    t.anelSai = fechar ? [F + 1.0, F + 1.8] : null;  // apaga, seguindo o mesmo sentido
+    t.fim = fechar ? F + 1.8 : fimAbrir;
+    t.total = laco ? t.fim + 0.6 : t.fim;
+    return t;
+  };
+  // animação por pontos [[tempo, valor], ...]: em laço repete o ciclo inteiro; senão para no último valor
+  const pontos = (attr, pts, t, tipo = '') => {
+    const T = t.total, ks = pts.map(([x]) => n(Math.min(1, Math.max(0, x / T))));
+    const vs = pts.map(([, v]) => v).join(';');
+    const sp = Array(pts.length - 1).fill('0.3 0 0.2 1').join(';');
+    const tag = tipo ? `animateTransform attributeName="transform" type="${tipo}"` : `animate attributeName="${attr}"`;
+    return `<${tag} values="${vs}" keyTimes="${ks.join(';')}" calcMode="spline" keySplines="${sp}" dur="${n(T)}s" ${t.laco ? 'repeatCount="indefinite"' : 'fill="freeze"'}/>`;
+  };
+  // monta a sequência de valores de uma peça: oculto → visível (abrir) → oculto (fechar)
+  const trilha = (t, ab, fe, oculto, visivel, oculto2 = oculto) => {
+    const p = [[0, ab ? oculto : visivel]];
+    if (ab) p.push([ab[0], oculto], [ab[1], visivel]);
+    if (fe) p.push([fe[0], visivel], [fe[1], oculto2]);
+    p.push([t.total, fe ? oculto2 : visivel]);
+    return p.filter((x, i, a) => i === 0 || x[0] > a[i - 1][0] || (x[0] === a[i - 1][0] && x[1] !== a[i - 1][1]));
+  };
+  const sequenciaLogo = (variante, cores, comNome, t) => {
+    const c = { simbolo: 'currentColor', de: 'currentColor', boaz: 'currentColor', ...cores }, p = pecas(c);
+    const { y, h } = caixa(variante), largura = comNome ? n(nome.largura) : LARG, id = `marca-sq-${variante}-${++seq}`;
+    const V = n(VOLTA), baixo = Math.ceil(yVao(0));
+    const anelPts = trilha(t, t.anel, t.anelSai, V, 0, -V);
+    const anel = `<circle cx="${CX}" cy="${CY}" r="${RM}" fill="none" stroke="${p.anel}" stroke-width="${HW}" stroke-dasharray="${V}" stroke-dashoffset="${anelPts[0][1]}" transform="rotate(90 ${CX} ${CY})">${pontos('stroke-dashoffset', anelPts, t)}</circle>`;
+    const defs = [0, 1].map((i) => { const pts = trilha(t, t.antena(i), t.antenaSai(i), baixo, y);
+      return `<clipPath id="${id}-${i}"><rect x="0" y="${pts[0][1]}" width="${LARG}" height="${BASE}">${pontos('y', pts, t)}</rect></clipPath>`; }).join('');
+    const antenas = [0, 1].map((i) => `<path fill="${i ? p.d : p.b}" d="${antena(variante, i)}" clip-path="url(#${id}-${i})"/>`).join('');
+    const texto = (d, cor, i) => { const op = trilha(t, t.nome(i), t.nomeSai(i), 0, 1), tr = trilha(t, t.nome(i), t.nomeSai(i), '0 60', '0 0', '0 60');
+      return `<path fill="${cor}" d="${d}" opacity="${op[0][1]}" transform="translate(${tr[0][1]})">${pontos('opacity', op, t)}${pontos('', tr, t, 'translate')}</path>`; };
+    return `${cab(`0 ${y} ${largura} ${h}`, 'deboaz')}<defs>${defs}</defs>${anel}${antenas}` +
+      (comNome ? texto(nome.de, c.de, 0) + texto(nome.boaz, c.boaz, 1) : '') + '</svg>';
+  };
+  /** Fechamento: o inverso da abertura — o nome sai, as antenas recolhem para o vão e o anel se apaga. Toca uma vez (≈ 2 s). */
+  const fechamento = (variante = 'longo', cores = {}, { nome: comNome = true } = {}) => sequenciaLogo(variante, cores, comNome, LINHA(false, true, false));
+  /** Ciclo: abertura, pausa com o logo formado, fechamento e pausa vazia, em laço (≈ 6,6 s). */
+  const ciclo = (variante = 'longo', cores = {}, { nome: comNome = true } = {}) => sequenciaLogo(variante, cores, comNome, LINHA(true, true, true));
+  return { simbolo, logo, icone, favicon, abertura, carregamento, fechamento, ciclo };
+}
+
+/**
+ * Cores da marca em cada tema de cor e modo, a partir de tokens/cores.json:
+ * { <tema>: { nome, mono, claro: { simbolo, de, boaz, iconeFundo, iconeCor }, escuro: {…} } }.
+ * Tema monocromático: tudo em on-surface e o ícone oficial (fundo preto, símbolo branco).
+ * Tema de cor: anel tertiary, antena do b e "boaz" primary, antena do d e "de" secondary;
+ * ícone em primary com on-primary.
+ */
+export function coresDaMarca(cores, marca) {
+  const defs = marca.cores.temas, padrao = marca.cores.tema_padrao, saida = {};
+  for (const [id, t] of Object.entries(cores.temas)) {
+    const ids = typeof padrao === 'object' && id === `${padrao.claro}-${padrao.escuro}` ? [padrao.claro, padrao.escuro] : [id];
+    const mono = ids.some((i) => defs[i]?.variante === 'monochrome');
+    const modo = (esq) => {
+      const v = (k) => esq[k].$value.toUpperCase();
+      return mono
+        ? { anel: v('on-surface'), b: v('on-surface'), d: v('on-surface'), de: v('on-surface'), boaz: v('on-surface'), iconeFundo: '#000000', iconeCor: '#FFFFFF' }
+        : { anel: v('tertiary'), b: v('primary'), d: v('secondary'), de: v('secondary'), boaz: v('primary'), iconeFundo: v('primary'), iconeCor: v('on-primary') };
+    };
+    saida[id] = { nome: ids.map((i) => defs[i]?.nome ?? i).join(' / '), mono, claro: modo(t.md.sys.color.light), escuro: modo(t.md.sys.color.dark) };
+  }
+  return saida;
+}
+
+// ── gerado: o nome deboaz em contorno (Fredoka Medium) ──
+export const NOME = {"de":"M837.3 787.7L837.3 787.7Q813.4 787.7 792.0 777.8Q770.7 767.9 754.6 750.5Q738.5 733.1 729.1 709.4Q719.8 685.8 719.8 658.7L719.8 658.7Q719.8 632.7 729.1 609.6Q738.5 586.4 754.9 569.0Q771.2 551.6 792.6 541.7Q813.9 531.8 837.3 531.8L837.3 531.8Q862.2 531.8 882 541.7Q901.8 551.6 915.5 569.0Q929.3 586.4 936.6 609.6Q943.9 632.7 944.4 659.2L944.4 659.2Q944.4 685.8 937.4 708.9Q930.4 732.0 916.6 749.7Q902.8 767.4 882.8 777.5Q862.8 787.7 837.3 787.7ZM845.6 726.8L845.6 726.8Q863.8 726.8 878.1 718.3Q892.4 709.7 901.0 694.6Q909.6 679.5 909.6 660.3L909.6 660.3Q909.6 640.5 901.0 625.4Q892.4 610.4 878.1 601.5Q863.8 592.7 845.6 592.7L845.6 592.7Q827.4 592.7 812.8 601.3Q798.3 609.8 789.7 625.2Q781.1 640.5 781.1 660.3L781.1 660.3Q781.1 679.5 789.7 694.6Q798.3 709.7 813.1 718.3Q827.9 726.8 845.6 726.8ZM941.8 787.7L941.8 787.7Q927.2 787.7 920.5 782.7Q913.7 777.8 911.6 766.9L911.6 766.9L911.6 446.6Q911.6 437.7 912.9 430.7Q914.2 423.7 920.7 419.3Q927.2 414.8 941.3 414.8L941.3 414.8Q956.4 414.8 962.6 419Q968.8 423.2 970.7 430.2Q972.5 437.2 972.5 446.0L972.5 446.0L972.5 756.0Q972.5 764.8 970.9 772.1Q969.4 779.4 962.9 783.5Q956.4 787.7 941.8 787.7ZM1149.8 791.3L1149.8 791.3Q1116 791.3 1090.8 780.4Q1065.6 769.5 1048.7 750.5Q1031.8 731.5 1023.2 707.9Q1014.6 684.2 1014.6 658.7L1014.6 658.7Q1014.6 621.3 1031.8 592.2Q1048.9 563.0 1079.3 546.4Q1109.8 529.8 1149.3 529.8L1149.3 529.8Q1177.4 529.8 1198.7 538.6Q1220 547.4 1234.3 561.7Q1248.6 576.0 1256.1 593.2Q1263.7 610.4 1263.7 626.5L1263.7 626.5Q1263.7 654.0 1250.4 666.5Q1237.2 679 1217.4 679L1217.4 679L1080.1 679Q1080.6 696.7 1091.3 709.7Q1102.0 722.7 1118.3 729.7Q1134.7 736.7 1151.9 736.7L1151.9 736.7Q1164.9 736.7 1175.0 735.2Q1185.2 733.6 1192.4 731.3Q1199.7 728.9 1205.2 726.3Q1210.6 723.7 1215.3 721.6Q1220 719.6 1224.2 719.0L1224.2 719.0Q1229.9 718.5 1235.6 721.6Q1241.3 724.8 1245.0 732.6L1245.0 732.6Q1248.1 737.8 1249.4 742.2Q1250.7 746.6 1250.7 750.8L1250.7 750.8Q1250.7 761.2 1238.2 770.3Q1225.7 779.4 1203.1 785.3Q1180.5 791.3 1149.8 791.3ZM1080.1 642.1L1080.1 642.1L1186.7 642.1Q1195.6 642.1 1200.2 639.2Q1204.9 636.4 1204.9 627L1204.9 627Q1204.9 615.0 1197.6 605.4Q1190.4 595.8 1177.9 590.3Q1165.4 584.9 1148.8 584.9L1148.8 584.9Q1129.5 584.9 1113.9 592.4Q1098.3 600.0 1089.2 613.0Q1080.1 626.0 1080.1 642.1Z","boaz":"M1440.0 787.7L1440.0 787.7Q1414.5 787.7 1394.5 777.5Q1374.4 767.4 1360.7 749.7Q1346.9 732.0 1339.9 708.9Q1332.8 685.8 1332.8 659.2L1332.8 659.2Q1333.4 632.7 1340.6 609.6Q1347.9 586.4 1361.7 569.0Q1375.5 551.6 1395.2 541.7Q1415 531.8 1440.0 531.8L1440.0 531.8Q1463.9 531.8 1484.9 541.7Q1506 551.6 1522.4 569.0Q1538.8 586.4 1548.1 609.6Q1557.5 632.7 1557.5 658.7L1557.5 658.7Q1557.5 685.8 1548.1 709.4Q1538.8 733.1 1522.6 750.5Q1506.5 767.9 1485.2 777.8Q1463.9 787.7 1440.0 787.7ZM1431.6 726.8L1431.6 726.8Q1449.8 726.8 1464.4 718.3Q1479.0 709.7 1487.5 694.6Q1496.1 679.5 1496.1 660.3L1496.1 660.3Q1496.1 640.5 1487.5 625.2Q1479.0 609.8 1464.4 601.3Q1449.8 592.7 1431.6 592.7L1431.6 592.7Q1414.0 592.7 1399.4 601.5Q1384.8 610.4 1376.3 625.4Q1367.7 640.5 1367.7 660.3L1367.7 660.3Q1367.7 679.5 1376.3 694.6Q1384.8 709.7 1399.4 718.3Q1414.0 726.8 1431.6 726.8ZM1335.4 788.2L1335.4 788.2Q1321.4 788.2 1314.6 783.8Q1307.9 779.4 1306.3 772.3Q1304.8 765.3 1304.8 756.5L1304.8 756.5L1304.8 446.6Q1304.8 437.7 1306.3 430.7Q1307.9 423.7 1314.6 419.5Q1321.4 415.4 1335.4 415.4L1335.4 415.4Q1350 415.4 1356.2 419.5Q1362.5 423.7 1364.0 431.0Q1365.6 438.2 1365.6 446.6L1365.6 446.6L1365.6 766.9Q1363.5 778.3 1357.0 783.3Q1350.5 788.2 1335.4 788.2ZM1723.9 791.3L1723.9 791.3Q1698.9 791.3 1675.3 781.7Q1651.6 772.1 1632.6 754.4Q1613.6 736.7 1602.5 712.8Q1591.3 688.9 1591.3 660.3L1591.3 660.3Q1591.3 632.7 1601.7 608.8Q1612.1 584.9 1630.3 566.7Q1648.5 548.5 1672.1 538.3Q1695.8 528.2 1722.8 528.2L1722.8 528.2Q1759.2 528.2 1788.9 545.6Q1818.5 563.0 1836.2 592.7Q1853.9 622.3 1853.9 659.8L1853.9 659.8Q1853.9 689.4 1843.0 713.6Q1832.0 737.8 1813.3 755.2Q1794.6 772.6 1771.5 782.0Q1748.3 791.3 1723.9 791.3ZM1722.8 730.0L1722.8 730.0Q1740 730.0 1755.9 721.4Q1771.7 712.8 1781.9 696.7Q1792 680.6 1792 658.7L1792 658.7Q1792 638.4 1782.9 622.8Q1773.8 607.2 1758.2 598.4Q1742.6 589.6 1722.3 589.6L1722.3 589.6Q1703.1 589.6 1687.5 598.7Q1671.9 607.8 1662.8 623.6Q1653.7 639.5 1653.7 659.2L1653.7 659.2Q1653.7 681.1 1663.6 696.9Q1673.4 712.8 1689.3 721.4Q1705.2 730.0 1722.8 730.0ZM2108.2 787.2L2108.2 787.2Q2093.1 787.2 2085.8 781.4Q2078.5 775.7 2078.5 765.8L2078.5 765.8L2082.2 748.7Q2078 755.4 2068.1 764.5Q2058.2 773.6 2042.1 780.7Q2026 787.7 2003.1 787.7L2003.1 787.7Q1978.7 787.7 1957.1 777.5Q1935.5 767.4 1919.1 749.5Q1902.8 731.5 1893.1 708.4Q1883.5 685.2 1883.5 658.7L1883.5 658.7Q1883.5 633.2 1893.1 610.6Q1902.8 588 1919.4 570.3Q1936.0 552.6 1957.6 542.5Q1979.2 532.4 2003.1 532.4L2003.1 532.4Q2024.4 532.4 2039.3 538.1Q2054.1 543.8 2064.5 552.4Q2074.9 561.0 2081.6 570.3L2081.6 570.3L2078.5 555.2Q2078.5 543.8 2085.8 537.8Q2093.1 531.8 2108.7 531.8L2108.7 531.8Q2123.2 531.8 2129.5 536.3Q2135.7 540.7 2137.3 548.2Q2138.8 555.8 2138.8 565.1L2138.8 565.1L2138.8 755.4Q2138.8 764.3 2137.3 771.6Q2135.7 778.8 2129.2 783Q2122.7 787.2 2108.2 787.2ZM2012.5 726.8L2012.5 726.8Q2030.2 726.8 2044.2 718Q2058.2 709.2 2066.8 693.8Q2075.4 678.5 2075.4 659.8L2075.4 659.8Q2075.4 639.5 2066.6 624.4Q2057.7 609.3 2043.4 600.7Q2029.1 592.2 2011.4 592.2L2011.4 592.2Q1992.2 592.2 1977.1 601.3Q1962.0 610.4 1953.5 625.7Q1944.9 641.0 1944.9 660.3L1944.9 660.3Q1944.9 679 1953.7 694.1Q1962.6 709.2 1977.9 718Q1993.2 726.8 2012.5 726.8ZM2395.7 788.2L2210.1 788.2Q2196.0 788.2 2187.7 779.6Q2179.4 771.0 2179.4 757.5L2179.4 757.5Q2179.4 750.2 2181.7 744.5Q2184.1 738.8 2188.8 734.1L2188.8 734.1L2324.5 594.2L2222.0 594.2Q2213.7 594.2 2206.4 592.4Q2199.2 590.6 2194.7 584.1Q2190.3 577.6 2190.3 563.0L2190.3 563.0Q2190.3 548.5 2194.7 542.0Q2199.2 535.5 2206.4 533.7Q2213.7 531.8 2222.0 531.8L2222.0 531.8L2390 531.8Q2403.5 531.8 2412.1 540.2Q2420.7 548.5 2420.7 562L2420.7 562Q2420.7 568.8 2418.3 574.7Q2416 580.7 2412.4 584.4L2412.4 584.4L2278.2 725.8L2396.2 725.8Q2405.1 725.8 2412.1 727.6Q2419.1 729.4 2423.3 736.2Q2427.4 743.0 2427.4 757.5L2427.4 757.5Q2427.4 771.6 2423.0 778.3Q2418.6 785.1 2411.6 786.6Q2404.6 788.2 2395.7 788.2L2395.7 788.2Z","largura":2428};
+export const marca = criarMarca(NOME);
+
+window.boazMarca = { marca, FRENTES, VARIANTES, geometria, pecas, temas: {
+  "branco-preto": {
+    "nome": "Branco / Preto",
+    "mono": true,
+    "claro": {
+      "anel": "#1B1B1B",
+      "b": "#1B1B1B",
+      "d": "#1B1B1B",
+      "de": "#1B1B1B",
+      "boaz": "#1B1B1B",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E2E2E2",
+      "b": "#E2E2E2",
+      "d": "#E2E2E2",
+      "de": "#E2E2E2",
+      "boaz": "#E2E2E2",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    }
+  },
+  "roxo": {
+    "nome": "Roxo",
+    "mono": false,
+    "claro": {
+      "anel": "#7E5260",
+      "b": "#65558F",
+      "d": "#625B71",
+      "de": "#625B71",
+      "boaz": "#65558F",
+      "iconeFundo": "#65558F",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#EFB8C8",
+      "b": "#CFBDFE",
+      "d": "#CBC2DB",
+      "de": "#CBC2DB",
+      "boaz": "#CFBDFE",
+      "iconeFundo": "#CFBDFE",
+      "iconeCor": "#36275D"
+    }
+  },
+  "oceano": {
+    "nome": "Oceano",
+    "mono": false,
+    "claro": {
+      "anel": "#004F46",
+      "b": "#00477F",
+      "d": "#4B607C",
+      "de": "#4B607C",
+      "boaz": "#00477F",
+      "iconeFundo": "#00477F",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#70D8C8",
+      "b": "#A2C9FF",
+      "d": "#B2C8E9",
+      "de": "#B2C8E9",
+      "boaz": "#A2C9FF",
+      "iconeFundo": "#A2C9FF",
+      "iconeCor": "#00315B"
+    }
+  },
+  "floresta": {
+    "nome": "Floresta",
+    "mono": false,
+    "claro": {
+      "anel": "#7D4900",
+      "b": "#0D631B",
+      "d": "#476644",
+      "de": "#476644",
+      "boaz": "#0D631B",
+      "iconeFundo": "#0D631B",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFB86E",
+      "b": "#88D982",
+      "d": "#ADD0A6",
+      "de": "#ADD0A6",
+      "boaz": "#88D982",
+      "iconeFundo": "#88D982",
+      "iconeCor": "#003909"
+    }
+  },
+  "aurora": {
+    "nome": "Aurora",
+    "mono": false,
+    "claro": {
+      "anel": "#4153B7",
+      "b": "#A93200",
+      "d": "#98462A",
+      "de": "#98462A",
+      "boaz": "#A93200",
+      "iconeFundo": "#A93200",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#BAC3FF",
+      "b": "#FFB59E",
+      "d": "#FFB59E",
+      "de": "#FFB59E",
+      "boaz": "#FFB59E",
+      "iconeFundo": "#FFB59E",
+      "iconeCor": "#5D1800"
+    }
+  },
+  "grafite": {
+    "nome": "Grafite",
+    "mono": false,
+    "claro": {
+      "anel": "#006874",
+      "b": "#526068",
+      "d": "#586064",
+      "de": "#586064",
+      "boaz": "#526068",
+      "iconeFundo": "#526068",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#66D6E7",
+      "b": "#BAC9D1",
+      "d": "#C0C8CD",
+      "de": "#C0C8CD",
+      "boaz": "#BAC9D1",
+      "iconeFundo": "#BAC9D1",
+      "iconeCor": "#253239"
+    }
+  },
+  "magenta": {
+    "nome": "Magenta",
+    "mono": false,
+    "claro": {
+      "anel": "#005147",
+      "b": "#8A0062",
+      "d": "#914370",
+      "de": "#914370",
+      "boaz": "#8A0062",
+      "iconeFundo": "#8A0062",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#7AD7C6",
+      "b": "#FFAFD7",
+      "d": "#FFAFD7",
+      "de": "#FFAFD7",
+      "boaz": "#FFAFD7",
+      "iconeFundo": "#FFAFD7",
+      "iconeCor": "#620044"
+    }
+  },
+  "sol": {
+    "nome": "Sol",
+    "mono": false,
+    "claro": {
+      "anel": "#4059AA",
+      "b": "#785900",
+      "d": "#745B21",
+      "de": "#745B21",
+      "boaz": "#785900",
+      "iconeFundo": "#785900",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#D4DBFF",
+      "b": "#FFD782",
+      "d": "#E3C27E",
+      "de": "#E3C27E",
+      "boaz": "#FFD782",
+      "iconeFundo": "#FFD782",
+      "iconeCor": "#3F2E00"
+    }
+  },
+  "girassol": {
+    "nome": "Girassol",
+    "mono": false,
+    "claro": {
+      "anel": "#AC3400",
+      "b": "#785A00",
+      "d": "#735B1E",
+      "de": "#735B1E",
+      "boaz": "#785A00",
+      "iconeFundo": "#785A00",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFE2DA",
+      "b": "#FFE5B2",
+      "d": "#E3C37B",
+      "de": "#E3C37B",
+      "boaz": "#FFE5B2",
+      "iconeFundo": "#FFE5B2",
+      "iconeCor": "#3F2E00"
+    }
+  },
+  "rubi": {
+    "nome": "Rubi",
+    "mono": false,
+    "claro": {
+      "anel": "#5C4100",
+      "b": "#91000A",
+      "d": "#9E4038",
+      "de": "#9E4038",
+      "boaz": "#91000A",
+      "iconeFundo": "#91000A",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#F7BD48",
+      "b": "#FFB4AB",
+      "d": "#FFB4AB",
+      "de": "#FFB4AB",
+      "boaz": "#FFB4AB",
+      "iconeFundo": "#FFB4AB",
+      "iconeCor": "#690005"
+    }
+  },
+  "cereja": {
+    "nome": "Cereja",
+    "mono": false,
+    "claro": {
+      "anel": "#00685C",
+      "b": "#B7131A",
+      "d": "#A13D36",
+      "de": "#A13D36",
+      "boaz": "#B7131A",
+      "iconeFundo": "#B7131A",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#7AD7C6",
+      "b": "#FFB4AC",
+      "d": "#FFB4AC",
+      "de": "#FFB4AC",
+      "boaz": "#FFB4AC",
+      "iconeFundo": "#FFB4AC",
+      "iconeCor": "#690006"
+    }
+  },
+  "branco": {
+    "nome": "Branco",
+    "mono": true,
+    "claro": {
+      "anel": "#1B1B1B",
+      "b": "#1B1B1B",
+      "d": "#1B1B1B",
+      "de": "#1B1B1B",
+      "boaz": "#1B1B1B",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E2E2E2",
+      "b": "#E2E2E2",
+      "d": "#E2E2E2",
+      "de": "#E2E2E2",
+      "boaz": "#E2E2E2",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    }
+  },
+  "preto": {
+    "nome": "Preto",
+    "mono": true,
+    "claro": {
+      "anel": "#1B1B1B",
+      "b": "#1B1B1B",
+      "d": "#1B1B1B",
+      "de": "#1B1B1B",
+      "boaz": "#1B1B1B",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E2E2E2",
+      "b": "#E2E2E2",
+      "d": "#E2E2E2",
+      "de": "#E2E2E2",
+      "boaz": "#E2E2E2",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    }
+  }
+} };
+window.dispatchEvent(new Event('boaz-marca'));
+</script>
+<script type="module" id="design-fundos">
+// =============================================================================
+// boaz · fundos da marca deboaz: seis conceitos feitos de peças do símbolo e de
+// mascotes, em qualquer formato (16:9, 9:16, 1:1 ou outro)
+//
+//   estampa    símbolo e mascotes em grade, bem leve        páginas, login, verso do cartão do aluno
+//   anel       anel gigante cortado pela borda               cabeçalho do hub, capa de sala, banner
+//   antenas    antenas em ritmo na borda de baixo            rodapé, faixa de progresso, espera
+//   ondas      linhas concêntricas saindo de um anel         formulários e configurações do hub
+//   recorte    símbolo enorme saindo pela borda              abertura do app, boas-vindas
+//   halo       brilhos suaves com as peças no centro         abertura, carregamento, fim de partida
+//
+// Em todos: peças (logo, mascotes ou os dois), mascote montado (expressão, forma,
+// proporção, movimento) ou sorteado (estampa e antenas, campo vazio = sortido),
+// animação do logo ('' | 'abertura' | 'carregamento' | 'fechamento' | 'ciclo') e semente do sorteio.
+// Com movimentoReduzido, nada se move.
+//
+// Este módulo não usa nada do Node nem importa nada: recebe o núcleo da marca e o
+// dos mascotes em criarFundos. O gerador (scripts/fundos-arquivos.mjs) grava os
+// fundos oficiais em identidade/imagens/fundos/ e entrega plataformas/web/fundos.mjs
+// já ligado a ./marca.mjs e ./mascotes.mjs.
+//
+// Uso na tela (web):
+//   import { fundos } from '../design/fundos.mjs';
+//   import temas from '../design/fundos-temas.json';
+//   el.innerHTML = fundos.desenhar('halo', { largura: 1600, altura: 900, cores: temas[paleta][modo],
+//     mascote: { expressao: 'feliz', forma: 'bolha', movimento: 'flutuar' }, logo: 'abertura' });
+// Regras de uso: 1_Requisitos/90_identidade-visual.html.
+// =============================================================================
+
+/** Os conceitos, na ordem do catálogo. */
+export const CONCEITOS = {
+  estampa: { nome: 'Estampa', uso: 'páginas, tela de login, verso do cartão do aluno', sortido: true, mascote: { expressao: '', forma: '' } },
+  anel: { nome: 'Anel gigante', uso: 'cabeçalho do hub, capa de sala, banner da landing page', mascote: { expressao: 'curioso', forma: 'circulo' } },
+  antenas: { nome: 'Antenas em ritmo', uso: 'rodapé de telas, faixa de progresso, tela de espera', sortido: true, quantidade: true, mascote: { expressao: '', forma: '' } },
+  ondas: { nome: 'Ondas do vão', uso: 'formulários e telas de configuração do hub', mascote: { expressao: 'pensando', forma: 'circulo' } },
+  recorte: { nome: 'Símbolo recortado', uso: 'abertura do app, tela de boas-vindas, apresentações', mascote: { expressao: 'tchau', forma: 'rosto' } },
+  halo: { nome: 'Halo', uso: 'abertura, tela de carregamento, fim de partida', mascote: { expressao: 'feliz', forma: 'bolha', movimento: 'flutuar' }, logo: 'abertura' },
+};
+/** Formatos de referência (o fundo serve em qualquer proporção). */
+export const FORMATOS = { horizontal: [1600, 900], vertical: [900, 1600], quadrado: [1000, 1000] };
+/** Papéis de cor que os fundos usam (de tokens/cores.json), mais a cor do mascote. */
+export const PAPEIS = ['surface', 'surface-container', 'surface-container-high', 'on-surface', 'on-surface-variant', 'outline-variant',
+  'primary', 'secondary', 'tertiary', 'primary-container', 'secondary-container', 'tertiary-container'];
+
+const ALEGRES = ['feliz', 'piscadinha', 'acertou', 'rindo', 'curioso', 'estrela', 'orgulhoso', 'surpreso', 'brincalhao', 'apaixonado', 'tchau', 'aliviado'];
+const FZ = 'fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.3 0 0.2 1"';
+const n = (v) => Math.round(v * 100) / 100;
+const rnd = (seed) => { let x = (Math.abs(Math.floor(seed)) % 2147483646) + 1; return () => (x = (x * 16807) % 2147483647) / 2147483647; };
+
+/**
+ * marca = criarMarca(NOME) do núcleo da marca (com geometria e pecas);
+ * mascotes = { estatico, animado, embutir, FORMAS } do núcleo dos mascotes.
+ */
+export function criarFundos({ marca, geometria, pecas, mascotes }) {
+  const { estatico, animado, embutir, FORMAS } = mascotes;
+  const SORTEIO = Object.keys(FORMAS).filter((k) => FORMAS[k].tipo !== 'glifo' && k !== 'rosto' && !k.startsWith('cartao'));
+  const GEO = { longo: geometria('longo'), curto: geometria('curto') };
+  let seq = 0;
+
+  // laço de abrir e fechar das peças soltas: [tempo, valor] em 4,6 s
+  const CICLO = 4.6;
+  const laco = (attr, a, b) => `<animate attributeName="${attr}" values="${a};${b};${b};${a};${a}" keyTimes="0;0.2;0.62;0.82;1" calcMode="spline" keySplines="0.3 0 0.2 1;0 0 1 1;0.3 0 0.2 1;0 0 1 1" dur="${CICLO}s" repeatCount="indefinite"/>`;
+  const encaixa = (svg, x, y, w, h, op) => `<g opacity="${op}">${svg.replace(/^<svg[^>]*viewBox="([^"]+)"[^>]*>/, `<svg x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" viewBox="$1">`)}</g>`;
+  const simb = (x, y, alt, cor, v, op, anim) => {
+    const g = GEO[v], p = pecas(cor), larg = alt * g.largura / g.altura;
+    if (anim === 'abertura') return encaixa(marca.abertura(v, p, { nome: false }), x, y, larg, alt, op);
+    if (anim === 'carregamento') return encaixa(marca.carregamento(v, p), x, y, larg, alt, op);
+    if (anim === 'fechamento') return encaixa(marca.fechamento(v, p, { nome: false }), x, y, larg, alt, op);
+    if (anim === 'ciclo') return encaixa(marca.ciclo(v, p, { nome: false }), x, y, larg, alt, op);
+    const k = alt / g.altura;
+    return `<g transform="translate(${n(x)} ${n(y)}) scale(${n(k * 1e5) / 1e5}) translate(0 ${-g.y})" opacity="${op}"><path fill="${p.anel}" d="${g.anel}"/><path fill="${p.b}" d="${g.b}"/><path fill="${p.d}" d="${g.d}"/></g>`;
+  };
+  const anel = (cx, cy, R, cor, op, anim) => {
+    const esp = R * 116 / 270, rm = R - esp / 2, volta = 2 * Math.PI * rm;
+    const base = `cx="${n(cx)}" cy="${n(cy)}" r="${n(rm)}" fill="none" stroke="${cor}" stroke-width="${n(esp)}"`;
+    if (anim === 'abertura') return `<circle ${base} opacity="${op}" stroke-dasharray="${n(volta)}" stroke-dashoffset="${n(volta)}" transform="rotate(90 ${n(cx)} ${n(cy)})"><animate attributeName="stroke-dashoffset" from="${n(volta)}" to="0" dur="0.9s" ${FZ}/></circle>`;
+    if (anim === 'fechamento') return `<circle ${base} opacity="${op}" stroke-dasharray="${n(volta)}" stroke-dashoffset="0" transform="rotate(90 ${n(cx)} ${n(cy)})"><animate attributeName="stroke-dashoffset" from="0" to="${n(-volta)}" begin="0.5s" dur="0.9s" ${FZ}/></circle>`;
+    if (anim === 'ciclo') return `<circle ${base} opacity="${op}" stroke-dasharray="${n(volta)}" stroke-dashoffset="${n(volta)}" transform="rotate(90 ${n(cx)} ${n(cy)})"><animate attributeName="stroke-dashoffset" values="${n(volta)};0;0;${n(-volta)};${n(-volta)}" keyTimes="0;0.2;0.62;0.82;1" calcMode="spline" keySplines="0.3 0 0.2 1;0 0 1 1;0.3 0 0.2 1;0 0 1 1" dur="${CICLO}s" repeatCount="indefinite"/></circle>`;
+    if (anim === 'carregamento') return `<circle ${base} opacity="${n(op * 0.25)}"/><circle ${base} opacity="${op}" stroke-dasharray="${n(volta * 0.3)} ${n(volta * 0.7)}"><animateTransform attributeName="transform" type="rotate" from="90 ${n(cx)} ${n(cy)}" to="450 ${n(cx)} ${n(cy)}" dur="1.6s" repeatCount="indefinite"/></circle>`;
+    return `<circle ${base} opacity="${op}"/>`;
+  };
+  const antena = (x, y, w, h, cor, op, anim, atraso) => {
+    const ry = w * 40 / 116, d = `M${n(x)} ${n(y)}V${n(y - h + ry)}A${n(w / 2)} ${n(ry)} 0 0 1 ${n(x + w)} ${n(y - h + ry)}V${n(y)}Z`;
+    if (anim === 'abertura') { const id = `fundo-a${++seq}`;
+      return `<defs><clipPath id="${id}"><rect x="${n(x - 1)}" y="${n(y)}" width="${n(w + 2)}" height="${n(h + 2)}"><animate attributeName="y" from="${n(y)}" to="${n(y - h - 1)}" begin="${n(atraso)}s" dur="0.6s" ${FZ}/></rect></clipPath></defs><path fill="${cor}" opacity="${op}" d="${d}" clip-path="url(#${id})"/>`; }
+    if (anim === 'fechamento' || anim === 'ciclo') { const id = `fundo-a${++seq}`, topo = n(y - h - 1), anima = anim === 'ciclo' ? laco('y', n(y), topo) : `<animate attributeName="y" from="${topo}" to="${n(y)}" begin="${n(atraso)}s" dur="0.5s" ${FZ}/>`;
+      return `<defs><clipPath id="${id}"><rect x="${n(x - 1)}" y="${anim === 'ciclo' ? n(y) : topo}" width="${n(w + 2)}" height="${n(h + 2)}">${anima}</rect></clipPath></defs><path fill="${cor}" opacity="${op}" d="${d}" clip-path="url(#${id})"/>`; }
+    if (anim === 'carregamento') return `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 ${n(h * 0.35)};0 0" dur="1.6s" begin="${n(-atraso)}s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/><path fill="${cor}" opacity="${op}" d="${d}"/></g>`;
+    return `<path fill="${cor}" opacity="${op}" d="${d}"/>`;
+  };
+  const base = (w, h, cor) => `<rect width="${w}" height="${h}" fill="${cor}"/>`;
+
+  /**
+   * Desenha um fundo e devolve o SVG.
+   * op = { largura, altura, cores (PAPEIS + mascote), pecas: 'ambos'|'logo'|'mascotes',
+   *        mascote: { expressao, forma, proporcao, movimento }, logo: ''|'abertura'|'carregamento',
+   *        quantidade (antenas), semente, movimentoReduzido }
+   */
+  function desenhar(conceito, op = {}) {
+    const def = CONCEITOS[conceito];
+    const { largura: w = 1600, altura: h = 900, cores: c, pecas: P = 'ambos', quantidade = 3, semente = 1, movimentoReduzido = false } = op;
+    const ms = { proporcao: 'normal', movimento: '', ...def.mascote, ...(op.mascote || {}) };
+    const a = movimentoReduzido ? '' : (op.logo ?? def.logo ?? '');
+    const r = rnd(semente), b = Math.min(w, h);
+    const montar = (formaPadrao) => ({
+      expressao: ms.expressao || ALEGRES[Math.floor(r() * ALEGRES.length)],
+      forma: ms.forma || formaPadrao || SORTEIO[Math.floor(r() * SORTEIO.length)],
+      proporcao: ms.proporcao, movimento: movimentoReduzido ? '' : ms.movimento });
+    const masc = (m, cx, cy, t, opac = 1) => {
+      const o = { forma: m.forma, proporcao: m.proporcao, cor: c.mascote || undefined };
+      const svg = m.movimento ? animado(m.expressao, { ...o, movimento: m.movimento }) : estatico(m.expressao, o);
+      return `<g opacity="${opac}">${embutir(svg, `fundo-m${++seq}-`, cx - t / 2, cy - t / 2, t, t)}</g>`;
+    };
+    const tres = { anel: c.tertiary, b: c.primary, d: c.secondary };
+    let s = '';
+    if (conceito === 'estampa') {
+      const t = b / 7, sx = t * 1.25, sy = t * 1.5; s = base(w, h, c.surface); let i = 0;
+      for (let y = -sy * 0.4, lin = 0; y < h + sy; y += sy, lin++) for (let x = (lin % 2 ? sx / 2 : 0) - sx * 0.2; x < w + sx; x += sx, i++) {
+        const logo = P === 'logo' || (P === 'ambos' && (i + lin) % 2 === 0);
+        s += logo ? simb(x - t * 0.34, y, t, c['on-surface'], 'longo', 0.09, a) : masc(montar(), x, y + t / 2, t * 0.8, 0.32); }
+    } else if (conceito === 'anel') {
+      const R = Math.max(w, h) * 0.55, cx = w * 0.92, cy = h * 0.98;
+      if (P === 'mascotes') s = base(w, h, c['surface-container']) + masc(montar(), cx - R * 0.1, cy - R * 0.1, R * 1.6);
+      else s = base(w, h, c['primary-container']) + anel(cx, cy, R, c.primary, 0.9, a) + anel(w * 0.12, h * 0.2, b * 0.07, c.secondary, 0.9, a) +
+        (P === 'ambos' ? masc(montar(), cx - R * 0.38, cy - R * 0.38, R * 0.62) : anel(cx, cy, R * 0.42, c.tertiary, 0.7, a));
+    } else if (conceito === 'antenas') {
+      const k = Math.max(8, Math.round(w / (b / 9))), g = w / k, wd = g * 0.62; s = base(w, h, c.surface);
+      const qtd = Math.max(0, Math.min(quantidade, 8, k)), vagas = [...Array(k).keys()].sort(() => r() - 0.5).slice(0, qtd);
+      if (P === 'mascotes') { const gg = w / Math.max(qtd, 1); for (let i = 0; i < qtd; i++) { const t = Math.min(gg * (0.75 + r() * 0.3), h * 0.5); s += masc(montar(), i * gg + gg / 2, h - t * 0.45, t); } }
+      else { const alt = []; for (let i = 0; i < k; i++) { alt[i] = h * (0.18 + r() * 0.42); s += antena(i * g + (g - wd) / 2, h + 2, wd, alt[i], i % 2 ? c.secondary : c.primary, 0.85, a, i * 0.07); }
+        if (P === 'ambos') vagas.forEach((i) => { s += masc(montar('rosto'), i * g + g / 2, h - alt[i] - g * 0.55, g * 1.1); });
+        s += anel(w * 0.82, h * 0.22, b * 0.09, c.tertiary, 0.9, a); }
+    } else if (conceito === 'ondas') {
+      const cx = w * 0.1, cy = h * 0.12; s = base(w, h, c.surface);
+      for (let i = 1; i < 26; i++) s += `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(b * 0.16 + i * b * 0.055)}" fill="none" stroke="${c['outline-variant']}" stroke-width="${n(b * 0.006)}"/>`;
+      if (P === 'logo') s += anel(cx, cy, b * 0.16, c.primary, 1, a);
+      else if (P === 'ambos') s += anel(cx, cy, b * 0.16, c.primary, 1, a) + masc(montar(), w * 0.86, h * 0.82, b * 0.26);
+      else s += masc(montar(), cx, cy, b * 0.4);
+    } else if (conceito === 'recorte') {
+      const alt = Math.max(w, h) * 0.95, x = w - alt * 0.52, y = h - alt * 0.78; s = base(w, h, c['surface-container']);
+      if (P === 'mascotes') s += masc(montar(), w * 0.78, h * 0.78, alt * 0.95);
+      else s += simb(x, y, alt, { anel: c['tertiary-container'], b: c['primary-container'], d: c['secondary-container'] }, 'longo', 1, a) +
+        (P === 'ambos' ? masc(montar(), x + alt * 0.34, y + alt * 0.66, alt * 0.26) : '');
+    } else if (conceito === 'halo') {
+      const id = `fundo-h${++seq}`;
+      const gr = (k, cor, x, y, raio) => `<radialGradient id="${id}-${k}" cx="${n(x)}" cy="${n(y)}" r="${n(raio)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${cor}" stop-opacity=".55"/><stop offset="1" stop-color="${cor}" stop-opacity="0"/></radialGradient>`;
+      s = `<defs>${gr(1, c.primary, w * 0.2, h * 0.25, b * 0.9)}${gr(2, c.secondary, w * 0.85, h * 0.8, b * 0.9)}${gr(3, c.tertiary, w * 0.7, h * 0.15, b * 0.6)}</defs>` + base(w, h, c.surface) +
+        [1, 2, 3].map((k) => `<rect width="${w}" height="${h}" fill="url(#${id}-${k})"/>`).join('');
+      if (P === 'logo') s += simb(w / 2 - b * 0.09, h / 2 - b * 0.13, b * 0.26, tres, 'longo', 1, a);
+      else if (P === 'mascotes') s += masc(montar(), w / 2, h / 2, b * 0.38);
+      else s += simb(w / 2 - b * 0.2, h / 2 - b * 0.13, b * 0.26, tres, 'longo', 1, a) + masc(montar(), w / 2 + b * 0.14, h / 2 + b * 0.02, b * 0.26);
+    } else throw new Error(`fundo desconhecido: ${conceito}`);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="${def.nome}">${s}</svg>`;
+  }
+  return { desenhar };
+}
+
+/** Cores dos fundos por tema e modo: os PAPEIS de tokens/cores.json + mascote (cor do mascote no tema, ou vazio). */
+export function coresDosFundos(cores, temasMascotes) {
+  const saida = {};
+  for (const [id, t] of Object.entries(cores.temas)) {
+    const modo = (esq) => ({ ...Object.fromEntries(PAPEIS.map((p) => [p, esq[p].$value.toUpperCase()])), mascote: temasMascotes[id]?.cor ?? '' });
+    saida[id] = { nome: temasMascotes[id]?.nome ?? id, claro: modo(t.md.sys.color.light), escuro: modo(t.md.sys.color.dark) };
+  }
+  return saida;
+}
+
+const { marca: M, geometria: GEO, pecas: PC } = window.boazMarca;
+window.boazFundos = { ...criarFundos({ marca: M, geometria: GEO, pecas: PC, mascotes: window.boazMascotes }), CONCEITOS, FORMATOS, temas: {
+  "branco-preto": {
+    "nome": "Branco / Preto",
+    "claro": {
+      "surface": "#FFFFFF",
+      "surface-container": "#F5F5F5",
+      "surface-container-high": "#EFEFEF",
+      "on-surface": "#1B1B1B",
+      "on-surface-variant": "#474747",
+      "outline-variant": "#C6C6C6",
+      "primary": "#000000",
+      "secondary": "#5E5E5E",
+      "tertiary": "#3B3B3B",
+      "primary-container": "#3B3B3B",
+      "secondary-container": "#D4D4D4",
+      "tertiary-container": "#747474",
+      "mascote": ""
+    },
+    "escuro": {
+      "surface": "#000000",
+      "surface-container": "#141414",
+      "surface-container-high": "#1C1C1C",
+      "on-surface": "#E2E2E2",
+      "on-surface-variant": "#C6C6C6",
+      "outline-variant": "#474747",
+      "primary": "#FFFFFF",
+      "secondary": "#C6C6C6",
+      "tertiary": "#E2E2E2",
+      "primary-container": "#D4D4D4",
+      "secondary-container": "#474747",
+      "tertiary-container": "#919191",
+      "mascote": ""
+    }
+  },
+  "roxo": {
+    "nome": "Roxo",
+    "claro": {
+      "surface": "#FDF7FF",
+      "surface-container": "#F2ECF4",
+      "surface-container-high": "#ECE6EE",
+      "on-surface": "#1D1B20",
+      "on-surface-variant": "#49454E",
+      "outline-variant": "#CAC4CF",
+      "primary": "#65558F",
+      "secondary": "#625B71",
+      "tertiary": "#7E5260",
+      "primary-container": "#E9DDFF",
+      "secondary-container": "#E8DEF8",
+      "tertiary-container": "#FFD9E3",
+      "mascote": "#9887C5"
+    },
+    "escuro": {
+      "surface": "#141218",
+      "surface-container": "#211F24",
+      "surface-container-high": "#2B292F",
+      "on-surface": "#E6E0E9",
+      "on-surface-variant": "#CAC4CF",
+      "outline-variant": "#49454E",
+      "primary": "#CFBDFE",
+      "secondary": "#CBC2DB",
+      "tertiary": "#EFB8C8",
+      "primary-container": "#4D3D75",
+      "secondary-container": "#4A4458",
+      "tertiary-container": "#633B48",
+      "mascote": "#9887C5"
+    }
+  },
+  "oceano": {
+    "nome": "Oceano",
+    "claro": {
+      "surface": "#F8F9FF",
+      "surface-container": "#ECEDF4",
+      "surface-container-high": "#E7E8EE",
+      "on-surface": "#191C20",
+      "on-surface-variant": "#414751",
+      "outline-variant": "#C1C7D2",
+      "primary": "#00477F",
+      "secondary": "#4B607C",
+      "tertiary": "#004F46",
+      "primary-container": "#0B5FA5",
+      "secondary-container": "#C6DCFD",
+      "tertiary-container": "#00695E",
+      "mascote": "#5593DD"
+    },
+    "escuro": {
+      "surface": "#111418",
+      "surface-container": "#1D2024",
+      "surface-container-high": "#272A2F",
+      "on-surface": "#E1E2E9",
+      "on-surface-variant": "#C1C7D2",
+      "outline-variant": "#414751",
+      "primary": "#A2C9FF",
+      "secondary": "#B2C8E9",
+      "tertiary": "#70D8C8",
+      "primary-container": "#0B5FA5",
+      "secondary-container": "#354A66",
+      "tertiary-container": "#00695E",
+      "mascote": "#5593DD"
+    }
+  },
+  "floresta": {
+    "nome": "Floresta",
+    "claro": {
+      "surface": "#F7FBF0",
+      "surface-container": "#EBEFE5",
+      "surface-container-high": "#E5EADF",
+      "on-surface": "#181D17",
+      "on-surface-variant": "#40493D",
+      "outline-variant": "#BFCABA",
+      "primary": "#0D631B",
+      "secondary": "#476644",
+      "tertiary": "#7D4900",
+      "primary-container": "#2E7D32",
+      "secondary-container": "#C6E9BE",
+      "tertiary-container": "#9F5E00",
+      "mascote": "#53A252"
+    },
+    "escuro": {
+      "surface": "#10150F",
+      "surface-container": "#1C211B",
+      "surface-container-high": "#262B25",
+      "on-surface": "#E0E4DA",
+      "on-surface-variant": "#BFCABA",
+      "outline-variant": "#40493D",
+      "primary": "#88D982",
+      "secondary": "#ADD0A6",
+      "tertiary": "#FFB86E",
+      "primary-container": "#2E7D32",
+      "secondary-container": "#304E2E",
+      "tertiary-container": "#9F5E00",
+      "mascote": "#53A252"
+    }
+  },
+  "aurora": {
+    "nome": "Aurora",
+    "claro": {
+      "surface": "#FFF8F6",
+      "surface-container": "#FFE9E3",
+      "surface-container-high": "#FEE2DA",
+      "on-surface": "#261814",
+      "on-surface-variant": "#5A4139",
+      "outline-variant": "#E3BFB4",
+      "primary": "#A93200",
+      "secondary": "#98462A",
+      "tertiary": "#4153B7",
+      "primary-container": "#D14307",
+      "secondary-container": "#FD9573",
+      "tertiary-container": "#5B6CD1",
+      "mascote": "#D9480F"
+    },
+    "escuro": {
+      "surface": "#1D100C",
+      "surface-container": "#2B1C17",
+      "surface-container-high": "#362621",
+      "on-surface": "#F8DDD5",
+      "on-surface-variant": "#E3BFB4",
+      "outline-variant": "#5A4139",
+      "primary": "#FFB59E",
+      "secondary": "#FFB59E",
+      "tertiary": "#BAC3FF",
+      "primary-container": "#F85E27",
+      "secondary-container": "#7A2F15",
+      "tertiary-container": "#7789F0",
+      "mascote": "#D9480F"
+    }
+  },
+  "grafite": {
+    "nome": "Grafite",
+    "claro": {
+      "surface": "#FBF9F9",
+      "surface-container": "#EFEDEE",
+      "surface-container-high": "#E9E8E8",
+      "on-surface": "#1B1C1C",
+      "on-surface-variant": "#464747",
+      "outline-variant": "#C7C6C7",
+      "primary": "#526068",
+      "secondary": "#586064",
+      "tertiary": "#006874",
+      "primary-container": "#D6E5ED",
+      "secondary-container": "#DCE4E9",
+      "tertiary-container": "#97F0FF",
+      "mascote": "#84939B"
+    },
+    "escuro": {
+      "surface": "#121314",
+      "surface-container": "#1F2020",
+      "surface-container-high": "#292A2B",
+      "on-surface": "#E3E2E2",
+      "on-surface-variant": "#C7C6C7",
+      "outline-variant": "#464747",
+      "primary": "#BAC9D1",
+      "secondary": "#C0C8CD",
+      "tertiary": "#66D6E7",
+      "primary-container": "#3B4950",
+      "secondary-container": "#40484C",
+      "tertiary-container": "#004F58",
+      "mascote": "#84939B"
+    }
+  },
+  "magenta": {
+    "nome": "Magenta",
+    "claro": {
+      "surface": "#FFF8F8",
+      "surface-container": "#FFE8F0",
+      "surface-container-high": "#F9E2EB",
+      "on-surface": "#24181E",
+      "on-surface-variant": "#56414B",
+      "outline-variant": "#DCBFCB",
+      "primary": "#8A0062",
+      "secondary": "#914370",
+      "tertiary": "#005147",
+      "primary-container": "#B0177F",
+      "secondary-container": "#FD9ED0",
+      "tertiary-container": "#006B5E",
+      "mascote": "#F053B4"
+    },
+    "escuro": {
+      "surface": "#1B1016",
+      "surface-container": "#281C22",
+      "surface-container-high": "#33262C",
+      "on-surface": "#F3DDE5",
+      "on-surface-variant": "#DCBFCB",
+      "outline-variant": "#56414B",
+      "primary": "#FFAFD7",
+      "secondary": "#FFAFD7",
+      "tertiary": "#7AD7C6",
+      "primary-container": "#B0177F",
+      "secondary-container": "#752B57",
+      "tertiary-container": "#006B5E",
+      "mascote": "#F053B4"
+    }
+  },
+  "sol": {
+    "nome": "Sol",
+    "claro": {
+      "surface": "#FFF8F2",
+      "surface-container": "#F8ECDC",
+      "surface-container-high": "#F2E7D6",
+      "on-surface": "#201B11",
+      "on-surface-variant": "#4F4633",
+      "outline-variant": "#D3C5AC",
+      "primary": "#785900",
+      "secondary": "#745B21",
+      "tertiary": "#4059AA",
+      "primary-container": "#F2B705",
+      "secondary-container": "#FEDC95",
+      "tertiary-container": "#ADBEFF",
+      "mascote": "#F2B705"
+    },
+    "escuro": {
+      "surface": "#171309",
+      "surface-container": "#241F15",
+      "surface-container-high": "#2F291F",
+      "on-surface": "#ECE1D1",
+      "on-surface-variant": "#D3C5AC",
+      "outline-variant": "#4F4633",
+      "primary": "#FFD782",
+      "secondary": "#E3C27E",
+      "tertiary": "#D4DBFF",
+      "primary-container": "#F2B705",
+      "secondary-container": "#5A430A",
+      "tertiary-container": "#ADBEFF",
+      "mascote": "#F2B705"
+    }
+  },
+  "girassol": {
+    "nome": "Girassol",
+    "claro": {
+      "surface": "#FFF8F2",
+      "surface-container": "#F8ECDB",
+      "surface-container-high": "#F2E7D5",
+      "on-surface": "#201B10",
+      "on-surface-variant": "#4F4632",
+      "outline-variant": "#D3C5AB",
+      "primary": "#785A00",
+      "secondary": "#735B1E",
+      "tertiary": "#AC3400",
+      "primary-container": "#FFC300",
+      "secondary-container": "#FEDC91",
+      "tertiary-container": "#FFBDA8",
+      "mascote": "#FFC300"
+    },
+    "escuro": {
+      "surface": "#171309",
+      "surface-container": "#241F14",
+      "surface-container-high": "#2F291E",
+      "on-surface": "#ECE1D0",
+      "on-surface-variant": "#D3C5AB",
+      "outline-variant": "#4F4632",
+      "primary": "#FFE5B2",
+      "secondary": "#E3C37B",
+      "tertiary": "#FFE2DA",
+      "primary-container": "#FFC300",
+      "secondary-container": "#5C4608",
+      "tertiary-container": "#FFBDA8",
+      "mascote": "#FFC300"
+    }
+  },
+  "rubi": {
+    "nome": "Rubi",
+    "claro": {
+      "surface": "#FFF8F7",
+      "surface-container": "#FFE9E6",
+      "surface-container-high": "#FFE2DE",
+      "on-surface": "#271816",
+      "on-surface-variant": "#5B403D",
+      "outline-variant": "#E4BEB9",
+      "primary": "#91000A",
+      "secondary": "#9E4038",
+      "tertiary": "#5C4100",
+      "primary-container": "#B71C1C",
+      "secondary-container": "#FE8A7E",
+      "tertiary-container": "#7A5700",
+      "mascote": "#FF544A"
+    },
+    "escuro": {
+      "surface": "#1E100E",
+      "surface-container": "#2B1C1A",
+      "surface-container-high": "#372624",
+      "on-surface": "#F9DCD8",
+      "on-surface-variant": "#E4BEB9",
+      "outline-variant": "#5B403D",
+      "primary": "#FFB4AB",
+      "secondary": "#FFB4AB",
+      "tertiary": "#F7BD48",
+      "primary-container": "#B71C1C",
+      "secondary-container": "#822B25",
+      "tertiary-container": "#7A5700",
+      "mascote": "#FF544A"
+    }
+  },
+  "cereja": {
+    "nome": "Cereja",
+    "claro": {
+      "surface": "#FFF8F7",
+      "surface-container": "#FFE9E6",
+      "surface-container-high": "#FFE2DE",
+      "on-surface": "#271716",
+      "on-surface-variant": "#5B403D",
+      "outline-variant": "#E4BEB9",
+      "primary": "#B7131A",
+      "secondary": "#A13D36",
+      "tertiary": "#00685C",
+      "primary-container": "#DB322F",
+      "secondary-container": "#FF857A",
+      "tertiary-container": "#198374",
+      "mascote": "#E53935"
+    },
+    "escuro": {
+      "surface": "#1E0F0E",
+      "surface-container": "#2C1B1A",
+      "surface-container-high": "#372624",
+      "on-surface": "#FADCD8",
+      "on-surface-variant": "#E4BEB9",
+      "outline-variant": "#5B403D",
+      "primary": "#FFB4AC",
+      "secondary": "#FFB4AC",
+      "tertiary": "#7AD7C6",
+      "primary-container": "#FF544C",
+      "secondary-container": "#822622",
+      "tertiary-container": "#40A090",
+      "mascote": "#E53935"
+    }
+  },
+  "branco": {
+    "nome": "Branco",
+    "claro": {
+      "surface": "#FFFFFF",
+      "surface-container": "#F5F5F5",
+      "surface-container-high": "#EFEFEF",
+      "on-surface": "#1B1B1B",
+      "on-surface-variant": "#474747",
+      "outline-variant": "#C6C6C6",
+      "primary": "#000000",
+      "secondary": "#5E5E5E",
+      "tertiary": "#3B3B3B",
+      "primary-container": "#3B3B3B",
+      "secondary-container": "#D4D4D4",
+      "tertiary-container": "#747474",
+      "mascote": ""
+    },
+    "escuro": {
+      "surface": "#131313",
+      "surface-container": "#1F1F1F",
+      "surface-container-high": "#2A2A2A",
+      "on-surface": "#E2E2E2",
+      "on-surface-variant": "#C6C6C6",
+      "outline-variant": "#474747",
+      "primary": "#FFFFFF",
+      "secondary": "#C6C6C6",
+      "tertiary": "#E2E2E2",
+      "primary-container": "#D4D4D4",
+      "secondary-container": "#474747",
+      "tertiary-container": "#919191",
+      "mascote": ""
+    }
+  },
+  "preto": {
+    "nome": "Preto",
+    "claro": {
+      "surface": "#F9F9F9",
+      "surface-container": "#EEEEEE",
+      "surface-container-high": "#E8E8E8",
+      "on-surface": "#1B1B1B",
+      "on-surface-variant": "#474747",
+      "outline-variant": "#C6C6C6",
+      "primary": "#000000",
+      "secondary": "#5E5E5E",
+      "tertiary": "#3B3B3B",
+      "primary-container": "#3B3B3B",
+      "secondary-container": "#D4D4D4",
+      "tertiary-container": "#747474",
+      "mascote": ""
+    },
+    "escuro": {
+      "surface": "#000000",
+      "surface-container": "#141414",
+      "surface-container-high": "#1C1C1C",
+      "on-surface": "#E2E2E2",
+      "on-surface-variant": "#C6C6C6",
+      "outline-variant": "#474747",
+      "primary": "#FFFFFF",
+      "secondary": "#C6C6C6",
+      "tertiary": "#E2E2E2",
+      "primary-container": "#D4D4D4",
+      "secondary-container": "#474747",
+      "tertiary-container": "#919191",
+      "mascote": ""
+    }
+  }
+} };
+window.dispatchEvent(new Event('boaz-fundos'));
 </script>
 <!-- design:tokens:fim -->
 <style id="design-componentes">
@@ -9853,6 +10978,35 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
 .vaga .material-symbols { font-size: 36px; color: var(--md-sys-color-outline); }
 .vaga b { color: var(--md-sys-color-on-surface); }
 .vaga small { font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+.marca-arq { display: grid; gap: 12px; align-content: start; margin: 0; padding: 16px; text-align: center;
+  border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--md-sys-shape-corner-large); color: var(--md-sys-color-on-surface-variant); }
+.marca-arq b { color: var(--md-sys-color-on-surface); display: block; }
+.marca-arq small { font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+.marca-arq__amostras { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; align-items: center; min-height: 112px; }
+.marca-arq__icone { width: 96px; height: 96px; border-radius: var(--md-sys-shape-corner-extra-large); }
+.marca-arq--largo { grid-column: 1 / -1; }
+.marca-arq--largo .marca-arq__amostras { gap: 24px 56px; }
+.marca-arq__logo svg { display: block; height: 64px; width: auto; max-width: 100%; }
+.marca-arq__simb svg { display: block; height: 88px; width: auto; }
+.marca-arq__fav { display: block; width: 32px; height: 32px; }
+.marca-arq__fav--16 { width: 16px; height: 16px; }
+.marca-arq__fav svg { display: block; width: 100%; height: 100%; }
+.marca-arq__anim svg { display: block; height: 64px; width: auto; }
+.marca-arq__anim--simb svg { height: 72px; }
+.marca-arq__fonte { font-family: var(--md-sys-typescale-display-small-font); font-weight: 500; font-size: var(--md-sys-typescale-display-small-size); color: var(--md-sys-color-on-surface); }
+.marca-arq__icone { outline: 1px solid var(--md-sys-color-outline-variant); }
+
+/* fundos */
+.fundos { display: grid; gap: 16px; }
+.fundo { display: grid; gap: 10px; padding: 16px; border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--md-sys-shape-corner-large); }
+.fundo h4 { margin: 0; font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); }
+.fundo p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); }
+.fundo__controles { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.fundo__controles label { display: flex; gap: 6px; align-items: center; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); }
+.fundo__controles select { min-height: 40px; padding: 0 12px; border-radius: var(--md-sys-shape-corner-full); border: 1px solid var(--md-sys-color-outline); background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); font: inherit; }
+.fundo__formatos { display: grid; grid-template-columns: minmax(0, 16fr) minmax(0, 4.5fr) minmax(0, 8fr); gap: 10px; align-items: start; }
+@media (max-width: 599px) { .fundo__formatos { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .fundo__formatos > :first-child { grid-column: 1 / -1; } }
+.fundo__formatos > svg { display: block; width: 100%; height: auto; border-radius: var(--md-sys-shape-corner-medium); outline: 1px solid var(--md-sys-color-outline-variant); }
 
 /* cores */
 .esquemas { display: grid; gap: 16px; grid-template-columns: 1fr; }
@@ -10005,6 +11159,7 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
   <h5>boaz · design system</h5>
   <a class="md-drawer-item md-estado" href="#principios"><span class="material-symbols">flag</span>Princípios</a>
   <a class="md-drawer-item md-estado" href="#identidade"><span class="material-symbols">verified</span>Identidade</a>
+  <a class="md-drawer-item md-estado" href="#fundos"><span class="material-symbols">wallpaper</span>Fundos</a>
   <a class="md-drawer-item md-estado" href="#temas"><span class="material-symbols">format_paint</span>Temas de cor</a>
   <a class="md-drawer-item md-estado" href="#cor"><span class="material-symbols">palette</span>Cor</a>
   <a class="md-drawer-item md-estado" href="#tipografia"><span class="material-symbols">text_fields</span>Tipografia</a>
@@ -10026,8 +11181,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v06</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-17 03:08</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v16</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-17 23:07</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -10049,13 +11204,65 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <div class="linha palco" id="resumo-marca"></div>
       <h3 class="sub md-typescale-title-large">Arquivos esperados</h3>
       <div class="grade">
-        <div class="vaga"><span class="material-symbols">hexagon</span><b>Logo principal</b><small><code>logos/logo-principal.svg</code><br>+ <code>logo-principal-negativo.svg</code> para fundos escuros</small></div>
-        <div class="vaga"><span class="material-symbols">token</span><b>Símbolo</b><small><code>logos/simbolo.svg</code><br>a marca sem o nome, para espaços pequenos</small></div>
-        <div class="vaga"><span class="material-symbols">apps</span><b>Ícone do app e favicon</b><small><code>icones/app-icone.svg</code> (1024×1024, com área segura)<br><code>icones/favicon.svg</code></small></div>
-        <div class="vaga"><span class="material-symbols">font_download</span><b>Fontes</b><small><code>fontes/&lt;familia&gt;-&lt;peso&gt;.ttf</code><br>regular, medium e bold</small></div>
+        <figure class="marca-arq marca-arq--largo">
+          <div class="marca-arq__amostras">
+            <span class="marca-arq__logo" data-marca-logo="longo" role="img" aria-label="Logo deboaz, hastes longas"></span>
+            <span class="marca-arq__logo" data-marca-logo="curto" role="img" aria-label="Logo deboaz, hastes curtas"></span>
+          </div>
+          <figcaption><b>Logo principal</b><small>símbolo + deboaz em Fredoka Medium · <code>logos/logo-principal.svg</code> (landing page e hub) e <code>logo-principal-curto.svg</code> (quest), com <code>-negativo</code> para fundo escuro<br>oficial em preto e branco; num tema de cor, anel na terciária, antena do b e “boaz” na primária, antena do d e “de” na secundária — troque o tema no topo para ver</small></figcaption>
+        </figure>
+        <figure class="marca-arq">
+          <div class="marca-arq__amostras">
+            <span class="marca-arq__simb" data-marca-simbolo="longo" role="img" aria-label="Símbolo, hastes longas"></span>
+            <span class="marca-arq__simb" data-marca-simbolo="curto" role="img" aria-label="Símbolo, hastes curtas"></span>
+          </div>
+          <figcaption><b>Símbolo</b><small>b e d com as antenas separadas do anel por um vão · <code>logos/simbolo.svg</code> (hastes longas: landing page e hub) e <code>simbolo-curto.svg</code> (hastes curtas: quest), com <code>-negativo</code></small></figcaption>
+        </figure>
+        <figure class="marca-arq">
+          <div class="marca-arq__amostras">
+            <img class="marca-arq__icone" src="identidade/icones/app-icone.svg" alt="Ícone oficial do hub">
+            <img class="marca-arq__icone" src="identidade/icones/app-icone-curto.svg" alt="Ícone oficial do quest">
+            <span class="marca-arq__fav" data-marca-favicon="longo" role="img" aria-label="Favicon no tema ativo"></span>
+            <span class="marca-arq__fav marca-arq__fav--16" data-marca-favicon="curto" role="img" aria-label="Favicon do quest no tema ativo, 16 px"></span>
+          </div>
+          <figcaption><b>Ícone do app e favicon</b><small>oficial: fundo preto e símbolo branco · <code>icones/app-icone.svg</code>, <code>app-icone-curto.svg</code>, <code>-frente</code> + <code>app-icone-fundo.svg</code> (adaptativo), <code>favicon.svg</code>, <code>favicon-curto.svg</code><br>o favicon acompanha o tema: primária com o símbolo em on-primary</small></figcaption>
+        </figure>
+        <figure class="marca-arq">
+          <div class="marca-arq__amostras"><span class="marca-arq__fonte">deboaz</span></div>
+          <figcaption><b>Fontes</b><small>marca: Fredoka (display, headline, title-large e o nome no logo) · texto: Roboto<br><code>fontes/fredoka-regular.ttf</code>, <code>-medium</code>, <code>-bold</code> e <code>LICENSE-fredoka.txt</code> (SIL OFL 1.1)</small></figcaption>
+        </figure>
         <div class="vaga"><span class="material-symbols">image</span><b>Imagens e ilustrações</b><small><code>imagens/&lt;nome&gt;.svg|webp</code><br>estados vazios, onboarding, telas de erro</small></div>
-        <div class="vaga"><span class="material-symbols">motion_photos_on</span><b>Animações</b><small><code>animacoes/&lt;nome&gt;.json|webp|gif</code><br>carregamento, sucesso, splash</small></div>
+        <figure class="marca-arq marca-arq--largo">
+          <div class="marca-arq__amostras">
+            <span class="marca-arq__anim" data-marca-abertura="longo" role="img" aria-label="Abertura: o símbolo se desenha e o nome entra"></span>
+            <span class="marca-arq__anim marca-arq__anim--simb" data-marca-carregamento="longo" role="img" aria-label="Carregando"></span>
+            <span class="marca-arq__anim" data-marca-abertura="curto" role="img" aria-label="Abertura do quest"></span>
+            <span class="marca-arq__anim marca-arq__anim--simb" data-marca-carregamento="curto" role="img" aria-label="Carregando, quest"></span>
+            <span class="marca-arq__anim" data-marca-fechamento="longo" role="img" aria-label="Fechamento: o nome sai, as antenas recolhem e o anel se apaga"></span>
+            <span class="marca-arq__anim" data-marca-ciclo="curto" role="img" aria-label="Ciclo: abertura e fechamento em laço"></span>
+            <button class="md-button md-button--tonal md-estado" type="button" data-marca-repetir><span class="material-symbols">replay</span>Repetir</button>
+          </div>
+          <figcaption><b>Animações</b><small>abertura: o anel se desenha, as antenas brotam do vão e o nome entra (≈ 2 s, uma vez) · fechamento: o inverso, o nome sai, as antenas recolhem para o vão e o anel se apaga (≈ 2 s, uma vez) · ciclo: abertura + fechamento em laço · carregamento: um arco corre pelo anel e as antenas descem e voltam (laço de 1,6 s)<br><code>animacoes/abertura</code>, <code>fechamento</code>, <code>ciclo</code> e <code>carregamento</code>, com <code>-curto</code> e <code>-negativo</code>; acompanham o tema; com movimento reduzido, use o símbolo parado</small></figcaption>
+        </figure>
       </div>
+    </section>
+
+    <section id="fundos">
+      <h2 class="md-typescale-headline-medium">Fundos</h2>
+      <p class="lead">Seis fundos feitos só de peças do símbolo (anel, antenas, vão, o símbolo inteiro) e de mascotes, em qualquer formato. Em cada um: peças (logo, mascotes ou os dois), mascote montado (expressão, forma, proporção e movimento) ou sorteado, e animação do logo. Acompanham o tema no topo. Texto por cima vai sempre num painel de superfície.</p>
+      <div class="fundos" data-fundos></div>
+      <h3 class="sub md-typescale-title-large">No código</h3>
+      <div class="palco"><span class="rotulo">Web</span><pre class="masc-codigo"><code>import { fundos, CONCEITOS } from '@/design/fundos.mjs';
+import temas from '@/design/fundos-temas.json';
+
+el.innerHTML = fundos.desenhar('halo', {
+  largura: 1600, altura: 900, cores: temas[paleta][modo],   // modo: 'claro' | 'escuro'
+  pecas: 'ambos',                                          // 'logo' | 'mascotes' | 'ambos'
+  mascote: { expressao: 'feliz', forma: 'bolha', proporcao: 'normal', movimento: 'flutuar' },
+  logo: 'abertura',                     // '' | 'abertura' | 'fechamento' | 'ciclo' | 'carregamento'
+  semente: Date.now(),                                     // sorteio novo a cada abertura da tela
+  movimentoReduzido: matchMedia('(prefers-reduced-motion: reduce)').matches,
+});</code></pre></div>
     </section>
 
     <section id="temas">
@@ -10412,6 +11619,16 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v16</td><td>2026-10-17 23:07</td><td>Animações do logo: fechamento (o inverso da abertura: o nome sai, as antenas recolhem e o anel se apaga) e ciclo (abertura + fechamento em laço), na identidade e nos fundos</td></tr>
+          <tr><td>v15</td><td>2026-10-17 22:55</td><td>Fundos no catálogo com o montador completo do mascote: expressão, forma, proporção e movimento (sortido na Estampa e nas Antenas, com a quantidade de mascotes)</td></tr>
+          <tr><td>v14</td><td>2026-10-17 22:36</td><td>Fundos da marca: Estampa, Anel gigante, Antenas em ritmo, Ondas do vão, Símbolo recortado e Halo, com peças (logo, mascotes ou os dois), mascote montado ou sorteado e animação do logo; núcleo em scripts/fundos.mjs, oficiais em identidade/imagens/fundos/ e plataformas/web/fundos.mjs</td></tr>
+          <tr><td>v13</td><td>2026-10-17 21:23</td><td>App: plataformas/maui/Marca.xaml com as peças do símbolo e do nome como PathGeometry, para o logo seguir o tema em vetor</td></tr>
+          <tr><td>v12</td><td>2026-10-17 20:41</td><td>Logo num tema de cor em três peças: anel na terciária, antena do b na primária e antena do d na secundária, também nas animações</td></tr>
+          <tr><td>v11</td><td>2026-10-17 20:29</td><td>Símbolo: antenas separadas do anel por um vão de 22 que acompanha a curva; na abertura as antenas brotam do vão e no carregamento descem para dentro dele</td></tr>
+          <tr><td>v10</td><td>2026-10-17 19:36</td><td>Animações da marca: abertura (o anel se desenha, as antenas sobem e o nome entra) e carregamento (arco no anel e antenas em laço), em preto, branco e nas cores do tema</td></tr>
+          <tr><td>v09</td><td>2026-10-17 19:28</td><td>Marca deboaz: símbolo b e d fundidos (hastes longas para landing page e hub, curtas para o quest), logo principal com o nome em Fredoka Medium, ícone e favicon oficiais em preto e branco; num tema de cor o logo usa terciária, secundária e primária; núcleo em plataformas/web/marca.mjs; arquivos da Fredoka com a licença</td></tr>
+          <tr><td>v08</td><td>2026-10-17 18:54</td><td>Fonte da marca (display, headline e title-large) passa a ser Fredoka; o texto continua em Roboto</td></tr>
+          <tr><td>v07</td><td>2026-10-17 18:15</td><td>Símbolo do deboaz vetorizado (duas cores, negativo e monocromático), ícone do app (com camadas do ícone adaptativo) e favicon; cartões da seção Identidade trocados pelos arquivos</td></tr>
           <tr><td>v06</td><td>2026-10-17 03:08</td><td>Mascotes: personagens com rosto expressivo (30 expressões, 74 formas entre planas, setas, 3D, números, letras, sinais, só o rosto e cartões, 5 proporções, 18 movimentos e sequências); cor do tema nos temas coloridos; seção Mascotes com regras, galeria e exemplos em botões, card, lista, retorno, snackbar, chip e estado vazio; mascotes no tema.svg; núcleo em plataformas/web/mascotes.mjs</td></tr>
           <tr><td>v05</td><td>2026-10-16 21:32</td><td>Tema padrão passa a ser Branco e Preto (branco no modo claro, preto no escuro); tema_padrao aceita um tema por modo; roxo vira tema opcional</td></tr>
           <tr><td>v04</td><td>2026-10-16 20:54</td><td>Temas monocromáticos branco (superfícies brancas puras, melhor no claro) e preto (fundo preto absoluto para OLED, melhor no escuro); ajustes de papéis por tema com conferência de contraste; cartões de tema sobre surface</td></tr>
@@ -10420,7 +11637,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v01</td><td>2026-10-16 11:52</td><td>Criação: fundamentos do Material Design 3 (cor, tipografia, forma, elevação, layout por janela, movimento, estados), 12 componentes de referência, quadro tema.svg e identidade provisória</td></tr>
         </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v06 · 2026-10-17 03:08</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v16 · 2026-10-17 23:07</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>
@@ -10674,6 +11891,66 @@ function desenhar() {
 desenhar();
 new MutationObserver(desenhar).observe(document.documentElement, { attributes: true, attributeFilter: ['data-paleta'] });
 reduzir.addEventListener('change', desenhar);
+</script>
+<script type="module">
+// ── marca: logo, símbolo e favicon no tema ativo, com o núcleo embutido (design-marca) ──
+const { marca, temas } = window.boazMarca;
+const v = (papel) => `var(--md-sys-color-${papel})`;
+function cores() {
+  const t = temas[document.documentElement.dataset.paleta || 'branco-preto'];
+  return t?.mono
+    ? { anel: v('on-surface'), b: v('on-surface'), d: v('on-surface'), de: v('on-surface'), boaz: v('on-surface'), iconeFundo: '#000000', iconeCor: '#FFFFFF' }
+    : { anel: v('tertiary'), b: v('primary'), d: v('secondary'), de: v('secondary'), boaz: v('primary'), iconeFundo: v('primary'), iconeCor: v('on-primary') };
+}
+function desenharMarca() {
+  const c = cores();
+  document.querySelectorAll('[data-marca-logo]').forEach((el) => { el.innerHTML = marca.logo(el.dataset.marcaLogo, c); });
+  document.querySelectorAll('[data-marca-simbolo]').forEach((el) => { el.innerHTML = marca.simbolo(el.dataset.marcaSimbolo, c); });
+  const parado = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('[data-marca-abertura]').forEach((el) => { el.innerHTML = parado ? marca.logo(el.dataset.marcaAbertura, c) : marca.abertura(el.dataset.marcaAbertura, c); });
+  document.querySelectorAll('[data-marca-fechamento]').forEach((el) => { el.innerHTML = parado ? marca.logo(el.dataset.marcaFechamento, c) : marca.fechamento(el.dataset.marcaFechamento, c); });
+  document.querySelectorAll('[data-marca-ciclo]').forEach((el) => { el.innerHTML = parado ? marca.logo(el.dataset.marcaCiclo, c) : marca.ciclo(el.dataset.marcaCiclo, c); });
+  document.querySelectorAll('[data-marca-carregamento]').forEach((el) => { el.innerHTML = parado ? marca.simbolo(el.dataset.marcaCarregamento, c) : marca.carregamento(el.dataset.marcaCarregamento, c); });
+  document.querySelectorAll('[data-marca-favicon]').forEach((el) => { el.innerHTML = marca.favicon(el.dataset.marcaFavicon, { fundo: c.iconeFundo, cor: c.iconeCor }); });
+}
+desenharMarca();
+document.querySelector('[data-marca-repetir]')?.addEventListener('click', desenharMarca);
+new MutationObserver(desenharMarca).observe(document.documentElement, { attributes: true, attributeFilter: ['data-paleta'] });
+</script>
+<script type="module">
+// ── fundos: desenha cada conceito com o núcleo embutido (design-fundos), nas cores do tema ativo ──
+const F = window.boazFundos, MS = window.boazMascotes;
+const vv = (p) => `var(--md-sys-color-${p})`;
+const estado = Object.fromEntries(Object.entries(F.CONCEITOS).map(([k, d]) => [k, {
+  pecas: 'ambos', logo: d.logo ?? '', semente: Math.floor(Math.random() * 1e9), quantidade: 3,
+  mascote: { proporcao: 'normal', movimento: '', ...d.mascote } }]));
+const FORMAS_M = Object.keys(MS.FORMAS).filter((x) => !x.startsWith('cartao'));
+const caixa = document.querySelector('[data-fundos]');
+const sel = (k, campo, rotulo, ops, atual) => `<label>${rotulo} <select data-fundo="${k}" data-campo="${campo}">${ops.map(([v, t]) => `<option value="${v}"${atual === v ? ' selected' : ''}>${t}</option>`).join('')}</select></label>`;
+caixa.innerHTML = Object.entries(F.CONCEITOS).map(([k, d]) => { const e = estado[k], m = e.mascote, sortido = d.sortido ? [['', 'Sortido']] : [];
+  return `<article class="fundo" id="fundo-${k}"><h4>${d.nome}</h4><p>${d.uso}</p><div class="fundo__controles">` +
+    sel(k, 'pecas', 'Peças', [['ambos', 'Logo e mascotes'], ['logo', 'Só logo'], ['mascotes', 'Só mascotes']], e.pecas) +
+    sel(k, 'logo', 'Animação do logo', [['', 'Parado'], ['abertura', 'Abertura'], ['fechamento', 'Fechamento'], ['ciclo', 'Ciclo (abertura + fechamento)'], ['carregamento', 'Carregamento']], e.logo) +
+    sel(k, 'mascote.expressao', 'Expressão', [...sortido, ...Object.entries(MS.EXPRESSOES).map(([x, v]) => [x, v.nome])], m.expressao) +
+    sel(k, 'mascote.forma', 'Forma', [...sortido, ...FORMAS_M.map((x) => [x, MS.FORMAS[x].nome])], m.forma) +
+    sel(k, 'mascote.proporcao', 'Proporção', Object.entries(MS.PROPORCOES).map(([x, v]) => [x, v.nome]), m.proporcao) +
+    sel(k, 'mascote.movimento', 'Movimento do mascote', [['', 'Parado'], ...Object.entries(MS.MOVIMENTOS).map(([x, v]) => [x, v.nome])], m.movimento) +
+    (d.quantidade ? sel(k, 'quantidade', 'Mascotes', [0, 1, 2, 3, 4, 5, 6, 7, 8].map((x) => [String(x), String(x)]), '3') : '') +
+    (d.sortido ? `<button class="md-button md-button--text md-estado" type="button" data-sortear="${k}">Sortear</button>` : '') +
+    `<button class="md-button md-button--text md-estado" type="button" data-repetir="${k}">Repetir</button></div><div class="fundo__formatos"></div></article>`; }).join('');
+function desenharFundos(so) {
+  const paleta = document.documentElement.dataset.paleta || 'branco-preto';
+  const cores = { ...Object.fromEntries(Object.keys(F.temas[paleta].claro).filter((p) => p !== 'mascote').map((p) => [p, vv(p)])), mascote: F.temas[paleta]?.claro.mascote || '' };
+  const parado = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const k of Object.keys(F.CONCEITOS)) { if (so && so !== k) continue;
+    document.querySelector(`#fundo-${k} .fundo__formatos`).innerHTML = Object.values(F.FORMATOS).map(([w, h]) =>
+      F.desenhar(k, { largura: w, altura: h, cores, ...estado[k], movimentoReduzido: parado })).join(''); }
+}
+caixa.addEventListener('change', (ev) => { const t = ev.target, k = t.dataset.fundo; if (!k) return;
+  const [a, b] = t.dataset.campo.split('.'); if (b) estado[k][a][b] = t.value; else estado[k][a] = a === 'quantidade' ? +t.value : t.value; desenharFundos(k); });
+caixa.addEventListener('click', (ev) => { const d = ev.target.closest('button')?.dataset || {}; if (d.sortear) { estado[d.sortear].semente = Math.floor(Math.random() * 1e9); desenharFundos(d.sortear); } if (d.repetir) desenharFundos(d.repetir); });
+desenharFundos();
+new MutationObserver(() => desenharFundos()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-paleta'] });
 </script>
 </body>
 </html>

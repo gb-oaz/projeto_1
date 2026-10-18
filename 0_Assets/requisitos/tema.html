@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tema dos documentos de requisito · boaz · v04</title>
+<title>Tema dos documentos de requisito · boaz · v05</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="tema">
 <meta name="boaz:caminho" content="0_Assets/requisitos/tema.html">
 <meta name="boaz:tipo" content="Tema">
-<meta name="boaz:versao" content="v04">
-<meta name="boaz:data" content="2026-10-11 04:38">
+<meta name="boaz:versao" content="v05">
+<meta name="boaz:data" content="2026-10-17 18:14">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v04
+   boaz · tema dos documentos de requisito · v05
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
    ════════════════════════════════════════════════════════════ */
@@ -548,6 +548,41 @@ figure.diagrama figcaption {
 }
 figure.diagrama figcaption code { font-size: 11.5px; color: var(--muted); background: none; padding: 0; }
 
+/* ── amostras da marca (só na Identidade da visão do produto) ─ */
+.marcas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 0 0 24px;
+}
+figure.marca {
+  margin: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  overflow: hidden;
+  break-inside: avoid;
+}
+figure.marca > div {
+  box-sizing: border-box;
+  height: 140px;
+  padding: 18px;
+  background: var(--surface);
+}
+figure.marca.fundo-claro > div { background: #ffffff; } /* fundo claro fixo, para arquivos feitos para fundo branco */
+figure.marca.fundo-medio > div { background: #8c8c8c; } /* tom médio fixo: contrasta com o preto e com o branco do símbolo de duas cores */
+figure.marca.fundo-escuro > div { background: #0d1117; } /* fundo escuro fixo, como a moldura dos diagramas */
+figure.marca img { display: block; width: 100%; height: 100%; object-fit: contain; }
+figure.marca figcaption {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--page);
+  border-top: 1px solid var(--border-soft);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+figure.marca figcaption code { font-size: 11px; font-weight: 400; color: var(--muted); background: none; padding: 0; overflow-wrap: anywhere; }
+
 /* ── referência a outro documento ────────────────────────── */
 a.ref { font-weight: 550; text-decoration: none; white-space: nowrap; }
 a.ref::after { content: " ↗"; font-size: .85em; }
@@ -649,13 +684,15 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   caption, thead { break-after: avoid; }
   tbody > tr:first-child { break-before: avoid; }
   figure.diagrama:not(.recorte) img { width: auto; max-width: 100%; max-height: 75mm; margin: 0 auto; }
+  .marcas { grid-template-columns: repeat(auto-fill, minmax(30mm, 1fr)); gap: 3mm; }
+  figure.marca > div { height: 24mm; padding: 3mm; }
   tr, pre, .persona, .metrica, ul.pendencias > li { break-inside: avoid; }
   a { color: inherit; text-decoration: none; }
   a.ref { color: var(--accent); }
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v04 — tema (claro/sistema/escuro), PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v05 — tema (claro/sistema/escuro), PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
@@ -806,8 +843,8 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
   <p class="boaz-objetivo"><span>Objetivo</span>padronizar marca d'água, tipografia, formato e estilo de todo documento <code>.html</code> de <code>1_Requisitos/</code> e mostrar, renderizado, cada componente que um documento pode usar.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>tema</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v04</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-11 · 04:38</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v05</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-17 · 18:14</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -1003,7 +1040,7 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
       <li>Diga <strong>o quê</strong>, não <strong>como</strong>: nada de backend, frontend, banco, API, framework, provedor ou tela específica</li>
       <li>Voz ativa, tempo presente, um nome por coisa (o do glossário)</li>
       <li>Datas <code>AAAA-MM-DD</code>, horas <code>HH:MM</code> (24 h); número e unidade com espaço (<code>2 s</code>, <code>10 MB</code>, <code>R$ 1.500,00</code>), decimal com vírgula; limites com símbolo (<code>≤ 2 s</code>, <code>≥ 99,5 %</code>)</li>
-      <li>Sem emojis; imagens só como diagrama</li>
+      <li>Sem emojis; imagens só como diagrama ou, na seção Identidade da visão do produto, como amostra da marca</li>
       <li>Dúvida não vira requisito: vai para Em aberto</li>
     </ul>
     <p>Palavras vagas são proibidas; troque por um critério verificável:</p>
@@ -1192,6 +1229,25 @@ Cenário: código expirado
       </figure>
     </div>
 
+    <h3>Amostras da marca</h3>
+    <p>Só na seção Identidade da visão do produto: logos, símbolo, ícone e favicon de <code>0_Assets/design/identidade/</code>, por caminho relativo. O fundo da amostra acompanha o tema (padrão) ou é fixo: <code>fundo-claro</code>, <code>fundo-medio</code> ou <code>fundo-escuro</code>, conforme o fundo para o qual o arquivo foi feito; a legenda dá o nome e o caminho.</p>
+    <div class="boaz-exemplo">
+      <div class="marcas">
+        <figure class="marca fundo-medio">
+          <div><img src="../design/identidade/logos/simbolo.svg" alt="Símbolo de duas cores"></div>
+          <figcaption>Símbolo<code>logos/simbolo.svg</code></figcaption>
+        </figure>
+        <figure class="marca fundo-claro">
+          <div><img src="../design/identidade/logos/simbolo-mono.svg" alt="Símbolo monocromático"></div>
+          <figcaption>Monocromático<code>logos/simbolo-mono.svg</code></figcaption>
+        </figure>
+        <figure class="marca fundo-escuro">
+          <div><img src="../design/identidade/icones/favicon.svg" alt="Favicon"></div>
+          <figcaption>Favicon<code>icones/favicon.svg</code></figcaption>
+        </figure>
+      </div>
+    </div>
+
     <h3>Referência a outro documento</h3>
     <div class="boaz-exemplo">
       <p>Usa a conta de <a class="ref" href="02_cadastro-usuario.html#RF-01">Cadastro de usuário <code class="id">RF-01</code></a>.</p>
@@ -1212,13 +1268,13 @@ Cenário: código expirado
     <table>
       <thead><tr><th>Tipo</th><th>Arquivo</th><th>Seções, na ordem (<strong>obrigatórias</strong> em negrito)</th></tr></thead>
       <tbody>
-        <tr><td>Visão do produto</td><td><code>00_visao-produto.html</code></td><td><strong>Problema</strong>, <strong>Objetivos e métricas</strong>, <strong>Personas</strong>, <strong>Escopo</strong>, Fora de escopo, Em aberto, Diagramas</td></tr>
+        <tr><td>Visão do produto</td><td><code>00_visao-produto.html</code></td><td><strong>Problema</strong>, <strong>Objetivos e métricas</strong>, <strong>Personas</strong>, <strong>Escopo</strong>, Identidade, Fora de escopo, Em aberto, Diagramas</td></tr>
         <tr><td>Funcionalidade</td><td><code>01</code>–<code>89</code></td><td><strong>Contexto</strong>, <strong>Requisitos funcionais</strong>, Regras de negócio, Requisitos não funcionais, <strong>Critérios de aceite</strong>, Fora de escopo, Em aberto, Diagramas</td></tr>
         <tr><td>Transversal</td><td><code>90</code>–<code>98</code></td><td><strong>Contexto</strong>, Regras de negócio, <strong>Requisitos não funcionais</strong>, Em aberto, Diagramas</td></tr>
         <tr><td>Glossário</td><td><code>99_glossario.html</code></td><td><strong>Termos</strong></td></tr>
       </tbody>
     </table>
-    <p>Todos começam com a marca de topo e terminam com a de rodapé. Escopo, na visão, é uma lista curta das capacidades do produto, não dos arquivos (<code>./boaz.sh requisitos</code> lista os arquivos).</p>
+    <p>Todos começam com a marca de topo e terminam com a de rodapé. Identidade, na visão, traz o nome, as amostras da marca e as regras de uso (tabela de regras de negócio). Escopo, na visão, é uma lista curta das capacidades do produto, não dos arquivos (<code>./boaz.sh requisitos</code> lista os arquivos).</p>
   </section>
 
   <section id="versionamento">
@@ -1242,14 +1298,15 @@ Cenário: código expirado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v04</span></td><td>2026-10-11 04:38</td><td>Impressão: diagrama com no máximo 75 mm de altura (era 85 mm), para caber no fim da página em vez de abrir uma nova</td></tr>
+      <tr><td><span class="boaz-versao">v05</span></td><td>2026-10-17 18:14</td><td>Visão do produto ganha a seção opcional Identidade, com o componente de amostras da marca (<code>figure.marca</code>, fundos claro, médio e escuro) para logos, símbolo e ícones de <code>0_Assets/design/identidade/</code></td></tr>
+      <tr><td>v04</td><td>2026-10-11 04:38</td><td>Impressão: diagrama com no máximo 75 mm de altura (era 85 mm), para caber no fim da página em vez de abrir uma nova</td></tr>
       <tr><td>v03</td><td>2026-10-11 03:21</td><td>Impressão: o histórico do rodapé pode quebrar entre páginas (sem página quase vazia só para ele) e a legenda e o cabeçalho de uma tabela não ficam separados das linhas; diagrama com no máximo 85 mm de altura</td></tr>
       <tr><td>v02</td><td>2026-10-11 16:00</td><td>Rolagem lateral: tabelas largas rolam dentro do documento, código longo quebra a linha e nada mais é cortado na borda da página</td></tr>
       <tr><td><span class="boaz-versao">v01</span></td><td>2026-10-11 15:00</td><td>Criação: documentos de requisito em <code>.html</code>, com temas claro, sistema e escuro e exportação para PDF</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v04 · 2026-10-11 04:38</span>
+    <span>boaz · v05 · 2026-10-17 18:14</span>
     <span class="boaz-arquivo">0_Assets/requisitos/tema.html</span>
   </div>
 </footer>

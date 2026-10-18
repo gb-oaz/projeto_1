@@ -186,8 +186,9 @@
   "tipografia": {
     "$descricao": "`marca` (brand) vai nos papéis display, headline e title-large; `texto` (plain) no resto. `arquivos` são os .ttf/.otf em identidade/fontes/, por peso, usados no app MAUI (alias <Papel><Peso>, ex.: TextoMedium).",
     "marca": {
-      "familia": "Roboto",
+      "familia": "Fredoka",
       "alternativas": [
+        "Nunito",
         "system-ui",
         "-apple-system",
         "Segoe UI",
@@ -197,9 +198,9 @@
       ],
       "google_fonts": true,
       "arquivos": {
-        "regular": null,
-        "medium": null,
-        "bold": null
+        "regular": "fredoka-regular.ttf",
+        "medium": "fredoka-medium.ttf",
+        "bold": "fredoka-bold.ttf"
       }
     },
     "texto": {

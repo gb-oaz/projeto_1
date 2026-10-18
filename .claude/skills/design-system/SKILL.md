@@ -85,6 +85,24 @@ Leia `design-system.html` (regras e catálogo) e os JSON antes de mudar algo. Pa
   4. se for usado no app, um estilo em `Tokens.xaml` (no gerador, como os botões).
 - Rode `pnpm run gerar`. Nunca edite `cores.json`, `plataformas/*`, `tema.svg` nem o bloco `design:tokens` à mão: `pnpm run conferir` falha se estiverem diferentes do gerado.
 
+## Marca (símbolo, logo, ícone, favicon)
+
+- O símbolo do deboaz é um b e um d: barriga redonda com uma antena de cada lado, separadas dela por um vão (`VAO`) que acompanha a curva. Variação `longo` (hastes longas) na landing page e no hub; `curto` (hastes curtas) no quest (`FRENTES` em `scripts/marca.mjs`).
+- Tudo sai do núcleo `scripts/marca.mjs` (sem Node, roda no navegador) por `scripts/marca-arquivos.mjs`: `identidade/logos/` e `identidade/icones/` são **gerados** — nunca edite os `.svg` à mão. O nome deboaz é medido em `identidade/fontes/fredoka-medium.ttf` (opentype.js) e vira contorno.
+- Oficial: monocromático (preto; `-negativo` em branco); ícone e favicon com fundo preto e símbolo branco. Num tema de cor, o logo usa `tertiary` no anel, `primary` na antena do b e em "boaz" e `secondary` na antena do d e em "de" (cores `{ anel, b, d, de, boaz }`), e o favicon `primary` com `on-primary` — tabela em `plataformas/web/marca-temas.json` (`coresDaMarca`). Nos temas monocromáticos tudo fica em `on-surface`.
+- Web: `import { marca, FRENTES } from '@/design/marca.mjs'` e `marca.logo(FRENTES.hub, cores)`; em SVG embutido, as cores podem ser `var(--md-sys-color-…)` e acompanham tema e modo sozinhas (como faz o catálogo).
+- Animações: `marca.abertura(variante, cores)` (o anel se desenha, as antenas brotam do vão, o nome entra; toca uma vez), `marca.fechamento` (o inverso: o nome sai, as antenas recolhem, o anel se apaga; uma vez), `marca.ciclo` (abertura + fechamento em laço) e `marca.carregamento(variante, cores)` (laço); os oficiais saem em `identidade/animacoes/`. Com movimento reduzido, use `marca.logo` / `marca.simbolo` parados.
+- App (MAUI): `plataformas/maui/Marca.xaml` traz as peças como `PathGeometry` (`MarcaAnel`, `MarcaAntenaB/D[Curta]`, `MarcaNomeDe/Boaz`); desenhe cada uma num `Path` com a cor do tema (`AppThemeBinding`), num `Grid` de 540 × 793 escalado. É vetor nativo, sem custo de processar SVG. O ícone da tela inicial é sempre o oficial.
+- Regras de uso: `1_Requisitos/90_identidade-visual.html`.
+- Animação no app (decidido): o MAUI não toca SMIL, então a marca e os mascotes animam com a **API de animação do próprio MAUI** sobre os desenhos parados — `TranslateTo` (cima, baixo, lados, pular, flutuar), `RotateTo` (balançar, girar), `ScaleTo` (frente e trás, comemorar) e `FadeTo`, encadeados com `await` e repetidos em laço, com as mesmas durações e curvas de `fundamentos.json` (movimento). O equivalente de cada movimento está em `MOVIMENTOS` de `scripts/mascotes.mjs`. Antes de animar, consulte a preferência de movimento reduzido do aparelho e, se ativa, não anime. `WebView` com o `.svg` animado não é o padrão: só com motivo registrado na vista.
+
+## Fundos
+
+- Seis conceitos em `scripts/fundos.mjs` (sem Node; recebe os núcleos da marca e dos mascotes em `criarFundos`): `estampa`, `anel`, `antenas`, `ondas`, `recorte`, `halo`. Uso de cada um em `CONCEITOS` e na RN-56 do requisito 90.
+- `fundos.desenhar(conceito, { largura, altura, cores, pecas, mascote, logo, quantidade, semente, movimentoReduzido })`: `pecas` = `ambos` | `logo` | `mascotes`; `mascote` = `{ expressao, forma, proporcao, movimento }` (vazio = sortido, na estampa e nas antenas); `logo` = `''` | `abertura` | `fechamento` | `ciclo` | `carregamento`; `semente` nova a cada abertura da tela; `cores` de `plataformas/web/fundos-temas.json` (ou `var(--md-sys-color-…)` em SVG embutido, como no catálogo).
+- Os oficiais (Branco e Preto, claro, parados) saem em `identidade/imagens/fundos/`; a web usa `plataformas/web/fundos.mjs`, já ligado a `./marca.mjs` e `./mascotes.mjs`.
+- Texto por cima sempre num painel de superfície (RNF-119). Fundo novo ou peça nova entra no núcleo, com versão nova do catálogo.
+
 ## Mascotes
 
 Personagens com rosto expressivo da identidade (regras de produto em `1_Requisitos/06_design-system-telas.html`, RN-34 a RN-38 e RNF-110 a RNF-115; catálogo em `design-system.html#mascotes`). Um mascote é a combinação de:
@@ -110,7 +128,7 @@ Regras completas em `1_Requisitos/06_design-system-telas.html` (vista antes do c
 
 - **Web (Vue)**: importar `tokens.css` e `tipografia.css` uma vez; componentes usam `var(--md-comp-…)`/`var(--md-sys-…)`; tema por `<html data-theme="light|dark">` (sem o atributo, segue o sistema); responsividade com as media queries das janelas (`windowMedia`/`windowClassOf` de `tokens.ts`) ou container queries com as mesmas larguras.
 - **Mascotes (web)**: `import { animado, estatico } from './design/mascotes.mjs'` e `mascotes-temas.json` (cor por tema); `img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)`; `estatico` com `prefers-reduced-motion`. No app, os SVG parados de `mascotes/estaticos/`.
-- **Mobile (.NET MAUI)**: `Tokens.xaml` em `App.xaml` (`MergedDictionaries`); cores com `AppThemeBinding` (`{StaticResource PrimaryLight}`/`PrimaryDark`), textos com os estilos `BodyLarge`, `TitleMedium`…, botões com `ButtonFilled`, `ButtonTonal`…; fontes registradas em `MauiProgram` com os aliases do comentário do arquivo.
+- **Mobile (.NET MAUI)**: `Tokens.xaml` e `Marca.xaml` em `App.xaml` (`MergedDictionaries`); animações pela API do MAUI (ver **Marca**); cores com `AppThemeBinding` (`{StaticResource PrimaryLight}`/`PrimaryDark`), textos com os estilos `BodyLarge`, `TitleMedium`…, botões com `ButtonFilled`, `ButtonTonal`…; fontes registradas em `MauiProgram` com os aliases do comentário do arquivo.
 - Ao revisar código de tela: valor solto de cor/tamanho/fonte é defeito — troque pelo token. Faltou token? Crie-o aqui primeiro.
 
 ## Versionamento

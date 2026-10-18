@@ -3513,7 +3513,7 @@ export const colors = {
 } as const;
 
 export const typeface = {
-  "brand": "Roboto, system-ui, -apple-system, \"Segoe UI\", \"Helvetica Neue\", Arial, sans-serif",
+  "brand": "Fredoka, Nunito, system-ui, -apple-system, \"Segoe UI\", \"Helvetica Neue\", Arial, sans-serif",
   "plain": "Roboto, system-ui, -apple-system, \"Segoe UI\", \"Helvetica Neue\", Arial, sans-serif"
 } as const;
 
