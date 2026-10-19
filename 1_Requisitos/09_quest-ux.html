@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quest · UX base · boaz · v03</title>
+<!-- boaz:marca -->
+<meta name="boaz:projeto" content="boaz">
+<meta name="boaz:documento" content="09_quest-ux">
+<meta name="boaz:caminho" content="1_Requisitos/09_quest-ux.html">
+<meta name="boaz:tipo" content="Funcionalidade">
+<meta name="boaz:versao" content="v03">
+<meta name="boaz:data" content="2026-10-19 00:53">
+<meta name="boaz:status" content="Aprovado">
+<!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style id="boaz-tema">
+/* ════════════════════════════════════════════════════════════
+   boaz · tema dos documentos de requisito · v05
+   Paleta do tema.svg (dark) com a variante light equivalente.
+   Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── tokens: claro ───────────────────────────────────────── */
+:root {
+  color-scheme: light;
+  --canvas: #eceff3;
+  --page: #ffffff;
+  --band: #f6f8fa;
+  --surface: #f6f8fa;
+  --surface-2: #eef1f4;
+  --border: #d1d9e0;
+  --border-soft: #e4e8ec;
+  --text: #1f2328;
+  --text-strong: #0d1117;
+  --muted: #59636e;
+  --faint: #818b98;
+  --accent: #0969da;
+  --accent-ink: #0550ae;
+  --accent-soft: #ddf4ff;
+  --accent-2: #8250df;
+  --accent-2-soft: #fbefff;
+  --green: #1a7f37;   --green-soft: #dafbe1;
+  --orange: #bc4c00;  --orange-soft: #fff1e5;
+  --red: #cf222e;     --red-soft: #ffebe9;
+  --yellow: #9a6700;  --yellow-soft: #fff8c5;
+  --shadow: 0 1px 2px rgba(31, 35, 40, .06), 0 12px 32px rgba(31, 35, 40, .10);
+  --marca-dagua: rgba(9, 105, 218, .055);
+  --font: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* ── tokens: escuro (o mesmo do tema.svg) ────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --canvas: #010409;
+    --page: #0d1117;
+    --band: #11161e;
+    --surface: #161b22;
+    --surface-2: #1c2128;
+    --border: #30363d;
+    --border-soft: #21262d;
+    --text: #e6edf3;
+    --text-strong: #f0f6fc;
+    --muted: #8b949e;
+    --faint: #6e7681;
+    --accent: #58a6ff;
+    --accent-ink: #79c0ff;
+    --accent-soft: #0c2d4a;
+    --accent-2: #bc8cff;
+    --accent-2-soft: #271a45;
+    --green: #3fb950;   --green-soft: #0f2e1b;
+    --orange: #f0883e;  --orange-soft: #3a2410;
+    --red: #f85149;     --red-soft: #3b1219;
+    --yellow: #d29922;  --yellow-soft: #2b2311;
+    --shadow: 0 0 0 1px #21262d, 0 16px 40px rgba(0, 0, 0, .55);
+    --marca-dagua: rgba(88, 166, 255, .05);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #010409;
+  --page: #0d1117;
+  --band: #11161e;
+  --surface: #161b22;
+  --surface-2: #1c2128;
+  --border: #30363d;
+  --border-soft: #21262d;
+  --text: #e6edf3;
+  --text-strong: #f0f6fc;
+  --muted: #8b949e;
+  --faint: #6e7681;
+  --accent: #58a6ff;
+  --accent-ink: #79c0ff;
+  --accent-soft: #0c2d4a;
+  --accent-2: #bc8cff;
+  --accent-2-soft: #271a45;
+  --green: #3fb950;   --green-soft: #0f2e1b;
+  --orange: #f0883e;  --orange-soft: #3a2410;
+  --red: #f85149;     --red-soft: #3b1219;
+  --yellow: #d29922;  --yellow-soft: #2b2311;
+  --shadow: 0 0 0 1px #21262d, 0 16px 40px rgba(0, 0, 0, .55);
+  --marca-dagua: rgba(88, 166, 255, .05);
+}
+
+/* ── base ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  background: var(--canvas);
+  -webkit-text-size-adjust: 100%;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+body {
+  max-width: 920px;
+  margin: 56px auto 96px;
+  background: var(--page);
+  color: var(--text);
+  font: 400 15.5px/1.68 var(--font);
+  font-optical-sizing: auto;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--accent-soft); color: var(--text-strong); }
+main { padding: 8px 56px 56px; }
+
+h1, h2, h3 { color: var(--text-strong); text-wrap: balance; }
+h2 {
+  margin: 56px 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.012em;
+  scroll-margin-top: 24px;
+}
+h3 {
+  margin: 28px 0 10px;
+  font-size: 1.04rem;
+  font-weight: 650;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  scroll-margin-top: 24px;
+}
+p { margin: 0 0 14px; text-wrap: pretty; }
+a { color: var(--accent); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--accent); }
+strong, b { font-weight: 650; color: var(--text-strong); }
+em { font-style: italic; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; }
+li { margin: 4px 0; }
+li::marker { color: var(--faint); }
+hr { border: 0; border-top: 1px solid var(--border-soft); margin: 32px 0; }
+
+/* código, IDs, nomes de arquivo, valores literais */
+code, kbd, samp, pre { font-family: var(--mono); font-size: .86em; font-variant-ligatures: none; }
+code {
+  padding: .12em .42em;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text-strong);
+  overflow-wrap: anywhere;
+}
+code.id {
+  white-space: nowrap;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+pre {
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-x: auto;
+  tab-size: 2;
+}
+pre code { padding: 0; background: none; font-size: inherit; white-space: pre; }
+
+/* texto exibido ao usuário, exatamente como aparece */
+q.ui { quotes: "“" "”"; font-family: var(--mono); font-size: .9em; color: var(--text-strong); }
+
+/* ── marca d'água · topo ─────────────────────────────────── */
+.boaz-marca-topo {
+  position: relative;
+  padding: 44px 56px 0;
+  border-radius: 14px 14px 0 0;
+  background: var(--band);
+  border-bottom: 1px solid var(--border-soft);
+}
+.boaz-marca-topo::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2) 50%, transparent);
+}
+.boaz-eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.boaz-marca-topo h1 {
+  margin: 0 0 12px;
+  font-size: 2.15rem;
+  font-weight: 760;
+  line-height: 1.15;
+  letter-spacing: -.024em;
+}
+.boaz-objetivo {
+  max-width: 64ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.04rem;
+  line-height: 1.6;
+}
+.boaz-objetivo > span:first-child {
+  margin-right: 8px;
+  color: var(--faint);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.boaz-carimbo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  margin: 32px -56px 0;
+  padding: 0;
+  border-top: 1px solid var(--border-soft);
+}
+.boaz-carimbo > div { padding: 14px 24px 16px; border-left: 1px solid var(--border-soft); min-width: 0; }
+.boaz-carimbo > div:first-child { padding-left: 56px; border-left: 0; }
+.boaz-carimbo > div:last-child { padding-right: 56px; }
+.boaz-carimbo dt {
+  margin-bottom: 6px;
+  color: var(--faint);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.boaz-carimbo dd { margin: 0; color: var(--text-strong); font-family: var(--mono); font-size: 13px; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.boaz-versao {
+  display: inline-block;
+  padding: 0 10px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+/* status do documento */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px 0 9px;
+  border-radius: 999px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 22px;
+  white-space: nowrap;
+}
+.status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.status-rascunho   { background: var(--yellow-soft); color: var(--yellow); }
+.status-em-revisao { background: var(--accent-2-soft); color: var(--accent-2); }
+.status-aprovado   { background: var(--green-soft); color: var(--green); }
+.status-obsoleto   { background: var(--red-soft); color: var(--red); text-decoration: line-through; }
+
+/* ── marca d'água · rodapé ───────────────────────────────── */
+.boaz-marca-rodape {
+  padding: 32px 56px 28px;
+  border-radius: 0 0 14px 14px;
+  background: var(--band);
+  border-top: 1px solid var(--border-soft);
+}
+.boaz-marca-rodape table { margin-bottom: 20px; font-size: 13px; }
+.boaz-marca-rodape .boaz-tabela { margin-bottom: 20px; }
+.boaz-marca-rodape td:nth-child(2) { color: var(--muted); font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+.boaz-rodape-linha {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+  color: var(--faint);
+  font-size: 12px;
+}
+.boaz-arquivo { font-family: var(--mono); font-size: 11.5px; }
+
+/* marca d'água diagonal: só para Rascunho, Em revisão e Obsoleto (o script lê o status) */
+body[data-marca]::after {
+  content: attr(data-marca);
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--marca-dagua);
+  font: 800 clamp(64px, 13vw, 150px)/1 var(--font);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transform: rotate(-28deg);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ── sumário ─────────────────────────────────────────────── */
+.sumario {
+  margin: 36px 0 8px;
+  padding: 18px 22px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.sumario > p { margin: 0 0 8px; }
+.sumario ol { columns: 2; column-gap: 32px; margin: 0; padding-left: 20px; font-size: 14px; }
+.sumario li { break-inside: avoid; }
+.sumario a { color: var(--text); text-decoration: none; }
+.sumario a:hover { color: var(--accent); }
+
+/* ── tabelas ─────────────────────────────────────────────── */
+table {
+  width: 100%;
+  margin: 0 0 20px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  font-size: 14.5px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+th {
+  padding: 9px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+td { padding: 11px 14px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+tr:last-child > td { border-bottom: 0; }
+tbody tr:target > td { background: var(--accent-soft); }
+td:has(> code.id:only-child), td:has(> .prio:only-child), td:has(> .tag:only-child) { width: 1%; white-space: nowrap; }
+td code:not(.id) { white-space: normal; }
+.boaz-tabela { margin: 0 0 20px; overflow-x: auto; overscroll-behavior-x: contain; }
+.boaz-tabela > table { margin: 0; }
+caption { caption-side: top; padding: 0 0 8px; color: var(--muted); font-size: 13px; text-align: left; }
+
+/* prioridade MoSCoW */
+.prio {
+  display: inline-block;
+  padding: 0 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 22px;
+  white-space: nowrap;
+}
+.prio-deve      { background: var(--accent); color: var(--page); }
+.prio-deveria   { background: var(--accent-2-soft); color: var(--accent-2); }
+.prio-poderia   { background: var(--surface-2); color: var(--muted); }
+.prio-nao-agora { border: 1px dashed var(--border); color: var(--faint); line-height: 20px; }
+
+/* etiqueta neutra (categoria de RNF, responsável…) */
+.tag {
+  display: inline-block;
+  padding: 0 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 21px;
+  white-space: nowrap;
+}
+
+/* ── história de usuário ─────────────────────────────────── */
+.historia {
+  margin: 0 0 12px;
+  padding: 10px 0 10px 18px;
+  border-left: 3px solid var(--accent-2);
+  font-size: 1.02rem;
+}
+.historia > span { color: var(--accent-2); font-size: .74em; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+
+/* ── critérios de aceite (Gherkin) ───────────────────────── */
+.criterio { margin: 0 0 24px; break-inside: avoid; }
+.criterio h3 { margin-top: 24px; }
+pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); }
+pre.gherkin::before {
+  content: "GHERKIN";
+  position: absolute;
+  top: 9px; right: 14px;
+  color: var(--faint);
+  font: 700 9.5px/1 var(--font);
+  letter-spacing: .14em;
+}
+pre.gherkin .g-cenario { color: var(--accent-2); font-weight: 700; }
+pre.gherkin .g-passo   { color: var(--accent); font-weight: 700; }
+pre.gherkin .g-texto   { color: var(--green); }
+
+/* ── personas ────────────────────────────────────────────── */
+.personas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin: 0 0 20px; }
+.persona {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 4px 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--surface);
+  break-inside: avoid;
+}
+.persona::before {
+  content: attr(data-inicial);
+  grid-row: span 3;
+  display: grid;
+  place-items: center;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 700;
+  font-size: 17px;
+}
+.persona h3 { margin: 0; font-size: 1rem; }
+.persona p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.persona p > span { color: var(--faint); font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-right: 6px; }
+
+/* ── objetivos e métricas ────────────────────────────────── */
+.metricas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin: 0 0 20px; }
+.metrica {
+  padding: 18px 20px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--surface);
+  break-inside: avoid;
+}
+.metrica h3 { margin: 0 0 4px; font-size: .98rem; }
+.metrica .meta { margin: 10px 0 2px; color: var(--accent); font-family: var(--mono); font-size: 1.7rem; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
+.metrica p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+
+/* ── escopo, fora de escopo, pendências ──────────────────── */
+ul.escopo, ul.fora, ul.pendencias { list-style: none; padding: 0; }
+ul.escopo > li, ul.fora > li, ul.pendencias > li { position: relative; padding-left: 28px; margin: 7px 0; }
+ul.escopo > li::before, ul.fora > li::before {
+  position: absolute; left: 0; top: .2em;
+  display: grid; place-items: center;
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  font-size: 11px; font-weight: 800; line-height: 1;
+}
+ul.escopo > li::before { content: "✓"; background: var(--green-soft); color: var(--green); }
+ul.fora > li::before { content: "✕"; background: var(--surface-2); color: var(--faint); }
+ul.fora > li { color: var(--muted); }
+ul.pendencias > li {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  padding: 10px 14px 10px 42px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--surface);
+}
+ul.pendencias > li::before {
+  content: "";
+  position: absolute; left: 14px; top: 13px;
+  width: 15px; height: 15px;
+  border: 1.5px solid var(--yellow);
+  border-radius: 4px;
+}
+ul.pendencias .dono { flex: none; }
+
+/* ── destaques (no máximo 2 por documento) ───────────────── */
+.destaque {
+  --cor: var(--accent); --fundo: var(--accent-soft);
+  margin: 0 0 18px;
+  padding: 14px 18px 14px 18px;
+  border: 1px solid color-mix(in srgb, var(--cor) 35%, transparent);
+  border-left: 4px solid var(--cor);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--fundo) 70%, var(--page));
+  break-inside: avoid;
+}
+.destaque > :last-child { margin-bottom: 0; }
+.destaque::before {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--cor);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.destaque.nota::before       { content: "ⓘ  Nota"; }
+.destaque.importante         { --cor: var(--accent-2); --fundo: var(--accent-2-soft); }
+.destaque.importante::before { content: "◆  Importante"; }
+.destaque.aviso              { --cor: var(--orange); --fundo: var(--orange-soft); }
+.destaque.aviso::before      { content: "▲  Aviso"; }
+
+/* ── diagramas (.svg de 2_Diagramas e 3_Arquitetura) ─────── */
+figure.diagrama {
+  margin: 0 0 24px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: #0d1117; /* os diagramas são dark: a moldura acompanha em qualquer tema */
+  overflow: hidden;
+  break-inside: avoid;
+}
+figure.diagrama > a { display: block; }
+figure.diagrama img { display: block; width: 100%; height: auto; }
+figure.diagrama.recorte > a { aspect-ratio: var(--recorte-proporcao); overflow: hidden; }
+figure.diagrama.recorte img { margin-top: calc(-1 * var(--recorte-y)); }
+figure.diagrama figcaption {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px;
+  padding: 12px 18px;
+  background: var(--page);
+  border-top: 1px solid var(--border-soft);
+  font-size: 14px;
+}
+figure.diagrama figcaption code { font-size: 11.5px; color: var(--muted); background: none; padding: 0; }
+
+/* ── amostras da marca (só na Identidade da visão do produto) ─ */
+.marcas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 0 0 24px;
+}
+figure.marca {
+  margin: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  overflow: hidden;
+  break-inside: avoid;
+}
+figure.marca > div {
+  box-sizing: border-box;
+  height: 140px;
+  padding: 18px;
+  background: var(--surface);
+}
+figure.marca.fundo-claro > div { background: #ffffff; } /* fundo claro fixo, para arquivos feitos para fundo branco */
+figure.marca.fundo-medio > div { background: #8c8c8c; } /* tom médio fixo: contrasta com o preto e com o branco do símbolo de duas cores */
+figure.marca.fundo-escuro > div { background: #0d1117; } /* fundo escuro fixo, como a moldura dos diagramas */
+figure.marca img { display: block; width: 100%; height: 100%; object-fit: contain; }
+figure.marca figcaption {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--page);
+  border-top: 1px solid var(--border-soft);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+figure.marca figcaption code { font-size: 11px; font-weight: 400; color: var(--muted); background: none; padding: 0; overflow-wrap: anywhere; }
+
+/* ── referência a outro documento ────────────────────────── */
+a.ref { font-weight: 550; text-decoration: none; white-space: nowrap; }
+a.ref::after { content: " ↗"; font-size: .85em; }
+a.ref code.id { margin-left: 2px; }
+
+/* ── glossário ───────────────────────────────────────────── */
+dl.glossario {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
+  margin: 0 0 20px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  overflow: hidden;
+}
+dl.glossario > dt, dl.glossario > dd { margin: 0; padding: 11px 16px; border-bottom: 1px solid var(--border-soft); }
+dl.glossario > dt { background: var(--surface); color: var(--text-strong); font-weight: 650; }
+dl.glossario > dd { color: var(--muted); }
+dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
+
+/* ── barra: tema e PDF (criada pelo script; some na impressão) ── */
+.boaz-barra {
+  position: fixed;
+  top: 16px; right: 16px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+  font: 600 12.5px/1 var(--font);
+}
+.boaz-seg { display: flex; gap: 2px; padding: 2px; border-radius: 8px; background: var(--surface-2); }
+.boaz-barra button {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 9px;
+  border: 0; border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+.boaz-barra button:hover { color: var(--text-strong); }
+.boaz-barra button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.boaz-seg button[aria-pressed="true"] { background: var(--page); color: var(--text-strong); box-shadow: 0 1px 3px rgba(0, 0, 0, .15); }
+.boaz-barra svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.boaz-barra .boaz-pdf { padding: 0 12px; background: var(--accent); color: #fff; }
+.boaz-barra .boaz-pdf:hover { color: #fff; filter: brightness(1.08); }
+.boaz-barra[data-alerta] .boaz-pdf { background: var(--red); }
+
+/* ── telas estreitas ─────────────────────────────────────── */
+@media screen and (max-width: 760px) {
+  body { margin: 0; border-radius: 0; box-shadow: none; font-size: 15px; }
+  main { padding: 0 16px 40px; }
+  .boaz-marca-topo { padding: 72px 16px 0; }
+  .boaz-marca-topo h1 { font-size: 1.7rem; }
+  .boaz-carimbo { grid-template-columns: 1fr 1fr; margin: 24px -16px 0; }
+  .boaz-carimbo > div, .boaz-carimbo > div:first-child, .boaz-carimbo > div:last-child { padding: 12px 16px; border-left: 0; border-top: 1px solid var(--border-soft); }
+  .boaz-carimbo > div:nth-child(even) { border-left: 1px solid var(--border-soft); }
+  .boaz-carimbo > div:nth-child(-n + 2) { border-top: 0; }
+  .boaz-marca-rodape { padding: 24px 16px; }
+  .sumario ol { columns: 1; }
+  dl.glossario { grid-template-columns: minmax(0, 1fr); }
+  dl.glossario > dt { border-bottom: 0; padding-bottom: 2px; }
+  .boaz-barra { top: 12px; right: 12px; }
+  .boaz-barra .rotulo { display: none; }
+}
+
+/* ── impressão / PDF: sempre claro, A4 ───────────────────── */
+@page { size: A4; margin: 18mm 15mm 18mm; }
+@media print {
+  :root:root:root {
+    color-scheme: light;
+    --canvas: #ffffff; --page: #ffffff; --band: #f6f8fa; --surface: #f6f8fa; --surface-2: #eef1f4;
+    --border: #d1d9e0; --border-soft: #e4e8ec; --text: #1f2328; --text-strong: #0d1117;
+    --muted: #59636e; --faint: #818b98; --accent: #0969da; --accent-ink: #0550ae; --accent-soft: #ddf4ff;
+    --accent-2: #8250df; --accent-2-soft: #fbefff; --green: #1a7f37; --green-soft: #dafbe1;
+    --orange: #bc4c00; --orange-soft: #fff1e5; --red: #cf222e; --red-soft: #ffebe9;
+    --yellow: #9a6700; --yellow-soft: #fff8c5; --marca-dagua: rgba(9, 105, 218, .06);
+  }
+  html { background: #fff; }
+  body { max-width: none; margin: 0; border-radius: 0; box-shadow: none; overflow: visible; font-size: 10pt; }
+  main { padding: 0 2mm; }
+  .boaz-marca-topo { padding: 9mm 8mm 0; border-radius: 8px 8px 0 0; }
+  .boaz-carimbo { margin: 7mm -8mm 0; }
+  .boaz-carimbo > div:first-child { padding-left: 8mm; }
+  .boaz-carimbo > div:last-child { padding-right: 8mm; }
+  .boaz-marca-rodape { margin-top: 10mm; padding: 7mm 8mm 6mm; border-radius: 0 0 8px 8px; }
+  .boaz-marca-rodape > .boaz-eyebrow { break-after: avoid; }
+  .boaz-rodape-linha { break-inside: avoid; break-before: avoid; }
+  .boaz-barra, .sumario, details.boaz-snippet { display: none !important; }
+  body[data-marca]::after { font-size: 92px; }
+  h2 { margin-top: 9mm; break-after: avoid; }
+  h3 { break-after: avoid; }
+  .boaz-tabela { overflow: visible; }
+  caption, thead { break-after: avoid; }
+  tbody > tr:first-child { break-before: avoid; }
+  figure.diagrama:not(.recorte) img { width: auto; max-width: 100%; max-height: 75mm; margin: 0 auto; }
+  .marcas { grid-template-columns: repeat(auto-fill, minmax(30mm, 1fr)); gap: 3mm; }
+  figure.marca > div { height: 24mm; padding: 3mm; }
+  tr, pre, .persona, .metrica, ul.pendencias > li { break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+  a.ref { color: var(--accent); }
+}
+</style>
+<script id="boaz-tema-js">
+/* boaz · tema dos documentos de requisito · v05 — tema (claro/sistema/escuro), PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+(function () {
+  var d = document, h = d.documentElement, CHAVE = "boaz-tema";
+  function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
+  function guardado() { try { return localStorage.getItem(CHAVE) || "system"; } catch (e) { return "system"; } }
+  function aplicar(t) {
+    if (t === "light" || t === "dark") h.setAttribute("data-theme", t); else h.removeAttribute("data-theme");
+    var bs = d.querySelectorAll(".boaz-seg button");
+    for (var i = 0; i < bs.length; i++) bs[i].setAttribute("aria-pressed", String(bs[i].getAttribute("data-tema") === t));
+  }
+  aplicar(guardado());
+
+
+  // Cabeçalho e rodapé de cada página do PDF (margin boxes do @page, Chrome/Edge 131+)
+  var q = function (s) { return JSON.stringify(s); };
+  var caixa = "font-family:Inter,'Segoe UI',Roboto,Arial,sans-serif;font-size:7.5pt;color:#818b98;";
+  var pagina = d.createElement("style");
+  pagina.textContent = "@page{" +
+    "@top-left{" + caixa + "content:" + q(meta("projeto") + " · " + meta("documento")) + "}" +
+    "@top-right{" + caixa + "content:" + q(meta("versao") + " · " + meta("data") + " · " + meta("status")) + "}" +
+    "@bottom-left{" + caixa + "font-family:'JetBrains Mono',Menlo,monospace;content:" + q(meta("caminho")) + "}" +
+    "@bottom-right{" + caixa + "content:\"Página \" counter(page) \" de \" counter(pages)}}" +
+    "@page:first{@top-left{content:none}@top-right{content:none}}";
+  d.head.appendChild(pagina);
+
+  // Nome sugerido do PDF: <documento>_v<NN>_<AAAAMMDD-HHMM>
+  function nomePdf() {
+    return meta("documento") + "_" + meta("versao") + "_" + meta("data").replace(/[^0-9 ]/g, "").replace(" ", "-");
+  }
+  var tituloOriginal = d.title, temaAntes = null;
+  function antes() {
+    tituloOriginal = d.title; d.title = nomePdf();
+    temaAntes = h.getAttribute("data-theme"); h.setAttribute("data-theme", "light");
+  }
+  function depois() {
+    d.title = tituloOriginal;
+    if (temaAntes) h.setAttribute("data-theme", temaAntes); else h.removeAttribute("data-theme");
+  }
+  window.addEventListener("beforeprint", antes);
+  window.addEventListener("afterprint", depois);
+
+  var ICONES = {
+    light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><\/svg>',
+    system: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><\/svg>',
+    dark: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/><\/svg>',
+    pdf: '<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/><\/svg>'
+  };
+  function norm(s) { return (s || "").replace(/[^0-9a-z]/gi, "").toLowerCase(); }
+
+  function montar() {
+    // Marca diagonal: Rascunho, Em revisão e Obsoleto
+    if (/rascunho|revis|obsoleto/i.test(meta("status"))) d.body.setAttribute("data-marca", meta("status"));
+
+    // Barra: tema + PDF
+    var barra = d.createElement("div");
+    barra.className = "boaz-barra";
+    barra.setAttribute("role", "toolbar");
+    barra.setAttribute("aria-label", "Visualização do documento");
+    var temas = [["light", "Claro"], ["system", "Sistema"], ["dark", "Escuro"]], seg = '<div class="boaz-seg" role="group" aria-label="Tema">';
+    for (var i = 0; i < temas.length; i++) {
+      seg += '<button type="button" data-tema="' + temas[i][0] + '" title="Tema ' + temas[i][1].toLowerCase() + '" aria-label="Tema ' + temas[i][1].toLowerCase() + '">' + ICONES[temas[i][0]] + "<\/button>";
+    }
+    barra.innerHTML = seg + '<\/div><button type="button" class="boaz-pdf" title="Gerar PDF (' + nomePdf() + '.pdf)">' + ICONES.pdf + '<span class="rotulo">PDF ' + meta("versao") + "<\/span><\/button>";
+    d.body.appendChild(barra);
+    barra.addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      if (b.classList.contains("boaz-pdf")) { window.print(); return; }
+      var t = b.getAttribute("data-tema");
+      try { localStorage.setItem(CHAVE, t); } catch (x) {}
+      aplicar(t);
+    });
+    aplicar(guardado());
+
+    // Tabelas largas rolam na horizontal dentro do documento, sem cortar conteúdo
+    var ts = d.querySelectorAll("table");
+    for (var t = 0; t < ts.length; t++) {
+      if (ts[t].parentNode.classList && ts[t].parentNode.classList.contains("boaz-tabela")) continue;
+      var envolve = d.createElement("div");
+      envolve.className = "boaz-tabela";
+      ts[t].parentNode.insertBefore(envolve, ts[t]);
+      envolve.appendChild(ts[t]);
+    }
+
+    // Gherkin: destaca palavras-chave e textos entre aspas
+    var gs = d.querySelectorAll("pre.gherkin");
+    for (var g = 0; g < gs.length; g++) {
+      if (gs[g].getAttribute("data-pronto")) continue;
+      // aspas antes das palavras-chave: os class="…" inseridos depois não podem ser pegos
+      gs[g].innerHTML = gs[g].innerHTML
+        .replace(/"([^"<\n]*)"/g, '<span class="g-texto">"$1"<\/span>')
+        .replace(/^(\s*)(Funcionalidade|Contexto|Cenário|Esquema do Cenário|Exemplos):/gm, '$1<span class="g-cenario">$2:<\/span>')
+        .replace(/^(\s*)(Dado|Dada|Dados|Dadas|Quando|Então|E|Mas)(?= )/gm, '$1<span class="g-passo">$2<\/span>');
+      gs[g].setAttribute("data-pronto", "1");
+    }
+
+    // Sumário automático: <nav class="sumario"><\/nav> recebe os <h2> de <main>
+    var nav = d.querySelector("nav.sumario");
+    if (nav && !nav.querySelector("ol")) {
+      var hs = d.querySelectorAll("main > section > h2"), ol = d.createElement("ol");
+      for (var k = 0; k < hs.length; k++) {
+        var sec = hs[k].closest("section"), id = (sec && sec.id) || hs[k].id;
+        if (!id) continue;
+        var li = d.createElement("li"), a = d.createElement("a");
+        a.href = "#" + id; a.textContent = hs[k].textContent; li.appendChild(a); ol.appendChild(li);
+      }
+      nav.innerHTML = '<p class="boaz-eyebrow">Sumário<\/p>'; nav.appendChild(ol);
+    }
+
+    // Conferência da marca d'água: versão e data iguais em <meta>, carimbo, histórico e rodapé
+    var v = meta("versao"), dt = meta("data"), erros = [];
+    var cv = d.querySelector(".boaz-carimbo .boaz-versao"), cd = d.querySelector(".boaz-carimbo .boaz-data");
+    var h1 = d.querySelector(".boaz-historico tbody tr"), lr = d.querySelector(".boaz-rodape-linha");
+    if (!cv || norm(cv.textContent) !== norm(v)) erros.push("versão do carimbo");
+    if (!cd || norm(cd.textContent) !== norm(dt)) erros.push("data do carimbo");
+    if (!h1 || norm(h1.cells[0].textContent) !== norm(v) || norm(h1.cells[1].textContent) !== norm(dt)) erros.push("1ª linha do histórico");
+    if (!lr || norm(lr.textContent).indexOf(norm(v) + norm(dt)) < 0) erros.push("linha do rodapé");
+    if (erros.length) {
+      barra.setAttribute("data-alerta", "");
+      barra.querySelector(".boaz-pdf").title = "Marca d'água diferente de <meta boaz:versao/data>: " + erros.join(", ");
+      if (window.console) console.warn("boaz: marca d'água inconsistente →", erros.join(", "));
+    }
+  }
+  if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", montar); else montar();
+})();
+</script>
+<!-- boaz:casca:fim -->
+</head>
+<body>
+<header class="boaz-marca-topo">
+  <p class="boaz-eyebrow">boaz · Funcionalidade</p>
+  <h1>Quest · UX base</h1>
+  <p class="boaz-objetivo"><span>Objetivo</span>definir como o participante e o responsável acessam o quest pelo código de acesso e como tarefas, módulos fixos e perfil se distribuem no celular e na web.</p>
+  <dl class="boaz-carimbo">
+    <div><dt>Documento</dt><dd>09_quest-ux</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v03</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-19 · 00:53</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+  </dl>
+</header>
+<main>
+  <nav class="sumario"></nav>
+  <section id="contexto">
+    <h2>Contexto</h2>
+    <p>Terceiro documento de UX base, depois de <a class="ref" href="07_landing-page-ux.html">Landing page · UX base</a> e <a class="ref" href="08_hub-ux.html">Hub · UX base</a>. O <a class="ref" href="99_glossario.html#quest">quest</a> é onde o <a class="ref" href="00_visao-produto.html#personas">Participante</a> (estudante ou colaborador de empresa) e o Responsável acompanham tarefas, resultados e os módulos que a instituição liberou, no navegador e no app. Não há cadastro no quest: a instituição entrega um código de acesso, e esse código abre o perfil. Cada <a class="ref" href="99_glossario.html#modulo">módulo</a> ocupa os espaços em roxo tracejado das <a class="ref" href="99_glossario.html#blueprint">blueprints</a>; a sala do quiz também é um módulo.</p>
+    <p class="historia"><span>Como</span> <strong>estudante ou responsável</strong>, <span>quero</span> entrar só com o código que a escola me deu e ver primeiro o que vence antes, <span>para</span> não perder prazos nem procurar onde cada coisa fica</p>
+    <aside class="destaque nota"><p>Exemplo de um módulo de carteirinha, só para mostrar a estrutura. A instituição contrata e configura o módulo no hub. No quest, a carteirinha já traz o nome do estudante, a série e os responsáveis, e aparece em Fixos com o aviso para completar. O estudante envia a foto pelo app, com a autorização dos responsáveis, e a carteirinha fica pronta.</p></aside>
+  </section>
+  <section id="requisitos-funcionais">
+    <h2>Requisitos funcionais</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
+      <tbody>
+        <tr id="RF-29"><td><code class="id">RF-29</code></td><td>O sistema deve abrir o quest na tela de acesso, com um card por perfil já acessado no aparelho (foto, nome, instituição, turma e ano) e a ação <q class="ui">Inserir outro código</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-30"><td><code class="id">RF-30</code></td><td>O sistema deve mostrar na tela de acesso um aviso de que os códigos de acesso são entregues e recuperados pela instituição</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-31"><td><code class="id">RF-31</code></td><td>O sistema deve guardar no aparelho o código de acesso de cada perfil que entrou por ele, até a pessoa tocar em <q class="ui">Remover</q> no card do perfil, que apaga o código guardado</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-32"><td><code class="id">RF-32</code></td><td>O sistema deve perguntar, ao entrar com um código de acesso, quem está acessando: o próprio participante ou um responsável, com o parentesco</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-33"><td><code class="id">RF-33</code></td><td>O sistema deve oferecer na tela de acesso a ação <q class="ui">Entrar numa sala</q>, que leva pelo <a class="ref" href="99_glossario.html#codigo-da-sala">código da sala</a> ao módulo da sala</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-34"><td><code class="id">RF-34</code></td><td>O sistema deve manter, em toda tela do perfil, a casca com o perfil ativo no topo e a navegação entre Tarefas, Fixos e Perfil, como barra inferior na janela compact, trilho nas janelas medium e expanded e gaveta a partir da large</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-35"><td><code class="id">RF-35</code></td><td>O sistema deve voltar à tela de acesso quando a pessoa toca no perfil ativo do topo</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-36"><td><code class="id">RF-36</code></td><td>O sistema deve abrir o perfil em Tarefas, com as tarefas pendentes da que vence primeiro à que vence por último e, depois delas, as sem prazo</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-37"><td><code class="id">RF-37</code></td><td>O sistema deve mostrar em cada card de tarefa o módulo de origem, o título e o prazo restante</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-38"><td><code class="id">RF-38</code></td><td>O sistema deve mostrar em Fixos, em grade, os módulos sempre disponíveis ao participante, cada um com o número de notificações não lidas</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-39"><td><code class="id">RF-39</code></td><td>O sistema deve mostrar em Perfil o painel do módulo de perfil, com agenda, notas, pontuação e engajamento do ano do código de acesso</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-40"><td><code class="id">RF-40</code></td><td>O sistema deve mostrar um aviso para completar, no card e no módulo aberto, quando um módulo pede algo ao participante ou ao responsável</td><td><span class="prio prio-deve">Deve</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="regras-de-negocio">
+    <h2>Regras de negócio</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Regra</th></tr></thead>
+      <tbody>
+        <tr id="RN-91"><td><code class="id">RN-91</code></td><td>A instituição gera um código de acesso único ao cadastrar cada participante; a empresa pode usar a identificação do funcionário como base</td></tr>
+        <tr id="RN-92"><td><code class="id">RN-92</code></td><td>O código de acesso do estudante menor de idade é entregue aos responsáveis; nos outros casos, ao próprio participante</td></tr>
+        <tr id="RN-93"><td><code class="id">RN-93</code></td><td>Só a instituição gera, troca e recupera códigos de acesso; quem esquece o código pede à instituição</td></tr>
+        <tr id="RN-94"><td><code class="id">RN-94</code></td><td>O estudante e os responsáveis entram com o mesmo código de acesso; a sessão registra quem acessou e o parentesco</td></tr>
+        <tr id="RN-95"><td><code class="id">RN-95</code></td><td>Quem acompanha mais de um estudante entra com o código de cada um, e cada perfil acessado fica na tela de acesso do aparelho</td></tr>
+        <tr id="RN-96"><td><code class="id">RN-96</code></td><td>Na troca de ano ou de turma, a instituição gera um novo código de acesso para o ano novo, que começa sem dados; o código de cada ano anterior continua abrindo os dados daquele ano</td></tr>
+        <tr id="RN-97"><td><code class="id">RN-97</code></td><td>Uma tarefa com prazo fica em Tarefas até o prazo vencer; o módulo da tarefa define se aceita entrega depois do prazo</td></tr>
+        <tr id="RN-98"><td><code class="id">RN-98</code></td><td>Um módulo fixo, como uma tarefa de estudo com flashcards, fica disponível ao participante até a instituição revogar</td></tr>
+        <tr id="RN-99"><td><code class="id">RN-99</code></td><td>A instituição contrata e configura no hub os módulos que o participante usa no quest; o participante só usa</td></tr>
+        <tr id="RN-100"><td><code class="id">RN-100</code></td><td>A sala é um módulo: espera, perguntas, ranking e resultado ficam no documento do módulo da sala</td></tr>
+        <tr id="RN-101"><td><code class="id">RN-101</code></td><td>Numa sala aberta de evento público, o evento define se aceita participante anônimo ou se pede o código de acesso</td></tr>
+        <tr id="RN-102"><td><code class="id">RN-102</code></td><td>Um dado que o estudante menor de idade envia a pedido de um módulo, como a foto da carteirinha, depende da autorização dos responsáveis</td></tr>
+        <tr id="RN-103"><td><code class="id">RN-103</code></td><td>O documento de cada módulo define o card, a tarefa, o aviso para completar e o conteúdo, sem mudar a casca desta UX base</td></tr>
+        <tr id="RN-104"><td><code class="id">RN-104</code></td><td>Mudar a casca ou a estrutura das telas exige uma nova versão deste documento e das blueprints antes de chegar à UI (13_quest_ui)</td></tr>
+        <tr id="RN-105"><td><code class="id">RN-105</code></td><td>O responsável vê o perfil do mesmo jeito que o estudante; cabe a ele deixar que o próprio estudante responda às tarefas</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="requisitos-nao-funcionais">
+    <h2>Requisitos não funcionais</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
+      <tbody>
+        <tr id="RNF-136"><td><code class="id">RNF-136</code></td><td><span class="tag">Usabilidade</span></td><td>Um perfil já acessado abre com 1 toque na tela de acesso, sem digitar o código de novo</td></tr>
+        <tr id="RNF-137"><td><code class="id">RNF-137</code></td><td><span class="tag">Usabilidade</span></td><td>O prazo da tarefa aparece em texto relativo e em data, como <q class="ui">vence em 2 dias · 21/10</q></td></tr>
+        <tr id="RNF-138"><td><code class="id">RNF-138</code></td><td><span class="tag">Compatibilidade</span></td><td>A grade de Fixos tem 2 colunas no compact, 3 no medium e 4 a partir do expanded</td></tr>
+        <tr id="RNF-139"><td><code class="id">RNF-139</code></td><td><span class="tag">Compatibilidade</span></td><td>No expanded e acima, Tarefas mostra ao lado o resumo do perfil</td></tr>
+        <tr id="RNF-140"><td><code class="id">RNF-140</code></td><td><span class="tag">Acessibilidade</span></td><td>A tarefa que vence hoje é indicada em texto, não só por cor</td></tr>
+        <tr id="RNF-141"><td><code class="id">RNF-141</code></td><td><span class="tag">Acessibilidade</span></td><td>O leitor de tela anuncia o número de notificações junto com o nome do módulo</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="criterios-de-aceite">
+    <h2>Critérios de aceite</h2>
+    <article class="criterio" id="ca-RF-29">
+      <h3><code class="id">RF-29</code> Perfis acessados</h3>
+      <pre class="gherkin">Cenário: responsável com dois filhos
+  Dado um responsável que já entrou neste aparelho com o código de cada filho
+  Quando abre o quest
+  Então vê dois cards, cada um com a foto, o nome, a instituição, a turma e o ano do filho
+  E a ação "Inserir outro código"</pre>
+    </article>
+    <article class="criterio" id="ca-RF-30">
+      <h3><code class="id">RF-30</code> Aviso dos códigos</h3>
+      <pre class="gherkin">Cenário: primeira vez no aparelho
+  Dado um aparelho sem perfil acessado
+  Quando a pessoa abre o quest
+  Então vê o aviso de que os códigos de acesso são entregues e recuperados pela instituição</pre>
+    </article>
+    <article class="criterio" id="ca-RF-31">
+      <h3><code class="id">RF-31</code> Código guardado</h3>
+      <pre class="gherkin">Cenário: voltar sem digitar
+  Dado um estudante que entrou com o código de acesso neste aparelho
+  Quando abre o quest de novo
+  Então toca no card do perfil e entra sem digitar o código
+
+Cenário: remover de um aparelho compartilhado
+  Dado um perfil acessado num aparelho compartilhado
+  Quando a pessoa toca em "Remover" no card do perfil
+  Então o card sai da tela de acesso e o código guardado é apagado</pre>
+    </article>
+    <article class="criterio" id="ca-RF-32">
+      <h3><code class="id">RF-32</code> Quem está acessando</h3>
+      <pre class="gherkin">Cenário: mãe entra com o código do filho
+  Dado o código de acesso de um estudante
+  Quando a pessoa informa o código e escolhe "Sou responsável" e "mãe"
+  Então entra no perfil do estudante
+  E a sessão registra que a mãe acessou</pre>
+    </article>
+    <article class="criterio" id="ca-RF-33">
+      <h3><code class="id">RF-33</code> Entrar numa sala</h3>
+      <pre class="gherkin">Cenário: visitante de evento aberto
+  Dado uma sala aberta que aceita participante anônimo
+  Quando um visitante toca em "Entrar numa sala" e informa o código da sala
+  Então entra no módulo da sala sem código de acesso</pre>
+    </article>
+    <article class="criterio" id="ca-RF-34">
+      <h3><code class="id">RF-34</code> Casca do perfil</h3>
+      <pre class="gherkin">Cenário: do celular para a web
+  Dado o perfil aberto numa janela compact com a barra inferior
+  Quando a janela passa a expanded
+  Então a navegação vira trilho à esquerda, com Tarefas, Fixos e Perfil</pre>
+    </article>
+    <article class="criterio" id="ca-RF-35">
+      <h3><code class="id">RF-35</code> Trocar de perfil</h3>
+      <pre class="gherkin">Cenário: ir para o outro filho
+  Dado um responsável no perfil do primeiro filho
+  Quando toca no perfil ativo do topo
+  Então volta à tela de acesso com os dois perfis</pre>
+    </article>
+    <article class="criterio" id="ca-RF-36">
+      <h3><code class="id">RF-36</code> Ordem das tarefas</h3>
+      <pre class="gherkin">Cenário: prazos diferentes
+  Dado uma tarefa que vence em 5 dias, uma que vence hoje e uma sem prazo
+  Quando o estudante abre Tarefas
+  Então vê a que vence hoje, depois a de 5 dias e, por último, a sem prazo</pre>
+    </article>
+    <article class="criterio" id="ca-RF-37">
+      <h3><code class="id">RF-37</code> Card de tarefa</h3>
+      <pre class="gherkin">Cenário: tarefa com prazo
+  Dado uma tarefa do módulo de exercícios que vence em 2 dias
+  Então o card mostra o módulo de exercícios, o título e "vence em 2 dias"</pre>
+    </article>
+    <article class="criterio" id="ca-RF-38">
+      <h3><code class="id">RF-38</code> Fixos</h3>
+      <pre class="gherkin">Cenário: chat da turma com mensagens novas
+  Dado cinco mensagens não lidas no chat da turma
+  Quando o estudante abre Fixos
+  Então o card do chat da turma mostra 5</pre>
+    </article>
+    <article class="criterio" id="ca-RF-39">
+      <h3><code class="id">RF-39</code> Perfil</h3>
+      <pre class="gherkin">Cenário: estudante que mudou de ano
+  Dado um estudante com o código do ano passado e o novo código deste ano guardados no aparelho
+  Quando abre o perfil pelo código deste ano
+  Então Perfil mostra só os dados deste ano
+  E o card do ano passado, na tela de acesso, abre os dados daquele ano</pre>
+    </article>
+    <article class="criterio" id="ca-RF-40">
+      <h3><code class="id">RF-40</code> Aviso para completar</h3>
+      <pre class="gherkin">Cenário: carteirinha sem foto
+  Dado o módulo de carteirinha esperando a foto do estudante
+  Quando o estudante abre Fixos
+  Então o card da carteirinha mostra o aviso para completar
+  E o módulo aberto pede a foto</pre>
+    </article>
+  </section>
+  <section id="fora-de-escopo">
+    <h2>Fora de escopo</h2>
+    <ul class="fora">
+      <li>Sala do quiz (espera, perguntas, ranking, resultado e o apelido do visitante anônimo): documento do módulo da sala</li>
+      <li>Telas internas de cada módulo (tarefas, flashcards, chat da turma, carteirinha, perfil): documentos dos módulos</li>
+      <li>Geração, formato e entrega dos códigos de acesso pela instituição: módulo de cadastro, no hub</li>
+      <li>Regras de login, inclusive tentativas erradas do código de acesso: documento das regras de login</li>
+      <li>Textos finais, cores, tipografia e componentes: componentes compostos (10) e UI do quest (13)</li>
+    </ul>
+  </section>
+  <section id="diagramas">
+    <h2>Diagramas</h2>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/blueprint-quest-acesso_v02_20261019-0040.svg"><img src="../2_Diagramas/blueprint-quest-acesso_v02_20261019-0040.svg" alt="Blueprint do acesso ao quest: perfis acessados no aparelho, código de acesso, quem está acessando e entrada numa sala"></a>
+      <figcaption><strong>Quest · acesso · blueprint de UX</strong><code>2_Diagramas/blueprint-quest-acesso_v02_20261019-0040.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/blueprint-quest-casca_v02_20261019-0040.svg"><img src="../2_Diagramas/blueprint-quest-casca_v02_20261019-0040.svg" alt="Blueprint da casca do perfil no quest: tarefas por prazo, módulos fixos com notificações e painel do perfil"></a>
+      <figcaption><strong>Quest · tarefas, fixos e perfil · blueprint de UX</strong><code>2_Diagramas/blueprint-quest-casca_v02_20261019-0040.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/blueprint-quest-modulo_v01_20261019-0028.svg"><img src="../2_Diagramas/blueprint-quest-modulo_v01_20261019-0028.svg" alt="Blueprint do módulo aberto no quest: aviso para completar e espaço do módulo"></a>
+      <figcaption><strong>Quest · módulo aberto · blueprint de UX</strong><code>2_Diagramas/blueprint-quest-modulo_v01_20261019-0028.svg</code></figcaption>
+    </figure>
+  </section>
+</main>
+<footer class="boaz-marca-rodape">
+  <p class="boaz-eyebrow">Histórico</p>
+  <table class="boaz-historico">
+    <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
+    <tbody>
+      <tr><td><span class="boaz-versao">v03</span></td><td>2026-10-19 00:53</td><td>Status → Aprovado</td></tr>
+      <tr><td>v02</td><td>2026-10-19 00:41</td><td>Pendências respondidas: <code class="id">RN-105</code> incluído; <code class="id">RF-29</code>, <code class="id">RF-31</code>, <code class="id">RF-39</code> e <code class="id">RN-96</code> alterados (cada código abre o seu ano; Remover no card); apelido do anônimo e formato do código fora de escopo; blueprints de acesso e da casca v02; seção Em aberto removida</td></tr>
+      <tr><td>v01</td><td>2026-10-19 00:30</td><td>Criação: <code class="id">RF-29</code> a <code class="id">RF-40</code>, <code class="id">RN-91</code> a <code class="id">RN-104</code>, <code class="id">RNF-136</code> a <code class="id">RNF-141</code> e blueprints de acesso, casca do perfil e módulo aberto</td></tr>
+    </tbody>
+  </table>
+  <div class="boaz-rodape-linha">
+    <span>boaz · v03 · 2026-10-19 00:53</span>
+    <span class="boaz-arquivo">1_Requisitos/09_quest-ux.html</span>
+  </div>
+</footer>
+</body>
+</html>
