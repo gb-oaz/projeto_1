@@ -1,0 +1,290 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1712 1514" width="1712" height="1514">
+  <title>Hub · entrada · blueprint de UX</title>
+  <desc>Blueprint de UX da entrada no hub (requisito 08_hub-ux): entrar e criar conta. v01: criação.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <!-- ── markers, filtro e gradiente da marca d'água: copie sempre ── -->
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1712" height="1514"/>
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="1712" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="1712" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · BLUEPRINT DE UX</text>
+    <text class="title" x="40" y="72">Hub · entrada · blueprint de UX</text>
+    <text class="subtitle" x="40" y="94">Entrar e criar conta no celular (compact) e na web (expanded)</text>
+    <text class="wm-meta-label" x="1424" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1424" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1448" y="71" text-anchor="middle">v01</text>
+    <line class="wm-sep" x1="1496" y1="32" x2="1496" y2="80"/>
+    <text class="wm-meta-label" x="1520" y="44">DATA</text>
+    <text class="wm-meta-value" x="1520" y="72">2026-10-18 · 23:06</text>
+  </g>
+  <g id="compact-entrar">
+  <rect class="panel" x="40" y="152" width="360" height="624" rx="24" filter="url(#sombra)"/>
+  <g id="c-topo">
+  <rect class="node-orange" x="56" y="168" width="328" height="80" rx="12"/>
+  <circle class="chip" cx="76" cy="183" r="9"/><text class="chip-text" x="76" y="187" text-anchor="middle">1</text>
+  <text class="boundary-label" x="92" y="187">TOPO</text>
+  <rect class="node-face" x="140" y="198" width="160" height="40" rx="8"/>
+  <text class="label" x="220" y="222.5" text-anchor="middle">logo do hub</text>
+  </g>
+  <g id="c-boas-vindas">
+  <rect class="boundary" x="56" y="256" width="328" height="176" rx="12"/>
+  <circle class="chip" cx="76" cy="271" r="9"/><text class="chip-text" x="76" y="275" text-anchor="middle">2</text>
+  <text class="boundary-label" x="92" y="275">BOAS-VINDAS</text>
+  <rect class="node-face" x="140" y="286" width="160" height="96" rx="8"/>
+  <text class="label" x="220" y="331" text-anchor="middle">mascote</text>
+  <text class="muted" x="220" y="347" text-anchor="middle">boas-vindas · feliz</text>
+  <rect class="node-face" x="68" y="390" width="304" height="32" rx="8"/>
+  <text class="label" x="220" y="410.5" text-anchor="middle">Título · Entrar</text>
+  </g>
+  <g id="c-form">
+  <rect class="boundary" x="56" y="440" width="328" height="224" rx="12"/>
+  <circle class="chip" cx="76" cy="455" r="9"/><text class="chip-text" x="76" y="459" text-anchor="middle">3</text>
+  <text class="boundary-label" x="92" y="459">ENTRAR</text>
+  <rect class="node-face" x="68" y="470" width="304" height="40" rx="8"/>
+  <text class="label" x="220" y="494.5" text-anchor="middle">campo · e-mail</text>
+  <rect class="node-face" x="68" y="518" width="304" height="40" rx="8"/>
+  <text class="label" x="220" y="542.5" text-anchor="middle">campo · senha</text>
+  <rect class="node-blue" x="68" y="566" width="304" height="48" rx="8"/>
+  <text class="label" x="220" y="594.5" text-anchor="middle">Entrar</text>
+  <rect class="node-face" x="68" y="622" width="304" height="32" rx="8"/>
+  <text class="label" x="220" y="642.5" text-anchor="middle">Esqueci a senha</text>
+  </g>
+  <g id="c-criar">
+  <rect class="boundary" x="56" y="672" width="328" height="88" rx="12"/>
+  <circle class="chip" cx="76" cy="687" r="9"/><text class="chip-text" x="76" y="691" text-anchor="middle">4</text>
+  <text class="boundary-label" x="92" y="691">CRIAR CONTA</text>
+  <rect class="node-face" x="68" y="702" width="304" height="48" rx="8"/>
+  <text class="label" x="220" y="723" text-anchor="middle">Criar conta</text>
+  <text class="muted" x="220" y="739" text-anchor="middle">vai ao cadastro</text>
+  </g>
+  <text class="mono" x="220" y="800" text-anchor="middle">compact · 360dp · entrar</text>
+  </g>
+  <g id="compact-cadastro">
+  <rect class="panel" x="496" y="152" width="360" height="704" rx="24" filter="url(#sombra)"/>
+  <g id="k-topo">
+  <rect class="node-orange" x="512" y="168" width="328" height="80" rx="12"/>
+  <circle class="chip" cx="532" cy="183" r="9"/><text class="chip-text" x="532" y="187" text-anchor="middle">1</text>
+  <text class="boundary-label" x="548" y="187">TOPO</text>
+  <rect class="node-face" x="524" y="198" width="40" height="40" rx="8"/>
+  <text class="label" x="544" y="222.5" text-anchor="middle">←</text>
+  <rect class="node-face" x="572" y="198" width="256" height="40" rx="8"/>
+  <text class="label" x="700" y="222.5" text-anchor="middle">Criar conta</text>
+  </g>
+  <g id="k-tipo">
+  <rect class="boundary" x="512" y="256" width="328" height="224" rx="12"/>
+  <circle class="chip" cx="532" cy="271" r="9"/><text class="chip-text" x="532" y="275" text-anchor="middle">5</text>
+  <text class="boundary-label" x="548" y="275">TIPO DE CONTA</text>
+  <rect class="node-face" x="524" y="286" width="304" height="56" rx="8"/>
+  <text class="label" x="676" y="318.5" text-anchor="middle">Instituição · escola</text>
+  <rect class="node-face" x="524" y="350" width="304" height="56" rx="8"/>
+  <text class="label" x="676" y="382.5" text-anchor="middle">Instituição · empresa</text>
+  <rect class="node-face" x="524" y="414" width="304" height="56" rx="8"/>
+  <text class="label" x="676" y="446.5" text-anchor="middle">Educador autônomo</text>
+  </g>
+  <g id="k-dados">
+  <rect class="boundary" x="512" y="488" width="328" height="216" rx="12"/>
+  <circle class="chip" cx="532" cy="503" r="9"/><text class="chip-text" x="532" y="507" text-anchor="middle">6</text>
+  <text class="boundary-label" x="548" y="507">DADOS DO CADASTRO</text>
+  <rect class="node-purple edge-async" x="524" y="518" width="304" height="176" rx="8"/>
+  <text class="label" x="676" y="603" text-anchor="middle">campos do cadastro</text>
+  <text class="muted" x="676" y="619" text-anchor="middle">definidos no módulo de cadastro</text>
+  </g>
+  <g id="k-acao">
+  <rect class="boundary" x="512" y="712" width="328" height="128" rx="12"/>
+  <circle class="chip" cx="532" cy="727" r="9"/><text class="chip-text" x="532" y="731" text-anchor="middle">7</text>
+  <text class="boundary-label" x="548" y="731">AÇÃO</text>
+  <rect class="node-blue" x="524" y="742" width="304" height="48" rx="8"/>
+  <text class="label" x="676" y="770.5" text-anchor="middle">Criar conta</text>
+  <rect class="node-face" x="524" y="798" width="304" height="32" rx="8"/>
+  <text class="label" x="676" y="818.5" text-anchor="middle">Já tenho conta · Entrar</text>
+  </g>
+  <text class="mono" x="676" y="880" text-anchor="middle">compact · 360dp · criar conta</text>
+  </g>
+  <g id="expanded-entrar">
+  <rect class="panel" x="952" y="152" width="720" height="464" rx="24" filter="url(#sombra)"/>
+  <g id="e-topo">
+  <rect class="node-orange" x="968" y="168" width="688" height="80" rx="12"/>
+  <circle class="chip" cx="988" cy="183" r="9"/><text class="chip-text" x="988" y="187" text-anchor="middle">1</text>
+  <text class="boundary-label" x="1004" y="187">TOPO</text>
+  <rect class="node-face" x="980" y="198" width="160" height="40" rx="8"/>
+  <text class="label" x="1060" y="222.5" text-anchor="middle">logo do hub</text>
+  <rect class="node-face" x="1572" y="198" width="72" height="40" rx="8"/>
+  <text class="label" x="1608" y="222.5" text-anchor="middle">tema</text>
+  </g>
+  <g id="e-boas-vindas">
+  <rect class="boundary" x="968" y="256" width="336" height="272" rx="12"/>
+  <circle class="chip" cx="988" cy="271" r="9"/><text class="chip-text" x="988" y="275" text-anchor="middle">2</text>
+  <text class="boundary-label" x="1004" y="275">BOAS-VINDAS</text>
+  <rect class="node-face" x="980" y="286" width="312" height="232" rx="8"/>
+  <text class="label" x="1136" y="399" text-anchor="middle">mascote e frase de boas-vindas</text>
+  <text class="muted" x="1136" y="415" text-anchor="middle">boas-vindas · feliz</text>
+  </g>
+  <g id="e-form">
+  <rect class="boundary" x="1320" y="256" width="336" height="256" rx="12"/>
+  <circle class="chip" cx="1340" cy="271" r="9"/><text class="chip-text" x="1340" y="275" text-anchor="middle">3</text>
+  <text class="boundary-label" x="1356" y="275">ENTRAR</text>
+  <rect class="node-face" x="1332" y="286" width="312" height="32" rx="8"/>
+  <text class="label" x="1488" y="306.5" text-anchor="middle">Título · Entrar</text>
+  <rect class="node-face" x="1332" y="326" width="312" height="40" rx="8"/>
+  <text class="label" x="1488" y="350.5" text-anchor="middle">campo · e-mail</text>
+  <rect class="node-face" x="1332" y="374" width="312" height="40" rx="8"/>
+  <text class="label" x="1488" y="398.5" text-anchor="middle">campo · senha</text>
+  <rect class="node-blue" x="1332" y="422" width="312" height="40" rx="8"/>
+  <text class="label" x="1488" y="446.5" text-anchor="middle">Entrar</text>
+  <rect class="node-face" x="1332" y="470" width="312" height="32" rx="8"/>
+  <text class="label" x="1488" y="490.5" text-anchor="middle">Esqueci a senha</text>
+  </g>
+  <g id="e-criar">
+  <rect class="boundary" x="1320" y="520" width="336" height="80" rx="12"/>
+  <circle class="chip" cx="1340" cy="535" r="9"/><text class="chip-text" x="1340" y="539" text-anchor="middle">4</text>
+  <text class="boundary-label" x="1356" y="539">CRIAR CONTA</text>
+  <rect class="node-face" x="1332" y="550" width="312" height="40" rx="8"/>
+  <text class="label" x="1488" y="574.5" text-anchor="middle">Criar conta</text>
+  </g>
+  <text class="mono" x="1312" y="640" text-anchor="middle">expanded · 1280dp · desenhado na escala 0,56</text>
+  </g>
+  <g id="anotacoes">
+  <text class="section" x="496" y="944">BLOCOS</text>
+  <circle class="chip" cx="505" cy="971" r="9"/><text class="chip-text" x="505" y="975" text-anchor="middle">1</text>
+  <text class="label-strong" x="524" y="976">Topo</text>
+  <text class="muted" x="524" y="994">logo do hub; na criação de conta, voltar</text>
+  <circle class="chip" cx="505" cy="1023" r="9"/><text class="chip-text" x="505" y="1027" text-anchor="middle">2</text>
+  <text class="label-strong" x="524" y="1028">Boas-vindas</text>
+  <text class="muted" x="524" y="1046">mascote feliz e o título da tela</text>
+  <circle class="chip" cx="505" cy="1075" r="9"/><text class="chip-text" x="505" y="1079" text-anchor="middle">3</text>
+  <text class="label-strong" x="524" y="1080">Entrar</text>
+  <text class="muted" x="524" y="1098">e-mail, senha, Entrar e Esqueci a senha</text>
+  <circle class="chip" cx="505" cy="1127" r="9"/><text class="chip-text" x="505" y="1131" text-anchor="middle">4</text>
+  <text class="label-strong" x="524" y="1132">Criar conta</text>
+  <text class="muted" x="524" y="1150">leva ao cadastro</text>
+  <circle class="chip" cx="505" cy="1179" r="9"/><text class="chip-text" x="505" y="1183" text-anchor="middle">5</text>
+  <text class="label-strong" x="524" y="1184">Tipo de conta</text>
+  <text class="muted" x="524" y="1202">instituição (escola ou empresa)</text>
+  <text class="muted" x="524" y="1220">ou educador autônomo</text>
+  <circle class="chip" cx="505" cy="1249" r="9"/><text class="chip-text" x="505" y="1253" text-anchor="middle">6</text>
+  <text class="label-strong" x="524" y="1254">Dados do cadastro</text>
+  <text class="muted" x="524" y="1272">espaço do módulo de cadastro</text>
+  <circle class="chip" cx="505" cy="1301" r="9"/><text class="chip-text" x="505" y="1305" text-anchor="middle">7</text>
+  <text class="label-strong" x="524" y="1306">Ação</text>
+  <text class="muted" x="524" y="1324">Criar conta; volta a Entrar</text>
+  </g>
+  <g id="marca-rodape" transform="translate(0,1398)">
+    <rect class="wm-band" x="0" y="0" width="1712" height="116"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="1712" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-face" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">Bloco base</text>
+    <rect class="node-blue" x="160" y="47" width="14" height="14" rx="3"/><text class="label" x="182" y="58">Ação principal</text>
+    <rect class="node-purple edge-async" x="308" y="47" width="14" height="14" rx="3"/><text class="label" x="330" y="58">Espaço de módulo</text>
+    <rect class="node-orange" x="470" y="47" width="14" height="14" rx="3"/><text class="label" x="492" y="58">Fixo na tela</text>
+    <rect class="boundary" x="604" y="47" width="14" height="14" rx="3"/><text class="label" x="626" y="58">Seção</text>
+    <line class="divider" x1="40" y1="76" x2="1672" y2="76"/>
+    <text class="footer" x="40" y="100">v01 · criação: entrar e criar conta no compact, entrar no expanded</text>
+    <text class="wm-file" x="1672" y="100" text-anchor="end">blueprint-hub-entrada_v01_20261018-2306.svg</text>
+  </g>
+</svg>
