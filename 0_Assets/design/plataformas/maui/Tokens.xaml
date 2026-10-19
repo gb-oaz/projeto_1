@@ -254,6 +254,11 @@
   <x:Double x:Key="CarouselIndicatorDotSize">8</x:Double>
   <x:Double x:Key="CarouselIndicatorActiveWidth">24</x:Double>
   <x:Double x:Key="CarouselIndicatorGap">8</x:Double>
+  <x:Double x:Key="SwitchTrackWidth">52</x:Double>
+  <x:Double x:Key="SwitchTrackHeight">32</x:Double>
+  <x:Double x:Key="SwitchTrackOutlineWidth">2</x:Double>
+  <x:Double x:Key="SwitchHandleSize">16</x:Double>
+  <x:Double x:Key="SwitchSelectedHandleSize">24</x:Double>
 
   <!-- ── tipografia: um estilo de Label por papel (x:Key = papel em PascalCase) ── -->
   <Style x:Key="DisplayLarge" TargetType="Label">

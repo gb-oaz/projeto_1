@@ -260,6 +260,23 @@
         "indicator-active-color": { "$value": "{md.sys.color.primary}" },
         "position-label": { "$value": "{md.sys.typescale.label-medium}" },
         "position-label-color": { "$value": "{md.sys.color.on-surface-variant}" }
+      },
+
+      "switch": {
+        "$descricao": "Interruptor: liga ou desliga uma opção na hora (ex.: mascotes nas cores do tema).",
+        "track-width": { "$value": 52 },
+        "track-height": { "$value": 32 },
+        "track-shape": { "$value": "{md.sys.shape.corner.full}" },
+        "track-outline-width": { "$value": 2 },
+        "handle-size": { "$value": 16 },
+        "selected-handle-size": { "$value": 24 },
+        "selected-track-color": { "$value": "{md.sys.color.primary}" },
+        "selected-handle-color": { "$value": "{md.sys.color.on-primary}" },
+        "track-color": { "$value": "{md.sys.color.surface-container-highest}" },
+        "outline-color": { "$value": "{md.sys.color.outline}" },
+        "handle-color": { "$value": "{md.sys.color.outline}" },
+        "label": { "$value": "{md.sys.typescale.body-large}" },
+        "label-color": { "$value": "{md.sys.color.on-surface}" }
       }
     }
   }
