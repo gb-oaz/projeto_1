@@ -18,6 +18,9 @@ import { criarFundos, coresDosFundos, CONCEITOS, FORMATOS } from './fundos.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 
+// núcleo dos fundos no Node (o tema.svg desenha com ele o fundo dos cards)
+export const fundosNode = () => criarFundos({ marca: criarMarca(medirNome()), geometria, pecas, mascotes });
+
 export function arquivosFundos(cores, marca) {
   const temas = coresDosFundos(cores, temasDosMascotes(cores, marca));
   const f = criarFundos({ marca: criarMarca(medirNome()), geometria, pecas, mascotes });
