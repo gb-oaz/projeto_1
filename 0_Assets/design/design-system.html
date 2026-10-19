@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v22</title>
+<title>Design system · boaz · v25</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v22">
-<meta name="design:data" content="2026-10-19 03:01">
+<meta name="design:versao" content="v25">
+<meta name="design:data" content="2026-10-19 04:21">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -608,6 +608,23 @@
   --md-comp-carousel-position-label-tracking: var(--md-sys-typescale-label-medium-tracking);
   --md-comp-carousel-position-label-weight: var(--md-sys-typescale-label-medium-weight);
   --md-comp-carousel-position-label-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-switch-track-width: 52px;
+  --md-comp-switch-track-height: 32px;
+  --md-comp-switch-track-shape: var(--md-sys-shape-corner-full);
+  --md-comp-switch-track-outline-width: 2px;
+  --md-comp-switch-handle-size: 16px;
+  --md-comp-switch-selected-handle-size: 24px;
+  --md-comp-switch-selected-track-color: var(--md-sys-color-primary);
+  --md-comp-switch-selected-handle-color: var(--md-sys-color-on-primary);
+  --md-comp-switch-track-color: var(--md-sys-color-surface-container-highest);
+  --md-comp-switch-outline-color: var(--md-sys-color-outline);
+  --md-comp-switch-handle-color: var(--md-sys-color-outline);
+  --md-comp-switch-label-font: var(--md-sys-typescale-body-large-font);
+  --md-comp-switch-label-size: var(--md-sys-typescale-body-large-size);
+  --md-comp-switch-label-line-height: var(--md-sys-typescale-body-large-line-height);
+  --md-comp-switch-label-tracking: var(--md-sys-typescale-body-large-tracking);
+  --md-comp-switch-label-weight: var(--md-sys-typescale-body-large-weight);
+  --md-comp-switch-label-color: var(--md-sys-color-on-surface);
 }
 
 @media (min-width: 600px) {
@@ -11011,6 +11028,20 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .md-segmented button[aria-pressed="true"] { background: var(--md-comp-segmented-button-selected-container-color); color: var(--md-comp-segmented-button-selected-label-color); }
 .md-segmented .material-symbols { font-size: var(--md-comp-segmented-button-icon-size); }
 
+/* ── interruptor (switch) ── */
+.md-switch {
+  position: relative; flex: none; box-sizing: border-box; width: var(--md-comp-switch-track-width); height: var(--md-comp-switch-track-height); padding: 0; cursor: pointer;
+  border: var(--md-comp-switch-track-outline-width) solid var(--md-comp-switch-outline-color); border-radius: var(--md-comp-switch-track-shape); background: var(--md-comp-switch-track-color);
+}
+.md-switch::after {
+  content: ""; position: absolute; top: 50%; left: var(--md-sys-spacing-1); width: var(--md-comp-switch-handle-size); height: var(--md-comp-switch-handle-size);
+  border-radius: var(--md-sys-shape-corner-full); background: var(--md-comp-switch-handle-color); transform: translateY(-50%);
+  transition: left var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+.md-switch[aria-checked="true"] { border-color: var(--md-comp-switch-selected-track-color); background: var(--md-comp-switch-selected-track-color); }
+.md-switch[aria-checked="true"]::after { left: calc(100% - var(--md-comp-switch-selected-handle-size) - var(--md-comp-switch-track-outline-width)); width: var(--md-comp-switch-selected-handle-size); height: var(--md-comp-switch-selected-handle-size); background: var(--md-comp-switch-selected-handle-color); }
+.md-linha-switch { display: flex; align-items: center; justify-content: space-between; gap: var(--md-sys-spacing-4); min-height: var(--md-comp-list-one-line-height); color: var(--md-comp-switch-label-color); font-family: var(--md-comp-switch-label-font); font-size: var(--md-comp-switch-label-size); letter-spacing: var(--md-comp-switch-label-tracking); }
+
 /* ── menu ── */
 .md-menu {
   box-sizing: border-box; min-width: var(--md-comp-menu-min-width); max-width: var(--md-comp-menu-max-width); margin: 0; padding: 8px 0; list-style: none;
@@ -11074,7 +11105,10 @@ window.dispatchEvent(new Event('boaz-fundos'));
 @media (min-width: 840px) { .cx-grade-modulos { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
 /* comuns · card do catálogo (vitrine da landing, catálogo do hub, outros módulos) */
-.cx-card-catalogo { display: grid; gap: var(--md-sys-spacing-3); padding: var(--md-comp-card-padding); border-radius: var(--md-comp-carousel-item-shape); background: var(--md-comp-card-outlined-container-color); border: 1px solid var(--md-comp-card-outlined-outline-color); }
+/* card do catálogo: fundo cheio e o mascote padrinho do módulo à direita, metade cortada pela borda */
+.cx-card-catalogo { position: relative; overflow: hidden; display: grid; gap: var(--md-sys-spacing-3); padding: var(--md-comp-card-padding) var(--md-sys-spacing-16) var(--md-comp-card-padding) var(--md-comp-card-padding); border-radius: var(--md-comp-carousel-item-shape); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.cx-card-catalogo .cx-texto-titulo, .cx-card-catalogo .cx-texto-apoio, .cx-card-catalogo .dado { color: var(--md-sys-color-on-secondary-container); }
+.cx-card-catalogo .padrinho { position: absolute; top: 50%; right: calc(-1 * var(--md-sys-spacing-16)); width: calc(2 * var(--md-sys-spacing-16)); height: auto; transform: translateY(-50%); pointer-events: none; }
 .cx-card-catalogo .cabeca { display: flex; gap: var(--md-sys-spacing-3); align-items: center; }
 .cx-card-catalogo .dado { color: var(--md-sys-color-primary); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-label-large-weight); }
 .cx-card-catalogo .md-button { justify-self: start; }
@@ -11093,6 +11127,17 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .cx-boas-vindas { display: grid; justify-items: center; gap: var(--md-sys-spacing-3); padding: var(--md-sys-spacing-6) var(--md-sys-spacing-4); text-align: center; }
 .cx-boas-vindas img { width: var(--md-sys-spacing-24); height: var(--md-sys-spacing-24); }
 .cx-boas-vindas h3 { margin: 0; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-headline-small-weight); }
+/* turma de mascotes: todas as expressões, pequenas e lado a lado, em formas variadas e proporção normal */
+.cx-turma { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--md-sys-spacing-1); width: 100%; max-width: 20rem; }
+.cx-turma img { width: 100%; height: auto; aspect-ratio: 1; }
+/* menu da landing page (compact e medium) */
+.cx-menu-landing { display: grid; gap: var(--md-sys-spacing-2); max-width: 22.5rem; width: 100%; padding-bottom: var(--md-sys-spacing-4); background: var(--md-sys-color-surface); }
+.cx-menu-landing .cabeca { display: flex; align-items: center; justify-content: space-between; height: var(--md-comp-top-app-bar-height); padding: 0 var(--md-sys-spacing-1) 0 var(--md-sys-spacing-4); }
+.cx-menu-landing nav { display: grid; padding: 0 var(--md-sys-spacing-4); }
+.cx-menu-landing nav a, .cx-menu-landing .tema { display: flex; align-items: center; gap: var(--md-sys-spacing-4); min-height: var(--md-comp-list-one-line-height); color: var(--md-sys-color-on-surface); text-decoration: none; font-family: var(--md-sys-typescale-body-large-font); font-size: var(--md-sys-typescale-body-large-size); }
+.cx-menu-landing .tema { margin: 0 var(--md-sys-spacing-4); padding: 0; border: 0; border-radius: 0; border-top: 1px solid var(--md-sys-color-outline-variant); background: none; cursor: pointer; text-align: left; }
+.cx-menu-landing .tema small { margin-left: auto; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); }
+.cx-menu-landing .acoes { display: grid; gap: var(--md-sys-spacing-3); padding: 0 var(--md-sys-spacing-4); }
 .cx-boas-vindas .acoes { display: grid; gap: var(--md-sys-spacing-2); width: 100%; max-width: 20rem; }
 
 /* comuns · seletor de tema */
@@ -11206,7 +11251,7 @@ h3.sub { margin: 32px 0 12px; }
 .palco + .palco { margin-top: 12px; }
 .cx-par { display: grid; gap: 12px; margin-top: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
 .cx-par .palco + .palco { margin-top: 0; }
-.cx-centro { display: grid; justify-items: center; }
+.cx-centro { display: grid; justify-items: center; align-content: start; }
 .cx-centro > .rotulo { justify-self: stretch; }
 .palco + .cx-par, .cx-par + .palco { margin-top: 12px; }
 .rotulo { display: block; margin: 0 0 12px; color: var(--md-sys-color-on-surface-variant);
@@ -11434,8 +11479,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v22</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-19 03:01</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v25</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-19 04:21</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -11756,6 +11801,13 @@ el.innerHTML = fundos.desenhar('halo', {
         </div>
       </div>
 
+      <h3 class="sub md-typescale-title-large">Interruptor</h3>
+      <div class="palco linha">
+        <span class="rotulo">Liga ou desliga uma opção na hora; trilho de 52 × 32dp, ligado em primary, com o rótulo ao lado.</span>
+        <label class="md-linha-switch" style="width: 100%; max-width: 22rem">Mascotes nas cores do tema<button class="md-switch md-estado" role="switch" aria-checked="true"></button></label>
+        <label class="md-linha-switch" style="width: 100%; max-width: 22rem">Desligado<button class="md-switch md-estado" role="switch" aria-checked="false"></button></label>
+      </div>
+
       <h3 class="sub md-typescale-title-large">Menu</h3>
       <div class="palco linha">
         <span class="rotulo">Aberto por um botão (⋮); itens de 48dp, em surface-container com sombra de nível 2.</span>
@@ -11813,10 +11865,10 @@ el.innerHTML = fundos.desenhar('halo', {
         </div>
       </div>
       <div class="palco">
-        <span class="rotulo">Card do catálogo · vitrine da landing page, catálogo do hub e outros módulos: nome, frase, um dado (quem usa ou preço inicial) e Saiba mais</span>
+        <span class="rotulo">Card do catálogo · vitrine da landing page, catálogo do hub e outros módulos: fundo cheio, nome, frase, um dado (quem usa ou preço inicial), ação e o mascote padrinho do módulo, metade à vista</span>
         <div class="cx-par">
-          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="cx-texto-titulo">Presença</span></span><p class="cx-texto-apoio">Chamada em sala, acompanhada pela família no quest.</p><span class="dado">120 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a></article>
-          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span></span><p class="cx-texto-apoio">Salas ao vivo com ranking.</p><span class="dado">a partir de R$ 49,00/mês</span><a class="md-button md-button--text md-estado" href="#compostos">Ver detalhes</a></article>
+          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="cx-texto-titulo">Presença</span></span><p class="cx-texto-apoio">Chamada em sala, acompanhada pela família no quest.</p><span class="dado">120 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a><img class="padrinho" data-mascote="acertou" data-forma="circulo" alt=""></article>
+          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span></span><p class="cx-texto-apoio">Salas ao vivo com ranking.</p><span class="dado">a partir de R$ 49,00/mês</span><a class="md-button md-button--text md-estado" href="#compostos">Ver detalhes</a><img class="padrinho" data-mascote="estrela" data-forma="estrela" alt=""></article>
         </div>
       </div>
       <div class="palco">
@@ -11834,16 +11886,18 @@ el.innerHTML = fundos.desenhar('halo', {
       </div>
       <div class="cx-par">
         <div class="palco cx-centro">
-          <span class="rotulo">Boas-vindas com mascote · apresentação da landing page e entrada do hub e do quest</span>
+          <span class="rotulo">Boas-vindas com mascote · entrada do hub e do quest; na apresentação da landing page, a turma de mascotes com todas as expressões, um animado por vez</span>
           <div class="cx-boas-vindas"><img data-mascote="feliz" alt=""><h3>Que bom te ver!</h3><p class="cx-texto-apoio">Entre com o código que a escola entregou.</p><div class="acoes"><button class="md-button md-button--filled md-estado">Inserir código</button></div></div>
+          <div class="cx-boas-vindas"><div class="cx-turma" aria-hidden="true"><img data-mascote="feliz" data-forma="circulo" alt=""><img data-mascote="acertou" data-forma="nuvem" alt=""><img data-mascote="estrela" data-forma="pentagono" alt=""><img data-mascote="errou" data-forma="bolha" alt=""><img data-mascote="ops" data-forma="coracao" alt=""><img data-mascote="duvida" data-forma="oval" alt=""><img data-mascote="pensando" data-forma="quadrado" alt=""><img data-mascote="surpreso" data-forma="gota" alt=""><img data-mascote="bravo" data-forma="esfera" alt=""><img data-mascote="brincalhao" data-forma="hexagono" alt=""><img data-mascote="sonolento" data-forma="octogono" alt=""><img data-mascote="desconfiado" data-forma="trevo" alt=""><img data-mascote="piscadinha" data-forma="estrela" alt=""><img data-mascote="envergonhado" data-forma="losango" alt=""><img data-mascote="orgulhoso" data-forma="circulo" alt=""><img data-mascote="rindo" data-forma="nuvem" alt=""><img data-mascote="apaixonado" data-forma="pentagono" alt=""><img data-mascote="aliviado" data-forma="bolha" alt=""><img data-mascote="chorando" data-forma="coracao" alt=""><img data-mascote="frustrado" data-forma="oval" alt=""><img data-mascote="tonto" data-forma="quadrado" alt=""><img data-mascote="preocupado" data-forma="gota" alt=""><img data-mascote="concentrado" data-forma="esfera" alt=""><img data-mascote="curioso" data-forma="hexagono" alt=""><img data-mascote="esperando" data-forma="octogono" alt=""><img data-mascote="pressa" data-forma="trevo" alt=""><img data-mascote="tchau" data-forma="estrela" alt=""><img data-mascote="beijo" data-forma="losango" alt=""><img data-mascote="silencio" data-forma="circulo" alt=""><img data-mascote="doente" data-forma="nuvem" alt=""></div><h3>Aprender fica deboaz</h3></div>
         </div>
         <div class="palco cx-centro">
-          <span class="rotulo">Seletor de tema · landing page, hub e quest: tema de cor e modo, guardados no aparelho</span>
+          <span class="rotulo">Seletor de tema · landing page, hub e quest: tema de cor, modo e se os mascotes seguem as cores do tema, guardados no aparelho</span>
           <div class="cx-seletor-tema" role="dialog" aria-label="Tema">
             <span class="cx-texto-rotulo">Tema de cor</span>
             <div class="amostras"><button class="amostra" style="--cx-amostra: var(--md-sys-color-surface)" aria-pressed="true" aria-label="Branco e Preto"></button><button class="amostra md-paleta-roxo" style="--cx-amostra: var(--md-sys-color-primary)" aria-pressed="false" aria-label="Roxo"></button><button class="amostra md-paleta-oceano" style="--cx-amostra: var(--md-sys-color-primary)" aria-pressed="false" aria-label="Oceano"></button><button class="amostra md-paleta-floresta" style="--cx-amostra: var(--md-sys-color-primary)" aria-pressed="false" aria-label="Floresta"></button><button class="amostra md-paleta-sol" style="--cx-amostra: var(--md-sys-color-primary)" aria-pressed="false" aria-label="Sol"></button></div>
             <span class="cx-texto-rotulo">Modo</span>
             <div class="md-segmented" role="group" aria-label="Modo"><button class="md-estado" aria-pressed="false">Claro</button><button class="md-estado" aria-pressed="false">Escuro</button><button class="md-estado" aria-pressed="true"><span class="material-symbols">check</span>Sistema</button></div>
+            <label class="md-linha-switch">Mascotes nas cores do tema<button class="md-switch md-estado" role="switch" aria-checked="true"></button></label>
           </div>
         </div>
       </div>
@@ -11857,12 +11911,21 @@ el.innerHTML = fundos.desenhar('halo', {
         <span class="rotulo">Topo da landing page: compact com logo, Entrar e menu; a partir do expanded, links das seções, tema e as três ações</span>
         <div class="cx-topo-landing"><span class="cx-logo" data-marca-logo="longo" role="img" aria-label="deboaz"></span><span class="vao"></span><nav aria-label="Seções"><a class="md-button md-button--text md-estado" href="#compostos">Módulos</a><a class="md-button md-button--text md-estado" href="#compostos">Para quem</a><a class="md-button md-button--text md-estado" href="#compostos">Como funciona</a><a class="md-button md-button--text md-estado" href="#compostos">Depoimentos</a></nav><button class="md-icon-button md-estado md-alvo so-web" aria-label="Tema"><span class="material-symbols">palette</span></button><a class="md-button md-button--outlined md-estado so-web" href="#compostos">Entrar numa sala</a><a class="md-button md-button--text md-estado" href="#compostos">Entrar</a><a class="md-button md-button--filled md-estado so-web" href="#compostos">Começar grátis</a><button class="md-icon-button md-estado md-alvo so-celular" aria-label="Menu"><span class="material-symbols">menu</span></button></div>
       </div>
+      <div class="palco cx-centro">
+        <span class="rotulo">Menu da landing page · compact e medium: links das seções, tema e as três ações</span>
+        <div class="cx-menu-landing" role="dialog" aria-label="Menu">
+          <div class="cabeca"><span class="cx-logo" data-marca-logo="longo" role="img" aria-label="deboaz"></span><button class="md-icon-button md-estado md-alvo" aria-label="Fechar menu"><span class="material-symbols">close</span></button></div>
+          <nav aria-label="Seções"><a class="md-estado" href="#compostos">Módulos</a><a class="md-estado" href="#compostos">Para quem</a><a class="md-estado" href="#compostos">Como funciona</a><a class="md-estado" href="#compostos">Depoimentos</a></nav>
+          <button class="tema md-estado"><span class="material-symbols">palette</span>Tema<small>Branco e Preto</small></button>
+          <div class="acoes"><a class="md-button md-button--filled md-estado" href="#compostos">Começar grátis</a><a class="md-button md-button--outlined md-estado" href="#compostos">Entrar numa sala</a><a class="md-button md-button--text md-estado" href="#compostos">Entrar</a></div>
+        </div>
+      </div>
       <div class="palco">
         <span class="rotulo">Vitrine de módulos: carrossel de cards do catálogo, do mais contratado ao menos contratado</span>
         <div class="md-carousel"><div class="md-carousel__trilha" tabindex="0" aria-label="Módulos">
-          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="cx-texto-titulo">Presença</span></span><p class="cx-texto-apoio">Chamada em sala.</p><span class="dado">120 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a></article>
-          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span></span><p class="cx-texto-apoio">Salas ao vivo.</p><span class="dado">95 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a></article>
-          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">badge</span></span><span class="cx-texto-titulo">Carteirinha</span></span><p class="cx-texto-apoio">Identidade do aluno.</p><span class="dado">60 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a></article>
+          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="cx-texto-titulo">Presença</span></span><p class="cx-texto-apoio">Chamada em sala.</p><span class="dado">120 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a><img class="padrinho" data-mascote="acertou" data-forma="circulo" alt=""></article>
+          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span></span><p class="cx-texto-apoio">Salas ao vivo.</p><span class="dado">95 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a><img class="padrinho" data-mascote="estrela" data-forma="estrela" alt=""></article>
+          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">badge</span></span><span class="cx-texto-titulo">Carteirinha</span></span><p class="cx-texto-apoio">Identidade do aluno.</p><span class="dado">60 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a><img class="padrinho" data-mascote="piscadinha" data-forma="quadrado" alt=""></article>
         </div><div class="md-carousel__controles"><button class="md-icon-button md-estado md-alvo" aria-label="Anterior"><span class="material-symbols">chevron_left</span></button><span class="md-carousel__pontos" aria-hidden="true"><i aria-current="true"></i><i></i><i></i></span><span class="md-carousel__posicao">1 de 3</span><button class="md-icon-button md-estado md-alvo" aria-label="Próximo"><span class="material-symbols">chevron_right</span></button></div></div>
       </div>
       <div class="cx-par">
@@ -12073,6 +12136,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v25</td><td>2026-10-19 04:21</td><td>Interruptor (switch) entre os componentes básicos; card do catálogo com fundo cheio em secondary-container e o mascote padrinho do módulo à direita, metade cortada pela borda; seletor de tema com a opção Mascotes nas cores do tema</td></tr>
+          <tr><td>v24</td><td>2026-10-19 04:05</td><td>Turma de mascotes: as 30 expressões, pequenas e lado a lado numa grade fechada, em formas variadas e só na proporção normal</td></tr>
+          <tr><td>v23</td><td>2026-10-19 03:52</td><td>Compostos: turma de mascotes nas boas-vindas da apresentação da landing page (expressões de boas-vindas em formas e proporções diferentes, um animado por vez) e o menu da landing page (compact e medium: seções, tema e as três ações); desenhista do tema.svg com prefixo de mascotes e cores do logo por tema, para as vistas</td></tr>
           <tr><td>v22</td><td>2026-10-19 03:01</td><td>Identidade: no logo principal e nas animações, o nome deboaz fica centralizado na altura do símbolo de cada variação (hastes longas e curtas; MarcaNomeDeslocamento no app); topos com o logo centralizado na barra, e o topo da casca com avisos, o nome (instituição ou pessoa no hub, usuário no quest) e a foto, que abre a conta ou Trocar perfil</td></tr>
           <tr><td>v21</td><td>2026-10-19 02:31</td><td>Logo na linha do topo: o nome deboaz fica na linha dos outros textos e ícones e o símbolo sobe, com a mesma escala no hub (hastes longas) e no quest (hastes curtas); topo da casca igual no hub e no quest (logo, avisos e foto), com o nome e Trocar perfil no toque da foto</td></tr>
           <tr><td>v20</td><td>2026-10-19 02:24</td><td>Topos com o logo em 40dp (antes 24dp); topo da casca com o logo de hastes longas no hub e de hastes curtas no quest, e no quest os avisos, o perfil ativo com Trocar perfil e a foto à direita; logo de 40dp no rodapé</td></tr>
@@ -12080,12 +12146,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v18</td><td>2026-10-19 01:36</td><td>Componentes compostos das UX 07, 08 e 09, por frente: comuns (topo da casca, navegação da casca, card de módulo, card do catálogo, card de acesso, aviso para completar, topo do módulo, boas-vindas com mascote, seletor de tema, indicador), landing page (topo, vitrine de módulos, card de perfil, passos, depoimento, barra de ação fixa, rodapé), hub (grade ordenando, simulador de custo, diálogo de código) e quest (card de tarefa, quem está acessando); seção Componentes compostos no catálogo e no tema.svg</td></tr>
           <tr><td>v17</td><td>2026-10-19 01:15</td><td>Componentes básicos do Material Design 3 que as UX 07, 08 e 09 pedem: selo de notificação (badge), abas, botão segmentado, menu e carrossel com indicador de páginas e posição em texto; tokens em md.comp.badge|tabs|segmented-button|menu|carousel, referência no catálogo e desenho no tema.svg</td></tr>
           <tr><td>v16</td><td>2026-10-17 23:07</td><td>Animações do logo: fechamento (o inverso da abertura: o nome sai, as antenas recolhem e o anel se apaga) e ciclo (abertura + fechamento em laço), na identidade e nos fundos</td></tr>
-          <tr><td>v15</td><td>2026-10-17 22:55</td><td>Fundos no catálogo com o montador completo do mascote: expressão, forma, proporção e movimento (sortido na Estampa e nas Antenas, com a quantidade de mascotes)</td></tr>
-          <tr><td>v14</td><td>2026-10-17 22:36</td><td>Fundos da marca: Estampa, Anel gigante, Antenas em ritmo, Ondas do vão, Símbolo recortado e Halo, com peças (logo, mascotes ou os dois), mascote montado ou sorteado e animação do logo; núcleo em scripts/fundos.mjs, oficiais em identidade/imagens/fundos/ e plataformas/web/fundos.mjs</td></tr>
-          <tr><td>v13</td><td>2026-10-17 21:23</td><td>App: plataformas/maui/Marca.xaml com as peças do símbolo e do nome como PathGeometry, para o logo seguir o tema em vetor</td></tr>
         </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v22 · 2026-10-19 03:01</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v25 · 2026-10-19 04:21</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>

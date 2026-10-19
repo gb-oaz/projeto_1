@@ -593,6 +593,23 @@
   --md-comp-carousel-position-label-tracking: var(--md-sys-typescale-label-medium-tracking);
   --md-comp-carousel-position-label-weight: var(--md-sys-typescale-label-medium-weight);
   --md-comp-carousel-position-label-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-switch-track-width: 52px;
+  --md-comp-switch-track-height: 32px;
+  --md-comp-switch-track-shape: var(--md-sys-shape-corner-full);
+  --md-comp-switch-track-outline-width: 2px;
+  --md-comp-switch-handle-size: 16px;
+  --md-comp-switch-selected-handle-size: 24px;
+  --md-comp-switch-selected-track-color: var(--md-sys-color-primary);
+  --md-comp-switch-selected-handle-color: var(--md-sys-color-on-primary);
+  --md-comp-switch-track-color: var(--md-sys-color-surface-container-highest);
+  --md-comp-switch-outline-color: var(--md-sys-color-outline);
+  --md-comp-switch-handle-color: var(--md-sys-color-outline);
+  --md-comp-switch-label-font: var(--md-sys-typescale-body-large-font);
+  --md-comp-switch-label-size: var(--md-sys-typescale-body-large-size);
+  --md-comp-switch-label-line-height: var(--md-sys-typescale-body-large-line-height);
+  --md-comp-switch-label-tracking: var(--md-sys-typescale-body-large-tracking);
+  --md-comp-switch-label-weight: var(--md-sys-typescale-body-large-weight);
+  --md-comp-switch-label-color: var(--md-sys-color-on-surface);
 }
 
 @media (min-width: 600px) {

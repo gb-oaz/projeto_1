@@ -43,9 +43,11 @@ const ICONES = {
   chat: 'M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z',
 };
 
-export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos }) {
+// Funções de desenho (componentes, compostos, marca) com os tokens resolvidos; usadas pelo
+// tema.svg e pelas vistas de 2_Diagramas, para que as telas saiam iguais ao design system.
+export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, prefixo = 'm', coresLogo = null }) {
   let nm = 0; // prefixo único de cada mascote embutido
-  const masc = (id, op, x, y, w, h) => mascote(id, op, `m${++nm}-`, x, y, w, h);
+  const masc = (id, op, x, y, w, h) => mascote(id, op, `${prefixo}${++nm}-`, x, y, w, h);
   const L = 1600, M = 40, GAP = 40, PW = (L - 2 * M - GAP) / 2, PAD = 24;
   const fundo = esquemas.dark; // o quadro é escuro, como o tema dos diagramas
   const comp = Object.fromEntries(tokensComp.map((t) => [t.nome, t]));
@@ -322,7 +324,10 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
   // mesma escala no hub (hastes longas, 40dp) e no quest (hastes curtas): o nome sai do mesmo tamanho
   const ESCALA_TOPO = 40 / 793;
   const logoNaBarra = (e, x, y, h, v = 'longo') => { const lh = Math.round(logoAlt(v) * ESCALA_TOPO); return logo(e, x, y + (h - lh) / 2, lh, v); };
-  const logo = (e, x, y, h = 32, v = 'longo') => logos[v].replace('<svg ', `<svg x="${x}" y="${y}" width="${logoW(h, v)}" height="${h}" `).replace(/fill="#000000"/g, `fill="${e['on-surface']}"`).replace(/ role="img" aria-label="[^"]*"/, '');
+  const logo = (e, x, y, h = 32, v = 'longo') => {
+    const cs = coresLogo ? coresLogo(e) : null; let i = 0;
+    return logos[v].replace('<svg ', `<svg x="${x}" y="${y}" width="${logoW(h, v)}" height="${h}" `).replace(/fill="#000000"/g, () => `fill="${cs ? cs[i++] : e['on-surface']}"`).replace(/ role="img" aria-label="[^"]*"/, '');
+  };
   const caixaIcone = (e, x, y, ic) => rect(x, y, 40, 40, cantos.medium, e['secondary-container']) + icone(ic, x + 8, y + 8, 24, e['on-secondary-container']);
   const avatar = (e, cx, cy, r, letra) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${e['primary-container']}"/>` + txt(cx, cy + 5, letra, 'title-medium', e['on-primary-container'], 'middle');
   // topo da casca: logo à esquerda (hastes longas no hub, curtas no quest, com o nome do mesmo tamanho);
@@ -360,12 +365,24 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     if (n) s += selo(e, x + w - 20, y + 20, n);
     return s;
   }
-  function cardCatalogo(e, x, y, w, ic, titulo, frase, dado, acao = 'Saiba mais') {
-    const p = num('card-padding'), h = 176;
-    return rect(x + 0.5, y + 0.5, w - 1, h - 1, canto('carousel-item-shape', h), cor(e, 'card-outlined-container-color'), `stroke="${cor(e, 'card-outlined-outline-color')}"`)
-      + caixaIcone(e, x + p, y + p, ic) + txt(x + p + 52, y + p + 26, titulo, 'title-medium', e['on-surface'])
-      + txt(x + p, y + p + 70, frase, 'body-medium', e['on-surface-variant']) + txt(x + p, y + p + 96, dado, 'label-large', e.primary)
-      + botao(e, x + p - 12, y + h - p - 40, acao, 'text').svg;
+  // card do catálogo: fundo cheio em secondary-container e o mascote padrinho do módulo à direita,
+  // com metade dentro do card e metade cortada pela borda
+  let ncard = 0;
+  function cardCatalogo(e, x, y, w, ic, titulo, frase, dado, acao = 'Saiba mais', padrinho = ['feliz', 'circulo']) {
+    const p = num('card-padding'), h = 176, r = canto('carousel-item-shape', h), t = 128, id = `${prefixo}cc${++ncard}`, fg = e['on-secondary-container'];
+    const maxTxt = w - p - t / 2 - 12, frs = quebrar(frase, maxTxt, 'body-medium').slice(0, 2);
+    return `<clipPath id="${id}">${rect(x, y, w, h, r, '#000000')}</clipPath>` + rect(x, y, w, h, r, e['secondary-container'])
+      + `<g clip-path="url(#${id})">${masc(padrinho[0], { forma: padrinho[1] }, x + w - t / 2, y + (h - t) / 2, t, t)}</g>`
+      + caixaIcone(e, x + p, y + p, ic) + txt(x + p + 52, y + p + 26, titulo, 'title-medium', fg)
+      + frs.map((l, i) => txt(x + p, y + p + 64 + i * 18, l, 'body-medium', fg)).join('') + txt(x + p, y + p + 104, dado, 'label-large', fg)
+      + botao(e, x + p - 12, y + h - p - 36, acao, 'text').svg;
+  }
+  // interruptor (switch)
+  function interruptor(e, x, y, ligado) {
+    const w = num('switch-track-width'), h = num('switch-track-height'), r = h / 2;
+    if (ligado) { const d = num('switch-selected-handle-size'); return rect(x, y, w, h, r, cor(e, 'switch-selected-track-color')) + `<circle cx="${x + w - 4 - d / 2}" cy="${y + h / 2}" r="${d / 2}" fill="${cor(e, 'switch-selected-handle-color')}"/>`; }
+    const d = num('switch-handle-size'), b = num('switch-track-outline-width');
+    return rect(x + b / 2, y + b / 2, w - b, h - b, r, cor(e, 'switch-track-color'), `stroke="${cor(e, 'switch-outline-color')}" stroke-width="${b}"`) + `<circle cx="${x + 8 + d / 2}" cy="${y + h / 2}" r="${d / 2}" fill="${cor(e, 'switch-handle-color')}"/>`;
   }
   function cardAcesso(e, x, y, w, letra, titulo, apoio) {
     const h = num('list-two-line-height');
@@ -382,6 +399,43 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     return rect(x, y, w, 88, canto('card-shape', 88), cor(e, 'card-filled-container-color')) + txt(x + 16, y + 44, valor, 'headline-medium', e['on-surface']) + txt(x + 16, y + 68, rotulo, 'label-medium', e['on-surface-variant']);
   }
   const modoDe = (e) => (e === esquemas.dark ? 'dark' : 'light');
+  // turma de mascotes: todas as expressões, pequenas e lado a lado, em formas variadas e proporção normal
+  const FORMAS_TURMA = ['circulo', 'bolha', 'quadrado', 'hexagono', 'estrela', 'nuvem', 'coracao', 'gota', 'octogono', 'losango', 'pentagono', 'oval', 'esfera', 'trevo'];
+  function turma(x, y, w, h, cols) {
+    const ex = (mascotes.expressoes || []).map(([id]) => id), n = ex.length;
+    // colunas que fecham a grade (divisor de n) mais perto da proporção do espaço
+    const ideal = Math.sqrt(n * w / h), divs = [...Array(n).keys()].map((k) => k + 1).filter((k) => n % k === 0 && k >= 3);
+    const c = cols || divs.reduce((a, b) => (Math.abs(b - ideal) < Math.abs(a - ideal) ? b : a), divs[0]);
+    const linhas = Math.ceil(n / c), cw = w / c, ch = h / linhas, t = Math.min(cw, ch) * 0.9;
+    return ex.map((id, i) => {
+      const cx = x + (i % c + 0.5) * cw, cy = y + (Math.floor(i / c) + 0.5) * ch;
+      return masc(id, { forma: FORMAS_TURMA[(i * 5) % FORMAS_TURMA.length] }, cx - t / 2, cy - t / 2, t, t);
+    }).join('');
+  }
+  // menu da landing page (compact e medium): seções, tema e as três ações
+  function menuLanding(e, x, y, w, nomeTema = 'Branco e Preto') {
+    const h0 = num('top-app-bar-height'), ih = num('list-one-line-height');
+    let s = rect(x, y, w, 584, 0, e.surface) + logoNaBarra(e, x + 16, y, h0, 'longo') + iconButton(e, x + w - 52, y + 12, 'close', 'padrao').svg;
+    let yy = y + h0 + 8;
+    for (const l of ['Módulos', 'Para quem', 'Como funciona', 'Depoimentos']) { s += txt(x + 16, meio(yy, ih, 'body-large'), l, 'body-large', e['on-surface']); yy += ih; }
+    s += `<rect x="${x + 16}" y="${yy + 4}" width="${w - 32}" height="1" fill="${e['outline-variant']}"/>`; yy += 12;
+    s += icone('paleta', x + 16, yy + (ih - 24) / 2, 24, e['on-surface-variant']) + txt(x + 56, meio(yy, ih, 'body-large'), 'Tema', 'body-large', e['on-surface'])
+      + txt(x + w - 16, meio(yy, ih, 'body-medium'), nomeTema, 'body-medium', e['on-surface-variant'], 'end');
+    yy += ih + 16;
+    const bw = w - 32;
+    s += rect(x + 16, yy, bw, 40, 20, cor(e, 'button-filled-container-color')) + txt(x + w / 2, meio(yy, 40, 'label-large'), 'Começar grátis', 'label-large', cor(e, 'button-filled-label-color'), 'middle');
+    yy += 52;
+    s += rect(x + 16.5, yy + 0.5, bw - 1, 39, 20, null, `stroke="${cor(e, 'button-outlined-outline-color')}"`) + txt(x + w / 2, meio(yy, 40, 'label-large'), 'Entrar numa sala', 'label-large', cor(e, 'button-outlined-label-color'), 'middle');
+    yy += 52;
+    s += txt(x + w / 2, meio(yy, 40, 'label-large'), 'Entrar', 'label-large', cor(e, 'button-text-label-color'), 'middle');
+    return s;
+  }
+
+  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor };
+}
+
+export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos }) {
+  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos });
 
   // ── componentes no quadro: título, descrição, altura do conteúdo, desenho ──
   const COMPONENTES = [
@@ -428,6 +482,10 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     ['Abas', 'Abas primárias para vistas do mesmo assunto; indicador de 3dp em primary sob a aba ativa.', 48, (e, x, y) => abas(e, x + (PW - 2 * PAD - 360) / 2, y, 360, ['Configuração', 'Utilização'])],
     ['Botão segmentado', 'De 2 a 5 opções curtas lado a lado; a selecionada ganha secondary-container e marcação.', 40, (e, x, y) =>
       fila([(cx, cy) => segmentado(e, cx, cy, ['Mensal', 'Anual'], 0), (cx, cy) => segmentado(e, cx, cy, ['Claro', 'Escuro', 'Sistema'], 2)], x, y, 24)],
+    ['Interruptor', 'Liga ou desliga uma opção na hora; trilho de 52 × 32dp, ligado em primary.', 32, (e, x, y) => {
+      const x1 = x + (PW - 2 * PAD - 300) / 2;
+      return interruptor(e, x1, y, true) + interruptor(e, x1 + 76, y, false) + txt(x1 + 152, y + 21, 'Mascotes nas cores do tema', tipoDe('switch-label'), cor(e, 'switch-label-color'));
+    }],
     ['Menu', 'Lista temporária de ações aberta por um botão (⋮); itens de 48dp em surface-container, sombra de nível 2.', 112, (e, x, y) =>
       ((x1) => iconButton(e, x1, y, 'more', 'padrao').svg + menu(e, x1 + 48, y, 240, [['editar', 'Renomear'], ['apagar', 'Remover deste aparelho']]).svg)(x + (PW - 2 * PAD - 288) / 2)],
     ['Carrossel', 'Um item por vez no compact (2 no medium, 3 no expanded); só avança por ação da pessoa e mostra a posição em texto.', 184, (e, x0, y) => {
@@ -461,8 +519,8 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
       return cardModulo(e, x, y, w, 128, 'check', 'Presença', { apoio: 'Chamada da turma', n: '3' }) + cardModulo(e, x + (w + 12), y, w, 128, 'perfil', 'Carteirinha', { estado: 'Completar', n: '1' })
         + cardModulo(e, x + 2 * (w + 12), y, w, 128, 'editar', 'Quiz', { estado: 'Configurar' }) + cardModulo(e, x + 3 * (w + 12), y, w, 128, 'chat', 'Suporte', { apoio: 'Módulo da conta' });
     }],
-    ['Comum · Card do catálogo', 'Vitrine da landing page, catálogo do hub e outros módulos: nome, frase, um dado (quem usa ou preço inicial) e ação.', 176, (e, x, y) =>
-      cardCatalogo(e, x, y, 338, 'check', 'Presença', 'Chamada em sala, vista pela família.', '120 escolas usando') + cardCatalogo(e, x + 354, y, 338, 'editar', 'Quiz', 'Salas ao vivo com ranking.', 'a partir de R$ 49,00/mês', 'Ver detalhes')],
+    ['Comum · Card do catálogo', 'Vitrine da landing page, catálogo do hub e outros módulos: fundo cheio, nome, frase, um dado (quem usa ou preço inicial), ação e o mascote padrinho do módulo, metade à vista.', 176, (e, x, y) =>
+      cardCatalogo(e, x, y, 338, 'check', 'Presença', 'Chamada em sala, vista pela família.', '120 escolas usando', 'Saiba mais', ['acertou', 'circulo']) + cardCatalogo(e, x + 354, y, 338, 'editar', 'Quiz', 'Salas ao vivo com ranking.', 'a partir de R$ 49,00/mês', 'Ver detalhes', ['estrela', 'estrela'])],
     ['Comum · Card de acesso', 'Contas acessadas (hub) e perfis acessados (quest): foto, nome, instituição e menu com Remover.', 152, (e, x, y) =>
       cardAcesso(e, x, y, 420, 'A', 'Ana Souza', 'Escola Horizonte · conta master') + cardAcesso(e, x, y + 80, 420, 'L', 'Lucas Andrade', 'Escola Horizonte · 7º A · 2026')
       + menu(e, x + 436, y + 72, 240, [['apagar', 'Remover deste aparelho']]).svg],
@@ -476,19 +534,22 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
         + iconButton(e, x + w - 52, y + (h - ib) / 2, 'avisos', 'padrao').svg + selo(e, x + w - 52 + ib - 8, y + (h - ib) / 2 + 8, '1')
         + abas(e, x, y + h, w, ['Configuração', 'Utilização']);
     }],
-    ['Comum · Boas-vindas com mascote', 'Apresentação da landing page e entrada do hub e do quest: mascote feliz, título, frase e ação.', 248, (e, x, y) => {
-      const cx = x + (PW - 2 * PAD) / 2, b = botao(e, 0, 0, 'Inserir código', 'filled').w;
+    ['Comum · Boas-vindas com mascote', 'Entrada do hub e do quest: mascote feliz, título, frase e ação. Apresentação da landing page: a turma de mascotes, com todas as expressões lado a lado, em formas variadas.', 248, (e, x, y) => {
+      const cx = x + 169, b = botao(e, 0, 0, 'Inserir código', 'filled').w;
       return masc('feliz', {}, cx - 48, y, 96) + txt(cx, y + 136, 'Que bom te ver!', 'headline-small', e['on-surface'], 'middle')
-        + txt(cx, y + 164, 'Entre com o código que a escola entregou.', 'body-medium', e['on-surface-variant'], 'middle') + botao(e, cx - b / 2, y + 196, 'Inserir código', 'filled').svg;
+        + txt(cx, y + 164, 'Entre com o código que a escola entregou.', 'body-medium', e['on-surface-variant'], 'middle') + botao(e, cx - b / 2, y + 196, 'Inserir código', 'filled').svg
+        + turma(x + 370, y, 322, 160) + txt(x + 531, y + 196, 'Aprender fica deboaz', 'headline-small', e['on-surface'], 'middle');
     }],
-    ['Comum · Seletor de tema', 'Landing page, hub e quest: tema de cor e modo (claro, escuro ou sistema), guardados no aparelho.', 192, (e, x0, y) => {
-      const w = 340, h = 192, x = x0 + (PW - 2 * PAD - w) / 2;
+    ['Comum · Seletor de tema', 'Landing page, hub e quest: tema de cor, modo (claro, escuro ou sistema) e se os mascotes seguem as cores do tema, guardados no aparelho.', 248, (e, x0, y) => {
+      const w = 340, h = 248, x = x0 + (PW - 2 * PAD - w) / 2;
       let s = rect(x, y, w, h, canto('menu-shape', h), cor(e, 'menu-container-color'), sombra(nivel('menu-elevation'))) + txt(x + 16, y + 28, 'Tema de cor', 'label-medium', e['on-surface-variant']);
       temas.slice(0, 6).forEach((t, i) => {
         const te = t.esquemas[modoDe(e)], cx = x + 36 + i * 52, cy = y + 64, c = t.variante === 'monochrome' ? te.surface : te.primary;
         s += `<circle cx="${cx}" cy="${cy}" r="20" fill="${c}" stroke="${e['outline-variant']}"/>` + (t.padrao ? `<circle cx="${cx}" cy="${cy}" r="24" fill="none" stroke="${e.primary}" stroke-width="3"/>` : '');
       });
-      return s + txt(x + 16, y + 116, 'Modo', 'label-medium', e['on-surface-variant']) + segmentado(e, x + 16, y + 132, ['Claro', 'Escuro', 'Sistema'], 2).svg;
+      return s + txt(x + 16, y + 116, 'Modo', 'label-medium', e['on-surface-variant']) + segmentado(e, x + 16, y + 132, ['Claro', 'Escuro', 'Sistema'], 2).svg
+        + `<rect x="${x + 16}" y="${y + 188}" width="${w - 32}" height="1" fill="${e['outline-variant']}"/>`
+        + txt(x + 16, y + 224, 'Mascotes nas cores do tema', tipoDe('switch-label'), cor(e, 'switch-label-color')) + interruptor(e, x + w - 16 - num('switch-track-width'), y + 204, true);
     }],
     ['Comum · Indicador', 'Números da landing page e painel do perfil no quest: valor grande e rótulo; só totais, nunca nomes.', 88, (e, x, y) => {
       const w = (PW - 2 * PAD - 24) / 3;
@@ -506,8 +567,10 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
       const total = cx + 52 + ['Entrar numa sala', 'Entrar', 'Começar grátis'].reduce((t, r, i) => t + botao(e, 0, 0, r, ['outlined', 'text', 'filled'][i]).w + 8, 0) + 8;
       return s + `<g transform="translate(${x} ${y + h + 8}) scale(${((PW - 2 * PAD) / total).toFixed(3)})">${g.replace('width="860"', `width="${total}"`)}</g>`;
     }],
+    ['Landing · Menu', 'Compact e medium: logo e fechar, links das seções, o seletor de tema e as três ações.', 584, (e, x, y) =>
+      menuLanding(e, x + (PW - 2 * PAD - 360) / 2, y, 360)],
     ['Landing · Vitrine de módulos', 'Carrossel de cards do catálogo, do mais contratado ao menos contratado, com a posição em texto.', 232, (e, x, y) =>
-      cardCatalogo(e, x, y, 338, 'check', 'Presença', 'Chamada em sala.', '120 escolas usando') + cardCatalogo(e, x + 354, y, 338, 'editar', 'Quiz', 'Salas ao vivo.', '95 escolas usando')
+      cardCatalogo(e, x, y, 338, 'check', 'Presença', 'Chamada em sala.', '120 escolas usando', 'Saiba mais', ['acertou', 'circulo']) + cardCatalogo(e, x + 354, y, 338, 'editar', 'Quiz', 'Salas ao vivo.', '95 escolas usando', 'Saiba mais', ['estrela', 'estrela'])
       + controlesCarrossel(e, x + 182, y + 192, 328, 6, 0)],
     ['Landing · Card de perfil', 'Bloco Para quem: um card por perfil de contratação.', 136, (e, x, y) => {
       const w = (PW - 2 * PAD - 24) / 3, el = sombra(nivel('card-elevated-elevation'));
