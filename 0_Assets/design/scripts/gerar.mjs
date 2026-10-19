@@ -37,7 +37,7 @@ import { temaSvg } from './tema-svg.mjs';
 import { copiasSincronizadas } from './sincronizar.mjs';
 import { arquivosMascotes, temasDosMascotes } from './mascotes-arquivos.mjs';
 import { arquivosMarca } from './marca-arquivos.mjs';
-import { arquivosFundos } from './fundos-arquivos.mjs';
+import { arquivosFundos, fundosNode } from './fundos-arquivos.mjs';
 import { estatico as mascoteEstatico, embutir, EXPRESSOES as M_EXPR, FORMAS as M_FORMAS, PROPORCOES as M_PROP } from './mascotes.mjs';
 import { VITRINE as M_VITRINE } from './mascotes-arquivos.mjs';
 
@@ -495,7 +495,7 @@ if (i < 0 || f < 0) throw new Error(`${htmlArq}: marcadores ${INI} â€¦ ${FIM} nÃ
 const iconeCss = `.material-symbols { font-family: "${ic.familia}"; font-weight: normal; font-style: normal; font-size: var(--md-sys-layout-icon-size); line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-variation-settings: "FILL" ${ic.preenchimento}, "wght" ${ic.peso}, "GRAD" ${ic.grau}, "opsz" ${ic.tamanho_otico}; }`;
 const novoBloco = `${html.slice(i, html.indexOf('\n', i) + 1)}${linkFontes.join('\n')}\n<style id="design-tokens">\n${css}\n${tipografiaCss}\n${iconeCss}\n</style>\n<script id="design-dados" type="application/json">${JSON.stringify({ semente: c.semente.toUpperCase(), variante: c.variante, status: marca.status, fontes: { marca: fonte.brand.familia, texto: fonte.plain.familia }, icones: ic.familia, extras: EXTRAS.map(([n]) => n), temas: Object.values(TEMAS).map((t) => ({ id: t.id, nome: t.nome, descricao: t.descricao, harmonia: t.harmonia, semente: t.semente, terciaria: t.terciaria, modo: t.modo, padrao: t === PADRAO })), papeis: Object.keys(ESQUEMAS.light), paletas: Object.fromEntries(Object.entries(paletas).map(([n, p]) => [n, Object.keys(p).map(Number)])), tipos, janelas })}</script>\n`;
 const nucleoMascotes = readFileSync(join(RAIZ, 'scripts', 'mascotes.mjs'), 'utf8');
-const blocoMascotes = `<script type="module" id="design-mascotes">\n${nucleoMascotes}\nwindow.boazMascotes = { EXPRESSOES, FORMAS, PROPORCOES, MOVIMENTOS, CORES, estatico, animado, sequencia, embutir, temas: ${JSON.stringify(temasDosMascotes(cores, marca))} };\nwindow.dispatchEvent(new Event('boaz-mascotes'));\n</script>\n`;
+const blocoMascotes = `<script type="module" id="design-mascotes">\n${nucleoMascotes}\nwindow.boazMascotes = { EXPRESSOES, FORMAS, PROPORCOES, MOVIMENTOS, CORES, forma, estatico, animado, sequencia, embutir, temas: ${JSON.stringify(temasDosMascotes(cores, marca))} };\nwindow.dispatchEvent(new Event('boaz-mascotes'));\n</script>\n`;
 const arqMarca = arquivosMarca(cores, marca);
 const blocoMarca = `<script type="module" id="design-marca">\n${arqMarca['plataformas/web/marca.mjs']}\nwindow.boazMarca = { marca, FRENTES, VARIANTES, geometria, pecas, temas: ${arqMarca['plataformas/web/marca-temas.json'].trim()} };\nwindow.dispatchEvent(new Event('boaz-marca'));\n</script>\n`;
 const arqFundos = arquivosFundos(cores, marca);
@@ -511,6 +511,7 @@ const svg = temaSvg({
   logos: { longo: arqMarca['identidade/logos/logo-principal.svg'], curto: arqMarca['identidade/logos/logo-principal-curto.svg'] },
   temas: Object.values(TEMAS).map((t) => ({ ...t, padrao: t === PADRAO })),
   mascote: (id, op, prefixo, x, y, largura, altura) => embutir(mascoteEstatico(id, op), prefixo, x, y, largura, altura),
+  desenharFundo: ((f) => (conceito, op) => f.desenhar(conceito, { semente: 1, movimentoReduzido: true, ...op }))(fundosNode()),
   mascotes: {
     expressoes: Object.entries(M_EXPR).map(([k, v]) => [k, v.nome]),
     formas: [['bolha', 'feliz'], ...Object.entries(M_VITRINE.formas)].map(([k, e]) => [k, M_FORMAS[k].nome, e]),

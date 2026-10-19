@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v25</title>
+<title>Design system · boaz · v27</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v25">
-<meta name="design:data" content="2026-10-19 04:21">
+<meta name="design:versao" content="v27">
+<meta name="design:data" content="2026-10-19 14:16">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -9613,7 +9613,7 @@ export function embutir(svgTexto, prefixo, x, y, largura, altura = largura) {
   return `<svg x="${f(x + (largura - w) / 2)}" y="${f(y + (altura - h) / 2)}" width="${f(w)}" height="${f(h)}" viewBox="${vx} ${vy} ${vw} ${vh}">${corpo}</svg>`;
 }
 
-window.boazMascotes = { EXPRESSOES, FORMAS, PROPORCOES, MOVIMENTOS, CORES, estatico, animado, sequencia, embutir, temas: {"branco-preto":{"nome":"Branco / Preto","cor":null},"roxo":{"nome":"Roxo","cor":"#9887C5"},"oceano":{"nome":"Oceano","cor":"#5593DD"},"floresta":{"nome":"Floresta","cor":"#53A252"},"aurora":{"nome":"Aurora","cor":"#D9480F"},"grafite":{"nome":"Grafite","cor":"#84939B"},"magenta":{"nome":"Magenta","cor":"#F053B4"},"sol":{"nome":"Sol","cor":"#F2B705"},"girassol":{"nome":"Girassol","cor":"#FFC300"},"rubi":{"nome":"Rubi","cor":"#FF544A"},"cereja":{"nome":"Cereja","cor":"#E53935"},"branco":{"nome":"Branco","cor":null},"preto":{"nome":"Preto","cor":null}} };
+window.boazMascotes = { EXPRESSOES, FORMAS, PROPORCOES, MOVIMENTOS, CORES, forma, estatico, animado, sequencia, embutir, temas: {"branco-preto":{"nome":"Branco / Preto","cor":null},"roxo":{"nome":"Roxo","cor":"#9887C5"},"oceano":{"nome":"Oceano","cor":"#5593DD"},"floresta":{"nome":"Floresta","cor":"#53A252"},"aurora":{"nome":"Aurora","cor":"#D9480F"},"grafite":{"nome":"Grafite","cor":"#84939B"},"magenta":{"nome":"Magenta","cor":"#F053B4"},"sol":{"nome":"Sol","cor":"#F2B705"},"girassol":{"nome":"Girassol","cor":"#FFC300"},"rubi":{"nome":"Rubi","cor":"#FF544A"},"cereja":{"nome":"Cereja","cor":"#E53935"},"branco":{"nome":"Branco","cor":null},"preto":{"nome":"Preto","cor":null}} };
 window.dispatchEvent(new Event('boaz-mascotes'));
 </script>
 <script type="module" id="design-marca">
@@ -10147,9 +10147,9 @@ window.dispatchEvent(new Event('boaz-marca'));
 // mascotes, em qualquer formato (16:9, 9:16, 1:1 ou outro)
 //
 //   estampa    símbolo e mascotes em grade, bem leve        páginas, login, verso do cartão do aluno
-//   anel       anel gigante cortado pela borda               cabeçalho do hub, capa de sala, banner
-//   antenas    antenas em ritmo na borda de baixo            rodapé, faixa de progresso, espera
-//   ondas      linhas concêntricas saindo de um anel         formulários e configurações do hub
+//   anel       anel gigante cortado pela borda, na forma do mascote   cabeçalho do hub, capa de sala, banner
+//   antenas    antenas em ritmo; os mascotes sobem e descem com elas   rodapé, faixa de progresso, espera
+//   ondas      linhas concêntricas na forma do mascote       formulários e configurações do hub
 //   recorte    símbolo enorme saindo pela borda              abertura do app, boas-vindas
 //   halo       brilhos suaves com as peças no centro         abertura, carregamento, fim de partida
 //
@@ -10196,7 +10196,7 @@ const rnd = (seed) => { let x = (Math.abs(Math.floor(seed)) % 2147483646) + 1; r
  * mascotes = { estatico, animado, embutir, FORMAS } do núcleo dos mascotes.
  */
 export function criarFundos({ marca, geometria, pecas, mascotes }) {
-  const { estatico, animado, embutir, FORMAS } = mascotes;
+  const { estatico, animado, embutir, FORMAS, forma } = mascotes;
   const SORTEIO = Object.keys(FORMAS).filter((k) => FORMAS[k].tipo !== 'glifo' && k !== 'rosto' && !k.startsWith('cartao'));
   const GEO = { longo: geometria('longo'), curto: geometria('curto') };
   let seq = 0;
@@ -10223,6 +10223,38 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
     if (anim === 'carregamento') return `<circle ${base} opacity="${n(op * 0.25)}"/><circle ${base} opacity="${op}" stroke-dasharray="${n(volta * 0.3)} ${n(volta * 0.7)}"><animateTransform attributeName="transform" type="rotate" from="90 ${n(cx)} ${n(cy)}" to="450 ${n(cx)} ${n(cy)}" dur="1.6s" repeatCount="indefinite"/></circle>`;
     return `<circle ${base} opacity="${op}"/>`;
   };
+  // contorno na forma do mascote (círculo = o anel do símbolo, igual ao de sempre); o traço tem a espessura do anel
+  const contornavel = (id) => id && id !== 'circulo' && FORMAS[id] && forma && !['glifo', 'cartao', 'nenhuma'].includes(FORMAS[id].tipo) && id !== 'rosto';
+  const geoForma = (id, cx, cy, R) => {
+    const fm = forma(id), c = fm.caixa, k = (2 * R) / Math.max(c.w, c.h);
+    return { d: fm.d, k, t: `translate(${n(cx)} ${n(cy)}) scale(${n(k * 1e4) / 1e4}) translate(${n(-(c.x + c.w / 2))} ${n(-(c.y + c.h / 2))})` };
+  };
+  const anelForma = (id, cx, cy, R, cor, op, anim) => {
+    if (!contornavel(id)) return anel(cx, cy, R, cor, op, anim);
+    const esp = R * 116 / 270, g = geoForma(id, cx, cy, R - esp / 2);
+    const base = `d="${g.d}" fill="none" stroke="${cor}" stroke-width="${n(esp / g.k)}" stroke-linejoin="round" pathLength="100"`;
+    const forma0 = (extra, filho = '') => `<g transform="${g.t}" opacity="${op}"><path ${base}${extra}>${filho}</path></g>`;
+    if (anim === 'abertura') return forma0(' stroke-dasharray="100" stroke-dashoffset="100"', `<animate attributeName="stroke-dashoffset" from="100" to="0" dur="0.9s" ${FZ}/>`);
+    if (anim === 'fechamento') return forma0(' stroke-dasharray="100" stroke-dashoffset="0"', `<animate attributeName="stroke-dashoffset" from="0" to="-100" begin="0.5s" dur="0.9s" ${FZ}/>`);
+    if (anim === 'ciclo') return forma0(' stroke-dasharray="100" stroke-dashoffset="100"', `<animate attributeName="stroke-dashoffset" values="100;0;0;-100;-100" keyTimes="0;0.2;0.62;0.82;1" calcMode="spline" keySplines="0.3 0 0.2 1;0 0 1 1;0.3 0 0.2 1;0 0 1 1" dur="${CICLO}s" repeatCount="indefinite"/>`);
+    if (anim === 'carregamento') return `<g transform="${g.t}"><path ${base} opacity="${n(op * 0.25)}"/><path ${base} opacity="${op}" stroke-dasharray="30 70"><animate attributeName="stroke-dashoffset" from="0" to="-100" dur="1.6s" repeatCount="indefinite"/></path></g>`;
+    return forma0('');
+  };
+  // linha fina na forma do mascote (ondas)
+  const ondaForma = (id, cx, cy, r, cor, larg) => {
+    if (!contornavel(id)) return `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(r)}" fill="none" stroke="${cor}" stroke-width="${n(larg)}"/>`;
+    const g = geoForma(id, cx, cy, r);
+    return `<g transform="${g.t}"><path d="${g.d}" fill="none" stroke="${cor}" stroke-width="${n(larg / g.k)}" stroke-linejoin="round"/></g>`;
+  };
+  // o mascote acompanha a antena em que está: mesmo tempo e mesmo deslocamento da barra
+  const acompanha = (anim, h, atraso, abaixo) => {
+    const T = (de, para, inicio, dur) => `<animateTransform attributeName="transform" type="translate" from="0 ${n(de)}" to="0 ${n(para)}" begin="${n(inicio)}s" dur="${dur}s" ${FZ}/>`;
+    if (anim === 'abertura') return { ini: `translate(0 ${n(abaixo)})`, anim: T(abaixo, 0, atraso, 0.6) };
+    if (anim === 'fechamento') return { ini: '', anim: T(0, abaixo, atraso, 0.5) };
+    if (anim === 'ciclo') return { ini: `translate(0 ${n(abaixo)})`, anim: `<animateTransform attributeName="transform" type="translate" values="0 ${n(abaixo)};0 0;0 0;0 ${n(abaixo)};0 ${n(abaixo)}" keyTimes="0;0.2;0.62;0.82;1" calcMode="spline" keySplines="0.3 0 0.2 1;0 0 1 1;0.3 0 0.2 1;0 0 1 1" dur="${CICLO}s" repeatCount="indefinite"/>` };
+    if (anim === 'carregamento') return { ini: '', anim: `<animateTransform attributeName="transform" type="translate" values="0 0;0 ${n(h * 0.35)};0 0" dur="1.6s" begin="${n(-atraso)}s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>` };
+    return { ini: '', anim: '' };
+  };
   const antena = (x, y, w, h, cor, op, anim, atraso) => {
     const ry = w * 40 / 116, d = `M${n(x)} ${n(y)}V${n(y - h + ry)}A${n(w / 2)} ${n(ry)} 0 0 1 ${n(x + w)} ${n(y - h + ry)}V${n(y)}Z`;
     if (anim === 'abertura') { const id = `fundo-a${++seq}`;
@@ -10236,7 +10268,8 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
 
   /**
    * Desenha um fundo e devolve o SVG.
-   * op = { largura, altura, cores (PAPEIS + mascote), pecas: 'ambos'|'logo'|'mascotes',
+   * op = { largura, altura, cores (PAPEIS + mascote), pecas: 'ambos'|'logo'|'mascotes'|'nenhuma' (só o desenho, para fundo de card),
+   *        origem: { x, y } (0 a 1; centro do anel e das ondas), raio (do anel gigante, em px; padrão 0,55 do lado maior),
    *        mascote: { expressao, forma, proporcao, movimento }, logo: ''|'abertura'|'carregamento',
    *        quantidade (antenas), semente, movimentoReduzido }
    */
@@ -10245,7 +10278,7 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
     const { largura: w = 1600, altura: h = 900, cores: c, pecas: P = 'ambos', quantidade = 3, semente = 1, movimentoReduzido = false } = op;
     const ms = { proporcao: 'normal', movimento: '', ...def.mascote, ...(op.mascote || {}) };
     const a = movimentoReduzido ? '' : (op.logo ?? def.logo ?? '');
-    const r = rnd(semente), b = Math.min(w, h);
+    const r = rnd(semente), b = Math.min(w, h), og = op.origem || {};
     const montar = (formaPadrao) => ({
       expressao: ms.expressao || ALEGRES[Math.floor(r() * ALEGRES.length)],
       forma: ms.forma || formaPadrao || SORTEIO[Math.floor(r() * SORTEIO.length)],
@@ -10260,26 +10293,31 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
     if (conceito === 'estampa') {
       const t = b / 7, sx = t * 1.25, sy = t * 1.5; s = base(w, h, c.surface); let i = 0;
       for (let y = -sy * 0.4, lin = 0; y < h + sy; y += sy, lin++) for (let x = (lin % 2 ? sx / 2 : 0) - sx * 0.2; x < w + sx; x += sx, i++) {
-        const logo = P === 'logo' || (P === 'ambos' && (i + lin) % 2 === 0);
+        const logo = P === 'logo' || P === 'nenhuma' || (P === 'ambos' && (i + lin) % 2 === 0);
         s += logo ? simb(x - t * 0.34, y, t, c['on-surface'], 'longo', 0.09, a) : masc(montar(), x, y + t / 2, t * 0.8, 0.32); }
     } else if (conceito === 'anel') {
-      const R = Math.max(w, h) * 0.55, cx = w * 0.92, cy = h * 0.98;
-      if (P === 'mascotes') s = base(w, h, c['surface-container']) + masc(montar(), cx - R * 0.1, cy - R * 0.1, R * 1.6);
-      else s = base(w, h, c['primary-container']) + anel(cx, cy, R, c.primary, 0.9, a) + anel(w * 0.12, h * 0.2, b * 0.07, c.secondary, 0.9, a) +
-        (P === 'ambos' ? masc(montar(), cx - R * 0.38, cy - R * 0.38, R * 0.62) : anel(cx, cy, R * 0.42, c.tertiary, 0.7, a));
+      const R = op.raio ?? Math.max(w, h) * 0.55, cx = w * (og.x ?? 0.92), cy = h * (og.y ?? 0.98);
+      if (P === 'nenhuma') s = base(w, h, c['primary-container']) + anelForma(ms.forma, cx, cy, R, c.primary, 0.9, a) + anelForma(ms.forma, cx, cy, R * 0.42, c.tertiary, 0.7, a);
+      else if (P === 'mascotes') s = base(w, h, c['surface-container']) + masc(montar(), cx - R * 0.1, cy - R * 0.1, R * 1.6);
+      else s = base(w, h, c['primary-container']) + anelForma(ms.forma, cx, cy, R, c.primary, 0.9, a) + anelForma(ms.forma, w * 0.12, h * 0.2, b * 0.07, c.secondary, 0.9, a) +
+        (P === 'ambos' ? masc(montar(), cx - R * 0.38, cy - R * 0.38, R * 0.62) : anelForma(ms.forma, cx, cy, R * 0.42, c.tertiary, 0.7, a));
     } else if (conceito === 'antenas') {
       const k = Math.max(8, Math.round(w / (b / 9))), g = w / k, wd = g * 0.62; s = base(w, h, c.surface);
       const qtd = Math.max(0, Math.min(quantidade, 8, k)), vagas = [...Array(k).keys()].sort(() => r() - 0.5).slice(0, qtd);
       if (P === 'mascotes') { const gg = w / Math.max(qtd, 1); for (let i = 0; i < qtd; i++) { const t = Math.min(gg * (0.75 + r() * 0.3), h * 0.5); s += masc(montar(), i * gg + gg / 2, h - t * 0.45, t); } }
       else { const alt = []; for (let i = 0; i < k; i++) { alt[i] = h * (0.18 + r() * 0.42); s += antena(i * g + (g - wd) / 2, h + 2, wd, alt[i], i % 2 ? c.secondary : c.primary, 0.85, a, i * 0.07); }
-        if (P === 'ambos') vagas.forEach((i) => { s += masc(montar('rosto'), i * g + g / 2, h - alt[i] - g * 0.55, g * 1.1); });
-        s += anel(w * 0.82, h * 0.22, b * 0.09, c.tertiary, 0.9, a); }
+        if (P === 'ambos') vagas.forEach((i) => {
+          const ac = acompanha(a, alt[i], i * 0.07, alt[i] + g * 1.2);
+          const m = masc(montar('rosto'), i * g + g / 2, h - alt[i] - g * 0.55, g * 1.1);
+          s += ac.anim ? `<g${ac.ini ? ` transform="${ac.ini}"` : ''}>${ac.anim}${m}</g>` : m;
+        });
+        if (P !== 'nenhuma') s += anel(w * 0.82, h * 0.22, b * 0.09, c.tertiary, 0.9, a); }
     } else if (conceito === 'ondas') {
-      const cx = w * 0.1, cy = h * 0.12; s = base(w, h, c.surface);
-      for (let i = 1; i < 26; i++) s += `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(b * 0.16 + i * b * 0.055)}" fill="none" stroke="${c['outline-variant']}" stroke-width="${n(b * 0.006)}"/>`;
-      if (P === 'logo') s += anel(cx, cy, b * 0.16, c.primary, 1, a);
-      else if (P === 'ambos') s += anel(cx, cy, b * 0.16, c.primary, 1, a) + masc(montar(), w * 0.86, h * 0.82, b * 0.26);
-      else s += masc(montar(), cx, cy, b * 0.4);
+      const cx = w * (og.x ?? 0.1), cy = h * (og.y ?? 0.12); s = base(w, h, c.surface);
+      for (let i = 1; i < 26; i++) s += ondaForma(ms.forma, cx, cy, b * 0.16 + i * b * 0.055, c['outline-variant'], b * 0.006);
+      if (P === 'logo') s += anelForma(ms.forma, cx, cy, b * 0.16, c.primary, 1, a);
+      else if (P === 'ambos') s += anelForma(ms.forma, cx, cy, b * 0.16, c.primary, 1, a) + masc(montar(), w * 0.86, h * 0.82, b * 0.26);
+      else if (P === 'mascotes') s += masc(montar(), cx, cy, b * 0.4);
     } else if (conceito === 'recorte') {
       const alt = Math.max(w, h) * 0.95, x = w - alt * 0.52, y = h - alt * 0.78; s = base(w, h, c['surface-container']);
       if (P === 'mascotes') s += masc(montar(), w * 0.78, h * 0.78, alt * 0.95);
@@ -10290,7 +10328,8 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
       const gr = (k, cor, x, y, raio) => `<radialGradient id="${id}-${k}" cx="${n(x)}" cy="${n(y)}" r="${n(raio)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${cor}" stop-opacity=".55"/><stop offset="1" stop-color="${cor}" stop-opacity="0"/></radialGradient>`;
       s = `<defs>${gr(1, c.primary, w * 0.2, h * 0.25, b * 0.9)}${gr(2, c.secondary, w * 0.85, h * 0.8, b * 0.9)}${gr(3, c.tertiary, w * 0.7, h * 0.15, b * 0.6)}</defs>` + base(w, h, c.surface) +
         [1, 2, 3].map((k) => `<rect width="${w}" height="${h}" fill="url(#${id}-${k})"/>`).join('');
-      if (P === 'logo') s += simb(w / 2 - b * 0.09, h / 2 - b * 0.13, b * 0.26, tres, 'longo', 1, a);
+      if (P === 'nenhuma') s += '';
+      else if (P === 'logo') s += simb(w / 2 - b * 0.09, h / 2 - b * 0.13, b * 0.26, tres, 'longo', 1, a);
       else if (P === 'mascotes') s += masc(montar(), w / 2, h / 2, b * 0.38);
       else s += simb(w / 2 - b * 0.2, h / 2 - b * 0.13, b * 0.26, tres, 'longo', 1, a) + masc(montar(), w / 2 + b * 0.14, h / 2 + b * 0.02, b * 0.26);
     } else throw new Error(`fundo desconhecido: ${conceito}`);
@@ -11027,6 +11066,9 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .md-segmented button + button { border-left: var(--md-comp-segmented-button-outline-width) solid var(--md-comp-segmented-button-outline-color); }
 .md-segmented button[aria-pressed="true"] { background: var(--md-comp-segmented-button-selected-container-color); color: var(--md-comp-segmented-button-selected-label-color); }
 .md-segmented .material-symbols { font-size: var(--md-comp-segmented-button-icon-size); }
+/* segmentado cheio: ocupa o contêiner e divide por igual (formulários no compact) */
+.md-segmented--cheio { display: flex; width: 100%; }
+.md-segmented--cheio button { flex: 1 1 0; }
 
 /* ── interruptor (switch) ── */
 .md-switch {
@@ -11090,6 +11132,12 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .cx-topo .conta .nome { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-title-small-font); font-size: var(--md-sys-typescale-title-small-size); font-weight: var(--md-sys-typescale-title-small-weight); }
 
 /* comuns · topo da casca e topo do módulo */
+/* no compact e no medium o topo fica só com o logo e os avisos: a conta abre pelo destino Conta (Perfil no quest) */
+.cx-topo .conta { display: none; }
+@media (min-width: 840px) { .cx-topo .conta { display: flex; } }
+/* sem foto, o mascote adotado faz as vezes de foto (sem círculo em volta) */
+.cx-topo .avatar--mascote, .cx-card-acesso .foto--mascote { background: none; border-radius: 0; }
+.cx-topo .avatar--mascote img, .cx-card-acesso .foto--mascote img { width: 100%; height: 100%; }
 .cx-topo { display: flex; align-items: center; gap: var(--md-sys-spacing-2); height: var(--md-comp-top-app-bar-height); padding: 0 var(--md-sys-spacing-1) 0 var(--md-sys-spacing-4); background: var(--md-comp-top-app-bar-container-color); color: var(--md-comp-top-app-bar-icon-color); }
 .cx-topo--modulo { padding-left: var(--md-sys-spacing-1); }
 .cx-topo .vao { flex: 1; }
@@ -11108,6 +11156,10 @@ window.dispatchEvent(new Event('boaz-fundos'));
 /* card do catálogo: fundo cheio e o mascote padrinho do módulo à direita, metade cortada pela borda */
 .cx-card-catalogo { position: relative; overflow: hidden; display: grid; gap: var(--md-sys-spacing-3); padding: var(--md-comp-card-padding) var(--md-sys-spacing-16) var(--md-comp-card-padding) var(--md-comp-card-padding); border-radius: var(--md-comp-carousel-item-shape); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
 .cx-card-catalogo .cx-texto-titulo, .cx-card-catalogo .cx-texto-apoio, .cx-card-catalogo .dado { color: var(--md-sys-color-on-secondary-container); }
+.cx-card-catalogo > :not(.padrinho, .ondas) { position: relative; }
+/* fundo Ondas do vão: só as linhas, na forma do padrinho e saindo dele (desenhado pelo núcleo dos fundos) */
+.cx-card-catalogo .ondas { position: absolute; inset: 0; opacity: 0.14; pointer-events: none; }
+.cx-card-catalogo .ondas svg { display: block; width: 100%; height: 100%; }
 .cx-card-catalogo .padrinho { position: absolute; top: 50%; right: calc(-1 * var(--md-sys-spacing-16)); width: calc(2 * var(--md-sys-spacing-16)); height: auto; transform: translateY(-50%); pointer-events: none; }
 .cx-card-catalogo .cabeca { display: flex; gap: var(--md-sys-spacing-3); align-items: center; }
 .cx-card-catalogo .dado { color: var(--md-sys-color-primary); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-label-large-weight); }
@@ -11121,6 +11173,9 @@ window.dispatchEvent(new Event('boaz-fundos'));
 /* comuns · aviso para completar */
 .cx-aviso { display: flex; flex-wrap: wrap; align-items: center; gap: var(--md-sys-spacing-3); padding: var(--md-sys-spacing-4); border-radius: var(--md-comp-card-shape); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
 .cx-aviso > span:nth-child(2) { flex: 1 1 12rem; }
+.cx-aviso .acao-icone { display: none; }
+/* no compact a ação vira botão de ícone: o texto do aviso não fica coberto */
+@media (max-width: 599px) { .cx-aviso { flex-wrap: nowrap; } .cx-aviso .acao-texto { display: none; } .cx-aviso .acao-icone { display: inline-grid; flex: none; } }
 .cx-aviso p { margin: 0; font-family: var(--md-sys-typescale-body-medium-font); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
 
 /* comuns · boas-vindas com mascote */
@@ -11479,8 +11534,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v25</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-19 04:21</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v27</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-19 14:16</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -11547,7 +11602,7 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
 
     <section id="fundos">
       <h2 class="md-typescale-headline-medium">Fundos</h2>
-      <p class="lead">Seis fundos feitos só de peças do símbolo (anel, antenas, vão, o símbolo inteiro) e de mascotes, em qualquer formato. Em cada um: peças (logo, mascotes ou os dois), mascote montado (expressão, forma, proporção e movimento) ou sorteado, e animação do logo. Acompanham o tema no topo. Texto por cima vai sempre num painel de superfície.</p>
+      <p class="lead">Seis fundos feitos só de peças do símbolo (anel, antenas, vão, o símbolo inteiro) e de mascotes, em qualquer formato. Em cada um: peças (logo, mascotes ou os dois), mascote montado (expressão, forma, proporção e movimento) ou sorteado, e animação do logo. No Anel gigante e nas Ondas do vão o desenho toma a forma escolhida do mascote (círculo é o anel do símbolo); nas Antenas em ritmo, cada mascote sobe e desce com a sua antena. Acompanham o tema no topo. Texto por cima vai sempre num painel de superfície.</p>
       <div class="fundos" data-fundos></div>
       <h3 class="sub md-typescale-title-large">No código</h3>
       <div class="palco"><span class="rotulo">Web</span><pre class="masc-codigo"><code>import { fundos, CONCEITOS } from '@/design/fundos.mjs';
@@ -11800,6 +11855,14 @@ el.innerHTML = fundos.desenhar('halo', {
           <button class="md-estado" aria-pressed="true"><span class="material-symbols">check</span>Sistema</button>
         </div>
       </div>
+      <div class="palco">
+        <span class="rotulo">Cheio (md-segmented--cheio): ocupa o contêiner e divide por igual; a selecionada preenche o segmento inteiro (formulários no compact, como o tipo de conta).</span>
+        <div class="md-segmented md-segmented--cheio" role="group" aria-label="Tipo de conta">
+          <button class="md-estado" aria-pressed="true"><span class="material-symbols">check</span>Escola</button>
+          <button class="md-estado" aria-pressed="false">Empresa</button>
+          <button class="md-estado" aria-pressed="false">Autônomo</button>
+        </div>
+      </div>
 
       <h3 class="sub md-typescale-title-large">Interruptor</h3>
       <div class="palco linha">
@@ -11843,9 +11906,9 @@ el.innerHTML = fundos.desenhar('halo', {
 
       <h3 class="sub md-typescale-title-large">Comuns</h3>
       <div class="palco">
-        <span class="rotulo">Topo da casca · igual no hub e no quest: logo (hastes longas no hub, curtas no quest), avisos, o nome (instituição ou pessoa logada no hub, usuário no quest) e a foto; o toque abre a conta (hub) ou Trocar perfil (quest); sem o título da tela, que a navegação já marca</span>
+        <span class="rotulo">Topo da casca · igual no hub e no quest: logo (hastes longas no hub, curtas no quest) e avisos; a partir do expanded, também o nome (instituição ou pessoa logada no hub, usuário no quest) e a foto ou o mascote adotado; o toque abre a conta (hub) ou Trocar perfil (quest); sem o título da tela, que a navegação já marca</span>
         <div class="cx-topo"><span class="cx-logo" data-marca-logo="longo" role="img" aria-label="deboaz"></span><span class="vao"></span><span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 2 não lidos"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">2</span></span><button class="conta md-estado" aria-label="Conta da Escola Horizonte"><span class="nome">Escola Horizonte</span><span class="avatar" aria-hidden="true">E</span></button></div>
-        <div class="cx-topo" style="margin-top: var(--md-sys-spacing-3)"><span class="cx-logo cx-logo--curto" data-marca-logo="curto" role="img" aria-label="deboaz"></span><span class="vao"></span><span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 2 não lidos"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">2</span></span><button class="conta md-estado" aria-label="Perfil de Lucas Andrade: trocar perfil"><span class="nome">Lucas Andrade</span><span class="avatar" aria-hidden="true">L</span></button></div>
+        <div class="cx-topo" style="margin-top: var(--md-sys-spacing-3)"><span class="cx-logo cx-logo--curto" data-marca-logo="curto" role="img" aria-label="deboaz"></span><span class="vao"></span><span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 2 não lidos"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">2</span></span><button class="conta md-estado" aria-label="Perfil de Lucas Andrade: trocar perfil"><span class="nome">Lucas Andrade</span><span class="avatar avatar--mascote" aria-hidden="true"><img data-mascote="feliz" data-forma="estrela" alt=""></span></button></div>
       </div>
       <div class="palco">
         <span class="rotulo">Navegação da casca · hub e quest: três destinos; barra no compact, trilho no medium e no expanded, gaveta a partir do large</span>
@@ -11865,19 +11928,19 @@ el.innerHTML = fundos.desenhar('halo', {
         </div>
       </div>
       <div class="palco">
-        <span class="rotulo">Card do catálogo · vitrine da landing page, catálogo do hub e outros módulos: fundo cheio, nome, frase, um dado (quem usa ou preço inicial), ação e o mascote padrinho do módulo, metade à vista</span>
+        <span class="rotulo">Card do catálogo · vitrine da landing page, catálogo do hub e outros módulos: fundo cheio com as Ondas do vão na forma do padrinho, nome, frase, um dado (quem usa ou preço inicial), ação e o mascote padrinho do módulo, metade à vista</span>
         <div class="cx-par">
           <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="cx-texto-titulo">Presença</span></span><p class="cx-texto-apoio">Chamada em sala, acompanhada pela família no quest.</p><span class="dado">120 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a><img class="padrinho" data-mascote="acertou" data-forma="circulo" alt=""></article>
           <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span></span><p class="cx-texto-apoio">Salas ao vivo com ranking.</p><span class="dado">a partir de R$ 49,00/mês</span><a class="md-button md-button--text md-estado" href="#compostos">Ver detalhes</a><img class="padrinho" data-mascote="estrela" data-forma="estrela" alt=""></article>
         </div>
       </div>
       <div class="palco">
-        <span class="rotulo">Card de acesso · contas acessadas (hub) e perfis acessados (quest): foto, nome, instituição e menu com Remover</span>
-        <div class="cx-card-acesso"><span class="foto">L</span><span><span class="cx-texto-titulo">Lucas Andrade</span><span class="cx-texto-apoio">Escola Horizonte · 7º A · 2026</span></span><button class="md-icon-button md-estado md-alvo" aria-label="Mais opções"><span class="material-symbols">more_vert</span></button></div>
+        <span class="rotulo">Card de acesso · contas acessadas (hub) e perfis acessados (quest): foto (ou, sem foto, o mascote adotado), nome, instituição e menu com Remover</span>
+        <div class="cx-card-acesso"><span class="foto foto--mascote"><img data-mascote="feliz" data-forma="hexagono" alt=""></span><span><span class="cx-texto-titulo">Lucas Andrade</span><span class="cx-texto-apoio">Escola Horizonte · 7º A · 2026</span></span><button class="md-icon-button md-estado md-alvo" aria-label="Mais opções"><span class="material-symbols">more_vert</span></button></div>
       </div>
       <div class="palco">
-        <span class="rotulo">Aviso para completar · módulo aberto (hub e quest) e tela de acesso: ícone, texto e ação</span>
-        <div class="cx-aviso"><span class="material-symbols">photo_camera</span><span><p>Envie a foto 3x4 para a carteirinha ficar pronta.</p></span><button class="md-button md-button--filled md-estado">Enviar foto</button></div>
+        <span class="rotulo">Aviso para completar · módulo aberto (hub e quest) e tela de acesso: ícone, texto e ação; no compact a ação vira botão de ícone</span>
+        <div class="cx-aviso"><span class="material-symbols">photo_camera</span><span><p>Envie a foto 3x4 para a carteirinha ficar pronta.</p></span><button class="md-button md-button--filled md-estado acao-texto">Enviar foto</button><button class="md-icon-button md-icon-button--filled md-estado md-alvo acao-icone" aria-label="Enviar foto"><span class="material-symbols">chevron_right</span></button></div>
       </div>
       <div class="palco">
         <span class="rotulo">Topo do módulo · hub (com abas por permissão) e quest: voltar, nome do módulo e avisos dele</span>
@@ -12136,6 +12199,8 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v27</td><td>2026-10-19 14:16</td><td>Botão segmentado cheio; topo da casca só com logo e avisos no compact e no medium (nome e foto a partir do expanded); foto ou mascote adotado no avatar; trilho com Conta embaixo; aviso com botão de ícone no compact; card do catálogo com as Ondas do vão na forma do padrinho; fundos com peças nenhuma, origem e raio do anel</td></tr>
+          <tr><td>v26</td><td>2026-10-19 13:37</td><td>Fundos: Anel gigante e Ondas do vão na forma escolhida do mascote; nas Antenas em ritmo os mascotes acompanham a animação da barra</td></tr>
           <tr><td>v25</td><td>2026-10-19 04:21</td><td>Interruptor (switch) entre os componentes básicos; card do catálogo com fundo cheio em secondary-container e o mascote padrinho do módulo à direita, metade cortada pela borda; seletor de tema com a opção Mascotes nas cores do tema</td></tr>
           <tr><td>v24</td><td>2026-10-19 04:05</td><td>Turma de mascotes: as 30 expressões, pequenas e lado a lado numa grade fechada, em formas variadas e só na proporção normal</td></tr>
           <tr><td>v23</td><td>2026-10-19 03:52</td><td>Compostos: turma de mascotes nas boas-vindas da apresentação da landing page (expressões de boas-vindas em formas e proporções diferentes, um animado por vez) e o menu da landing page (compact e medium: seções, tema e as três ações); desenhista do tema.svg com prefixo de mascotes e cores do logo por tema, para as vistas</td></tr>
@@ -12144,11 +12209,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v20</td><td>2026-10-19 02:24</td><td>Topos com o logo em 40dp (antes 24dp); topo da casca com o logo de hastes longas no hub e de hastes curtas no quest, e no quest os avisos, o perfil ativo com Trocar perfil e a foto à direita; logo de 40dp no rodapé</td></tr>
           <tr><td>v19</td><td>2026-10-19 02:15</td><td>Compostos: logo oficial (símbolo + nome) no topo da casca, no topo da landing page e no rodapé, também no tema.svg; o topo da casca deixa de repetir o título da tela, que a navegação já marca; elementos sozinhos centralizados no painel (catálogo e tema.svg)</td></tr>
           <tr><td>v18</td><td>2026-10-19 01:36</td><td>Componentes compostos das UX 07, 08 e 09, por frente: comuns (topo da casca, navegação da casca, card de módulo, card do catálogo, card de acesso, aviso para completar, topo do módulo, boas-vindas com mascote, seletor de tema, indicador), landing page (topo, vitrine de módulos, card de perfil, passos, depoimento, barra de ação fixa, rodapé), hub (grade ordenando, simulador de custo, diálogo de código) e quest (card de tarefa, quem está acessando); seção Componentes compostos no catálogo e no tema.svg</td></tr>
-          <tr><td>v17</td><td>2026-10-19 01:15</td><td>Componentes básicos do Material Design 3 que as UX 07, 08 e 09 pedem: selo de notificação (badge), abas, botão segmentado, menu e carrossel com indicador de páginas e posição em texto; tokens em md.comp.badge|tabs|segmented-button|menu|carousel, referência no catálogo e desenho no tema.svg</td></tr>
-          <tr><td>v16</td><td>2026-10-17 23:07</td><td>Animações do logo: fechamento (o inverso da abertura: o nome sai, as antenas recolhem e o anel se apaga) e ciclo (abertura + fechamento em laço), na identidade e nos fundos</td></tr>
         </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v25 · 2026-10-19 04:21</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v27 · 2026-10-19 14:16</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>
@@ -12462,6 +12525,18 @@ caixa.addEventListener('change', (ev) => { const t = ev.target, k = t.dataset.fu
 caixa.addEventListener('click', (ev) => { const d = ev.target.closest('button')?.dataset || {}; if (d.sortear) { estado[d.sortear].semente = Math.floor(Math.random() * 1e9); desenharFundos(d.sortear); } if (d.repetir) desenharFundos(d.repetir); });
 desenharFundos();
 new MutationObserver(() => desenharFundos()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-paleta'] });
+// card do catálogo: Ondas do vão só com as linhas, na forma do padrinho, saindo da borda direita (metade do tamanho, ampliado)
+function ondasDosCards() {
+  document.querySelectorAll('.cx-card-catalogo').forEach((card) => {
+    const r = card.getBoundingClientRect(); if (!r.width) return;
+    let el = card.querySelector('.ondas'); if (!el) { el = document.createElement('span'); el.className = 'ondas'; el.setAttribute('aria-hidden', 'true'); card.prepend(el); }
+    el.innerHTML = F.desenhar('ondas', { largura: Math.round(r.width / 2), altura: Math.round(r.height / 2), pecas: 'nenhuma', origem: { x: 1, y: 0.5 }, movimentoReduzido: true,
+      mascote: { forma: card.querySelector('.padrinho')?.dataset.forma || 'circulo' }, cores: { surface: 'transparent', 'outline-variant': vv('on-secondary-container') } })
+      .replace(/ width="[^"]+" height="[^"]+"/, ' preserveAspectRatio="xMaxYMid slice"');
+  });
+}
+ondasDosCards();
+new ResizeObserver(() => ondasDosCards()).observe(document.body);
 </script>
 </body>
 </html>

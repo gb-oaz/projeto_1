@@ -45,7 +45,7 @@ const ICONES = {
 
 // Funções de desenho (componentes, compostos, marca) com os tokens resolvidos; usadas pelo
 // tema.svg e pelas vistas de 2_Diagramas, para que as telas saiam iguais ao design system.
-export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, prefixo = 'm', coresLogo = null }) {
+export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, prefixo = 'm', coresLogo = null, desenharFundo = null }) {
   let nm = 0; // prefixo único de cada mascote embutido
   const masc = (id, op, x, y, w, h) => mascote(id, op, `${prefixo}${++nm}-`, x, y, w, h);
   const L = 1600, M = 40, GAP = 40, PW = (L - 2 * M - GAP) / 2, PAD = 24;
@@ -274,17 +274,20 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     });
     return s;
   }
-  function segmentado(e, x, y, rotulos, sel) {
+  // segmentado: sem largura, cada segmento mede o rótulo; com largura, ocupa o contêiner e divide por igual
+  function segmentado(e, x, y, rotulos, sel, cheio = 0) {
     const h = num('segmented-button-height'), papel = tipoDe('segmented-button-label'), p = num('segmented-button-padding'), ti = num('segmented-button-icon-size');
-    const ws = rotulos.map((r, i) => Math.round(largura(r, papel) + 2 * p + (i === sel ? ti + 8 : 0)));
+    const ws = cheio ? rotulos.map((r, i) => (i < rotulos.length - 1 ? Math.round(cheio / rotulos.length) : cheio - Math.round(cheio / rotulos.length) * (rotulos.length - 1)))
+      : rotulos.map((r, i) => Math.round(largura(r, papel) + 2 * p + (i === sel ? ti + 8 : 0)));
     const w = ws.reduce((a, b) => a + b, 0), r = canto('segmented-button-shape', h), linha = cor(e, 'segmented-button-outline-color');
     let s = '', cx = x;
     rotulos.forEach((t, i) => {
       const at = i === sel;
       if (at) s += `<path d="${i === 0 ? `M${cx + r} ${y}H${cx + ws[i]}V${y + h}H${cx + r}a${r} ${r} 0 0 1 0 -${h}Z` : i === rotulos.length - 1 ? `M${cx} ${y}H${cx + ws[i] - r}a${r} ${r} 0 0 1 0 ${h}H${cx}Z` : `M${cx} ${y}h${ws[i]}v${h}h-${ws[i]}Z`}" fill="${cor(e, 'segmented-button-selected-container-color')}"/>`;
       const fg = at ? cor(e, 'segmented-button-selected-label-color') : cor(e, 'segmented-button-label-color');
-      if (at) s += icone('check', cx + p, y + (h - ti) / 2, ti, fg);
-      s += txt(at ? cx + p + ti + 8 : cx + ws[i] / 2, meio(y, h, papel), t, papel, fg, at ? 'start' : 'middle');
+      const ix = cheio ? cx + (ws[i] - largura(t, papel) - ti - 8) / 2 : cx + p;
+      if (at) s += icone('check', ix, y + (h - ti) / 2, ti, fg);
+      s += txt(at ? ix + ti + 8 : cx + ws[i] / 2, meio(y, h, papel), t, papel, fg, at ? 'start' : 'middle');
       if (i) s += `<rect x="${cx}" y="${y}" width="1" height="${h}" fill="${linha}"/>`;
       cx += ws[i];
     });
@@ -329,13 +332,17 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     return logos[v].replace('<svg ', `<svg x="${x}" y="${y}" width="${logoW(h, v)}" height="${h}" `).replace(/fill="#000000"/g, () => `fill="${cs ? cs[i++] : e['on-surface']}"`).replace(/ role="img" aria-label="[^"]*"/, '');
   };
   const caixaIcone = (e, x, y, ic) => rect(x, y, 40, 40, cantos.medium, e['secondary-container']) + icone(ic, x + 8, y + 8, 24, e['on-secondary-container']);
-  const avatar = (e, cx, cy, r, letra) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${e['primary-container']}"/>` + txt(cx, cy + 5, letra, 'title-medium', e['on-primary-container'], 'middle');
+  // avatar: a foto (a letra no desenho) ou, sem foto, o mascote adotado ([expressão, forma]), sem círculo em volta
+  const avatar = (e, cx, cy, r, letra) => Array.isArray(letra) ? masc(letra[0], { forma: letra[1] }, cx - r, cy - r, 2 * r, 2 * r) : `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${e['primary-container']}"/>` + txt(cx, cy + 5, letra, 'title-medium', e['on-primary-container'], 'middle');
   // topo da casca: logo à esquerda (hastes longas no hub, curtas no quest, com o nome do mesmo tamanho);
   // à direita os avisos e a conta (hub) ou o perfil ativo com troca de perfil e a foto (quest)
   // topo da casca, igual no hub e no quest: logo (hastes longas no hub, curtas no quest), avisos, o nome
   // (instituição ou pessoa logada no hub, usuário no quest) e a foto; o toque no nome ou na foto abre as ações
-  function topoCasca(e, x, y, w, { quest, nome = 'Escola Horizonte', letra = 'E', n = '2' } = {}) {
+  // conta = false (compact e medium): só o logo e os avisos; a conta fica no destino Conta da navegação
+  function topoCasca(e, x, y, w, { quest, nome = 'Escola Horizonte', letra = 'E', n = '2', conta = true } = {}) {
     const h = num('top-app-bar-height'), ib = num('icon-button-size'), tx = x + w - 56, v = quest ? 'curto' : 'longo';
+    if (!conta) return rect(x, y, w, h, 0, cor(e, 'top-app-bar-container-color')) + logoNaBarra(e, x + 16, y, h, v)
+      + iconButton(e, x + w - 4 - ib, y + (h - ib) / 2, 'avisos', 'padrao').svg + selo(e, x + w - 4 - 8, y + (h - ib) / 2 + 8, n);
     // o nome ocupa o espaço entre o logo e os avisos; se não couber, é cortado com reticências
     const livre = tx - (x + 16 + logoW(Math.round(logoAlt(v) * ESCALA_TOPO), v) + 12 + ib + 4);
     while (largura(nome, 'title-small') > livre && nome.length > 4) nome = nome.slice(0, -2).trimEnd() + '…';
@@ -344,10 +351,24 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
       + iconButton(e, bx, y + (h - ib) / 2, 'avisos', 'padrao').svg + selo(e, bx + ib - 8, y + (h - ib) / 2 + 8, n)
       + txt(tx, meio(y, h, 'title-small'), nome, 'title-small', e['on-surface'], 'end') + avatar(e, x + w - 32, y + h / 2, 16, letra);
   }
-  function nav3(e, x, y, w, destinos, n) {
+  // trilho da casca (medium e expanded): os mesmos destinos da barra, em coluna, com selo
+  function trilho3(e, x, y, h, destinos, n, ativo = 0) {
+    const w = num('navigation-rail-width'), iw = num('navigation-rail-indicator-width'), ih = num('navigation-rail-indicator-height'), papel = tipoDe('navigation-rail-label');
+    let s = rect(x, y, w, h, 0, cor(e, 'navigation-rail-container-color'));
+    // os destinos de conteúdo ficam no alto e o último (Conta ou Perfil) embaixo
+    destinos.forEach(([ic, r], i) => {
+      const ult = i === destinos.length - 1 && destinos.length > 2, cy = ult ? y + h - 24 - ih - 4 - tipos[papel]['line-height'] : y + 24 + i * 72, cx = x + w / 2, at = i === ativo;
+      if (at) s += rect(cx - iw / 2, cy, iw, ih, canto('navigation-rail-indicator-shape', ih), cor(e, 'navigation-rail-indicator-color'));
+      s += icone(ic, cx - 12, cy + 4, 24, at ? e['on-secondary-container'] : e['on-surface-variant']);
+      if (i === 1 && n) s += selo(e, cx + 12, cy + 6, n);
+      s += txt(cx, cy + ih + 4 + tipos[papel].size, r, papel, at ? e['on-surface'] : e['on-surface-variant'], 'middle');
+    });
+    return s;
+  }
+  function nav3(e, x, y, w, destinos, n, ativo = 0) {
     const h = num('navigation-bar-height'), iw = num('navigation-bar-indicator-width'), ih = num('navigation-bar-indicator-height'), papel = tipoDe('navigation-bar-label'), passo = w / destinos.length;
     return rect(x, y, w, h, 0, cor(e, 'navigation-bar-container-color')) + destinos.map(([ic, r], i) => {
-      const cx = x + passo * i + passo / 2, at = i === 0;
+      const cx = x + passo * i + passo / 2, at = i === ativo;
       return (at ? rect(cx - iw / 2, y + 12, iw, ih, canto('navigation-bar-indicator-shape', ih), cor(e, 'navigation-bar-indicator-color')) : '')
         + icone(ic, cx - 12, y + 12 + (ih - 24) / 2, 24, at ? cor(e, 'navigation-bar-active-icon-color') : cor(e, 'navigation-bar-icon-color'))
         + (i === 1 && n ? selo(e, cx + 12, y + 16, n) : '')
@@ -371,8 +392,13 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
   function cardCatalogo(e, x, y, w, ic, titulo, frase, dado, acao = 'Saiba mais', padrinho = ['feliz', 'circulo']) {
     const p = num('card-padding'), h = 176, r = canto('carousel-item-shape', h), t = 128, id = `${prefixo}cc${++ncard}`, fg = e['on-secondary-container'];
     const maxTxt = w - p - t / 2 - 12, frs = quebrar(frase, maxTxt, 'body-medium').slice(0, 2);
+    // fundo Ondas do vão: só as linhas, na forma do padrinho e saindo dele
+    // (desenhado na metade do tamanho e ampliado: linhas mais espaçadas no card pequeno)
+    const ondas = desenharFundo ? desenharFundo('ondas', { largura: w / 2, altura: h / 2, pecas: 'nenhuma', origem: { x: 1, y: 0.5 }, mascote: { forma: padrinho[1] },
+      cores: { ...e, surface: e['secondary-container'], 'outline-variant': e['on-secondary-container'] } })
+      .replace(/ width="[^"]+" height="[^"]+"/, ` x="${x}" y="${y}" width="${w}" height="${h}" opacity="0.14"`) : '';
     return `<clipPath id="${id}">${rect(x, y, w, h, r, '#000000')}</clipPath>` + rect(x, y, w, h, r, e['secondary-container'])
-      + `<g clip-path="url(#${id})">${masc(padrinho[0], { forma: padrinho[1] }, x + w - t / 2, y + (h - t) / 2, t, t)}</g>`
+      + `<g clip-path="url(#${id})">${ondas}${masc(padrinho[0], { forma: padrinho[1] }, x + w - t / 2, y + (h - t) / 2, t, t)}</g>`
       + caixaIcone(e, x + p, y + p, ic) + txt(x + p + 52, y + p + 26, titulo, 'title-medium', fg)
       + frs.map((l, i) => txt(x + p, y + p + 64 + i * 18, l, 'body-medium', fg)).join('') + txt(x + p, y + p + 104, dado, 'label-large', fg)
       + botao(e, x + p - 12, y + h - p - 36, acao, 'text').svg;
@@ -390,10 +416,14 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
       + txt(x + 72, y + h / 2 - 2, titulo, 'title-medium', e['on-surface']) + txt(x + 72, y + h / 2 + 18, apoio, 'body-medium', e['on-surface-variant'])
       + iconButton(e, x + w - 48, y + (h - 40) / 2, 'more', 'padrao').svg;
   }
-  function aviso(e, x, y, w, ic, texto, acao) {
-    const h = 72, b = acao ? botao(e, 0, 0, acao, 'filled').w : 0;
-    return rect(x, y, w, h, canto('card-shape', h), e['secondary-container']) + icone(ic, x + 16, y + 24, 24, e['on-secondary-container'])
-      + txt(x + 56, meio(y, h, 'body-medium'), texto, 'body-medium', e['on-secondary-container']) + (acao ? botao(e, x + w - 16 - b, y + 16, acao, 'filled').svg : '');
+  // aviso: com compacto, a ação vira um botão de ícone (tonal) e sobra espaço para o texto, que quebra em até duas linhas
+  function aviso(e, x, y, w, ic, texto, acao, { compacto = false, iconeAcao = 'proximo' } = {}) {
+    const h = 72, ib = num('icon-button-size'), b = acao ? (compacto ? ib : botao(e, 0, 0, acao, 'filled').w) : 0, fg = e['on-secondary-container'];
+    const ls = quebrar(texto, w - 56 - (acao ? b + 32 : 16), 'body-medium').slice(0, 2), lh = tipos['body-medium']['line-height'];
+    const ty = meio(y, h, 'body-medium') - (ls.length - 1) * lh / 2;
+    return rect(x, y, w, h, canto('card-shape', h), e['secondary-container']) + icone(ic, x + 16, y + 24, 24, fg)
+      + ls.map((l, i) => txt(x + 56, ty + i * lh, l, 'body-medium', fg)).join('')
+      + (acao ? (compacto ? iconButton(e, x + w - 16 - ib, y + (h - ib) / 2, iconeAcao, 'filled').svg : botao(e, x + w - 16 - b, y + 16, acao, 'filled').svg) : '');
   }
   function indicador(e, x, y, w, valor, rotulo) {
     return rect(x, y, w, 88, canto('card-shape', 88), cor(e, 'card-filled-container-color')) + txt(x + 16, y + 44, valor, 'headline-medium', e['on-surface']) + txt(x + 16, y + 68, rotulo, 'label-medium', e['on-surface-variant']);
@@ -431,11 +461,11 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     return s;
   }
 
-  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor };
+  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3 };
 }
 
-export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos }) {
-  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos });
+export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo }) {
+  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3 } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo });
 
   // ── componentes no quadro: título, descrição, altura do conteúdo, desenho ──
   const COMPONENTES = [
@@ -480,8 +510,9 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
       return s + b.svg + selo(e, x + 144 + b.w - 4, y + 6, '12');
     }],
     ['Abas', 'Abas primárias para vistas do mesmo assunto; indicador de 3dp em primary sob a aba ativa.', 48, (e, x, y) => abas(e, x + (PW - 2 * PAD - 360) / 2, y, 360, ['Configuração', 'Utilização'])],
-    ['Botão segmentado', 'De 2 a 5 opções curtas lado a lado; a selecionada ganha secondary-container e marcação.', 40, (e, x, y) =>
-      fila([(cx, cy) => segmentado(e, cx, cy, ['Mensal', 'Anual'], 0), (cx, cy) => segmentado(e, cx, cy, ['Claro', 'Escuro', 'Sistema'], 2)], x, y, 24)],
+    ['Botão segmentado', 'De 2 a 5 opções curtas lado a lado; a selecionada ganha secondary-container e marcação. Cheio: ocupa o contêiner e divide por igual (formulários no compact).', 96, (e, x, y) =>
+      fila([(cx, cy) => segmentado(e, cx, cy, ['Mensal', 'Anual'], 0), (cx, cy) => segmentado(e, cx, cy, ['Claro', 'Escuro', 'Sistema'], 2)], x, y, 24)
+      + segmentado(e, x, y + 56, ['Escola', 'Empresa', 'Autônomo'], 0, 328).svg],
     ['Interruptor', 'Liga ou desliga uma opção na hora; trilho de 52 × 32dp, ligado em primary.', 32, (e, x, y) => {
       const x1 = x + (PW - 2 * PAD - 300) / 2;
       return interruptor(e, x1, y, true) + interruptor(e, x1 + 76, y, false) + txt(x1 + 152, y + 21, 'Mascotes nas cores do tema', tipoDe('switch-label'), cor(e, 'switch-label-color'));
@@ -507,10 +538,10 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
 
   // ── componentes compostos no quadro, por frente ──
   const COMPOSTOS = [
-    ['Comum · Topo da casca', 'Hub e quest: logo (hastes longas no hub, curtas no quest), avisos, nome (instituição ou pessoa no hub, usuário no quest) e foto, que abre a conta ou Trocar perfil.', 208, (e, x, y) => {
+    ['Comum · Topo da casca', 'Hub e quest: logo (hastes longas no hub, curtas no quest) e avisos; a partir do expanded, também o nome (instituição ou pessoa no hub, usuário no quest) e a foto ou o mascote adotado, que abre a conta ou Trocar perfil.', 288, (e, x, y) => {
       const x1 = x + (PW - 2 * PAD - 360) / 2;
-      return topoCasca(e, x1, y, 360) + topoCasca(e, x1, y + 80, 360, { quest: true, nome: 'Lucas Andrade', letra: 'L' })
-        + menu(e, x1 + 360 - 240, y + 144, 240, [['voltar', 'Trocar perfil']]).svg;
+      return topoCasca(e, x1, y, 360, { conta: false }) + topoCasca(e, x1, y + 80, 360) + topoCasca(e, x1, y + 160, 360, { quest: true, nome: 'Lucas Andrade', letra: ['feliz', 'estrela'] })
+        + menu(e, x1 + 360 - 240, y + 224, 240, [['voltar', 'Trocar perfil']]).svg;
     }],
     ['Comum · Navegação da casca', 'Três destinos com selo: barra no compact, trilho no medium e no expanded, gaveta a partir do large.', 80, (e, x, y) =>
       nav3(e, x, y, 336, [['modulo', 'Meus módulos'], ['add', 'Catálogo'], ['perfil', 'Conta']]) + nav3(e, x + 356, y, 336, [['evento', 'Tarefas'], ['salvos', 'Fixos'], ['perfil', 'Perfil']], '5')],
@@ -519,14 +550,15 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
       return cardModulo(e, x, y, w, 128, 'check', 'Presença', { apoio: 'Chamada da turma', n: '3' }) + cardModulo(e, x + (w + 12), y, w, 128, 'perfil', 'Carteirinha', { estado: 'Completar', n: '1' })
         + cardModulo(e, x + 2 * (w + 12), y, w, 128, 'editar', 'Quiz', { estado: 'Configurar' }) + cardModulo(e, x + 3 * (w + 12), y, w, 128, 'chat', 'Suporte', { apoio: 'Módulo da conta' });
     }],
-    ['Comum · Card do catálogo', 'Vitrine da landing page, catálogo do hub e outros módulos: fundo cheio, nome, frase, um dado (quem usa ou preço inicial), ação e o mascote padrinho do módulo, metade à vista.', 176, (e, x, y) =>
+    ['Comum · Card do catálogo', 'Vitrine da landing page, catálogo do hub e outros módulos: fundo cheio com as Ondas do vão na forma do padrinho, nome, frase, um dado (quem usa ou preço inicial), ação e o mascote padrinho do módulo, metade à vista.', 176, (e, x, y) =>
       cardCatalogo(e, x, y, 338, 'check', 'Presença', 'Chamada em sala, vista pela família.', '120 escolas usando', 'Saiba mais', ['acertou', 'circulo']) + cardCatalogo(e, x + 354, y, 338, 'editar', 'Quiz', 'Salas ao vivo com ranking.', 'a partir de R$ 49,00/mês', 'Ver detalhes', ['estrela', 'estrela'])],
-    ['Comum · Card de acesso', 'Contas acessadas (hub) e perfis acessados (quest): foto, nome, instituição e menu com Remover.', 152, (e, x, y) =>
-      cardAcesso(e, x, y, 420, 'A', 'Ana Souza', 'Escola Horizonte · conta master') + cardAcesso(e, x, y + 80, 420, 'L', 'Lucas Andrade', 'Escola Horizonte · 7º A · 2026')
+    ['Comum · Card de acesso', 'Contas acessadas (hub) e perfis acessados (quest): foto (ou o mascote adotado, sem foto), nome, instituição e menu com Remover.', 152, (e, x, y) =>
+      cardAcesso(e, x, y, 420, 'A', 'Ana Souza', 'Escola Horizonte · conta master') + cardAcesso(e, x, y + 80, 420, ['feliz', 'hexagono'], 'Lucas Andrade', 'Escola Horizonte · 7º A · 2026')
       + menu(e, x + 436, y + 72, 240, [['apagar', 'Remover deste aparelho']]).svg],
-    ['Comum · Aviso para completar', 'Módulo aberto (hub e quest) e tela de acesso: ícone, texto e ação opcional, em secondary-container.', 160, (e, x, y) =>
+    ['Comum · Aviso para completar', 'Módulo aberto (hub e quest) e tela de acesso: ícone, texto e ação opcional, em secondary-container; no compact a ação é um botão de ícone, para o texto não ficar coberto.', 248, (e, x, y) =>
       aviso(e, x, y, PW - 2 * PAD, 'camera', 'Envie a foto 3x4 para a carteirinha ficar pronta.', 'Enviar foto')
-      + aviso(e, x, y + 88, PW - 2 * PAD, 'avisos', 'Os códigos de acesso são entregues pela sua instituição.')],
+      + aviso(e, x, y + 88, 360, 'avisos', 'Cadastre as turmas para começar a chamada.', 'Configurar', { compacto: true })
+      + aviso(e, x, y + 176, PW - 2 * PAD, 'avisos', 'Os códigos de acesso são entregues pela sua instituição.')],
     ['Comum · Topo do módulo', 'Hub e quest: voltar, nome do módulo e avisos dele; no hub, abas Configuração e Utilização por permissão.', 112, (e, x, y) => {
       const w = PW - 2 * PAD, h = num('top-app-bar-height'), ib = num('icon-button-size');
       return rect(x, y, w, h, 0, cor(e, 'top-app-bar-container-color')) + iconButton(e, x + 4, y + (h - ib) / 2, 'voltar', 'padrao').svg
