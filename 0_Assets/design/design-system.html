@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v16</title>
+<title>Design system · boaz · v22</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v16">
-<meta name="design:data" content="2026-10-17 23:07">
+<meta name="design:versao" content="v22">
+<meta name="design:data" content="2026-10-19 03:01">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -540,6 +540,74 @@
   --md-comp-snackbar-label-line-height: var(--md-sys-typescale-body-medium-line-height);
   --md-comp-snackbar-label-tracking: var(--md-sys-typescale-body-medium-tracking);
   --md-comp-snackbar-label-weight: var(--md-sys-typescale-body-medium-weight);
+  --md-comp-badge-small-size: 6px;
+  --md-comp-badge-large-height: 16px;
+  --md-comp-badge-large-min-width: 16px;
+  --md-comp-badge-large-padding: 4px;
+  --md-comp-badge-shape: var(--md-sys-shape-corner-full);
+  --md-comp-badge-color: var(--md-sys-color-error);
+  --md-comp-badge-label-color: var(--md-sys-color-on-error);
+  --md-comp-badge-label-font: var(--md-sys-typescale-label-small-font);
+  --md-comp-badge-label-size: var(--md-sys-typescale-label-small-size);
+  --md-comp-badge-label-line-height: var(--md-sys-typescale-label-small-line-height);
+  --md-comp-badge-label-tracking: var(--md-sys-typescale-label-small-tracking);
+  --md-comp-badge-label-weight: var(--md-sys-typescale-label-small-weight);
+  --md-comp-tabs-height: 48px;
+  --md-comp-tabs-padding: 16px;
+  --md-comp-tabs-container-color: var(--md-sys-color-surface);
+  --md-comp-tabs-divider-color: var(--md-sys-color-outline-variant);
+  --md-comp-tabs-active-indicator-height: 3px;
+  --md-comp-tabs-active-indicator-color: var(--md-sys-color-primary);
+  --md-comp-tabs-label-font: var(--md-sys-typescale-title-small-font);
+  --md-comp-tabs-label-size: var(--md-sys-typescale-title-small-size);
+  --md-comp-tabs-label-line-height: var(--md-sys-typescale-title-small-line-height);
+  --md-comp-tabs-label-tracking: var(--md-sys-typescale-title-small-tracking);
+  --md-comp-tabs-label-weight: var(--md-sys-typescale-title-small-weight);
+  --md-comp-tabs-label-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-tabs-active-label-color: var(--md-sys-color-primary);
+  --md-comp-segmented-button-height: 40px;
+  --md-comp-segmented-button-padding: 12px;
+  --md-comp-segmented-button-icon-size: 18px;
+  --md-comp-segmented-button-shape: var(--md-sys-shape-corner-full);
+  --md-comp-segmented-button-outline-color: var(--md-sys-color-outline);
+  --md-comp-segmented-button-outline-width: 1px;
+  --md-comp-segmented-button-label-font: var(--md-sys-typescale-label-large-font);
+  --md-comp-segmented-button-label-size: var(--md-sys-typescale-label-large-size);
+  --md-comp-segmented-button-label-line-height: var(--md-sys-typescale-label-large-line-height);
+  --md-comp-segmented-button-label-tracking: var(--md-sys-typescale-label-large-tracking);
+  --md-comp-segmented-button-label-weight: var(--md-sys-typescale-label-large-weight);
+  --md-comp-segmented-button-label-color: var(--md-sys-color-on-surface);
+  --md-comp-segmented-button-selected-container-color: var(--md-sys-color-secondary-container);
+  --md-comp-segmented-button-selected-label-color: var(--md-sys-color-on-secondary-container);
+  --md-comp-menu-min-width: 112px;
+  --md-comp-menu-max-width: 280px;
+  --md-comp-menu-shape: var(--md-sys-shape-corner-extra-small);
+  --md-comp-menu-container-color: var(--md-sys-color-surface-container);
+  --md-comp-menu-elevation: var(--md-sys-elevation-level2);
+  --md-comp-menu-item-height: 48px;
+  --md-comp-menu-item-padding: 12px;
+  --md-comp-menu-icon-size: 24px;
+  --md-comp-menu-label-font: var(--md-sys-typescale-label-large-font);
+  --md-comp-menu-label-size: var(--md-sys-typescale-label-large-size);
+  --md-comp-menu-label-line-height: var(--md-sys-typescale-label-large-line-height);
+  --md-comp-menu-label-tracking: var(--md-sys-typescale-label-large-tracking);
+  --md-comp-menu-label-weight: var(--md-sys-typescale-label-large-weight);
+  --md-comp-menu-label-color: var(--md-sys-color-on-surface);
+  --md-comp-menu-icon-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-carousel-item-shape: var(--md-sys-shape-corner-extra-large);
+  --md-comp-carousel-gap: 8px;
+  --md-comp-carousel-indicator-dot-size: 8px;
+  --md-comp-carousel-indicator-active-width: 24px;
+  --md-comp-carousel-indicator-gap: 8px;
+  --md-comp-carousel-indicator-shape: var(--md-sys-shape-corner-full);
+  --md-comp-carousel-indicator-color: var(--md-sys-color-outline-variant);
+  --md-comp-carousel-indicator-active-color: var(--md-sys-color-primary);
+  --md-comp-carousel-position-label-font: var(--md-sys-typescale-label-medium-font);
+  --md-comp-carousel-position-label-size: var(--md-sys-typescale-label-medium-size);
+  --md-comp-carousel-position-label-line-height: var(--md-sys-typescale-label-medium-line-height);
+  --md-comp-carousel-position-label-tracking: var(--md-sys-typescale-label-medium-tracking);
+  --md-comp-carousel-position-label-weight: var(--md-sys-typescale-label-medium-weight);
+  --md-comp-carousel-position-label-color: var(--md-sys-color-on-surface-variant);
 }
 
 @media (min-width: 600px) {
@@ -9544,7 +9612,8 @@ window.dispatchEvent(new Event('boaz-mascotes'));
 // O oficial é monocromático (preto no claro, branco no escuro). Num tema de cor,
 // o anel fica na terciária, a antena do b na primária e a do d na secundária, e
 // o logo usa símbolo na terciária, "de" na secundária e "boaz" na primária
-// (coresDaMarca). O nome sai em contorno da fonte da marca (Fredoka Medium):
+// (coresDaMarca). O nome sai em contorno da fonte da marca (Fredoka Medium),
+// centralizado na altura do símbolo de cada variação (deslocNome):
 // o gerador mede os glifos e entrega os caminhos em `nome` (criarMarca).
 //
 // Este módulo não usa nada do Node, então também roda no navegador. O gerador
@@ -9585,6 +9654,8 @@ export const geometria = (variante = 'longo') => {
 /** Caminho do símbolo, no quadro 0..540 × topo..793. */
 export const caminhoSimbolo = (variante = 'longo') => hastes(variante) + anelCheio();
 const caixa = (variante) => { const topo = VARIANTES[variante].topo; return { y: topo, h: BASE - topo }; };
+/** Deslocamento vertical do nome para ficar centralizado na altura do símbolo da variação. */
+export const deslocNome = (nome, variante = 'longo') => (nome.y1 == null ? 0 : Math.round((VARIANTES[variante].topo + BASE) / 2 - (nome.y1 + nome.y2) / 2));
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 const cab = (vb, titulo, extra = '') => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}"${extra} role="img" aria-label="${esc(titulo)}">`;
 
@@ -9624,7 +9695,7 @@ export function criarMarca(nome) {
     const { y, h } = caixa(variante);
     const c = { simbolo: 'currentColor', de: 'currentColor', boaz: 'currentColor', ...cores };
     return `${cab(`0 ${y} ${n(nome.largura)} ${h}`, 'deboaz')}${desenho(variante, c)}` +
-      `<path fill="${c.de}" d="${nome.de}"/><path fill="${c.boaz}" d="${nome.boaz}"/></svg>`;
+      `<g transform="translate(0 ${deslocNome(nome, variante)})"><path fill="${c.de}" d="${nome.de}"/><path fill="${c.boaz}" d="${nome.boaz}"/></g></svg>`;
   };
   /**
    * Ícone quadrado de 1024: fundo liso e o símbolo centralizado.
@@ -9664,7 +9735,7 @@ export function criarMarca(nome) {
     const entra = (d, cor, t) => `<path fill="${cor}" d="${d}" opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${t}s" dur="0.35s" fill="freeze"/>` +
       `<animateTransform attributeName="transform" type="translate" from="0 60" to="0 0" begin="${t}s" dur="0.45s" ${fz}/></path>`;
     return `${cab(`0 ${y} ${largura} ${h}`, 'deboaz')}<defs>${defs}</defs>${anel}${antenas}` +
-      (comNome ? entra(nome.de, c.de, 1.2) + entra(nome.boaz, c.boaz, 1.4) : '') + '</svg>';
+      (comNome ? `<g transform="translate(0 ${deslocNome(nome, variante)})">${entra(nome.de, c.de, 1.2)}${entra(nome.boaz, c.boaz, 1.4)}</g>` : '') + '</svg>';
   };
   /**
    * Carregamento: um arco corre pelo anel sobre um trilho claro e as antenas descem
@@ -9727,7 +9798,7 @@ export function criarMarca(nome) {
     const texto = (d, cor, i) => { const op = trilha(t, t.nome(i), t.nomeSai(i), 0, 1), tr = trilha(t, t.nome(i), t.nomeSai(i), '0 60', '0 0', '0 60');
       return `<path fill="${cor}" d="${d}" opacity="${op[0][1]}" transform="translate(${tr[0][1]})">${pontos('opacity', op, t)}${pontos('', tr, t, 'translate')}</path>`; };
     return `${cab(`0 ${y} ${largura} ${h}`, 'deboaz')}<defs>${defs}</defs>${anel}${antenas}` +
-      (comNome ? texto(nome.de, c.de, 0) + texto(nome.boaz, c.boaz, 1) : '') + '</svg>';
+      (comNome ? `<g transform="translate(0 ${deslocNome(nome, variante)})">${texto(nome.de, c.de, 0)}${texto(nome.boaz, c.boaz, 1)}</g>` : '') + '</svg>';
   };
   /** Fechamento: o inverso da abertura — o nome sai, as antenas recolhem para o vão e o anel se apaga. Toca uma vez (≈ 2 s). */
   const fechamento = (variante = 'longo', cores = {}, { nome: comNome = true } = {}) => sequenciaLogo(variante, cores, comNome, LINHA(false, true, false));
@@ -9760,7 +9831,7 @@ export function coresDaMarca(cores, marca) {
 }
 
 // ── gerado: o nome deboaz em contorno (Fredoka Medium) ──
-export const NOME = {"de":"M837.3 787.7L837.3 787.7Q813.4 787.7 792.0 777.8Q770.7 767.9 754.6 750.5Q738.5 733.1 729.1 709.4Q719.8 685.8 719.8 658.7L719.8 658.7Q719.8 632.7 729.1 609.6Q738.5 586.4 754.9 569.0Q771.2 551.6 792.6 541.7Q813.9 531.8 837.3 531.8L837.3 531.8Q862.2 531.8 882 541.7Q901.8 551.6 915.5 569.0Q929.3 586.4 936.6 609.6Q943.9 632.7 944.4 659.2L944.4 659.2Q944.4 685.8 937.4 708.9Q930.4 732.0 916.6 749.7Q902.8 767.4 882.8 777.5Q862.8 787.7 837.3 787.7ZM845.6 726.8L845.6 726.8Q863.8 726.8 878.1 718.3Q892.4 709.7 901.0 694.6Q909.6 679.5 909.6 660.3L909.6 660.3Q909.6 640.5 901.0 625.4Q892.4 610.4 878.1 601.5Q863.8 592.7 845.6 592.7L845.6 592.7Q827.4 592.7 812.8 601.3Q798.3 609.8 789.7 625.2Q781.1 640.5 781.1 660.3L781.1 660.3Q781.1 679.5 789.7 694.6Q798.3 709.7 813.1 718.3Q827.9 726.8 845.6 726.8ZM941.8 787.7L941.8 787.7Q927.2 787.7 920.5 782.7Q913.7 777.8 911.6 766.9L911.6 766.9L911.6 446.6Q911.6 437.7 912.9 430.7Q914.2 423.7 920.7 419.3Q927.2 414.8 941.3 414.8L941.3 414.8Q956.4 414.8 962.6 419Q968.8 423.2 970.7 430.2Q972.5 437.2 972.5 446.0L972.5 446.0L972.5 756.0Q972.5 764.8 970.9 772.1Q969.4 779.4 962.9 783.5Q956.4 787.7 941.8 787.7ZM1149.8 791.3L1149.8 791.3Q1116 791.3 1090.8 780.4Q1065.6 769.5 1048.7 750.5Q1031.8 731.5 1023.2 707.9Q1014.6 684.2 1014.6 658.7L1014.6 658.7Q1014.6 621.3 1031.8 592.2Q1048.9 563.0 1079.3 546.4Q1109.8 529.8 1149.3 529.8L1149.3 529.8Q1177.4 529.8 1198.7 538.6Q1220 547.4 1234.3 561.7Q1248.6 576.0 1256.1 593.2Q1263.7 610.4 1263.7 626.5L1263.7 626.5Q1263.7 654.0 1250.4 666.5Q1237.2 679 1217.4 679L1217.4 679L1080.1 679Q1080.6 696.7 1091.3 709.7Q1102.0 722.7 1118.3 729.7Q1134.7 736.7 1151.9 736.7L1151.9 736.7Q1164.9 736.7 1175.0 735.2Q1185.2 733.6 1192.4 731.3Q1199.7 728.9 1205.2 726.3Q1210.6 723.7 1215.3 721.6Q1220 719.6 1224.2 719.0L1224.2 719.0Q1229.9 718.5 1235.6 721.6Q1241.3 724.8 1245.0 732.6L1245.0 732.6Q1248.1 737.8 1249.4 742.2Q1250.7 746.6 1250.7 750.8L1250.7 750.8Q1250.7 761.2 1238.2 770.3Q1225.7 779.4 1203.1 785.3Q1180.5 791.3 1149.8 791.3ZM1080.1 642.1L1080.1 642.1L1186.7 642.1Q1195.6 642.1 1200.2 639.2Q1204.9 636.4 1204.9 627L1204.9 627Q1204.9 615.0 1197.6 605.4Q1190.4 595.8 1177.9 590.3Q1165.4 584.9 1148.8 584.9L1148.8 584.9Q1129.5 584.9 1113.9 592.4Q1098.3 600.0 1089.2 613.0Q1080.1 626.0 1080.1 642.1Z","boaz":"M1440.0 787.7L1440.0 787.7Q1414.5 787.7 1394.5 777.5Q1374.4 767.4 1360.7 749.7Q1346.9 732.0 1339.9 708.9Q1332.8 685.8 1332.8 659.2L1332.8 659.2Q1333.4 632.7 1340.6 609.6Q1347.9 586.4 1361.7 569.0Q1375.5 551.6 1395.2 541.7Q1415 531.8 1440.0 531.8L1440.0 531.8Q1463.9 531.8 1484.9 541.7Q1506 551.6 1522.4 569.0Q1538.8 586.4 1548.1 609.6Q1557.5 632.7 1557.5 658.7L1557.5 658.7Q1557.5 685.8 1548.1 709.4Q1538.8 733.1 1522.6 750.5Q1506.5 767.9 1485.2 777.8Q1463.9 787.7 1440.0 787.7ZM1431.6 726.8L1431.6 726.8Q1449.8 726.8 1464.4 718.3Q1479.0 709.7 1487.5 694.6Q1496.1 679.5 1496.1 660.3L1496.1 660.3Q1496.1 640.5 1487.5 625.2Q1479.0 609.8 1464.4 601.3Q1449.8 592.7 1431.6 592.7L1431.6 592.7Q1414.0 592.7 1399.4 601.5Q1384.8 610.4 1376.3 625.4Q1367.7 640.5 1367.7 660.3L1367.7 660.3Q1367.7 679.5 1376.3 694.6Q1384.8 709.7 1399.4 718.3Q1414.0 726.8 1431.6 726.8ZM1335.4 788.2L1335.4 788.2Q1321.4 788.2 1314.6 783.8Q1307.9 779.4 1306.3 772.3Q1304.8 765.3 1304.8 756.5L1304.8 756.5L1304.8 446.6Q1304.8 437.7 1306.3 430.7Q1307.9 423.7 1314.6 419.5Q1321.4 415.4 1335.4 415.4L1335.4 415.4Q1350 415.4 1356.2 419.5Q1362.5 423.7 1364.0 431.0Q1365.6 438.2 1365.6 446.6L1365.6 446.6L1365.6 766.9Q1363.5 778.3 1357.0 783.3Q1350.5 788.2 1335.4 788.2ZM1723.9 791.3L1723.9 791.3Q1698.9 791.3 1675.3 781.7Q1651.6 772.1 1632.6 754.4Q1613.6 736.7 1602.5 712.8Q1591.3 688.9 1591.3 660.3L1591.3 660.3Q1591.3 632.7 1601.7 608.8Q1612.1 584.9 1630.3 566.7Q1648.5 548.5 1672.1 538.3Q1695.8 528.2 1722.8 528.2L1722.8 528.2Q1759.2 528.2 1788.9 545.6Q1818.5 563.0 1836.2 592.7Q1853.9 622.3 1853.9 659.8L1853.9 659.8Q1853.9 689.4 1843.0 713.6Q1832.0 737.8 1813.3 755.2Q1794.6 772.6 1771.5 782.0Q1748.3 791.3 1723.9 791.3ZM1722.8 730.0L1722.8 730.0Q1740 730.0 1755.9 721.4Q1771.7 712.8 1781.9 696.7Q1792 680.6 1792 658.7L1792 658.7Q1792 638.4 1782.9 622.8Q1773.8 607.2 1758.2 598.4Q1742.6 589.6 1722.3 589.6L1722.3 589.6Q1703.1 589.6 1687.5 598.7Q1671.9 607.8 1662.8 623.6Q1653.7 639.5 1653.7 659.2L1653.7 659.2Q1653.7 681.1 1663.6 696.9Q1673.4 712.8 1689.3 721.4Q1705.2 730.0 1722.8 730.0ZM2108.2 787.2L2108.2 787.2Q2093.1 787.2 2085.8 781.4Q2078.5 775.7 2078.5 765.8L2078.5 765.8L2082.2 748.7Q2078 755.4 2068.1 764.5Q2058.2 773.6 2042.1 780.7Q2026 787.7 2003.1 787.7L2003.1 787.7Q1978.7 787.7 1957.1 777.5Q1935.5 767.4 1919.1 749.5Q1902.8 731.5 1893.1 708.4Q1883.5 685.2 1883.5 658.7L1883.5 658.7Q1883.5 633.2 1893.1 610.6Q1902.8 588 1919.4 570.3Q1936.0 552.6 1957.6 542.5Q1979.2 532.4 2003.1 532.4L2003.1 532.4Q2024.4 532.4 2039.3 538.1Q2054.1 543.8 2064.5 552.4Q2074.9 561.0 2081.6 570.3L2081.6 570.3L2078.5 555.2Q2078.5 543.8 2085.8 537.8Q2093.1 531.8 2108.7 531.8L2108.7 531.8Q2123.2 531.8 2129.5 536.3Q2135.7 540.7 2137.3 548.2Q2138.8 555.8 2138.8 565.1L2138.8 565.1L2138.8 755.4Q2138.8 764.3 2137.3 771.6Q2135.7 778.8 2129.2 783Q2122.7 787.2 2108.2 787.2ZM2012.5 726.8L2012.5 726.8Q2030.2 726.8 2044.2 718Q2058.2 709.2 2066.8 693.8Q2075.4 678.5 2075.4 659.8L2075.4 659.8Q2075.4 639.5 2066.6 624.4Q2057.7 609.3 2043.4 600.7Q2029.1 592.2 2011.4 592.2L2011.4 592.2Q1992.2 592.2 1977.1 601.3Q1962.0 610.4 1953.5 625.7Q1944.9 641.0 1944.9 660.3L1944.9 660.3Q1944.9 679 1953.7 694.1Q1962.6 709.2 1977.9 718Q1993.2 726.8 2012.5 726.8ZM2395.7 788.2L2210.1 788.2Q2196.0 788.2 2187.7 779.6Q2179.4 771.0 2179.4 757.5L2179.4 757.5Q2179.4 750.2 2181.7 744.5Q2184.1 738.8 2188.8 734.1L2188.8 734.1L2324.5 594.2L2222.0 594.2Q2213.7 594.2 2206.4 592.4Q2199.2 590.6 2194.7 584.1Q2190.3 577.6 2190.3 563.0L2190.3 563.0Q2190.3 548.5 2194.7 542.0Q2199.2 535.5 2206.4 533.7Q2213.7 531.8 2222.0 531.8L2222.0 531.8L2390 531.8Q2403.5 531.8 2412.1 540.2Q2420.7 548.5 2420.7 562L2420.7 562Q2420.7 568.8 2418.3 574.7Q2416 580.7 2412.4 584.4L2412.4 584.4L2278.2 725.8L2396.2 725.8Q2405.1 725.8 2412.1 727.6Q2419.1 729.4 2423.3 736.2Q2427.4 743.0 2427.4 757.5L2427.4 757.5Q2427.4 771.6 2423.0 778.3Q2418.6 785.1 2411.6 786.6Q2404.6 788.2 2395.7 788.2L2395.7 788.2Z","largura":2428};
+export const NOME = {"de":"M837.3 787.7L837.3 787.7Q813.4 787.7 792.0 777.8Q770.7 767.9 754.6 750.5Q738.5 733.1 729.1 709.4Q719.8 685.8 719.8 658.7L719.8 658.7Q719.8 632.7 729.1 609.6Q738.5 586.4 754.9 569.0Q771.2 551.6 792.6 541.7Q813.9 531.8 837.3 531.8L837.3 531.8Q862.2 531.8 882 541.7Q901.8 551.6 915.5 569.0Q929.3 586.4 936.6 609.6Q943.9 632.7 944.4 659.2L944.4 659.2Q944.4 685.8 937.4 708.9Q930.4 732.0 916.6 749.7Q902.8 767.4 882.8 777.5Q862.8 787.7 837.3 787.7ZM845.6 726.8L845.6 726.8Q863.8 726.8 878.1 718.3Q892.4 709.7 901.0 694.6Q909.6 679.5 909.6 660.3L909.6 660.3Q909.6 640.5 901.0 625.4Q892.4 610.4 878.1 601.5Q863.8 592.7 845.6 592.7L845.6 592.7Q827.4 592.7 812.8 601.3Q798.3 609.8 789.7 625.2Q781.1 640.5 781.1 660.3L781.1 660.3Q781.1 679.5 789.7 694.6Q798.3 709.7 813.1 718.3Q827.9 726.8 845.6 726.8ZM941.8 787.7L941.8 787.7Q927.2 787.7 920.5 782.7Q913.7 777.8 911.6 766.9L911.6 766.9L911.6 446.6Q911.6 437.7 912.9 430.7Q914.2 423.7 920.7 419.3Q927.2 414.8 941.3 414.8L941.3 414.8Q956.4 414.8 962.6 419Q968.8 423.2 970.7 430.2Q972.5 437.2 972.5 446.0L972.5 446.0L972.5 756.0Q972.5 764.8 970.9 772.1Q969.4 779.4 962.9 783.5Q956.4 787.7 941.8 787.7ZM1149.8 791.3L1149.8 791.3Q1116 791.3 1090.8 780.4Q1065.6 769.5 1048.7 750.5Q1031.8 731.5 1023.2 707.9Q1014.6 684.2 1014.6 658.7L1014.6 658.7Q1014.6 621.3 1031.8 592.2Q1048.9 563.0 1079.3 546.4Q1109.8 529.8 1149.3 529.8L1149.3 529.8Q1177.4 529.8 1198.7 538.6Q1220 547.4 1234.3 561.7Q1248.6 576.0 1256.1 593.2Q1263.7 610.4 1263.7 626.5L1263.7 626.5Q1263.7 654.0 1250.4 666.5Q1237.2 679 1217.4 679L1217.4 679L1080.1 679Q1080.6 696.7 1091.3 709.7Q1102.0 722.7 1118.3 729.7Q1134.7 736.7 1151.9 736.7L1151.9 736.7Q1164.9 736.7 1175.0 735.2Q1185.2 733.6 1192.4 731.3Q1199.7 728.9 1205.2 726.3Q1210.6 723.7 1215.3 721.6Q1220 719.6 1224.2 719.0L1224.2 719.0Q1229.9 718.5 1235.6 721.6Q1241.3 724.8 1245.0 732.6L1245.0 732.6Q1248.1 737.8 1249.4 742.2Q1250.7 746.6 1250.7 750.8L1250.7 750.8Q1250.7 761.2 1238.2 770.3Q1225.7 779.4 1203.1 785.3Q1180.5 791.3 1149.8 791.3ZM1080.1 642.1L1080.1 642.1L1186.7 642.1Q1195.6 642.1 1200.2 639.2Q1204.9 636.4 1204.9 627L1204.9 627Q1204.9 615.0 1197.6 605.4Q1190.4 595.8 1177.9 590.3Q1165.4 584.9 1148.8 584.9L1148.8 584.9Q1129.5 584.9 1113.9 592.4Q1098.3 600.0 1089.2 613.0Q1080.1 626.0 1080.1 642.1Z","boaz":"M1440.0 787.7L1440.0 787.7Q1414.5 787.7 1394.5 777.5Q1374.4 767.4 1360.7 749.7Q1346.9 732.0 1339.9 708.9Q1332.8 685.8 1332.8 659.2L1332.8 659.2Q1333.4 632.7 1340.6 609.6Q1347.9 586.4 1361.7 569.0Q1375.5 551.6 1395.2 541.7Q1415 531.8 1440.0 531.8L1440.0 531.8Q1463.9 531.8 1484.9 541.7Q1506 551.6 1522.4 569.0Q1538.8 586.4 1548.1 609.6Q1557.5 632.7 1557.5 658.7L1557.5 658.7Q1557.5 685.8 1548.1 709.4Q1538.8 733.1 1522.6 750.5Q1506.5 767.9 1485.2 777.8Q1463.9 787.7 1440.0 787.7ZM1431.6 726.8L1431.6 726.8Q1449.8 726.8 1464.4 718.3Q1479.0 709.7 1487.5 694.6Q1496.1 679.5 1496.1 660.3L1496.1 660.3Q1496.1 640.5 1487.5 625.2Q1479.0 609.8 1464.4 601.3Q1449.8 592.7 1431.6 592.7L1431.6 592.7Q1414.0 592.7 1399.4 601.5Q1384.8 610.4 1376.3 625.4Q1367.7 640.5 1367.7 660.3L1367.7 660.3Q1367.7 679.5 1376.3 694.6Q1384.8 709.7 1399.4 718.3Q1414.0 726.8 1431.6 726.8ZM1335.4 788.2L1335.4 788.2Q1321.4 788.2 1314.6 783.8Q1307.9 779.4 1306.3 772.3Q1304.8 765.3 1304.8 756.5L1304.8 756.5L1304.8 446.6Q1304.8 437.7 1306.3 430.7Q1307.9 423.7 1314.6 419.5Q1321.4 415.4 1335.4 415.4L1335.4 415.4Q1350 415.4 1356.2 419.5Q1362.5 423.7 1364.0 431.0Q1365.6 438.2 1365.6 446.6L1365.6 446.6L1365.6 766.9Q1363.5 778.3 1357.0 783.3Q1350.5 788.2 1335.4 788.2ZM1723.9 791.3L1723.9 791.3Q1698.9 791.3 1675.3 781.7Q1651.6 772.1 1632.6 754.4Q1613.6 736.7 1602.5 712.8Q1591.3 688.9 1591.3 660.3L1591.3 660.3Q1591.3 632.7 1601.7 608.8Q1612.1 584.9 1630.3 566.7Q1648.5 548.5 1672.1 538.3Q1695.8 528.2 1722.8 528.2L1722.8 528.2Q1759.2 528.2 1788.9 545.6Q1818.5 563.0 1836.2 592.7Q1853.9 622.3 1853.9 659.8L1853.9 659.8Q1853.9 689.4 1843.0 713.6Q1832.0 737.8 1813.3 755.2Q1794.6 772.6 1771.5 782.0Q1748.3 791.3 1723.9 791.3ZM1722.8 730.0L1722.8 730.0Q1740 730.0 1755.9 721.4Q1771.7 712.8 1781.9 696.7Q1792 680.6 1792 658.7L1792 658.7Q1792 638.4 1782.9 622.8Q1773.8 607.2 1758.2 598.4Q1742.6 589.6 1722.3 589.6L1722.3 589.6Q1703.1 589.6 1687.5 598.7Q1671.9 607.8 1662.8 623.6Q1653.7 639.5 1653.7 659.2L1653.7 659.2Q1653.7 681.1 1663.6 696.9Q1673.4 712.8 1689.3 721.4Q1705.2 730.0 1722.8 730.0ZM2108.2 787.2L2108.2 787.2Q2093.1 787.2 2085.8 781.4Q2078.5 775.7 2078.5 765.8L2078.5 765.8L2082.2 748.7Q2078 755.4 2068.1 764.5Q2058.2 773.6 2042.1 780.7Q2026 787.7 2003.1 787.7L2003.1 787.7Q1978.7 787.7 1957.1 777.5Q1935.5 767.4 1919.1 749.5Q1902.8 731.5 1893.1 708.4Q1883.5 685.2 1883.5 658.7L1883.5 658.7Q1883.5 633.2 1893.1 610.6Q1902.8 588 1919.4 570.3Q1936.0 552.6 1957.6 542.5Q1979.2 532.4 2003.1 532.4L2003.1 532.4Q2024.4 532.4 2039.3 538.1Q2054.1 543.8 2064.5 552.4Q2074.9 561.0 2081.6 570.3L2081.6 570.3L2078.5 555.2Q2078.5 543.8 2085.8 537.8Q2093.1 531.8 2108.7 531.8L2108.7 531.8Q2123.2 531.8 2129.5 536.3Q2135.7 540.7 2137.3 548.2Q2138.8 555.8 2138.8 565.1L2138.8 565.1L2138.8 755.4Q2138.8 764.3 2137.3 771.6Q2135.7 778.8 2129.2 783Q2122.7 787.2 2108.2 787.2ZM2012.5 726.8L2012.5 726.8Q2030.2 726.8 2044.2 718Q2058.2 709.2 2066.8 693.8Q2075.4 678.5 2075.4 659.8L2075.4 659.8Q2075.4 639.5 2066.6 624.4Q2057.7 609.3 2043.4 600.7Q2029.1 592.2 2011.4 592.2L2011.4 592.2Q1992.2 592.2 1977.1 601.3Q1962.0 610.4 1953.5 625.7Q1944.9 641.0 1944.9 660.3L1944.9 660.3Q1944.9 679 1953.7 694.1Q1962.6 709.2 1977.9 718Q1993.2 726.8 2012.5 726.8ZM2395.7 788.2L2210.1 788.2Q2196.0 788.2 2187.7 779.6Q2179.4 771.0 2179.4 757.5L2179.4 757.5Q2179.4 750.2 2181.7 744.5Q2184.1 738.8 2188.8 734.1L2188.8 734.1L2324.5 594.2L2222.0 594.2Q2213.7 594.2 2206.4 592.4Q2199.2 590.6 2194.7 584.1Q2190.3 577.6 2190.3 563.0L2190.3 563.0Q2190.3 548.5 2194.7 542.0Q2199.2 535.5 2206.4 533.7Q2213.7 531.8 2222.0 531.8L2222.0 531.8L2390 531.8Q2403.5 531.8 2412.1 540.2Q2420.7 548.5 2420.7 562L2420.7 562Q2420.7 568.8 2418.3 574.7Q2416 580.7 2412.4 584.4L2412.4 584.4L2278.2 725.8L2396.2 725.8Q2405.1 725.8 2412.1 727.6Q2419.1 729.4 2423.3 736.2Q2427.4 743.0 2427.4 757.5L2427.4 757.5Q2427.4 771.6 2423.0 778.3Q2418.6 785.1 2411.6 786.6Q2404.6 788.2 2395.7 788.2L2395.7 788.2Z","largura":2428,"y1":414,"y2":792};
 export const marca = criarMarca(NOME);
 
 window.boazMarca = { marca, FRENTES, VARIANTES, geometria, pecas, temas: {
@@ -10901,6 +10972,182 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .md-snackbar span { flex: 1; padding: 10px 0; }
 .md-snackbar .md-button--text { color: var(--md-comp-snackbar-action-color); }
 .md-snackbar .md-icon-button { color: var(--md-comp-snackbar-label-color); }
+
+/* ── selo de notificação (badge) ── */
+.md-badge-ancora { position: relative; display: inline-flex; }
+.md-badge {
+  position: absolute; top: 0; right: 0; transform: translate(40%, -40%); box-sizing: border-box;
+  display: inline-grid; place-items: center; min-width: var(--md-comp-badge-large-min-width); height: var(--md-comp-badge-large-height);
+  padding: 0 var(--md-comp-badge-large-padding); border-radius: var(--md-comp-badge-shape);
+  background: var(--md-comp-badge-color); color: var(--md-comp-badge-label-color);
+  font-family: var(--md-comp-badge-label-font); font-size: var(--md-comp-badge-label-size);
+  line-height: var(--md-comp-badge-label-line-height); letter-spacing: var(--md-comp-badge-label-tracking); font-weight: var(--md-comp-badge-label-weight);
+}
+.md-badge--ponto { min-width: var(--md-comp-badge-small-size); width: var(--md-comp-badge-small-size); height: var(--md-comp-badge-small-size); padding: 0; transform: translate(25%, -25%); }
+
+/* ── abas ── */
+.md-tabs { display: flex; background: var(--md-comp-tabs-container-color); box-shadow: inset 0 -1px 0 var(--md-comp-tabs-divider-color); overflow-x: auto; }
+.md-tab {
+  position: relative; flex: 1 0 auto; height: var(--md-comp-tabs-height); padding: 0 var(--md-comp-tabs-padding); border: 0; background: none; cursor: pointer;
+  color: var(--md-comp-tabs-label-color); font-family: var(--md-comp-tabs-label-font); font-size: var(--md-comp-tabs-label-size);
+  line-height: var(--md-comp-tabs-label-line-height); letter-spacing: var(--md-comp-tabs-label-tracking); font-weight: var(--md-comp-tabs-label-weight);
+}
+.md-tab[aria-selected="true"] { color: var(--md-comp-tabs-active-label-color); }
+.md-tab[aria-selected="true"]::after {
+  content: ""; position: absolute; left: var(--md-comp-tabs-padding); right: var(--md-comp-tabs-padding); bottom: 0;
+  height: var(--md-comp-tabs-active-indicator-height); border-radius: var(--md-comp-tabs-active-indicator-height) var(--md-comp-tabs-active-indicator-height) 0 0;
+  background: var(--md-comp-tabs-active-indicator-color);
+}
+
+/* ── botão segmentado ── */
+.md-segmented { display: inline-flex; border: var(--md-comp-segmented-button-outline-width) solid var(--md-comp-segmented-button-outline-color); border-radius: var(--md-comp-segmented-button-shape); overflow: hidden; }
+.md-segmented button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 48px; height: calc(var(--md-comp-segmented-button-height) - 2 * var(--md-comp-segmented-button-outline-width));
+  padding: 0 var(--md-comp-segmented-button-padding); border: 0; background: none; cursor: pointer; color: var(--md-comp-segmented-button-label-color);
+  font-family: var(--md-comp-segmented-button-label-font); font-size: var(--md-comp-segmented-button-label-size);
+  letter-spacing: var(--md-comp-segmented-button-label-tracking); font-weight: var(--md-comp-segmented-button-label-weight);
+}
+.md-segmented button + button { border-left: var(--md-comp-segmented-button-outline-width) solid var(--md-comp-segmented-button-outline-color); }
+.md-segmented button[aria-pressed="true"] { background: var(--md-comp-segmented-button-selected-container-color); color: var(--md-comp-segmented-button-selected-label-color); }
+.md-segmented .material-symbols { font-size: var(--md-comp-segmented-button-icon-size); }
+
+/* ── menu ── */
+.md-menu {
+  box-sizing: border-box; min-width: var(--md-comp-menu-min-width); max-width: var(--md-comp-menu-max-width); margin: 0; padding: 8px 0; list-style: none;
+  border-radius: var(--md-comp-menu-shape); background: var(--md-comp-menu-container-color); box-shadow: var(--md-comp-menu-elevation);
+}
+.md-menu button {
+  display: flex; align-items: center; gap: var(--md-comp-menu-item-padding); width: 100%; height: var(--md-comp-menu-item-height);
+  padding: 0 var(--md-comp-menu-item-padding); border: 0; background: none; cursor: pointer; text-align: left; color: var(--md-comp-menu-label-color);
+  font-family: var(--md-comp-menu-label-font); font-size: var(--md-comp-menu-label-size); letter-spacing: var(--md-comp-menu-label-tracking); font-weight: var(--md-comp-menu-label-weight);
+}
+.md-menu .material-symbols { font-size: var(--md-comp-menu-icon-size); color: var(--md-comp-menu-icon-color); }
+
+/* ── carrossel com indicador de páginas ── */
+.md-carousel { display: grid; gap: var(--md-sys-spacing-3); }
+.md-carousel__trilha { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: var(--md-comp-carousel-gap); overflow-x: auto; scroll-snap-type: x mandatory; }
+.md-carousel__trilha > * { scroll-snap-align: start; border-radius: var(--md-comp-carousel-item-shape); }
+.md-carousel__controles { display: flex; align-items: center; justify-content: center; gap: var(--md-sys-spacing-2); }
+.md-carousel__pontos { display: inline-flex; align-items: center; gap: var(--md-comp-carousel-indicator-gap); }
+.md-carousel__pontos i {
+  display: block; width: var(--md-comp-carousel-indicator-dot-size); height: var(--md-comp-carousel-indicator-dot-size);
+  border-radius: var(--md-comp-carousel-indicator-shape); background: var(--md-comp-carousel-indicator-color);
+}
+.md-carousel__pontos i[aria-current="true"] { width: var(--md-comp-carousel-indicator-active-width); background: var(--md-comp-carousel-indicator-active-color); }
+.md-carousel__posicao {
+  color: var(--md-comp-carousel-position-label-color); font-family: var(--md-comp-carousel-position-label-font); font-size: var(--md-comp-carousel-position-label-size);
+  letter-spacing: var(--md-comp-carousel-position-label-tracking); font-weight: var(--md-comp-carousel-position-label-weight);
+}
+@media (min-width: 600px) { .md-carousel__trilha { grid-auto-columns: calc((100% - var(--md-comp-carousel-gap)) / 2); } }
+@media (min-width: 840px) { .md-carousel__trilha { grid-auto-columns: calc((100% - 2 * var(--md-comp-carousel-gap)) / 3); } }
+@media (prefers-reduced-motion: reduce) { .md-carousel__trilha { scroll-behavior: auto; } }
+
+/* =============================================================================
+   Componentes compostos (requisitos 10_componentes-compostos-*): juntam
+   componentes e identidade num bloco reutilizável; só tokens md.comp/md.sys.
+   ============================================================================= */
+.cx-texto-titulo { display: block; margin: 0; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-title-medium-weight); }
+.cx-texto-apoio { display: block; margin: 0; color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-body-medium-font); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+.cx-texto-rotulo { color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-label-medium-font); font-size: var(--md-sys-typescale-label-medium-size); letter-spacing: var(--md-sys-typescale-label-medium-tracking); font-weight: var(--md-sys-typescale-label-medium-weight); }
+.cx-icone { display: grid; place-items: center; flex: none; width: var(--md-sys-spacing-10); height: var(--md-sys-spacing-10); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.cx-logo { display: inline-flex; flex: none; }
+/* logo centralizado na barra: o nome já fica centralizado na altura do símbolo (identidade);
+   hastes curtas (quest) na mesma escala das longas (hub), para o nome sair do mesmo tamanho */
+.cx-logo svg { display: block; height: var(--md-sys-spacing-10); width: auto; }
+.cx-logo--curto svg { height: var(--md-sys-spacing-8); }
+.cx-topo .conta { display: flex; align-items: center; gap: var(--md-sys-spacing-2); min-width: 0; padding: 0; border: 0; background: none; cursor: pointer; border-radius: var(--md-sys-shape-corner-full); }
+.cx-topo .conta .nome { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-title-small-font); font-size: var(--md-sys-typescale-title-small-size); font-weight: var(--md-sys-typescale-title-small-weight); }
+
+/* comuns · topo da casca e topo do módulo */
+.cx-topo { display: flex; align-items: center; gap: var(--md-sys-spacing-2); height: var(--md-comp-top-app-bar-height); padding: 0 var(--md-sys-spacing-1) 0 var(--md-sys-spacing-4); background: var(--md-comp-top-app-bar-container-color); color: var(--md-comp-top-app-bar-icon-color); }
+.cx-topo--modulo { padding-left: var(--md-sys-spacing-1); }
+.cx-topo .vao { flex: 1; }
+.cx-topo h3 { flex: 1; min-width: 0; margin: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--md-comp-top-app-bar-title-color); font-family: var(--md-comp-top-app-bar-title-font); font-size: var(--md-comp-top-app-bar-title-size); font-weight: var(--md-comp-top-app-bar-title-weight); }
+.cx-topo .avatar { flex: none; display: grid; place-items: center; width: var(--md-sys-spacing-8); height: var(--md-sys-spacing-8); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); font-family: var(--md-sys-typescale-label-large-font); font-weight: var(--md-sys-typescale-label-large-weight); }
+
+/* comuns · card de módulo (meus módulos no hub, fixos no quest) */
+.cx-card-modulo { position: relative; display: grid; align-content: start; gap: var(--md-sys-spacing-2); min-height: var(--md-sys-spacing-24); padding: var(--md-comp-card-padding); border: 0; border-radius: var(--md-comp-card-shape); background: var(--md-comp-card-filled-container-color); color: var(--md-sys-color-on-surface); text-align: left; cursor: pointer; }
+.cx-card-modulo .md-badge { top: var(--md-sys-spacing-3); right: var(--md-sys-spacing-3); transform: none; }
+.cx-card-modulo .estado { justify-self: start; margin-top: auto; padding: var(--md-sys-spacing-1) var(--md-sys-spacing-2); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); font-family: var(--md-sys-typescale-label-medium-font); font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-label-medium-weight); }
+.cx-grade-modulos { display: grid; gap: var(--md-sys-spacing-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 600px) { .cx-grade-modulos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 840px) { .cx-grade-modulos { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* comuns · card do catálogo (vitrine da landing, catálogo do hub, outros módulos) */
+.cx-card-catalogo { display: grid; gap: var(--md-sys-spacing-3); padding: var(--md-comp-card-padding); border-radius: var(--md-comp-carousel-item-shape); background: var(--md-comp-card-outlined-container-color); border: 1px solid var(--md-comp-card-outlined-outline-color); }
+.cx-card-catalogo .cabeca { display: flex; gap: var(--md-sys-spacing-3); align-items: center; }
+.cx-card-catalogo .dado { color: var(--md-sys-color-primary); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-label-large-weight); }
+.cx-card-catalogo .md-button { justify-self: start; }
+
+/* comuns · card de acesso (contas acessadas no hub, perfis acessados no quest) */
+.cx-card-acesso { display: flex; align-items: center; gap: var(--md-sys-spacing-4); min-height: var(--md-comp-list-two-line-height); padding: 0 var(--md-sys-spacing-1) 0 var(--md-sys-spacing-4); border-radius: var(--md-comp-card-shape); background: var(--md-comp-card-filled-container-color); }
+.cx-card-acesso .foto { display: grid; place-items: center; flex: none; width: var(--md-sys-spacing-10); height: var(--md-sys-spacing-10); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); font-family: var(--md-sys-typescale-title-medium-font); font-weight: var(--md-sys-typescale-title-medium-weight); }
+.cx-card-acesso > span:nth-child(2) { flex: 1; min-width: 0; }
+
+/* comuns · aviso para completar */
+.cx-aviso { display: flex; flex-wrap: wrap; align-items: center; gap: var(--md-sys-spacing-3); padding: var(--md-sys-spacing-4); border-radius: var(--md-comp-card-shape); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.cx-aviso > span:nth-child(2) { flex: 1 1 12rem; }
+.cx-aviso p { margin: 0; font-family: var(--md-sys-typescale-body-medium-font); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+
+/* comuns · boas-vindas com mascote */
+.cx-boas-vindas { display: grid; justify-items: center; gap: var(--md-sys-spacing-3); padding: var(--md-sys-spacing-6) var(--md-sys-spacing-4); text-align: center; }
+.cx-boas-vindas img { width: var(--md-sys-spacing-24); height: var(--md-sys-spacing-24); }
+.cx-boas-vindas h3 { margin: 0; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-headline-small-weight); }
+.cx-boas-vindas .acoes { display: grid; gap: var(--md-sys-spacing-2); width: 100%; max-width: 20rem; }
+
+/* comuns · seletor de tema */
+.cx-seletor-tema { display: grid; gap: var(--md-sys-spacing-4); padding: var(--md-sys-spacing-4); border-radius: var(--md-comp-menu-shape); background: var(--md-comp-menu-container-color); box-shadow: var(--md-comp-menu-elevation); max-width: 22rem; }
+.cx-seletor-tema .amostras { display: flex; flex-wrap: wrap; gap: var(--md-sys-spacing-2); }
+.cx-seletor-tema .amostra { position: relative; flex: none; padding: 0; width: var(--md-sys-spacing-10); height: var(--md-sys-spacing-10); border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--md-sys-shape-corner-full); background: var(--cx-amostra); cursor: pointer; }
+.cx-seletor-tema .amostra { min-width: var(--md-sys-spacing-10); min-height: var(--md-sys-spacing-10); aspect-ratio: 1; }
+.cx-seletor-tema .md-segmented, .cx-simulador .md-segmented { justify-self: start; }
+.cx-seletor-tema .amostra[aria-pressed="true"] { outline: var(--md-sys-state-focus-indicator-thickness) solid var(--md-sys-color-primary); outline-offset: 2px; }
+
+/* comuns · indicador (números da landing, painel do perfil no quest) */
+.cx-indicadores { display: grid; gap: var(--md-sys-spacing-3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr)); }
+.cx-indicador { display: grid; gap: var(--md-sys-spacing-1); padding: var(--md-sys-spacing-4); border-radius: var(--md-comp-card-shape); background: var(--md-comp-card-filled-container-color); }
+.cx-indicador b { color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-headline-medium-weight); }
+
+/* landing · topo */
+.cx-topo-landing { display: flex; min-width: 0; overflow: hidden; align-items: center; gap: var(--md-sys-spacing-2); height: var(--md-comp-top-app-bar-height); padding: 0 var(--md-sys-spacing-2) 0 var(--md-sys-spacing-4); background: var(--md-comp-top-app-bar-container-color); }
+.cx-topo-landing nav { display: none; flex: 1; gap: var(--md-sys-spacing-1); }
+.cx-topo-landing .vao { flex: 1; }
+.cx-topo-landing .so-web { display: none; }
+@media (min-width: 840px) { .cx-topo-landing nav, .cx-topo-landing .so-web { display: inline-flex; } .cx-topo-landing .vao, .cx-topo-landing .so-celular { display: none; } }
+
+/* landing · card de perfil, passos, depoimento */
+.cx-card-perfil { display: grid; gap: var(--md-sys-spacing-2); padding: var(--md-comp-card-padding); border-radius: var(--md-comp-card-shape); background: var(--md-comp-card-elevated-container-color); box-shadow: var(--md-comp-card-elevated-elevation); }
+.cx-passos { display: grid; gap: var(--md-sys-spacing-3); margin: 0; padding: 0; list-style: none; counter-reset: passo; }
+@media (min-width: 840px) { .cx-passos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.cx-passos li { display: flex; gap: var(--md-sys-spacing-3); align-items: flex-start; counter-increment: passo; }
+.cx-passos li::before { content: counter(passo); display: grid; place-items: center; flex: none; width: var(--md-sys-spacing-8); height: var(--md-sys-spacing-8); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); font-family: var(--md-sys-typescale-title-medium-font); font-weight: var(--md-sys-typescale-title-medium-weight); }
+.cx-depoimento { display: grid; gap: var(--md-sys-spacing-3); padding: var(--md-sys-spacing-6); border-radius: var(--md-comp-carousel-item-shape); background: var(--md-sys-color-surface-container-high); }
+.cx-depoimento blockquote { margin: 0; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-body-large-font); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+.cx-depoimento footer { display: flex; align-items: center; gap: var(--md-sys-spacing-3); }
+
+/* landing · barra de ação fixa e rodapé */
+.cx-barra-acao { display: grid; grid-template-columns: 1fr 1fr; gap: var(--md-sys-spacing-2); padding: var(--md-sys-spacing-3) var(--md-sys-spacing-4); background: var(--md-sys-color-surface-container); box-shadow: var(--md-sys-elevation-level2); }
+@media (min-width: 840px) { .cx-barra-acao--celular { display: none; } }
+.cx-rodape { display: grid; gap: var(--md-sys-spacing-4); padding: var(--md-sys-spacing-6) var(--md-sys-spacing-4); background: var(--md-sys-color-surface-container-low); }
+@media (min-width: 840px) { .cx-rodape { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+.cx-rodape ul { display: grid; gap: var(--md-sys-spacing-2); margin: 0; padding: 0; list-style: none; }
+.cx-rodape a { color: var(--md-sys-color-on-surface-variant); text-decoration: none; font-family: var(--md-sys-typescale-body-medium-font); font-size: var(--md-sys-typescale-body-medium-size); }
+
+/* hub · ordenação, simulador de custo */
+.cx-card-modulo--ordenando { cursor: grab; outline: 1px dashed var(--md-sys-color-outline); }
+.cx-card-modulo--ordenando .mover { display: flex; gap: var(--md-sys-spacing-1); margin-top: auto; }
+.cx-simulador { display: grid; gap: var(--md-sys-spacing-4); padding: var(--md-comp-card-padding); border-radius: var(--md-comp-card-shape); background: var(--md-comp-card-outlined-container-color); border: 1px solid var(--md-comp-card-outlined-outline-color); max-width: 26rem; }
+.cx-simulador .total { display: grid; gap: var(--md-sys-spacing-1); padding: var(--md-sys-spacing-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-highest); }
+.cx-simulador .total b { color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); font-weight: var(--md-sys-typescale-headline-small-weight); }
+
+/* quest · card de tarefa e quem está acessando */
+.cx-card-tarefa { display: grid; gap: var(--md-sys-spacing-1); padding: var(--md-sys-spacing-4); border-radius: var(--md-comp-card-shape); background: var(--md-comp-card-outlined-container-color); border: 1px solid var(--md-comp-card-outlined-outline-color); }
+.cx-card-tarefa .prazo { display: inline-flex; align-items: center; gap: var(--md-sys-spacing-1); color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-label-large-weight); }
+.cx-card-tarefa--hoje { border-color: var(--md-sys-color-error); }
+.cx-card-tarefa--hoje .prazo { color: var(--md-sys-color-error); }
+.cx-quem-acessa { display: grid; gap: var(--md-sys-spacing-3); max-width: 22rem; }
+.cx-quem-acessa .opcao { display: flex; align-items: center; gap: var(--md-sys-spacing-3); min-height: var(--md-comp-list-one-line-height); padding: 0 var(--md-sys-spacing-4); border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--md-comp-card-shape); background: none; color: var(--md-sys-color-on-surface); cursor: pointer; font-family: var(--md-sys-typescale-body-large-font); font-size: var(--md-sys-typescale-body-large-size); text-align: left; }
+.cx-quem-acessa .opcao[aria-pressed="true"] { border-color: transparent; background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
 </style>
 <style id="design-catalogo">
 /* =============================================================================
@@ -10957,6 +11204,11 @@ h3.sub { margin: 32px 0 12px; }
 .linha { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .palco { padding: 24px; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
 .palco + .palco { margin-top: 12px; }
+.cx-par { display: grid; gap: 12px; margin-top: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.cx-par .palco + .palco { margin-top: 0; }
+.cx-centro { display: grid; justify-items: center; }
+.cx-centro > .rotulo { justify-self: stretch; }
+.palco + .cx-par, .cx-par + .palco { margin-top: 12px; }
 .rotulo { display: block; margin: 0 0 12px; color: var(--md-sys-color-on-surface-variant);
   font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-label-medium-weight); letter-spacing: var(--md-sys-typescale-label-medium-tracking); }
 .nota { padding: 16px; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }
@@ -11167,6 +11419,7 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
   <a class="md-drawer-item md-estado" href="#layout"><span class="material-symbols">devices</span>Layout responsivo</a>
   <a class="md-drawer-item md-estado" href="#movimento"><span class="material-symbols">animation</span>Movimento e estados</a>
   <a class="md-drawer-item md-estado" href="#componentes"><span class="material-symbols">widgets</span>Componentes</a>
+  <a class="md-drawer-item md-estado" href="#compostos"><span class="material-symbols">dashboard_customize</span>Componentes compostos</a>
   <a class="md-drawer-item md-estado" href="#mascotes"><span class="material-symbols">sentiment_satisfied</span>Mascotes</a>
   <a class="md-drawer-item md-estado" href="#acessibilidade"><span class="material-symbols">accessibility_new</span>Acessibilidade</a>
   <a class="md-drawer-item md-estado" href="#plataformas"><span class="material-symbols">code</span>Web e mobile</a>
@@ -11181,8 +11434,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v16</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-17 23:07</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v22</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-19 03:01</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -11471,6 +11724,207 @@ el.innerHTML = fundos.desenhar('halo', {
           <button class="md-button md-button--text md-estado" data-fechar>Descartar</button>
         </div>
       </dialog>
+
+      <h3 class="sub md-typescale-title-large">Selo de notificação</h3>
+      <div class="palco linha">
+        <span class="rotulo">Número em 16dp (até 999+) ou ponto de 6dp, em error; o número também vai no rótulo para leitor de tela.</span>
+        <span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 3 não lidos"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">3</span></span>
+        <span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Mensagens, há novidades"><span class="material-symbols">chat</span></button><span class="md-badge md-badge--ponto" aria-hidden="true"></span></span>
+        <span class="md-badge-ancora"><button class="md-button md-button--tonal md-estado" aria-label="Tarefas, 12 pendentes">Tarefas</button><span class="md-badge" aria-hidden="true">12</span></span>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Abas</h3>
+      <div class="palco">
+        <span class="rotulo">Abas primárias: vistas do mesmo assunto; indicador de 3dp em primary sob a ativa.</span>
+        <div class="md-tabs" role="tablist">
+          <button class="md-tab md-estado" role="tab" aria-selected="true">Configuração</button>
+          <button class="md-tab md-estado" role="tab" aria-selected="false">Utilização</button>
+        </div>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Botão segmentado</h3>
+      <div class="palco linha">
+        <span class="rotulo">De 2 a 5 opções curtas; a selecionada ganha secondary-container e marcação.</span>
+        <div class="md-segmented" role="group" aria-label="Prazo">
+          <button class="md-estado" aria-pressed="true"><span class="material-symbols">check</span>Mensal</button>
+          <button class="md-estado" aria-pressed="false">Anual</button>
+        </div>
+        <div class="md-segmented" role="group" aria-label="Modo">
+          <button class="md-estado" aria-pressed="false">Claro</button>
+          <button class="md-estado" aria-pressed="false">Escuro</button>
+          <button class="md-estado" aria-pressed="true"><span class="material-symbols">check</span>Sistema</button>
+        </div>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Menu</h3>
+      <div class="palco linha">
+        <span class="rotulo">Aberto por um botão (⋮); itens de 48dp, em surface-container com sombra de nível 2.</span>
+        <ul class="md-menu" role="menu">
+          <li><button class="md-estado" role="menuitem"><span class="material-symbols">edit</span>Renomear</button></li>
+          <li><button class="md-estado" role="menuitem"><span class="material-symbols">delete</span>Remover deste aparelho</button></li>
+        </ul>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Carrossel</h3>
+      <div class="palco">
+        <span class="rotulo">1 item por vez no compact, 2 no medium e 3 a partir do expanded; só avança por ação da pessoa, com a posição em texto.</span>
+        <div class="md-carousel">
+          <div class="md-carousel__trilha" tabindex="0" aria-label="Itens do carrossel">
+            <article class="md-card md-card--filled"><h4>Item 1</h4><p>Canto extra-large; desliza ou usa os botões.</p></article>
+            <article class="md-card md-card--filled"><h4>Item 2</h4><p>Encaixa no início ao soltar.</p></article>
+            <article class="md-card md-card--filled"><h4>Item 3</h4><p>Sem avanço automático.</p></article>
+            <article class="md-card md-card--filled"><h4>Item 4</h4><p>Posição sempre em texto.</p></article>
+          </div>
+          <div class="md-carousel__controles">
+            <button class="md-icon-button md-estado md-alvo" aria-label="Anterior"><span class="material-symbols">chevron_left</span></button>
+            <span class="md-carousel__pontos" aria-hidden="true"><i aria-current="true"></i><i></i><i></i><i></i></span>
+            <span class="md-carousel__posicao">1 de 4</span>
+            <button class="md-icon-button md-estado md-alvo" aria-label="Próximo"><span class="material-symbols">chevron_right</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="compostos">
+      <h2 class="md-typescale-headline-medium">Componentes compostos</h2>
+      <p class="lead">Blocos que juntam componentes e identidade, desenhados a partir das blueprints da UX base (07 landing page, 08 hub, 09 quest) e descritos em <code>1_Requisitos/10_componentes-compostos-*.html</code>. Cada um diz onde é usado; o espaço de um módulo é preenchido pelo documento do módulo.</p>
+
+      <h3 class="sub md-typescale-title-large">Comuns</h3>
+      <div class="palco">
+        <span class="rotulo">Topo da casca · igual no hub e no quest: logo (hastes longas no hub, curtas no quest), avisos, o nome (instituição ou pessoa logada no hub, usuário no quest) e a foto; o toque abre a conta (hub) ou Trocar perfil (quest); sem o título da tela, que a navegação já marca</span>
+        <div class="cx-topo"><span class="cx-logo" data-marca-logo="longo" role="img" aria-label="deboaz"></span><span class="vao"></span><span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 2 não lidos"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">2</span></span><button class="conta md-estado" aria-label="Conta da Escola Horizonte"><span class="nome">Escola Horizonte</span><span class="avatar" aria-hidden="true">E</span></button></div>
+        <div class="cx-topo" style="margin-top: var(--md-sys-spacing-3)"><span class="cx-logo cx-logo--curto" data-marca-logo="curto" role="img" aria-label="deboaz"></span><span class="vao"></span><span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 2 não lidos"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">2</span></span><button class="conta md-estado" aria-label="Perfil de Lucas Andrade: trocar perfil"><span class="nome">Lucas Andrade</span><span class="avatar" aria-hidden="true">L</span></button></div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Navegação da casca · hub e quest: três destinos; barra no compact, trilho no medium e no expanded, gaveta a partir do large</span>
+        <nav class="md-navigation-bar" aria-label="Navegação do hub">
+          <a class="md-nav-item" href="#compostos" aria-current="page"><span class="md-nav-item__indicador"><span class="material-symbols">dashboard</span></span>Meus módulos</a>
+          <a class="md-nav-item" href="#compostos"><span class="md-nav-item__indicador"><span class="material-symbols">add</span></span>Catálogo</a>
+          <a class="md-nav-item" href="#compostos"><span class="md-nav-item__indicador"><span class="material-symbols">account_circle</span></span>Conta</a>
+        </nav>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Card de módulo · Meus módulos (hub) e Fixos (quest): nome, apoio, selo de notificações e estado Configurar ou Completar</span>
+        <div class="cx-grade-modulos">
+          <button class="cx-card-modulo md-estado" aria-label="Presença, 3 notificações"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="cx-texto-titulo">Presença</span><span class="cx-texto-apoio">Chamada da turma</span><span class="md-badge" aria-hidden="true">3</span></button>
+          <button class="cx-card-modulo md-estado"><span class="cx-icone"><span class="material-symbols">badge</span></span><span class="cx-texto-titulo">Carteirinha</span><span class="estado">Completar</span></button>
+          <button class="cx-card-modulo md-estado"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span><span class="estado">Configurar</span></button>
+          <button class="cx-card-modulo md-estado"><span class="cx-icone"><span class="material-symbols">support_agent</span></span><span class="cx-texto-titulo">Suporte</span><span class="cx-texto-apoio">Módulo da conta</span></button>
+        </div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Card do catálogo · vitrine da landing page, catálogo do hub e outros módulos: nome, frase, um dado (quem usa ou preço inicial) e Saiba mais</span>
+        <div class="cx-par">
+          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="cx-texto-titulo">Presença</span></span><p class="cx-texto-apoio">Chamada em sala, acompanhada pela família no quest.</p><span class="dado">120 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a></article>
+          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span></span><p class="cx-texto-apoio">Salas ao vivo com ranking.</p><span class="dado">a partir de R$ 49,00/mês</span><a class="md-button md-button--text md-estado" href="#compostos">Ver detalhes</a></article>
+        </div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Card de acesso · contas acessadas (hub) e perfis acessados (quest): foto, nome, instituição e menu com Remover</span>
+        <div class="cx-card-acesso"><span class="foto">L</span><span><span class="cx-texto-titulo">Lucas Andrade</span><span class="cx-texto-apoio">Escola Horizonte · 7º A · 2026</span></span><button class="md-icon-button md-estado md-alvo" aria-label="Mais opções"><span class="material-symbols">more_vert</span></button></div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Aviso para completar · módulo aberto (hub e quest) e tela de acesso: ícone, texto e ação</span>
+        <div class="cx-aviso"><span class="material-symbols">photo_camera</span><span><p>Envie a foto 3x4 para a carteirinha ficar pronta.</p></span><button class="md-button md-button--filled md-estado">Enviar foto</button></div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Topo do módulo · hub (com abas por permissão) e quest: voltar, nome do módulo e avisos dele</span>
+        <div class="cx-topo cx-topo--modulo"><button class="md-icon-button md-estado md-alvo" aria-label="Voltar"><span class="material-symbols">arrow_back</span></button><h3>Presença</h3><span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 1 não lido"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">1</span></span></div>
+        <div class="md-tabs" role="tablist"><button class="md-tab md-estado" role="tab" aria-selected="true">Configuração</button><button class="md-tab md-estado" role="tab" aria-selected="false">Utilização</button></div>
+      </div>
+      <div class="cx-par">
+        <div class="palco cx-centro">
+          <span class="rotulo">Boas-vindas com mascote · apresentação da landing page e entrada do hub e do quest</span>
+          <div class="cx-boas-vindas"><img data-mascote="feliz" alt=""><h3>Que bom te ver!</h3><p class="cx-texto-apoio">Entre com o código que a escola entregou.</p><div class="acoes"><button class="md-button md-button--filled md-estado">Inserir código</button></div></div>
+        </div>
+        <div class="palco cx-centro">
+          <span class="rotulo">Seletor de tema · landing page, hub e quest: tema de cor e modo, guardados no aparelho</span>
+          <div class="cx-seletor-tema" role="dialog" aria-label="Tema">
+            <span class="cx-texto-rotulo">Tema de cor</span>
+            <div class="amostras"><button class="amostra" style="--cx-amostra: var(--md-sys-color-surface)" aria-pressed="true" aria-label="Branco e Preto"></button><button class="amostra md-paleta-roxo" style="--cx-amostra: var(--md-sys-color-primary)" aria-pressed="false" aria-label="Roxo"></button><button class="amostra md-paleta-oceano" style="--cx-amostra: var(--md-sys-color-primary)" aria-pressed="false" aria-label="Oceano"></button><button class="amostra md-paleta-floresta" style="--cx-amostra: var(--md-sys-color-primary)" aria-pressed="false" aria-label="Floresta"></button><button class="amostra md-paleta-sol" style="--cx-amostra: var(--md-sys-color-primary)" aria-pressed="false" aria-label="Sol"></button></div>
+            <span class="cx-texto-rotulo">Modo</span>
+            <div class="md-segmented" role="group" aria-label="Modo"><button class="md-estado" aria-pressed="false">Claro</button><button class="md-estado" aria-pressed="false">Escuro</button><button class="md-estado" aria-pressed="true"><span class="material-symbols">check</span>Sistema</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Indicador · números da landing page e painel do perfil no quest: valor grande e rótulo, só totais</span>
+        <div class="cx-indicadores"><div class="cx-indicador"><b>40</b><span class="cx-texto-rotulo">escolas</span></div><div class="cx-indicador"><b>5</b><span class="cx-texto-rotulo">empresas</span></div><div class="cx-indicador"><b>120</b><span class="cx-texto-rotulo">educadores autônomos</span></div></div>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Landing page</h3>
+      <div class="palco">
+        <span class="rotulo">Topo da landing page: compact com logo, Entrar e menu; a partir do expanded, links das seções, tema e as três ações</span>
+        <div class="cx-topo-landing"><span class="cx-logo" data-marca-logo="longo" role="img" aria-label="deboaz"></span><span class="vao"></span><nav aria-label="Seções"><a class="md-button md-button--text md-estado" href="#compostos">Módulos</a><a class="md-button md-button--text md-estado" href="#compostos">Para quem</a><a class="md-button md-button--text md-estado" href="#compostos">Como funciona</a><a class="md-button md-button--text md-estado" href="#compostos">Depoimentos</a></nav><button class="md-icon-button md-estado md-alvo so-web" aria-label="Tema"><span class="material-symbols">palette</span></button><a class="md-button md-button--outlined md-estado so-web" href="#compostos">Entrar numa sala</a><a class="md-button md-button--text md-estado" href="#compostos">Entrar</a><a class="md-button md-button--filled md-estado so-web" href="#compostos">Começar grátis</a><button class="md-icon-button md-estado md-alvo so-celular" aria-label="Menu"><span class="material-symbols">menu</span></button></div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Vitrine de módulos: carrossel de cards do catálogo, do mais contratado ao menos contratado</span>
+        <div class="md-carousel"><div class="md-carousel__trilha" tabindex="0" aria-label="Módulos">
+          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="cx-texto-titulo">Presença</span></span><p class="cx-texto-apoio">Chamada em sala.</p><span class="dado">120 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a></article>
+          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span></span><p class="cx-texto-apoio">Salas ao vivo.</p><span class="dado">95 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a></article>
+          <article class="cx-card-catalogo"><span class="cabeca"><span class="cx-icone"><span class="material-symbols">badge</span></span><span class="cx-texto-titulo">Carteirinha</span></span><p class="cx-texto-apoio">Identidade do aluno.</p><span class="dado">60 escolas usando</span><a class="md-button md-button--text md-estado" href="#compostos">Saiba mais</a></article>
+        </div><div class="md-carousel__controles"><button class="md-icon-button md-estado md-alvo" aria-label="Anterior"><span class="material-symbols">chevron_left</span></button><span class="md-carousel__pontos" aria-hidden="true"><i aria-current="true"></i><i></i><i></i></span><span class="md-carousel__posicao">1 de 3</span><button class="md-icon-button md-estado md-alvo" aria-label="Próximo"><span class="material-symbols">chevron_right</span></button></div></div>
+      </div>
+      <div class="cx-par">
+        <div class="palco cx-centro"><span class="rotulo">Card de perfil · bloco Para quem</span><article class="cx-card-perfil"><span class="cx-icone"><span class="material-symbols">school</span></span><span class="cx-texto-titulo">Escola</span><p class="cx-texto-apoio">Família perto da sala de aula.</p></article></div>
+        <div class="palco cx-centro"><span class="rotulo">Depoimento · bloco Depoimentos e página do módulo</span><figure class="cx-depoimento"><blockquote>Os pais acompanham a presença no mesmo dia.</blockquote><footer><span class="foto cx-icone">E</span><span class="cx-texto-rotulo">Escola Horizonte</span></footer></figure></div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Passos · bloco Como funciona: em pilha no compact, em linha a partir do expanded</span>
+        <ol class="cx-passos"><li><span><span class="cx-texto-titulo">Crie o quiz no hub</span></span></li><li><span><span class="cx-texto-titulo">Abra a sala e passe o código</span></span></li><li><span><span class="cx-texto-titulo">Jogue pelo quest</span></span></li></ol>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Barra de ação fixa · compact, depois que a apresentação sai de vista</span>
+        <div class="cx-barra-acao"><a class="md-button md-button--filled md-estado" href="#compostos">Começar grátis</a><a class="md-button md-button--outlined md-estado" href="#compostos">Entrar numa sala</a></div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Rodapé · landing page e página do módulo: marca, lema, seções, frentes e documentos legais</span>
+        <footer class="cx-rodape"><div><span class="cx-logo" data-marca-logo="longo" role="img" aria-label="deboaz"></span><p class="cx-texto-apoio">Na força do conhecimento, a sabedoria floresce.</p></div><ul><li><a href="#compostos">Módulos</a></li><li><a href="#compostos">Como funciona</a></li></ul><ul><li><a href="#compostos">Hub</a></li><li><a href="#compostos">Quest</a></li></ul><ul><li><a href="#compostos">Termos de uso</a></li><li><a href="#compostos">Privacidade</a></li></ul></footer>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Hub</h3>
+      <div class="palco">
+        <span class="rotulo">Grade de módulos ordenando: arrastar ou mover para cima e para baixo; os módulos da conta ficam fora</span>
+        <div class="cx-grade-modulos">
+          <div class="cx-card-modulo cx-card-modulo--ordenando"><span class="material-symbols">drag_indicator</span><span class="cx-texto-titulo">Presença</span><span class="mover"><button class="md-icon-button md-estado md-alvo" aria-label="Mover para cima"><span class="material-symbols">arrow_upward</span></button><button class="md-icon-button md-estado md-alvo" aria-label="Mover para baixo"><span class="material-symbols">arrow_downward</span></button></span></div>
+          <div class="cx-card-modulo cx-card-modulo--ordenando"><span class="material-symbols">drag_indicator</span><span class="cx-texto-titulo">Quiz</span><span class="mover"><button class="md-icon-button md-estado md-alvo" aria-label="Mover para cima"><span class="material-symbols">arrow_upward</span></button><button class="md-icon-button md-estado md-alvo" aria-label="Mover para baixo"><span class="material-symbols">arrow_downward</span></button></span></div>
+        </div>
+      </div>
+      <div class="cx-par">
+        <div class="palco cx-centro">
+          <span class="rotulo">Simulador de custo · detalhe do módulo no catálogo; só a conta master vê Incluir na conta</span>
+          <div class="cx-simulador">
+            <div class="md-text-field md-text-field--outlined"><div class="md-text-field__caixa"><input id="cx-pessoas" placeholder=" " value="30" inputmode="numeric"><label for="cx-pessoas">Pessoas que vão usar</label></div></div>
+            <div class="md-segmented" role="group" aria-label="Prazo"><button class="md-estado" aria-pressed="true"><span class="material-symbols">check</span>Mensal</button><button class="md-estado" aria-pressed="false">Anual</button></div>
+            <div class="total"><span class="cx-texto-rotulo">Custo</span><b>R$ 147,00/mês</b><span class="cx-texto-apoio">Pagamento todo dia 10</span></div>
+            <button class="md-button md-button--filled md-estado">Incluir na conta</button>
+          </div>
+        </div>
+        <div class="palco cx-centro">
+          <span class="rotulo">Diálogo de código · módulos do time deboaz</span>
+          <div class="md-dialog" style="position: static" role="dialog" aria-label="Adicionar módulo"><h3>Adicionar módulo</h3><div class="md-text-field md-text-field--outlined"><div class="md-text-field__caixa"><input id="cx-codigo" placeholder=" "><label for="cx-codigo">Código do módulo</label></div><small>Entregue pelo time deboaz</small></div><div class="acoes"><button class="md-button md-button--text md-estado">Cancelar</button><button class="md-button md-button--text md-estado">Adicionar</button></div></div>
+        </div>
+      </div>
+
+      <h3 class="sub md-typescale-title-large">Quest</h3>
+      <div class="cx-par">
+        <div class="palco">
+          <span class="rotulo">Card de tarefa · Tarefas: módulo de origem, título e prazo em texto e data; vence hoje com destaque também em texto</span>
+          <div style="display: grid; gap: var(--md-sys-spacing-3)">
+            <article class="cx-card-tarefa cx-card-tarefa--hoje"><span class="cx-texto-rotulo">Exercícios</span><span class="cx-texto-titulo">Frações equivalentes</span><span class="prazo"><span class="material-symbols">schedule</span>Vence hoje · 19/10</span></article>
+            <article class="cx-card-tarefa"><span class="cx-texto-rotulo">Flashcards</span><span class="cx-texto-titulo">Revisão para a prova</span><span class="prazo"><span class="material-symbols">event</span>Vence em 2 dias · 21/10</span></article>
+          </div>
+        </div>
+        <div class="palco cx-centro">
+          <span class="rotulo">Quem está acessando · depois do código de acesso: estudante ou responsável, com o parentesco</span>
+          <div class="cx-quem-acessa">
+            <button class="opcao md-estado" aria-pressed="false"><span class="material-symbols">person</span>Sou o estudante</button>
+            <button class="opcao md-estado" aria-pressed="true"><span class="material-symbols">family_restroom</span>Sou responsável</button>
+            <div class="linha"><button class="md-chip md-estado" aria-pressed="true"><span class="material-symbols">check</span>Mãe</button><button class="md-chip md-estado" aria-pressed="false">Pai</button><button class="md-chip md-estado" aria-pressed="false">Outro</button></div>
+            <button class="md-button md-button--filled md-estado">Entrar</button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section id="mascotes">
@@ -11619,25 +12073,19 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v22</td><td>2026-10-19 03:01</td><td>Identidade: no logo principal e nas animações, o nome deboaz fica centralizado na altura do símbolo de cada variação (hastes longas e curtas; MarcaNomeDeslocamento no app); topos com o logo centralizado na barra, e o topo da casca com avisos, o nome (instituição ou pessoa no hub, usuário no quest) e a foto, que abre a conta ou Trocar perfil</td></tr>
+          <tr><td>v21</td><td>2026-10-19 02:31</td><td>Logo na linha do topo: o nome deboaz fica na linha dos outros textos e ícones e o símbolo sobe, com a mesma escala no hub (hastes longas) e no quest (hastes curtas); topo da casca igual no hub e no quest (logo, avisos e foto), com o nome e Trocar perfil no toque da foto</td></tr>
+          <tr><td>v20</td><td>2026-10-19 02:24</td><td>Topos com o logo em 40dp (antes 24dp); topo da casca com o logo de hastes longas no hub e de hastes curtas no quest, e no quest os avisos, o perfil ativo com Trocar perfil e a foto à direita; logo de 40dp no rodapé</td></tr>
+          <tr><td>v19</td><td>2026-10-19 02:15</td><td>Compostos: logo oficial (símbolo + nome) no topo da casca, no topo da landing page e no rodapé, também no tema.svg; o topo da casca deixa de repetir o título da tela, que a navegação já marca; elementos sozinhos centralizados no painel (catálogo e tema.svg)</td></tr>
+          <tr><td>v18</td><td>2026-10-19 01:36</td><td>Componentes compostos das UX 07, 08 e 09, por frente: comuns (topo da casca, navegação da casca, card de módulo, card do catálogo, card de acesso, aviso para completar, topo do módulo, boas-vindas com mascote, seletor de tema, indicador), landing page (topo, vitrine de módulos, card de perfil, passos, depoimento, barra de ação fixa, rodapé), hub (grade ordenando, simulador de custo, diálogo de código) e quest (card de tarefa, quem está acessando); seção Componentes compostos no catálogo e no tema.svg</td></tr>
+          <tr><td>v17</td><td>2026-10-19 01:15</td><td>Componentes básicos do Material Design 3 que as UX 07, 08 e 09 pedem: selo de notificação (badge), abas, botão segmentado, menu e carrossel com indicador de páginas e posição em texto; tokens em md.comp.badge|tabs|segmented-button|menu|carousel, referência no catálogo e desenho no tema.svg</td></tr>
           <tr><td>v16</td><td>2026-10-17 23:07</td><td>Animações do logo: fechamento (o inverso da abertura: o nome sai, as antenas recolhem e o anel se apaga) e ciclo (abertura + fechamento em laço), na identidade e nos fundos</td></tr>
           <tr><td>v15</td><td>2026-10-17 22:55</td><td>Fundos no catálogo com o montador completo do mascote: expressão, forma, proporção e movimento (sortido na Estampa e nas Antenas, com a quantidade de mascotes)</td></tr>
           <tr><td>v14</td><td>2026-10-17 22:36</td><td>Fundos da marca: Estampa, Anel gigante, Antenas em ritmo, Ondas do vão, Símbolo recortado e Halo, com peças (logo, mascotes ou os dois), mascote montado ou sorteado e animação do logo; núcleo em scripts/fundos.mjs, oficiais em identidade/imagens/fundos/ e plataformas/web/fundos.mjs</td></tr>
           <tr><td>v13</td><td>2026-10-17 21:23</td><td>App: plataformas/maui/Marca.xaml com as peças do símbolo e do nome como PathGeometry, para o logo seguir o tema em vetor</td></tr>
-          <tr><td>v12</td><td>2026-10-17 20:41</td><td>Logo num tema de cor em três peças: anel na terciária, antena do b na primária e antena do d na secundária, também nas animações</td></tr>
-          <tr><td>v11</td><td>2026-10-17 20:29</td><td>Símbolo: antenas separadas do anel por um vão de 22 que acompanha a curva; na abertura as antenas brotam do vão e no carregamento descem para dentro dele</td></tr>
-          <tr><td>v10</td><td>2026-10-17 19:36</td><td>Animações da marca: abertura (o anel se desenha, as antenas sobem e o nome entra) e carregamento (arco no anel e antenas em laço), em preto, branco e nas cores do tema</td></tr>
-          <tr><td>v09</td><td>2026-10-17 19:28</td><td>Marca deboaz: símbolo b e d fundidos (hastes longas para landing page e hub, curtas para o quest), logo principal com o nome em Fredoka Medium, ícone e favicon oficiais em preto e branco; num tema de cor o logo usa terciária, secundária e primária; núcleo em plataformas/web/marca.mjs; arquivos da Fredoka com a licença</td></tr>
-          <tr><td>v08</td><td>2026-10-17 18:54</td><td>Fonte da marca (display, headline e title-large) passa a ser Fredoka; o texto continua em Roboto</td></tr>
-          <tr><td>v07</td><td>2026-10-17 18:15</td><td>Símbolo do deboaz vetorizado (duas cores, negativo e monocromático), ícone do app (com camadas do ícone adaptativo) e favicon; cartões da seção Identidade trocados pelos arquivos</td></tr>
-          <tr><td>v06</td><td>2026-10-17 03:08</td><td>Mascotes: personagens com rosto expressivo (30 expressões, 74 formas entre planas, setas, 3D, números, letras, sinais, só o rosto e cartões, 5 proporções, 18 movimentos e sequências); cor do tema nos temas coloridos; seção Mascotes com regras, galeria e exemplos em botões, card, lista, retorno, snackbar, chip e estado vazio; mascotes no tema.svg; núcleo em plataformas/web/mascotes.mjs</td></tr>
-          <tr><td>v05</td><td>2026-10-16 21:32</td><td>Tema padrão passa a ser Branco e Preto (branco no modo claro, preto no escuro); tema_padrao aceita um tema por modo; roxo vira tema opcional</td></tr>
-          <tr><td>v04</td><td>2026-10-16 20:54</td><td>Temas monocromáticos branco (superfícies brancas puras, melhor no claro) e preto (fundo preto absoluto para OLED, melhor no escuro); ajustes de papéis por tema com conferência de contraste; cartões de tema sobre surface</td></tr>
-          <tr><td>v03</td><td>2026-10-16 20:34</td><td>Temas amarelos (sol, girassol) e vermelhos (rubi, cereja); nos vermelhos, o papel error usa carmim para não se confundir com a marca</td></tr>
-          <tr><td>v02</td><td>2026-10-16 20:18</td><td>Temas de cor: 6 combinações (roxo padrão, oceano, floresta, aurora, grafite, magenta) com tokens próprios; troca por data-paleta na web e Paleta&lt;Tema&gt;.xaml no MAUI; seção Temas de cor no catálogo e no tema.svg</td></tr>
-          <tr><td>v01</td><td>2026-10-16 11:52</td><td>Criação: fundamentos do Material Design 3 (cor, tipografia, forma, elevação, layout por janela, movimento, estados), 12 componentes de referência, quadro tema.svg e identidade provisória</td></tr>
         </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v16 · 2026-10-17 23:07</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v22 · 2026-10-19 03:01</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>
