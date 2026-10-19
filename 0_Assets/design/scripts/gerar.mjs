@@ -508,6 +508,7 @@ const svg = temaSvg({
   esquemas: { light: ESQUEMAS.light, dark: ESQUEMAS.dark }, tipos, cantos, janelas, tokensComp, fonte,
   versao: meta('versao'), data: meta('data'), status: marca.status, semente: c.semente.toUpperCase(), variante: c.variante,
   extras: EXTRAS.map(([n]) => n),
+  logos: { longo: arqMarca['identidade/logos/logo-principal.svg'], curto: arqMarca['identidade/logos/logo-principal-curto.svg'] },
   temas: Object.values(TEMAS).map((t) => ({ ...t, padrao: t === PADRAO })),
   mascote: (id, op, prefixo, x, y, largura, altura) => embutir(mascoteEstatico(id, op), prefixo, x, y, largura, altura),
   mascotes: {

@@ -22,7 +22,7 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import opentype from 'opentype.js';
-import { criarMarca, coresDaMarca, geometria } from './marca.mjs';
+import { criarMarca, coresDaMarca, geometria, deslocNome } from './marca.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = join(AQUI, '..');
@@ -36,8 +36,9 @@ export function medirNome() {
   const xBoaz = x0 + fonte.getAdvanceWidth('de', corpo, op) +
     fonte.getKerningValue(fonte.charToGlyph('e'), fonte.charToGlyph('b')) * corpo / fonte.unitsPerEm;
   const boaz = fonte.getPath('boaz', xBoaz, base, corpo, op);
-  const fim = boaz.getBoundingBox().x2;
-  return { de: de.toPathData(1), boaz: boaz.toPathData(1), largura: Math.ceil(fim) };
+  const bd = de.getBoundingBox(), bb = boaz.getBoundingBox();
+  // topo e base do nome (y1, y2): o núcleo centraliza o nome na altura do símbolo de cada variação
+  return { de: de.toPathData(1), boaz: boaz.toPathData(1), largura: Math.ceil(bb.x2), y1: Math.floor(Math.min(bd.y1, bb.y1)), y2: Math.ceil(Math.max(bd.y2, bb.y2)) };
 }
 
 export function arquivosMarca(cores, marca) {
@@ -78,7 +79,9 @@ function xamlMarca(nome) {
 
   As peças do símbolo e do nome no quadro do símbolo: largura 540 e altura 793
   (hastes longas: y de 0 a 793) ou 613 (hastes curtas: y de 180 a 793). O nome
-  vai de x = 700 a x = ${nome.largura}.
+  vai de x = 700 a x = ${nome.largura} e fica centralizado na altura do símbolo:
+  desloque "de" e "boaz" (TranslationY, já na escala do quadro) por
+  MarcaNomeDeslocamento (hastes longas) ou MarcaNomeDeslocamentoCurta.
   Uso: ponha as peças num Grid de ${'540'} × 793 com Path Aspect="None" e escale o
   Grid (Scale) para o tamanho desejado; cada Path recebe a cor da peça:
     anel → Tertiary, antena do b → Primary, antena do d → Secondary,
@@ -94,6 +97,8 @@ ${geo('MarcaAntenaBCurta', g.curto.b)}
 ${geo('MarcaAntenaDCurta', g.curto.d)}
 ${geo('MarcaNomeDe', nome.de)}
 ${geo('MarcaNomeBoaz', nome.boaz)}
+  <x:Double x:Key="MarcaNomeDeslocamento">${deslocNome(nome, 'longo')}</x:Double>
+  <x:Double x:Key="MarcaNomeDeslocamentoCurta">${deslocNome(nome, 'curto')}</x:Double>
 </ResourceDictionary>
 `;
 }

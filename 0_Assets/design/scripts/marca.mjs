@@ -10,7 +10,8 @@
 // O oficial é monocromático (preto no claro, branco no escuro). Num tema de cor,
 // o anel fica na terciária, a antena do b na primária e a do d na secundária, e
 // o logo usa símbolo na terciária, "de" na secundária e "boaz" na primária
-// (coresDaMarca). O nome sai em contorno da fonte da marca (Fredoka Medium):
+// (coresDaMarca). O nome sai em contorno da fonte da marca (Fredoka Medium),
+// centralizado na altura do símbolo de cada variação (deslocNome):
 // o gerador mede os glifos e entrega os caminhos em `nome` (criarMarca).
 //
 // Este módulo não usa nada do Node, então também roda no navegador. O gerador
@@ -51,6 +52,8 @@ export const geometria = (variante = 'longo') => {
 /** Caminho do símbolo, no quadro 0..540 × topo..793. */
 export const caminhoSimbolo = (variante = 'longo') => hastes(variante) + anelCheio();
 const caixa = (variante) => { const topo = VARIANTES[variante].topo; return { y: topo, h: BASE - topo }; };
+/** Deslocamento vertical do nome para ficar centralizado na altura do símbolo da variação. */
+export const deslocNome = (nome, variante = 'longo') => (nome.y1 == null ? 0 : Math.round((VARIANTES[variante].topo + BASE) / 2 - (nome.y1 + nome.y2) / 2));
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 const cab = (vb, titulo, extra = '') => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}"${extra} role="img" aria-label="${esc(titulo)}">`;
 
@@ -90,7 +93,7 @@ export function criarMarca(nome) {
     const { y, h } = caixa(variante);
     const c = { simbolo: 'currentColor', de: 'currentColor', boaz: 'currentColor', ...cores };
     return `${cab(`0 ${y} ${n(nome.largura)} ${h}`, 'deboaz')}${desenho(variante, c)}` +
-      `<path fill="${c.de}" d="${nome.de}"/><path fill="${c.boaz}" d="${nome.boaz}"/></svg>`;
+      `<g transform="translate(0 ${deslocNome(nome, variante)})"><path fill="${c.de}" d="${nome.de}"/><path fill="${c.boaz}" d="${nome.boaz}"/></g></svg>`;
   };
   /**
    * Ícone quadrado de 1024: fundo liso e o símbolo centralizado.
@@ -130,7 +133,7 @@ export function criarMarca(nome) {
     const entra = (d, cor, t) => `<path fill="${cor}" d="${d}" opacity="0"><animate attributeName="opacity" from="0" to="1" begin="${t}s" dur="0.35s" fill="freeze"/>` +
       `<animateTransform attributeName="transform" type="translate" from="0 60" to="0 0" begin="${t}s" dur="0.45s" ${fz}/></path>`;
     return `${cab(`0 ${y} ${largura} ${h}`, 'deboaz')}<defs>${defs}</defs>${anel}${antenas}` +
-      (comNome ? entra(nome.de, c.de, 1.2) + entra(nome.boaz, c.boaz, 1.4) : '') + '</svg>';
+      (comNome ? `<g transform="translate(0 ${deslocNome(nome, variante)})">${entra(nome.de, c.de, 1.2)}${entra(nome.boaz, c.boaz, 1.4)}</g>` : '') + '</svg>';
   };
   /**
    * Carregamento: um arco corre pelo anel sobre um trilho claro e as antenas descem
@@ -193,7 +196,7 @@ export function criarMarca(nome) {
     const texto = (d, cor, i) => { const op = trilha(t, t.nome(i), t.nomeSai(i), 0, 1), tr = trilha(t, t.nome(i), t.nomeSai(i), '0 60', '0 0', '0 60');
       return `<path fill="${cor}" d="${d}" opacity="${op[0][1]}" transform="translate(${tr[0][1]})">${pontos('opacity', op, t)}${pontos('', tr, t, 'translate')}</path>`; };
     return `${cab(`0 ${y} ${largura} ${h}`, 'deboaz')}<defs>${defs}</defs>${anel}${antenas}` +
-      (comNome ? texto(nome.de, c.de, 0) + texto(nome.boaz, c.boaz, 1) : '') + '</svg>';
+      (comNome ? `<g transform="translate(0 ${deslocNome(nome, variante)})">${texto(nome.de, c.de, 0)}${texto(nome.boaz, c.boaz, 1)}</g>` : '') + '</svg>';
   };
   /** Fechamento: o inverso da abertura — o nome sai, as antenas recolhem para o vão e o anel se apaga. Toca uma vez (≈ 2 s). */
   const fechamento = (variante = 'longo', cores = {}, { nome: comNome = true } = {}) => sequenciaLogo(variante, cores, comNome, LINHA(false, true, false));

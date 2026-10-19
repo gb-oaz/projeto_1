@@ -192,6 +192,74 @@
         "action-color": { "$value": "{md.sys.color.inverse-primary}" },
         "elevation": { "$value": "{md.sys.elevation.level3}" },
         "label": { "$value": "{md.sys.typescale.body-medium}" }
+      },
+
+      "badge": {
+        "$descricao": "Selo de notificação: ponto de 6dp ou número em 16dp, no canto de um ícone, destino de navegação ou card.",
+        "small-size": { "$value": 6 },
+        "large-height": { "$value": 16 },
+        "large-min-width": { "$value": 16 },
+        "large-padding": { "$value": 4 },
+        "shape": { "$value": "{md.sys.shape.corner.full}" },
+        "color": { "$value": "{md.sys.color.error}" },
+        "label-color": { "$value": "{md.sys.color.on-error}" },
+        "label": { "$value": "{md.sys.typescale.label-small}" }
+      },
+
+      "tabs": {
+        "$descricao": "Abas primárias: alternam vistas do mesmo assunto, com indicador sob a aba ativa.",
+        "height": { "$value": 48 },
+        "padding": { "$value": 16 },
+        "container-color": { "$value": "{md.sys.color.surface}" },
+        "divider-color": { "$value": "{md.sys.color.outline-variant}" },
+        "active-indicator-height": { "$value": 3 },
+        "active-indicator-color": { "$value": "{md.sys.color.primary}" },
+        "label": { "$value": "{md.sys.typescale.title-small}" },
+        "label-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "active-label-color": { "$value": "{md.sys.color.primary}" }
+      },
+
+      "segmented-button": {
+        "$descricao": "Botão segmentado: escolha entre 2 a 5 opções curtas lado a lado (ex.: mensal ou anual).",
+        "height": { "$value": 40 },
+        "padding": { "$value": 12 },
+        "icon-size": { "$value": 18 },
+        "shape": { "$value": "{md.sys.shape.corner.full}" },
+        "outline-color": { "$value": "{md.sys.color.outline}" },
+        "outline-width": { "$value": 1 },
+        "label": { "$value": "{md.sys.typescale.label-large}" },
+        "label-color": { "$value": "{md.sys.color.on-surface}" },
+        "selected-container-color": { "$value": "{md.sys.color.secondary-container}" },
+        "selected-label-color": { "$value": "{md.sys.color.on-secondary-container}" }
+      },
+
+      "menu": {
+        "$descricao": "Menu: lista temporária de ações aberta a partir de um botão (ex.: ⋮ Remover).",
+        "min-width": { "$value": 112 },
+        "max-width": { "$value": 280 },
+        "shape": { "$value": "{md.sys.shape.corner.extra-small}" },
+        "container-color": { "$value": "{md.sys.color.surface-container}" },
+        "elevation": { "$value": "{md.sys.elevation.level2}" },
+        "item-height": { "$value": 48 },
+        "item-padding": { "$value": 12 },
+        "icon-size": { "$value": 24 },
+        "label": { "$value": "{md.sys.typescale.label-large}" },
+        "label-color": { "$value": "{md.sys.color.on-surface}" },
+        "icon-color": { "$value": "{md.sys.color.on-surface-variant}" }
+      },
+
+      "carousel": {
+        "$descricao": "Carrossel: itens lado a lado que a pessoa percorre deslizando ou pelos botões anterior e próximo, com indicador de páginas.",
+        "item-shape": { "$value": "{md.sys.shape.corner.extra-large}" },
+        "gap": { "$value": 8 },
+        "indicator-dot-size": { "$value": 8 },
+        "indicator-active-width": { "$value": 24 },
+        "indicator-gap": { "$value": 8 },
+        "indicator-shape": { "$value": "{md.sys.shape.corner.full}" },
+        "indicator-color": { "$value": "{md.sys.color.outline-variant}" },
+        "indicator-active-color": { "$value": "{md.sys.color.primary}" },
+        "position-label": { "$value": "{md.sys.typescale.label-medium}" },
+        "position-label-color": { "$value": "{md.sys.color.on-surface-variant}" }
       }
     }
   }
