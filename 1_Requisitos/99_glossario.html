@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Glossário · boaz · v09</title>
+<title>Glossário · boaz · v11</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="99_glossario">
 <meta name="boaz:caminho" content="1_Requisitos/99_glossario.html">
 <meta name="boaz:tipo" content="Glossário">
-<meta name="boaz:versao" content="v09">
-<meta name="boaz:data" content="2026-10-17 23:40">
+<meta name="boaz:versao" content="v11">
+<meta name="boaz:data" content="2026-10-18 22:27">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -790,8 +790,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>dar um significado único aos termos do domínio usados nos documentos de requisito.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>99_glossario</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-17 · 23:40</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v11</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-18 · 22:27</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -799,6 +799,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <section id="termos">
     <h2>Termos</h2>
     <dl class="glossario">
+      <dt id="blueprint">Blueprint</dt><dd>desenho de baixa fidelidade de uma tela, feito no documento de UX, que mostra só a distribuição dos blocos, as ações e os espaços reservados aos módulos, no celular e na web; vem antes da vista</dd>
       <dt id="cartao-do-mascote">Cartão do mascote</dt><dd>forma de mascote em que o fundo colorido ocupa um cartão vertical ou horizontal e só o rosto se move</dd>
       <dt id="catalogo-de-modulos">Catálogo de módulos</dt><dd>lista dos módulos que uma escola ou empresa pode contratar, cada um com preço próprio controlado no hub</dd>
       <dt id="classe-de-janela">Classe de janela</dt><dd>faixa de largura disponível para a tela (compact, medium, expanded, large ou extra-large) que define margem, colunas, painéis e navegação</dd>
@@ -807,6 +808,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <dt id="componente-comum">Componente comum</dt><dd>componente usado por mais de um módulo, com uma única implementação compartilhada por frente</dd>
       <dt id="componente-composto">Componente composto</dt><dd>bloco reutilizável que junta componentes e elementos de identidade visual, como uma barra de navegação com o logo, botões e imagens da marca</dd>
       <dt id="deboaz">deboaz</dt><dd>nome do produto: junta o nome Boaz com a gíria “de boa”</dd>
+      <dt id="depoimento">Depoimento</dt><dd>texto curto de uma instituição ou de um educador autônomo sobre o deboaz, escrito no hub e mostrado na landing page só com a autorização do autor</dd>
       <dt id="design-system">Design system</dt><dd>conjunto da identidade visual, dos tokens e dos componentes do projeto, mantido em <code>0_Assets/design/</code></dd>
       <dt id="educador">Educador</dt><dd>quem cria quizzes e conduz salas no hub: professor, instrutor ou responsável por um treinamento; contrata pela instituição ou como autônomo, gerenciando só a própria conta, o conteúdo e os custos</dd>
       <dt id="expressao">Expressão</dt><dd>estado emocional mostrado pelo rosto do mascote (feliz, acertou, errou, dúvida, esperando…), escolhido conforme a situação da tela</dd>
@@ -816,6 +818,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <dt id="landing-page">Landing page</dt><dd>frente do produto que apresenta o deboaz a quem ainda não o usa</dd>
       <dt id="mascote">Mascote</dt><dd>personagem da identidade visual com rosto expressivo, que reforça uma mensagem da tela; combina expressão, forma, proporção, movimento e cor</dd>
       <dt id="modulo">Módulo</dt><dd>conjunto de telas e regras de uma mesma funcionalidade dentro de uma aplicação; é também a unidade contratável do catálogo de módulos</dd>
+      <dt id="pagina-do-modulo">Página do módulo</dt><dd>página da landing page que apresenta um módulo do catálogo, com estrutura fixa que o documento do módulo preenche</dd>
+      <dt id="painel-de-administracao-do-deboaz">Painel de administração do deboaz</dt><dd>área do hub em que o time do deboaz administra escolas, empresas e educadores autônomos e responde às mensagens deles, guardando o histórico para auditoria</dd>
       <dt id="participante">Participante</dt><dd>quem responde aos quizzes pelo quest: estudante ou colaborador de empresa</dd>
       <dt id="proporcao">Proporção</dt><dd>variação do corpo do mascote (normal, alto, baixo, gordo ou magro); o rosto se ajusta para continuar cabendo</dd>
       <dt id="quest">Quest</dt><dd>frente do produto onde o participante entra numa sala pelo código e responde aos quizzes</dd>
@@ -835,7 +839,9 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v09</span></td><td>2026-10-17 23:40</td><td>Status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v11</span></td><td>2026-10-18 22:27</td><td>Status → Aprovado</td></tr>
+      <tr><td>v10</td><td>2026-10-18 22:22</td><td>Termos da UX da landing page: blueprint, depoimento, página do módulo e painel de administração do deboaz; status → Em revisão</td></tr>
+      <tr><td>v09</td><td>2026-10-17 23:40</td><td>Status → Aprovado</td></tr>
       <tr><td>v08</td><td>2026-10-17 21:19</td><td>Educador autônomo; identidade da instituição</td></tr>
       <tr><td>v07</td><td>2026-10-17 20:29</td><td>Símbolo: antenas separadas da barriga por um vão</td></tr>
       <tr><td>v06</td><td>2026-10-17 19:30</td><td>Símbolo: b e d fundidos, sem a espiral</td></tr>
@@ -843,11 +849,10 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <tr><td>v04</td><td>2026-10-17 18:29</td><td>Termos da visão do produto: código da sala, educador, participante, ranking e sala; hub e quest citam educador e participante</td></tr>
       <tr><td>v03</td><td>2026-10-17 18:14</td><td>Termos do produto e da marca: deboaz, hub, landing page, quest e símbolo</td></tr>
       <tr><td>v02</td><td>2026-10-17 03:14</td><td>Termos dos mascotes: cartão do mascote, expressão, mascote, proporção, sequência de movimentos e só o rosto</td></tr>
-      <tr><td>v01</td><td>2026-10-16 22:09</td><td>Criação: termos do design system e das telas, vindos de <code>06_design-system-telas</code></td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v09 · 2026-10-17 23:40</span>
+    <span>boaz · v11 · 2026-10-18 22:27</span>
     <span class="boaz-arquivo">1_Requisitos/99_glossario.html</span>
   </div>
 </footer>

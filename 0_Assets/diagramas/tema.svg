@@ -1,9 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 3876" width="1280" height="3876">
   <title>Tema dos diagramas</title>
-  <desc>Tema dark padrão do boaz e catálogo visual. As skills de diagrama copiam o bloco style e, de defs, os markers e o filtro sem alterações; dos symbol (#ic-* formas neutras, #uml-* notação, #prov-* ícones oficiais de exemplo) copiam só os que usarem. v01: criação. v02: comunicação, formas neutras de arquitetura, provedores e catálogo UML por tipo de diagrama. v03: marca d'água de topo (nome, versão, data) e de rodapé (legenda, nota da versão, arquivo).</desc>
+  <desc>Tema dark padrão do boaz e catálogo visual. As skills de diagrama copiam o bloco style e, de defs, os markers e o filtro sem alterações; dos symbol (#ic-* formas neutras, #uml-* notação, #prov-* ícones oficiais de exemplo) copiam só os que usarem. v01: criação. v02: comunicação, formas neutras de arquitetura, provedores e catálogo UML por tipo de diagrama. v03: marca d'água de topo (nome, versão, data) e de rodapé (legenda, nota da versão, arquivo). v04: fundo escuro na janela inteira ao abrir o .svg no navegador (:root), sem faixa branca ao lado de diagramas estreitos.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
     text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
     .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
     .subtitle      { font-size: 13px; fill: #8b949e; }

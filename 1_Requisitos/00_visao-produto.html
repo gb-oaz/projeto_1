@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Visão do produto · boaz · v09</title>
+<title>Visão do produto · boaz · v11</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="00_visao-produto">
 <meta name="boaz:caminho" content="1_Requisitos/00_visao-produto.html">
 <meta name="boaz:tipo" content="Visão do produto">
-<meta name="boaz:versao" content="v09">
-<meta name="boaz:data" content="2026-10-17 23:40">
+<meta name="boaz:versao" content="v11">
+<meta name="boaz:data" content="2026-10-18 22:27">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -828,8 +828,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir o que é o deboaz, para quem ele existe, como ele é contratado e com que identidade se apresenta; a visão é montada aos poucos.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>00_visao-produto</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-17 · 23:40</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v11</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-18 · 22:27</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -873,7 +873,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <article class="persona" data-inicial="V">
         <h3>Visitante</h3>
         <p><span>Quem é</span>chega à landing page e ainda não usa o produto</p>
-        <p><span>Precisa de</span>entender o que o deboaz oferece, conhecer os módulos e falar com o suporte</p>
+        <p><span>Precisa de</span>entender o que o deboaz oferece, conhecer os módulos, ver quem já usa e criar a conta para começar</p>
       </article>
       <article class="persona" data-inicial="E">
         <h3>Educador</h3>
@@ -906,7 +906,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <section id="escopo">
     <h2>Escopo</h2>
     <ul class="escopo">
-      <li><a class="ref" href="99_glossario.html#landing-page">Landing page</a>: apresenta a plataforma e o catálogo de módulos, dá acesso ao hub e ao quest e recebe contato e pedidos de suporte</li>
+      <li><a class="ref" href="99_glossario.html#landing-page">Landing page</a>: apresenta a plataforma, o catálogo de módulos e os números e depoimentos de quem já usa e dá acesso ao hub e ao quest; não recebe mensagens (<a class="ref" href="07_landing-page-ux.html">Landing page · UX base</a>)</li>
+      <li>Suporte dentro da conta: escolas, empresas e educadores autônomos falam com o deboaz por mensagens que chegam ao <a class="ref" href="99_glossario.html#painel-de-administracao-do-deboaz">painel de administração do deboaz</a>, no hub, com histórico guardado para auditoria</li>
       <li><a class="ref" href="99_glossario.html#hub">Hub</a> (navegador e app Android e iOS): quizzes, salas com código de acesso, acompanhamento em tempo real, relatórios, usuários, turmas, configurações, catálogo de módulos e pagamentos</li>
       <li><a class="ref" href="99_glossario.html#quest">Quest</a> (navegador e app Android e iOS): entrada pelo código da sala, quiz ao vivo ou no ritmo do participante, ranking, recompensas, conquistas e área dos responsáveis</li>
       <li>Escola e família: resultados das atividades de casa e de aula com datas, tabela de frequência e de desempenho do aluno para os responsáveis, agenda com o cronograma escolar e aviso antes dos eventos, conversa dos responsáveis com a secretaria, cartão do aluno com a identidade da escola e disputa saudável entre os alunos, que dá senso de responsabilidade nas tarefas</li>
@@ -963,7 +964,9 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v09</span></td><td>2026-10-17 23:40</td><td>Status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v11</span></td><td>2026-10-18 22:27</td><td>Status → Aprovado</td></tr>
+      <tr><td>v10</td><td>2026-10-18 22:22</td><td>Landing page sem contato, com números e depoimentos; suporte dentro da conta pelo painel de administração do deboaz; Visitante atualizado; status → Em revisão</td></tr>
+      <tr><td>v09</td><td>2026-10-17 23:40</td><td>Status → Aprovado</td></tr>
       <tr><td>v08</td><td>2026-10-17 21:31</td><td>Dados só com o cliente; governo por licitação</td></tr>
       <tr><td>v07</td><td>2026-10-17 21:19</td><td>Diferencial, meta de 5 %, autônomo, módulos e decisões de domínio e lema</td></tr>
       <tr><td>v06</td><td>2026-10-17 19:30</td><td>Símbolo novo (b e d) e amostras oficiais</td></tr>
@@ -971,11 +974,10 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <tr><td>v04</td><td>2026-10-17 18:43</td><td>Sem valores; catálogo de módulos</td></tr>
       <tr><td>v03</td><td>2026-10-17 18:29</td><td>Contexto do <code>PROJECT.md</code>; regras de identidade para o 90</td></tr>
       <tr><td>v02</td><td>2026-10-17 18:14</td><td>Produto deboaz, três frentes e Identidade; tema v05</td></tr>
-      <tr><td>v01</td><td>2026-10-11 01:42</td><td>Criação (modelo do boaz)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v09 · 2026-10-17 23:40</span>
+    <span>boaz · v11 · 2026-10-18 22:27</span>
     <span class="boaz-arquivo">1_Requisitos/00_visao-produto.html</span>
   </div>
 </footer>
