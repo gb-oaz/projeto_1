@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2168 1490" width="2168" height="1490">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2168 1802" width="2168" height="1802">
   <title>Hub · catálogo · blueprint de UX</title>
-  <desc>Blueprint de UX do catálogo de módulos no hub (requisito 08_hub-ux). v01: criação. v02: topo com logo, avisos e conta, sem o título da tela. v03: nome da instituição ou da pessoa ao lado da foto.</desc>
+  <desc>Blueprint de UX do catálogo de módulos no hub (requisito 08_hub-ux). v01: criação. v02: topo com logo, avisos e conta, sem o título da tela. v03: nome da instituição ou da pessoa ao lado da foto. v04: topo na largura toda, com o trilho abaixo; logo e avisos no compact; nome e foto a partir do medium; trilho sem Conta; detalhe com as telas do módulo, como funciona e quem usa.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -110,7 +110,7 @@
       <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <rect class="bg" x="0" y="0" width="2168" height="1490"/>
+  <rect class="bg" x="0" y="0" width="2168" height="1802"/>
   <g id="marca-topo">
     <rect class="wm-band" x="0" y="0" width="2168" height="112"/>
     <rect class="wm-accent" x="0" y="110" width="2168" height="2"/>
@@ -118,10 +118,10 @@
     <text class="title" x="40" y="72">Hub · catálogo · blueprint de UX</text>
     <text class="subtitle" x="40" y="94">Módulos a contratar, custo antes de incluir na conta e módulos do time deboaz por código</text>
     <text class="wm-meta-label" x="1880" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1880" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1904" y="71" text-anchor="middle">v03</text>
+    <rect class="wm-badge" x="1880" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1904" y="71" text-anchor="middle">v04</text>
     <line class="wm-sep" x1="1952" y1="32" x2="1952" y2="80"/>
     <text class="wm-meta-label" x="1976" y="44">DATA</text>
-    <text class="wm-meta-value" x="1976" y="72">2026-10-19 · 03:03</text>
+    <text class="wm-meta-value" x="1976" y="72">2026-10-19 · 19:44</text>
   </g>
   <g id="compact-catalogo">
   <rect class="panel" x="40" y="152" width="360" height="488" rx="24" filter="url(#sombra)"/>
@@ -131,14 +131,9 @@
   <text class="boundary-label" x="92" y="187">TOPO</text>
   <rect class="node-face" x="68" y="198" width="88" height="40" rx="8"/>
   <text class="label" x="112" y="222.5" text-anchor="middle">logo do hub</text>
-  <rect class="node-face" x="172" y="198" width="64" height="40" rx="8"/>
-  <rect class="wm-badge" x="212" y="198" width="28" height="20" rx="10"/><text class="wm-badge-text" x="226" y="212" text-anchor="middle">2</text>
-  <text class="label" x="204" y="222.5" text-anchor="middle">avisos</text>
-  <rect class="node-face" x="244" y="198" width="80" height="40" rx="8"/>
-  <text class="label" x="284" y="215" text-anchor="middle">nome</text>
-  <text class="muted" x="284" y="231" text-anchor="middle">instituição</text>
-  <rect class="node-face" x="332" y="198" width="40" height="40" rx="8"/>
-  <text class="label" x="352" y="222.5" text-anchor="middle">foto</text>
+  <rect class="node-face" x="308" y="198" width="64" height="40" rx="8"/>
+  <rect class="wm-badge" x="348" y="198" width="28" height="20" rx="10"/><text class="wm-badge-text" x="362" y="212" text-anchor="middle">2</text>
+  <text class="label" x="340" y="222.5" text-anchor="middle">avisos</text>
   </g>
   <g id="c-lista">
   <rect class="boundary" x="56" y="256" width="328" height="272" rx="12"/>
@@ -168,7 +163,7 @@
   <text class="mono" x="220" y="664" text-anchor="middle">compact · 360dp · catálogo</text>
   </g>
   <g id="compact-detalhe">
-  <rect class="panel" x="496" y="152" width="360" height="608" rx="24" filter="url(#sombra)"/>
+  <rect class="panel" x="496" y="152" width="360" height="832" rx="24" filter="url(#sombra)"/>
   <g id="d-topo">
   <rect class="node-orange" x="512" y="168" width="328" height="80" rx="12"/>
   <circle class="chip" cx="532" cy="183" r="9"/><text class="chip-text" x="532" y="187" text-anchor="middle">1</text>
@@ -178,38 +173,49 @@
   <rect class="node-face" x="572" y="198" width="256" height="40" rx="8"/>
   <text class="label" x="700" y="222.5" text-anchor="middle">nome do módulo</text>
   </g>
+  <g id="d-telas">
+  <rect class="boundary" x="512" y="256" width="328" height="152" rx="12"/>
+  <circle class="chip" cx="532" cy="271" r="9"/><text class="chip-text" x="532" y="275" text-anchor="middle">8</text>
+  <text class="boundary-label" x="548" y="275">TELAS DO MÓDULO</text>
+  <rect class="node-purple edge-async" x="524" y="286" width="304" height="112" rx="8"/>
+  <text class="label" x="676" y="339" text-anchor="middle">vitrine de telas</text>
+  <text class="muted" x="676" y="355" text-anchor="middle">hub e quest · carrossel</text>
+  </g>
   <g id="d-sobre">
-  <rect class="boundary" x="512" y="256" width="328" height="192" rx="12"/>
-  <circle class="chip" cx="532" cy="271" r="9"/><text class="chip-text" x="532" y="275" text-anchor="middle">4</text>
-  <text class="boundary-label" x="548" y="275">SOBRE O MÓDULO</text>
-  <rect class="node-purple edge-async" x="524" y="286" width="304" height="72" rx="8"/>
-  <text class="label" x="676" y="326.5" text-anchor="middle">descrição e para que serve</text>
-  <rect class="node-purple edge-async" x="524" y="366" width="304" height="72" rx="8"/>
-  <text class="label" x="676" y="399" text-anchor="middle">como funciona</text>
-  <text class="muted" x="676" y="415" text-anchor="middle">quem configura · quem usa · quem vê</text>
+  <rect class="boundary" x="512" y="416" width="328" height="256" rx="12"/>
+  <circle class="chip" cx="532" cy="431" r="9"/><text class="chip-text" x="532" y="435" text-anchor="middle">4</text>
+  <text class="boundary-label" x="548" y="435">SOBRE O MÓDULO</text>
+  <rect class="node-purple edge-async" x="524" y="446" width="304" height="56" rx="8"/>
+  <text class="label" x="676" y="478.5" text-anchor="middle">descrição e para que serve</text>
+  <rect class="node-purple edge-async" x="524" y="510" width="304" height="72" rx="8"/>
+  <text class="label" x="676" y="543" text-anchor="middle">como funciona</text>
+  <text class="muted" x="676" y="559" text-anchor="middle">os passos do módulo</text>
+  <rect class="node-purple edge-async" x="524" y="590" width="304" height="72" rx="8"/>
+  <text class="label" x="676" y="623" text-anchor="middle">quem usa</text>
+  <text class="muted" x="676" y="639" text-anchor="middle">configura · usa · acompanha</text>
   </g>
   <g id="d-custo">
-  <rect class="boundary" x="512" y="456" width="328" height="192" rx="12"/>
-  <circle class="chip" cx="532" cy="471" r="9"/><text class="chip-text" x="532" y="475" text-anchor="middle">5</text>
-  <text class="boundary-label" x="548" y="475">CUSTO</text>
-  <rect class="node-face" x="524" y="486" width="304" height="40" rx="8"/>
-  <text class="label" x="676" y="510.5" text-anchor="middle">campo · pessoas que vão usar</text>
-  <rect class="node-face" x="524" y="534" width="148" height="40" rx="8"/>
-  <text class="label" x="598" y="558.5" text-anchor="middle">Mensal</text>
-  <rect class="node-face" x="680" y="534" width="148" height="40" rx="8"/>
-  <text class="label" x="754" y="558.5" text-anchor="middle">Anual</text>
-  <rect class="node-face" x="524" y="582" width="304" height="56" rx="8"/>
-  <text class="label" x="676" y="607" text-anchor="middle">custo calculado</text>
-  <text class="muted" x="676" y="623" text-anchor="middle">valor e prazos de pagamento</text>
+  <rect class="boundary" x="512" y="680" width="328" height="192" rx="12"/>
+  <circle class="chip" cx="532" cy="695" r="9"/><text class="chip-text" x="532" y="699" text-anchor="middle">5</text>
+  <text class="boundary-label" x="548" y="699">CUSTO</text>
+  <rect class="node-face" x="524" y="710" width="304" height="40" rx="8"/>
+  <text class="label" x="676" y="734.5" text-anchor="middle">campo · pessoas que vão usar</text>
+  <rect class="node-face" x="524" y="758" width="148" height="40" rx="8"/>
+  <text class="label" x="598" y="782.5" text-anchor="middle">Mensal</text>
+  <rect class="node-face" x="680" y="758" width="148" height="40" rx="8"/>
+  <text class="label" x="754" y="782.5" text-anchor="middle">Anual</text>
+  <rect class="node-face" x="524" y="806" width="304" height="56" rx="8"/>
+  <text class="label" x="676" y="831" text-anchor="middle">custo calculado</text>
+  <text class="muted" x="676" y="847" text-anchor="middle">valor e prazos de pagamento</text>
   </g>
   <g id="d-acao">
-  <rect class="node-orange" x="512" y="656" width="328" height="88" rx="12"/>
-  <circle class="chip" cx="532" cy="671" r="9"/><text class="chip-text" x="532" y="675" text-anchor="middle">6</text>
-  <text class="boundary-label" x="548" y="675">AÇÃO</text>
-  <rect class="node-blue" x="524" y="686" width="304" height="48" rx="8"/>
-  <text class="label" x="676" y="714.5" text-anchor="middle">Incluir na conta</text>
+  <rect class="node-orange" x="512" y="880" width="328" height="88" rx="12"/>
+  <circle class="chip" cx="532" cy="895" r="9"/><text class="chip-text" x="532" y="899" text-anchor="middle">6</text>
+  <text class="boundary-label" x="548" y="899">AÇÃO</text>
+  <rect class="node-blue" x="524" y="910" width="304" height="48" rx="8"/>
+  <text class="label" x="676" y="938.5" text-anchor="middle">Incluir na conta</text>
   </g>
-  <text class="mono" x="676" y="784" text-anchor="middle">compact · 360dp · detalhe do módulo</text>
+  <text class="mono" x="676" y="1008" text-anchor="middle">compact · 360dp · detalhe do módulo</text>
   </g>
   <g id="compact-codigo">
   <rect class="panel" x="952" y="152" width="360" height="496" rx="24" filter="url(#sombra)"/>
@@ -219,14 +225,9 @@
   <text class="boundary-label" x="1004" y="187">TOPO</text>
   <rect class="node-face" x="980" y="198" width="88" height="40" rx="8"/>
   <text class="label" x="1024" y="222.5" text-anchor="middle">logo do hub</text>
-  <rect class="node-face" x="1084" y="198" width="64" height="40" rx="8"/>
-  <rect class="wm-badge" x="1124" y="198" width="28" height="20" rx="10"/><text class="wm-badge-text" x="1138" y="212" text-anchor="middle">2</text>
-  <text class="label" x="1116" y="222.5" text-anchor="middle">avisos</text>
-  <rect class="node-face" x="1156" y="198" width="80" height="40" rx="8"/>
-  <text class="label" x="1196" y="215" text-anchor="middle">nome</text>
-  <text class="muted" x="1196" y="231" text-anchor="middle">instituição</text>
-  <rect class="node-face" x="1244" y="198" width="40" height="40" rx="8"/>
-  <text class="label" x="1264" y="222.5" text-anchor="middle">foto</text>
+  <rect class="node-face" x="1220" y="198" width="64" height="40" rx="8"/>
+  <rect class="wm-badge" x="1260" y="198" width="28" height="20" rx="10"/><text class="wm-badge-text" x="1274" y="212" text-anchor="middle">2</text>
+  <text class="label" x="1252" y="222.5" text-anchor="middle">avisos</text>
   </g>
   <g id="t-lista">
   <rect class="boundary" x="968" y="256" width="328" height="104" rx="12"/>
@@ -264,26 +265,12 @@
   </g>
   <g id="expanded-catalogo">
   <rect class="panel" x="1408" y="152" width="720" height="456" rx="24" filter="url(#sombra)"/>
-  <g id="nav-trilho">
-  <rect class="node-orange" x="1424" y="168" width="84" height="224" rx="12"/>
-  <circle class="chip" cx="1444" cy="183" r="9"/><text class="chip-text" x="1444" y="187" text-anchor="middle">3</text>
-  <text class="boundary-label" x="1460" y="187">NAV</text>
-  <rect class="node-face" x="1436" y="198" width="60" height="56" rx="8"/>
-  <text class="label" x="1466" y="223" text-anchor="middle">Meus</text>
-  <text class="muted" x="1466" y="239" text-anchor="middle">módulos</text>
-  <rect class="node-blue" x="1436" y="262" width="60" height="56" rx="8"/>
-  <text class="label" x="1466" y="287" text-anchor="middle">+</text>
-  <text class="muted" x="1466" y="303" text-anchor="middle">Catálogo</text>
-  <rect class="node-face" x="1436" y="326" width="60" height="56" rx="8"/>
-  <text class="label" x="1466" y="351" text-anchor="middle">◯</text>
-  <text class="muted" x="1466" y="367" text-anchor="middle">Conta</text>
-  </g>
   <g id="e-topo">
-  <rect class="node-orange" x="1524" y="168" width="588" height="80" rx="12"/>
-  <circle class="chip" cx="1544" cy="183" r="9"/><text class="chip-text" x="1544" y="187" text-anchor="middle">1</text>
-  <text class="boundary-label" x="1560" y="187">TOPO</text>
-  <rect class="node-face" x="1536" y="198" width="88" height="40" rx="8"/>
-  <text class="label" x="1580" y="222.5" text-anchor="middle">logo do hub</text>
+  <rect class="node-orange" x="1424" y="168" width="688" height="80" rx="12"/>
+  <circle class="chip" cx="1444" cy="183" r="9"/><text class="chip-text" x="1444" y="187" text-anchor="middle">1</text>
+  <text class="boundary-label" x="1460" y="187">TOPO</text>
+  <rect class="node-face" x="1436" y="198" width="88" height="40" rx="8"/>
+  <text class="label" x="1480" y="222.5" text-anchor="middle">logo do hub</text>
   <rect class="node-face" x="1900" y="198" width="64" height="40" rx="8"/>
   <rect class="wm-badge" x="1940" y="198" width="28" height="20" rx="10"/><text class="wm-badge-text" x="1954" y="212" text-anchor="middle">2</text>
   <text class="label" x="1932" y="222.5" text-anchor="middle">avisos</text>
@@ -292,6 +279,17 @@
   <text class="muted" x="2012" y="231" text-anchor="middle">instituição</text>
   <rect class="node-face" x="2060" y="198" width="40" height="40" rx="8"/>
   <text class="label" x="2080" y="222.5" text-anchor="middle">foto</text>
+  </g>
+  <g id="nav-trilho">
+  <rect class="node-orange" x="1424" y="256" width="84" height="160" rx="12"/>
+  <circle class="chip" cx="1444" cy="271" r="9"/><text class="chip-text" x="1444" y="275" text-anchor="middle">3</text>
+  <text class="boundary-label" x="1460" y="275">NAV</text>
+  <rect class="node-face" x="1436" y="286" width="60" height="56" rx="8"/>
+  <text class="label" x="1466" y="311" text-anchor="middle">Meus</text>
+  <text class="muted" x="1466" y="327" text-anchor="middle">módulos</text>
+  <rect class="node-blue" x="1436" y="350" width="60" height="56" rx="8"/>
+  <text class="label" x="1466" y="375" text-anchor="middle">+</text>
+  <text class="muted" x="1466" y="391" text-anchor="middle">Catálogo</text>
   </g>
   <g id="e-lista">
   <rect class="boundary" x="1524" y="256" width="228.8" height="248" rx="12"/>
@@ -334,35 +332,40 @@
   <text class="mono" x="1768" y="632" text-anchor="middle">expanded · 1280dp · desenhado na escala 0,56</text>
   </g>
   <g id="anotacoes">
-  <text class="section" x="496" y="848">BLOCOS</text>
-  <circle class="chip" cx="505" cy="875" r="9"/><text class="chip-text" x="505" y="879" text-anchor="middle">1</text>
-  <text class="label-strong" x="524" y="880">Topo</text>
-  <text class="muted" x="524" y="898">logo do hub, avisos, nome e foto;</text>
-  <text class="muted" x="524" y="916">no detalhe, voltar e o nome do módulo</text>
-  <circle class="chip" cx="505" cy="945" r="9"/><text class="chip-text" x="505" y="949" text-anchor="middle">2</text>
-  <text class="label-strong" x="524" y="950">Módulos a contratar</text>
-  <text class="muted" x="524" y="968">só os não contratados, com preço inicial;</text>
-  <text class="muted" x="524" y="986">no time deboaz, só os módulos do time</text>
-  <circle class="chip" cx="505" cy="1015" r="9"/><text class="chip-text" x="505" y="1019" text-anchor="middle">3</text>
-  <text class="label-strong" x="524" y="1020">Navegação</text>
-  <text class="muted" x="524" y="1038">Catálogo ativo</text>
-  <circle class="chip" cx="505" cy="1067" r="9"/><text class="chip-text" x="505" y="1071" text-anchor="middle">4</text>
-  <text class="label-strong" x="524" y="1072">Sobre o módulo</text>
-  <text class="muted" x="524" y="1090">descrição, para que serve e como funciona</text>
-  <text class="muted" x="524" y="1108">para quem configura, usa e vê</text>
-  <circle class="chip" cx="505" cy="1137" r="9"/><text class="chip-text" x="505" y="1141" text-anchor="middle">5</text>
-  <text class="label-strong" x="524" y="1142">Custo</text>
-  <text class="muted" x="524" y="1160">pessoas e prazo mensal ou anual;</text>
-  <text class="muted" x="524" y="1178">custo e prazos de pagamento recalculados</text>
-  <circle class="chip" cx="505" cy="1207" r="9"/><text class="chip-text" x="505" y="1211" text-anchor="middle">6</text>
-  <text class="label-strong" x="524" y="1212">Ação</text>
-  <text class="muted" x="524" y="1230">Incluir na conta; só a conta master vê</text>
-  <text class="muted" x="524" y="1248">fixa na base no compact</text>
-  <circle class="chip" cx="505" cy="1277" r="9"/><text class="chip-text" x="505" y="1281" text-anchor="middle">7</text>
-  <text class="label-strong" x="524" y="1282">Código · time deboaz</text>
-  <text class="muted" x="524" y="1300">o módulo entra só com o código certo</text>
+  <text class="section" x="496" y="1072">BLOCOS</text>
+  <circle class="chip" cx="505" cy="1099" r="9"/><text class="chip-text" x="505" y="1103" text-anchor="middle">1</text>
+  <text class="label-strong" x="524" y="1104">Topo</text>
+  <text class="muted" x="524" y="1122">logo do hub e avisos (nome e foto a partir</text>
+  <text class="muted" x="524" y="1140">do medium), na largura toda, acima do</text>
+  <text class="muted" x="524" y="1158">trilho; no detalhe, voltar e o nome do módulo</text>
+  <circle class="chip" cx="505" cy="1187" r="9"/><text class="chip-text" x="505" y="1191" text-anchor="middle">2</text>
+  <text class="label-strong" x="524" y="1192">Módulos a contratar</text>
+  <text class="muted" x="524" y="1210">só os não contratados, com preço inicial;</text>
+  <text class="muted" x="524" y="1228">no time deboaz, só os módulos do time</text>
+  <circle class="chip" cx="505" cy="1257" r="9"/><text class="chip-text" x="505" y="1261" text-anchor="middle">3</text>
+  <text class="label-strong" x="524" y="1262">Navegação</text>
+  <text class="muted" x="524" y="1280">Catálogo ativo; sem Conta no trilho</text>
+  <circle class="chip" cx="505" cy="1309" r="9"/><text class="chip-text" x="505" y="1313" text-anchor="middle">4</text>
+  <text class="label-strong" x="524" y="1314">Sobre o módulo</text>
+  <text class="muted" x="524" y="1332">descrição, como funciona (os passos) e quem</text>
+  <text class="muted" x="524" y="1350">usa (configura, usa, acompanha)</text>
+  <circle class="chip" cx="505" cy="1379" r="9"/><text class="chip-text" x="505" y="1383" text-anchor="middle">8</text>
+  <text class="label-strong" x="524" y="1384">Telas do módulo</text>
+  <text class="muted" x="524" y="1402">vitrine com as telas do módulo no hub e no</text>
+  <text class="muted" x="524" y="1420">quest: o cliente vê o que está contratando</text>
+  <circle class="chip" cx="505" cy="1449" r="9"/><text class="chip-text" x="505" y="1453" text-anchor="middle">5</text>
+  <text class="label-strong" x="524" y="1454">Custo</text>
+  <text class="muted" x="524" y="1472">pessoas e prazo mensal ou anual;</text>
+  <text class="muted" x="524" y="1490">custo e prazos de pagamento recalculados</text>
+  <circle class="chip" cx="505" cy="1519" r="9"/><text class="chip-text" x="505" y="1523" text-anchor="middle">6</text>
+  <text class="label-strong" x="524" y="1524">Ação</text>
+  <text class="muted" x="524" y="1542">Incluir na conta; só a conta master vê</text>
+  <text class="muted" x="524" y="1560">fixa na base no compact</text>
+  <circle class="chip" cx="505" cy="1589" r="9"/><text class="chip-text" x="505" y="1593" text-anchor="middle">7</text>
+  <text class="label-strong" x="524" y="1594">Código · time deboaz</text>
+  <text class="muted" x="524" y="1612">o módulo entra só com o código certo</text>
   </g>
-  <g id="marca-rodape" transform="translate(0,1374)">
+  <g id="marca-rodape" transform="translate(0,1686)">
     <rect class="wm-band" x="0" y="0" width="2168" height="116"/>
     <line class="wm-sep" x1="0" y1="0.5" x2="2168" y2="0.5"/>
     <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
@@ -372,7 +375,7 @@
     <rect class="node-orange" x="470" y="47" width="14" height="14" rx="3"/><text class="label" x="492" y="58">Fixo na tela</text>
     <rect class="boundary" x="604" y="47" width="14" height="14" rx="3"/><text class="label" x="626" y="58">Seção</text>
     <line class="divider" x1="40" y1="76" x2="2128" y2="76"/>
-    <text class="footer" x="40" y="100">v03 · topo com logo, avisos, nome da instituição ou da pessoa e foto</text>
-    <text class="wm-file" x="2128" y="100" text-anchor="end">blueprint-hub-catalogo_v03_20261019-0303.svg</text>
+    <text class="footer" x="40" y="100">v04 · topo na largura toda, com o trilho abaixo; logo e avisos no compact; nome e foto a partir do medium; trilho sem Conta; detalhe com as telas do módulo, como funciona e quem usa</text>
+    <text class="wm-file" x="2128" y="100" text-anchor="end">blueprint-hub-catalogo_v04_20261019-1944.svg</text>
   </g>
 </svg>

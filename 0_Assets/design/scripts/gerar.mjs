@@ -38,7 +38,7 @@ import { copiasSincronizadas } from './sincronizar.mjs';
 import { arquivosMascotes, temasDosMascotes } from './mascotes-arquivos.mjs';
 import { arquivosMarca } from './marca-arquivos.mjs';
 import { arquivosFundos, fundosNode } from './fundos-arquivos.mjs';
-import { estatico as mascoteEstatico, embutir, EXPRESSOES as M_EXPR, FORMAS as M_FORMAS, PROPORCOES as M_PROP } from './mascotes.mjs';
+import { estatico as mascoteEstatico, animado as mascoteAnimado, embutir, EXPRESSOES as M_EXPR, FORMAS as M_FORMAS, PROPORCOES as M_PROP } from './mascotes.mjs';
 import { VITRINE as M_VITRINE } from './mascotes-arquivos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -385,7 +385,7 @@ const BOTOES = {
   Filled: { fundo: 'primary', texto: 'on-primary' },
   Tonal: { fundo: 'secondary-container', texto: 'on-secondary-container' },
   Elevated: { fundo: 'surface-container-low', texto: 'primary' },
-  Outlined: { fundo: null, texto: 'on-surface-variant', borda: 'outline-variant' },
+  Outlined: { fundo: 'surface', texto: 'on-surface-variant', borda: 'outline-variant' },  // fundo da tela: legível sobre a Estampa
   Text: { fundo: null, texto: 'primary' },
 };
 const b = Object.fromEntries(tokensComp.filter((t) => t.nome.startsWith('button-') && !t.ref).map((t) => [t.nome.slice(7), t.valor]));
@@ -510,7 +510,8 @@ const svg = temaSvg({
   extras: EXTRAS.map(([n]) => n),
   logos: { longo: arqMarca['identidade/logos/logo-principal.svg'], curto: arqMarca['identidade/logos/logo-principal-curto.svg'] },
   temas: Object.values(TEMAS).map((t) => ({ ...t, padrao: t === PADRAO })),
-  mascote: (id, op, prefixo, x, y, largura, altura) => embutir(mascoteEstatico(id, op), prefixo, x, y, largura, altura),
+  // com movimento (nome ou lista = movimento composto), o mascote sai animado; os apps param tudo com movimento reduzido
+  mascote: (id, op, prefixo, x, y, largura, altura) => embutir((op.movimento ? mascoteAnimado : mascoteEstatico)(id, op), prefixo, x, y, largura, altura),
   desenharFundo: ((f) => (conceito, op) => f.desenhar(conceito, { semente: 1, movimentoReduzido: true, ...op }))(fundosNode()),
   mascotes: {
     expressoes: Object.entries(M_EXPR).map(([k, v]) => [k, v.nome]),

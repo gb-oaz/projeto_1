@@ -413,7 +413,7 @@
     <Setter Property="FontFamily" Value="TextoMedium" />
     <Setter Property="FontSize" Value="14" />
     <Setter Property="CharacterSpacing" Value="0.1" />
-    <Setter Property="BackgroundColor" Value="Transparent" />
+    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}" />
     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
     <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource OutlineVariantLight}, Dark={StaticResource OutlineVariantDark}}" />
     <Setter Property="BorderWidth" Value="1" />

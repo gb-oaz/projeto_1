@@ -329,9 +329,11 @@
   --md-comp-button-elevated-label-color: var(--md-sys-color-primary);
   --md-comp-button-elevated-elevation: var(--md-sys-elevation-level1);
   --md-comp-button-elevated-hover-elevation: var(--md-sys-elevation-level2);
+  --md-comp-button-outlined-container-color: var(--md-sys-color-surface);
   --md-comp-button-outlined-outline-color: var(--md-sys-color-outline-variant);
   --md-comp-button-outlined-outline-width: 1px;
   --md-comp-button-outlined-label-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-button-text-container-color: var(--md-sys-color-surface);
   --md-comp-button-text-label-color: var(--md-sys-color-primary);
   --md-comp-button-text-padding: 12px;
   --md-comp-icon-button-size: 40px;
@@ -361,6 +363,7 @@
   --md-comp-chip-padding: 16px;
   --md-comp-chip-padding-with-icon: 8px;
   --md-comp-chip-icon-size: 18px;
+  --md-comp-chip-container-color: var(--md-sys-color-surface);
   --md-comp-chip-shape: var(--md-sys-shape-corner-small);
   --md-comp-chip-label-font: var(--md-sys-typescale-label-large-font);
   --md-comp-chip-label-size: var(--md-sys-typescale-label-large-size);
@@ -413,6 +416,7 @@
   --md-comp-text-field-filled-shape: var(--md-sys-shape-corner-extra-small);
   --md-comp-text-field-filled-indicator-color: var(--md-sys-color-on-surface-variant);
   --md-comp-text-field-outlined-shape: var(--md-sys-shape-corner-extra-small);
+  --md-comp-text-field-outlined-container-color: var(--md-sys-color-surface);
   --md-comp-text-field-outlined-outline-color: var(--md-sys-color-outline);
   --md-comp-list-one-line-height: 56px;
   --md-comp-list-two-line-height: 72px;
@@ -553,6 +557,7 @@
   --md-comp-segmented-button-height: 40px;
   --md-comp-segmented-button-padding: 12px;
   --md-comp-segmented-button-icon-size: 18px;
+  --md-comp-segmented-button-container-color: var(--md-sys-color-surface);
   --md-comp-segmented-button-shape: var(--md-sys-shape-corner-full);
   --md-comp-segmented-button-outline-color: var(--md-sys-color-outline);
   --md-comp-segmented-button-outline-width: 1px;
@@ -580,6 +585,7 @@
   --md-comp-menu-label-color: var(--md-sys-color-on-surface);
   --md-comp-menu-icon-color: var(--md-sys-color-on-surface-variant);
   --md-comp-carousel-item-shape: var(--md-sys-shape-corner-extra-large);
+  --md-comp-carousel-controls-container-color: var(--md-sys-color-surface);
   --md-comp-carousel-gap: 8px;
   --md-comp-carousel-indicator-dot-size: 8px;
   --md-comp-carousel-indicator-active-width: 24px;
