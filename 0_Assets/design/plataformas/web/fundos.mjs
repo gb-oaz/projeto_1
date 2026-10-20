@@ -4,7 +4,7 @@ import * as mascotes from './mascotes.mjs';
 // boaz · fundos da marca deboaz: seis conceitos feitos de peças do símbolo e de
 // mascotes, em qualquer formato (16:9, 9:16, 1:1 ou outro)
 //
-//   estampa    símbolo e mascotes em grade, bem leve        páginas, login, verso do cartão do aluno
+//   estampa    rabiscos espalhados: mascotes, números, sinais e o símbolo, pequenos e girados, num tom discreto   fixos do quest, páginas, login, cartão do aluno
 //   anel       anel gigante cortado pela borda, na forma do mascote   cabeçalho do hub, capa de sala, banner
 //   antenas    antenas em ritmo; os mascotes sobem e descem com elas   rodapé, faixa de progresso, espera
 //   ondas      linhas concêntricas na forma do mascote       formulários e configurações do hub
@@ -31,7 +31,7 @@ import * as mascotes from './mascotes.mjs';
 
 /** Os conceitos, na ordem do catálogo. */
 export const CONCEITOS = {
-  estampa: { nome: 'Estampa', uso: 'páginas, tela de login, verso do cartão do aluno', sortido: true, mascote: { expressao: '', forma: '' } },
+  estampa: { nome: 'Estampa', uso: 'tela Fixos do quest, páginas, tela de login, verso do cartão do aluno', sortido: true, mascote: { expressao: '', forma: '' } },
   anel: { nome: 'Anel gigante', uso: 'cabeçalho do hub, capa de sala, banner da landing page', mascote: { expressao: 'curioso', forma: 'circulo' } },
   antenas: { nome: 'Antenas em ritmo', uso: 'rodapé de telas, faixa de progresso, tela de espera', sortido: true, quantidade: true, mascote: { expressao: '', forma: '' } },
   ondas: { nome: 'Ondas do vão', uso: 'formulários e telas de configuração do hub', mascote: { expressao: 'pensando', forma: 'circulo' } },
@@ -127,7 +127,7 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
   /**
    * Desenha um fundo e devolve o SVG.
    * op = { largura, altura, cores (PAPEIS + mascote), pecas: 'ambos'|'logo'|'mascotes'|'nenhuma' (só o desenho, para fundo de card),
-   *        origem: { x, y } (0 a 1; centro do anel e das ondas), raio (do anel gigante, em px; padrão 0,55 do lado maior),
+   *        origem: { x, y } (0 a 1; centro do anel e das ondas), celula (Estampa: tamanho da célula em px; no fundo de tela, fixo em ~48dp), raio (do anel gigante, em px; padrão 0,55 do lado maior),
    *        mascote: { expressao, forma, proporcao, movimento }, logo: ''|'abertura'|'carregamento',
    *        quantidade (antenas), semente, movimentoReduzido }
    */
@@ -149,10 +149,50 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
     const tres = { anel: c.tertiary, b: c.primary, d: c.secondary };
     let s = '';
     if (conceito === 'estampa') {
-      const t = b / 7, sx = t * 1.25, sy = t * 1.5; s = base(w, h, c.surface); let i = 0;
-      for (let y = -sy * 0.4, lin = 0; y < h + sy; y += sy, lin++) for (let x = (lin % 2 ? sx / 2 : 0) - sx * 0.2; x < w + sx; x += sx, i++) {
-        const logo = P === 'logo' || P === 'nenhuma' || (P === 'ambos' && (i + lin) % 2 === 0);
-        s += logo ? simb(x - t * 0.34, y, t, c['on-surface'], 'longo', 0.09, a) : masc(montar(), x, y + t / 2, t * 0.8, 0.32); }
+      // rabiscos espalhados (como um papel de parede de conversa): uma grade com sorteio de posição, tamanho e giro para as peças
+      // maiores (mascotes em contorno com rosto, números e sinais, o símbolo) e uma grade fina de miudezas nos vãos; tudo num tom só
+      const cel = op.celula ?? Math.max(40, b / 8), tom = c['outline-variant'], sw = n(Math.max(1.2, cel * 0.026)), grandes = [];
+      s = base(w, h, c.surface);
+      const comMasc = P !== 'logo' && P !== 'nenhuma', comLogo = P !== 'mascotes';
+      const GLIFOS_E = ['numero-1', 'numero-2', 'numero-3', 'numero-4', 'numero-5', 'numero-7', 'numero-8', 'mais', 'menos', 'vezes', 'dividir', 'igual', 'letra-a', 'letra-b', 'letra-d'];
+      const caminho = (id, cx, cy, t, giro, rosto) => {
+        const fm = forma(id); if (!fm || !fm.d) return '';
+        const cx0 = fm.caixa.x + fm.caixa.w / 2, cy0 = fm.caixa.y + fm.caixa.h / 2, k = t / Math.max(fm.caixa.w, fm.caixa.h), lw = n(sw / k);
+        let g = `<path d="${fm.d}" fill="none" stroke="${tom}" stroke-width="${lw}" stroke-linecap="round" stroke-linejoin="round"/>`;
+        if (rosto) {
+          const [fx, fy] = fm.centro || [cx0, cy0], v = Math.floor(r() * 4), e = 9, d = 24;
+          g += v === 2 ? `<path d="M${fx - d - e} ${fy - 6}h${2 * e}" stroke="${tom}" stroke-width="${lw}" stroke-linecap="round"/>` : `<circle cx="${fx - d}" cy="${fy - 6}" r="${e}" fill="${tom}"/>`;
+          g += `<circle cx="${fx + d}" cy="${fy - 6}" r="${e}" fill="${tom}"/>`;
+          g += v === 1 ? `<circle cx="${fx}" cy="${fy + 26}" r="12" fill="none" stroke="${tom}" stroke-width="${lw}"/>`
+            : `<path d="M${fx - 24} ${fy + 18}Q${fx} ${fy + 44} ${fx + 24} ${fy + 18}" fill="none" stroke="${tom}" stroke-width="${lw}" stroke-linecap="round"/>` + (v === 3 ? `<path d="M${fx - 6} ${fy + 30}q6 14 12 0" fill="${tom}"/>` : '');
+        }
+        return `<g transform="translate(${n(cx)} ${n(cy)}) rotate(${n(giro)}) scale(${n(k * 1e4) / 1e4}) translate(${n(-cx0)} ${n(-cy0)})">${g}</g>`;
+      };
+      for (let y = cel * 0.4; y < h + cel; y += cel) for (let x = cel * 0.4; x < w + cel; x += cel) {
+        if (r() < 0.12) continue;
+        const t = cel * (0.48 + r() * 0.36), cx = x + (r() - 0.5) * cel * 0.5, cy = y + (r() - 0.5) * cel * 0.5, giro = (r() - 0.5) * 70, q = r();
+        if (comLogo && (!comMasc || q < 0.18)) s += `<g transform="rotate(${n(giro)} ${n(cx)} ${n(cy)})">${simb(cx - t * 0.3, cy - t / 2, t, tom, r() < 0.5 ? 'longo' : 'curto', 0.55, a)}</g>`;
+        else if (comMasc && q < 0.4) s += caminho(GLIFOS_E[Math.floor(r() * GLIFOS_E.length)], cx, cy, t * 0.85, giro, false);
+        else if (comMasc) s += caminho(ms.forma || SORTEIO[Math.floor(r() * SORTEIO.length)], cx, cy, t, giro, true);
+        grandes.push([cx, cy, t / 2]);
+      }
+      // miudezas nos vãos: ponto, anel, estrela, brilho, xis, mais, coração e triângulo
+      const passo = cel / 2.6, mi = (ix, cx, cy, u, giro) => {
+        const T = `transform="rotate(${n(giro)} ${n(cx)} ${n(cy)})"`, L = `fill="none" stroke="${tom}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"`;
+        if (ix === 0) return `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(u * 0.28)}" fill="${tom}"/>`;
+        if (ix === 1) return `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(u * 0.5)}" ${L}/>`;
+        if (ix === 2) { const p = [...Array(10).keys()].map((k) => { const ang = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? u * 0.32 : u * 0.75; return `${n(cx + rr * Math.cos(ang))} ${n(cy + rr * Math.sin(ang))}`; }); return `<path d="M${p.join('L')}Z" ${L} ${T}/>`; }
+        if (ix === 3) return `<path d="M${n(cx)} ${n(cy - u)}Q${n(cx)} ${n(cy)} ${n(cx + u)} ${n(cy)}Q${n(cx)} ${n(cy)} ${n(cx)} ${n(cy + u)}Q${n(cx)} ${n(cy)} ${n(cx - u)} ${n(cy)}Q${n(cx)} ${n(cy)} ${n(cx)} ${n(cy - u)}Z" fill="${tom}" ${T}/>`;
+        if (ix === 4) return `<path d="M${n(cx - u * 0.5)} ${n(cy - u * 0.5)}L${n(cx + u * 0.5)} ${n(cy + u * 0.5)}M${n(cx + u * 0.5)} ${n(cy - u * 0.5)}L${n(cx - u * 0.5)} ${n(cy + u * 0.5)}" ${L} ${T}/>`;
+        if (ix === 5) return `<path d="M${n(cx)} ${n(cy - u * 0.6)}V${n(cy + u * 0.6)}M${n(cx - u * 0.6)} ${n(cy)}H${n(cx + u * 0.6)}" ${L} ${T}/>`;
+        if (ix === 6) return `<path d="M${n(cx)} ${n(cy + u * 0.55)}C${n(cx - u * 1.1)} ${n(cy - u * 0.1)} ${n(cx - u * 0.4)} ${n(cy - u * 0.8)} ${n(cx)} ${n(cy - u * 0.25)}C${n(cx + u * 0.4)} ${n(cy - u * 0.8)} ${n(cx + u * 1.1)} ${n(cy - u * 0.1)} ${n(cx)} ${n(cy + u * 0.55)}Z" ${L} ${T}/>`;
+        return `<path d="M${n(cx)} ${n(cy - u * 0.6)}L${n(cx + u * 0.6)} ${n(cy + u * 0.45)}L${n(cx - u * 0.6)} ${n(cy + u * 0.45)}Z" ${L} ${T}/>`;
+      };
+      for (let y = passo / 2; y < h; y += passo) for (let x = passo / 2; x < w; x += passo) {
+        const cx = x + (r() - 0.5) * passo * 0.8, cy = y + (r() - 0.5) * passo * 0.8, u = cel * (0.06 + r() * 0.07);
+        if (grandes.some(([gx, gy, gr]) => Math.hypot(gx - cx, gy - cy) < gr + u + 3) || r() < 0.35) continue;
+        s += mi(Math.floor(r() * 8), cx, cy, u, (r() - 0.5) * 60);
+      }
     } else if (conceito === 'anel') {
       const R = op.raio ?? Math.max(w, h) * 0.55, cx = w * (og.x ?? 0.92), cy = h * (og.y ?? 0.98);
       if (P === 'nenhuma') s = base(w, h, c['primary-container']) + anelForma(ms.forma, cx, cy, R, c.primary, 0.9, a) + anelForma(ms.forma, cx, cy, R * 0.42, c.tertiary, 0.7, a);

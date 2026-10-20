@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v27</title>
+<title>Design system · boaz · v28</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v27">
-<meta name="design:data" content="2026-10-19 14:16">
+<meta name="design:versao" content="v28">
+<meta name="design:data" content="2026-10-19 19:40">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -344,9 +344,11 @@
   --md-comp-button-elevated-label-color: var(--md-sys-color-primary);
   --md-comp-button-elevated-elevation: var(--md-sys-elevation-level1);
   --md-comp-button-elevated-hover-elevation: var(--md-sys-elevation-level2);
+  --md-comp-button-outlined-container-color: var(--md-sys-color-surface);
   --md-comp-button-outlined-outline-color: var(--md-sys-color-outline-variant);
   --md-comp-button-outlined-outline-width: 1px;
   --md-comp-button-outlined-label-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-button-text-container-color: var(--md-sys-color-surface);
   --md-comp-button-text-label-color: var(--md-sys-color-primary);
   --md-comp-button-text-padding: 12px;
   --md-comp-icon-button-size: 40px;
@@ -376,6 +378,7 @@
   --md-comp-chip-padding: 16px;
   --md-comp-chip-padding-with-icon: 8px;
   --md-comp-chip-icon-size: 18px;
+  --md-comp-chip-container-color: var(--md-sys-color-surface);
   --md-comp-chip-shape: var(--md-sys-shape-corner-small);
   --md-comp-chip-label-font: var(--md-sys-typescale-label-large-font);
   --md-comp-chip-label-size: var(--md-sys-typescale-label-large-size);
@@ -428,6 +431,7 @@
   --md-comp-text-field-filled-shape: var(--md-sys-shape-corner-extra-small);
   --md-comp-text-field-filled-indicator-color: var(--md-sys-color-on-surface-variant);
   --md-comp-text-field-outlined-shape: var(--md-sys-shape-corner-extra-small);
+  --md-comp-text-field-outlined-container-color: var(--md-sys-color-surface);
   --md-comp-text-field-outlined-outline-color: var(--md-sys-color-outline);
   --md-comp-list-one-line-height: 56px;
   --md-comp-list-two-line-height: 72px;
@@ -568,6 +572,7 @@
   --md-comp-segmented-button-height: 40px;
   --md-comp-segmented-button-padding: 12px;
   --md-comp-segmented-button-icon-size: 18px;
+  --md-comp-segmented-button-container-color: var(--md-sys-color-surface);
   --md-comp-segmented-button-shape: var(--md-sys-shape-corner-full);
   --md-comp-segmented-button-outline-color: var(--md-sys-color-outline);
   --md-comp-segmented-button-outline-width: 1px;
@@ -595,6 +600,7 @@
   --md-comp-menu-label-color: var(--md-sys-color-on-surface);
   --md-comp-menu-icon-color: var(--md-sys-color-on-surface-variant);
   --md-comp-carousel-item-shape: var(--md-sys-shape-corner-extra-large);
+  --md-comp-carousel-controls-container-color: var(--md-sys-color-surface);
   --md-comp-carousel-gap: 8px;
   --md-comp-carousel-indicator-dot-size: 8px;
   --md-comp-carousel-indicator-active-width: 24px;
@@ -10146,7 +10152,7 @@ window.dispatchEvent(new Event('boaz-marca'));
 // boaz · fundos da marca deboaz: seis conceitos feitos de peças do símbolo e de
 // mascotes, em qualquer formato (16:9, 9:16, 1:1 ou outro)
 //
-//   estampa    símbolo e mascotes em grade, bem leve        páginas, login, verso do cartão do aluno
+//   estampa    rabiscos espalhados: mascotes, números, sinais e o símbolo, pequenos e girados, num tom discreto   fixos do quest, páginas, login, cartão do aluno
 //   anel       anel gigante cortado pela borda, na forma do mascote   cabeçalho do hub, capa de sala, banner
 //   antenas    antenas em ritmo; os mascotes sobem e descem com elas   rodapé, faixa de progresso, espera
 //   ondas      linhas concêntricas na forma do mascote       formulários e configurações do hub
@@ -10173,7 +10179,7 @@ window.dispatchEvent(new Event('boaz-marca'));
 
 /** Os conceitos, na ordem do catálogo. */
 export const CONCEITOS = {
-  estampa: { nome: 'Estampa', uso: 'páginas, tela de login, verso do cartão do aluno', sortido: true, mascote: { expressao: '', forma: '' } },
+  estampa: { nome: 'Estampa', uso: 'tela Fixos do quest, páginas, tela de login, verso do cartão do aluno', sortido: true, mascote: { expressao: '', forma: '' } },
   anel: { nome: 'Anel gigante', uso: 'cabeçalho do hub, capa de sala, banner da landing page', mascote: { expressao: 'curioso', forma: 'circulo' } },
   antenas: { nome: 'Antenas em ritmo', uso: 'rodapé de telas, faixa de progresso, tela de espera', sortido: true, quantidade: true, mascote: { expressao: '', forma: '' } },
   ondas: { nome: 'Ondas do vão', uso: 'formulários e telas de configuração do hub', mascote: { expressao: 'pensando', forma: 'circulo' } },
@@ -10269,7 +10275,7 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
   /**
    * Desenha um fundo e devolve o SVG.
    * op = { largura, altura, cores (PAPEIS + mascote), pecas: 'ambos'|'logo'|'mascotes'|'nenhuma' (só o desenho, para fundo de card),
-   *        origem: { x, y } (0 a 1; centro do anel e das ondas), raio (do anel gigante, em px; padrão 0,55 do lado maior),
+   *        origem: { x, y } (0 a 1; centro do anel e das ondas), celula (Estampa: tamanho da célula em px; no fundo de tela, fixo em ~48dp), raio (do anel gigante, em px; padrão 0,55 do lado maior),
    *        mascote: { expressao, forma, proporcao, movimento }, logo: ''|'abertura'|'carregamento',
    *        quantidade (antenas), semente, movimentoReduzido }
    */
@@ -10291,10 +10297,50 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
     const tres = { anel: c.tertiary, b: c.primary, d: c.secondary };
     let s = '';
     if (conceito === 'estampa') {
-      const t = b / 7, sx = t * 1.25, sy = t * 1.5; s = base(w, h, c.surface); let i = 0;
-      for (let y = -sy * 0.4, lin = 0; y < h + sy; y += sy, lin++) for (let x = (lin % 2 ? sx / 2 : 0) - sx * 0.2; x < w + sx; x += sx, i++) {
-        const logo = P === 'logo' || P === 'nenhuma' || (P === 'ambos' && (i + lin) % 2 === 0);
-        s += logo ? simb(x - t * 0.34, y, t, c['on-surface'], 'longo', 0.09, a) : masc(montar(), x, y + t / 2, t * 0.8, 0.32); }
+      // rabiscos espalhados (como um papel de parede de conversa): uma grade com sorteio de posição, tamanho e giro para as peças
+      // maiores (mascotes em contorno com rosto, números e sinais, o símbolo) e uma grade fina de miudezas nos vãos; tudo num tom só
+      const cel = op.celula ?? Math.max(40, b / 8), tom = c['outline-variant'], sw = n(Math.max(1.2, cel * 0.026)), grandes = [];
+      s = base(w, h, c.surface);
+      const comMasc = P !== 'logo' && P !== 'nenhuma', comLogo = P !== 'mascotes';
+      const GLIFOS_E = ['numero-1', 'numero-2', 'numero-3', 'numero-4', 'numero-5', 'numero-7', 'numero-8', 'mais', 'menos', 'vezes', 'dividir', 'igual', 'letra-a', 'letra-b', 'letra-d'];
+      const caminho = (id, cx, cy, t, giro, rosto) => {
+        const fm = forma(id); if (!fm || !fm.d) return '';
+        const cx0 = fm.caixa.x + fm.caixa.w / 2, cy0 = fm.caixa.y + fm.caixa.h / 2, k = t / Math.max(fm.caixa.w, fm.caixa.h), lw = n(sw / k);
+        let g = `<path d="${fm.d}" fill="none" stroke="${tom}" stroke-width="${lw}" stroke-linecap="round" stroke-linejoin="round"/>`;
+        if (rosto) {
+          const [fx, fy] = fm.centro || [cx0, cy0], v = Math.floor(r() * 4), e = 9, d = 24;
+          g += v === 2 ? `<path d="M${fx - d - e} ${fy - 6}h${2 * e}" stroke="${tom}" stroke-width="${lw}" stroke-linecap="round"/>` : `<circle cx="${fx - d}" cy="${fy - 6}" r="${e}" fill="${tom}"/>`;
+          g += `<circle cx="${fx + d}" cy="${fy - 6}" r="${e}" fill="${tom}"/>`;
+          g += v === 1 ? `<circle cx="${fx}" cy="${fy + 26}" r="12" fill="none" stroke="${tom}" stroke-width="${lw}"/>`
+            : `<path d="M${fx - 24} ${fy + 18}Q${fx} ${fy + 44} ${fx + 24} ${fy + 18}" fill="none" stroke="${tom}" stroke-width="${lw}" stroke-linecap="round"/>` + (v === 3 ? `<path d="M${fx - 6} ${fy + 30}q6 14 12 0" fill="${tom}"/>` : '');
+        }
+        return `<g transform="translate(${n(cx)} ${n(cy)}) rotate(${n(giro)}) scale(${n(k * 1e4) / 1e4}) translate(${n(-cx0)} ${n(-cy0)})">${g}</g>`;
+      };
+      for (let y = cel * 0.4; y < h + cel; y += cel) for (let x = cel * 0.4; x < w + cel; x += cel) {
+        if (r() < 0.12) continue;
+        const t = cel * (0.48 + r() * 0.36), cx = x + (r() - 0.5) * cel * 0.5, cy = y + (r() - 0.5) * cel * 0.5, giro = (r() - 0.5) * 70, q = r();
+        if (comLogo && (!comMasc || q < 0.18)) s += `<g transform="rotate(${n(giro)} ${n(cx)} ${n(cy)})">${simb(cx - t * 0.3, cy - t / 2, t, tom, r() < 0.5 ? 'longo' : 'curto', 0.55, a)}</g>`;
+        else if (comMasc && q < 0.4) s += caminho(GLIFOS_E[Math.floor(r() * GLIFOS_E.length)], cx, cy, t * 0.85, giro, false);
+        else if (comMasc) s += caminho(ms.forma || SORTEIO[Math.floor(r() * SORTEIO.length)], cx, cy, t, giro, true);
+        grandes.push([cx, cy, t / 2]);
+      }
+      // miudezas nos vãos: ponto, anel, estrela, brilho, xis, mais, coração e triângulo
+      const passo = cel / 2.6, mi = (ix, cx, cy, u, giro) => {
+        const T = `transform="rotate(${n(giro)} ${n(cx)} ${n(cy)})"`, L = `fill="none" stroke="${tom}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"`;
+        if (ix === 0) return `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(u * 0.28)}" fill="${tom}"/>`;
+        if (ix === 1) return `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(u * 0.5)}" ${L}/>`;
+        if (ix === 2) { const p = [...Array(10).keys()].map((k) => { const ang = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? u * 0.32 : u * 0.75; return `${n(cx + rr * Math.cos(ang))} ${n(cy + rr * Math.sin(ang))}`; }); return `<path d="M${p.join('L')}Z" ${L} ${T}/>`; }
+        if (ix === 3) return `<path d="M${n(cx)} ${n(cy - u)}Q${n(cx)} ${n(cy)} ${n(cx + u)} ${n(cy)}Q${n(cx)} ${n(cy)} ${n(cx)} ${n(cy + u)}Q${n(cx)} ${n(cy)} ${n(cx - u)} ${n(cy)}Q${n(cx)} ${n(cy)} ${n(cx)} ${n(cy - u)}Z" fill="${tom}" ${T}/>`;
+        if (ix === 4) return `<path d="M${n(cx - u * 0.5)} ${n(cy - u * 0.5)}L${n(cx + u * 0.5)} ${n(cy + u * 0.5)}M${n(cx + u * 0.5)} ${n(cy - u * 0.5)}L${n(cx - u * 0.5)} ${n(cy + u * 0.5)}" ${L} ${T}/>`;
+        if (ix === 5) return `<path d="M${n(cx)} ${n(cy - u * 0.6)}V${n(cy + u * 0.6)}M${n(cx - u * 0.6)} ${n(cy)}H${n(cx + u * 0.6)}" ${L} ${T}/>`;
+        if (ix === 6) return `<path d="M${n(cx)} ${n(cy + u * 0.55)}C${n(cx - u * 1.1)} ${n(cy - u * 0.1)} ${n(cx - u * 0.4)} ${n(cy - u * 0.8)} ${n(cx)} ${n(cy - u * 0.25)}C${n(cx + u * 0.4)} ${n(cy - u * 0.8)} ${n(cx + u * 1.1)} ${n(cy - u * 0.1)} ${n(cx)} ${n(cy + u * 0.55)}Z" ${L} ${T}/>`;
+        return `<path d="M${n(cx)} ${n(cy - u * 0.6)}L${n(cx + u * 0.6)} ${n(cy + u * 0.45)}L${n(cx - u * 0.6)} ${n(cy + u * 0.45)}Z" ${L} ${T}/>`;
+      };
+      for (let y = passo / 2; y < h; y += passo) for (let x = passo / 2; x < w; x += passo) {
+        const cx = x + (r() - 0.5) * passo * 0.8, cy = y + (r() - 0.5) * passo * 0.8, u = cel * (0.06 + r() * 0.07);
+        if (grandes.some(([gx, gy, gr]) => Math.hypot(gx - cx, gy - cy) < gr + u + 3) || r() < 0.35) continue;
+        s += mi(Math.floor(r() * 8), cx, cy, u, (r() - 0.5) * 60);
+      }
     } else if (conceito === 'anel') {
       const R = op.raio ?? Math.max(w, h) * 0.55, cx = w * (og.x ?? 0.92), cy = h * (og.y ?? 0.98);
       if (P === 'nenhuma') s = base(w, h, c['primary-container']) + anelForma(ms.forma, cx, cy, R, c.primary, 0.9, a) + anelForma(ms.forma, cx, cy, R * 0.42, c.tertiary, 0.7, a);
@@ -10828,8 +10874,10 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .md-button--tonal:hover { box-shadow: var(--md-comp-button-tonal-hover-elevation); }
 .md-button--elevated { background: var(--md-comp-button-elevated-container-color); color: var(--md-comp-button-elevated-label-color); box-shadow: var(--md-comp-button-elevated-elevation); }
 .md-button--elevated:hover { box-shadow: var(--md-comp-button-elevated-hover-elevation); }
-.md-button--outlined { color: var(--md-comp-button-outlined-label-color); border: var(--md-comp-button-outlined-outline-width) solid var(--md-comp-button-outlined-outline-color); }
-.md-button--text { color: var(--md-comp-button-text-label-color); padding: 0 var(--md-comp-button-text-padding); }
+.md-button--outlined { background: var(--md-comp-button-outlined-container-color); color: var(--md-comp-button-outlined-label-color); border: var(--md-comp-button-outlined-outline-width) solid var(--md-comp-button-outlined-outline-color); }
+.md-button--text { background: var(--md-comp-button-text-container-color); color: var(--md-comp-button-text-label-color); padding: 0 var(--md-comp-button-text-padding); }
+/* botão de texto: com o fundo da tela quando solto sobre a Estampa; transparente dentro de card, diálogo, snackbar e barras */
+:is(.md-card, .md-dialog, .md-snackbar, .md-top-app-bar, [class*="cx-card"], .cx-aviso, .cx-topo, .cx-topo-landing, .md-menu) { --md-comp-button-text-container-color: transparent; }
 .md-button:disabled, .md-icon-button:disabled, .md-fab:disabled {
   color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
   background: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-container-opacity) * 100%), transparent);
@@ -10875,7 +10923,7 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .md-chip {
   display: inline-flex; align-items: center; gap: 8px; height: var(--md-comp-chip-height);
   padding: 0 var(--md-comp-chip-padding); border: 1px solid var(--md-comp-chip-outline-color);
-  border-radius: var(--md-comp-chip-shape); background: transparent; color: var(--md-comp-chip-label-color);
+  border-radius: var(--md-comp-chip-shape); background: var(--md-comp-chip-container-color); color: var(--md-comp-chip-label-color);
   font-family: var(--md-comp-chip-label-font); font-size: var(--md-comp-chip-label-size);
   letter-spacing: var(--md-comp-chip-label-tracking); font-weight: var(--md-comp-chip-label-weight); cursor: pointer;
 }
@@ -10924,6 +10972,7 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .md-text-field--filled .md-text-field__caixa:focus-within { box-shadow: inset 0 -2px 0 var(--md-comp-text-field-focus-color); }
 .md-text-field--outlined .md-text-field__caixa {
   border-radius: var(--md-comp-text-field-outlined-shape); box-shadow: inset 0 0 0 1px var(--md-comp-text-field-outlined-outline-color); position: relative;
+  background: var(--md-comp-text-field-outlined-container-color);
 }
 .md-text-field--outlined .md-text-field__caixa:focus-within { box-shadow: inset 0 0 0 2px var(--md-comp-text-field-focus-color); }
 .md-text-field--erro .md-text-field__caixa { box-shadow: inset 0 -2px 0 var(--md-comp-text-field-error-color); }
@@ -11056,7 +11105,7 @@ window.dispatchEvent(new Event('boaz-fundos'));
 }
 
 /* ── botão segmentado ── */
-.md-segmented { display: inline-flex; border: var(--md-comp-segmented-button-outline-width) solid var(--md-comp-segmented-button-outline-color); border-radius: var(--md-comp-segmented-button-shape); overflow: hidden; }
+.md-segmented { display: inline-flex; background: var(--md-comp-segmented-button-container-color); border: var(--md-comp-segmented-button-outline-width) solid var(--md-comp-segmented-button-outline-color); border-radius: var(--md-comp-segmented-button-shape); overflow: hidden; }
 .md-segmented button {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 48px; height: calc(var(--md-comp-segmented-button-height) - 2 * var(--md-comp-segmented-button-outline-width));
   padding: 0 var(--md-comp-segmented-button-padding); border: 0; background: none; cursor: pointer; color: var(--md-comp-segmented-button-label-color);
@@ -11066,6 +11115,15 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .md-segmented button + button { border-left: var(--md-comp-segmented-button-outline-width) solid var(--md-comp-segmented-button-outline-color); }
 .md-segmented button[aria-pressed="true"] { background: var(--md-comp-segmented-button-selected-container-color); color: var(--md-comp-segmented-button-selected-label-color); }
 .md-segmented .material-symbols { font-size: var(--md-comp-segmented-button-icon-size); }
+/* gráfico de barras: cada barra com --v de 0 a 1; destaque em primary, as outras em secondary-container; valor sempre em texto */
+.md-grafico { display: flex; align-items: flex-end; gap: var(--md-sys-spacing-2); height: var(--altura, 7.5rem); padding-bottom: var(--md-sys-spacing-5); border-bottom: 1px solid var(--md-sys-color-outline-variant); position: relative; }
+.md-grafico .barra { position: relative; flex: 1 1 0; max-width: var(--md-sys-spacing-10); height: calc(var(--v) * 100%); border-radius: var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small) 0 0; background: var(--md-sys-color-secondary-container); }
+.md-grafico .barra--destaque { background: var(--md-sys-color-primary); }
+.md-grafico .barra > span { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-label-small-font); font-size: var(--md-sys-typescale-label-small-size); font-weight: var(--md-sys-typescale-label-small-weight); }
+.md-grafico .barra .valor { bottom: calc(100% + 2px); }
+.md-grafico .barra .rotulo-x { top: calc(100% + 4px); }
+.md-grafico--mini { --altura: 2.25rem; padding-bottom: 0; gap: var(--md-sys-spacing-1); }
+.md-grafico--mini .barra { max-width: var(--md-sys-spacing-4); }
 /* segmentado cheio: ocupa o contêiner e divide por igual (formulários no compact) */
 .md-segmented--cheio { display: flex; width: 100%; }
 .md-segmented--cheio button { flex: 1 1 0; }
@@ -11100,7 +11158,7 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .md-carousel { display: grid; gap: var(--md-sys-spacing-3); }
 .md-carousel__trilha { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: var(--md-comp-carousel-gap); overflow-x: auto; scroll-snap-type: x mandatory; }
 .md-carousel__trilha > * { scroll-snap-align: start; border-radius: var(--md-comp-carousel-item-shape); }
-.md-carousel__controles { display: flex; align-items: center; justify-content: center; gap: var(--md-sys-spacing-2); }
+.md-carousel__controles { display: flex; align-items: center; justify-content: center; gap: var(--md-sys-spacing-2); justify-self: center; padding: 0 var(--md-sys-spacing-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-comp-carousel-controls-container-color); }
 .md-carousel__pontos { display: inline-flex; align-items: center; gap: var(--md-comp-carousel-indicator-gap); }
 .md-carousel__pontos i {
   display: block; width: var(--md-comp-carousel-indicator-dot-size); height: var(--md-comp-carousel-indicator-dot-size);
@@ -11132,9 +11190,10 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .cx-topo .conta .nome { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-title-small-font); font-size: var(--md-sys-typescale-title-small-size); font-weight: var(--md-sys-typescale-title-small-weight); }
 
 /* comuns · topo da casca e topo do módulo */
-/* no compact e no medium o topo fica só com o logo e os avisos: a conta abre pelo destino Conta (Perfil no quest) */
+/* no compact o topo fica só com o logo e os avisos: a conta abre pelo destino Conta (Perfil no quest) da barra;
+   a partir do medium o nome e a foto voltam ao topo e o trilho fica sem Conta ou Perfil */
 .cx-topo .conta { display: none; }
-@media (min-width: 840px) { .cx-topo .conta { display: flex; } }
+@media (min-width: 600px) { .cx-topo .conta { display: flex; } }
 /* sem foto, o mascote adotado faz as vezes de foto (sem círculo em volta) */
 .cx-topo .avatar--mascote, .cx-card-acesso .foto--mascote { background: none; border-radius: 0; }
 .cx-topo .avatar--mascote img, .cx-card-acesso .foto--mascote img { width: 100%; height: 100%; }
@@ -11234,6 +11293,27 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .cx-rodape a { color: var(--md-sys-color-on-surface-variant); text-decoration: none; font-family: var(--md-sys-typescale-body-medium-font); font-size: var(--md-sys-typescale-body-medium-size); }
 
 /* hub · ordenação, simulador de custo */
+.cx-card-modulo .metrica { color: var(--md-sys-color-primary); font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); }
+.cx-card-modulo .md-grafico--mini { margin-top: auto; }
+/* painel do módulo (hub): número principal em primary, tendência (sucesso quando melhora, erro quando piora) e números de apoio
+   com a cor da paleta que diz o que significam; sem mascotes. Um por linha no compact, até dois a partir do medium */
+.cx-card-modulo .linha-metrica { display: flex; align-items: center; gap: var(--md-sys-spacing-2); }
+.cx-card-modulo .tendencia { display: inline-flex; align-items: center; gap: 2px; padding: 0 var(--md-sys-spacing-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-sucesso-container); color: var(--md-sys-color-on-sucesso-container); font-family: var(--md-sys-typescale-label-medium-font); font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-label-medium-weight); }
+.cx-card-modulo .tendencia--piora { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
+.cx-card-modulo .tendencia .material-symbols { font-size: 1rem; }
+.cx-card-modulo .apoio-numeros { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--md-sys-spacing-2); padding-top: var(--md-sys-spacing-3); border-top: 1px solid var(--md-sys-color-outline-variant); text-align: start; }
+.cx-card-modulo .apoio-numeros b { display: flex; align-items: center; gap: var(--md-sys-spacing-1); font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); font-weight: var(--md-sys-typescale-title-medium-weight); }
+.cx-card-modulo .apoio-numeros b::before { content: ""; width: 10px; height: 10px; border-radius: var(--md-sys-shape-corner-full); background: currentColor; }
+.cx-card-modulo .apoio-numeros small { color: var(--md-sys-color-on-surface-variant); }
+.cx-cor-secondary { color: var(--md-sys-color-secondary); } .cx-cor-tertiary { color: var(--md-sys-color-tertiary); } .cx-cor-sucesso { color: var(--md-sys-color-sucesso); } .cx-cor-erro { color: var(--md-sys-color-error); }
+.cx-grade-paineis { display: grid; gap: var(--md-sys-spacing-3); }
+@media (min-width: 600px) { .cx-grade-paineis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* vitrine de telas: computador (hub) e celular (quest) com as telas do módulo; até ficar pronto, um espaço com o nome da tela */
+.cx-vitrine { position: relative; display: grid; gap: var(--md-sys-spacing-4); max-width: 30rem; }
+.cx-vitrine .palco-telas { position: relative; padding-bottom: 8%; }
+.cx-vitrine .computador { width: 80%; aspect-ratio: 16 / 10; padding: var(--md-sys-spacing-6) var(--md-sys-spacing-2) var(--md-sys-spacing-2); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-highest); box-shadow: var(--md-sys-elevation-level1); }
+.cx-vitrine .celular { position: absolute; right: 0; top: 20%; width: 24%; aspect-ratio: 1 / 1.9; padding: var(--md-sys-spacing-3) var(--md-sys-spacing-1-5, 6px); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-inverse-surface); box-shadow: var(--md-sys-elevation-level2); }
+.cx-vitrine .tela { display: grid; place-items: center; align-content: center; height: 100%; padding: var(--md-sys-spacing-2); border: 1px dashed var(--md-sys-color-outline); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface-variant); text-align: center; font-family: var(--md-sys-typescale-label-medium-font); font-size: var(--md-sys-typescale-label-medium-size); }
 .cx-card-modulo--ordenando { cursor: grab; outline: 1px dashed var(--md-sys-color-outline); }
 .cx-card-modulo--ordenando .mover { display: flex; gap: var(--md-sys-spacing-1); margin-top: auto; }
 .cx-simulador { display: grid; gap: var(--md-sys-spacing-4); padding: var(--md-comp-card-padding); border-radius: var(--md-comp-card-shape); background: var(--md-comp-card-outlined-container-color); border: 1px solid var(--md-comp-card-outlined-outline-color); max-width: 26rem; }
@@ -11243,9 +11323,58 @@ window.dispatchEvent(new Event('boaz-fundos'));
 /* quest · card de tarefa e quem está acessando */
 .cx-card-tarefa { display: grid; gap: var(--md-sys-spacing-1); padding: var(--md-sys-spacing-4); border-radius: var(--md-comp-card-shape); background: var(--md-comp-card-outlined-container-color); border: 1px solid var(--md-comp-card-outlined-outline-color); }
 .cx-card-tarefa .prazo { display: inline-flex; align-items: center; gap: var(--md-sys-spacing-1); color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-label-large-weight); }
-.cx-card-tarefa--hoje { border-color: var(--md-sys-color-error); }
-.cx-card-tarefa--hoje .prazo { color: var(--md-sys-color-error); }
+.cx-card-tarefa { position: relative; overflow: hidden; }
+.cx-card-tarefa > :not(.recorte) { position: relative; }
+/* estado na borda e na hora: primary no prazo, tertiary vencida; sem prazo fica neutro */
+.cx-card-tarefa--prazo { border-color: var(--md-sys-color-primary); }
+.cx-card-tarefa--vencida { border-color: var(--md-sys-color-tertiary); }
+.cx-card-tarefa .hora { color: var(--md-sys-color-on-surface-variant); }
+.cx-card-tarefa--prazo .hora { color: var(--md-sys-color-primary); }
+.cx-card-tarefa--vencida .hora { color: var(--md-sys-color-tertiary); }
+.cx-card-tarefa .envios { display: inline-flex; align-items: center; gap: var(--md-sys-spacing-1); color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-body-medium-font); font-size: var(--md-sys-typescale-body-medium-size); }
+.cx-card-tarefa .detalhe { color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-body-small-font); font-size: var(--md-sys-typescale-body-small-size); font-weight: var(--md-sys-typescale-body-small-weight); }
+/* ponto no canto: sucesso = pode fazer, erro = bloqueada (o texto do prazo e o rótulo do leitor de tela dizem o mesmo) */
+.cx-card-tarefa .ponto { position: absolute; top: var(--md-sys-spacing-3); right: var(--md-sys-spacing-3); width: var(--md-sys-spacing-3); height: var(--md-sys-spacing-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-sucesso); box-shadow: 0 0 0 2px var(--md-comp-card-outlined-container-color); }
+.cx-card-tarefa .ponto--bloqueada { background: var(--md-sys-color-error); }
+/* acontecendo agora: borda de 2dp, selo Agora e o fundo Símbolo recortado com um mascote animado (desenhado pelo núcleo dos fundos) */
+.cx-card-tarefa--agora { border-width: 2px; padding-right: calc(var(--md-sys-spacing-16) + var(--md-sys-spacing-8)); min-height: 7.5rem; }
+.cx-card-tarefa .recorte { position: absolute; inset: 0; pointer-events: none; }
+.cx-card-tarefa .recorte svg { display: block; width: 100%; height: 100%; }
+.cx-card-tarefa .agora { justify-self: start; padding: 0 var(--md-sys-spacing-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); font-family: var(--md-sys-typescale-label-small-font); font-size: var(--md-sys-typescale-label-small-size); font-weight: var(--md-sys-typescale-label-small-weight); line-height: var(--md-sys-typescale-label-small-line-height); }
+/* agenda: um dia por divisória; dia da semana e número em secondary, hoje com o número num círculo cheio */
+.cx-agenda { display: grid; }
+.cx-agenda .dia { display: grid; grid-template-columns: var(--md-sys-spacing-10) 1fr; gap: var(--md-sys-spacing-4); padding: var(--md-sys-spacing-3) 0; border-top: 1px solid var(--md-sys-color-outline-variant); }
+.cx-agenda .data { display: grid; justify-items: center; align-content: start; gap: var(--md-sys-spacing-1); color: var(--md-sys-color-secondary); font-family: var(--md-sys-typescale-label-medium-font); font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-label-medium-weight); }
+.cx-agenda .data b { display: grid; place-items: center; width: var(--md-sys-spacing-10); height: var(--md-sys-spacing-10); font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); font-weight: var(--md-sys-typescale-title-large-weight); }
+.cx-agenda .hoje b { border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-secondary); color: var(--md-sys-color-on-secondary); }
+.cx-agenda .cards { display: grid; gap: var(--md-sys-spacing-3); }
 .cx-quem-acessa { display: grid; gap: var(--md-sys-spacing-3); max-width: 22rem; }
+/* card de desafio (tarefa sem prazo): pódio com mascotes em forma de número, 4º e 5º em linhas, sua posição em destaque, tentativas e Jogar de novo */
+.cx-card-desafio { position: relative; align-self: start; align-content: start; display: grid; gap: var(--md-sys-spacing-3); padding: var(--md-sys-spacing-4); border-radius: var(--md-comp-card-shape); background: var(--md-comp-card-outlined-container-color); border: 1px solid var(--md-comp-card-outlined-outline-color); }
+.cx-card-desafio .ponto { position: absolute; top: var(--md-sys-spacing-3); right: var(--md-sys-spacing-3); width: var(--md-sys-spacing-3); height: var(--md-sys-spacing-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-sucesso); }
+.cx-card-desafio .cabeca { display: grid; gap: var(--md-sys-spacing-1); }
+.cx-card-desafio .envios { display: inline-flex; align-items: center; gap: var(--md-sys-spacing-1); color: var(--md-sys-color-on-surface-variant); }
+.cx-card-desafio h4 { margin: 0; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-label-large-weight); }
+.cx-podio { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--md-sys-spacing-2); align-items: end; }
+.cx-podio li { display: grid; justify-items: center; list-style: none; }
+.cx-podio img { width: 3.75rem; height: 3.75rem; margin-bottom: calc(-1 * var(--md-sys-spacing-1)); }
+.cx-podio .bloco { display: grid; place-items: center; align-content: center; width: 100%; border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); font-family: var(--md-sys-typescale-label-medium-font); font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-label-medium-weight); }
+.cx-podio .p1 .bloco { min-height: 3.625rem; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+.cx-podio .p2 .bloco { min-height: 3rem; }
+.cx-podio .p3 .bloco { min-height: 2.625rem; }
+.cx-podio .eu .bloco { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.cx-podio { padding: 0; margin: 0; }
+.cx-ranking { display: grid; padding: 0; margin: 0; }
+.cx-ranking li { display: grid; grid-template-columns: var(--md-sys-spacing-8) minmax(0, 6.5rem) 1fr auto; align-items: center; gap: var(--md-sys-spacing-2); min-height: var(--md-sys-spacing-8); padding: 0 var(--md-sys-spacing-2); list-style: none; border-radius: var(--md-sys-shape-corner-small); }
+.cx-ranking .eu { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); font-weight: var(--md-sys-typescale-title-small-weight); }
+.cx-ranking .trilha { height: 6px; border-radius: 3px; background: var(--md-sys-color-surface-container-highest); overflow: hidden; }
+.cx-ranking .trilha i { display: block; height: 100%; width: calc(var(--v) * 100%); background: var(--md-sys-color-secondary); }
+.cx-ranking .eu .trilha i { background: var(--md-sys-color-primary); }
+.cx-card-desafio .rodape { display: flex; align-items: end; justify-content: space-between; gap: var(--md-sys-spacing-3); padding-top: var(--md-sys-spacing-3); border-top: 1px solid var(--md-sys-color-outline-variant); }
+/* parentesco e Entrar na largura das opções: os chips dividem a linha por igual */
+.cx-quem-acessa .linha { display: flex; gap: var(--md-sys-spacing-2); }
+.cx-quem-acessa .linha .md-chip { flex: 1 1 0; justify-content: center; }
+.cx-quem-acessa > .md-button { width: 100%; }
 .cx-quem-acessa .opcao { display: flex; align-items: center; gap: var(--md-sys-spacing-3); min-height: var(--md-comp-list-one-line-height); padding: 0 var(--md-sys-spacing-4); border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--md-comp-card-shape); background: none; color: var(--md-sys-color-on-surface); cursor: pointer; font-family: var(--md-sys-typescale-body-large-font); font-size: var(--md-sys-typescale-body-large-size); text-align: left; }
 .cx-quem-acessa .opcao[aria-pressed="true"] { border-color: transparent; background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
 </style>
@@ -11534,8 +11663,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v27</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-19 14:16</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v28</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-19 19:40</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -11864,6 +11993,14 @@ el.innerHTML = fundos.desenhar('halo', {
         </div>
       </div>
 
+      <h3 class="sub md-typescale-title-large">Gráfico de barras</h3>
+      <div class="palco linha">
+        <span class="rotulo">Valores lado a lado com o topo arredondado: destaque em primary, os outros em secondary-container; o valor sempre também em texto (e no rótulo para leitor de tela).</span>
+        <div class="md-grafico" role="img" aria-label="Pontos por tentativa: 900, 1200, 1350, 1720 (melhor), 1600 e 1500" style="width: 100%; max-width: 20rem">
+          <span class="barra" style="--v: .52"><span class="valor">900</span><span class="rotulo-x">1ª</span></span><span class="barra" style="--v: .7"><span class="valor">1200</span><span class="rotulo-x">2ª</span></span><span class="barra" style="--v: .78"><span class="valor">1350</span><span class="rotulo-x">3ª</span></span><span class="barra barra--destaque" style="--v: 1"><span class="valor">1720</span><span class="rotulo-x">4ª</span></span><span class="barra" style="--v: .93"><span class="valor">1600</span><span class="rotulo-x">5ª</span></span><span class="barra" style="--v: .87"><span class="valor">1500</span><span class="rotulo-x">6ª</span></span>
+        </div>
+      </div>
+
       <h3 class="sub md-typescale-title-large">Interruptor</h3>
       <div class="palco linha">
         <span class="rotulo">Liga ou desliga uma opção na hora; trilho de 52 × 32dp, ligado em primary, com o rótulo ao lado.</span>
@@ -11906,12 +12043,12 @@ el.innerHTML = fundos.desenhar('halo', {
 
       <h3 class="sub md-typescale-title-large">Comuns</h3>
       <div class="palco">
-        <span class="rotulo">Topo da casca · igual no hub e no quest: logo (hastes longas no hub, curtas no quest) e avisos; a partir do expanded, também o nome (instituição ou pessoa logada no hub, usuário no quest) e a foto ou o mascote adotado; o toque abre a conta (hub) ou Trocar perfil (quest); sem o título da tela, que a navegação já marca</span>
+        <span class="rotulo">Topo da casca · igual no hub e no quest: logo (hastes longas no hub, curtas no quest) e avisos; a partir do medium, também o nome (instituição ou pessoa logada no hub, usuário no quest) e a foto (sem foto, a inicial no hub e o mascote adotado no quest); o toque abre a conta (hub) ou Trocar perfil (quest); sem o título da tela, que a navegação já marca</span>
         <div class="cx-topo"><span class="cx-logo" data-marca-logo="longo" role="img" aria-label="deboaz"></span><span class="vao"></span><span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 2 não lidos"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">2</span></span><button class="conta md-estado" aria-label="Conta da Escola Horizonte"><span class="nome">Escola Horizonte</span><span class="avatar" aria-hidden="true">E</span></button></div>
         <div class="cx-topo" style="margin-top: var(--md-sys-spacing-3)"><span class="cx-logo cx-logo--curto" data-marca-logo="curto" role="img" aria-label="deboaz"></span><span class="vao"></span><span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 2 não lidos"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">2</span></span><button class="conta md-estado" aria-label="Perfil de Lucas Andrade: trocar perfil"><span class="nome">Lucas Andrade</span><span class="avatar avatar--mascote" aria-hidden="true"><img data-mascote="feliz" data-forma="estrela" alt=""></span></button></div>
       </div>
       <div class="palco">
-        <span class="rotulo">Navegação da casca · hub e quest: três destinos; barra no compact, trilho no medium e no expanded, gaveta a partir do large</span>
+        <span class="rotulo">Navegação da casca · hub e quest: barra com três destinos no compact; a partir do medium, trilho (gaveta no large) abaixo do topo, sem Conta ou Perfil, que abrem pelo nome e pela foto do topo</span>
         <nav class="md-navigation-bar" aria-label="Navegação do hub">
           <a class="md-nav-item" href="#compostos" aria-current="page"><span class="md-nav-item__indicador"><span class="material-symbols">dashboard</span></span>Meus módulos</a>
           <a class="md-nav-item" href="#compostos"><span class="md-nav-item__indicador"><span class="material-symbols">add</span></span>Catálogo</a>
@@ -11919,12 +12056,19 @@ el.innerHTML = fundos.desenhar('halo', {
         </nav>
       </div>
       <div class="palco">
-        <span class="rotulo">Card de módulo · Meus módulos (hub) e Fixos (quest): nome, apoio, selo de notificações e estado Configurar ou Completar</span>
-        <div class="cx-grade-modulos">
-          <button class="cx-card-modulo md-estado" aria-label="Presença, 3 notificações"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="cx-texto-titulo">Presença</span><span class="cx-texto-apoio">Chamada da turma</span><span class="md-badge" aria-hidden="true">3</span></button>
-          <button class="cx-card-modulo md-estado"><span class="cx-icone"><span class="material-symbols">badge</span></span><span class="cx-texto-titulo">Carteirinha</span><span class="estado">Completar</span></button>
-          <button class="cx-card-modulo md-estado"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span><span class="estado">Configurar</span></button>
-          <button class="cx-card-modulo md-estado"><span class="cx-icone"><span class="material-symbols">support_agent</span></span><span class="cx-texto-titulo">Suporte</span><span class="cx-texto-apoio">Módulo da conta</span></button>
+        <span class="rotulo">Card de módulo · Meus módulos (hub) e Fixos (quest): nome, selo e, na capa, a métrica que importa para quem cuida do módulo, com uma série curta; sem métrica ainda, o estado Configurar ou Completar</span>
+        <div class="cx-grade-paineis">
+          <button class="cx-card-modulo md-estado" aria-label="Presença: 94% de presença na semana, 2 pontos a mais; 12 turmas, 3 sem chamada hoje, 18 faltas seguidas"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="md-badge" aria-hidden="true">3</span><span class="cx-texto-titulo">Presença</span><span class="linha-metrica"><span class="metrica">94%</span><span class="tendencia"><span class="material-symbols">arrow_upward</span>+2 pts</span></span><span class="cx-texto-apoio">presença na semana</span><span class="md-grafico md-grafico--mini" aria-hidden="true"><span class="barra" style="--v: .94"></span><span class="barra" style="--v: .97"></span><span class="barra" style="--v: .96"></span><span class="barra" style="--v: .98"></span><span class="barra barra--destaque" style="--v: 1"></span></span><span class="apoio-numeros"><span><b class="cx-cor-secondary">12</b><small>turmas</small></span><span><b class="cx-cor-tertiary">3</b><small>sem chamada hoje</small></span><span><b class="cx-cor-erro">18</b><small>faltas seguidas</small></span></span></button>
+          <button class="cx-card-modulo md-estado" aria-label="Carteirinha: 312 de 340 prontas"><span class="cx-icone"><span class="material-symbols">badge</span></span><span class="cx-texto-titulo">Carteirinha</span><span class="metrica">312 de 340</span><span class="cx-texto-apoio">carteirinhas prontas</span></button>
+          <button class="cx-card-modulo md-estado"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span><span class="cx-texto-apoio">Configure para ver as métricas</span><span class="estado">Configurar</span></button>
+          <button class="cx-card-modulo md-estado" aria-label="Suporte: 2 conversas abertas"><span class="cx-icone"><span class="material-symbols">support_agent</span></span><span class="cx-texto-titulo">Suporte</span><span class="metrica">2</span><span class="cx-texto-apoio">conversas abertas</span></button>
+        </div>
+      </div>
+      <div class="palco">
+        <span class="rotulo">Vitrine de telas · página do módulo (landing) e detalhe no catálogo (hub): as telas do módulo num computador e num celular, com o carrossel; até o módulo ficar pronto, cada tela é um espaço com o nome dela</span>
+        <div class="cx-vitrine" role="group" aria-label="Telas do módulo Presença, 1 de 4">
+          <div class="palco-telas"><div class="computador"><span class="tela">Hub · chamada da turma<br>imagem quando o módulo estiver pronto</span></div><div class="celular"><span class="tela">Quest<br>presença</span></div></div>
+          <div class="md-carousel__controles"><button class="md-icon-button md-estado md-alvo" aria-label="Tela anterior"><span class="material-symbols">chevron_left</span></button><span class="md-carousel__pontos" aria-hidden="true"><i aria-current="true"></i><i></i><i></i><i></i></span><span>1 de 4</span><button class="md-icon-button md-estado md-alvo" aria-label="Próxima tela"><span class="material-symbols">chevron_right</span></button></div>
         </div>
       </div>
       <div class="palco">
@@ -11935,7 +12079,7 @@ el.innerHTML = fundos.desenhar('halo', {
         </div>
       </div>
       <div class="palco">
-        <span class="rotulo">Card de acesso · contas acessadas (hub) e perfis acessados (quest): foto (ou, sem foto, o mascote adotado), nome, instituição e menu com Remover</span>
+        <span class="rotulo">Card de acesso · contas acessadas (hub) e perfis acessados (quest): foto (sem foto, a inicial no hub e o mascote adotado no quest), nome, instituição e menu com Remover</span>
         <div class="cx-card-acesso"><span class="foto foto--mascote"><img data-mascote="feliz" data-forma="hexagono" alt=""></span><span><span class="cx-texto-titulo">Lucas Andrade</span><span class="cx-texto-apoio">Escola Horizonte · 7º A · 2026</span></span><button class="md-icon-button md-estado md-alvo" aria-label="Mais opções"><span class="material-symbols">more_vert</span></button></div>
       </div>
       <div class="palco">
@@ -12035,18 +12179,43 @@ el.innerHTML = fundos.desenhar('halo', {
       <h3 class="sub md-typescale-title-large">Quest</h3>
       <div class="cx-par">
         <div class="palco">
-          <span class="rotulo">Card de tarefa · Tarefas: módulo de origem, título e prazo em texto e data; vence hoje com destaque também em texto</span>
-          <div style="display: grid; gap: var(--md-sys-spacing-3)">
-            <article class="cx-card-tarefa cx-card-tarefa--hoje"><span class="cx-texto-rotulo">Exercícios</span><span class="cx-texto-titulo">Frações equivalentes</span><span class="prazo"><span class="material-symbols">schedule</span>Vence hoje · 19/10</span></article>
-            <article class="cx-card-tarefa"><span class="cx-texto-rotulo">Flashcards</span><span class="cx-texto-titulo">Revisão para a prova</span><span class="prazo"><span class="material-symbols">event</span>Vence em 2 dias · 21/10</span></article>
+          <span class="rotulo">Agenda e card de tarefa · calendário vertical, um dia por divisória (dia em secondary); hora e borda em primary no prazo ou tertiary vencida; ponto sucesso (pode fazer) ou erro (bloqueada); envios possíveis e feitos; acontecendo agora: Símbolo recortado com mascote animado</span>
+          <div class="cx-agenda">
+            <div class="dia hoje"><span class="data">HOJE<b>19</b></span><div class="cards">
+              <article class="cx-card-tarefa cx-card-tarefa--prazo cx-card-tarefa--agora" data-agora="feliz estrela pular" aria-label="Acontecendo agora, pode participar"><span class="agora">Agora</span><span class="cx-texto-rotulo">Aula ao vivo · Matemática</span><span class="cx-texto-titulo">Frações na prática</span><span class="prazo hora"><span class="material-symbols">schedule</span>14:00 – 14:50</span><span class="envios"><span class="material-symbols">repeat</span>Participação única</span><span class="ponto" aria-hidden="true"></span></article>
+              <article class="cx-card-tarefa cx-card-tarefa--prazo" aria-label="Pode fazer"><span class="cx-texto-rotulo">Exercícios</span><span class="cx-texto-titulo">Frações equivalentes</span><span class="prazo"><span class="material-symbols">schedule</span><span class="hora">Até 23:59</span><span class="detalhe">· vence hoje</span></span><span class="envios"><span class="material-symbols">repeat</span>Envio único · 0 de 1</span><span class="ponto" aria-hidden="true"></span></article>
+            </div></div>
+            <div class="dia"><span class="data">SÁB<b>17</b></span><div class="cards">
+              <article class="cx-card-tarefa cx-card-tarefa--vencida" aria-label="Vencida, entrega aceita"><span class="cx-texto-rotulo">Exercícios</span><span class="cx-texto-titulo">Tabuada do 7</span><span class="prazo"><span class="material-symbols">schedule</span><span class="hora">Venceu 23:59</span><span class="detalhe">· entrega aceita</span></span><span class="envios"><span class="material-symbols">repeat</span>Até 3 envios · 1 de 3</span><span class="ponto" aria-hidden="true"></span></article>
+              <article class="cx-card-tarefa cx-card-tarefa--vencida" aria-label="Vencida, bloqueada"><span class="cx-texto-rotulo">Quiz</span><span class="cx-texto-titulo">Quiz da semana</span><span class="prazo"><span class="material-symbols">schedule</span><span class="hora">Venceu 18:00</span><span class="detalhe">· encerrado</span></span><span class="envios"><span class="material-symbols">repeat</span>Envio único · 1 de 1</span><span class="ponto ponto--bloqueada" aria-hidden="true"></span></article>
+            </div></div>
           </div>
         </div>
+        <div class="palco">
+          <span class="rotulo">Card de desafio · tarefa sem prazo, competitiva: pódio com os 3 primeiros (mascotes em forma de número, felizes e com movimento composto: comemorar, pular, dançar), 4º e 5º, sua posição em destaque, suas tentativas e Jogar de novo; muda a cada envio</span>
+          <article class="cx-card-desafio" aria-label="Soma rápida, você está em 8º com 1.240 pontos">
+            <span class="ponto" aria-hidden="true"></span>
+            <div class="cabeca"><span class="cx-texto-rotulo">Jogo · Memória</span><span class="cx-texto-titulo">Memória das frações</span><span class="envios"><span class="material-symbols">repeat</span>Até 5 envios · 2 de 5</span></div>
+            <h4>Ranking da tarefa</h4>
+            <ol class="cx-podio">
+              <li class="p2"><img data-mascote="rindo" data-forma="numero-2" data-movimento="dancar,balancar" alt=""><span class="bloco">Ana S.<br>1.950</span></li>
+              <li class="p1"><img data-mascote="estrela" data-forma="numero-1" data-movimento="comemorar,pular,dancar" alt=""><span class="bloco">Carla P.<br>2.100</span></li>
+              <li class="p3"><img data-mascote="feliz" data-forma="numero-3" data-movimento="pular,balancar" alt=""><span class="bloco">Davi R.<br>1.720</span></li>
+            </ol>
+            <ol class="cx-ranking">
+              <li><span>4º</span><span>Bruno M.</span><span class="trilha"><i style="--v: .76"></i></span><span>1.600</span></li>
+              <li><span>5º</span><span>Eva L.</span><span class="trilha"><i style="--v: .7"></i></span><span>1.480</span></li>
+              <li class="eu"><span>8º</span><span>Você</span><span class="trilha"><i style="--v: .59"></i></span><span>1.240</span></li>
+            </ol>
+            <div class="rodape"><div><span class="cx-texto-rotulo">Suas tentativas</span><div class="md-grafico md-grafico--mini" role="img" aria-label="Tentativas: 980 e 1240 (melhor)"><span class="barra" style="--v: .79"></span><span class="barra barra--destaque" style="--v: 1"></span></div></div><button class="md-button md-button--tonal md-estado">Jogar de novo</button></div>
+          </article>
+        </div>
         <div class="palco cx-centro">
-          <span class="rotulo">Quem está acessando · depois do código de acesso: estudante ou responsável, com o parentesco</span>
+          <span class="rotulo">Quem está acessando · depois do código de acesso: estudante ou responsável, com o parentesco num botão segmentado cheio</span>
           <div class="cx-quem-acessa">
             <button class="opcao md-estado" aria-pressed="false"><span class="material-symbols">person</span>Sou o estudante</button>
             <button class="opcao md-estado" aria-pressed="true"><span class="material-symbols">family_restroom</span>Sou responsável</button>
-            <div class="linha"><button class="md-chip md-estado" aria-pressed="true"><span class="material-symbols">check</span>Mãe</button><button class="md-chip md-estado" aria-pressed="false">Pai</button><button class="md-chip md-estado" aria-pressed="false">Outro</button></div>
+            <div class="md-segmented md-segmented--cheio" role="group" aria-label="Parentesco"><button class="md-estado" aria-pressed="true"><span class="material-symbols">check</span>Mãe</button><button class="md-estado" aria-pressed="false">Pai</button><button class="md-estado" aria-pressed="false">Outro</button></div>
             <button class="md-button md-button--filled md-estado">Entrar</button>
           </div>
         </div>
@@ -12199,6 +12368,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v28</td><td>2026-10-19 19:40</td><td>Quest: agenda em calendário vertical (dia em secondary, um dia por divisória) e card de tarefa com hora e borda em primary (no prazo) ou tertiary (vencida), ponto sucesso/erro (pode fazer ou bloqueada) e Símbolo recortado com mascote animado quando acontece agora; quem está acessando com parentesco e Entrar na largura toda; chip com largura; card de tarefa com os envios possíveis e feitos; topo com nome e foto a partir do medium e trilho sem Conta ou Perfil; gráfico de barras (componente base) e card de desafio do quest (tarefa sem prazo: pódio com mascotes em forma de número, 4º e 5º, sua posição, tentativas e Jogar de novo); pódio do card de desafio em festa: mascotes felizes com movimento composto (comemorar, pular, dançar, balançar); Estampa redesenhada como rabiscos espalhados (mascotes em contorno com rosto, números, sinais, o símbolo e miudezas, pequenos, girados e num tom discreto), também para a tela Fixos do quest; componentes sem fundo (campo outlined, botões outlined e de texto soltos na tela, segmentado, chip, controles do carrossel) ganham o fundo da tela, legíveis sobre a Estampa; parentesco num segmentado cheio; card de módulo com a métrica de quem cuida do módulo e uma série curta; vitrine de telas (computador e celular) para a página do módulo e o detalhe do catálogo; painel do módulo no hub: número principal com tendência (sucesso ou erro pelo significado), série ou progresso e números de apoio nas cores da paleta, sem mascotes, até dois por linha</td></tr>
           <tr><td>v27</td><td>2026-10-19 14:16</td><td>Botão segmentado cheio; topo da casca só com logo e avisos no compact e no medium (nome e foto a partir do expanded); foto ou mascote adotado no avatar; trilho com Conta embaixo; aviso com botão de ícone no compact; card do catálogo com as Ondas do vão na forma do padrinho; fundos com peças nenhuma, origem e raio do anel</td></tr>
           <tr><td>v26</td><td>2026-10-19 13:37</td><td>Fundos: Anel gigante e Ondas do vão na forma escolhida do mascote; nas Antenas em ritmo os mascotes acompanham a animação da barra</td></tr>
           <tr><td>v25</td><td>2026-10-19 04:21</td><td>Interruptor (switch) entre os componentes básicos; card do catálogo com fundo cheio em secondary-container e o mascote padrinho do módulo à direita, metade cortada pela borda; seletor de tema com a opção Mascotes nas cores do tema</td></tr>
@@ -12208,10 +12378,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v21</td><td>2026-10-19 02:31</td><td>Logo na linha do topo: o nome deboaz fica na linha dos outros textos e ícones e o símbolo sobe, com a mesma escala no hub (hastes longas) e no quest (hastes curtas); topo da casca igual no hub e no quest (logo, avisos e foto), com o nome e Trocar perfil no toque da foto</td></tr>
           <tr><td>v20</td><td>2026-10-19 02:24</td><td>Topos com o logo em 40dp (antes 24dp); topo da casca com o logo de hastes longas no hub e de hastes curtas no quest, e no quest os avisos, o perfil ativo com Trocar perfil e a foto à direita; logo de 40dp no rodapé</td></tr>
           <tr><td>v19</td><td>2026-10-19 02:15</td><td>Compostos: logo oficial (símbolo + nome) no topo da casca, no topo da landing page e no rodapé, também no tema.svg; o topo da casca deixa de repetir o título da tela, que a navegação já marca; elementos sozinhos centralizados no painel (catálogo e tema.svg)</td></tr>
-          <tr><td>v18</td><td>2026-10-19 01:36</td><td>Componentes compostos das UX 07, 08 e 09, por frente: comuns (topo da casca, navegação da casca, card de módulo, card do catálogo, card de acesso, aviso para completar, topo do módulo, boas-vindas com mascote, seletor de tema, indicador), landing page (topo, vitrine de módulos, card de perfil, passos, depoimento, barra de ação fixa, rodapé), hub (grade ordenando, simulador de custo, diálogo de código) e quest (card de tarefa, quem está acessando); seção Componentes compostos no catálogo e no tema.svg</td></tr>
         </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v27 · 2026-10-19 14:16</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v28 · 2026-10-19 19:40</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>
@@ -12459,7 +12628,7 @@ const GRADES = {
 function desenhar() {
   document.querySelectorAll('[data-masc-grade]').forEach((g) => { g.innerHTML = GRADES[g.dataset.mascGrade]().join(''); });
   document.querySelectorAll('img[data-mascote]').forEach((img) => {
-    img.src = uri(gerar(img.dataset.mascote, { forma: img.dataset.forma, proporcao: img.dataset.proporcao, cor: corTema() }));
+    img.src = uri(gerar(img.dataset.mascote, { forma: img.dataset.forma, proporcao: img.dataset.proporcao, movimento: img.dataset.movimento?.split(','), cor: corTema() }));
   });
 }
 desenhar();
@@ -12537,6 +12706,20 @@ function ondasDosCards() {
 }
 ondasDosCards();
 new ResizeObserver(() => ondasDosCards()).observe(document.body);
+// card de tarefa acontecendo agora: fundo Símbolo recortado com o mascote animado (parado com movimento reduzido)
+function recorteDosCards() {
+  const parado = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('.cx-card-tarefa[data-agora]').forEach((card) => {
+    const r = card.getBoundingClientRect(); if (!r.width) return;
+    const [expressao, forma, movimento] = card.dataset.agora.split(' ');
+    let el = card.querySelector('.recorte'); if (!el) { el = document.createElement('span'); el.className = 'recorte'; el.setAttribute('aria-hidden', 'true'); card.prepend(el); }
+    const cores = { ...Object.fromEntries(['surface', 'surface-container', 'on-surface', 'primary-container', 'secondary-container', 'tertiary-container', 'primary', 'secondary', 'tertiary'].map((p) => [p, vv(p)])), mascote: '' };
+    el.innerHTML = F.desenhar('recorte', { largura: Math.round(r.width), altura: Math.round(r.height), pecas: 'ambos', cores, mascote: { expressao, forma, movimento }, movimentoReduzido: parado })
+      .replace(/ width="[^"]+" height="[^"]+"/, ' preserveAspectRatio="xMaxYMid slice"');
+  });
+}
+recorteDosCards();
+new ResizeObserver(() => recorteDosCards()).observe(document.body);
 </script>
 </body>
 </html>

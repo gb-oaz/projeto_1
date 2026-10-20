@@ -1,70 +1,70 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1600" width="900" height="1600" role="img" aria-label="Antenas em ritmo"><rect width="900" height="1600" fill="#FFFFFF"/><path fill="#000000" opacity="0.85" d="M19 1602V1245.54A31 21.38 0 0 1 81 1245.54V1602Z"/><path fill="#5E5E5E" opacity="0.85" d="M119 1602V774.28A31 21.38 0 0 1 181 774.28V1602Z"/><path fill="#000000" opacity="0.85" d="M219 1602V1084.36A31 21.38 0 0 1 281 1084.36V1602Z"/><path fill="#5E5E5E" opacity="0.85" d="M319 1602V1215.79A31 21.38 0 0 1 381 1215.79V1602Z"/><path fill="#000000" opacity="0.85" d="M419 1602V756.87A31 21.38 0 0 1 481 756.87V1602Z"/><path fill="#5E5E5E" opacity="0.85" d="M519 1602V870.13A31 21.38 0 0 1 581 870.13V1602Z"/><path fill="#000000" opacity="0.85" d="M619 1602V1299.19A31 21.38 0 0 1 681 1299.19V1602Z"/><path fill="#5E5E5E" opacity="0.85" d="M719 1602V1211.78A31 21.38 0 0 1 781 1211.78V1602Z"/><path fill="#000000" opacity="0.85" d="M819 1602V1128.51A31 21.38 0 0 1 881 1128.51V1602Z"/><g opacity="1"><svg x="695" y="1078.4" width="110" height="110" viewBox="16.2 17.2 223.6 223.6"><defs>
-<radialGradient id="fundo-m99-g-corpo" gradientUnits="userSpaceOnUse" cx="94.4" cy="76.72" r="184.8">
+<radialGradient id="fundo-m7-g-corpo" gradientUnits="userSpaceOnUse" cx="94.4" cy="76.72" r="184.8">
 <stop offset="0" stop-color="#FFA6C9"/><stop offset="0.45" stop-color="#FF6FA8"/><stop offset="1" stop-color="#C75783"/></radialGradient>
 
-<radialGradient id="fundo-m99-g-olho" cx="0.4" cy="0.35" r="0.75"><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9DEE6"/></radialGradient>
-<radialGradient id="fundo-m99-g-iris" cx="0.45" cy="0.6" r="0.6"><stop offset="0" stop-color="#FF93BE"/><stop offset="0.7" stop-color="#BF537E"/><stop offset="1" stop-color="#73324C"/></radialGradient>
-<linearGradient id="fundo-m99-g-lingua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FAB"/><stop offset="1" stop-color="#E5547A"/></linearGradient>
-<linearGradient id="fundo-m99-g-gota" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F7FF"/><stop offset="1" stop-color="#7CC8F2"/></linearGradient>
-<linearGradient id="fundo-m99-g-estrela" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF176"/><stop offset="1" stop-color="#FFB300"/></linearGradient>
-<radialGradient id="fundo-m99-g-esfera" cx="0.36" cy="0.3" r="0.78"><stop offset="0.5" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.38"/></radialGradient>
-<filter id="fundo-m99-f-adesivo" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/><feFlood flood-color="#FFFFFF" flood-opacity="0.92"/><feComposite in2="d" operator="in" result="borda"/><feMerge><feMergeNode in="borda"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<filter id="fundo-m99-f-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
-<filter id="fundo-m99-f-sombra" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
+<radialGradient id="fundo-m7-g-olho" cx="0.4" cy="0.35" r="0.75"><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9DEE6"/></radialGradient>
+<radialGradient id="fundo-m7-g-iris" cx="0.45" cy="0.6" r="0.6"><stop offset="0" stop-color="#FF93BE"/><stop offset="0.7" stop-color="#BF537E"/><stop offset="1" stop-color="#73324C"/></radialGradient>
+<linearGradient id="fundo-m7-g-lingua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FAB"/><stop offset="1" stop-color="#E5547A"/></linearGradient>
+<linearGradient id="fundo-m7-g-gota" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F7FF"/><stop offset="1" stop-color="#7CC8F2"/></linearGradient>
+<linearGradient id="fundo-m7-g-estrela" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF176"/><stop offset="1" stop-color="#FFB300"/></linearGradient>
+<radialGradient id="fundo-m7-g-esfera" cx="0.36" cy="0.3" r="0.78"><stop offset="0.5" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.38"/></radialGradient>
+<filter id="fundo-m7-f-adesivo" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/><feFlood flood-color="#FFFFFF" flood-opacity="0.92"/><feComposite in2="d" operator="in" result="borda"/><feMerge><feMergeNode in="borda"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="fundo-m7-f-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="fundo-m7-f-sombra" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
 </defs>
-<g filter="url(#fundo-m99-f-adesivo)"><g>
+<g filter="url(#fundo-m7-f-adesivo)"><g>
 <path d="M68 66 Q90 54 112 62" fill="none" stroke="#3A2A22" stroke-width="11" stroke-linecap="round"/><path d="M144 62 Q166 54 188 66" fill="none" stroke="#3A2A22" stroke-width="11" stroke-linecap="round"/>
 <g><path d="M92 132.5 C53 107 68 78.5 92 96.5 C116 78.5 131 107 92 132.5 Z" fill="#E5484D" stroke="#B3202A" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="79.4" cy="97.4" rx="5.4" ry="3.3" fill="#FFFFFF" opacity="0.8" transform="rotate(-35 79.4 97.4)"/></g><g><path d="M164 132.5 C125 107 140 78.5 164 96.5 C188 78.5 203 107 164 132.5 Z" fill="#E5484D" stroke="#B3202A" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="151.4" cy="97.4" rx="5.4" ry="3.3" fill="#FFFFFF" opacity="0.8" transform="rotate(-35 151.4 97.4)"/></g>
-<ellipse cx="62" cy="150" rx="18" ry="11" fill="#FF5C8A" opacity="0.55" filter="url(#fundo-m99-f-sombra)"/><ellipse cx="194" cy="150" rx="18" ry="11" fill="#FF5C8A" opacity="0.55" filter="url(#fundo-m99-f-sombra)"/>
+<ellipse cx="62" cy="150" rx="18" ry="11" fill="#FF5C8A" opacity="0.55" filter="url(#fundo-m7-f-sombra)"/><ellipse cx="194" cy="150" rx="18" ry="11" fill="#FF5C8A" opacity="0.55" filter="url(#fundo-m7-f-sombra)"/>
 <path d="M96 164 Q128 192 160 164" fill="none" stroke="#3A2A22" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g><g transform="translate(196 70) scale(0.6 0.6) translate(-196 -70)" opacity="0"><path d="M196 79 C180.4 68.8 186.4 57.4 196 64.6 C205.6 57.4 211.6 68.8 196 79 Z" fill="#E5484D" stroke="#B3202A" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="190.96" cy="64.96" rx="2.16" ry="1.32" fill="#FFFFFF" opacity="0.8" transform="rotate(-35 190.96 64.96)"/></g><g transform="translate(0 -20) translate(218 110) scale(0.8 0.8) translate(-218 -110)"><path d="M218 119 C202.4 108.8 208.4 97.4 218 104.6 C227.6 97.4 233.6 108.8 218 119 Z" fill="#E5484D" stroke="#B3202A" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="212.96" cy="104.96" rx="2.16" ry="1.32" fill="#FFFFFF" opacity="0.8" transform="rotate(-35 212.96 104.96)"/></g></g>
 </svg></g><g opacity="1"><svg x="395" y="623.49" width="110" height="110" viewBox="16.2 17.2 223.6 223.6"><defs>
-<radialGradient id="fundo-m100-g-corpo" gradientUnits="userSpaceOnUse" cx="94.4" cy="76.72" r="184.8">
+<radialGradient id="fundo-m8-g-corpo" gradientUnits="userSpaceOnUse" cx="94.4" cy="76.72" r="184.8">
 <stop offset="0" stop-color="#B7E581"/><stop offset="0.45" stop-color="#8BD534"/><stop offset="1" stop-color="#6CA629"/></radialGradient>
 
-<radialGradient id="fundo-m100-g-olho" cx="0.4" cy="0.35" r="0.75"><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9DEE6"/></radialGradient>
-<radialGradient id="fundo-m100-g-iris" cx="0.45" cy="0.6" r="0.6"><stop offset="0" stop-color="#A8E067"/><stop offset="0.7" stop-color="#68A027"/><stop offset="1" stop-color="#3F6017"/></radialGradient>
-<linearGradient id="fundo-m100-g-lingua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FAB"/><stop offset="1" stop-color="#E5547A"/></linearGradient>
-<linearGradient id="fundo-m100-g-gota" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F7FF"/><stop offset="1" stop-color="#7CC8F2"/></linearGradient>
-<linearGradient id="fundo-m100-g-estrela" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF176"/><stop offset="1" stop-color="#FFB300"/></linearGradient>
-<radialGradient id="fundo-m100-g-esfera" cx="0.36" cy="0.3" r="0.78"><stop offset="0.5" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.38"/></radialGradient>
-<filter id="fundo-m100-f-adesivo" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/><feFlood flood-color="#FFFFFF" flood-opacity="0.92"/><feComposite in2="d" operator="in" result="borda"/><feMerge><feMergeNode in="borda"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<filter id="fundo-m100-f-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
-<filter id="fundo-m100-f-sombra" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
+<radialGradient id="fundo-m8-g-olho" cx="0.4" cy="0.35" r="0.75"><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9DEE6"/></radialGradient>
+<radialGradient id="fundo-m8-g-iris" cx="0.45" cy="0.6" r="0.6"><stop offset="0" stop-color="#A8E067"/><stop offset="0.7" stop-color="#68A027"/><stop offset="1" stop-color="#3F6017"/></radialGradient>
+<linearGradient id="fundo-m8-g-lingua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FAB"/><stop offset="1" stop-color="#E5547A"/></linearGradient>
+<linearGradient id="fundo-m8-g-gota" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F7FF"/><stop offset="1" stop-color="#7CC8F2"/></linearGradient>
+<linearGradient id="fundo-m8-g-estrela" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF176"/><stop offset="1" stop-color="#FFB300"/></linearGradient>
+<radialGradient id="fundo-m8-g-esfera" cx="0.36" cy="0.3" r="0.78"><stop offset="0.5" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.38"/></radialGradient>
+<filter id="fundo-m8-f-adesivo" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/><feFlood flood-color="#FFFFFF" flood-opacity="0.92"/><feComposite in2="d" operator="in" result="borda"/><feMerge><feMergeNode in="borda"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="fundo-m8-f-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="fundo-m8-f-sombra" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
 </defs>
-<g filter="url(#fundo-m100-f-adesivo)"><g transform="rotate(-7 128 236)">
+<g filter="url(#fundo-m8-f-adesivo)"><g transform="rotate(-7 128 236)">
 <g><path d="M62 60 Q90 40 116 54" fill="none" stroke="#3A2A22" stroke-width="11" stroke-linecap="round"/></g><path d="M146 78 Q166 72 186 78" fill="none" stroke="#3A2A22" stroke-width="9" stroke-linecap="round"/>
 <g><g>
-<ellipse cx="90" cy="111" rx="37" ry="40" fill="#5A8A22" opacity="0.45" filter="url(#fundo-m100-f-sombra)"/>
-<clipPath id="fundo-m100-clip-olho-1"><ellipse cx="90" cy="108" rx="32" ry="35"/></clipPath>
-<ellipse cx="90" cy="108" rx="32" ry="35" fill="url(#fundo-m100-g-olho)"/>
-<g clip-path="url(#fundo-m100-clip-olho-1)"><g transform="translate(6 -6)"><circle cx="90" cy="110" r="15" fill="url(#fundo-m100-g-iris)"/><circle cx="90" cy="110" r="8.25" fill="#111111"/><circle cx="84.3" cy="103.7" r="3.6" fill="#FFFFFF"/><circle cx="94.5" cy="115.25" r="1.5" fill="#FFFFFF" opacity="0.8"/></g><g transform="rotate(0 90 67)"><rect x="28" y="-43" width="124" height="110" fill="url(#fundo-m100-g-corpo)"/><line x1="28" y1="67" x2="152" y2="67" stroke="#466B1A" stroke-width="4"/></g></g>
+<ellipse cx="90" cy="111" rx="37" ry="40" fill="#5A8A22" opacity="0.45" filter="url(#fundo-m8-f-sombra)"/>
+<clipPath id="fundo-m8-clip-olho-1"><ellipse cx="90" cy="108" rx="32" ry="35"/></clipPath>
+<ellipse cx="90" cy="108" rx="32" ry="35" fill="url(#fundo-m8-g-olho)"/>
+<g clip-path="url(#fundo-m8-clip-olho-1)"><g transform="translate(6 -6)"><circle cx="90" cy="110" r="15" fill="url(#fundo-m8-g-iris)"/><circle cx="90" cy="110" r="8.25" fill="#111111"/><circle cx="84.3" cy="103.7" r="3.6" fill="#FFFFFF"/><circle cx="94.5" cy="115.25" r="1.5" fill="#FFFFFF" opacity="0.8"/></g><g transform="rotate(0 90 67)"><rect x="28" y="-43" width="124" height="110" fill="url(#fundo-m8-g-corpo)"/><line x1="28" y1="67" x2="152" y2="67" stroke="#466B1A" stroke-width="4"/></g></g>
 <ellipse cx="90" cy="108" rx="32" ry="35" fill="none" stroke="#466B1A" stroke-width="2" opacity="0.55"/>
 </g></g><g opacity="0"><path d="M60 112 Q90 124 120 112" fill="none" stroke="#3A2A22" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g>
 <g><g>
-<ellipse cx="166" cy="117" rx="26" ry="27" fill="#5A8A22" opacity="0.45" filter="url(#fundo-m100-f-sombra)"/>
-<clipPath id="fundo-m100-clip-olho-2"><ellipse cx="166" cy="114" rx="21" ry="22"/></clipPath>
-<ellipse cx="166" cy="114" rx="21" ry="22" fill="url(#fundo-m100-g-olho)"/>
-<g clip-path="url(#fundo-m100-clip-olho-2)"><g transform="translate(4 -4)"><circle cx="166" cy="116" r="12" fill="url(#fundo-m100-g-iris)"/><circle cx="166" cy="116" r="6.6" fill="#111111"/><circle cx="161.44" cy="110.96" r="3" fill="#FFFFFF"/><circle cx="169.6" cy="120.2" r="1.5" fill="#FFFFFF" opacity="0.8"/></g><g transform="rotate(0 166 86)"><rect x="115" y="2" width="102" height="84" fill="url(#fundo-m100-g-corpo)"/><line x1="115" y1="86" x2="217" y2="86" stroke="#466B1A" stroke-width="4"/></g></g>
+<ellipse cx="166" cy="117" rx="26" ry="27" fill="#5A8A22" opacity="0.45" filter="url(#fundo-m8-f-sombra)"/>
+<clipPath id="fundo-m8-clip-olho-2"><ellipse cx="166" cy="114" rx="21" ry="22"/></clipPath>
+<ellipse cx="166" cy="114" rx="21" ry="22" fill="url(#fundo-m8-g-olho)"/>
+<g clip-path="url(#fundo-m8-clip-olho-2)"><g transform="translate(4 -4)"><circle cx="166" cy="116" r="12" fill="url(#fundo-m8-g-iris)"/><circle cx="166" cy="116" r="6.6" fill="#111111"/><circle cx="161.44" cy="110.96" r="3" fill="#FFFFFF"/><circle cx="169.6" cy="120.2" r="1.5" fill="#FFFFFF" opacity="0.8"/></g><g transform="rotate(0 166 86)"><rect x="115" y="2" width="102" height="84" fill="url(#fundo-m8-g-corpo)"/><line x1="115" y1="86" x2="217" y2="86" stroke="#466B1A" stroke-width="4"/></g></g>
 <ellipse cx="166" cy="114" rx="21" ry="22" fill="none" stroke="#466B1A" stroke-width="2" opacity="0.55"/>
 </g></g><g opacity="0"><path d="M147 118 Q166 130 185 118" fill="none" stroke="#3A2A22" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></g>
 <ellipse cx="136" cy="178" rx="9" ry="10" fill="#4A1616" stroke="#5A8A22" stroke-width="3"/></g></g>
 </svg></g><g opacity="1"><svg x="795" y="995.13" width="110" height="110" viewBox="16.2 17.2 223.6 223.6"><defs>
-<radialGradient id="fundo-m101-g-corpo" gradientUnits="userSpaceOnUse" cx="94.4" cy="76.72" r="184.8">
+<radialGradient id="fundo-m9-g-corpo" gradientUnits="userSpaceOnUse" cx="94.4" cy="76.72" r="184.8">
 <stop offset="0" stop-color="#FFA6C9"/><stop offset="0.45" stop-color="#FF6FA8"/><stop offset="1" stop-color="#C75783"/></radialGradient>
 
-<radialGradient id="fundo-m101-g-olho" cx="0.4" cy="0.35" r="0.75"><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9DEE6"/></radialGradient>
-<radialGradient id="fundo-m101-g-iris" cx="0.45" cy="0.6" r="0.6"><stop offset="0" stop-color="#FF93BE"/><stop offset="0.7" stop-color="#BF537E"/><stop offset="1" stop-color="#73324C"/></radialGradient>
-<linearGradient id="fundo-m101-g-lingua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FAB"/><stop offset="1" stop-color="#E5547A"/></linearGradient>
-<linearGradient id="fundo-m101-g-gota" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F7FF"/><stop offset="1" stop-color="#7CC8F2"/></linearGradient>
-<linearGradient id="fundo-m101-g-estrela" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF176"/><stop offset="1" stop-color="#FFB300"/></linearGradient>
-<radialGradient id="fundo-m101-g-esfera" cx="0.36" cy="0.3" r="0.78"><stop offset="0.5" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.38"/></radialGradient>
-<filter id="fundo-m101-f-adesivo" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/><feFlood flood-color="#FFFFFF" flood-opacity="0.92"/><feComposite in2="d" operator="in" result="borda"/><feMerge><feMergeNode in="borda"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<filter id="fundo-m101-f-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
-<filter id="fundo-m101-f-sombra" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
+<radialGradient id="fundo-m9-g-olho" cx="0.4" cy="0.35" r="0.75"><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9DEE6"/></radialGradient>
+<radialGradient id="fundo-m9-g-iris" cx="0.45" cy="0.6" r="0.6"><stop offset="0" stop-color="#FF93BE"/><stop offset="0.7" stop-color="#BF537E"/><stop offset="1" stop-color="#73324C"/></radialGradient>
+<linearGradient id="fundo-m9-g-lingua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FAB"/><stop offset="1" stop-color="#E5547A"/></linearGradient>
+<linearGradient id="fundo-m9-g-gota" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F7FF"/><stop offset="1" stop-color="#7CC8F2"/></linearGradient>
+<linearGradient id="fundo-m9-g-estrela" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF176"/><stop offset="1" stop-color="#FFB300"/></linearGradient>
+<radialGradient id="fundo-m9-g-esfera" cx="0.36" cy="0.3" r="0.78"><stop offset="0.5" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.38"/></radialGradient>
+<filter id="fundo-m9-f-adesivo" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/><feFlood flood-color="#FFFFFF" flood-opacity="0.92"/><feComposite in2="d" operator="in" result="borda"/><feMerge><feMergeNode in="borda"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="fundo-m9-f-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="fundo-m9-f-sombra" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
 </defs>
-<g filter="url(#fundo-m101-f-adesivo)"><g>
+<g filter="url(#fundo-m9-f-adesivo)"><g>
 <path d="M68 66 Q90 54 112 62" fill="none" stroke="#3A2A22" stroke-width="11" stroke-linecap="round"/><path d="M144 62 Q166 54 188 66" fill="none" stroke="#3A2A22" stroke-width="11" stroke-linecap="round"/>
 <g><path d="M92 132.5 C53 107 68 78.5 92 96.5 C116 78.5 131 107 92 132.5 Z" fill="#E5484D" stroke="#B3202A" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="79.4" cy="97.4" rx="5.4" ry="3.3" fill="#FFFFFF" opacity="0.8" transform="rotate(-35 79.4 97.4)"/></g><g><path d="M164 132.5 C125 107 140 78.5 164 96.5 C188 78.5 203 107 164 132.5 Z" fill="#E5484D" stroke="#B3202A" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="151.4" cy="97.4" rx="5.4" ry="3.3" fill="#FFFFFF" opacity="0.8" transform="rotate(-35 151.4 97.4)"/></g>
-<ellipse cx="62" cy="150" rx="18" ry="11" fill="#FF5C8A" opacity="0.55" filter="url(#fundo-m101-f-sombra)"/><ellipse cx="194" cy="150" rx="18" ry="11" fill="#FF5C8A" opacity="0.55" filter="url(#fundo-m101-f-sombra)"/>
+<ellipse cx="62" cy="150" rx="18" ry="11" fill="#FF5C8A" opacity="0.55" filter="url(#fundo-m9-f-sombra)"/><ellipse cx="194" cy="150" rx="18" ry="11" fill="#FF5C8A" opacity="0.55" filter="url(#fundo-m9-f-sombra)"/>
 <path d="M96 164 Q128 192 160 164" fill="none" stroke="#3A2A22" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></g><g transform="translate(196 70) scale(0.6 0.6) translate(-196 -70)" opacity="0"><path d="M196 79 C180.4 68.8 186.4 57.4 196 64.6 C205.6 57.4 211.6 68.8 196 79 Z" fill="#E5484D" stroke="#B3202A" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="190.96" cy="64.96" rx="2.16" ry="1.32" fill="#FFFFFF" opacity="0.8" transform="rotate(-35 190.96 64.96)"/></g><g transform="translate(0 -20) translate(218 110) scale(0.8 0.8) translate(-218 -110)"><path d="M218 119 C202.4 108.8 208.4 97.4 218 104.6 C227.6 97.4 233.6 108.8 218 119 Z" fill="#E5484D" stroke="#B3202A" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="212.96" cy="104.96" rx="2.16" ry="1.32" fill="#FFFFFF" opacity="0.8" transform="rotate(-35 212.96 104.96)"/></g></g>
 </svg></g><circle cx="738" cy="352" r="63.6" fill="none" stroke="#3B3B3B" stroke-width="34.8" opacity="0.9"/></svg>

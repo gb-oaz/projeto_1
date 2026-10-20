@@ -40,6 +40,7 @@ const ICONES = {
   arrastar: 'M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',
   cima: 'M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z',
   baixo: 'M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z',
+  repetir: 'M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z',
   chat: 'M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z',
 };
 
@@ -76,7 +77,8 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
   const meio = (y, h, papel) => y + h / 2 + tipos[papel].size * 0.35;
 
   // ── componentes ──
-  function botao(e, x, y, rotulo, variante, { icon, desabilitado, mascote: mx } = {}) {
+  // sobreFundo: botão de texto solto na tela (sobre a Estampa) ganha o fundo da tela; dentro de card e diálogo fica transparente
+  function botao(e, x, y, rotulo, variante, { icon, desabilitado, mascote: mx, sobreFundo = false } = {}) {
     const h = num('button-height'), papel = tipoDe('button-label');
     const pad = variante === 'text' ? num('button-text-padding') : num('button-padding');
     const padIc = num('button-padding-with-icon'), tamIc = num('button-icon-size'), gap = num('button-gap');
@@ -87,8 +89,8 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
       filled: [cor(e, 'button-filled-container-color'), cor(e, 'button-filled-label-color'), nivel('button-filled-elevation')],
       tonal: [cor(e, 'button-tonal-container-color'), cor(e, 'button-tonal-label-color'), nivel('button-tonal-elevation')],
       elevated: [cor(e, 'button-elevated-container-color'), cor(e, 'button-elevated-label-color'), nivel('button-elevated-elevation')],
-      outlined: [null, cor(e, 'button-outlined-label-color'), null],
-      text: [null, cor(e, 'button-text-label-color'), null],
+      outlined: [cor(e, 'button-outlined-container-color'), cor(e, 'button-outlined-label-color'), null],
+      text: [sobreFundo ? cor(e, 'button-text-container-color') : null, cor(e, 'button-text-label-color'), null],
     }[variante];
     let [bg, fg, el] = V;
     let borda = variante === 'outlined' ? `stroke="${cor(e, 'button-outlined-outline-color')}" stroke-width="${num('button-outlined-outline-width')}"` : '';
@@ -130,15 +132,17 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     return { w: h, svg: rect(x, y, h, h, r, bg, sombra(el)) + icone('add', x + (h - ti) / 2, y + (h - ti) / 2, ti, fg) };
   }
 
-  function chip(e, x, y, rotulo, { icon, selecionado } = {}) {
+  // chip; com largura, ocupa o espaço dado com o conteúdo centrado (opções que dividem a linha por igual)
+  function chip(e, x, y, rotulo, { icon, selecionado, largura: cheio } = {}) {
     const h = num('chip-height'), papel = tipoDe('chip-label'), p = num('chip-padding'), pi = num('chip-padding-with-icon'), ti = num('chip-icon-size');
     const ic = selecionado ? 'check' : icon;
-    const w = Math.round(largura(rotulo, papel) + (ic ? pi + ti + 8 + p : 2 * p));
+    const nat = Math.round(largura(rotulo, papel) + (ic ? pi + ti + 8 + p : 2 * p)), w = cheio || nat, dx = cheio ? (cheio - nat) / 2 : 0;
+    x += dx;
     const r = canto('chip-shape', h);
-    const bg = selecionado ? cor(e, 'chip-selected-container-color') : null;
+    const bg = selecionado ? cor(e, 'chip-selected-container-color') : cor(e, 'chip-container-color');
     const fg = selecionado ? cor(e, 'chip-selected-label-color') : cor(e, 'chip-label-color');
     const borda = selecionado ? '' : `stroke="${cor(e, 'chip-outline-color')}"`;
-    return { w, svg: rect(x + 0.5, y + 0.5, w - 1, h - 1, r, bg, borda) + (ic ? icone(ic, x + pi, y + (h - ti) / 2, ti, selecionado ? fg : e.primary) : '') + txt(ic ? x + pi + ti + 8 : x + w / 2, meio(y, h, papel), rotulo, papel, fg, ic ? 'start' : 'middle') };
+    return { w, svg: rect(x - dx + 0.5, y + 0.5, w - 1, h - 1, r, bg, borda) + (ic ? icone(ic, x + pi, y + (h - ti) / 2, ti, selecionado ? fg : e.primary) : '') + txt(ic ? x + pi + ti + 8 : x + nat / 2, meio(y, h, papel), rotulo, papel, fg, ic ? 'start' : 'middle') };
   }
 
   function card(e, x, y, w, h, tipo, titulo, linhas) {
@@ -161,9 +165,11 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     let s = '';
     if (tipo === 'outlined') {
       const r = canto('text-field-outlined-shape', h);
-      s += rect(x + 1, y + 1, w - 2, h - 2, r, null, `stroke="${destaque}" stroke-width="2"`);
-      const lw = largura(rotulo, pp) + 8;
-      s += `<rect x="${x + p - 4}" y="${y - 2}" width="${lw}" height="4" fill="${e.surface}"/>`;
+      // contêiner com o fundo da tela: o valor e o rótulo ficam legíveis sobre a Estampa
+      const fc = cor(e, 'text-field-outlined-container-color');
+      s += rect(x + 1, y + 1, w - 2, h - 2, r, fc, `stroke="${destaque}" stroke-width="2"`);
+      const lw = largura(rotulo, pp) + 8, la = tipos[pp].size;
+      s += `<rect x="${x + p - 4}" y="${y - la * 0.7}" width="${lw}" height="${la * 0.7 + 3}" fill="${fc}"/>`;
       s += txt(x + p, y + tipos[pp].size * 0.35, rotulo, pp, destaque);
       s += txt(x + p, meio(y, h, pl), valor, pl, cor(e, 'text-field-input-color'));
     } else {
@@ -280,7 +286,7 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     const ws = cheio ? rotulos.map((r, i) => (i < rotulos.length - 1 ? Math.round(cheio / rotulos.length) : cheio - Math.round(cheio / rotulos.length) * (rotulos.length - 1)))
       : rotulos.map((r, i) => Math.round(largura(r, papel) + 2 * p + (i === sel ? ti + 8 : 0)));
     const w = ws.reduce((a, b) => a + b, 0), r = canto('segmented-button-shape', h), linha = cor(e, 'segmented-button-outline-color');
-    let s = '', cx = x;
+    let s = rect(x, y, w, h, r, cor(e, 'segmented-button-container-color')), cx = x;
     rotulos.forEach((t, i) => {
       const at = i === sel;
       if (at) s += `<path d="${i === 0 ? `M${cx + r} ${y}H${cx + ws[i]}V${y + h}H${cx + r}a${r} ${r} 0 0 1 0 -${h}Z` : i === rotulos.length - 1 ? `M${cx} ${y}H${cx + ws[i] - r}a${r} ${r} 0 0 1 0 ${h}H${cx}Z` : `M${cx} ${y}h${ws[i]}v${h}h-${ws[i]}Z`}" fill="${cor(e, 'segmented-button-selected-container-color')}"/>`;
@@ -308,7 +314,8 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     const d = num('carousel-indicator-dot-size'), aw = num('carousel-indicator-active-width'), g = num('carousel-indicator-gap'), papel = tipoDe('carousel-position-label');
     const pw = aw + (total - 1) * (d + g), pos = `${atual + 1} de ${total}`, tw = largura(pos, papel);
     const bloco = pw + 16 + tw, s0 = x + (w - bloco) / 2, cy = y + 20;
-    let s = iconButton(e, x, y, 'anterior', 'padrao').svg + iconButton(e, x + w - num('icon-button-size'), y, 'proximo', 'padrao').svg;
+    let s = rect(x, y, w, num('icon-button-size'), num('icon-button-size') / 2, cor(e, 'carousel-controls-container-color'))
+      + iconButton(e, x, y, 'anterior', 'padrao').svg + iconButton(e, x + w - num('icon-button-size'), y, 'proximo', 'padrao').svg;
     let cx = s0;
     for (let i = 0; i < total; i++) {
       const ww = i === atual ? aw : d;
@@ -338,7 +345,7 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
   // à direita os avisos e a conta (hub) ou o perfil ativo com troca de perfil e a foto (quest)
   // topo da casca, igual no hub e no quest: logo (hastes longas no hub, curtas no quest), avisos, o nome
   // (instituição ou pessoa logada no hub, usuário no quest) e a foto; o toque no nome ou na foto abre as ações
-  // conta = false (compact e medium): só o logo e os avisos; a conta fica no destino Conta da navegação
+  // conta = false (compact): só o logo e os avisos; a conta fica no destino Conta (Perfil no quest) da barra
   function topoCasca(e, x, y, w, { quest, nome = 'Escola Horizonte', letra = 'E', n = '2', conta = true } = {}) {
     const h = num('top-app-bar-height'), ib = num('icon-button-size'), tx = x + w - 56, v = quest ? 'curto' : 'longo';
     if (!conta) return rect(x, y, w, h, 0, cor(e, 'top-app-bar-container-color')) + logoNaBarra(e, x + 16, y, h, v)
@@ -375,8 +382,45 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
         + txt(cx, y + 12 + ih + 4 + tipos[papel].size, r, papel, at ? cor(e, 'navigation-bar-active-label-color') : cor(e, 'navigation-bar-label-color'), 'middle');
     }).join('');
   }
-  function cardModulo(e, x, y, w, h, ic, titulo, { apoio, estado, n, ordenando } = {}) {
+  // card de módulo; com metrica, é o painel do módulo para quem cuida dele (instituição, educador): o número principal em
+  // primary com a tendência (sucesso quando melhora, erro quando piora), uma série num gráfico ou uma barra de progresso e até
+  // três números de apoio com a cor da paleta que diz o que significam (secondary, tertiary, sucesso, erro). Sem mascotes:
+  // tom profissional. Sem métrica ainda, pede para configurar
+  const COR_MET = (e, c) => ({ secondary: e.secondary, tertiary: e.tertiary, sucesso: e.sucesso, error: e.error, primary: e.primary }[c] || e['on-surface-variant']);
+  function cardModulo(e, x, y, w, h, ic, titulo, { apoio, estado, n, ordenando, metrica } = {}) {
     const p = num('card-padding');
+    if (metrica !== undefined) {
+      let s = rect(x, y, w, h, canto('card-shape', h), cor(e, 'card-filled-container-color')) + caixaIcone(e, x + p, y + p, ic);
+      const corta = (t, papel, m) => { while (largura(t, papel) > m && t.length > 4) t = t.slice(0, -2).trimEnd() + '…'; return t; };
+      s += txt(x + p + 52, y + p + 26, corta(titulo, 'title-medium', w - 2 * p - 80), 'title-medium', e['on-surface']);
+      if (n) s += selo(e, x + w - 20, y + 20, n);
+      if (!metrica) {
+        quebrar(apoio || 'Configure o módulo para ver os números da sua gestão', w - 2 * p, 'body-medium').slice(0, 2).forEach((l, k) => { s += txt(x + p, y + 84 + k * 20, l, 'body-medium', e['on-surface-variant']); });
+        if (estado) { const ew = largura(estado, 'label-medium') + 16; s += rect(x + p, y + h - p - 24, ew, 24, cantos.small, e['tertiary-container']) + txt(x + p + 8, meio(y + h - p - 24, 24, 'label-medium'), estado, 'label-medium', e['on-tertiary-container']); }
+        return s;
+      }
+      const { valor, rotulo, tendencia, melhora, serie, progresso, extras = [] } = metrica, y0 = y + 72, gw = serie ? Math.min(132, w * 0.36) : 0;
+      s += txt(x + p, y0 + 28, valor, 'headline-medium', e.primary);
+      if (tendencia) {
+        // a seta diz para onde o número foi; a cor diz se isso é bom (melhora: padrão subir é bom; false quando cair é bom)
+        const sobe = !tendencia.startsWith('-'), bom = melhora ?? sobe, tw = largura(tendencia, 'label-medium') + 30, tx = x + p + largura(valor, 'headline-medium') * 1.08 + 12, bg = bom ? e['sucesso-container'] : e['error-container'], fg = bom ? e['on-sucesso-container'] : e['on-error-container'];
+        s += rect(tx, y0 + 8, tw, 24, 12, bg) + icone(sobe ? 'cima' : 'baixo', tx + 6, y0 + 11, 18, fg) + txt(tx + 24, meio(y0 + 8, 24, 'label-medium'), tendencia, 'label-medium', fg);
+      }
+      s += txt(x + p, y0 + 50, corta(rotulo, 'body-medium', w - 2 * p - gw - 12), 'body-medium', e['on-surface-variant']);
+      if (serie) s += graficoBarras(e, x + w - p - gw, y0, gw, 54, serie, { destaque: serie.length - 1, barraMax: 16 });
+      let ye = y0 + 66;
+      if (progresso !== undefined) { s += rect(x + p, ye, w - 2 * p, 8, 4, e['surface-container-highest']) + rect(x + p, ye, Math.max(8, (w - 2 * p) * progresso), 8, 4, e.primary); ye += 18; }
+      if (extras.length) {
+        s += `<rect x="${x + p}" y="${ye}" width="${w - 2 * p}" height="1" fill="${e['outline-variant']}"/>`;
+        const cw = (w - 2 * p) / extras.length;
+        extras.forEach(([v, r, c], k) => {
+          const cx = x + p + k * cw, cc = COR_MET(e, c);
+          s += `<circle cx="${cx + 5}" cy="${ye + 23}" r="5" fill="${cc}"/>` + txt(cx + 16, ye + 28, v, 'title-medium', cc)
+            + quebrar(r, cw - 12, 'body-small').slice(0, 2).map((l, kk) => txt(cx, ye + 46 + kk * 16, l, 'body-small', e['on-surface-variant'])).join('');
+        });
+      }
+      return s;
+    }
     let s = rect(x, y, w, h, canto('card-shape', h), cor(e, 'card-filled-container-color'), ordenando ? `stroke="${e.outline}" stroke-dasharray="4 3"` : '');
     s += ordenando ? icone('arrastar', x + p, y + p, 24, e['on-surface-variant']) : caixaIcone(e, x + p, y + p, ic);
     s += txt(x + p, y + p + 64, titulo, 'title-medium', e['on-surface']);
@@ -417,6 +461,127 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
       + iconButton(e, x + w - 48, y + (h - 40) / 2, 'more', 'padrao').svg;
   }
   // aviso: com compacto, a ação vira um botão de ícone (tonal) e sobra espaço para o texto, que quebra em até duas linhas
+  // card de tarefa (quest): módulo de origem, título, hora em destaque e prazo em texto. Cor do estado na borda e na hora:
+  // primary dentro do prazo, tertiary vencida, neutra sem prazo. Ponto no canto: sucesso = pode fazer, erro = bloqueada.
+  // agora: acontecendo neste momento, com o fundo Símbolo recortado e um mascote animado (parado com movimento reduzido)
+  // envios: quantas vezes a tarefa pode ser enviada e quantas já foram (Envio único · 0 de 1, Até 3 envios · 1 de 3, Envios livres · 4 feitos)
+  function cardTarefa(e, x, y, w, { modulo, titulo, hora, prazo, envios, estado = 'prazo', liberada = true, agora = null }) {
+    const h = (agora ? 120 : 96) + (envios ? 22 : 0), cs = estado === 'vencida' ? e.tertiary : estado === 'livre' ? e['on-surface-variant'] : e.primary;
+    const borda = estado === 'livre' ? cor(e, 'card-outlined-outline-color') : cs, id = `${prefixo}ct${++ncard}`, r = canto('card-shape', h);
+    let s = rect(x, y, w, h, r, cor(e, 'card-outlined-container-color'));
+    if (agora && desenharFundo) s += `<clipPath id="${id}">${rect(x, y, w, h, r, '#000000')}</clipPath><g clip-path="url(#${id})">`
+      + desenharFundo('recorte', { largura: w, altura: h, pecas: 'ambos', cores: { ...e, mascote: '' }, mascote: { expressao: agora[0], forma: agora[1], movimento: agora[2] || 'pular' }, movimentoReduzido: false })
+        .replace(/id="([^"]+)"/g, `id="${id}$1"`).replace(/url\(#([^)]+)\)/g, `url(#${id}$1)`).replace(/href="#([^"]+)"/g, `href="#${id}$1"`)
+        .replace('<svg ', `<svg x="${x}" y="${y}" `) + '</g>';
+    s += rect(x + (agora ? 1 : 0.5), y + (agora ? 1 : 0.5), w - (agora ? 2 : 1), h - (agora ? 2 : 1), r, null, `stroke="${borda}" stroke-width="${agora ? 2 : 1}"`);
+    const tw = w - 32 - (agora ? 72 : 12), corta = (t, p, m = tw) => { while (largura(t, p) > m && t.length > 4) t = t.slice(0, -2).trimEnd() + '…'; return t; };
+    let yy = y + 26;
+    if (agora) { const aw = largura('Agora', 'label-small') + 16; s += rect(x + 16, y + 12, aw, 20, 10, e.primary) + txt(x + 16 + aw / 2, y + 26, 'Agora', 'label-small', e['on-primary'], 'middle'); yy = y + 50; }
+    s += txt(x + 16, yy, corta(modulo, 'label-medium'), 'label-medium', e['on-surface-variant']) + txt(x + 16, yy + 24, corta(titulo, 'title-medium'), 'title-medium', e['on-surface']);
+    const hw = largura(hora, 'label-large');
+    s += icone('relogio', x + 16, yy + 36, 18, cs) + txt(x + 40, yy + 50, hora, 'label-large', cs) + (prazo && !agora && tw - 24 - hw - 6 > 40 ? txt(x + 40 + hw + 6, yy + 50, corta('· ' + prazo, 'body-small', tw - 24 - hw - 6), 'body-small', e['on-surface-variant']) : '');
+    if (envios) s += icone('repetir', x + 16, yy + 58, 18, e['on-surface-variant']) + txt(x + 40, yy + 72, corta(envios, 'body-medium', w - 56 - (agora ? 72 : 0)), 'body-medium', e['on-surface-variant']);
+    s += `<circle cx="${x + w - 14}" cy="${y + 14}" r="6" fill="${liberada ? e.sucesso : e.error}" stroke="${cor(e, 'card-outlined-container-color')}" stroke-width="2"/>`;
+    return s;
+  }
+  // vitrine de telas: as telas do módulo num computador (hub) e num celular (quest), com o carrossel das telas;
+  // enquanto o módulo não tem as imagens, cada tela é um espaço com o nome dela. Devolve a altura em h
+  function vitrineTelas(e, x, y, w, { telas = [['computador', 'Tela do hub'], ['celular', 'Tela do quest']], total = 4, atual = 0 } = {}) {
+    const cw = w * 0.8, ch = cw * 0.62, ph = ch * 0.95, pw = ph / 1.9, oy = ch * 0.25;
+    let s = '';
+    // tela estreita (celular): o nome em duas linhas (frente · tela), sem o apoio
+    const espacoTela = (tx, ty, tw, th, rot) => rect(tx, ty, tw, th, cantos.small, e['surface-container-low'], `stroke="${e.outline}" stroke-dasharray="5 4"`)
+      + (tw < 140 ? rot.split(' · ').map((l, k, a) => txt(tx + tw / 2, ty + th / 2 + (k - (a.length - 1) / 2) * 16 + 4, l, 'label-small', e['on-surface-variant'], 'middle')).join('')
+        : txt(tx + tw / 2, ty + th / 2 - 4, rot, 'label-large', e['on-surface-variant'], 'middle') + txt(tx + tw / 2, ty + th / 2 + 14, tw < 300 ? 'imagem do módulo' : 'imagem quando o módulo estiver pronto', 'label-small', e['on-surface-variant'], 'middle'));
+    // computador: janela com a barra de três pontos
+    s += rect(x, y, cw, ch, cantos.medium, e['surface-container-highest'], sombra('level1'));
+    [0, 1, 2].forEach((i) => { s += `<circle cx="${x + 14 + i * 12}" cy="${y + 12}" r="3.5" fill="${e['outline-variant']}"/>`; });
+    s += espacoTela(x + 8, y + 24, cw - 16, ch - 32, telas[0][1]);
+    // celular: na frente, à direita e mais abaixo
+    const px = x + w - pw, py = y + oy;
+    s += rect(px, py, pw, ph, cantos.large, e['inverse-surface'], sombra('level2')) + espacoTela(px + 6, py + 14, pw - 12, ph - 28, telas[1][1]);
+    s += rect(px + pw / 2 - 14, py + 5, 28, 4, 2, e['inverse-on-surface']);
+    const fim = Math.max(y + ch, py + ph) + 16;
+    s += controlesCarrossel(e, x + (w - Math.min(w, 320)) / 2, fim, Math.min(w, 320), total, atual);
+    return { svg: s, h: fim + 40 - y };
+  }
+  // gráfico de barras (base): valores em barras verticais com o topo arredondado; a barra em destaque em primary,
+  // as outras em secondary-container, linha de base em outline-variant; rótulos (opcional) embaixo, valores (opcional) em cima
+  function graficoBarras(e, x, y, w, h, valores, { destaque = -1, rotulos = null, mostrarValores = false, gap = 4, barraMax = 40 } = {}) {
+    const n = valores.length, max = Math.max(...valores, 1), bw = Math.min(barraMax, (w - gap * (n - 1)) / n), base = y + h - (rotulos ? 18 : 0), alto = base - y - (mostrarValores ? 18 : 0);
+    let s = `<rect x="${x}" y="${base}" width="${w}" height="1" fill="${e['outline-variant']}"/>`;
+    valores.forEach((v, i) => {
+      const bh = Math.max(2, alto * v / max), bx = x + i * (bw + gap), r = Math.min(bw / 2, 4), c = i === destaque ? e.primary : e['secondary-container'];
+      s += `<path d="M${bx} ${base}V${base - bh + r}a${r} ${r} 0 0 1 ${r} -${r}H${bx + bw - r}a${r} ${r} 0 0 1 ${r} ${r}V${base}Z" fill="${c}"/>`;
+      if (mostrarValores) s += txt(bx + bw / 2, base - bh - 6, String(v), 'label-small', i === destaque ? e.primary : e['on-surface-variant'], 'middle');
+      if (rotulos) s += txt(bx + bw / 2, base + 14, rotulos[i], 'label-small', e['on-surface-variant'], 'middle');
+    });
+    return s;
+  }
+  // card de desafio (quest, tarefa sem prazo): cabeçalho do card de tarefa; pódio com os 3 primeiros como mascotes em forma de
+  // número (2º, 1º, 3º) sobre blocos de alturas diferentes; 4º e 5º em linhas com barra de pontos; a posição de quem está vendo em
+  // destaque (no pódio, numa linha ou depois de ···); as tentativas num gráfico de barras e Jogar de novo (Envios esgotados quando acabam).
+  // ranking: [[nome, pontos]] (5), voce: { pos, pontos }, tentativas: [pontos por envio]
+  // pódio em festa: cada colocado com uma expressão feliz e um movimento composto (parados com movimento reduzido)
+  const PODIO = [['estrela', ['comemorar', 'pular', 'dancar']], ['rindo', ['dancar', 'balancar']], ['feliz', ['pular', 'balancar']]];
+  const fmtPts = (v) => String(v).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  function cardDesafio(e, x, y, w, { modulo, titulo, envios, liberada = true, ranking, voce, tentativas = [] }) {
+    const p = 16, lh = 34, resto = ranking.slice(3), fora = voce.pos > ranking.length, hp = 132;
+    const h = 96 + 28 + hp + 8 + resto.length * lh + (fora ? 48 : 0) + 88, r = canto('card-shape', h);
+    let s = rect(x + 0.5, y + 0.5, w - 1, h - 1, r, cor(e, 'card-outlined-container-color'), `stroke="${cor(e, 'card-outlined-outline-color')}"`);
+    const corta = (t, papel, m) => { while (largura(t, papel) > m && t.length > 4) t = t.slice(0, -2).trimEnd() + '…'; return t; };
+    s += txt(x + p, y + 26, corta(modulo, 'label-medium', w - 2 * p - 16), 'label-medium', e['on-surface-variant']) + txt(x + p, y + 50, corta(titulo, 'title-medium', w - 2 * p - 16), 'title-medium', e['on-surface']);
+    s += icone('repetir', x + p, y + 62, 18, e['on-surface-variant']) + txt(x + p + 24, y + 76, corta(envios, 'body-medium', w - 2 * p - 24), 'body-medium', e['on-surface-variant']);
+    s += `<circle cx="${x + w - 14}" cy="${y + 14}" r="6" fill="${liberada ? e.sucesso : e.error}" stroke="${cor(e, 'card-outlined-container-color')}" stroke-width="2"/>`;
+    let yy = y + 96;
+    s += txt(x + p, yy + 16, 'Ranking da tarefa', 'label-large', e['on-surface']);
+    yy += 28;
+    // pódio: 2º à esquerda, 1º no meio (mais alto), 3º à direita
+    const cw = (w - 2 * p - 16) / 3, base = yy + hp, alt = [58, 48, 42], mt = [70, 60, 60];
+    [1, 0, 2].forEach((i, k) => {
+      const cx = x + p + k * (cw + 8), [nome, pts] = ranking[i], eu = voce.pos === i + 1, by = base - alt[i];
+      const bg = eu ? e.primary : i === 0 ? e['primary-container'] : e['secondary-container'], fg = eu ? e['on-primary'] : i === 0 ? e['on-primary-container'] : e['on-secondary-container'];
+      s += masc(PODIO[i][0], { forma: `numero-${i + 1}`, movimento: PODIO[i][1] }, cx + cw / 2 - mt[i] * 0.5, by - mt[i] + 4, mt[i], mt[i]);
+      s += rect(cx, by, cw, alt[i], cantos.small, bg) + txt(cx + cw / 2, by + 18, corta(eu ? 'Você' : nome, 'label-medium', cw - 8), 'label-medium', fg, 'middle')
+        + txt(cx + cw / 2, by + 34, fmtPts(pts), 'label-small', fg, 'middle');
+    });
+    yy = base + 8;
+    const max = Math.max(...ranking.map((l) => l[1]), voce.pontos), nx = x + p + 40, bx = x + p + 40 + Math.min(104, (w - 2 * p) * 0.34), ex = x + w - p - 52;
+    const linha = (pos, nome, pts, eu) => {
+      let t = eu ? rect(x + 8, yy, w - 16, lh - 2, cantos.small, e['secondary-container']) : '';
+      const fg = eu ? e['on-secondary-container'] : e['on-surface'];
+      t += txt(x + p + 14, yy + 21, `${pos}º`, 'label-large', fg, 'middle') + txt(nx, yy + 21, corta(nome, eu ? 'title-small' : 'body-medium', bx - nx - 8), eu ? 'title-small' : 'body-medium', fg);
+      t += rect(bx, yy + 13, ex - bx - 8, 6, 3, e['surface-container-highest']) + rect(bx, yy + 13, Math.max(6, (ex - bx - 8) * pts / max), 6, 3, eu ? e.primary : e.secondary);
+      return t + txt(x + w - p, yy + 21, fmtPts(pts), 'label-large', fg, 'end');
+    };
+    resto.forEach(([nome, pts], i) => { s += linha(i + 4, voce.pos === i + 4 ? 'Você' : nome, pts, voce.pos === i + 4); yy += lh; });
+    if (fora) { s += txt(x + w / 2, yy + 8, '···', 'label-large', e['on-surface-variant'], 'middle'); yy += 14; s += linha(voce.pos, 'Você', voce.pontos, true); yy += lh; }
+    yy += 10;
+    s += `<rect x="${x + p}" y="${yy}" width="${w - 2 * p}" height="1" fill="${e['outline-variant']}"/>`;
+    yy += 12;
+    const gw = Math.min(132, w - 2 * p - 150), melhor = tentativas.length ? tentativas.indexOf(Math.max(...tentativas)) : -1;
+    s += txt(x + p, yy + 14, 'Suas tentativas', 'label-medium', e['on-surface-variant']);
+    if (tentativas.length) s += graficoBarras(e, x + p, yy + 22, gw, 34, tentativas, { destaque: melhor, barraMax: 16 });
+    const acao = !liberada ? null : tentativas.length ? 'Jogar de novo' : 'Jogar';
+    if (acao) { const bb = botao(e, 0, 0, acao, 'tonal'); s += botao(e, x + w - p - bb.w, yy + 16, acao, 'tonal').svg; }
+    else s += txt(x + w - p, yy + 42, 'Envios esgotados', 'label-large', e.error, 'end');
+    return s;
+  }
+  // dia da agenda (quest): divisória que separa um dia do outro e, à esquerda, o dia da semana e o número em secondary
+  // (hoje com o número num círculo cheio); sem dia, o rótulo da seção (Sem prazo)
+  function diaAgenda(e, x, y, w, semana, dia, hoje = false) {
+    let s = `<rect x="${x}" y="${y}" width="${w}" height="1" fill="${e['outline-variant']}"/>`;
+    if (!dia) return s + txt(x, y + 28, semana, 'label-large', e.secondary);
+    s += txt(x + 20, y + 30, semana, 'label-medium', e.secondary, 'middle');
+    return s + (hoje ? `<circle cx="${x + 20}" cy="${y + 50}" r="18" fill="${e.secondary}"/>` + txt(x + 20, y + 57, dia, 'title-medium', e['on-secondary'], 'middle') : txt(x + 20, y + 58, dia, 'title-large', e.secondary, 'middle'));
+  }
+  // quem está acessando (quest): o estudante ou um responsável (marcado), o parentesco num botão segmentado cheio e Entrar; 232 de altura
+  function quemAcessa(e, x, y, w, parentes = ['Mãe', 'Pai', 'Outro']) {
+    let s = rect(x + 0.5, y + 0.5, w - 1, 55, canto('card-shape', 56), null, `stroke="${e['outline-variant']}"`) + icone('perfil', x + 16, y + 16, 24, e['on-surface']) + txt(x + 52, meio(y, 56, 'body-large'), 'Sou o estudante', 'body-large', e['on-surface']);
+    s += rect(x, y + 64, w, 56, canto('card-shape', 56), e['secondary-container']) + icone('perfil', x + 16, y + 80, 24, e['on-secondary-container']) + txt(x + 52, meio(y + 64, 56, 'body-large'), 'Sou responsável', 'body-large', e['on-secondary-container']);
+    s += segmentado(e, x, y + 136, parentes, 0, w).svg;
+    return s + rect(x, y + 188, w, 40, 20, cor(e, 'button-filled-container-color')) + txt(x + w / 2, meio(y + 188, 40, 'label-large'), 'Entrar', 'label-large', cor(e, 'button-filled-label-color'), 'middle');
+  }
   function aviso(e, x, y, w, ic, texto, acao, { compacto = false, iconeAcao = 'proximo' } = {}) {
     const h = 72, ib = num('icon-button-size'), b = acao ? (compacto ? ib : botao(e, 0, 0, acao, 'filled').w) : 0, fg = e['on-secondary-container'];
     const ls = quebrar(texto, w - 56 - (acao ? b + 32 : 16), 'body-medium').slice(0, 2), lh = tipos['body-medium']['line-height'];
@@ -461,11 +626,11 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     return s;
   }
 
-  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3 };
+  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas };
 }
 
 export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo }) {
-  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3 } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo });
+  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo });
 
   // ── componentes no quadro: título, descrição, altura do conteúdo, desenho ──
   const COMPONENTES = [
@@ -513,6 +678,9 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     ['Botão segmentado', 'De 2 a 5 opções curtas lado a lado; a selecionada ganha secondary-container e marcação. Cheio: ocupa o contêiner e divide por igual (formulários no compact).', 96, (e, x, y) =>
       fila([(cx, cy) => segmentado(e, cx, cy, ['Mensal', 'Anual'], 0), (cx, cy) => segmentado(e, cx, cy, ['Claro', 'Escuro', 'Sistema'], 2)], x, y, 24)
       + segmentado(e, x, y + 56, ['Escola', 'Empresa', 'Autônomo'], 0, 328).svg],
+    ['Gráfico de barras', 'Valores lado a lado com o topo arredondado: destaque em primary, os outros em secondary-container; rótulos e valores opcionais. Sempre com o valor também em texto.', 120, (e, x, y) =>
+      graficoBarras(e, x, y, 300, 120, [900, 1200, 1350, 1720, 1600, 1500], { destaque: 3, rotulos: ['1ª', '2ª', '3ª', '4ª', '5ª', '6ª'], mostrarValores: true, gap: 8 })
+      + graficoBarras(e, x + 340, y + 40, 120, 40, [980, 1240], { destaque: 1 })],
     ['Interruptor', 'Liga ou desliga uma opção na hora; trilho de 52 × 32dp, ligado em primary.', 32, (e, x, y) => {
       const x1 = x + (PW - 2 * PAD - 300) / 2;
       return interruptor(e, x1, y, true) + interruptor(e, x1 + 76, y, false) + txt(x1 + 152, y + 21, 'Mascotes nas cores do tema', tipoDe('switch-label'), cor(e, 'switch-label-color'));
@@ -538,21 +706,26 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
 
   // ── componentes compostos no quadro, por frente ──
   const COMPOSTOS = [
-    ['Comum · Topo da casca', 'Hub e quest: logo (hastes longas no hub, curtas no quest) e avisos; a partir do expanded, também o nome (instituição ou pessoa no hub, usuário no quest) e a foto ou o mascote adotado, que abre a conta ou Trocar perfil.', 288, (e, x, y) => {
+    ['Comum · Topo da casca', 'Hub e quest: logo (hastes longas no hub, curtas no quest) e avisos; a partir do medium, também o nome (instituição ou pessoa no hub, usuário no quest) e a foto (sem foto, a inicial no hub e o mascote adotado no quest), que abre a conta ou Trocar perfil.', 288, (e, x, y) => {
       const x1 = x + (PW - 2 * PAD - 360) / 2;
       return topoCasca(e, x1, y, 360, { conta: false }) + topoCasca(e, x1, y + 80, 360) + topoCasca(e, x1, y + 160, 360, { quest: true, nome: 'Lucas Andrade', letra: ['feliz', 'estrela'] })
         + menu(e, x1 + 360 - 240, y + 224, 240, [['voltar', 'Trocar perfil']]).svg;
     }],
-    ['Comum · Navegação da casca', 'Três destinos com selo: barra no compact, trilho no medium e no expanded, gaveta a partir do large.', 80, (e, x, y) =>
+    ['Comum · Navegação da casca', 'Barra com três destinos no compact; a partir do medium, trilho (gaveta no large) abaixo do topo, sem Conta ou Perfil, que ficam no nome e na foto do topo.', 80, (e, x, y) =>
       nav3(e, x, y, 336, [['modulo', 'Meus módulos'], ['add', 'Catálogo'], ['perfil', 'Conta']]) + nav3(e, x + 356, y, 336, [['evento', 'Tarefas'], ['salvos', 'Fixos'], ['perfil', 'Perfil']], '5')],
-    ['Comum · Card de módulo', 'Meus módulos (hub) e Fixos (quest): nome, apoio, selo de notificações e estado Configurar ou Completar.', 128, (e, x, y) => {
-      const w = (PW - 2 * PAD - 36) / 4;
-      return cardModulo(e, x, y, w, 128, 'check', 'Presença', { apoio: 'Chamada da turma', n: '3' }) + cardModulo(e, x + (w + 12), y, w, 128, 'perfil', 'Carteirinha', { estado: 'Completar', n: '1' })
-        + cardModulo(e, x + 2 * (w + 12), y, w, 128, 'editar', 'Quiz', { estado: 'Configurar' }) + cardModulo(e, x + 3 * (w + 12), y, w, 128, 'chat', 'Suporte', { apoio: 'Módulo da conta' });
+    ['Comum · Card de módulo', 'Meus módulos (hub): painel do módulo com o número principal e a tendência, uma série ou o progresso e números de apoio nas cores da paleta, sem mascotes; Fixos (quest): nome, apoio, selo e estado. Até 2 por linha.', 420, (e, x, y) => {
+      const w = (PW - 2 * PAD - 16) / 2;
+      return cardModulo(e, x, y, w, 236, 'check', 'Presença', { n: '3', metrica: { valor: '94%', rotulo: 'presença na semana', tendencia: '+2 pts', serie: [88, 91, 90, 92, 94], extras: [['12', 'turmas', 'secondary'], ['3', 'sem chamada hoje', 'tertiary'], ['18', 'faltas seguidas', 'error']] } })
+        + cardModulo(e, x + w + 16, y, w, 236, 'perfil', 'Carteirinha', { metrica: { valor: '312 de 340', rotulo: 'carteirinhas prontas', progresso: 0.92, extras: [['21', 'esperando foto', 'tertiary'], ['7', 'sem autorização', 'error'], ['4', 'impressas hoje', 'secondary']] } })
+        + cardModulo(e, x, y + 252, w, 160, 'editar', 'Quiz', { n: '1', estado: 'Configurar', metrica: null })
+        + cardModulo(e, x + w + 16, y + 252, (w - 12) / 2, 128, 'salvos', 'Flashcards', { apoio: 'Estudo · quest' })
+        + cardModulo(e, x + w + 16 + (w - 12) / 2 + 12, y + 252, (w - 12) / 2, 128, 'chat', 'Chat da turma', { n: '5', apoio: '7º A · quest' });
     }],
+    ['Comum · Vitrine de telas', 'Página do módulo (landing) e detalhe no catálogo (hub): as telas do módulo num computador e num celular, com o carrossel; até o módulo ficar pronto, cada tela é um espaço com o nome dela.', 340, (e, x, y) =>
+      vitrineTelas(e, x + (PW - 2 * PAD - 460) / 2, y, 460, { telas: [['computador', 'Hub · chamada da turma'], ['celular', 'Quest · presença']] }).svg],
     ['Comum · Card do catálogo', 'Vitrine da landing page, catálogo do hub e outros módulos: fundo cheio com as Ondas do vão na forma do padrinho, nome, frase, um dado (quem usa ou preço inicial), ação e o mascote padrinho do módulo, metade à vista.', 176, (e, x, y) =>
       cardCatalogo(e, x, y, 338, 'check', 'Presença', 'Chamada em sala, vista pela família.', '120 escolas usando', 'Saiba mais', ['acertou', 'circulo']) + cardCatalogo(e, x + 354, y, 338, 'editar', 'Quiz', 'Salas ao vivo com ranking.', 'a partir de R$ 49,00/mês', 'Ver detalhes', ['estrela', 'estrela'])],
-    ['Comum · Card de acesso', 'Contas acessadas (hub) e perfis acessados (quest): foto (ou o mascote adotado, sem foto), nome, instituição e menu com Remover.', 152, (e, x, y) =>
+    ['Comum · Card de acesso', 'Contas acessadas (hub) e perfis acessados (quest): foto (sem foto, a inicial no hub e o mascote adotado no quest), nome, instituição e menu com Remover.', 152, (e, x, y) =>
       cardAcesso(e, x, y, 420, 'A', 'Ana Souza', 'Escola Horizonte · conta master') + cardAcesso(e, x, y + 80, 420, ['feliz', 'hexagono'], 'Lucas Andrade', 'Escola Horizonte · 7º A · 2026')
       + menu(e, x + 436, y + 72, 240, [['apagar', 'Remover deste aparelho']]).svg],
     ['Comum · Aviso para completar', 'Módulo aberto (hub e quest) e tela de acesso: ícone, texto e ação opcional, em secondary-container; no compact a ação é um botão de ícone, para o texto não ficar coberto.', 248, (e, x, y) =>
@@ -649,19 +822,22 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
       const b2 = botao(e, 0, 0, 'Adicionar', 'text').w, b1 = botao(e, 0, 0, 'Cancelar', 'text').w;
       return s + botao(e, dx + dw - p - b2, dy + 200 - p - 28, 'Adicionar', 'text').svg + botao(e, dx + dw - p - b2 - 8 - b1, dy + 200 - p - 28, 'Cancelar', 'text').svg;
     }],
-    ['Quest · Card de tarefa', 'Tarefas: módulo de origem, título e prazo em texto e data; a que vence hoje ganha destaque também em texto.', 96, (e, x, y) =>
-      [[e.error, 'Exercícios', 'Frações equivalentes', 'Vence hoje · 19/10', e.error], [cor(e, 'card-outlined-outline-color'), 'Flashcards', 'Revisão para a prova', 'Vence em 2 dias · 21/10', e['on-surface-variant']]].map(([borda, m, t, p, cp], i) => {
-        const cx = x + i * 354;
-        return rect(cx + 0.5, y + 0.5, 337, 95, canto('card-shape', 96), cor(e, 'card-outlined-container-color'), `stroke="${borda}"`) + txt(cx + 16, y + 26, m, 'label-medium', e['on-surface-variant'])
-          + txt(cx + 16, y + 50, t, 'title-medium', e['on-surface']) + icone('relogio', cx + 16, y + 62, 18, cp) + txt(cx + 40, y + 76, p, 'label-large', cp);
-      }).join('')],
-    ['Quest · Quem está acessando', 'Depois do código de acesso: o estudante ou um responsável, com o parentesco, guardado na sessão.', 232, (e, x0, y) => {
-      const w = 340, x = x0 + (PW - 2 * PAD - w) / 2;
-      let s = rect(x + 0.5, y + 0.5, w - 1, 55, canto('card-shape', 56), null, `stroke="${e['outline-variant']}"`) + icone('perfil', x + 16, y + 16, 24, e['on-surface']) + txt(x + 52, meio(y, 56, 'body-large'), 'Sou o estudante', 'body-large', e['on-surface']);
-      s += rect(x, y + 64, w, 56, canto('card-shape', 56), e['secondary-container']) + icone('perfil', x + 16, y + 80, 24, e['on-secondary-container']) + txt(x + 52, meio(y + 64, 56, 'body-large'), 'Sou responsável', 'body-large', e['on-secondary-container']);
-      s += fila([(a, b) => chip(e, a, b, 'Mãe', { selecionado: true }), (a, b) => chip(e, a, b, 'Pai'), (a, b) => chip(e, a, b, 'Outro')], x, y + 136, 8);
-      return s + botao(e, x, y + 188, 'Entrar', 'filled').svg;
+    ['Quest · Agenda e card de tarefa', 'Calendário vertical, um dia por divisória (dia em secondary); hora e borda em primary (no prazo) ou tertiary (vencida); ponto sucesso/erro: pode fazer ou bloqueada; envios possíveis e feitos; agora: Símbolo recortado e mascote.', 420, (e, x, y) => {
+      const w = 420, cx = x + 56, cw = w - 56, rx = x + w + 24, rw = PW - 2 * PAD - w - 24;
+      return diaAgenda(e, x, y, w, 'HOJE', '19', true) + cardTarefa(e, cx, y + 12, cw, { modulo: 'Aula ao vivo · Matemática', titulo: 'Frações na prática', hora: '14:00 – 14:50', envios: 'Participação única', agora: ['feliz', 'estrela', 'pular'] })
+        + cardTarefa(e, cx, y + 166, cw, { modulo: 'Exercícios', titulo: 'Frações equivalentes', hora: 'Até 23:59', prazo: 'vence hoje', envios: 'Envio único · 0 de 1' })
+        + diaAgenda(e, x, y + 296, w, 'SÁB', '17') + cardTarefa(e, cx, y + 308, cw, { modulo: 'Exercícios', titulo: 'Tabuada do 7', hora: 'Venceu 23:59', prazo: 'entrega aceita', envios: 'Até 3 envios · 1 de 3', estado: 'vencida' })
+        + cardTarefa(e, rx, y + 12, rw, { modulo: 'Leitura', titulo: 'Capítulo 3 do livro', hora: 'Abre 08:00', prazo: 'bloqueada até sexta', envios: 'Envio único · 0 de 1', liberada: false })
+        + cardTarefa(e, rx, y + 142, rw, { modulo: 'Quiz', titulo: 'Quiz da semana', hora: 'Venceu 18:00', prazo: 'encerrado', envios: 'Envio único · 1 de 1', estado: 'vencida', liberada: false })
+        + cardTarefa(e, rx, y + 272, rw, { modulo: 'Pesquisa', titulo: 'Animais do cerrado', hora: 'Sem prazo', envios: 'Envios livres · 2 feitos', estado: 'livre' });
     }],
+    ['Quest · Card de desafio', 'Tarefa sem prazo, competitiva: pódio com os 3 primeiros (mascotes em forma de número, felizes e dançando), 4º e 5º em linhas, sua posição em destaque, suas tentativas num gráfico e Jogar de novo; muda a cada envio.', 476, (e, x, y) => {
+      const w = 340;
+      return cardDesafio(e, x, y, w, { modulo: 'Jogo · Matemática', titulo: 'Soma rápida', envios: 'Envios livres · 6 feitos', ranking: [['Ana S.', 1980], ['Bruno M.', 1870], ['Lucas A.', 1720], ['Carla P.', 1540], ['Davi R.', 1410]], voce: { pos: 3, pontos: 1720 }, tentativas: [900, 1200, 1350, 1720, 1600, 1500] })
+        + cardDesafio(e, x + w + 16, y, PW - 2 * PAD - w - 16, { modulo: 'Jogo · Memória', titulo: 'Memória das frações', envios: 'Até 5 envios · 2 de 5', ranking: [['Carla P.', 2100], ['Ana S.', 1950], ['Davi R.', 1720], ['Bruno M.', 1600], ['Eva L.', 1480]], voce: { pos: 8, pontos: 1240 }, tentativas: [980, 1240] });
+    }],
+    ['Quest · Quem está acessando', 'Depois do código de acesso: o estudante ou um responsável, com o parentesco, guardado na sessão.', 232, (e, x0, y) =>
+      quemAcessa(e, x0 + (PW - 2 * PAD - 340) / 2, y, 340)],
   ];
 
   // ── montagem ──

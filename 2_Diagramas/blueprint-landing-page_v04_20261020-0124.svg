@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1712 2204" width="1712" height="2204">
   <title>Landing page · blueprint de UX</title>
-  <desc>Blueprint de UX da landing page do deboaz (requisito 07_landing-page-ux): blocos base, ações principais, espaços reservados aos módulos e elementos fixos, no compact (página e menu aberto) e no expanded. v01: criação. v02: bloco de contato removido; módulos e destaques em carrossel; blocos Números e Depoimentos; seletor de tema no topo e no menu. v03: fundo escuro na janela inteira ao abrir no navegador (tema v04).</desc>
+  <desc>Blueprint de UX da landing page do deboaz (requisito 07_landing-page-ux): blocos base, ações principais, espaços reservados aos módulos e elementos fixos, no compact (página e menu aberto) e no expanded. v01: criação. v02: bloco de contato removido; módulos e destaques em carrossel; blocos Números e Depoimentos; seletor de tema no topo e no menu. v03: fundo escuro na janela inteira ao abrir no navegador (tema v04). v04: destaque, como funciona do destaque e módulos, nessa ordem.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -118,10 +118,10 @@
     <text class="title" x="40" y="72">Landing page · blueprint de UX</text>
     <text class="subtitle" x="40" y="94">Distribuição dos blocos no celular (compact) e na web (expanded), com os espaços reservados aos módulos</text>
     <text class="wm-meta-label" x="1424" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1424" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1448" y="71" text-anchor="middle">v03</text>
+    <rect class="wm-badge" x="1424" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1448" y="71" text-anchor="middle">v04</text>
     <line class="wm-sep" x1="1496" y1="32" x2="1496" y2="80"/>
     <text class="wm-meta-label" x="1520" y="44">DATA</text>
-    <text class="wm-meta-value" x="1520" y="72">2026-10-18 · 22:20</text>
+    <text class="wm-meta-value" x="1520" y="72">2026-10-20 · 01:24</text>
   </g>
   <g id="compact-pagina">
   <rect class="panel" x="40" y="152" width="360" height="1864" rx="24" filter="url(#sombra)"/>
@@ -168,42 +168,42 @@
   <text class="label" x="220" y="815" text-anchor="middle">Educador autônomo</text>
   <text class="muted" x="220" y="831" text-anchor="middle">card de perfil</text>
   </g>
-  <g id="c-modulos">
-  <rect class="boundary" x="56" y="864" width="328" height="152" rx="12"/>
+  <g id="c-destaques">
+  <rect class="boundary" x="56" y="864" width="328" height="208" rx="12"/>
   <circle class="chip" cx="76" cy="879" r="9"/><text class="chip-text" x="76" y="883" text-anchor="middle">4</text>
-  <text class="boundary-label" x="92" y="883">MÓDULOS · CARROSSEL</text>
-  <rect class="node-purple edge-async" x="68" y="894" width="304" height="72" rx="8"/>
-  <text class="label" x="220" y="927" text-anchor="middle">card do módulo</text>
-  <text class="muted" x="220" y="943" text-anchor="middle">nome · frase · N usando · Saiba mais</text>
-  <rect class="node-face" x="68" y="974" width="40" height="32" rx="8"/>
-  <text class="label" x="88" y="994.5" text-anchor="middle">‹</text>
-  <rect class="node" x="116" y="974" width="208" height="32" rx="8"/>
-  <text class="label" x="220" y="994.5" text-anchor="middle">● ○ ○ ○</text>
-  <rect class="node-face" x="332" y="974" width="40" height="32" rx="8"/>
-  <text class="label" x="352" y="994.5" text-anchor="middle">›</text>
+  <text class="boundary-label" x="92" y="883">DESTAQUE · CARROSSEL</text>
+  <rect class="node-purple edge-async" x="68" y="894" width="304" height="128" rx="8"/>
+  <text class="label" x="220" y="955" text-anchor="middle">módulo em destaque</text>
+  <text class="muted" x="220" y="971" text-anchor="middle">um por vez · do módulo</text>
+  <rect class="node-face" x="68" y="1030" width="40" height="32" rx="8"/>
+  <text class="label" x="88" y="1050.5" text-anchor="middle">‹</text>
+  <rect class="node" x="116" y="1030" width="208" height="32" rx="8"/>
+  <text class="label" x="220" y="1050.5" text-anchor="middle">● ○</text>
+  <rect class="node-face" x="332" y="1030" width="40" height="32" rx="8"/>
+  <text class="label" x="352" y="1050.5" text-anchor="middle">›</text>
   </g>
   <g id="c-como-funciona">
-  <rect class="boundary" x="56" y="1024" width="328" height="200" rx="12"/>
-  <circle class="chip" cx="76" cy="1039" r="9"/><text class="chip-text" x="76" y="1043" text-anchor="middle">5</text>
-  <text class="boundary-label" x="92" y="1043">COMO FUNCIONA</text>
-  <rect class="node-face" x="68" y="1054" width="304" height="48" rx="8"/>
-  <text class="label" x="220" y="1082.5" text-anchor="middle">1 · Crie o quiz no hub</text>
-  <rect class="node-face" x="68" y="1110" width="304" height="48" rx="8"/>
-  <text class="label" x="220" y="1138.5" text-anchor="middle">2 · Abra a sala e passe o código</text>
-  <rect class="node-face" x="68" y="1166" width="304" height="48" rx="8"/>
-  <text class="label" x="220" y="1194.5" text-anchor="middle">3 · Jogue pelo quest</text>
+  <rect class="boundary" x="56" y="1080" width="328" height="200" rx="12"/>
+  <circle class="chip" cx="76" cy="1095" r="9"/><text class="chip-text" x="76" y="1099" text-anchor="middle">5</text>
+  <text class="boundary-label" x="92" y="1099">COMO FUNCIONA · DO DESTAQUE</text>
+  <rect class="node-purple edge-async" x="68" y="1110" width="304" height="48" rx="8"/>
+  <text class="label" x="220" y="1138.5" text-anchor="middle">1 · passo do módulo em destaque</text>
+  <rect class="node-purple edge-async" x="68" y="1166" width="304" height="48" rx="8"/>
+  <text class="label" x="220" y="1194.5" text-anchor="middle">2 · passo do módulo em destaque</text>
+  <rect class="node-purple edge-async" x="68" y="1222" width="304" height="48" rx="8"/>
+  <text class="label" x="220" y="1250.5" text-anchor="middle">3 · passo do módulo em destaque</text>
   </g>
-  <g id="c-destaques">
-  <rect class="boundary" x="56" y="1232" width="328" height="208" rx="12"/>
-  <circle class="chip" cx="76" cy="1247" r="9"/><text class="chip-text" x="76" y="1251" text-anchor="middle">6</text>
-  <text class="boundary-label" x="92" y="1251">DESTAQUES DE MÓDULOS · CARROSSEL</text>
-  <rect class="node-purple edge-async" x="68" y="1262" width="304" height="128" rx="8"/>
-  <text class="label" x="220" y="1323" text-anchor="middle">seção de destaque</text>
-  <text class="muted" x="220" y="1339" text-anchor="middle">opcional · uma por módulo</text>
+  <g id="c-modulos">
+  <rect class="boundary" x="56" y="1288" width="328" height="152" rx="12"/>
+  <circle class="chip" cx="76" cy="1303" r="9"/><text class="chip-text" x="76" y="1307" text-anchor="middle">6</text>
+  <text class="boundary-label" x="92" y="1307">MÓDULOS · CARROSSEL</text>
+  <rect class="node-purple edge-async" x="68" y="1318" width="304" height="72" rx="8"/>
+  <text class="label" x="220" y="1351" text-anchor="middle">card do módulo</text>
+  <text class="muted" x="220" y="1367" text-anchor="middle">nome · frase · N usando · Saiba mais</text>
   <rect class="node-face" x="68" y="1398" width="40" height="32" rx="8"/>
   <text class="label" x="88" y="1418.5" text-anchor="middle">‹</text>
   <rect class="node" x="116" y="1398" width="208" height="32" rx="8"/>
-  <text class="label" x="220" y="1418.5" text-anchor="middle">● ○</text>
+  <text class="label" x="220" y="1418.5" text-anchor="middle">● ○ ○ ○</text>
   <rect class="node-face" x="332" y="1398" width="40" height="32" rx="8"/>
   <text class="label" x="352" y="1418.5" text-anchor="middle">›</text>
   </g>
@@ -347,48 +347,48 @@
   <text class="label" x="1536" y="515" text-anchor="middle">Educador autônomo</text>
   <text class="muted" x="1536" y="531" text-anchor="middle">card</text>
   </g>
-  <g id="e-modulos">
-  <rect class="boundary" x="968" y="568" width="688" height="144" rx="12"/>
+  <g id="e-destaques">
+  <rect class="boundary" x="968" y="568" width="688" height="184" rx="12"/>
   <circle class="chip" cx="988" cy="583" r="9"/><text class="chip-text" x="988" y="587" text-anchor="middle">4</text>
-  <text class="boundary-label" x="1004" y="587">MÓDULOS · CARROSSEL</text>
-  <rect class="node-face" x="980" y="598" width="32" height="72" rx="8"/>
-  <text class="label" x="996" y="638.5" text-anchor="middle">‹</text>
-  <rect class="node-purple edge-async" x="1020" y="598" width="189.333" height="72" rx="8"/>
-  <text class="label" x="1114.67" y="638.5" text-anchor="middle">card do módulo</text>
-  <rect class="node-purple edge-async" x="1217.33" y="598" width="189.333" height="72" rx="8"/>
-  <text class="label" x="1312" y="638.5" text-anchor="middle">card do módulo</text>
-  <rect class="node-purple edge-async" x="1414.67" y="598" width="189.333" height="72" rx="8"/>
-  <text class="label" x="1509.33" y="638.5" text-anchor="middle">card do módulo</text>
-  <rect class="node-face" x="1612" y="598" width="32" height="72" rx="8"/>
-  <text class="label" x="1628" y="638.5" text-anchor="middle">›</text>
-  <rect class="node" x="1252" y="678" width="120" height="24" rx="8"/>
-  <text class="label" x="1312" y="694.5" text-anchor="middle">● ○ ○</text>
+  <text class="boundary-label" x="1004" y="587">DESTAQUE · CARROSSEL</text>
+  <rect class="node-face" x="980" y="598" width="32" height="112" rx="8"/>
+  <text class="label" x="996" y="658.5" text-anchor="middle">‹</text>
+  <rect class="node-purple edge-async" x="1020" y="598" width="288" height="112" rx="8"/>
+  <text class="label" x="1164" y="658.5" text-anchor="middle">texto do destaque</text>
+  <rect class="node-purple edge-async" x="1316" y="598" width="288" height="112" rx="8"/>
+  <text class="label" x="1460" y="658.5" text-anchor="middle">imagem do destaque</text>
+  <rect class="node-face" x="1612" y="598" width="32" height="112" rx="8"/>
+  <text class="label" x="1628" y="658.5" text-anchor="middle">›</text>
+  <rect class="node" x="1252" y="718" width="120" height="24" rx="8"/>
+  <text class="label" x="1312" y="734.5" text-anchor="middle">● ○</text>
   </g>
   <g id="e-como-funciona">
-  <rect class="boundary" x="968" y="720" width="688" height="96" rx="12"/>
-  <circle class="chip" cx="988" cy="735" r="9"/><text class="chip-text" x="988" y="739" text-anchor="middle">5</text>
-  <text class="boundary-label" x="1004" y="739">COMO FUNCIONA</text>
-  <rect class="node-face" x="980" y="750" width="216" height="56" rx="8"/>
-  <text class="label" x="1088" y="782.5" text-anchor="middle">1 · Crie no hub</text>
-  <rect class="node-face" x="1204" y="750" width="216" height="56" rx="8"/>
-  <text class="label" x="1312" y="782.5" text-anchor="middle">2 · Abra a sala</text>
-  <rect class="node-face" x="1428" y="750" width="216" height="56" rx="8"/>
-  <text class="label" x="1536" y="782.5" text-anchor="middle">3 · Jogue no quest</text>
+  <rect class="boundary" x="968" y="760" width="688" height="96" rx="12"/>
+  <circle class="chip" cx="988" cy="775" r="9"/><text class="chip-text" x="988" y="779" text-anchor="middle">5</text>
+  <text class="boundary-label" x="1004" y="779">COMO FUNCIONA · DO DESTAQUE</text>
+  <rect class="node-purple edge-async" x="980" y="790" width="216" height="56" rx="8"/>
+  <text class="label" x="1088" y="822.5" text-anchor="middle">1 · passo</text>
+  <rect class="node-purple edge-async" x="1204" y="790" width="216" height="56" rx="8"/>
+  <text class="label" x="1312" y="822.5" text-anchor="middle">2 · passo</text>
+  <rect class="node-purple edge-async" x="1428" y="790" width="216" height="56" rx="8"/>
+  <text class="label" x="1536" y="822.5" text-anchor="middle">3 · passo</text>
   </g>
-  <g id="e-destaques">
-  <rect class="boundary" x="968" y="824" width="688" height="184" rx="12"/>
-  <circle class="chip" cx="988" cy="839" r="9"/><text class="chip-text" x="988" y="843" text-anchor="middle">6</text>
-  <text class="boundary-label" x="1004" y="843">DESTAQUES DE MÓDULOS · CARROSSEL</text>
-  <rect class="node-face" x="980" y="854" width="32" height="112" rx="8"/>
-  <text class="label" x="996" y="914.5" text-anchor="middle">‹</text>
-  <rect class="node-purple edge-async" x="1020" y="854" width="288" height="112" rx="8"/>
-  <text class="label" x="1164" y="914.5" text-anchor="middle">texto do destaque</text>
-  <rect class="node-purple edge-async" x="1316" y="854" width="288" height="112" rx="8"/>
-  <text class="label" x="1460" y="914.5" text-anchor="middle">imagem do destaque</text>
-  <rect class="node-face" x="1612" y="854" width="32" height="112" rx="8"/>
-  <text class="label" x="1628" y="914.5" text-anchor="middle">›</text>
+  <g id="e-modulos">
+  <rect class="boundary" x="968" y="864" width="688" height="144" rx="12"/>
+  <circle class="chip" cx="988" cy="879" r="9"/><text class="chip-text" x="988" y="883" text-anchor="middle">6</text>
+  <text class="boundary-label" x="1004" y="883">MÓDULOS · CARROSSEL</text>
+  <rect class="node-face" x="980" y="894" width="32" height="72" rx="8"/>
+  <text class="label" x="996" y="934.5" text-anchor="middle">‹</text>
+  <rect class="node-purple edge-async" x="1020" y="894" width="189.333" height="72" rx="8"/>
+  <text class="label" x="1114.67" y="934.5" text-anchor="middle">card do módulo</text>
+  <rect class="node-purple edge-async" x="1217.33" y="894" width="189.333" height="72" rx="8"/>
+  <text class="label" x="1312" y="934.5" text-anchor="middle">card do módulo</text>
+  <rect class="node-purple edge-async" x="1414.67" y="894" width="189.333" height="72" rx="8"/>
+  <text class="label" x="1509.33" y="934.5" text-anchor="middle">card do módulo</text>
+  <rect class="node-face" x="1612" y="894" width="32" height="72" rx="8"/>
+  <text class="label" x="1628" y="934.5" text-anchor="middle">›</text>
   <rect class="node" x="1252" y="974" width="120" height="24" rx="8"/>
-  <text class="label" x="1312" y="990.5" text-anchor="middle">● ○</text>
+  <text class="label" x="1312" y="990.5" text-anchor="middle">● ○ ○</text>
   </g>
   <g id="e-numeros">
   <rect class="boundary" x="968" y="1016" width="688" height="104" rx="12"/>
@@ -450,36 +450,37 @@
   <text class="label-strong" x="524" y="980">Para quem</text>
   <text class="muted" x="524" y="998">um card por perfil de contratação</text>
   <circle class="chip" cx="505" cy="1027" r="9"/><text class="chip-text" x="505" y="1031" text-anchor="middle">4</text>
-  <text class="label-strong" x="524" y="1032">Módulos · carrossel</text>
-  <text class="muted" x="524" y="1050">todos os módulos, mais contratados primeiro</text>
-  <text class="muted" x="524" y="1068">card: nome, frase, quantos usam, Saiba mais</text>
-  <text class="muted" x="524" y="1086">1 por vez no compact · 2 medium · 3 expanded</text>
-  <circle class="chip" cx="505" cy="1115" r="9"/><text class="chip-text" x="505" y="1119" text-anchor="middle">5</text>
-  <text class="label-strong" x="524" y="1120">Como funciona</text>
-  <text class="muted" x="524" y="1138">três passos fixos: hub → sala → quest</text>
+  <text class="label-strong" x="524" y="1032">Destaque · carrossel</text>
+  <text class="muted" x="524" y="1050">um módulo em destaque por vez, na ordem</text>
+  <text class="muted" x="524" y="1068">dos módulos; some quando nenhum tem destaque</text>
+  <circle class="chip" cx="505" cy="1097" r="9"/><text class="chip-text" x="505" y="1101" text-anchor="middle">5</text>
+  <text class="label-strong" x="524" y="1102">Como funciona · do destaque</text>
+  <text class="muted" x="524" y="1120">os passos do módulo em destaque, escritos</text>
+  <text class="muted" x="524" y="1138">pelo módulo; mudam junto com o destaque</text>
   <circle class="chip" cx="505" cy="1167" r="9"/><text class="chip-text" x="505" y="1171" text-anchor="middle">6</text>
-  <text class="label-strong" x="524" y="1172">Destaques · carrossel</text>
-  <text class="muted" x="524" y="1190">um destaque por vez, na ordem dos módulos</text>
-  <text class="muted" x="524" y="1208">some quando nenhum módulo tem destaque</text>
-  <circle class="chip" cx="505" cy="1237" r="9"/><text class="chip-text" x="505" y="1241" text-anchor="middle">7</text>
-  <text class="label-strong" x="524" y="1242">Números</text>
-  <text class="muted" x="524" y="1260">totais de escolas, empresas e educadores</text>
-  <text class="muted" x="524" y="1278">autônomos que usam o deboaz; sem nomes</text>
-  <circle class="chip" cx="505" cy="1307" r="9"/><text class="chip-text" x="505" y="1311" text-anchor="middle">8</text>
-  <text class="label-strong" x="524" y="1312">Depoimentos · carrossel</text>
-  <text class="muted" x="524" y="1330">só autorizados, escritos no hub</text>
-  <text class="muted" x="524" y="1348">conteúdo definido no módulo depoimento</text>
-  <circle class="chip" cx="505" cy="1377" r="9"/><text class="chip-text" x="505" y="1381" text-anchor="middle">9</text>
-  <text class="label-strong" x="524" y="1382">Rodapé</text>
-  <text class="muted" x="524" y="1400">marca, lema, links, termos e privacidade</text>
-  <circle class="chip" cx="505" cy="1429" r="9"/><text class="chip-text" x="505" y="1433" text-anchor="middle">10</text>
-  <text class="label-strong" x="524" y="1434">Barra de ação · compact</text>
-  <text class="muted" x="524" y="1452">fixa na base depois que a apresentação</text>
-  <text class="muted" x="524" y="1470">sai de vista; some no rodapé</text>
-  <circle class="chip" cx="505" cy="1499" r="9"/><text class="chip-text" x="505" y="1503" text-anchor="middle">11</text>
-  <text class="label-strong" x="524" y="1504">Menu · compact e medium</text>
-  <text class="muted" x="524" y="1522">seções, seletor de tema e as 3 ações</text>
-  <text class="muted" x="524" y="1540">fecha ao escolher ou no ✕</text>
+  <text class="label-strong" x="524" y="1172">Módulos · carrossel</text>
+  <text class="muted" x="524" y="1190">todos os módulos, mais contratados primeiro</text>
+  <text class="muted" x="524" y="1208">card: nome, frase, quantos usam, Saiba mais</text>
+  <text class="muted" x="524" y="1226">1 por vez no compact · 2 medium · 3 expanded</text>
+  <circle class="chip" cx="505" cy="1255" r="9"/><text class="chip-text" x="505" y="1259" text-anchor="middle">7</text>
+  <text class="label-strong" x="524" y="1260">Números</text>
+  <text class="muted" x="524" y="1278">totais de escolas, empresas e educadores</text>
+  <text class="muted" x="524" y="1296">autônomos que usam o deboaz; sem nomes</text>
+  <circle class="chip" cx="505" cy="1325" r="9"/><text class="chip-text" x="505" y="1329" text-anchor="middle">8</text>
+  <text class="label-strong" x="524" y="1330">Depoimentos · carrossel</text>
+  <text class="muted" x="524" y="1348">só autorizados, escritos no hub</text>
+  <text class="muted" x="524" y="1366">conteúdo definido no módulo depoimento</text>
+  <circle class="chip" cx="505" cy="1395" r="9"/><text class="chip-text" x="505" y="1399" text-anchor="middle">9</text>
+  <text class="label-strong" x="524" y="1400">Rodapé</text>
+  <text class="muted" x="524" y="1418">marca, lema, links, termos e privacidade</text>
+  <circle class="chip" cx="505" cy="1447" r="9"/><text class="chip-text" x="505" y="1451" text-anchor="middle">10</text>
+  <text class="label-strong" x="524" y="1452">Barra de ação · compact</text>
+  <text class="muted" x="524" y="1470">fixa na base depois que a apresentação</text>
+  <text class="muted" x="524" y="1488">sai de vista; some no rodapé</text>
+  <circle class="chip" cx="505" cy="1517" r="9"/><text class="chip-text" x="505" y="1521" text-anchor="middle">11</text>
+  <text class="label-strong" x="524" y="1522">Menu · compact e medium</text>
+  <text class="muted" x="524" y="1540">seções, seletor de tema e as 3 ações</text>
+  <text class="muted" x="524" y="1558">fecha ao escolher ou no ✕</text>
   </g>
   <g id="marca-rodape" transform="translate(0,2088)">
     <rect class="wm-band" x="0" y="0" width="1712" height="116"/>
@@ -492,7 +493,7 @@
     <rect class="boundary" x="604" y="47" width="14" height="14" rx="3"/><text class="label" x="626" y="58">Seção</text>
     <line class="edge-accent" x1="689" y1="54" x2="717" y2="54" marker-end="url(#seta-destaque)"/><text class="label" x="729" y="58">Toque / navegação</text>
     <line class="divider" x1="40" y1="76" x2="1672" y2="76"/>
-    <text class="footer" x="40" y="100">v03 · fundo escuro na janela inteira ao abrir o .svg no navegador (tema v04)</text>
-    <text class="wm-file" x="1672" y="100" text-anchor="end">blueprint-landing-page_v03_20261018-2220.svg</text>
+    <text class="footer" x="40" y="100">v04 · destaque antes do como funciona, que mostra os passos do módulo em destaque, e dos módulos</text>
+    <text class="wm-file" x="1672" y="100" text-anchor="end">blueprint-landing-page_v04_20261020-0124.svg</text>
   </g>
 </svg>

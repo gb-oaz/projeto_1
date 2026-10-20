@@ -30,11 +30,13 @@
           "hover-elevation": { "$value": "{md.sys.elevation.level2}" }
         },
         "outlined": {
+          "container-color": { "$value": "{md.sys.color.surface}", "$descricao": "fundo da tela por trás: o texto fica legível sobre a Estampa" },
           "outline-color": { "$value": "{md.sys.color.outline-variant}" },
           "outline-width": { "$value": 1 },
           "label-color": { "$value": "{md.sys.color.on-surface-variant}" }
         },
         "text": {
+          "container-color": { "$value": "{md.sys.color.surface}", "$descricao": "solto na tela, sobre a Estampa; dentro de card, diálogo e snackbar fica transparente" },
           "label-color": { "$value": "{md.sys.color.primary}" },
           "padding": { "$value": 12 }
         }
@@ -70,6 +72,7 @@
         "padding": { "$value": 16 },
         "padding-with-icon": { "$value": 8 },
         "icon-size": { "$value": 18 },
+        "container-color": { "$value": "{md.sys.color.surface}", "$descricao": "fundo da tela por trás: o texto fica legível sobre a Estampa" },
         "shape": { "$value": "{md.sys.shape.corner.small}" },
         "label": { "$value": "{md.sys.typescale.label-large}" },
         "outline-color": { "$value": "{md.sys.color.outline-variant}" },
@@ -104,6 +107,7 @@
         "filled-shape": { "$value": "{md.sys.shape.corner.extra-small}", "$descricao": "só os cantos de cima" },
         "filled-indicator-color": { "$value": "{md.sys.color.on-surface-variant}" },
         "outlined-shape": { "$value": "{md.sys.shape.corner.extra-small}" },
+        "outlined-container-color": { "$value": "{md.sys.color.surface}", "$descricao": "fundo da tela por trás: o texto fica legível sobre a Estampa" },
         "outlined-outline-color": { "$value": "{md.sys.color.outline}" }
       },
 
@@ -224,6 +228,7 @@
         "height": { "$value": 40 },
         "padding": { "$value": 12 },
         "icon-size": { "$value": 18 },
+        "container-color": { "$value": "{md.sys.color.surface}", "$descricao": "fundo da tela por trás: o texto fica legível sobre a Estampa" },
         "shape": { "$value": "{md.sys.shape.corner.full}" },
         "outline-color": { "$value": "{md.sys.color.outline}" },
         "outline-width": { "$value": 1 },
@@ -251,6 +256,7 @@
       "carousel": {
         "$descricao": "Carrossel: itens lado a lado que a pessoa percorre deslizando ou pelos botões anterior e próximo, com indicador de páginas.",
         "item-shape": { "$value": "{md.sys.shape.corner.extra-large}" },
+        "controls-container-color": { "$value": "{md.sys.color.surface}", "$descricao": "pílula atrás dos controles (anterior, indicador, próximo), legível sobre a Estampa" },
         "gap": { "$value": 8 },
         "indicator-dot-size": { "$value": 8 },
         "indicator-active-width": { "$value": 24 },

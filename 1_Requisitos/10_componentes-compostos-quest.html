@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Componentes compostos · quest · boaz · v06</title>
+<title>Componentes compostos · quest · boaz · v08</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="10_componentes-compostos-quest">
 <meta name="boaz:caminho" content="1_Requisitos/10_componentes-compostos-quest.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v06">
-<meta name="boaz:data" content="2026-10-19 03:07">
+<meta name="boaz:versao" content="v08">
+<meta name="boaz:data" content="2026-10-20 01:57">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -827,8 +827,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir os componentes compostos próprios do quest, que a UI do quest usa junto com os compostos comuns.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>10_componentes-compostos-quest</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v06</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-19 · 03:07</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v08</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-20 · 01:57</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -844,8 +844,10 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     <table>
       <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
       <tbody>
-        <tr id="RF-61"><td><code class="id">RF-61</code></td><td>O sistema deve oferecer o card de tarefa, com o módulo de origem, o título e o prazo em texto relativo e em data</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-62"><td><code class="id">RF-62</code></td><td>O sistema deve oferecer o quem está acessando, com as opções estudante e responsável, o parentesco e a ação <q class="ui">Entrar</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-61"><td><code class="id">RF-61</code></td><td>O sistema deve oferecer o card de tarefa, com o módulo de origem, o título, a hora em destaque, o prazo em texto, os envios que aceita e os já feitos (como Envio único · 0 de 1, Até 3 envios · 1 de 3 e Envios livres · 2 feitos) e um ponto no canto que diz se a tarefa pode ser feita, na agenda em calendário vertical, com um dia por divisória e o dia da semana e o número à esquerda</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-62"><td><code class="id">RF-62</code></td><td>O sistema deve oferecer o quem está acessando, com as opções estudante e responsável, o parentesco num botão segmentado cheio e a ação <q class="ui">Entrar</q>, todos na largura das opções</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-98"><td><code class="id">RF-98</code></td><td>O sistema deve oferecer o card da tarefa que acontece neste momento, com o selo <q class="ui">Agora</q>, a borda de 2dp e o fundo Símbolo recortado com um mascote animado</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-99"><td><code class="id">RF-99</code></td><td>O sistema deve oferecer o card de desafio da tarefa sem prazo, com o módulo de origem, o título, os envios, o pódio dos 3 primeiros como mascotes em forma de número (1, 2 e 3), felizes e com movimento composto (comemorar, pular, dançar e balançar), o 4º e o 5º com a barra de pontos, a posição de quem está vendo em destaque, as tentativas dele num gráfico de barras e a ação <q class="ui">Jogar de novo</q> (<q class="ui">Envios esgotados</q> quando os envios acabam)</td><td><span class="prio prio-deve">Deve</span></td></tr>
       </tbody>
     </table>
   </section>
@@ -855,6 +857,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <thead><tr><th>ID</th><th>Regra</th></tr></thead>
       <tbody>
         <tr id="RN-112"><td><code class="id">RN-112</code></td><td>O parentesco só é pedido quando a pessoa escolhe que é responsável</td></tr>
+        <tr id="RN-132"><td><code class="id">RN-132</code></td><td>Cores da agenda: o dia em secondary; a borda e a hora do card em primary quando a tarefa está no prazo e em tertiary quando venceu; o ponto em sucesso quando a tarefa pode ser feita (também vencida com entrega aceita) e em erro quando está bloqueada (ainda não abriu, foi encerrada ou os envios acabaram); o módulo da tarefa define o que é aceito depois do prazo</td></tr>
+        <tr id="RN-135"><td><code class="id">RN-135</code></td><td>Ranking da tarefa: conta a melhor pontuação de cada participante entre os que receberam a tarefa e muda a cada envio; no empate, fica à frente quem chegou primeiro à pontuação; o card mostra os 5 primeiros e a posição de quem está vendo, com o primeiro nome e a inicial do sobrenome de cada um</td></tr>
       </tbody>
     </table>
   </section>
@@ -864,6 +868,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
       <tbody>
         <tr id="RNF-147"><td><code class="id">RNF-147</code></td><td><span class="tag">Acessibilidade</span></td><td>O destaque da tarefa que vence hoje usa cor e texto, nunca só cor</td></tr>
+        <tr id="RNF-158"><td><code class="id">RNF-158</code></td><td><span class="tag">Acessibilidade</span></td><td>O estado da tarefa e o ponto de acesso também aparecem em texto (como entrega aceita ou bloqueada) e no rótulo do leitor de tela; com movimento reduzido, o mascote do card Agora fica parado</td></tr>
+        <tr id="RNF-159"><td><code class="id">RNF-159</code></td><td><span class="tag">Acessibilidade</span></td><td>No card de desafio, a posição e os pontos aparecem em texto, o gráfico de tentativas tem rótulo com os valores para o leitor de tela e os mascotes do pódio são decorativos e ficam parados com a preferência de movimento reduzida</td></tr>
       </tbody>
     </table>
   </section>
@@ -872,14 +878,50 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     <article class="criterio" id="ca-RF-61">
       <h3><code class="id">RF-61</code> Card de tarefa</h3>
       <pre class="gherkin">Cenário: tarefa que vence hoje
-  Dado uma tarefa de exercícios que vence hoje
-  Então o card mostra "Vence hoje · 19/10" com destaque também em texto</pre>
+  Dado uma tarefa de exercícios que vence hoje às 23:59
+  Então o card mostra "Até 23:59 · vence hoje" e "Envio único · 0 de 1", com a borda e a hora em primary e o ponto em sucesso
+
+Cenário: vencida com entrega aceita
+  Dado uma tarefa que venceu ontem e cujo módulo aceita entrega depois do prazo
+  Então o card mostra "Venceu 23:59 · entrega aceita" e "Até 3 envios · 1 de 3", com a borda e a hora em tertiary e o ponto em sucesso
+
+Cenário: envios acabaram
+  Dado um quiz de envio único já enviado
+  Então o card mostra "Envio único · 1 de 1" e o ponto em erro
+
+Cenário: bloqueada
+  Dado uma leitura que só abre na sexta
+  Então o card mostra "Abre 08:00 · bloqueada até sexta" e o ponto em erro</pre>
+    </article>
+    <article class="criterio" id="ca-RF-98">
+      <h3><code class="id">RF-98</code> Acontecendo agora</h3>
+      <pre class="gherkin">Cenário: aula ao vivo
+  Dado uma aula ao vivo das 14:00 às 14:50 e o relógio às 14:10
+  Então o card mostra "Agora", a borda de 2dp e o Símbolo recortado com o mascote animado
+  E com movimento reduzido o mascote fica parado</pre>
+    </article>
+    <article class="criterio" id="ca-RF-99">
+      <h3><code class="id">RF-99</code> Card de desafio</h3>
+      <pre class="gherkin">Cenário: fora do pódio
+  Dado o jogo Memória das frações, com Lucas em 8º lugar com 1.240 pontos
+  Então o card mostra o pódio com Carla P., Ana S. e Davi R., o 4º e o 5º
+  E a linha "8º · Você · 1.240" em destaque, as duas tentativas no gráfico e "Jogar de novo"
+
+Cenário: novo envio
+  Dado Lucas em 8º lugar
+  Quando ele joga de novo e faz 1.990 pontos
+  Então passa a aparecer no pódio, em 2º, com o bloco em destaque e "Você"
+
+Cenário: pódio em festa
+  Dado o card de desafio na tela
+  Então o 1º comemora, pula e dança, o 2º dança e balança e o 3º pula e balança
+  E com movimento reduzido os três ficam parados</pre>
     </article>
     <article class="criterio" id="ca-RF-62">
       <h3><code class="id">RF-62</code> Quem está acessando</h3>
       <pre class="gherkin">Cenário: responsável
   Quando a pessoa escolhe "Sou responsável"
-  Então aparecem as opções de parentesco antes de "Entrar"</pre>
+  Então aparece o botão segmentado do parentesco ("Mãe", "Pai" e "Outro") antes de "Entrar", na largura das opções</pre>
     </article>
   </section>
   <section id="fora-de-escopo">
@@ -892,8 +934,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../2_Diagramas/vista-compostos-quest_v05_20261019-0304.svg"><img src="../2_Diagramas/vista-compostos-quest_v05_20261019-0304.svg" alt="Vista dos dois componentes compostos do quest nos esquemas claro e escuro: card de tarefa e quem está acessando"></a>
-      <figcaption><strong>Componentes compostos do quest</strong><code>2_Diagramas/vista-compostos-quest_v05_20261019-0304.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-compostos-quest_v06_20261019-1945.svg"><img src="../2_Diagramas/vista-compostos-quest_v06_20261019-1945.svg" alt="Vista dos três componentes compostos do quest nos esquemas claro e escuro: agenda e card de tarefa, card de desafio e quem está acessando"></a>
+      <figcaption><strong>Componentes compostos do quest</strong><code>2_Diagramas/vista-compostos-quest_v06_20261019-1945.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -902,7 +944,9 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v06</span></td><td>2026-10-19 03:07</td><td>Status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v08</span></td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
+      <tr><td>v07</td><td>2026-10-20 00:43</td><td><code class="id">RF-61</code> e <code class="id">RF-62</code> alterados e <code class="id">RF-98</code>, <code class="id">RN-132</code> e <code class="id">RNF-158</code> incluídos: agenda em calendário vertical, card de tarefa com estados por cor, ponto de acesso e acontecendo agora, parentesco e Entrar na largura toda; vista v06; status → Em revisão; envios possíveis e feitos no card de tarefa (<code class="id">RF-61</code>, <code class="id">RN-132</code>); <code class="id">RF-99</code>, <code class="id">RN-135</code> e <code class="id">RNF-159</code> incluídos: card de desafio da tarefa sem prazo, com pódio de mascotes em forma de número, ranking da tarefa e gráfico de tentativas (o design system ganhou o gráfico de barras); vista v06 com três compostos; pódio em festa: mascotes felizes com movimento composto (<code class="id">RF-99</code>, <code class="id">RNF-159</code>); parentesco num botão segmentado cheio (<code class="id">RF-62</code>); componentes sem fundo próprio (campo outlined, botões outlined e de texto soltos na tela, botão segmentado, chip e controles do carrossel) ganham o fundo da tela, legíveis sobre a Estampa</td></tr>
+      <tr><td>v06</td><td>2026-10-19 03:07</td><td>Status → Aprovado</td></tr>
       <tr><td>v05</td><td>2026-10-19 03:04</td><td>Vista v05: nome deboaz centralizado no símbolo e logo centralizado na barra</td></tr>
       <tr><td>v04</td><td>2026-10-19 02:32</td><td>Vista v04: logo na linha dos textos do topo</td></tr>
       <tr><td>v03</td><td>2026-10-19 02:25</td><td>Vista v03: logo de 40dp nos topos e no rodapé</td></tr>
@@ -911,7 +955,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v06 · 2026-10-19 03:07</span>
+    <span>boaz · v08 · 2026-10-20 01:57</span>
     <span class="boaz-arquivo">1_Requisitos/10_componentes-compostos-quest.html</span>
   </div>
 </footer>
