@@ -739,11 +739,24 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
         + iconButton(e, x + w - 52, y + (h - ib) / 2, 'avisos', 'padrao').svg + selo(e, x + w - 52 + ib - 8, y + (h - ib) / 2 + 8, '1')
         + abas(e, x, y + h, w, ['Configuração', 'Utilização']);
     }],
-    ['Comum · Boas-vindas com mascote', 'Entrada do hub e do quest: mascote feliz, título, frase e ação. Apresentação da landing page: a turma de mascotes, com todas as expressões lado a lado, em formas variadas.', 248, (e, x, y) => {
-      const cx = x + 169, b = botao(e, 0, 0, 'Inserir código', 'filled').w;
-      return masc('feliz', {}, cx - 48, y, 96) + txt(cx, y + 136, 'Que bom te ver!', 'headline-small', e['on-surface'], 'middle')
-        + txt(cx, y + 164, 'Entre com o código que a escola entregou.', 'body-medium', e['on-surface-variant'], 'middle') + botao(e, cx - b / 2, y + 196, 'Inserir código', 'filled').svg
-        + turma(x + 370, y, 322, 160) + txt(x + 531, y + 196, 'Aprender fica deboaz', 'headline-small', e['on-surface'], 'middle');
+    ['Comum · Boas-vindas com o logo', 'Landing, entrada do hub e acesso do quest: Halo passando pelos temas, logo na abertura e texto num painel; hub e quest: faixa no compact, só o logo do medium em diante.', 504, (e, x, y) => {
+      const w = PW - 2 * PAD, h = 264, id = `boas-vindas-${modoDe(e)}`;
+      // tema do quadro é monocromático: logo em on-surface (num tema colorido, nas cores da marca);
+      // o ciclo começa no primeiro tema colorido, que é o que o desenho parado mostra
+      const primeiro = temas.find((t) => t.variante !== 'monochrome')?.esquemas[modoDe(e)];
+      const halo = (ww, hh, op) => desenharFundo ? desenharFundo('halo', { largura: ww, altura: hh, pecas: 'logo', nome: true, cores: { ...e, mascote: '' }, ciclo: primeiro ? [primeiro] : undefined, ...op }) : '';
+      const pw = 400, px = x + 24, py = y + 28, ph = h - 56, b1 = botao(e, 0, 0, 'Começar grátis', 'filled').w;
+      let s = `<clipPath id="${id}">${rect(x, y, w, h, cantos['extra-large'], '#000000')}</clipPath><g clip-path="url(#${id})">${halo(w, h, { origem: { x: 0.8, y: 0.5 }, raio: 64 }).replace('<svg ', `<svg x="${x}" y="${y}" `)}</g>`
+        + rect(px, py, pw, ph, cantos['extra-large'], e.surface, sombra('level1')) + txt(px + 24, py + 48, 'Aprender fica deboaz', 'headline-medium', e['on-surface'])
+        + quebrar('Quizzes ao vivo, tarefas e o acompanhamento da família numa só plataforma.', pw - 48, 'body-medium').map((l, i) => txt(px + 24, py + 80 + i * 20, l, 'body-medium', e['on-surface-variant'])).join('')
+        + botao(e, px + 24, py + ph - 64, 'Começar grátis', 'filled').svg + botao(e, px + 24 + b1 + 8, py + ph - 64, 'Entrar numa sala', 'outlined').svg;
+      // compact do quest: faixa do Halo com o logo de hastes curtas, que some antes do título
+      const cw = 320, cx0 = x + (w - cw) / 2, fy = y + h + 16, fh = 112, gid = `boas-vindas-faixa-${modoDe(e)}`, cb = botao(e, 0, 0, 'Inserir código', 'filled').w;
+      s += halo(cw, fh, { origem: { x: 0.5, y: 0.45 }, raio: 48, variante: 'curto' }).replace('<svg ', `<svg x="${cx0}" y="${fy}" `)
+        + `<linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${e.surface}" stop-opacity="0"/><stop offset="1" stop-color="${e.surface}"/></linearGradient><rect x="${cx0}" y="${fy + fh - 40}" width="${cw}" height="41" fill="url(#${gid})"/>`
+        + txt(cx0 + cw / 2, fy + fh + 28, 'Que bom te ver!', 'headline-small', e['on-surface'], 'middle')
+        + txt(cx0 + cw / 2, fy + fh + 56, 'Escolha o perfil para entrar', 'body-medium', e['on-surface-variant'], 'middle') + botao(e, cx0 + (cw - cb) / 2, fy + fh + 76, 'Inserir código', 'filled').svg;
+      return s;
     }],
     ['Comum · Seletor de tema', 'Landing page, hub e quest: tema de cor, modo (claro, escuro ou sistema) e se os mascotes seguem as cores do tema, guardados no aparelho.', 248, (e, x0, y) => {
       const w = 340, h = 248, x = x0 + (PW - 2 * PAD - w) / 2;

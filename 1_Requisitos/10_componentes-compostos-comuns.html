@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Componentes compostos · comuns · boaz · v14</title>
+<title>Componentes compostos · comuns · boaz · v15</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="10_componentes-compostos-comuns">
 <meta name="boaz:caminho" content="1_Requisitos/10_componentes-compostos-comuns.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v14">
-<meta name="boaz:data" content="2026-10-20 01:57">
+<meta name="boaz:versao" content="v15">
+<meta name="boaz:data" content="2026-10-21 22:12">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -827,8 +827,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir os componentes compostos usados por mais de uma frente — hub, quest e landing page — para que as telas das UIs sejam montadas com os mesmos blocos.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>10_componentes-compostos-comuns</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v14</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-20 · 01:57</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v15</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-21 · 22:12</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -853,7 +853,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RF-45"><td><code class="id">RF-45</code></td><td>O sistema deve oferecer o card de acesso, com a foto (sem foto, a inicial no hub e o mascote adotado no quest), nome, instituição e um menu com <q class="ui">Remover deste aparelho</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-46"><td><code class="id">RF-46</code></td><td>O sistema deve oferecer o aviso para completar, com ícone, texto e uma ação opcional, que na janela compact é um botão de ícone, para o texto ficar inteiro à vista</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-47"><td><code class="id">RF-47</code></td><td>O sistema deve oferecer o topo do módulo, com voltar, o nome do módulo, os avisos dele e, quando houver mais de uma, as abas Configuração e Utilização</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-48"><td><code class="id">RF-48</code></td><td>O sistema deve oferecer as boas-vindas com mascote, com um mascote de boas-vindas ou a turma de mascotes (todas as expressões, lado a lado, em formas variadas e proporção normal, um animado por vez), título, frase e ação principal</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-48"><td><code class="id">RF-48</code></td><td>O sistema deve oferecer as boas-vindas com o logo, com o fundo Halo, o logo inteiro na animação de abertura (hastes longas na landing page e no hub, curtas no quest), os brilhos do fundo passando pelas cores dos temas coloridos e o título, a frase e as ações num painel de superfície, sem mascotes, na apresentação da landing page, na entrada do hub e no acesso do quest; na entrada do hub e no acesso do quest, a partir da janela medium, só o logo, centralizado, sem painel de texto</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-49"><td><code class="id">RF-49</code></td><td>O sistema deve oferecer o seletor de tema, com uma amostra por tema de cor do design system, a escolha do modo claro, escuro ou sistema e o interruptor <q class="ui">Mascotes nas cores do tema</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-50"><td><code class="id">RF-50</code></td><td>O sistema deve oferecer o indicador, com um valor em destaque e o rótulo dele</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-101"><td><code class="id">RF-101</code></td><td>O sistema deve oferecer a vitrine de telas, com as telas do módulo num computador (hub) e num celular (quest) e o carrossel das telas; enquanto o módulo não tem as imagens, cada tela é um espaço com o nome dela</td><td><span class="prio prio-deve">Deve</span></td></tr>
@@ -956,14 +956,15 @@ Cenário: compact
   Então o topo do módulo não mostra as abas</pre>
     </article>
     <article class="criterio" id="ca-RF-48">
-      <h3><code class="id">RF-48</code> Boas-vindas com mascote</h3>
-      <pre class="gherkin">Cenário: entrada do quest
-  Dado o quest aberto num aparelho sem perfil acessado
-  Então as boas-vindas mostram o mascote feliz, o título e a ação "Inserir código"
+      <h3><code class="id">RF-48</code> Boas-vindas com o logo</h3>
+      <pre class="gherkin">Cenário: acesso do quest
+  Dado o quest aberto
+  Então as boas-vindas mostram o logo do quest, de hastes curtas, se montando uma vez sobre o fundo Halo
+  E nenhum mascote aparece nas boas-vindas
 
 Cenário: apresentação da landing page
   Dado a landing page aberta
-  Então as boas-vindas mostram a turma de mascotes, com no máximo um animado por vez</pre>
+  Então as boas-vindas mostram o logo de hastes longas e o título, a frase e as ações num painel de superfície</pre>
     </article>
     <article class="criterio" id="ca-RF-49">
       <h3><code class="id">RF-49</code> Seletor de tema</h3>
@@ -1005,8 +1006,8 @@ Cenário: módulo pronto
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../2_Diagramas/vista-compostos-comuns_v10_20261019-2025.svg"><img src="../2_Diagramas/vista-compostos-comuns_v10_20261019-2025.svg" alt="Vista dos onze componentes compostos comuns nos esquemas claro e escuro: topo da casca, navegação, card de módulo, card do catálogo, card de acesso, aviso, topo do módulo, boas-vindas, seletor de tema, indicador e vitrine de telas"></a>
-      <figcaption><strong>Componentes compostos comuns</strong><code>2_Diagramas/vista-compostos-comuns_v10_20261019-2025.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-compostos-comuns_v11_20261021-2138.svg"><img src="../2_Diagramas/vista-compostos-comuns_v11_20261021-2138.svg" alt="Vista dos onze componentes compostos comuns nos esquemas claro e escuro: topo da casca, navegação, card de módulo, card do catálogo, card de acesso, aviso, topo do módulo, boas-vindas, seletor de tema, indicador e vitrine de telas"></a>
+      <figcaption><strong>Componentes compostos comuns</strong><code>2_Diagramas/vista-compostos-comuns_v11_20261021-2138.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -1015,7 +1016,8 @@ Cenário: módulo pronto
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v14</span></td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v15</span></td><td>2026-10-21 22:12</td><td><code class="id">RF-48</code> alterado: boas-vindas com o logo (fundo Halo, logo na abertura, brilhos passando pelos temas coloridos, texto num painel, sem mascotes) na landing page, no hub e no quest, no lugar das boas-vindas com mascote e da turma; vista v11; na entrada do hub e no acesso do quest, a partir do medium, só o logo centralizado; status → Aprovado</td></tr>
+      <tr><td>v14</td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
       <tr><td>v13</td><td>2026-10-20 01:47</td><td><code class="id">RF-41</code> alterado: o topo só com o logo e os avisos nas janelas compact e medium vale também para o quest; status → Em revisão; <code class="id">RF-42</code>: trilho e gaveta abaixo do topo, que ocupa a largura toda; nome e foto no topo a partir da janela medium e trilho sem Conta ou Perfil (<code class="id">RF-41</code>, <code class="id">RF-42</code>); vista v10; componentes sem fundo próprio (campo outlined, botões outlined e de texto soltos na tela, botão segmentado, chip e controles do carrossel) ganham o fundo da tela, legíveis sobre a Estampa; <code class="id">RF-43</code> alterado (métrica na capa do card de módulo) e <code class="id">RF-101</code> incluído (vitrine de telas); <code class="id">RN-119</code>: o padrinho sai da página do módulo; card de módulo como painel com número, tendência, série ou progresso e números de apoio nas cores da paleta, sem mascotes, até dois por linha (<code class="id">RF-43</code>); mascote no lugar da foto só no quest (<code class="id">RF-41</code>, <code class="id">RF-45</code>)</td></tr>
       <tr><td>v12</td><td>2026-10-19 15:06</td><td>Status → Aprovado</td></tr>
       <tr><td>v11</td><td>2026-10-19 14:24</td><td><code class="id">RF-41</code>, <code class="id">RF-42</code>, <code class="id">RF-44</code>, <code class="id">RF-45</code> e <code class="id">RF-46</code> alterados: topo do hub só com logo e avisos até o medium, Conta embaixo no trilho, Ondas do vão no card do catálogo, mascote adotado no lugar da foto e aviso com botão de ícone no compact; vista v09; status → Em revisão</td></tr>
@@ -1024,11 +1026,10 @@ Cenário: módulo pronto
       <tr><td>v08</td><td>2026-10-19 04:06</td><td><code class="id">RF-48</code> alterado: a turma mostra as 30 expressões lado a lado, em formas variadas e proporção normal; vista v07</td></tr>
       <tr><td>v07</td><td>2026-10-19 03:53</td><td><code class="id">RF-48</code> alterado: turma de mascotes na apresentação da landing page; vista v06; status → Em revisão</td></tr>
       <tr><td>v06</td><td>2026-10-19 03:07</td><td>Status → Aprovado</td></tr>
-      <tr><td>v05</td><td>2026-10-19 03:04</td><td><code class="id">RF-41</code> alterado (nome ao lado da foto) e <code class="id">RN-114</code> incluído; vista v05 com o nome deboaz centralizado no símbolo</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v14 · 2026-10-20 01:57</span>
+    <span>boaz · v15 · 2026-10-21 22:12</span>
     <span class="boaz-arquivo">1_Requisitos/10_componentes-compostos-comuns.html</span>
   </div>
 </footer>

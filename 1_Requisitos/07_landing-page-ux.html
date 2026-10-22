@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landing page · UX base · boaz · v06</title>
+<title>Landing page · UX base · boaz · v07</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="07_landing-page-ux">
 <meta name="boaz:caminho" content="1_Requisitos/07_landing-page-ux.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v06">
-<meta name="boaz:data" content="2026-10-20 01:57">
+<meta name="boaz:versao" content="v07">
+<meta name="boaz:data" content="2026-10-21 22:12">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -827,8 +827,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir como os blocos da landing page se distribuem no celular e na web e como o visitante se move entre eles, deixando espaços fixos para cada módulo se apresentar.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>07_landing-page-ux</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v06</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-20 · 01:57</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v07</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-21 · 22:12</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -850,7 +850,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RF-02"><td><code class="id">RF-02</code></td><td>O sistema deve manter o topo fixo no alto da tela durante toda a rolagem, com o logo levando ao início da página</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-03"><td><code class="id">RF-03</code></td><td>O sistema deve oferecer, nas janelas compact e medium, um menu com os links das seções Módulos, Para quem, Como funciona e Depoimentos, o seletor de tema e as ações <q class="ui">Começar grátis</q>, <q class="ui">Entrar numa sala</q> e <q class="ui">Entrar</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-04"><td><code class="id">RF-04</code></td><td>O sistema deve mostrar, a partir da janela expanded, os links das seções, o seletor de tema e as três ações no próprio topo, sem menu</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-05"><td><code class="id">RF-05</code></td><td>O sistema deve mostrar na apresentação o título, a frase de valor, o <a class="ref" href="99_glossario.html#mascote">mascote</a> de boas-vindas e as ações <q class="ui">Começar grátis</q> e <q class="ui">Entrar numa sala</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-05"><td><code class="id">RF-05</code></td><td>O sistema deve mostrar na apresentação o título, a frase de valor, o logo na animação de abertura e as ações <q class="ui">Começar grátis</q> e <q class="ui">Entrar numa sala</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-06"><td><code class="id">RF-06</code></td><td>O sistema deve levar <q class="ui">Começar grátis</q> ao cadastro no hub, <q class="ui">Entrar</q> ao acesso ao hub e <q class="ui">Entrar numa sala</q> à entrada pelo <a class="ref" href="99_glossario.html#codigo-da-sala">código da sala</a> no quest</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-07"><td><code class="id">RF-07</code></td><td>O sistema deve mostrar, na janela compact, uma barra de ação fixa na base da tela enquanto a apresentação estiver fora de vista e o rodapé não estiver visível</td><td><span class="prio prio-deveria">Deveria</span></td></tr>
         <tr id="RF-08"><td><code class="id">RF-08</code></td><td>O sistema deve mostrar no bloco Módulos, num carrossel, um card por módulo publicado, com ícone, nome, frase curta, o número de instituições e educadores autônomos que usam o módulo e a ação <q class="ui">Saiba mais</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
@@ -942,7 +942,7 @@ Cenário: o destaque muda
       <h3><code class="id">RF-05</code> Apresentação</h3>
       <pre class="gherkin">Cenário: primeira tela no celular
   Dado a landing page aberta numa tela de 360 × 640dp
-  Então o visitante vê o título, a frase de valor, o mascote de boas-vindas e a ação "Começar grátis" sem rolar</pre>
+  Então o visitante vê o logo, o título, a frase de valor e a ação "Começar grátis" sem rolar</pre>
     </article>
     <article class="criterio" id="ca-RF-06">
       <h3><code class="id">RF-06</code> Destinos das ações</h3>
@@ -1011,8 +1011,8 @@ Cenário: primeira visita
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../2_Diagramas/blueprint-landing-page_v04_20261020-0124.svg"><img src="../2_Diagramas/blueprint-landing-page_v04_20261020-0124.svg" alt="Blueprint da landing page: página inteira e menu aberto no compact, página no expanded, com 11 blocos numerados, carrosséis e os espaços reservados aos módulos"></a>
-      <figcaption><strong>Landing page · blueprint de UX</strong><code>2_Diagramas/blueprint-landing-page_v04_20261020-0124.svg</code></figcaption>
+      <a href="../2_Diagramas/blueprint-landing-page_v05_20261021-2138.svg"><img src="../2_Diagramas/blueprint-landing-page_v05_20261021-2138.svg" alt="Blueprint da landing page: página inteira e menu aberto no compact, página no expanded, com 11 blocos numerados, carrosséis e os espaços reservados aos módulos"></a>
+      <figcaption><strong>Landing page · blueprint de UX</strong><code>2_Diagramas/blueprint-landing-page_v05_20261021-2138.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
       <a href="../2_Diagramas/blueprint-landing-modulo_v04_20261020-0124.svg"><img src="../2_Diagramas/blueprint-landing-modulo_v04_20261020-0124.svg" alt="Blueprint da página do módulo: estrutura base no compact e no expanded, com 9 blocos, números e depoimentos do módulo e os espaços que cada módulo preenche"></a>
@@ -1025,7 +1025,8 @@ Cenário: primeira visita
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v06</span></td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v07</span></td><td>2026-10-21 22:12</td><td><code class="id">RF-05</code> alterado: o logo na abertura no lugar do mascote de boas-vindas; blueprint v05; status → Aprovado</td></tr>
+      <tr><td>v06</td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
       <tr><td>v05</td><td>2026-10-20 01:27</td><td>Destaque antes de Como funciona, que mostra os passos do módulo em destaque, e dos Módulos (<code class="id">RF-01</code>, <code class="id">RN-62</code>, <code class="id">RN-74</code>); página do módulo com a vitrine das telas dele (<code class="id">RF-09</code>); blueprints da página e da página do módulo v04; status → Em revisão</td></tr>
       <tr><td>v04</td><td>2026-10-18 22:27</td><td>Status → Aprovado</td></tr>
       <tr><td>v03</td><td>2026-10-18 22:21</td><td>Blueprints v03: fundo escuro na janela inteira ao abrir o diagrama no navegador</td></tr>
@@ -1034,7 +1035,7 @@ Cenário: primeira visita
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v06 · 2026-10-20 01:57</span>
+    <span>boaz · v07 · 2026-10-21 22:12</span>
     <span class="boaz-arquivo">1_Requisitos/07_landing-page-ux.html</span>
   </div>
 </footer>
