@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2168 1338" width="2168" height="1338">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2168 1392" width="2168" height="1392">
   <title>Hub · entrada · blueprint de UX</title>
-  <desc>Blueprint de UX da entrada no hub (requisito 08_hub-ux): contas acessadas no aparelho, outra conta e criar conta. v01: criação. v02: contas acessadas no aparelho e Outra conta.</desc>
+  <desc>Blueprint de UX da entrada no hub (requisito 08_hub-ux): contas acessadas no aparelho, outra conta e criar conta. v01: criação. v02: contas acessadas no aparelho e Outra conta. v03: logo na abertura sobre o fundo Halo no lugar do mascote de boas-vindas; no expanded, só o logo centralizado, sem barra do topo.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -110,7 +110,7 @@
       <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <rect class="bg" x="0" y="0" width="2168" height="1338"/>
+  <rect class="bg" x="0" y="0" width="2168" height="1392"/>
   <g id="marca-topo">
     <rect class="wm-band" x="0" y="0" width="2168" height="112"/>
     <rect class="wm-accent" x="0" y="110" width="2168" height="2"/>
@@ -118,53 +118,51 @@
     <text class="title" x="40" y="72">Hub · entrada · blueprint de UX</text>
     <text class="subtitle" x="40" y="94">Contas acessadas no aparelho, outra conta e criar conta no celular (compact) e na web (expanded)</text>
     <text class="wm-meta-label" x="1880" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1880" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1904" y="71" text-anchor="middle">v02</text>
+    <rect class="wm-badge" x="1880" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1904" y="71" text-anchor="middle">v03</text>
     <line class="wm-sep" x1="1952" y1="32" x2="1952" y2="80"/>
     <text class="wm-meta-label" x="1976" y="44">DATA</text>
-    <text class="wm-meta-value" x="1976" y="72">2026-10-18 · 23:24</text>
+    <text class="wm-meta-value" x="1976" y="72">2026-10-21 · 21:53</text>
   </g>
   <g id="compact-contas">
-  <rect class="panel" x="40" y="152" width="360" height="624" rx="24" filter="url(#sombra)"/>
+  <rect class="panel" x="40" y="152" width="360" height="552" rx="24" filter="url(#sombra)"/>
   <g id="c-topo">
-  <rect class="node-orange" x="56" y="168" width="328" height="80" rx="12"/>
+  <rect class="node-orange" x="56" y="168" width="328" height="112" rx="12"/>
   <circle class="chip" cx="76" cy="183" r="9"/><text class="chip-text" x="76" y="187" text-anchor="middle">1</text>
   <text class="boundary-label" x="92" y="187">TOPO</text>
-  <rect class="node-face" x="140" y="198" width="160" height="40" rx="8"/>
-  <text class="label" x="220" y="222.5" text-anchor="middle">logo do hub</text>
+  <rect class="node-face" x="120" y="198" width="200" height="72" rx="8"/>
+  <text class="label" x="220" y="231" text-anchor="middle">logo do hub</text>
+  <text class="muted" x="220" y="247" text-anchor="middle">abertura · fundo Halo</text>
   </g>
   <g id="c-boas-vindas">
-  <rect class="boundary" x="56" y="256" width="328" height="176" rx="12"/>
-  <circle class="chip" cx="76" cy="271" r="9"/><text class="chip-text" x="76" y="275" text-anchor="middle">2</text>
-  <text class="boundary-label" x="92" y="275">BOAS-VINDAS</text>
-  <rect class="node-face" x="140" y="286" width="160" height="96" rx="8"/>
-  <text class="label" x="220" y="331" text-anchor="middle">mascote</text>
-  <text class="muted" x="220" y="347" text-anchor="middle">boas-vindas · feliz</text>
-  <rect class="node-face" x="68" y="390" width="304" height="32" rx="8"/>
-  <text class="label" x="220" y="410.5" text-anchor="middle">Título · Entrar</text>
+  <rect class="boundary" x="56" y="288" width="328" height="72" rx="12"/>
+  <circle class="chip" cx="76" cy="303" r="9"/><text class="chip-text" x="76" y="307" text-anchor="middle">2</text>
+  <text class="boundary-label" x="92" y="307">BOAS-VINDAS</text>
+  <rect class="node-face" x="68" y="318" width="304" height="32" rx="8"/>
+  <text class="label" x="220" y="338.5" text-anchor="middle">Título · Entrar</text>
   </g>
   <g id="c-contas">
-  <rect class="boundary" x="56" y="440" width="328" height="224" rx="12"/>
-  <circle class="chip" cx="76" cy="455" r="9"/><text class="chip-text" x="76" y="459" text-anchor="middle">3</text>
-  <text class="boundary-label" x="92" y="459">CONTAS ACESSADAS NESTE APARELHO</text>
-  <rect class="node-face" x="68" y="470" width="304" height="56" rx="8"/>
-  <text class="label" x="220" y="495" text-anchor="middle">instituição A</text>
-  <text class="muted" x="220" y="511" text-anchor="middle">nome da pessoa</text>
-  <rect class="node-face" x="68" y="534" width="304" height="56" rx="8"/>
-  <text class="label" x="220" y="559" text-anchor="middle">instituição B</text>
-  <text class="muted" x="220" y="575" text-anchor="middle">nome da pessoa</text>
-  <rect class="node-face" x="68" y="598" width="304" height="56" rx="8"/>
-  <text class="label" x="220" y="623" text-anchor="middle">educador autônomo</text>
-  <text class="muted" x="220" y="639" text-anchor="middle">nome da pessoa</text>
+  <rect class="boundary" x="56" y="368" width="328" height="224" rx="12"/>
+  <circle class="chip" cx="76" cy="383" r="9"/><text class="chip-text" x="76" y="387" text-anchor="middle">3</text>
+  <text class="boundary-label" x="92" y="387">CONTAS ACESSADAS NESTE APARELHO</text>
+  <rect class="node-face" x="68" y="398" width="304" height="56" rx="8"/>
+  <text class="label" x="220" y="423" text-anchor="middle">instituição A</text>
+  <text class="muted" x="220" y="439" text-anchor="middle">nome da pessoa</text>
+  <rect class="node-face" x="68" y="462" width="304" height="56" rx="8"/>
+  <text class="label" x="220" y="487" text-anchor="middle">instituição B</text>
+  <text class="muted" x="220" y="503" text-anchor="middle">nome da pessoa</text>
+  <rect class="node-face" x="68" y="526" width="304" height="56" rx="8"/>
+  <text class="label" x="220" y="551" text-anchor="middle">educador autônomo</text>
+  <text class="muted" x="220" y="567" text-anchor="middle">nome da pessoa</text>
   </g>
   <g id="c-outra">
-  <rect class="boundary" x="56" y="672" width="328" height="88" rx="12"/>
-  <circle class="chip" cx="76" cy="687" r="9"/><text class="chip-text" x="76" y="691" text-anchor="middle">4</text>
-  <text class="boundary-label" x="92" y="691">OUTRA CONTA</text>
-  <rect class="node-face" x="68" y="702" width="304" height="48" rx="8"/>
-  <text class="label" x="220" y="723" text-anchor="middle">Outra conta</text>
-  <text class="muted" x="220" y="739" text-anchor="middle">entrar com e-mail e senha</text>
+  <rect class="boundary" x="56" y="600" width="328" height="88" rx="12"/>
+  <circle class="chip" cx="76" cy="615" r="9"/><text class="chip-text" x="76" y="619" text-anchor="middle">4</text>
+  <text class="boundary-label" x="92" y="619">OUTRA CONTA</text>
+  <rect class="node-face" x="68" y="630" width="304" height="48" rx="8"/>
+  <text class="label" x="220" y="651" text-anchor="middle">Outra conta</text>
+  <text class="muted" x="220" y="667" text-anchor="middle">entrar com e-mail e senha</text>
   </g>
-  <text class="mono" x="220" y="800" text-anchor="middle">compact · 360dp · contas acessadas</text>
+  <text class="mono" x="220" y="728" text-anchor="middle">compact · 360dp · contas acessadas</text>
   </g>
   <g id="compact-outra">
   <rect class="panel" x="496" y="152" width="360" height="440" rx="24" filter="url(#sombra)"/>
@@ -243,77 +241,71 @@
   <text class="mono" x="1132" y="880" text-anchor="middle">compact · 360dp · criar conta</text>
   </g>
   <g id="expanded-entrar">
-  <rect class="panel" x="1408" y="152" width="720" height="408" rx="24" filter="url(#sombra)"/>
-  <g id="e-topo">
-  <rect class="node-orange" x="1424" y="168" width="688" height="80" rx="12"/>
-  <circle class="chip" cx="1444" cy="183" r="9"/><text class="chip-text" x="1444" y="187" text-anchor="middle">1</text>
-  <text class="boundary-label" x="1460" y="187">TOPO</text>
-  <rect class="node-face" x="1436" y="198" width="160" height="40" rx="8"/>
-  <text class="label" x="1516" y="222.5" text-anchor="middle">logo do hub</text>
-  <rect class="node-face" x="2028" y="198" width="72" height="40" rx="8"/>
-  <text class="label" x="2064" y="222.5" text-anchor="middle">tema</text>
-  </g>
+  <rect class="panel" x="1408" y="152" width="720" height="320" rx="24" filter="url(#sombra)"/>
   <g id="e-boas-vindas">
-  <rect class="boundary" x="1424" y="256" width="336" height="288" rx="12"/>
-  <circle class="chip" cx="1444" cy="271" r="9"/><text class="chip-text" x="1444" y="275" text-anchor="middle">2</text>
-  <text class="boundary-label" x="1460" y="275">BOAS-VINDAS</text>
-  <rect class="node-face" x="1436" y="286" width="312" height="248" rx="8"/>
-  <text class="label" x="1592" y="407" text-anchor="middle">mascote e frase de boas-vindas</text>
-  <text class="muted" x="1592" y="423" text-anchor="middle">boas-vindas · feliz</text>
+  <rect class="boundary" x="1424" y="168" width="336" height="288" rx="12"/>
+  <circle class="chip" cx="1444" cy="183" r="9"/><text class="chip-text" x="1444" y="187" text-anchor="middle">2</text>
+  <text class="boundary-label" x="1460" y="187">BOAS-VINDAS</text>
+  <rect class="node-face" x="1436" y="198" width="312" height="248" rx="8"/>
+  <text class="label" x="1592" y="319" text-anchor="middle">logo do hub</text>
+  <text class="muted" x="1592" y="335" text-anchor="middle">centralizado · abertura · fundo Halo</text>
   </g>
   <g id="e-contas">
-  <rect class="boundary" x="1776" y="256" width="336" height="184" rx="12"/>
-  <circle class="chip" cx="1796" cy="271" r="9"/><text class="chip-text" x="1796" y="275" text-anchor="middle">3</text>
-  <text class="boundary-label" x="1812" y="275">CONTAS ACESSADAS</text>
-  <rect class="node-face" x="1788" y="286" width="312" height="32" rx="8"/>
-  <text class="label" x="1944" y="306.5" text-anchor="middle">Título · Entrar</text>
-  <rect class="node-face" x="1788" y="326" width="312" height="48" rx="8"/>
-  <text class="label" x="1944" y="347" text-anchor="middle">instituição A</text>
-  <text class="muted" x="1944" y="363" text-anchor="middle">nome da pessoa</text>
-  <rect class="node-face" x="1788" y="382" width="312" height="48" rx="8"/>
-  <text class="label" x="1944" y="403" text-anchor="middle">instituição B</text>
-  <text class="muted" x="1944" y="419" text-anchor="middle">nome da pessoa</text>
+  <rect class="boundary" x="1776" y="168" width="336" height="184" rx="12"/>
+  <circle class="chip" cx="1796" cy="183" r="9"/><text class="chip-text" x="1796" y="187" text-anchor="middle">3</text>
+  <text class="boundary-label" x="1812" y="187">CONTAS ACESSADAS</text>
+  <rect class="node-face" x="1788" y="198" width="312" height="32" rx="8"/>
+  <text class="label" x="1944" y="218.5" text-anchor="middle">Título · Entrar</text>
+  <rect class="node-face" x="1788" y="238" width="312" height="48" rx="8"/>
+  <text class="label" x="1944" y="259" text-anchor="middle">instituição A</text>
+  <text class="muted" x="1944" y="275" text-anchor="middle">nome da pessoa</text>
+  <rect class="node-face" x="1788" y="294" width="312" height="48" rx="8"/>
+  <text class="label" x="1944" y="315" text-anchor="middle">instituição B</text>
+  <text class="muted" x="1944" y="331" text-anchor="middle">nome da pessoa</text>
   </g>
   <g id="e-outra">
-  <rect class="boundary" x="1776" y="448" width="336" height="80" rx="12"/>
-  <circle class="chip" cx="1796" cy="463" r="9"/><text class="chip-text" x="1796" y="467" text-anchor="middle">4</text>
-  <text class="boundary-label" x="1812" y="467">OUTRA CONTA</text>
-  <rect class="node-face" x="1788" y="478" width="312" height="40" rx="8"/>
-  <text class="label" x="1944" y="502.5" text-anchor="middle">Outra conta</text>
+  <rect class="boundary" x="1776" y="360" width="336" height="80" rx="12"/>
+  <circle class="chip" cx="1796" cy="375" r="9"/><text class="chip-text" x="1796" y="379" text-anchor="middle">4</text>
+  <text class="boundary-label" x="1812" y="379">OUTRA CONTA</text>
+  <rect class="node-face" x="1788" y="390" width="312" height="40" rx="8"/>
+  <text class="label" x="1944" y="414.5" text-anchor="middle">Outra conta</text>
   </g>
-  <text class="mono" x="1768" y="584" text-anchor="middle">expanded · 1280dp · desenhado na escala 0,56</text>
+  <text class="mono" x="1768" y="496" text-anchor="middle">expanded · 1280dp · desenhado na escala 0,56</text>
   </g>
   <g id="anotacoes">
   <text class="section" x="496" y="680">BLOCOS</text>
   <circle class="chip" cx="505" cy="707" r="9"/><text class="chip-text" x="505" y="711" text-anchor="middle">1</text>
   <text class="label-strong" x="524" y="712">Topo</text>
-  <text class="muted" x="524" y="730">logo do hub; nas outras telas, voltar</text>
-  <circle class="chip" cx="505" cy="759" r="9"/><text class="chip-text" x="505" y="763" text-anchor="middle">2</text>
-  <text class="label-strong" x="524" y="764">Boas-vindas</text>
-  <text class="muted" x="524" y="782">mascote feliz e o título da tela</text>
-  <circle class="chip" cx="505" cy="811" r="9"/><text class="chip-text" x="505" y="815" text-anchor="middle">3</text>
-  <text class="label-strong" x="524" y="816">Contas acessadas</text>
-  <text class="muted" x="524" y="834">contas que já entraram neste aparelho;</text>
-  <text class="muted" x="524" y="852">uma por instituição, cada uma com</text>
-  <text class="muted" x="524" y="870">as próprias regras</text>
-  <circle class="chip" cx="505" cy="899" r="9"/><text class="chip-text" x="505" y="903" text-anchor="middle">4</text>
-  <text class="label-strong" x="524" y="904">Outra conta</text>
-  <text class="muted" x="524" y="922">entrar com e-mail e senha</text>
-  <circle class="chip" cx="505" cy="951" r="9"/><text class="chip-text" x="505" y="955" text-anchor="middle">5</text>
-  <text class="label-strong" x="524" y="956">Criar conta</text>
-  <text class="muted" x="524" y="974">leva ao cadastro</text>
-  <circle class="chip" cx="505" cy="1003" r="9"/><text class="chip-text" x="505" y="1007" text-anchor="middle">6</text>
-  <text class="label-strong" x="524" y="1008">Tipo de conta</text>
-  <text class="muted" x="524" y="1026">instituição (escola ou empresa)</text>
-  <text class="muted" x="524" y="1044">ou educador autônomo</text>
-  <circle class="chip" cx="505" cy="1073" r="9"/><text class="chip-text" x="505" y="1077" text-anchor="middle">7</text>
-  <text class="label-strong" x="524" y="1078">Dados do cadastro</text>
-  <text class="muted" x="524" y="1096">espaço do módulo de cadastro</text>
-  <circle class="chip" cx="505" cy="1125" r="9"/><text class="chip-text" x="505" y="1129" text-anchor="middle">8</text>
-  <text class="label-strong" x="524" y="1130">Ação</text>
-  <text class="muted" x="524" y="1148">Criar conta; volta a Entrar</text>
+  <text class="muted" x="524" y="730">logo inteiro do hub na abertura, sobre o</text>
+  <text class="muted" x="524" y="748">fundo Halo; nas outras telas, voltar</text>
+  <circle class="chip" cx="505" cy="777" r="9"/><text class="chip-text" x="505" y="781" text-anchor="middle">2</text>
+  <text class="label-strong" x="524" y="782">Boas-vindas</text>
+  <text class="muted" x="524" y="800">compact: título da tela, sem mascote;</text>
+  <text class="muted" x="524" y="818">expanded: só o logo, centralizado no Halo,</text>
+  <text class="muted" x="524" y="836">sem barra do topo</text>
+  <circle class="chip" cx="505" cy="865" r="9"/><text class="chip-text" x="505" y="869" text-anchor="middle">3</text>
+  <text class="label-strong" x="524" y="870">Contas acessadas</text>
+  <text class="muted" x="524" y="888">contas que já entraram neste aparelho;</text>
+  <text class="muted" x="524" y="906">uma por instituição, cada uma com</text>
+  <text class="muted" x="524" y="924">as próprias regras</text>
+  <circle class="chip" cx="505" cy="953" r="9"/><text class="chip-text" x="505" y="957" text-anchor="middle">4</text>
+  <text class="label-strong" x="524" y="958">Outra conta</text>
+  <text class="muted" x="524" y="976">entrar com e-mail e senha</text>
+  <circle class="chip" cx="505" cy="1005" r="9"/><text class="chip-text" x="505" y="1009" text-anchor="middle">5</text>
+  <text class="label-strong" x="524" y="1010">Criar conta</text>
+  <text class="muted" x="524" y="1028">leva ao cadastro</text>
+  <circle class="chip" cx="505" cy="1057" r="9"/><text class="chip-text" x="505" y="1061" text-anchor="middle">6</text>
+  <text class="label-strong" x="524" y="1062">Tipo de conta</text>
+  <text class="muted" x="524" y="1080">instituição (escola ou empresa)</text>
+  <text class="muted" x="524" y="1098">ou educador autônomo</text>
+  <circle class="chip" cx="505" cy="1127" r="9"/><text class="chip-text" x="505" y="1131" text-anchor="middle">7</text>
+  <text class="label-strong" x="524" y="1132">Dados do cadastro</text>
+  <text class="muted" x="524" y="1150">espaço do módulo de cadastro</text>
+  <circle class="chip" cx="505" cy="1179" r="9"/><text class="chip-text" x="505" y="1183" text-anchor="middle">8</text>
+  <text class="label-strong" x="524" y="1184">Ação</text>
+  <text class="muted" x="524" y="1202">Criar conta; volta a Entrar</text>
   </g>
-  <g id="marca-rodape" transform="translate(0,1222)">
+  <g id="marca-rodape" transform="translate(0,1276)">
     <rect class="wm-band" x="0" y="0" width="2168" height="116"/>
     <line class="wm-sep" x1="0" y1="0.5" x2="2168" y2="0.5"/>
     <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
@@ -323,7 +315,7 @@
     <rect class="node-orange" x="470" y="47" width="14" height="14" rx="3"/><text class="label" x="492" y="58">Fixo na tela</text>
     <rect class="boundary" x="604" y="47" width="14" height="14" rx="3"/><text class="label" x="626" y="58">Seção</text>
     <line class="divider" x1="40" y1="76" x2="2128" y2="76"/>
-    <text class="footer" x="40" y="100">v02 · contas acessadas no aparelho e Outra conta na entrada</text>
-    <text class="wm-file" x="2128" y="100" text-anchor="end">blueprint-hub-entrada_v02_20261018-2324.svg</text>
+    <text class="footer" x="40" y="100">v03 · logo na abertura sobre o fundo Halo no lugar do mascote de boas-vindas; no expanded, só o logo centralizado, sem barra do topo</text>
+    <text class="wm-file" x="2128" y="100" text-anchor="end">blueprint-hub-entrada_v03_20261021-2153.svg</text>
   </g>
 </svg>

@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v29</title>
+<title>Design system · boaz · v30</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v29">
-<meta name="design:data" content="2026-10-21 21:08">
+<meta name="design:versao" content="v30">
+<meta name="design:data" content="2026-10-21 21:37">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -22880,6 +22880,20 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
     const k = alt / g.altura;
     return `<g transform="translate(${n(x)} ${n(y)}) scale(${n(k * 1e5) / 1e5}) translate(0 ${-g.y})" opacity="${op}"><path fill="${p.anel}" d="${g.anel}"/><path fill="${p.b}" d="${g.b}"/><path fill="${p.d}" d="${g.d}"/></g>`;
   };
+  // logo inteiro (símbolo + nome) centrado em cx, cy, com a altura do símbolo = alt; anima a abertura (toca uma vez)
+  const logoInteiro = (cx, cy, alt, cor, anim, v = 'longo') => {
+    const svg = anim === 'abertura' ? marca.abertura(v, cor) : marca.logo(v, cor);
+    const [, , vw, vh] = svg.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number), larg = alt * vw / vh;
+    return encaixa(svg, cx - larg / 2, cy - alt / 2, larg, alt, 1);
+  };
+  // brilho que passa pelas cores dos temas em laço: fica `fica` s em cada tema e troca em `troca` s, suave
+  const corCiclo = (lista, fica, troca) => {
+    if (lista.length < 2) return '';
+    const passo = fica + troca, dur = passo * lista.length, kt = [0], vs = [lista[0]];
+    lista.forEach((cor, i) => { kt.push((i * passo + fica) / dur, ((i + 1) * passo) / dur); vs.push(cor, lista[(i + 1) % lista.length]); });
+    const sp = lista.map(() => '0 0 1 1;0.4 0 0.2 1').join(';');
+    return `<animate attributeName="stop-color" values="${vs.join(';')}" keyTimes="${kt.map((k) => n(k * 1e4) / 1e4).join(';')}" calcMode="spline" keySplines="${sp}" dur="${n(dur)}s" repeatCount="indefinite"/>`;
+  };
   const anel = (cx, cy, R, cor, op, anim) => {
     const esp = R * 116 / 270, rm = R - esp / 2, volta = 2 * Math.PI * rm;
     const base = `cx="${n(cx)}" cy="${n(cy)}" r="${n(rm)}" fill="none" stroke="${cor}" stroke-width="${n(esp)}"`;
@@ -22937,6 +22951,10 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
    * op = { largura, altura, cores (PAPEIS + mascote), pecas: 'ambos'|'logo'|'mascotes'|'nenhuma' (só o desenho, para fundo de card),
    *        origem: { x, y } (0 a 1; centro do anel e das ondas), celula (Estampa: tamanho da célula em px; no fundo de tela, fixo em ~48dp), raio (do anel gigante, em px; padrão 0,55 do lado maior),
    *        mascote: { expressao, forma, proporcao, movimento }, logo: ''|'abertura'|'carregamento',
+   *        nome (Halo com pecas 'logo': o logo inteiro, símbolo + nome, centrado na origem e com altura = raio; com logo 'abertura', o nome entra depois do símbolo),
+   *        variante ('longo' | 'curto': hastes do logo inteiro do Halo; curto no quest),
+   *        ciclo: [cores, …] (Halo: os brilhos passam pelas cores desses temas em laço, suave, começando no primeiro; parado, ficam no primeiro; a superfície fica a de `cores`),
+   *        cicloTempo: { fica, troca } (segundos em cada tema e na troca; padrão 6 e 2),
    *        quantidade (antenas), semente, movimentoReduzido }
    */
   function desenhar(conceito, op = {}) {
@@ -23031,10 +23049,17 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
         (P === 'ambos' ? masc(montar(), x + alt * 0.34, y + alt * 0.66, alt * 0.26) : '');
     } else if (conceito === 'halo') {
       const id = `fundo-h${++seq}`;
-      const gr = (k, cor, x, y, raio) => `<radialGradient id="${id}-${k}" cx="${n(x)}" cy="${n(y)}" r="${n(raio)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${cor}" stop-opacity=".55"/><stop offset="1" stop-color="${cor}" stop-opacity="0"/></radialGradient>`;
-      s = `<defs>${gr(1, c.primary, w * 0.2, h * 0.25, b * 0.9)}${gr(2, c.secondary, w * 0.85, h * 0.8, b * 0.9)}${gr(3, c.tertiary, w * 0.7, h * 0.15, b * 0.6)}</defs>` + base(w, h, c.surface) +
+      // com ciclo, cada brilho passa pela mesma cor (primary, secondary, tertiary) de cada tema da lista, a partir do primeiro
+      // (parado, fica no primeiro tema da lista); a superfície de baixo é sempre a de `cores`
+      const lista = op.ciclo?.length ? op.ciclo : null, cb = lista ? lista[0] : c;
+      const { fica = 6, troca = 2 } = op.cicloTempo || {};
+      const gr = (k, papel, x, y, raio) => { const an = lista && !movimentoReduzido ? corCiclo(lista.map((t) => t[papel]), fica, troca) : '';
+        return `<radialGradient id="${id}-${k}" cx="${n(x)}" cy="${n(y)}" r="${n(raio)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${cb[papel]}" stop-opacity=".55">${an}</stop><stop offset="1" stop-color="${cb[papel]}" stop-opacity="0">${an}</stop></radialGradient>`; };
+      s = `<defs>${gr(1, 'primary', w * 0.2, h * 0.25, b * 0.9)}${gr(2, 'secondary', w * 0.85, h * 0.8, b * 0.9)}${gr(3, 'tertiary', w * 0.7, h * 0.15, b * 0.6)}</defs>` + base(w, h, c.surface) +
         [1, 2, 3].map((k) => `<rect width="${w}" height="${h}" fill="url(#${id}-${k})"/>`).join('');
       if (P === 'nenhuma') s += '';
+      // logo inteiro nas cores da marca do tema (num tema monocromático, sem cor de mascote, tudo em on-surface)
+      else if (P === 'logo' && op.nome) s += logoInteiro(w * (og.x ?? 0.5), h * (og.y ?? 0.5), op.raio ?? b * 0.26, c.mascote ? { ...tres, de: c.secondary, boaz: c.primary } : { simbolo: c['on-surface'], de: c['on-surface'], boaz: c['on-surface'] }, a, op.variante);
       else if (P === 'logo') s += simb(w / 2 - b * 0.09, h / 2 - b * 0.13, b * 0.26, tres, 'longo', 1, a);
       else if (P === 'mascotes') s += masc(montar(), w / 2, h / 2, b * 0.38);
       else s += simb(w / 2 - b * 0.2, h / 2 - b * 0.13, b * 0.26, tres, 'longo', 1, a) + masc(montar(), w / 2 + b * 0.14, h / 2 + b * 0.02, b * 0.26);
@@ -24558,12 +24583,23 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .cx-aviso p { margin: 0; font-family: var(--md-sys-typescale-body-medium-font); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
 
 /* comuns · boas-vindas com mascote */
-.cx-boas-vindas { display: grid; justify-items: center; gap: var(--md-sys-spacing-3); padding: var(--md-sys-spacing-6) var(--md-sys-spacing-4); text-align: center; }
-.cx-boas-vindas img { width: var(--md-sys-spacing-24); height: var(--md-sys-spacing-24); }
-.cx-boas-vindas h3 { margin: 0; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-headline-small-weight); }
-/* turma de mascotes: todas as expressões, pequenas e lado a lado, em formas variadas e proporção normal */
-.cx-turma { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--md-sys-spacing-1); width: 100%; max-width: 20rem; }
-.cx-turma img { width: 100%; height: auto; aspect-ratio: 1; }
+/* boas-vindas com o logo (landing, hub e quest): fundo Halo (brilhos que passam pelos temas) com o logo na abertura; texto e ações num painel de superfície */
+/* compact: logo no alto, painel embaixo; a partir de 40rem, painel à esquerda e logo à direita */
+.cx-palco-boas-vindas { container-type: inline-size; }
+.cx-boas-vindas { position: relative; display: grid; align-items: center; min-height: 22rem; padding: 10rem var(--md-sys-spacing-4) var(--md-sys-spacing-4); overflow: hidden; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface); }
+.cx-boas-vindas .halo { position: absolute; inset: 0; pointer-events: none; }
+.cx-boas-vindas .halo svg { display: block; width: 100%; height: 100%; }
+.cx-boas-vindas .painel { position: relative; display: grid; gap: var(--md-sys-spacing-3); align-self: end; padding: var(--md-sys-spacing-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface); box-shadow: var(--md-sys-elevation-level1); }
+.cx-boas-vindas h3 { margin: 0; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-headline-medium-weight); }
+.cx-boas-vindas p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-body-large-font); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+.cx-boas-vindas .acoes { display: flex; flex-wrap: wrap; gap: var(--md-sys-spacing-2); }
+@container (min-width: 40rem) { .cx-boas-vindas:not(.cx-boas-vindas--faixa) { padding: var(--md-sys-spacing-8); } .cx-boas-vindas:not(.cx-boas-vindas--faixa) .painel { align-self: center; max-width: 52%; } }
+/* compact do hub e do quest: o Halo é uma faixa no alto que some antes do título; o texto fica direto na superfície */
+.cx-palco-boas-vindas--estreito { max-width: 22rem; margin: var(--md-sys-spacing-4) auto 0; }
+.cx-boas-vindas--faixa { min-height: 0; padding-top: 8rem; text-align: center; }
+.cx-boas-vindas--faixa .halo { bottom: auto; height: 8rem; -webkit-mask-image: linear-gradient(to bottom, var(--md-sys-color-on-surface) 60%, transparent); mask-image: linear-gradient(to bottom, var(--md-sys-color-on-surface) 60%, transparent); }
+.cx-boas-vindas--faixa .painel { padding: var(--md-sys-spacing-2) 0 0; background: none; box-shadow: none; }
+.cx-boas-vindas--faixa .acoes { justify-content: center; }
 /* menu da landing page (compact e medium) */
 .cx-menu-landing { display: grid; gap: var(--md-sys-spacing-2); max-width: 22.5rem; width: 100%; padding-bottom: var(--md-sys-spacing-4); background: var(--md-sys-color-surface); }
 .cx-menu-landing .cabeca { display: flex; align-items: center; justify-content: space-between; height: var(--md-comp-top-app-bar-height); padding: 0 var(--md-sys-spacing-1) 0 var(--md-sys-spacing-4); }
@@ -24572,7 +24608,6 @@ window.dispatchEvent(new Event('boaz-fundos'));
 .cx-menu-landing .tema { margin: 0 var(--md-sys-spacing-4); padding: 0; border: 0; border-radius: 0; border-top: 1px solid var(--md-sys-color-outline-variant); background: none; cursor: pointer; text-align: left; }
 .cx-menu-landing .tema small { margin-left: auto; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); }
 .cx-menu-landing .acoes { display: grid; gap: var(--md-sys-spacing-3); padding: 0 var(--md-sys-spacing-4); }
-.cx-boas-vindas .acoes { display: grid; gap: var(--md-sys-spacing-2); width: 100%; max-width: 20rem; }
 
 /* comuns · seletor de tema */
 .cx-seletor-tema { display: grid; gap: var(--md-sys-spacing-4); padding: var(--md-sys-spacing-4); border-radius: var(--md-comp-menu-shape); background: var(--md-comp-menu-container-color); box-shadow: var(--md-comp-menu-elevation); max-width: 22rem; }
@@ -24983,8 +25018,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v29</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-21 21:08</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v30</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-21 21:37</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -25411,12 +25446,12 @@ el.innerHTML = fundos.desenhar('halo', {
         <div class="cx-topo cx-topo--modulo"><button class="md-icon-button md-estado md-alvo" aria-label="Voltar"><span class="material-symbols">arrow_back</span></button><h3>Presença</h3><span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 1 não lido"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">1</span></span></div>
         <div class="md-tabs" role="tablist"><button class="md-tab md-estado" role="tab" aria-selected="true">Configuração</button><button class="md-tab md-estado" role="tab" aria-selected="false">Utilização</button></div>
       </div>
+      <div class="palco">
+        <span class="rotulo">Boas-vindas com o logo · apresentação da landing page, entrada do hub e acesso do quest: fundo Halo com o logo inteiro na abertura (toca uma vez; hastes curtas no quest), os brilhos passando pelas cores dos temas coloridos, suave e em laço, e o texto num painel de superfície, sem mascotes; no compact do hub e do quest, o Halo fica numa faixa no alto que some antes do título; do medium em diante, a coluna das boas-vindas do hub e do quest mostra só o logo, centralizado, sem painel</span>
+        <div class="cx-palco-boas-vindas"><div class="cx-boas-vindas"><span class="halo" aria-hidden="true"></span><div class="painel"><h3>Aprender fica deboaz</h3><p>Quizzes ao vivo, tarefas e o acompanhamento da família numa só plataforma, para escolas, empresas e educadores.</p><div class="acoes"><a class="md-button md-button--filled md-estado" href="#compostos">Começar grátis</a><a class="md-button md-button--outlined md-estado" href="#compostos">Entrar numa sala</a></div></div></div></div>
+        <div class="cx-palco-boas-vindas cx-palco-boas-vindas--estreito"><div class="cx-boas-vindas cx-boas-vindas--faixa" data-variante="curto"><span class="halo" aria-hidden="true"></span><div class="painel"><h3>Que bom te ver!</h3><p>Escolha o perfil para entrar</p><div class="acoes"><button class="md-button md-button--filled md-estado">Inserir código</button></div></div></div></div>
+      </div>
       <div class="cx-par">
-        <div class="palco cx-centro">
-          <span class="rotulo">Boas-vindas com mascote · entrada do hub e do quest; na apresentação da landing page, a turma de mascotes com todas as expressões, um animado por vez</span>
-          <div class="cx-boas-vindas"><img data-mascote="feliz" alt=""><h3>Que bom te ver!</h3><p class="cx-texto-apoio">Entre com o código que a escola entregou.</p><div class="acoes"><button class="md-button md-button--filled md-estado">Inserir código</button></div></div>
-          <div class="cx-boas-vindas"><div class="cx-turma" aria-hidden="true"><img data-mascote="feliz" data-forma="circulo" alt=""><img data-mascote="acertou" data-forma="nuvem" alt=""><img data-mascote="estrela" data-forma="pentagono" alt=""><img data-mascote="errou" data-forma="bolha" alt=""><img data-mascote="ops" data-forma="coracao" alt=""><img data-mascote="duvida" data-forma="oval" alt=""><img data-mascote="pensando" data-forma="quadrado" alt=""><img data-mascote="surpreso" data-forma="gota" alt=""><img data-mascote="bravo" data-forma="esfera" alt=""><img data-mascote="brincalhao" data-forma="hexagono" alt=""><img data-mascote="sonolento" data-forma="octogono" alt=""><img data-mascote="desconfiado" data-forma="trevo" alt=""><img data-mascote="piscadinha" data-forma="estrela" alt=""><img data-mascote="envergonhado" data-forma="losango" alt=""><img data-mascote="orgulhoso" data-forma="circulo" alt=""><img data-mascote="rindo" data-forma="nuvem" alt=""><img data-mascote="apaixonado" data-forma="pentagono" alt=""><img data-mascote="aliviado" data-forma="bolha" alt=""><img data-mascote="chorando" data-forma="coracao" alt=""><img data-mascote="frustrado" data-forma="oval" alt=""><img data-mascote="tonto" data-forma="quadrado" alt=""><img data-mascote="preocupado" data-forma="gota" alt=""><img data-mascote="concentrado" data-forma="esfera" alt=""><img data-mascote="curioso" data-forma="hexagono" alt=""><img data-mascote="esperando" data-forma="octogono" alt=""><img data-mascote="pressa" data-forma="trevo" alt=""><img data-mascote="tchau" data-forma="estrela" alt=""><img data-mascote="beijo" data-forma="losango" alt=""><img data-mascote="silencio" data-forma="circulo" alt=""><img data-mascote="doente" data-forma="nuvem" alt=""></div><h3>Aprender fica deboaz</h3></div>
-        </div>
         <div class="palco cx-centro">
           <span class="rotulo">Seletor de tema · landing page, hub e quest: tema de cor, modo e se os mascotes seguem as cores do tema, guardados no aparelho</span>
           <div class="cx-seletor-tema" role="dialog" aria-label="Tema">
@@ -25688,6 +25723,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v30</td><td>2026-10-21 21:37</td><td>Fundo Halo: opção <code>nome</code> (logo inteiro, símbolo + nome, com a abertura) e <code>ciclo</code> (os brilhos passam pelas cores de uma lista de temas, suave e em laço: 6 s em cada, 2 s de troca; parado com movimento reduzido). Halo: <code>variante</code> (hastes do logo inteiro: curtas no quest). Compostos: boas-vindas com o logo (Halo com o logo na abertura e os brilhos passando pelos temas coloridos; texto e ações num painel de superfície; no compact do hub e do quest, o Halo numa faixa no alto que some antes do título; do medium em diante, só o logo centralizado) na apresentação da landing page, na entrada do hub e no acesso do quest, no lugar da turma e das boas-vindas com mascote.</td></tr>
           <tr><td>v29</td><td>2026-10-21 21:08</td><td>Temas de cor: 8 paletas bem diferentes do padrão — Neon (verde-limão, ciano e magenta sobre roxo-noite, prefere o escuro), Vaporwave (rosa, lilás e ciano), Algodão-doce (pastéis sobre creme), Terra (terracota, oliva e mostarda sobre areia), Retrô (mostarda, laranja-queimado e petróleo), Meia-noite (azul-noite e dourado), Arco-íris (rosa, laranja e azul) e Salada de frutas (fruit-salad do M3). Usam neutra tingida (superfícies coloridas) e secundária/terciária em outras matizes. E 12 paletas dos genins da Folha, inspiradas nas cores de cada personagem: Time 7 (Naruto, Sasuke, Sakura), Time 8 (Hinata, Kiba, Shino), Time 10 (Shikamaru, Ino, Chōji) e Time Guy (Neji, Rock Lee, Tenten).</td></tr>
           <tr><td>v28</td><td>2026-10-19 19:40</td><td>Quest: agenda em calendário vertical (dia em secondary, um dia por divisória) e card de tarefa com hora e borda em primary (no prazo) ou tertiary (vencida), ponto sucesso/erro (pode fazer ou bloqueada) e Símbolo recortado com mascote animado quando acontece agora; quem está acessando com parentesco e Entrar na largura toda; chip com largura; card de tarefa com os envios possíveis e feitos; topo com nome e foto a partir do medium e trilho sem Conta ou Perfil; gráfico de barras (componente base) e card de desafio do quest (tarefa sem prazo: pódio com mascotes em forma de número, 4º e 5º, sua posição, tentativas e Jogar de novo); pódio do card de desafio em festa: mascotes felizes com movimento composto (comemorar, pular, dançar, balançar); Estampa redesenhada como rabiscos espalhados (mascotes em contorno com rosto, números, sinais, o símbolo e miudezas, pequenos, girados e num tom discreto), também para a tela Fixos do quest; componentes sem fundo (campo outlined, botões outlined e de texto soltos na tela, segmentado, chip, controles do carrossel) ganham o fundo da tela, legíveis sobre a Estampa; parentesco num segmentado cheio; card de módulo com a métrica de quem cuida do módulo e uma série curta; vitrine de telas (computador e celular) para a página do módulo e o detalhe do catálogo; painel do módulo no hub: número principal com tendência (sucesso ou erro pelo significado), série ou progresso e números de apoio nas cores da paleta, sem mascotes, até dois por linha</td></tr>
           <tr><td>v27</td><td>2026-10-19 14:16</td><td>Botão segmentado cheio; topo da casca só com logo e avisos no compact e no medium (nome e foto a partir do expanded); foto ou mascote adotado no avatar; trilho com Conta embaixo; aviso com botão de ícone no compact; card do catálogo com as Ondas do vão na forma do padrinho; fundos com peças nenhuma, origem e raio do anel</td></tr>
@@ -25697,10 +25733,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v23</td><td>2026-10-19 03:52</td><td>Compostos: turma de mascotes nas boas-vindas da apresentação da landing page (expressões de boas-vindas em formas e proporções diferentes, um animado por vez) e o menu da landing page (compact e medium: seções, tema e as três ações); desenhista do tema.svg com prefixo de mascotes e cores do logo por tema, para as vistas</td></tr>
           <tr><td>v22</td><td>2026-10-19 03:01</td><td>Identidade: no logo principal e nas animações, o nome deboaz fica centralizado na altura do símbolo de cada variação (hastes longas e curtas; MarcaNomeDeslocamento no app); topos com o logo centralizado na barra, e o topo da casca com avisos, o nome (instituição ou pessoa no hub, usuário no quest) e a foto, que abre a conta ou Trocar perfil</td></tr>
           <tr><td>v21</td><td>2026-10-19 02:31</td><td>Logo na linha do topo: o nome deboaz fica na linha dos outros textos e ícones e o símbolo sobe, com a mesma escala no hub (hastes longas) e no quest (hastes curtas); topo da casca igual no hub e no quest (logo, avisos e foto), com o nome e Trocar perfil no toque da foto</td></tr>
-          <tr><td>v20</td><td>2026-10-19 02:24</td><td>Topos com o logo em 40dp (antes 24dp); topo da casca com o logo de hastes longas no hub e de hastes curtas no quest, e no quest os avisos, o perfil ativo com Trocar perfil e a foto à direita; logo de 40dp no rodapé</td></tr>
         </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v29 · 2026-10-21 21:08</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v30 · 2026-10-21 21:37</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>
@@ -26026,6 +26061,26 @@ function ondasDosCards() {
 }
 ondasDosCards();
 new ResizeObserver(() => ondasDosCards()).observe(document.body);
+// boas-vindas com o logo: Halo nas cores do tema ativo, com o logo inteiro na abertura e os brilhos
+// passando pelos temas coloridos (6 s em cada, 2 s de troca); parado e sem ciclo com movimento reduzido
+function boasVindas() {
+  const raiz = document.documentElement, paleta = raiz.dataset.paleta || 'branco-preto';
+  const escuro = raiz.dataset.theme ? raiz.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches, modo = escuro ? 'escuro' : 'claro';
+  // o tema ativo (se for colorido) abre o ciclo, seguido dos outros coloridos
+  const coloridos = Object.keys(F.temas).filter((k) => F.temas[k][modo].mascote).sort((a, b) => (b === paleta) - (a === paleta));
+  const parado = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('.cx-boas-vindas').forEach((bv) => {
+    const el = bv.querySelector('.halo'), r = el.getBoundingClientRect(); if (!r.width) return;
+    const faixa = bv.classList.contains('cx-boas-vindas--faixa'), largo = !faixa && r.width >= 640;
+    el.innerHTML = F.desenhar('halo', { largura: Math.round(r.width), altura: Math.round(r.height), cores: F.temas[paleta][modo], pecas: 'logo', nome: true, logo: 'abertura',
+      variante: bv.dataset.variante || 'longo', origem: faixa ? { x: 0.5, y: 0.42 } : largo ? { x: 0.78, y: 0.5 } : { x: 0.5, y: 0.17 }, raio: faixa ? 48 : largo ? 96 : 64,
+      ciclo: coloridos.map((k) => F.temas[k][modo]), movimentoReduzido: parado });
+  });
+}
+boasVindas();
+let larguraBv = 0;
+new ResizeObserver(([en]) => { const w = Math.round(en.contentRect.width); if (w !== larguraBv) { larguraBv = w; boasVindas(); } }).observe(document.querySelector('.cx-boas-vindas') || document.body);
+new MutationObserver(() => boasVindas()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-paleta', 'data-theme'] });
 // card de tarefa acontecendo agora: fundo Símbolo recortado com o mascote animado (parado com movimento reduzido)
 function recorteDosCards() {
   const parado = matchMedia('(prefers-reduced-motion: reduce)').matches;

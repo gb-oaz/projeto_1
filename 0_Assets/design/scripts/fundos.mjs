@@ -70,6 +70,20 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
     const k = alt / g.altura;
     return `<g transform="translate(${n(x)} ${n(y)}) scale(${n(k * 1e5) / 1e5}) translate(0 ${-g.y})" opacity="${op}"><path fill="${p.anel}" d="${g.anel}"/><path fill="${p.b}" d="${g.b}"/><path fill="${p.d}" d="${g.d}"/></g>`;
   };
+  // logo inteiro (símbolo + nome) centrado em cx, cy, com a altura do símbolo = alt; anima a abertura (toca uma vez)
+  const logoInteiro = (cx, cy, alt, cor, anim, v = 'longo') => {
+    const svg = anim === 'abertura' ? marca.abertura(v, cor) : marca.logo(v, cor);
+    const [, , vw, vh] = svg.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number), larg = alt * vw / vh;
+    return encaixa(svg, cx - larg / 2, cy - alt / 2, larg, alt, 1);
+  };
+  // brilho que passa pelas cores dos temas em laço: fica `fica` s em cada tema e troca em `troca` s, suave
+  const corCiclo = (lista, fica, troca) => {
+    if (lista.length < 2) return '';
+    const passo = fica + troca, dur = passo * lista.length, kt = [0], vs = [lista[0]];
+    lista.forEach((cor, i) => { kt.push((i * passo + fica) / dur, ((i + 1) * passo) / dur); vs.push(cor, lista[(i + 1) % lista.length]); });
+    const sp = lista.map(() => '0 0 1 1;0.4 0 0.2 1').join(';');
+    return `<animate attributeName="stop-color" values="${vs.join(';')}" keyTimes="${kt.map((k) => n(k * 1e4) / 1e4).join(';')}" calcMode="spline" keySplines="${sp}" dur="${n(dur)}s" repeatCount="indefinite"/>`;
+  };
   const anel = (cx, cy, R, cor, op, anim) => {
     const esp = R * 116 / 270, rm = R - esp / 2, volta = 2 * Math.PI * rm;
     const base = `cx="${n(cx)}" cy="${n(cy)}" r="${n(rm)}" fill="none" stroke="${cor}" stroke-width="${n(esp)}"`;
@@ -127,6 +141,10 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
    * op = { largura, altura, cores (PAPEIS + mascote), pecas: 'ambos'|'logo'|'mascotes'|'nenhuma' (só o desenho, para fundo de card),
    *        origem: { x, y } (0 a 1; centro do anel e das ondas), celula (Estampa: tamanho da célula em px; no fundo de tela, fixo em ~48dp), raio (do anel gigante, em px; padrão 0,55 do lado maior),
    *        mascote: { expressao, forma, proporcao, movimento }, logo: ''|'abertura'|'carregamento',
+   *        nome (Halo com pecas 'logo': o logo inteiro, símbolo + nome, centrado na origem e com altura = raio; com logo 'abertura', o nome entra depois do símbolo),
+   *        variante ('longo' | 'curto': hastes do logo inteiro do Halo; curto no quest),
+   *        ciclo: [cores, …] (Halo: os brilhos passam pelas cores desses temas em laço, suave, começando no primeiro; parado, ficam no primeiro; a superfície fica a de `cores`),
+   *        cicloTempo: { fica, troca } (segundos em cada tema e na troca; padrão 6 e 2),
    *        quantidade (antenas), semente, movimentoReduzido }
    */
   function desenhar(conceito, op = {}) {
@@ -221,10 +239,17 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
         (P === 'ambos' ? masc(montar(), x + alt * 0.34, y + alt * 0.66, alt * 0.26) : '');
     } else if (conceito === 'halo') {
       const id = `fundo-h${++seq}`;
-      const gr = (k, cor, x, y, raio) => `<radialGradient id="${id}-${k}" cx="${n(x)}" cy="${n(y)}" r="${n(raio)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${cor}" stop-opacity=".55"/><stop offset="1" stop-color="${cor}" stop-opacity="0"/></radialGradient>`;
-      s = `<defs>${gr(1, c.primary, w * 0.2, h * 0.25, b * 0.9)}${gr(2, c.secondary, w * 0.85, h * 0.8, b * 0.9)}${gr(3, c.tertiary, w * 0.7, h * 0.15, b * 0.6)}</defs>` + base(w, h, c.surface) +
+      // com ciclo, cada brilho passa pela mesma cor (primary, secondary, tertiary) de cada tema da lista, a partir do primeiro
+      // (parado, fica no primeiro tema da lista); a superfície de baixo é sempre a de `cores`
+      const lista = op.ciclo?.length ? op.ciclo : null, cb = lista ? lista[0] : c;
+      const { fica = 6, troca = 2 } = op.cicloTempo || {};
+      const gr = (k, papel, x, y, raio) => { const an = lista && !movimentoReduzido ? corCiclo(lista.map((t) => t[papel]), fica, troca) : '';
+        return `<radialGradient id="${id}-${k}" cx="${n(x)}" cy="${n(y)}" r="${n(raio)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${cb[papel]}" stop-opacity=".55">${an}</stop><stop offset="1" stop-color="${cb[papel]}" stop-opacity="0">${an}</stop></radialGradient>`; };
+      s = `<defs>${gr(1, 'primary', w * 0.2, h * 0.25, b * 0.9)}${gr(2, 'secondary', w * 0.85, h * 0.8, b * 0.9)}${gr(3, 'tertiary', w * 0.7, h * 0.15, b * 0.6)}</defs>` + base(w, h, c.surface) +
         [1, 2, 3].map((k) => `<rect width="${w}" height="${h}" fill="url(#${id}-${k})"/>`).join('');
       if (P === 'nenhuma') s += '';
+      // logo inteiro nas cores da marca do tema (num tema monocromático, sem cor de mascote, tudo em on-surface)
+      else if (P === 'logo' && op.nome) s += logoInteiro(w * (og.x ?? 0.5), h * (og.y ?? 0.5), op.raio ?? b * 0.26, c.mascote ? { ...tres, de: c.secondary, boaz: c.primary } : { simbolo: c['on-surface'], de: c['on-surface'], boaz: c['on-surface'] }, a, op.variante);
       else if (P === 'logo') s += simb(w / 2 - b * 0.09, h / 2 - b * 0.13, b * 0.26, tres, 'longo', 1, a);
       else if (P === 'mascotes') s += masc(montar(), w / 2, h / 2, b * 0.38);
       else s += simb(w / 2 - b * 0.2, h / 2 - b * 0.13, b * 0.26, tres, 'longo', 1, a) + masc(montar(), w / 2 + b * 0.14, h / 2 + b * 0.02, b * 0.26);
