@@ -37,7 +37,10 @@ pnpm run conferir   # falha se algum arquivo gerado estiver desatualizado
 
 `identidade/marca.json` → `cores.temas` define as combinações de cor (hoje:
 roxo, oceano, floresta, aurora, grafite, magenta, sol, girassol,
-rubi, cereja, branco e preto), cada uma com
+rubi, cereja, neon, vaporwave, algodao-doce, terra, retro, meia-noite,
+arco-iris, salada-de-frutas, os genins da Folha — naruto, sasuke,
+sakura, hinata, kiba, shino, shikamaru, ino, choji, neji, rock-lee,
+tenten —, branco e preto), cada uma com
 semente, terciária, harmonia e variante do M3; `cores.tema_padrao` escolhe o
 padrão — hoje `{ "claro": "branco", "escuro": "preto" }`: branco no modo
 claro e preto no escuro (tema combinado `branco-preto`). Todas geram os mesmos papéis (`primary`, `surface`…), então trocar de

@@ -43,6 +43,86 @@
     "nome": "Cereja",
     "cor": "#E53935"
   },
+  "neon": {
+    "nome": "Neon",
+    "cor": "#39FF14"
+  },
+  "vaporwave": {
+    "nome": "Vaporwave",
+    "cor": "#FF71CE"
+  },
+  "algodao-doce": {
+    "nome": "Algodão-doce",
+    "cor": "#F4A6C6"
+  },
+  "terra": {
+    "nome": "Terra",
+    "cor": "#DC744A"
+  },
+  "retro": {
+    "nome": "Retrô",
+    "cor": "#D4A017"
+  },
+  "meia-noite": {
+    "nome": "Meia-noite",
+    "cor": "#7C89EA"
+  },
+  "arco-iris": {
+    "nome": "Arco-íris",
+    "cor": "#E91E63"
+  },
+  "salada-de-frutas": {
+    "nome": "Salada de frutas",
+    "cor": "#43A047"
+  },
+  "naruto": {
+    "nome": "Naruto",
+    "cor": "#FF7F00"
+  },
+  "sasuke": {
+    "nome": "Sasuke",
+    "cor": "#808FC2"
+  },
+  "sakura": {
+    "nome": "Sakura",
+    "cor": "#F7A1C4"
+  },
+  "hinata": {
+    "nome": "Hinata",
+    "cor": "#8E7CC3"
+  },
+  "kiba": {
+    "nome": "Kiba",
+    "cor": "#EB675C"
+  },
+  "shino": {
+    "nome": "Shino",
+    "cor": "#869763"
+  },
+  "shikamaru": {
+    "nome": "Shikamaru",
+    "cor": "#8B9480"
+  },
+  "ino": {
+    "nome": "Ino",
+    "cor": "#C370D5"
+  },
+  "choji": {
+    "nome": "Chōji",
+    "cor": "#DA7637"
+  },
+  "neji": {
+    "nome": "Neji",
+    "cor": "#A48C7A"
+  },
+  "rock-lee": {
+    "nome": "Rock Lee",
+    "cor": "#2DA44E"
+  },
+  "tenten": {
+    "nome": "Tenten",
+    "cor": "#E57399"
+  },
   "branco": {
     "nome": "Branco",
     "cor": null
