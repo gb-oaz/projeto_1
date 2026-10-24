@@ -1,0 +1,137 @@
+# =============================================================================
+# CI local — requisito 1_Requisitos/03_ci-qualidade.html (RNF-160 a RNF-166)
+# =============================================================================
+#
+# Não rode este arquivo direto: o ponto de partida é ./ci.sh, que descobre os
+# componentes alterados, lê as versões (global.json e .nvmrc) e chama os
+# serviços abaixo na ordem certa.
+#
+#   etapa 1 · verificação   backend-ci e web-ci repetem os jobs do CI do
+#                           GitHub Actions (.github/workflows/ci.yml); Android
+#                           e iOS rodam na máquina, fora do Docker
+#                           (scripts/verificar-mobile.sh, chamado pelo ci.sh)
+#   etapa 2 · aplicações    backend e frontend-<app> sobem a partir dos
+#                           Dockerfiles das imagens (arquivo gerado
+#                           .gerado/compose.apps.yml)
+#   etapa 3 · qa            saude confere o /health de cada aplicação; depois,
+#                           conforme --qa, qa-backend (5_DEV/qa/backend/api/)
+#                           e qa-web (5_DEV/qa/frontend/web_<app>/) testam as
+#                           aplicações em contêiner, separados ou em conjunto
+#
+# O código entra nos contêineres só para leitura (/fonte) e é copiado para
+# dentro deles antes do build: o CI local nunca altera a cópia de trabalho
+# (RNF-164). Nenhum serviço faz login ou envia imagem a registro (RN-140).
+# =============================================================================
+
+name: boaz-ci-local
+
+# Variáveis lidas pelo ci.sh antes de chamar o compose (RNF-161, RN-02):
+#   DOTNET_SDK    versão do SDK .NET de global.json  (ex.: 10.0.100)
+#   NODE_VERSION  versão do Node.js de .nvmrc        (ex.: 24.11.0)
+# Em todo serviço das etapas: ../.. (raiz do repositório) em /fonte, só
+# leitura, e ./scripts em /ci.
+
+services:
+  # ── dependências: as mesmas versões dos serviços do job backend (RNF-37) ──
+  # Banco e cache em memória (tmpfs): cada execução começa vazia, como no
+  # GitHub Actions, e nada fica para trás no Docker.
+  mongodb:
+    image: mongo:8.0
+    tmpfs: [/data/db, /data/configdb]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:8.0
+    tmpfs: [/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # ── etapa 1 · verificação do backend: um "run" por serviço ────────────────
+  # docker compose run --rm backend-ci <servico>
+  backend-ci:
+    image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK:-indefinido}
+    profiles: [verificacao]
+    entrypoint: ["bash", "/ci/verificar-backend.sh"]
+    volumes:
+      - ../..:/fonte:ro
+      - ./scripts:/ci:ro
+      - nuget:/root/.nuget/packages
+    environment:
+      DOTNET_NOLOGO: "true"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+      ConnectionStrings__MongoDb: mongodb://mongodb:27017
+      ConnectionStrings__Redis: redis:6379
+    depends_on:
+      mongodb: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  # ── etapa 1 · verificação da web: um "run" por app web_* ──────────────────
+  # docker compose run --rm web-ci <app>
+  web-ci:
+    image: boaz-ci-local/web-ci:node-${NODE_VERSION:-indefinido}
+    build:
+      context: ./imagens
+      dockerfile: web-ci.Dockerfile
+      args:
+        NODE_VERSION: ${NODE_VERSION:-indefinido}
+    profiles: [verificacao]
+    entrypoint: ["bash", "/ci/verificar-web.sh"]
+    volumes:
+      - ../..:/fonte:ro
+      - ./scripts:/ci:ro
+      - pnpm:/pnpm-store
+      - cypress:/root/.cache/Cypress
+
+  # ── etapa 3 · qa contra as aplicações em contêiner ────────────────────────
+  # As aplicações (etapa 2) vêm de .gerado/compose.apps.yml, na mesma rede.
+  # qa do backend: testes de API de 5_DEV/qa/backend/api/
+  # docker compose run --rm --no-deps qa-backend
+  qa-backend:
+    image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK:-indefinido}
+    profiles: [qa]
+    entrypoint: ["bash", "/ci/qa-backend.sh"]
+    volumes:
+      - ../..:/fonte:ro
+      - ./scripts:/ci:ro
+      - nuget:/root/.nuget/packages
+    environment:
+      DOTNET_NOLOGO: "true"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+      API_URL: http://backend:8080
+
+  # qa do frontend: Cypress de 5_DEV/qa/frontend/web_<app>/ contra o app
+  # docker compose run --rm --no-deps qa-web <app>
+  qa-web:
+    image: boaz-ci-local/web-ci:node-${NODE_VERSION:-indefinido}
+    profiles: [qa]
+    entrypoint: ["bash", "/ci/qa-web.sh"]
+    volumes:
+      - ../..:/fonte:ro
+      - ./scripts:/ci:ro
+      - pnpm:/pnpm-store
+      - cypress:/root/.cache/Cypress
+    environment:
+      API_URL: http://backend:8080
+
+  # ── etapa 2 · cada aplicação responde 200 em /health ─────────────────────
+  # A mesma verificação de prontidão das aplicações em homologação e produção.
+  # docker compose run --rm --no-deps saude <url> [<url>…]
+  saude:
+    image: curlimages/curl:8.11.1
+    profiles: [qa]
+    entrypoint: ["sh", "/ci/saude.sh"]
+    volumes:
+      - ./scripts:/ci:ro
+
+# Caches entre execuções (pacotes NuGet, store do pnpm e binário do Cypress).
+volumes:
+  nuget:
+  pnpm:
+  cypress:

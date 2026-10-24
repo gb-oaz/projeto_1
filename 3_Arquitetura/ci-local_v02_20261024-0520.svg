@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1680 1382" width="1680" height="1382">
+  <title>CI local</title>
+  <desc>CI local de 4_CI_CD/local (requisito 1_Requisitos/03_ci-qualidade.html): ci.sh descobre os componentes alterados desde a master; a etapa 1 repete os jobs backend, web, Android e iOS do GitHub Actions (SDK .NET do global.json, Node.js do .nvmrc, MongoDB 8.0 e Redis 8.0; Android em contêiner linux/amd64 com JDK 17 e SDK do Android; iOS direto no macOS com Xcode); com tudo verde, a etapa 2 sobe o backend e cada frontend a partir dos Dockerfiles das imagens e confere /health; a etapa 3 roda os testes de 5_DEV/qa contra os contêineres; o resultado é um veredito único. Nenhuma imagem é publicada: só o GitHub Actions publica no Docker Hub, com aprovação. v01: criação. v02: Android em contêiner e iOS no macOS com Xcode.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+    <symbol id="ic-ator" viewBox="0 0 24 24"><circle class="ico" cx="12" cy="8" r="4"/><path class="ico" d="M4,21 C4,16.5 7.6,14 12,14 C16.4,14 20,16.5 20,21"/></symbol>
+    <symbol id="ic-servico" viewBox="0 0 24 24"><rect class="ico" x="3" y="4" width="18" height="7" rx="1.5"/><rect class="ico" x="3" y="13" width="18" height="7" rx="1.5"/><circle class="ico-fill" cx="6.5" cy="7.5" r="0.9"/><circle class="ico-fill" cx="6.5" cy="16.5" r="0.9"/><path class="ico" d="M10,7.5 H17 M10,16.5 H17"/></symbol>
+    <symbol id="ic-dns" viewBox="0 0 24 24"><rect class="ico" x="9" y="2.5" width="6" height="5" rx="1"/><rect class="ico" x="2" y="16.5" width="6" height="5" rx="1"/><rect class="ico" x="9" y="16.5" width="6" height="5" rx="1"/><rect class="ico" x="16" y="16.5" width="6" height="5" rx="1"/><path class="ico" d="M12,7.5 V16.5 M5,16.5 V12 H19 V16.5"/></symbol>
+    <symbol id="ic-objetos" viewBox="0 0 24 24"><ellipse class="ico" cx="12" cy="6" rx="8.5" ry="2.8"/><path class="ico" d="M3.5,6 L6,20 C6.3,21.2 8.8,22 12,22 C15.2,22 17.7,21.2 18,20 L20.5,6"/></symbol>
+    <symbol id="ic-conteiner" viewBox="0 0 24 24"><path class="ico" d="M12,2.5 L20.5,7 V17 L12,21.5 L3.5,17 V7 Z M3.5,7 L12,11.5 L20.5,7 M12,11.5 V21.5"/></symbol>
+    <symbol id="ic-web" viewBox="0 0 24 24"><rect class="ico" x="2" y="4" width="20" height="16" rx="2"/><path class="ico" d="M2,9 H22"/><circle class="ico-fill" cx="5" cy="6.5" r="0.9"/><circle class="ico-fill" cx="7.8" cy="6.5" r="0.9"/></symbol>
+    <symbol id="ic-observabilidade" viewBox="0 0 24 24"><rect class="ico" x="2.5" y="3.5" width="19" height="17" rx="2"/><polyline class="ico" points="5,14 8.5,14 10.5,8.5 13.5,17 15.5,11.5 19,11.5"/></symbol>
+    <symbol id="ic-funcao" viewBox="0 0 24 24"><path class="ico" d="M6,3 C4.3,3 4,4.3 4,6 V10 C4,11 3.2,12 2,12 C3.2,12 4,13 4,14 V18 C4,19.7 4.3,21 6,21 M18,3 C19.7,3 20,4.3 20,6 V10 C20,11 20.8,12 22,12 C20.8,12 20,13 20,14 V18 C20,19.7 19.7,21 18,21 M15,6.5 C13.4,6.3 12.6,7 12.3,8.6 L11,16 C10.7,17.6 9.9,18 8.8,17.8 M9.5,10.5 H14.5"/></symbol>
+    <symbol id="ic-registro" viewBox="0 0 24 24"><path class="ico" d="M12,3 L21,7.5 L12,12 L3,7.5 Z M3,12 L12,16.5 L21,12 M3,16.5 L12,21 L21,16.5"/></symbol>
+    <symbol id="ic-externo" viewBox="0 0 24 24"><path class="ico" d="M14,4 H20 V10 M20,4 L11,13 M18,14 V19 C18,19.6 17.6,20 17,20 H5 C4.4,20 4,19.6 4,19 V7 C4,6.4 4.4,6 5,6 H10"/></symbol>
+    <symbol id="ic-identidade" viewBox="0 0 24 24"><rect class="ico" x="3" y="4" width="18" height="16" rx="2"/><circle class="ico" cx="9" cy="10.5" r="2.5"/><path class="ico" d="M5.5,17 C6,15.2 7.3,14.5 9,14.5 C10.7,14.5 12,15.2 12.5,17 M15,10 H18.5 M15,13.5 H18.5"/></symbol>
+    <symbol id="ic-mobile" viewBox="0 0 24 24"><rect class="ico" x="6" y="2" width="12" height="20" rx="2"/><path class="ico" d="M10.5,18.5 H13.5"/></symbol>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1680" height="1382"/>
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="1680" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="1680" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · PIPELINE DE CI LOCAL</text>
+    <text class="title" x="40" y="72">CI local</text>
+    <text class="subtitle" x="40" y="94">4_CI_CD/local: o CI do GitHub Actions repetido na máquina com Docker Compose, mais as aplicações em contêiner e o qa, sem publicar imagem</text>
+    <text class="wm-meta-label" x="1392" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1392" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1416" y="71" text-anchor="middle">v02</text>
+    <line class="wm-sep" x1="1464" y1="32" x2="1464" y2="80"/>
+    <text class="wm-meta-label" x="1488" y="44">DATA</text>
+    <text class="wm-meta-value" x="1488" y="72">2026-10-24 · 05:20</text>
+  </g>
+  <g id="maquina-local"><rect class="boundary" x="40" y="152" width="1600" height="856" rx="14"/><text class="boundary-label" x="56" y="174">MÁQUINA LOCAL · DOCKER COMPOSE (PROJETO boaz-ci-local) E, PARA O iOS, O PRÓPRIO macOS</text></g>
+  <g id="etapa-1"><rect class="boundary" x="320" y="208" width="320" height="672" rx="14"/><text class="boundary-label" x="336" y="230">ETAPA 1 · VERIFICAÇÃO</text></g>
+  <g id="etapa-2"><rect class="boundary" x="688" y="208" width="320" height="672" rx="14"/><text class="boundary-label" x="704" y="230">ETAPA 2 · APLICAÇÕES</text></g>
+  <g id="etapa-3"><rect class="boundary" x="1056" y="208" width="320" height="672" rx="14"/><text class="boundary-label" x="1072" y="230">ETAPA 3 · QA</text></g>
+  <g id="github"><rect class="boundary" x="40" y="1056" width="1600" height="152" rx="14"/><text class="boundary-label" x="56" y="1078">GITHUB ACTIONS · VEREDITO DO MERGE E ÚNICO QUE PUBLICA</text></g>
+  <g id="pessoa" filter="url(#sombra)"><rect class="node" x="72" y="232" width="200" height="64" rx="10"/><use href="#ic-ator" x="88" y="252" width="24" height="24"/><text class="label-strong" x="124" y="261">Quem desenvolve</text><text class="mono" x="124" y="279">[antes do push]</text></g>
+  <g id="ci-sh" filter="url(#sombra)"><rect class="node" x="72" y="376" width="200" height="64" rx="10"/><use href="#ic-servico" x="88" y="396" width="24" height="24"/><text class="label-strong" x="124" y="405">ci.sh</text><text class="mono" x="124" y="423">[4_CI_CD/local]</text></g>
+  <g id="mudancas" filter="url(#sombra)"><rect class="node" x="72" y="584" width="200" height="64" rx="10"/><use href="#ic-dns" x="88" y="604" width="24" height="24"/><text class="label-strong" x="124" y="613">mudancas</text><text class="mono" x="124" y="631">[desde a master]</text></g>
+  <g id="repositorio" filter="url(#sombra)"><rect class="node" x="72" y="912" width="200" height="64" rx="10"/><use href="#ic-objetos" x="88" y="932" width="24" height="24"/><text class="label-strong" x="124" y="941">Repositório</text><text class="mono" x="124" y="959">[/fonte · leitura]</text></g>
+  <g id="mongodb" filter="url(#sombra)"><rect class="node-green" x="344" y="240" width="128" height="64" rx="10"/><text class="label-strong" x="408" y="269" text-anchor="middle">MongoDB</text><text class="mono" x="408" y="287" text-anchor="middle">[mongo:8.0]</text></g>
+  <g id="redis" filter="url(#sombra)"><rect class="node-green" x="488" y="240" width="128" height="64" rx="10"/><text class="label-strong" x="552" y="269" text-anchor="middle">Redis</text><text class="mono" x="552" y="287" text-anchor="middle">[redis:8.0]</text></g>
+  <g id="backend-ci" filter="url(#sombra)"><rect class="node-blue" x="344" y="352" width="272" height="96" rx="10"/><use href="#ic-conteiner" x="360" y="372" width="24" height="24"/><text class="label-strong" x="396" y="381">backend-ci</text><text class="mono" x="396" y="399">[SDK do global.json]</text><text class="muted" x="396" y="419">format · build sem avisos</text><text class="muted" x="396" y="435">testes · cobertura ≥ 80 %</text></g>
+  <g id="web-ci" filter="url(#sombra)"><rect class="node-blue" x="344" y="480" width="272" height="96" rx="10"/><use href="#ic-conteiner" x="360" y="500" width="24" height="24"/><text class="label-strong" x="396" y="509">web-ci</text><text class="mono" x="396" y="527">[Node.js do .nvmrc]</text><text class="muted" x="396" y="547">ESLint · Prettier · vue-tsc</text><text class="muted" x="396" y="563">Vitest ≥ 80 % · build · Cypress</text></g>
+  <g id="android-ci" filter="url(#sombra)"><rect class="node-blue" x="344" y="608" width="272" height="96" rx="10"/><use href="#ic-mobile" x="360" y="628" width="24" height="24"/><text class="label-strong" x="396" y="637">android-ci</text><text class="mono" x="396" y="655">[linux/amd64 · JDK 17]</text><text class="muted" x="396" y="675">SDK do Android do workload</text><text class="muted" x="396" y="691">format · build · testes</text></g>
+  <g id="ios" filter="url(#sombra)"><rect class="node-blue" x="344" y="736" width="272" height="96" rx="10"/><use href="#ic-mobile" x="360" y="756" width="24" height="24"/><text class="label-strong" x="396" y="765">ios</text><text class="mono" x="396" y="783">[macOS · Xcode]</text><text class="muted" x="396" y="803">fora do Docker, cópia temporária</text><text class="muted" x="396" y="819">sem Xcode: pulado com aviso</text></g>
+  <g id="backend" filter="url(#sombra)"><rect class="node-purple" x="712" y="240" width="272" height="96" rx="10"/><use href="#ic-servico" x="728" y="260" width="24" height="24"/><text class="label-strong" x="764" y="269">backend</text><text class="mono" x="764" y="287">[backend-mono:ci]</text><text class="muted" x="764" y="307">Dockerfile da imagem · :8080</text><text class="muted" x="764" y="323">com o MongoDB e o Redis</text></g>
+  <g id="frontend" filter="url(#sombra)"><rect class="node-purple" x="712" y="384" width="272" height="96" rx="10"/><use href="#ic-web" x="728" y="404" width="24" height="24"/><text class="label-strong" x="764" y="413">frontend-&lt;app&gt;</text><text class="mono" x="764" y="431">[frontend-&lt;app&gt;:ci]</text><text class="muted" x="764" y="451">Dockerfile da imagem · :8080</text><text class="muted" x="764" y="467">um por app web_*</text></g>
+  <g id="saude" filter="url(#sombra)"><rect class="node-orange" x="712" y="544" width="272" height="96" rx="10"/><use href="#ic-observabilidade" x="728" y="564" width="24" height="24"/><text class="label-strong" x="764" y="573">saude</text><text class="mono" x="764" y="591">[curl]</text><text class="muted" x="764" y="611">GET /health responde 200</text><text class="muted" x="764" y="627">em cada aplicação</text></g>
+  <g id="testes-qa" filter="url(#sombra)"><rect class="node" x="1080" y="240" width="272" height="96" rx="10"/><use href="#ic-registro" x="1096" y="260" width="24" height="24"/><text class="label-strong" x="1132" y="269">Testes de qa</text><text class="mono" x="1132" y="287">[5_DEV/qa/frontend]</text><text class="muted" x="1132" y="307">fluxos com significado</text><text class="muted" x="1132" y="323">para quem usa o produto</text></g>
+  <g id="qa-web" filter="url(#sombra)"><rect class="node-orange" x="1080" y="384" width="272" height="96" rx="10"/><use href="#ic-funcao" x="1096" y="404" width="24" height="24"/><text class="label-strong" x="1132" y="413">qa-web</text><text class="mono" x="1132" y="431">[Cypress]</text><text class="muted" x="1132" y="451">test:e2e:imagem</text><text class="muted" x="1132" y="467">contra o contêiner do app</text></g>
+  <g id="resultado" filter="url(#sombra)"><rect class="node" x="1424" y="584" width="184" height="64" rx="10"/><use href="#ic-identidade" x="1440" y="604" width="24" height="24"/><text class="label-strong" x="1476" y="613">resultado</text><text class="mono" x="1476" y="631">[veredito único]</text></g>
+  <g id="gh-ci" filter="url(#sombra)"><rect class="node-external" x="1424" y="1104" width="184" height="64" rx="10"/><use href="#ic-externo" x="1440" y="1124" width="24" height="24"/><text class="label-strong" x="1476" y="1133">CI</text><text class="mono" x="1476" y="1151">[ci.yml]</text></g>
+  <g id="gh-aprovacao" filter="url(#sombra)"><rect class="node-external" x="1056" y="1104" width="272" height="64" rx="10"/><use href="#ic-identidade" x="1072" y="1124" width="24" height="24"/><text class="label-strong" x="1108" y="1133">Aprovação manual</text><text class="mono" x="1108" y="1151">[issue · approve]</text></g>
+  <g id="gh-publicar" filter="url(#sombra)"><rect class="node-external" x="688" y="1104" width="272" height="64" rx="10"/><use href="#ic-conteiner" x="704" y="1124" width="24" height="24"/><text class="label-strong" x="740" y="1133">Publicar imagens</text><text class="mono" x="740" y="1151">[só master e tag vX.Y.Z]</text></g>
+  <g id="dockerhub" filter="url(#sombra)"><rect class="node-external" x="320" y="1104" width="272" height="64" rx="10"/><use href="#ic-registro" x="336" y="1124" width="24" height="24"/><text class="label-strong" x="372" y="1133">Docker Hub</text><text class="mono" x="372" y="1151">[gustavoboaz/*]</text></g>
+  <g id="f-pessoa-ci"><path class="edge-accent" d="M172,296 V368" marker-end="url(#seta-destaque)"/><text class="muted" x="180" y="336" text-anchor="start">./ci.sh</text></g>
+  <g id="f-ci-mudancas"><path class="edge-accent" d="M172,440 V576" marker-end="url(#seta-destaque)"/></g>
+  <g id="f-mudancas-e1"><path class="edge-accent" d="M272,616 H312" marker-end="url(#seta-destaque)"/></g>
+  <g id="f-e1-e2"><path class="edge-accent" d="M640,616 H680" marker-end="url(#seta-destaque)"/><text class="muted" x="664" y="606" text-anchor="middle">verde</text></g>
+  <g id="f-e2-e3"><path class="edge-accent" d="M1008,616 H1048" marker-end="url(#seta-destaque)"/><text class="muted" x="1032" y="606" text-anchor="middle">200</text></g>
+  <g id="f-e3-resultado"><path class="edge-accent" d="M1376,616 H1416" marker-end="url(#seta-destaque)"/></g>
+  <g id="f-push"><path class="edge-accent" d="M1516,648 V1096" marker-end="url(#seta-destaque)"/><text class="muted" x="1504" y="1040" text-anchor="end">aprovado → git push</text></g>
+  <g id="c-backend-mongo"><path class="edge" d="M408,352 V312" marker-end="url(#seta)"/></g>
+  <g id="c-backend-redis"><path class="edge" d="M552,352 V312" marker-end="url(#seta)"/></g>
+  <g id="c-frontend-backend"><path class="edge" d="M848,384 V344" marker-end="url(#seta)"/><text class="muted" x="860" y="368" text-anchor="middle">API</text></g>
+  <g id="c-saude-frontend"><path class="edge" d="M848,544 V488" marker-end="url(#seta)"/><text class="muted" x="860" y="520" text-anchor="middle">/health</text></g>
+  <g id="c-saude-backend"><path class="edge" d="M712,592 H700 V288 H710" marker-end="url(#seta)"/></g>
+  <g id="c-qa-frontend"><path class="edge" d="M1080,432 H992" marker-end="url(#seta)"/><text class="muted" x="1032" y="424" text-anchor="middle">HTTP :8080</text></g>
+  <g id="d-testes-qa"><path class="edge edge-data" d="M1216,336 V376" marker-end="url(#seta)"/></g>
+  <g id="d-fonte"><path class="edge edge-data" d="M272,944 H480 V888" marker-end="url(#seta)"/><text class="muted" x="288" y="936" text-anchor="start">só leitura · copiado para dentro</text></g>
+  <g id="g-ci-aprovacao"><path class="edge" d="M1424,1136 H1336" marker-end="url(#seta)"/></g>
+  <g id="g-aprovacao-publicar"><path class="edge" d="M1056,1136 H968" marker-end="url(#seta)"/></g>
+  <g id="g-publicar-dockerhub"><path class="edge-accent" d="M688,1136 H600" marker-end="url(#seta-destaque)"/><text class="muted" x="644" y="1126" text-anchor="middle">push</text></g>
+  <g id="sem-publicacao"><text class="muted" x="520" y="952">Sem publicação: nenhum serviço faz login nem envia imagem; elas ficam na máquina como boaz-ci-local/&lt;imagem&gt;:ci (RN-140)</text><text class="muted" x="520" y="972">Android em contêiner linux/amd64 (Rosetta do Docker Desktop em Apple silicon); iOS direto no macOS, sem custo de executor: roda sempre que o app muda</text></g>
+  <g id="marca-rodape" transform="translate(0,1240)">
+    <rect class="wm-band" x="0" y="0" width="1680" height="142"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="1680" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">Partida e controle</text>
+    <rect class="node-blue" x="219" y="47" width="14" height="14" rx="3"/><text class="label" x="241" y="58">Verificação (jobs do CI)</text>
+    <rect class="node-green" x="441" y="47" width="14" height="14" rx="3"/><text class="label" x="463" y="58">Dependências</text>
+    <rect class="node-purple" x="577" y="47" width="14" height="14" rx="3"/><text class="label" x="599" y="58">Aplicação em contêiner</text>
+    <rect class="node-orange" x="785" y="47" width="14" height="14" rx="3"/><text class="label" x="807" y="58">qa</text>
+    <rect class="node-external" x="849" y="47" width="14" height="14" rx="3"/><text class="label" x="871" y="58">GitHub e Docker Hub</text>
+    <rect class="boundary" x="1035" y="47" width="14" height="14" rx="3"/><text class="label" x="1057" y="58">Etapa · ambiente</text>
+    <line class="edge-accent" x1="40" y1="80" x2="68" y2="80" marker-end="url(#seta-destaque)"/><text class="label" x="80" y="84">fluxo principal</text>
+    <line class="edge" x1="216" y1="80" x2="244" y2="80" marker-end="url(#seta)"/><text class="label" x="256" y="84">chamada</text>
+    <line class="edge edge-data" x1="334" y1="80" x2="362" y2="80" marker-end="url(#seta)"/><text class="label" x="374" y="84">leitura de dados</text>
+    <line class="divider" x1="40" y1="102" x2="1640" y2="102"/>
+    <text class="footer" x="40" y="126">v02 · Android em contêiner e iOS no macOS com Xcode na etapa de verificação</text>
+    <text class="wm-file" x="1640" y="126" text-anchor="end">ci-local_v02_20261024-0520.svg</text>
+  </g>
+</svg>
