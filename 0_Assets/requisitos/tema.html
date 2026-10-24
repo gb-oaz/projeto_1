@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tema dos documentos de requisito · boaz · v05</title>
+<title>Tema dos documentos de requisito · boaz · v06</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="tema">
 <meta name="boaz:caminho" content="0_Assets/requisitos/tema.html">
 <meta name="boaz:tipo" content="Tema">
-<meta name="boaz:versao" content="v05">
-<meta name="boaz:data" content="2026-10-17 18:14">
+<meta name="boaz:versao" content="v06">
+<meta name="boaz:data" content="2026-10-24 03:59">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,9 +18,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v05
+   boaz · tema dos documentos de requisito · v06
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
+   Paleta: vistas com data-paletas trocam tema de cor e modo das telas.
    ════════════════════════════════════════════════════════════ */
 
 /* ── tokens: claro ───────────────────────────────────────── */
@@ -636,6 +637,33 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 .boaz-barra .boaz-pdf:hover { color: #fff; filter: brightness(1.08); }
 .boaz-barra[data-alerta] .boaz-pdf { background: var(--red); }
 
+/* ── paleta das vistas: tema de cor e modo das telas (figure.diagrama[data-paletas]) ── */
+.boaz-barra .boaz-paleta[aria-expanded="true"] { background: var(--surface-2); color: var(--text-strong); }
+.boaz-paletas {
+  position: absolute;
+  top: calc(100% + 8px); right: 0;
+  width: min(320px, calc(100vw - 24px));
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--page);
+  box-shadow: var(--shadow);
+}
+.boaz-paletas[hidden] { display: none; }
+.boaz-paletas .boaz-eyebrow { margin: 4px 4px 8px; }
+.boaz-paletas .boaz-seg { margin-bottom: 12px; }
+.boaz-paletas .boaz-seg button { flex: 1; justify-content: center; }
+.boaz-paletas ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.boaz-paletas li button { width: 100%; height: 34px; justify-content: flex-start; gap: 10px; color: var(--text); font-weight: 500; }
+.boaz-paletas li button:hover { background: var(--surface); }
+.boaz-paletas li button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 650; }
+.boaz-amostras { display: inline-flex; flex: none; }
+.boaz-amostras i { width: 14px; height: 14px; margin-left: -4px; border: 1.5px solid var(--page); border-radius: 50%; }
+.boaz-amostras i:first-child { margin-left: 0; }
+figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weight: 600; }
+
 /* ── telas estreitas ─────────────────────────────────────── */
 @media screen and (max-width: 760px) {
   body { margin: 0; border-radius: 0; box-shadow: none; font-size: 15px; }
@@ -692,14 +720,14 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v05 — tema (claro/sistema/escuro), PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v06 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
   function guardado() { try { return localStorage.getItem(CHAVE) || "system"; } catch (e) { return "system"; } }
   function aplicar(t) {
     if (t === "light" || t === "dark") h.setAttribute("data-theme", t); else h.removeAttribute("data-theme");
-    var bs = d.querySelectorAll(".boaz-seg button");
+    var bs = d.querySelectorAll(".boaz-barra > .boaz-seg button");
     for (var i = 0; i < bs.length; i++) bs[i].setAttribute("aria-pressed", String(bs[i].getAttribute("data-tema") === t));
   }
   aplicar(guardado());
@@ -737,7 +765,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><\/svg>',
     system: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><\/svg>',
     dark: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/><\/svg>',
-    pdf: '<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/><\/svg>'
+    pdf: '<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/><\/svg>',
+    paleta: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16a5 5 0 0 0 5-5c0-4-4-7.2-9-7.2z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="15.5" cy="7.5" r="1"/><\/svg>'
   };
   function norm(s) { return (s || "").replace(/[^0-9a-z]/gi, "").toLowerCase(); }
 
@@ -765,6 +794,67 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       aplicar(t);
     });
     aplicar(guardado());
+
+    // Paleta das vistas: figure.diagrama[data-paletas="id|Nome|#cor|#cor|#cor,…"] aponta para um .svg que traz
+    // todos os temas nos dois modos; a escolha vira o fragmento #paleta-<id>-<claro|escuro> do <img> e do link
+    var vistas = d.querySelectorAll("figure.diagrama[data-paletas]");
+    if (vistas.length) {
+      var lista = vistas[0].getAttribute("data-paletas").split(",").map(function (p) { return p.split("|"); });
+      var escolha = { tema: lista[0][0], modo: "claro" };
+      var pb = d.createElement("button");
+      pb.type = "button"; pb.className = "boaz-paleta"; pb.title = "Tema de cor e modo das vistas";
+      pb.setAttribute("aria-expanded", "false"); pb.setAttribute("aria-haspopup", "true");
+      pb.innerHTML = ICONES.paleta + '<span class="rotulo">Paleta<\/span>';
+      var painel = d.createElement("div");
+      painel.className = "boaz-paletas"; painel.hidden = true;
+      painel.setAttribute("role", "dialog"); painel.setAttribute("aria-label", "Paleta das vistas");
+      var htm = '<p class="boaz-eyebrow">Modo das telas<\/p><div class="boaz-seg" role="group" aria-label="Modo das telas">' +
+        '<button type="button" data-modo="claro">' + ICONES.light + 'Claro<\/button><button type="button" data-modo="escuro">' + ICONES.dark + 'Escuro<\/button><\/div>' +
+        '<p class="boaz-eyebrow">Tema de cor · ' + lista.length + '<\/p><ul>';
+      for (var p = 0; p < lista.length; p++) {
+        htm += '<li><button type="button" data-paleta="' + lista[p][0] + '"><span class="boaz-amostras"><i><\/i><i><\/i><i><\/i><\/span>' + lista[p][1] + "<\/button><\/li>";
+      }
+      painel.innerHTML = htm + "<\/ul>";
+      var bolas = painel.querySelectorAll(".boaz-amostras");
+      for (var p2 = 0; p2 < bolas.length; p2++) {
+        var is = bolas[p2].children;
+        for (var c = 0; c < 3; c++) is[c].style.background = lista[p2][c + 2];
+      }
+      barra.insertBefore(pb, barra.querySelector(".boaz-pdf"));
+      barra.appendChild(painel);
+      for (var f = 0; f < vistas.length; f++) {
+        var leg = vistas[f].querySelector("figcaption strong");
+        if (leg) { var at = d.createElement("span"); at.className = "boaz-paleta-atual"; leg.appendChild(d.createTextNode(" · ")); leg.appendChild(at); }
+      }
+      var mostrar = function () {
+        var frag = "#paleta-" + escolha.tema + "-" + escolha.modo, nome = "";
+        for (var i = 0; i < lista.length; i++) if (lista[i][0] === escolha.tema) nome = lista[i][1];
+        for (var j = 0; j < vistas.length; j++) {
+          var img = vistas[j].querySelector("img"), a = vistas[j].querySelector("a"), sp = vistas[j].querySelector(".boaz-paleta-atual");
+          if (img) img.src = img.getAttribute("src").split("#")[0] + frag;
+          if (a) a.href = a.getAttribute("href").split("#")[0] + frag;
+          if (sp) sp.textContent = nome + ", " + escolha.modo;
+        }
+        var bs = painel.querySelectorAll("button");
+        for (var k = 0; k < bs.length; k++) {
+          var b = bs[k], on = b.getAttribute("data-modo") ? b.getAttribute("data-modo") === escolha.modo : b.getAttribute("data-paleta") === escolha.tema;
+          b.setAttribute("aria-pressed", String(on));
+        }
+      };
+      var abrir = function (sim) { painel.hidden = !sim; pb.setAttribute("aria-expanded", String(sim)); };
+      pb.addEventListener("click", function (e) { e.stopPropagation(); abrir(painel.hidden); });
+      painel.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var b = e.target.closest("button");
+        if (!b) return;
+        if (b.getAttribute("data-modo")) escolha.modo = b.getAttribute("data-modo");
+        if (b.getAttribute("data-paleta")) escolha.tema = b.getAttribute("data-paleta");
+        mostrar();
+      });
+      d.addEventListener("click", function () { abrir(false); });
+      d.addEventListener("keydown", function (e) { if (e.key === "Escape" && !painel.hidden) { abrir(false); pb.focus(); } });
+      mostrar();
+    }
 
     // Tabelas largas rolam na horizontal dentro do documento, sem cortar conteúdo
     var ts = d.querySelectorAll("table");
@@ -843,8 +933,8 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
   <p class="boaz-objetivo"><span>Objetivo</span>padronizar marca d'água, tipografia, formato e estilo de todo documento <code>.html</code> de <code>1_Requisitos/</code> e mostrar, renderizado, cada componente que um documento pode usar.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>tema</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v05</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-17 · 18:14</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v06</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 03:59</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -1228,6 +1318,11 @@ Cenário: código expirado
         <figcaption><strong>Arquitetura neutra (recorte)</strong><code>0_Assets/diagramas/tema.svg</code></figcaption>
       </figure>
     </div>
+    <p><strong>Vista com paletas</strong>: a vista de tela (<code>vista-&lt;aplicacao&gt;-&lt;tela&gt;</code>) traz todos os temas de cor do design system nos dois modos, numa linha só de molduras. Some <code>data-paletas</code> com a lista dos temas (<code>id|Nome|primary|secondary|tertiary</code>, separados por vírgula, o padrão primeiro): a barra ganha o botão <strong>Paleta</strong>, que troca o tema e o modo (claro ou escuro) de todas as vistas do documento pelo fragmento <code>#paleta-&lt;id&gt;-&lt;claro|escuro&gt;</code> do <code>.svg</code>, e a legenda mostra a escolha. Abre sempre no primeiro tema, claro. O PDF sai com a escolha da tela.</p>
+<pre><code>&lt;figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#474747|#2b2b2b,roxo|Roxo|#6750a4|#625b71|#7d5260"&gt;
+  &lt;a href="../2_Diagramas/vista-hub-inicio_v02_20261011-0915.svg"&gt;&lt;img src="../2_Diagramas/vista-hub-inicio_v02_20261011-0915.svg" alt="Vista do início do hub em compact, medium e expanded"&gt;&lt;/a&gt;
+  &lt;figcaption&gt;&lt;strong&gt;Hub · início · vista&lt;/strong&gt;&lt;code&gt;2_Diagramas/vista-hub-inicio_v02_20261011-0915.svg&lt;/code&gt;&lt;/figcaption&gt;
+&lt;/figure&gt;</code></pre>
 
     <h3>Amostras da marca</h3>
     <p>Só na seção Identidade da visão do produto: logos, símbolo, ícone e favicon de <code>0_Assets/design/identidade/</code>, por caminho relativo. O fundo da amostra acompanha o tema (padrão) ou é fixo: <code>fundo-claro</code>, <code>fundo-medio</code> ou <code>fundo-escuro</code>, conforme o fundo para o qual o arquivo foi feito; a legenda dá o nome e o caminho.</p>
@@ -1298,7 +1393,8 @@ Cenário: código expirado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v05</span></td><td>2026-10-17 18:14</td><td>Visão do produto ganha a seção opcional Identidade, com o componente de amostras da marca (<code>figure.marca</code>, fundos claro, médio e escuro) para logos, símbolo e ícones de <code>0_Assets/design/identidade/</code></td></tr>
+      <tr><td><span class="boaz-versao">v06</span></td><td>2026-10-24 03:59</td><td>Vista com paletas: <code>figure.diagrama[data-paletas]</code> e o botão <strong>Paleta</strong> na barra, que troca o tema de cor e o modo (claro ou escuro) das vistas de tela pelo fragmento <code>#paleta-&lt;id&gt;-&lt;modo&gt;</code> do <code>.svg</code>; casca v06</td></tr>
+      <tr><td>v05</td><td>2026-10-17 18:14</td><td>Visão do produto ganha a seção opcional Identidade, com o componente de amostras da marca (<code>figure.marca</code>, fundos claro, médio e escuro) para logos, símbolo e ícones de <code>0_Assets/design/identidade/</code></td></tr>
       <tr><td>v04</td><td>2026-10-11 04:38</td><td>Impressão: diagrama com no máximo 75 mm de altura (era 85 mm), para caber no fim da página em vez de abrir uma nova</td></tr>
       <tr><td>v03</td><td>2026-10-11 03:21</td><td>Impressão: o histórico do rodapé pode quebrar entre páginas (sem página quase vazia só para ele) e a legenda e o cabeçalho de uma tabela não ficam separados das linhas; diagrama com no máximo 85 mm de altura</td></tr>
       <tr><td>v02</td><td>2026-10-11 16:00</td><td>Rolagem lateral: tabelas largas rolam dentro do documento, código longo quebra a linha e nada mais é cortado na borda da página</td></tr>
@@ -1306,7 +1402,7 @@ Cenário: código expirado
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v05 · 2026-10-17 18:14</span>
+    <span>boaz · v06 · 2026-10-24 03:59</span>
     <span class="boaz-arquivo">0_Assets/requisitos/tema.html</span>
   </div>
 </footer>
