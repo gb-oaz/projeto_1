@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landing page · UI · boaz · v10</title>
+<title>Landing page · UI · boaz · v11</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="11_landing-page-ui">
 <meta name="boaz:caminho" content="1_Requisitos/11_landing-page-ui.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v10">
-<meta name="boaz:data" content="2026-10-21 22:12">
+<meta name="boaz:versao" content="v11">
+<meta name="boaz:data" content="2026-10-24 03:59">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,9 +18,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v05
+   boaz · tema dos documentos de requisito · v06
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
+   Paleta: vistas com data-paletas trocam tema de cor e modo das telas.
    ════════════════════════════════════════════════════════════ */
 
 /* ── tokens: claro ───────────────────────────────────────── */
@@ -636,6 +637,33 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 .boaz-barra .boaz-pdf:hover { color: #fff; filter: brightness(1.08); }
 .boaz-barra[data-alerta] .boaz-pdf { background: var(--red); }
 
+/* ── paleta das vistas: tema de cor e modo das telas (figure.diagrama[data-paletas]) ── */
+.boaz-barra .boaz-paleta[aria-expanded="true"] { background: var(--surface-2); color: var(--text-strong); }
+.boaz-paletas {
+  position: absolute;
+  top: calc(100% + 8px); right: 0;
+  width: min(320px, calc(100vw - 24px));
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--page);
+  box-shadow: var(--shadow);
+}
+.boaz-paletas[hidden] { display: none; }
+.boaz-paletas .boaz-eyebrow { margin: 4px 4px 8px; }
+.boaz-paletas .boaz-seg { margin-bottom: 12px; }
+.boaz-paletas .boaz-seg button { flex: 1; justify-content: center; }
+.boaz-paletas ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.boaz-paletas li button { width: 100%; height: 34px; justify-content: flex-start; gap: 10px; color: var(--text); font-weight: 500; }
+.boaz-paletas li button:hover { background: var(--surface); }
+.boaz-paletas li button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 650; }
+.boaz-amostras { display: inline-flex; flex: none; }
+.boaz-amostras i { width: 14px; height: 14px; margin-left: -4px; border: 1.5px solid var(--page); border-radius: 50%; }
+.boaz-amostras i:first-child { margin-left: 0; }
+figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weight: 600; }
+
 /* ── telas estreitas ─────────────────────────────────────── */
 @media screen and (max-width: 760px) {
   body { margin: 0; border-radius: 0; box-shadow: none; font-size: 15px; }
@@ -692,14 +720,14 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v05 — tema (claro/sistema/escuro), PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v06 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
   function guardado() { try { return localStorage.getItem(CHAVE) || "system"; } catch (e) { return "system"; } }
   function aplicar(t) {
     if (t === "light" || t === "dark") h.setAttribute("data-theme", t); else h.removeAttribute("data-theme");
-    var bs = d.querySelectorAll(".boaz-seg button");
+    var bs = d.querySelectorAll(".boaz-barra > .boaz-seg button");
     for (var i = 0; i < bs.length; i++) bs[i].setAttribute("aria-pressed", String(bs[i].getAttribute("data-tema") === t));
   }
   aplicar(guardado());
@@ -737,7 +765,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><\/svg>',
     system: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><\/svg>',
     dark: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/><\/svg>',
-    pdf: '<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/><\/svg>'
+    pdf: '<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/><\/svg>',
+    paleta: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16a5 5 0 0 0 5-5c0-4-4-7.2-9-7.2z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="15.5" cy="7.5" r="1"/><\/svg>'
   };
   function norm(s) { return (s || "").replace(/[^0-9a-z]/gi, "").toLowerCase(); }
 
@@ -765,6 +794,67 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       aplicar(t);
     });
     aplicar(guardado());
+
+    // Paleta das vistas: figure.diagrama[data-paletas="id|Nome|#cor|#cor|#cor,…"] aponta para um .svg que traz
+    // todos os temas nos dois modos; a escolha vira o fragmento #paleta-<id>-<claro|escuro> do <img> e do link
+    var vistas = d.querySelectorAll("figure.diagrama[data-paletas]");
+    if (vistas.length) {
+      var lista = vistas[0].getAttribute("data-paletas").split(",").map(function (p) { return p.split("|"); });
+      var escolha = { tema: lista[0][0], modo: "claro" };
+      var pb = d.createElement("button");
+      pb.type = "button"; pb.className = "boaz-paleta"; pb.title = "Tema de cor e modo das vistas";
+      pb.setAttribute("aria-expanded", "false"); pb.setAttribute("aria-haspopup", "true");
+      pb.innerHTML = ICONES.paleta + '<span class="rotulo">Paleta<\/span>';
+      var painel = d.createElement("div");
+      painel.className = "boaz-paletas"; painel.hidden = true;
+      painel.setAttribute("role", "dialog"); painel.setAttribute("aria-label", "Paleta das vistas");
+      var htm = '<p class="boaz-eyebrow">Modo das telas<\/p><div class="boaz-seg" role="group" aria-label="Modo das telas">' +
+        '<button type="button" data-modo="claro">' + ICONES.light + 'Claro<\/button><button type="button" data-modo="escuro">' + ICONES.dark + 'Escuro<\/button><\/div>' +
+        '<p class="boaz-eyebrow">Tema de cor · ' + lista.length + '<\/p><ul>';
+      for (var p = 0; p < lista.length; p++) {
+        htm += '<li><button type="button" data-paleta="' + lista[p][0] + '"><span class="boaz-amostras"><i><\/i><i><\/i><i><\/i><\/span>' + lista[p][1] + "<\/button><\/li>";
+      }
+      painel.innerHTML = htm + "<\/ul>";
+      var bolas = painel.querySelectorAll(".boaz-amostras");
+      for (var p2 = 0; p2 < bolas.length; p2++) {
+        var is = bolas[p2].children;
+        for (var c = 0; c < 3; c++) is[c].style.background = lista[p2][c + 2];
+      }
+      barra.insertBefore(pb, barra.querySelector(".boaz-pdf"));
+      barra.appendChild(painel);
+      for (var f = 0; f < vistas.length; f++) {
+        var leg = vistas[f].querySelector("figcaption strong");
+        if (leg) { var at = d.createElement("span"); at.className = "boaz-paleta-atual"; leg.appendChild(d.createTextNode(" · ")); leg.appendChild(at); }
+      }
+      var mostrar = function () {
+        var frag = "#paleta-" + escolha.tema + "-" + escolha.modo, nome = "";
+        for (var i = 0; i < lista.length; i++) if (lista[i][0] === escolha.tema) nome = lista[i][1];
+        for (var j = 0; j < vistas.length; j++) {
+          var img = vistas[j].querySelector("img"), a = vistas[j].querySelector("a"), sp = vistas[j].querySelector(".boaz-paleta-atual");
+          if (img) img.src = img.getAttribute("src").split("#")[0] + frag;
+          if (a) a.href = a.getAttribute("href").split("#")[0] + frag;
+          if (sp) sp.textContent = nome + ", " + escolha.modo;
+        }
+        var bs = painel.querySelectorAll("button");
+        for (var k = 0; k < bs.length; k++) {
+          var b = bs[k], on = b.getAttribute("data-modo") ? b.getAttribute("data-modo") === escolha.modo : b.getAttribute("data-paleta") === escolha.tema;
+          b.setAttribute("aria-pressed", String(on));
+        }
+      };
+      var abrir = function (sim) { painel.hidden = !sim; pb.setAttribute("aria-expanded", String(sim)); };
+      pb.addEventListener("click", function (e) { e.stopPropagation(); abrir(painel.hidden); });
+      painel.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var b = e.target.closest("button");
+        if (!b) return;
+        if (b.getAttribute("data-modo")) escolha.modo = b.getAttribute("data-modo");
+        if (b.getAttribute("data-paleta")) escolha.tema = b.getAttribute("data-paleta");
+        mostrar();
+      });
+      d.addEventListener("click", function () { abrir(false); });
+      d.addEventListener("keydown", function (e) { if (e.key === "Escape" && !painel.hidden) { abrir(false); pb.focus(); } });
+      mostrar();
+    }
 
     // Tabelas largas rolam na horizontal dentro do documento, sem cortar conteúdo
     var ts = d.querySelectorAll("table");
@@ -827,8 +917,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir como a landing page e a página do módulo ficam na tela, com os textos, os componentes compostos, o fundo e o mascote de cada bloco, no celular e na web.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>11_landing-page-ui</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v10</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-21 · 22:12</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v11</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 03:59</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -836,7 +926,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <nav class="sumario"></nav>
   <section id="contexto">
     <h2>Contexto</h2>
-    <p>Último passo antes do código da landing page. A distribuição dos blocos vem de <a class="ref" href="07_landing-page-ux.html">Landing page · UX base</a>, e os blocos são os de <a class="ref" href="10_componentes-compostos-landing.html">Componentes compostos · landing page</a> e <a class="ref" href="10_componentes-compostos-comuns.html">comuns</a>. As <a class="ref" href="99_glossario.html#vista">vistas</a> mostram a página inteira em compact, medium e expanded, nos modos claro e escuro do tema de cor padrão, e indicam o composto, a identidade e o mascote de cada bloco (<a class="ref" href="06_design-system-telas.html#RNF-103">Design system nas telas <code class="id">RNF-103</code></a>).</p>
+    <p>Último passo antes do código da landing page. A distribuição dos blocos vem de <a class="ref" href="07_landing-page-ux.html">Landing page · UX base</a>, e os blocos são os de <a class="ref" href="10_componentes-compostos-landing.html">Componentes compostos · landing page</a> e <a class="ref" href="10_componentes-compostos-comuns.html">comuns</a>. As <a class="ref" href="99_glossario.html#vista">vistas</a> mostram a página inteira em compact, medium e expanded, em todos os temas de cor do design system, no modo claro ou escuro escolhido pelo botão Paleta (abrem em Branco e Preto, claro), e indicam o composto, a identidade e o mascote de cada bloco (<a class="ref" href="06_design-system-telas.html#RNF-103">Design system nas telas <code class="id">RNF-103</code></a>).</p>
     <p class="historia"><span>Como</span> <strong>visitante</strong>, <span>quero</span> entender em poucos segundos o que o deboaz faz e para quem, <span>para</span> decidir se começo grátis ou entro numa sala</p>
     <aside class="destaque nota"><p>Os módulos, números e depoimentos das vistas são exemplos para mostrar o desenho. Na página, eles vêm do catálogo de módulos e dos depoimentos autorizados, nas regras da UX base.</p></aside>
   </section>
@@ -977,17 +1067,14 @@ Cenário: movimento reduzido
   </section>
   <section id="diagramas">
     <h2>Diagramas</h2>
-    <figure class="diagrama">
-      <a href="../2_Diagramas/vista-landing-pagina_v07_20261021-2138.svg"><img src="../2_Diagramas/vista-landing-pagina_v07_20261021-2138.svg" alt="Vista da landing page inteira em compact, medium e expanded, claro e escuro, com o composto e a identidade de cada bloco e a apresentação sobre o fundo Halo com o logo"></a>
-      <figcaption><strong>Landing page · vista</strong><code>2_Diagramas/vista-landing-pagina_v07_20261021-2138.svg</code></figcaption>
+    <p>As vistas abrem no tema Branco e Preto, claro. O botão <strong>Paleta</strong>, na barra do canto, mostra as mesmas telas em qualquer tema de cor do design system, no modo claro ou escuro.</p>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-landing-pagina_v08_20261024-0357.svg"><img src="../2_Diagramas/vista-landing-pagina_v08_20261024-0357.svg" alt="Vista da landing page inteira em compact, medium e expanded, com o tema de cor e o modo pelo botão Paleta, com o composto e a identidade de cada bloco e a apresentação sobre o fundo Halo com o logo"></a>
+      <figcaption><strong>Landing page · vista</strong><code>2_Diagramas/vista-landing-pagina_v08_20261024-0357.svg</code></figcaption>
     </figure>
-    <figure class="diagrama">
-      <a href="../2_Diagramas/vista-landing-modulo_v04_20261020-0021.svg"><img src="../2_Diagramas/vista-landing-modulo_v04_20261020-0021.svg" alt="Vista da página do módulo, no exemplo do módulo Presença, em compact, medium e expanded, claro e escuro"></a>
-      <figcaption><strong>Página do módulo · vista</strong><code>2_Diagramas/vista-landing-modulo_v04_20261020-0021.svg</code></figcaption>
-    </figure>
-    <figure class="diagrama">
-      <a href="../2_Diagramas/vista-landing-tema-roxo_v06_20261021-2138.svg"><img src="../2_Diagramas/vista-landing-tema-roxo_v06_20261021-2138.svg" alt="Vista da landing page no tema de cor Roxo: logo nas cores da marca, fundos, mascotes e ações nas cores do tema, claro e escuro"></a>
-      <figcaption><strong>Landing page · vista no tema Roxo</strong><code>2_Diagramas/vista-landing-tema-roxo_v06_20261021-2138.svg</code></figcaption>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-landing-modulo_v05_20261024-0357.svg"><img src="../2_Diagramas/vista-landing-modulo_v05_20261024-0357.svg" alt="Vista da página do módulo, no exemplo do módulo Presença, em compact, medium e expanded; tema de cor e modo pelo botão Paleta"></a>
+      <figcaption><strong>Página do módulo · vista</strong><code>2_Diagramas/vista-landing-modulo_v05_20261024-0357.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -996,7 +1083,8 @@ Cenário: movimento reduzido
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v10</span></td><td>2026-10-21 22:12</td><td><code class="id">RF-64</code> alterado: apresentação sobre o fundo Halo com o logo inteiro na abertura; <code class="id">RF-65</code> removido (turma de mascotes); <code class="id">RF-103</code> criado: brilhos do Halo passando pelos temas coloridos; <code class="id">RNF-150</code> e <code class="id">RN-137</code> alterados; vistas v07 e no tema Roxo v06; status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v11</span></td><td>2026-10-24 03:59</td><td>Vistas com paletas (casca v06): uma linha de molduras e o botão <strong>Paleta</strong> para ver as telas em todos os temas do design system, claro ou escuro (padrão Branco e Preto, claro); vistas da página v08 e da página do módulo v05; vista no tema Roxo removida; status → Aprovado</td></tr>
+      <tr><td>v10</td><td>2026-10-21 22:12</td><td><code class="id">RF-64</code> alterado: apresentação sobre o fundo Halo com o logo inteiro na abertura; <code class="id">RF-65</code> removido (turma de mascotes); <code class="id">RF-103</code> criado: brilhos do Halo passando pelos temas coloridos; <code class="id">RNF-150</code> e <code class="id">RN-137</code> alterados; vistas v07 e no tema Roxo v06; status → Aprovado</td></tr>
       <tr><td>v09</td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
       <tr><td>v08</td><td>2026-10-20 01:27</td><td><code class="id">RN-137</code> incluído: fundo Estampa em toda a página, abaixo da barra do topo e fora do menu; vistas da página v06, no tema Roxo v05 e da página do módulo v04; status → Em revisão; Destaque, Como funciona (do destaque) e Módulos, nessa ordem (<code class="id">RF-66</code>, <code class="id">RF-68</code>); vitrine de telas na página do módulo (<code class="id">RF-70</code>)</td></tr>
       <tr><td>v07</td><td>2026-10-19 15:06</td><td>Status → Aprovado</td></tr>
@@ -1005,11 +1093,10 @@ Cenário: movimento reduzido
       <tr><td>v04</td><td>2026-10-19 04:24</td><td><code class="id">RF-74</code> incluído (destaque em primary-container com o mascote padrinho) e <code class="id">RF-70</code> alterado (padrinho na página do módulo); vistas da página v04, no tema Roxo v03 e da página do módulo v02</td></tr>
       <tr><td>v03</td><td>2026-10-19 04:06</td><td><code class="id">RF-65</code> alterado: a turma mostra as 30 expressões lado a lado, em formas variadas e proporção normal; vistas da página v03 e no tema Roxo v02</td></tr>
       <tr><td>v02</td><td>2026-10-19 03:56</td><td><code class="id">RF-65</code> alterado (turma de mascotes), <code class="id">RF-73</code> e <code class="id">RN-118</code> incluídos (menu aberto e tema de cor aplicado); vista da página v02 e vista no tema Roxo</td></tr>
-      <tr><td>v01</td><td>2026-10-19 03:28</td><td>Criação: <code class="id">RF-63</code> a <code class="id">RF-71</code>, <code class="id">RN-115</code> a <code class="id">RN-117</code>, <code class="id">RNF-148</code> a <code class="id">RNF-150</code> e vistas da landing page e da página do módulo</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v10 · 2026-10-21 22:12</span>
+    <span>boaz · v11 · 2026-10-24 03:59</span>
     <span class="boaz-arquivo">1_Requisitos/11_landing-page-ui.html</span>
   </div>
 </footer>
