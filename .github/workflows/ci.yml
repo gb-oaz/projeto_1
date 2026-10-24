@@ -38,7 +38,8 @@
 #   frontend/web_<app>/       package.json + pnpm-lock.yaml; testes em qa/frontend/web_<app>/
 #   frontend/mob_and_<app>/   .sln/.csproj do app Android (.NET MAUI) e seus testes
 #   frontend/mob_ios_<app>/   .sln/.csproj do app iOS (.NET MAUI) e seus testes
-#   raiz do repositório       global.json (SDK .NET) e .nvmrc (Node.js) — RNF-19
+#   raiz do repositório       global.json (SDK .NET e workloads), .xcode-version
+#                             (Xcode do iOS) e .nvmrc (Node.js) — RNF-19
 #   5_DEV/backend/Dockerfile          imagem backend-mono (todo o backend)
 #   5_DEV/frontend/web_<app>/Dockerfile   imagem frontend-<app> (_ vira -),
 #                                         ex.: web_landing_page → frontend-landing-page
@@ -128,6 +129,7 @@ jobs:
             comum: &comum
               - '.github/**'
               - 'global.json'
+              - '.xcode-version'
               - '.nvmrc'
               - '**/docker-compose*.yml'
               - '**/compose*.yml'
@@ -141,10 +143,12 @@ jobs:
               - '5_DEV/qa/frontend/web_*/**'
             android:
               - *comum
+              - '5_DEV/frontend/Directory.Build.props'
               - '5_DEV/frontend/mob_and*/**'
               - '5_DEV/qa/frontend/mob_and*/**'
             ios:
               - *comum
+              - '5_DEV/frontend/Directory.Build.props'
               - '5_DEV/frontend/mob_ios_*/**'
               - '5_DEV/qa/frontend/mob_ios_*/**'
 
@@ -351,7 +355,9 @@ jobs:
       needs.mudancas.outputs.ios != '[]' && (
         (github.event_name == 'pull_request' && github.base_ref == 'master') ||
         (github.event_name == 'push' && github.ref == 'refs/heads/master'))
-    runs-on: macos-latest
+    # Imagem fixa: tem o Xcode de .xcode-version; macos-latest muda de macOS
+    # e de Xcodes instalados sem aviso.
+    runs-on: macos-26
     strategy:
       fail-fast: false
       matrix:
@@ -361,6 +367,10 @@ jobs:
         working-directory: 5_DEV/frontend/${{ matrix.app }}
     steps:
       - uses: actions/checkout@v4
+      # Xcode de .xcode-version, cujo SDK iOS é o do workload fixado no
+      # global.json (workloadVersion) — ver 5_DEV/frontend/Directory.Build.props
+      # (RNF-170).
+      - run: sudo xcode-select -s "/Applications/Xcode_$(tr -d ' \n' < "$GITHUB_WORKSPACE/.xcode-version").app"
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json

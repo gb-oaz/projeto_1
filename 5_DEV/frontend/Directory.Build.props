@@ -1,0 +1,13 @@
+<Project>
+  <!--
+    iOS (RNF-170): o workload iOS fixado no global.json (workloadVersion
+    10.0.111.1 → .NET para iOS 26.5) compila contra o SDK iOS 26.5, que é o
+    SDK do Xcode de .xcode-version (26.6). Não há workload publicado para o
+    Xcode 26.6, e a checagem do .NET compara o número do Xcode, não o do SDK;
+    por isso ela fica desligada. Ao trocar o workloadVersion por um que case
+    com o Xcode de .xcode-version, remova esta propriedade.
+  -->
+  <PropertyGroup>
+    <ValidateXcodeVersion>false</ValidateXcodeVersion>
+  </PropertyGroup>
+</Project>

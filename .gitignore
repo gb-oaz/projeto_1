@@ -53,8 +53,10 @@ obj/
 .vs/
 TestResults/
 coverage/
+cobertura/
 *.coverage
 *.coveragexml
+*.binlog
 
 # ── Node / web ───────────────────────────────────────────────────────────────
 node_modules/
@@ -71,6 +73,11 @@ cypress/screenshots/
 *.aab
 *.ipa
 *.dSYM/
+xcuserdata/
+*.xcuserstate
+DerivedData/
+.gradle/
+local.properties
 
 # ── sistema e editores ───────────────────────────────────────────────────────
 .DS_Store
