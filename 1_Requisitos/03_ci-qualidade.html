@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CI e qualidade · boaz · v18</title>
+<title>CI e qualidade · boaz · v21</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="03_ci-qualidade">
 <meta name="boaz:caminho" content="1_Requisitos/03_ci-qualidade.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v18">
-<meta name="boaz:data" content="2026-10-24 21:15">
+<meta name="boaz:versao" content="v21">
+<meta name="boaz:data" content="2026-10-24 23:21">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -791,8 +791,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir onde e quando o CI roda e quais testes e verificações de qualidade reprovam um build.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>03_ci-qualidade</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v18</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 21:15</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v21</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 23:21</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -828,8 +828,11 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RNF-23"><td><code class="id">RNF-23</code></td><td><span class="tag">CI</span></td><td>Backend, web e Android são compilados e passam por testes unitários e de integração a cada push e a cada pull request, em qualquer branch</td></tr>
         <tr id="RNF-34"><td><code class="id">RNF-34</code></td><td><span class="tag">CI</span></td><td>O código fica em <code>5_DEV/</code> na estrutura de <a class="ref" href="14_estrutura-projetos.html">Estrutura dos projetos</a>: o backend em <code>backend/</code>, a web em <code>frontend/web/</code> (um projeto, com um app por pasta em <code>apps/</code>) e o mobile em <code>frontend/mobile/</code> (um projeto .NET MAUI por app em <code>apps/</code>). O CI roda os jobs de uma frente somente quando o push ou o pull request altera a pasta dela ou os testes dela em <code>5_DEV/qa/backend/</code>, <code>5_DEV/qa/frontend/web/</code> ou <code>5_DEV/qa/frontend/mobile/</code></td></tr>
         <tr id="RNF-35"><td><code class="id">RNF-35</code></td><td><span class="tag">CI</span></td><td>Alteração em arquivo comum a todos os componentes (<code>.github/</code>, <code>global.json</code>, <code>.xcode-version</code>, <code>.nvmrc</code>, <code>docker-compose</code>) roda os jobs de todos os componentes, e alteração em <code>5_DEV/frontend/Directory.Build.props</code> roda os jobs Android e iOS</td></tr>
-        <tr id="RNF-188"><td><code class="id">RNF-188</code></td><td><span class="tag">CI</span></td><td>O job da web roda lint, formatação, tipos e testes uma vez para o projeto de <code>5_DEV/frontend/web/</code> e, depois, o build e os testes de ponta a ponta de cada app, com o nome do app na variável <code>APP</code></td></tr>
+        <tr id="RNF-188"><td><code class="id">RNF-188</code></td><td><span class="tag">CI</span></td><td>O job da web roda lint, formatação, tipos e os testes do projeto (unitários e de componentes) uma vez para o projeto de <code>5_DEV/frontend/web/</code> e, depois, o build de cada app, com o nome do app na variável <code>APP</code></td></tr>
         <tr id="RNF-189"><td><code class="id">RNF-189</code></td><td><span class="tag">CI</span></td><td>O job Android compila e testa a solution de <code>5_DEV/frontend/mobile/</code> no Linux, sem o alvo iOS; o job iOS confere a formatação da solution e compila o <code>net10.0-ios</code> de cada app</td></tr>
+        <tr id="RNF-194"><td><code class="id">RNF-194</code></td><td><span class="tag">CI</span></td><td>Com os jobs do backend e da web aprovados, o job de qa sobe o backend e as aplicações web em contêineres, como o CI local (<code class="id">RNF-162</code>), e roda as suítes de integração e funcionais de <code>5_DEV/qa/</code>; o resultado de cada suíte, em JUnit XML, fica como artefato da execução</td></tr>
+        <tr id="RNF-195"><td><code class="id">RNF-195</code></td><td><span class="tag">CI</span></td><td>Os testes de carga em homologação rodam por um workflow de disparo manual, só na branch principal, que recebe o endereço do backend de homologação e roda contra ele a suíte <code>5_DEV/qa/backend/carga/</code></td></tr>
+        <tr id="RNF-197"><td><code class="id">RNF-197</code></td><td><span class="tag">CI</span></td><td>Em pull request para a branch principal e no merge nela, o job de qa do mobile roda a suíte <code>5_DEV/qa/frontend/mobile/funcional/</code> no Android, num emulador do executor Linux, com o backend em contêiner; o funcional do iOS roda só no CI local, porque o executor macOS do GitHub Actions não roda contêineres</td></tr>
         <tr id="RNF-36"><td><code class="id">RNF-36</code></td><td><span class="tag">CI</span></td><td>A proteção da branch principal exige um único job agregador do CI, que falha se algum job disparado falhar; componente sem mudança, cujos jobs não rodaram, não bloqueia o merge</td></tr>
         <tr id="RNF-24"><td><code class="id">RNF-24</code></td><td><span class="tag">CI</span></td><td>O build iOS roda somente em pull requests para a branch principal e no merge nela</td></tr>
         <tr id="RNF-21"><td><code class="id">RNF-21</code></td><td><span class="tag">CI</span></td><td>O Dependabot abre pull requests de atualização de dependências, de imagens Docker e de <em>actions</em></td></tr>
@@ -847,21 +850,21 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RNF-22"><td><code class="id">RNF-22</code></td><td><span class="tag">Backend · Mobile</span></td><td>Avisos dos analisadores de código são tratados como erros no build do CI</td></tr>
         <tr id="RNF-16"><td><code class="id">RNF-16</code></td><td><span class="tag">Web</span></td><td>Os testes unitários e de integração usam Vitest com Vue Test Utils</td></tr>
         <tr id="RNF-17"><td><code class="id">RNF-17</code></td><td><span class="tag">Web</span></td><td>O CI reprova o build quando ESLint, Prettier ou <code>vue-tsc</code> (checagem de tipos) apontam erro</td></tr>
-        <tr id="RNF-18"><td><code class="id">RNF-18</code></td><td><span class="tag">Web</span></td><td>Os testes de ponta a ponta usam Cypress</td></tr>
+        <tr id="RNF-18"><td><code class="id">RNF-18</code></td><td><span class="tag">Web</span></td><td>Os testes de ponta a ponta da web usam Cypress e ficam no qa, em <code>5_DEV/qa/frontend/web/funcional/</code>, fora do projeto da web (<a class="ref" href="14_estrutura-projetos.html#RNF-192">Estrutura dos projetos <code class="id">RNF-192</code></a>)</td></tr>
       </tbody>
     </table>
     <table>
       <caption>CI local</caption>
       <thead><tr><th>ID</th><th>Frente</th><th>Requisito</th></tr></thead>
       <tbody>
-        <tr id="RNF-160"><td><code class="id">RNF-160</code></td><td><span class="tag">CI local</span></td><td>O CI local fica em <code>4_CI_CD/local/</code> e roda com um único comando, que só exige Docker com Docker Compose v2, git e bash na máquina; para o mobile, também o SDK .NET de <code>global.json</code> e o workload do MAUI, com o JDK 17 e o SDK do Android (Android) e macOS com Xcode (iOS)</td></tr>
+        <tr id="RNF-160"><td><code class="id">RNF-160</code></td><td><span class="tag">CI local</span></td><td>O CI local fica em <code>4_CI_CD/local/</code> e roda com um único comando, que só exige Docker com Docker Compose v2, git e bash na máquina; para o mobile, também o SDK .NET de <code>global.json</code> e o workload do MAUI, com o JDK 17 e o SDK do Android (Android) e macOS com Xcode (iOS); para o funcional do mobile, o Node.js de <code>.nvmrc</code> e o emulador ou o simulador ligado (o Appium e os drivers vêm, com versão exata, do <code>package.json</code> da suíte)</td></tr>
         <tr id="RNF-161"><td><code class="id">RNF-161</code></td><td><span class="tag">CI local</span></td><td>O CI local repete as verificações do GitHub Actions para backend, web, Android e iOS (<code class="id">RNF-14</code> a <code class="id">RNF-18</code>, <code class="id">RNF-22</code>, <code class="id">RNF-25</code>, <code class="id">RNF-26</code> e <code class="id">RNF-37</code>), com as mesmas versões de SDK, Node.js, MongoDB e Redis do CI</td></tr>
-        <tr id="RNF-162"><td><code class="id">RNF-162</code></td><td><span class="tag">CI local</span></td><td>Com as verificações aprovadas, o CI local sobe o backend e as aplicações web em contêineres gerados pelos mesmos Dockerfiles das imagens, confere que cada um responde 200 em <code>/health</code> e roda contra eles os testes de <code>5_DEV/qa/</code></td></tr>
+        <tr id="RNF-162"><td><code class="id">RNF-162</code></td><td><span class="tag">CI local</span></td><td>Com as verificações aprovadas, o CI local sobe o backend e as aplicações web em contêineres gerados pelos mesmos Dockerfiles das imagens, confere que cada um responde 200 em <code>/health</code> e roda contra eles as suítes de <code>5_DEV/qa/</code>, cada uma pela própria imagem (<a class="ref" href="14_estrutura-projetos.html#RNF-191">Estrutura dos projetos <code class="id">RNF-191</code></a>)</td></tr>
         <tr id="RNF-163"><td><code class="id">RNF-163</code></td><td><span class="tag">CI local</span></td><td>Por padrão, o CI local roda só os componentes alterados em relação à branch principal, incluindo mudanças ainda não commitadas, com os filtros de <code class="id">RNF-34</code> e <code class="id">RNF-35</code> (mais a própria pasta <code>4_CI_CD/local/</code>); uma opção roda todos os componentes</td></tr>
         <tr id="RNF-164"><td><code class="id">RNF-164</code></td><td><span class="tag">CI local</span></td><td>O CI local não altera a cópia de trabalho: o repositório entra nos contêineres só para leitura, Android e iOS compilam numa cópia temporária, e banco e cache começam vazios a cada execução</td></tr>
         <tr id="RNF-165"><td><code class="id">RNF-165</code></td><td><span class="tag">CI local</span></td><td>O CI local termina com o resultado de cada componente e etapa e um veredito único, que falha se algum componente falhar, como o job agregador (<a class="ref" href="#RNF-36"><code class="id">RNF-36</code></a>)</td></tr>
         <tr id="RNF-166"><td><code class="id">RNF-166</code></td><td><span class="tag">CI local</span></td><td>Backend e web rodam em contêineres; Android e iOS rodam direto na máquina, fora de contêiner, o iOS sempre que o mobile muda (sem a restrição de custo de <a class="ref" href="#RNF-24"><code class="id">RNF-24</code></a>); a plataforma mobile (Android ou iOS) cujos pré-requisitos faltam na máquina é pulada com aviso que diz o que falta, ficando a verificação para o GitHub Actions</td></tr>
-        <tr id="RNF-172"><td><code class="id">RNF-172</code></td><td><span class="tag">CI local</span></td><td>O qa do CI local tem três abordagens, escolhidas no comando: só o backend (testes de API de <code>5_DEV/qa/backend/api/</code> contra o contêiner do backend), só o frontend (testes de ponta a ponta de <code>5_DEV/qa/frontend/</code> contra o contêiner de cada aplicação web, com o backend no ar) e as duas em conjunto sobre os mesmos contêineres, que é o padrão</td></tr>
+        <tr id="RNF-172"><td><code class="id">RNF-172</code></td><td><span class="tag">CI local</span></td><td>O qa do CI local tem cinco abordagens, escolhidas no comando: só o backend (a suíte <code>5_DEV/qa/backend/integracao/</code> contra o contêiner do backend), só o frontend (a suíte <code>5_DEV/qa/frontend/web/funcional/</code> contra o contêiner de cada aplicação web, com o backend no ar), as duas em conjunto sobre os mesmos contêineres, que é o padrão, carga (a suíte <code>5_DEV/qa/backend/carga/</code> contra o contêiner do backend) e mobile (a suíte <code>5_DEV/qa/frontend/mobile/funcional/</code>, com Appium, no emulador Android e no simulador iOS da máquina, com o backend em contêiner); carga e mobile só rodam quando pedidas</td></tr>
       </tbody>
     </table>
     <aside class="destaque aviso"><p>O executor macOS do GitHub Actions custa mais por minuto que o Linux: por isso o build iOS roda só em pull requests para a branch principal e no merge (<code class="id">RNF-24</code>).</p></aside>
@@ -870,12 +873,12 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../3_Arquitetura/pipeline-ci_v08_20261015-0019.svg"><img src="../3_Arquitetura/pipeline-ci_v08_20261015-0019.svg" alt="Pipeline de CI no monorepo: push e pull request em qualquer branch passam pela detecção de mudanças, que dispara só os jobs Linux dos componentes alterados, com testes unitários e de integração; PR e merge na principal disparam iOS em macOS; com os jobs disparados verdes, merge e tag na branch principal pedem aprovação manual por issue no repositório e, aprovados, publicam as imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub; branches de tarefa e de correção não geram imagem"></a>
-      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v08_20261015-0019.svg</code></figcaption>
+      <a href="../3_Arquitetura/pipeline-ci_v10_20261024-2247.svg"><img src="../3_Arquitetura/pipeline-ci_v10_20261024-2247.svg" alt="Pipeline de CI no monorepo: push e pull request em qualquer branch passam pela detecção de mudanças, que dispara só os jobs Linux dos componentes alterados, com testes unitários e de integração; PR e merge na principal disparam iOS em macOS; depois de backend e web, o job QA roda as suítes de integração e funcionais contra as aplicações em contêiner; em PR e merge na principal, o job QA · mobile roda o Appium no Android em emulador; a carga roda num workflow manual contra homologação; com os jobs disparados verdes, merge e tag na branch principal pedem aprovação manual por issue no repositório e, aprovados, publicam as imagens versionadas nos repositórios públicos gustavoboaz/* do Docker Hub; branches de tarefa e de correção não geram imagem"></a>
+      <figcaption><strong>Pipeline de CI e qualidade</strong><code>3_Arquitetura/pipeline-ci_v10_20261024-2247.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../3_Arquitetura/ci-local_v04_20261024-2114.svg"><img src="../3_Arquitetura/ci-local_v04_20261024-2114.svg" alt="CI local em 4_CI_CD/local com Docker Compose: ci.sh descobre os componentes alterados; a etapa 1 repete os jobs backend e web do GitHub Actions em contêineres, com MongoDB e Redis, e os de Android e iOS direto na máquina; com tudo verde, a etapa 2 sobe backend e frontends das imagens e confere /health; a etapa 3 roda o qa do backend, do frontend ou os dois em conjunto contra os contêineres; o resultado aprovado segue por git push para o GitHub Actions, o único que publica no Docker Hub"></a>
-      <figcaption><strong>CI local</strong><code>3_Arquitetura/ci-local_v04_20261024-2114.svg</code></figcaption>
+      <a href="../3_Arquitetura/ci-local_v06_20261024-2247.svg"><img src="../3_Arquitetura/ci-local_v06_20261024-2247.svg" alt="CI local em 4_CI_CD/local com Docker Compose: ci.sh descobre os componentes alterados; a etapa 1 repete os jobs backend e web do GitHub Actions em contêineres, com MongoDB e Redis, e os de Android e iOS direto na máquina; com tudo verde, a etapa 2 sobe backend e frontends das imagens e confere /health; a etapa 3 roda pela própria imagem cada suíte de 5_DEV/qa/ (integração, funcional da web por app, as duas em conjunto ou a carga sob demanda) contra os contêineres e, com --qa mobile, o funcional do mobile com Appium na máquina; o resultado aprovado segue por git push para o GitHub Actions, o único que publica no Docker Hub"></a>
+      <figcaption><strong>CI local</strong><code>3_Arquitetura/ci-local_v06_20261024-2247.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -885,20 +888,20 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v18</span></td><td>2026-10-24 21:15</td><td><code class="id">RNF-34</code>, <code class="id">RNF-35</code> e <code class="id">RNF-166</code> alterados para a estrutura de <code>14_estrutura-projetos</code> (backend, web e mobile num projeto cada); <code class="id">RNF-188</code> (job da web, com build e e2e por app) e <code class="id">RNF-189</code> (jobs Android e iOS) incluídos; diagrama atualizado para <code>ci-local_v04</code>; status → Em revisão</td></tr>
+      <tr><td><span class="boaz-versao">v21</span></td><td>2026-10-24 23:21</td><td><code class="id">RNF-160</code> alterado: o funcional do mobile pede o Node.js de <code>.nvmrc</code> e o emulador ou o simulador; o Appium e os drivers vêm do <code>package.json</code> da suíte</td></tr>
+      <tr><td>v20</td><td>2026-10-24 22:47</td><td>Funcional do mobile com Appium: <code class="id">RNF-160</code> (pré-requisitos) e <code class="id">RNF-172</code> (abordagem mobile) alterados; <code class="id">RNF-197</code> (job de qa do mobile, Android em emulador) incluído; diagramas <code>pipeline-ci_v10</code> e <code>ci-local_v06</code></td></tr>
+      <tr><td>v19</td><td>2026-10-24 22:25</td><td>QA por suítes (<code>14_estrutura-projetos</code>): <code class="id">RNF-18</code> (ponta a ponta no qa), <code class="id">RNF-162</code>, <code class="id">RNF-172</code> (abordagem carga) e <code class="id">RNF-188</code> (job da web sem ponta a ponta) alterados; <code class="id">RNF-194</code> (job de qa) e <code class="id">RNF-195</code> (carga em homologação) incluídos; diagramas <code>pipeline-ci_v09</code> e <code>ci-local_v05</code></td></tr>
+      <tr><td>v18</td><td>2026-10-24 21:15</td><td><code class="id">RNF-34</code>, <code class="id">RNF-35</code> e <code class="id">RNF-166</code> alterados para a estrutura de <code>14_estrutura-projetos</code> (backend, web e mobile num projeto cada); <code class="id">RNF-188</code> (job da web, com build e e2e por app) e <code class="id">RNF-189</code> (jobs Android e iOS) incluídos; diagrama atualizado para <code>ci-local_v04</code>; status → Em revisão</td></tr>
       <tr><td>v17</td><td>2026-10-24 07:58</td><td><code class="id">RNF-35</code> inclui <code>.xcode-version</code> entre os arquivos comuns e <code>5_DEV/frontend/Directory.Build.props</code> como comum aos apps mobile; status → Aprovado</td></tr>
       <tr><td>v16</td><td>2026-10-24 06:06</td><td>CI local em <code>4_CI_CD/local/</code>: <code class="id">RN-140</code> a <code class="id">RN-142</code> e <code class="id">RNF-160</code> a <code class="id">RNF-166</code> e <code class="id">RNF-172</code> incluídos, com backend e web em contêineres, Android e iOS direto na máquina e qa do backend, do frontend ou em conjunto; contexto atualizado; diagrama <code>ci-local_v03</code> incluído; status → Em revisão</td></tr>
       <tr><td>v15</td><td>2026-10-15 00:21</td><td>Diagrama atualizado para <code>pipeline-ci_v08</code> (environment do token do Docker Hub: <code>dockerhub-publish</code>)</td></tr>
       <tr><td>v14</td><td>2026-10-11 22:23</td><td>Diagrama atualizado para <code>pipeline-ci_v07</code> (aprovação manual antes da publicação, <a class="ref" href="04_publicacao-imagens.html#RNF-43">Publicação das imagens <code class="id">RNF-43</code></a>); status mantido Aprovado</td></tr>
       <tr><td>v13</td><td>2026-10-11 15:15</td><td>Status → Aprovado</td></tr>
       <tr><td>v12</td><td>2026-10-11 15:02</td><td>Diagrama atualizado para <code>pipeline-ci_v06</code> (tag de imagem <code>master</code>)</td></tr>
-      <tr><td>v11</td><td>2026-10-11 14:59</td><td>Diagrama atualizado para <code>pipeline-ci_v05</code> (branches <code>tarefa_*</code> e <code>fix_*</code>)</td></tr>
-      <tr><td>v10</td><td>2026-10-11 14:53</td><td>Pendência respondida: mobile é tratado como frontend, uma pasta por aplicação em <code>5_DEV/frontend/</code>; <code class="id">RNF-34</code> alterado; seção Em aberto removida</td></tr>
-      <tr><td>v09</td><td>2026-10-11 14:46</td><td>Renumerado de <code>02_ci-qualidade</code> para <code>03_ci-qualidade</code>; CI em pull requests e só nos diretórios alterados: <code class="id">RNF-23</code> e <code class="id">RNF-16</code> alterados, <code class="id">RNF-34</code> a <code class="id">RNF-37</code> incluídos; 1 pendência nova; diagrama atualizado para <code>pipeline-ci_v04</code>; status → Em revisão</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v18 · 2026-10-24 21:15</span>
+    <span>boaz · v21 · 2026-10-24 23:21</span>
     <span class="boaz-arquivo">1_Requisitos/03_ci-qualidade.html</span>
   </div>
 </footer>

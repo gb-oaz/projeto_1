@@ -1,0 +1,209 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2368 1036" width="2368" height="1036">
+  <title>Pipeline de CI e qualidade</title>
+  <desc>Pipeline de CI no monorepo, no GitHub Actions, conforme 1_Requisitos/03_ci-qualidade.html e 1_Requisitos/04_publicacao-imagens.html: push e pull request em qualquer branch (inclusive as de tarefa dev-tarefa-*) passam pela detecção de mudanças, que dispara só os jobs dos componentes cujo diretório mudou (arquivo comum ou tag de versão disparam todos); os jobs Linux de backend, web e Android rodam testes unitários e de integração; PR para a principal e merge nela disparam o build iOS em executor macOS; com todos os jobs disparados verdes, só push na branch principal e tag vX.Y.Z em commit da principal pedem aprovação manual e, aprovados, geram as imagens Docker e as enviam versionadas aos repositórios públicos gustavoboaz/* do Docker Hub; branches de tarefa e de correção não geram imagem. v01: criação. v02: testes em qualquer push e merge; publicação só na branch principal. v03: quatro imagens e repositórios gustavoboaz/*; token no environment. v04: pull request dispara os testes; detecção de mudanças por diretório; testes de integração; branches de tarefa sem imagem. v05: branches tarefa_* e fix_*. v06: branch principal master e tag de imagem master. v07: aprovação manual (issue no repositório, approve/deny, 2 h) antes de gerar e enviar as imagens; tag só publica commit da master; environment do token restrito à master e às tags v*. v08: environment do token renomeado para dockerhub-publish, o nome usado no GitHub. v09: estrutura de 14_estrutura-projetos (web num projeto, iOS só com format e build), job QA com as suítes de 5_DEV/qa/ contra as aplicações em contêiner e workflow manual QA · carga contra homologação.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+    <symbol id="ic-web" viewBox="0 0 24 24"><rect class="ico" x="2" y="4" width="20" height="16" rx="2"/><path class="ico" d="M2,9 H22"/><circle class="ico-fill" cx="5" cy="6.5" r="0.9"/><circle class="ico-fill" cx="7.8" cy="6.5" r="0.9"/></symbol>
+    <symbol id="ic-mobile" viewBox="0 0 24 24"><rect class="ico" x="6" y="2" width="12" height="20" rx="2"/><path class="ico" d="M10.5,18.5 H13.5"/></symbol>
+    <symbol id="ic-servico" viewBox="0 0 24 24"><rect class="ico" x="3" y="4" width="18" height="7" rx="1.5"/><rect class="ico" x="3" y="13" width="18" height="7" rx="1.5"/><circle class="ico-fill" cx="6.5" cy="7.5" r="0.9"/><circle class="ico-fill" cx="6.5" cy="16.5" r="0.9"/><path class="ico" d="M10,7.5 H17 M10,16.5 H17"/></symbol>
+    <symbol id="ic-conteiner" viewBox="0 0 24 24"><path class="ico" d="M12,2.5 L20.5,7 V17 L12,21.5 L3.5,17 V7 Z M3.5,7 L12,11.5 L20.5,7 M12,11.5 V21.5"/></symbol>
+    <symbol id="ic-eventos" viewBox="0 0 24 24"><circle class="ico-fill" cx="12" cy="12" r="2.5"/><path class="ico" d="M7.5,7.5 A6.4,6.4 0 0 0 7.5,16.5 M16.5,7.5 A6.4,6.4 0 0 1 16.5,16.5 M4.5,4.5 A10.6,10.6 0 0 0 4.5,19.5 M19.5,4.5 A10.6,10.6 0 0 1 19.5,19.5"/></symbol>
+    <symbol id="ic-observabilidade" viewBox="0 0 24 24"><rect class="ico" x="2.5" y="3.5" width="19" height="17" rx="2"/><polyline class="ico" points="5,14 8.5,14 10.5,8.5 13.5,17 15.5,11.5 19,11.5"/></symbol>
+    <symbol id="ic-gateway" viewBox="0 0 24 24"><rect class="ico" x="8" y="3" width="8" height="18" rx="1.5"/><path class="ico" d="M2,9 H6 M18,9 H22 M20.5,7.5 L22,9 L20.5,10.5 M2,15 H6 M18,15 H22 M20.5,13.5 L22,15 L20.5,16.5"/></symbol>
+    <symbol id="ic-registro" viewBox="0 0 24 24"><path class="ico" d="M12,3 L21,7.5 L12,12 L3,7.5 Z M3,12 L12,16.5 L21,12 M3,16.5 L12,21 L21,16.5"/></symbol>
+    <symbol id="ic-externo" viewBox="0 0 24 24"><path class="ico" d="M14,4 H20 V10 M20,4 L11,13 M18,14 V19 C18,19.6 17.6,20 17,20 H5 C4.4,20 4,19.6 4,19 V7 C4,6.4 4.4,6 5,6 H10"/></symbol>
+    <symbol id="ic-identidade" viewBox="0 0 24 24"><rect class="ico" x="3" y="4" width="18" height="16" rx="2"/><circle class="ico" cx="9" cy="10.5" r="2.5"/><path class="ico" d="M5.5,17 C6,15.2 7.3,14.5 9,14.5 C10.7,14.5 12,15.2 12.5,17 M15,10 H18.5 M15,13.5 H18.5"/></symbol>
+      <symbol id="ic-funcao" viewBox="0 0 24 24"><path class="ico" d="M6,3 C4.3,3 4,4.3 4,6 V10 C4,11 3.2,12 2,12 C3.2,12 4,13 4,14 V18 C4,19.7 4.3,21 6,21 M18,3 C19.7,3 20,4.3 20,6 V10 C20,11 20.8,12 22,12 C20.8,12 20,13 20,14 V18 C20,19.7 19.7,21 18,21 M15,6.5 C13.4,6.3 12.6,7 12.3,8.6 L11,16 C10.7,17.6 9.9,18 8.8,17.8 M9.5,10.5 H14.5"/></symbol>
+  </defs>
+  <rect class="bg" x="0" y="0" width="2368" height="1036"/>
+
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="2368" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="2368" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · PIPELINE DE CI</text>
+    <text class="title" x="40" y="72">Pipeline de CI e qualidade</text>
+    <text class="subtitle" x="40" y="94">Do push ou pull request no monorepo ao envio da imagem versionada ao Docker Hub · 03_ci-qualidade · 04_publicacao-imagens</text>
+    <text class="wm-meta-label" x="2080" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="2080" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="2104" y="71" text-anchor="middle">v09</text>
+    <line class="wm-sep" x1="2152" y1="32" x2="2152" y2="80"/>
+    <text class="wm-meta-label" x="2176" y="44">DATA</text>
+    <text class="wm-meta-value" x="2176" y="72">2026-10-24 · 22:34</text>
+  </g>
+
+  <g id="fronteiras">
+    <rect class="boundary" x="344" y="152" width="1680" height="728" rx="14"/><text class="boundary-label" x="362" y="176">GITHUB ACTIONS</text>
+    <rect class="boundary" x="688" y="192" width="976" height="192" rx="14"/><text class="boundary-label" x="706" y="216">EXECUTOR LINUX · PUSH E PULL REQUEST, EM QUALQUER BRANCH</text>
+    <rect class="boundary" x="688" y="416" width="632" height="192" rx="14"/>
+    <rect class="boundary" x="1352" y="416" width="312" height="192" rx="14"/><text class="boundary-label" x="1368" y="440">LINUX · DEPOIS DO BACKEND E DA WEB</text>
+    <rect class="boundary" x="688" y="640" width="1312" height="216" rx="14"/>
+  </g>
+
+  <g id="dependabot" filter="url(#sombra)"><rect class="node-external" x="40" y="192" width="208" height="64" rx="10"/><use href="#ic-externo" x="56" y="212" width="24" height="24"/><text class="label-strong" x="92" y="221">Dependabot</text><text class="mono" x="92" y="239">[GitHub]</text></g>
+  <g id="repositorio" filter="url(#sombra)"><rect class="node-external" x="40" y="416" width="208" height="96" rx="10"/><use href="#ic-externo" x="56" y="432" width="24" height="24"/><text class="label-strong" x="92" y="446">Repositório</text><text class="mono" x="92" y="466">[GitHub · monorepo]</text><text class="muted" x="92" y="484">tarefa_* · fix_* → PR</text><text class="muted" x="92" y="502">→ branch principal</text></g>
+
+  <g id="deteccao" filter="url(#sombra)"><rect class="node-green" x="392" y="400" width="248" height="128" rx="10"/><use href="#ic-gateway" x="408" y="416" width="24" height="24"/><text class="label-strong" x="444" y="430">Detecção de mudanças</text><text class="mono" x="444" y="450">[filtro por diretório]</text><text class="muted" x="408" y="474">roda só o componente alterado</text><text class="muted" x="408" y="492">arquivo comum: todos rodam</text><text class="muted" x="408" y="510">tag de versão: todos rodam</text></g>
+
+  <g id="job-backend" filter="url(#sombra)"><rect class="node-blue" x="712" y="232" width="280" height="128" rx="10"/><use href="#ic-servico" x="728" y="248" width="24" height="24"/><text class="label-strong" x="764" y="262">Backend</text><text class="mono" x="764" y="282">[.NET 10 · xUnit]</text><text class="muted" x="764" y="302">unitários e de integração</text><text class="muted" x="764" y="320">integração: MongoDB e Redis</text><text class="muted" x="764" y="338">format · analisadores · ≥ 80 %</text></g>
+  <g id="job-web" filter="url(#sombra)"><rect class="node-blue" x="1040" y="232" width="280" height="128" rx="10"/><use href="#ic-web" x="1056" y="248" width="24" height="24"/><text class="label-strong" x="1092" y="262">Web · um projeto</text><text class="mono" x="1092" y="282">[pnpm · Vitest]</text><text class="muted" x="1092" y="302">unitários e de componentes</text><text class="muted" x="1092" y="320">ESLint · Prettier · vue-tsc</text><text class="muted" x="1092" y="338">≥ 80 % · build de cada app</text></g>
+  <g id="job-android" filter="url(#sombra)"><rect class="node-blue" x="1368" y="232" width="280" height="128" rx="10"/><use href="#ic-mobile" x="1384" y="248" width="24" height="24"/><text class="label-strong" x="1420" y="262">Android</text><text class="mono" x="1420" y="282">[.NET MAUI 10 · xUnit]</text><text class="muted" x="1420" y="302">unitários e de integração</text><text class="muted" x="1420" y="320">build do app</text><text class="muted" x="1420" y="338">cobertura medida, sem bloquear</text></g>
+  <g id="job-ios" filter="url(#sombra)"><rect class="node-blue" x="712" y="456" width="280" height="128" rx="10"/><use href="#ic-mobile" x="728" y="472" width="24" height="24"/><text class="label-strong" x="764" y="486">iOS</text><text class="mono" x="764" y="506">[.NET MAUI 10 · Xcode]</text><text class="muted" x="764" y="526">format</text><text class="muted" x="764" y="544">build de cada app (simulador)</text><text class="muted" x="764" y="562">testes ficam no Android</text></g>
+
+  <g id="job-qa" filter="url(#sombra)"><rect class="node-blue" x="1368" y="456" width="280" height="128" rx="10"/><use href="#ic-funcao" x="1384" y="472" width="24" height="24"/><text class="label-strong" x="1420" y="486">QA</text><text class="mono" x="1420" y="506">[ci.sh --so-qa]</text><text class="muted" x="1420" y="526">aplicações em contêiner</text><text class="muted" x="1420" y="544">integração · funcional web</text><text class="muted" x="1420" y="562">JUnit XML como artefato</text></g>
+  <g id="qa-carga" filter="url(#sombra)"><rect class="node-blue" x="1712" y="232" width="280" height="128" rx="10"/><use href="#ic-funcao" x="1728" y="248" width="24" height="24"/><text class="label-strong" x="1764" y="262">QA · carga</text><text class="mono" x="1764" y="282">[qa-carga.yml]</text><text class="muted" x="1764" y="302">disparo manual, só na master</text><text class="muted" x="1764" y="320">5_DEV/qa/backend/carga</text><text class="muted" x="1764" y="338">contra homologação (api_url)</text></g>
+
+  <g id="portao" filter="url(#sombra)"><rect class="node-green" x="712" y="688" width="280" height="144" rx="10"/><use href="#ic-observabilidade" x="728" y="704" width="24" height="24"/><text class="label-strong" x="764" y="718">Portão de qualidade</text><text class="mono" x="764" y="738">[jobs disparados verdes]</text><text class="muted" x="764" y="758">algum job falhou:</text><text class="muted" x="764" y="776">nada é publicado</text></g>
+  <g id="aprovacao" filter="url(#sombra)"><rect class="node-green" x="1040" y="688" width="280" height="144" rx="10"/><use href="#ic-identidade" x="1056" y="704" width="24" height="24"/><text class="label-strong" x="1092" y="718">Aprovação manual</text><text class="mono" x="1092" y="738">[manual-approval]</text><text class="muted" x="1092" y="758">issue no repositório</text><text class="muted" x="1092" y="776">approve: segue a publicação</text><text class="muted" x="1092" y="794">deny ou 2 h: nada publica</text><text class="muted" x="1092" y="812">tag: commit na master</text></g>
+  <g id="imagens" filter="url(#sombra)"><rect class="node-purple" x="1368" y="688" width="280" height="144" rx="10"/><use href="#ic-conteiner" x="1384" y="704" width="24" height="24"/><text class="label-strong" x="1420" y="718">Imagens Docker</text><text class="mono" x="1420" y="738">[docker build]</text><text class="muted" x="1420" y="758">só dos componentes alterados</text><text class="muted" x="1420" y="776">tag de versão: as quatro</text></g>
+  <g id="envio" filter="url(#sombra)"><rect class="node-purple" x="1696" y="688" width="280" height="144" rx="10"/><use href="#ic-eventos" x="1712" y="704" width="24" height="24"/><text class="label-strong" x="1748" y="718">Envio versionado</text><text class="mono" x="1748" y="738">[docker push]</text><text class="muted" x="1748" y="758">tags conforme o evento</text><text class="muted" x="1748" y="776">token: env. dockerhub-publish</text><text class="muted" x="1748" y="794">restrito: master e tags v*</text></g>
+
+  <g id="docker-hub" filter="url(#sombra)"><rect class="node-external" x="2080" y="544" width="248" height="288" rx="10"/><use href="#ic-registro" x="2096" y="560" width="24" height="24"/><text class="label-strong" x="2132" y="574">Docker Hub</text><text class="mono" x="2132" y="594">[gustavoboaz · público]</text><text class="muted" x="2096" y="626">backend-mono</text><text class="muted" x="2096" y="646">frontend-hub</text><text class="muted" x="2096" y="666">frontend-landing-page</text><text class="muted" x="2096" y="686">frontend-quest</text><line class="divider" x1="2096" y1="704" x2="2312" y2="704"/><text class="muted" x="2096" y="732">push na principal</text><text class="mono" x="2096" y="752">sha-&lt;commit&gt; · master</text><text class="muted" x="2096" y="784">tag v1.2.3 na principal</text><text class="mono" x="2096" y="804">1.2.3 · 1.2 · latest</text></g>
+
+  <g id="arestas">
+    <line class="edge" x1="144" y1="256" x2="144" y2="414" marker-end="url(#seta)"/>
+    <text class="muted" x="156" y="340">PRs de atualização</text>
+    <line class="edge" x1="248" y1="464" x2="390" y2="464" marker-end="url(#seta)"/>
+    <rect class="edge-label-bg" x="264" y="444" width="112" height="16"/><text class="muted" x="320" y="456" text-anchor="middle">push · PR · tag</text>
+    <path class="edge" d="M516,400 V296 H710" marker-end="url(#seta)"/>
+    <text class="muted" x="528" y="352">componentes alterados</text>
+    <line class="edge" x1="640" y1="520" x2="710" y2="520" marker-end="url(#seta)"/>
+    <path class="edge" d="M516,528 V760 H710" marker-end="url(#seta)"/>
+    <text class="muted" x="528" y="616">só na principal:</text><text class="muted" x="528" y="634">push · tag</text>
+    <path class="edge edge-async" d="M1104,384 V664 H976 V686" marker-end="url(#seta)"/>
+    <text class="muted" x="1116" y="404">status Linux</text>
+    <line class="edge edge-async" x1="852" y1="584" x2="852" y2="686" marker-end="url(#seta)"/>
+    <line class="edge" x1="1508" y1="384" x2="1508" y2="414" marker-end="url(#seta)"/>
+    <path class="edge edge-async" d="M1508,584 V664 H1106"/>
+    <text class="muted" x="1520" y="628">status qa</text>
+    <text class="muted" x="864" y="628">status macOS</text>
+    <line class="edge-accent" x1="992" y1="760" x2="1038" y2="760" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="1320" y1="760" x2="1366" y2="760" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="1648" y1="760" x2="1694" y2="760" marker-end="url(#seta-destaque)"/>
+    <line class="edge-accent" x1="1976" y1="760" x2="2078" y2="760" marker-end="url(#seta-destaque)"/>
+    <rect class="edge-label-bg" x="2032" y="740" width="40" height="16"/><text class="muted" x="2052" y="752" text-anchor="middle">push</text>
+  </g>
+
+  <g id="rotulos-sobre-arestas">
+    <rect class="edge-label-bg" x="700" y="426" width="376" height="20"/><text class="boundary-label" x="706" y="440">EXECUTOR macOS · PR PARA A PRINCIPAL E MERGE NELA</text>
+    <rect class="edge-label-bg" x="700" y="650" width="392" height="20"/><text class="boundary-label" x="706" y="664">PUBLICAÇÃO · SÓ NA PRINCIPAL, COM APROVAÇÃO MANUAL</text>
+  </g>
+
+  <g id="marca-rodape" transform="translate(0,920)">
+    <rect class="wm-band" x="0" y="0" width="2368" height="116"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="2368" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">Build e testes</text>
+    <rect class="node-green" x="182" y="47" width="14" height="14" rx="3"/><text class="label" x="204" y="58">Controle do pipeline</text>
+    <rect class="node-purple" x="370" y="47" width="14" height="14" rx="3"/><text class="label" x="392" y="58">Publicação</text>
+    <rect class="node-external" x="490" y="47" width="14" height="14" rx="3"/><text class="label" x="512" y="58">Serviço externo</text>
+    <line class="edge-accent" x1="640" y1="54" x2="668" y2="54" marker-end="url(#seta-destaque)"/><text class="label" x="680" y="58">publicação da imagem</text>
+    <line class="edge" x1="843" y1="54" x2="871" y2="54" marker-end="url(#seta)"/><text class="label" x="883" y="58">disparo do workflow</text>
+    <line class="edge edge-async" x1="1036" y1="54" x2="1064" y2="54" marker-end="url(#seta)"/><text class="label" x="1076" y="58">status dos jobs</text>
+    <line class="divider" x1="40" y1="76" x2="2328" y2="76"/>
+    <text class="footer" x="40" y="100">v09 · job QA (suítes de integração e funcionais contra as aplicações em contêiner) antes do portão; QA · carga manual contra homologação; web num projeto</text>
+    <text class="wm-file" x="2328" y="100" text-anchor="end">pipeline-ci_v09_20261024-2234.svg</text>
+  </g>
+</svg>

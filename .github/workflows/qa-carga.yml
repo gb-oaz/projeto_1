@@ -1,0 +1,50 @@
+# =============================================================================
+# QA · carga em homologação — requisito 1_Requisitos/03_ci-qualidade.html
+# (RNF-195) e 1_Requisitos/14_estrutura-projetos.html (RN-155, RN-156)
+# =============================================================================
+#
+# Disparo manual (Actions → QA · carga → Run workflow), só na master: gera a
+# imagem da suíte 5_DEV/qa/backend/carga/ pelo Dockerfile dela (RNF-191) e a
+# roda contra o backend de homologação, cujo endereço é informado no disparo
+# (saída "urls" do Terraform, 4_CI_CD/terraform/infra/outputs.tf). Os limites
+# de cada teste vêm do requisito da feature (RN-155). Nunca roda contra
+# produção (RN-156). O JUnit XML vira artefato da execução.
+# =============================================================================
+
+name: QA · carga
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: "Endereço do backend de homologação (https://…)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  carga:
+    name: Carga · homologação
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rodar a suíte de carga
+        env:
+          API_URL: ${{ inputs.api_url }}
+        run: |
+          case "$API_URL" in https://*) ;; *) echo "::error::api_url precisa começar com https://"; exit 1 ;; esac
+          if [ ! -f 5_DEV/qa/backend/carga/Dockerfile ]; then
+            echo "::warning::5_DEV/qa/backend/carga/ ainda não tem Dockerfile: nada a rodar"; exit 0
+          fi
+          docker build -t qa-backend-carga 5_DEV/qa/backend/carga
+          mkdir -p resultados
+          docker run --rm -e API_URL="$API_URL" -v "$PWD/resultados:/resultados" qa-backend-carga
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-carga
+          path: resultados/
+          if-no-files-found: ignore

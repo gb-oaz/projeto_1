@@ -14,9 +14,10 @@
 #                           Dockerfiles das imagens (arquivo gerado
 #                           .gerado/compose.apps.yml)
 #   etapa 3 · qa            saude confere o /health de cada aplicação; depois,
-#                           conforme --qa, qa-backend (5_DEV/qa/backend/api/)
-#                           e qa-web (ponta a ponta de cada app da web) testam as
-#                           aplicações em contêiner, separados ou em conjunto
+#                           conforme --qa, o ci.sh gera a imagem de cada suíte
+#                           de 5_DEV/qa/ pelo Dockerfile dela e a roda na rede
+#                           deste projeto (boaz-ci-local_default), contra as
+#                           aplicações em contêiner
 #
 # O código entra nos contêineres só para leitura (/fonte) e é copiado para
 # dentro deles antes do build: o CI local nunca altera a cópia de trabalho
@@ -87,38 +88,6 @@ services:
       - ../..:/fonte:ro
       - ./scripts:/ci:ro
       - pnpm:/pnpm-store
-      - cypress:/root/.cache/Cypress
-
-  # ── etapa 3 · qa contra as aplicações em contêiner ────────────────────────
-  # As aplicações (etapa 2) vêm de .gerado/compose.apps.yml, na mesma rede.
-  # qa do backend: testes de API de 5_DEV/qa/backend/api/
-  # docker compose run --rm --no-deps qa-backend
-  qa-backend:
-    image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK:-indefinido}
-    profiles: [qa]
-    entrypoint: ["bash", "/ci/qa-backend.sh"]
-    volumes:
-      - ../..:/fonte:ro
-      - ./scripts:/ci:ro
-      - nuget:/root/.nuget/packages
-    environment:
-      DOTNET_NOLOGO: "true"
-      DOTNET_CLI_TELEMETRY_OPTOUT: "true"
-      API_URL: http://backend:8080
-
-  # qa do frontend: Cypress de um app de 5_DEV/frontend/web/ contra a imagem dele
-  # docker compose run --rm --no-deps qa-web <app>
-  qa-web:
-    image: boaz-ci-local/web-ci:node-${NODE_VERSION:-indefinido}
-    profiles: [qa]
-    entrypoint: ["bash", "/ci/qa-web.sh"]
-    volumes:
-      - ../..:/fonte:ro
-      - ./scripts:/ci:ro
-      - pnpm:/pnpm-store
-      - cypress:/root/.cache/Cypress
-    environment:
-      API_URL: http://backend:8080
 
   # ── etapa 2 · cada aplicação responde 200 em /health ─────────────────────
   # A mesma verificação de prontidão das aplicações em homologação e produção.
@@ -130,8 +99,7 @@ services:
     volumes:
       - ./scripts:/ci:ro
 
-# Caches entre execuções (pacotes NuGet, store do pnpm e binário do Cypress).
+# Caches entre execuções (pacotes NuGet e store do pnpm).
 volumes:
   nuget:
   pnpm:
-  cypress:

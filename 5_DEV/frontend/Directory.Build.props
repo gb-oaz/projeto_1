@@ -15,6 +15,17 @@
   </PropertyGroup>
 
   <!--
+    Endereço do backend (14_estrutura-projetos RNF-198): entra no build pela
+    propriedade ApiUrl (dotnet build -p:ApiUrl=https://…) e fica no assembly
+    como AssemblyMetadata("ApiUrl"), que o app lê na inicialização. O qa
+    funcional do mobile compila com o API_URL_DISPOSITIVO; homologação e
+    produção, com o endereço do ambiente.
+  -->
+  <ItemGroup Condition="'$(ApiUrl)' != ''">
+    <AssemblyMetadata Include="ApiUrl" Value="$(ApiUrl)" />
+  </ItemGroup>
+
+  <!--
     iOS (RNF-170): o workload iOS fixado no global.json (workloadVersion
     10.0.111.1 → .NET para iOS 26.5) compila contra o SDK iOS 26.5, que é o
     SDK do Xcode de .xcode-version (26.6). Não há workload publicado para o

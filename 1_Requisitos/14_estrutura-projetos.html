@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Estrutura dos projetos · boaz · v04</title>
+<title>Estrutura dos projetos · boaz · v07</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="14_estrutura-projetos">
 <meta name="boaz:caminho" content="1_Requisitos/14_estrutura-projetos.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v04">
-<meta name="boaz:data" content="2026-10-24 21:32">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v07">
+<meta name="boaz:data" content="2026-10-24 23:21">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -918,9 +918,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir uma organização de pastas e de dependências única para backend, web e mobile, que separa o domínio (core) dos adaptadores.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>14_estrutura-projetos</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v04</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 21:32</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v07</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 23:21</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 
@@ -930,6 +930,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
     <p>O código das três frentes da <a class="ref" href="01_stack-desenvolvimento.html">Stack de desenvolvimento</a> fica em <code>5_DEV/</code>: o backend em C#, as aplicações web <code>frontend-landing-page</code>, <code>frontend-hub</code> e <code>frontend-quest</code> em Vue e os apps do hub e do quest em .NET MAUI, para Android e iOS. Sem uma estrutura comum, cada frente se organiza de um jeito e regras de domínio se misturam com HTTP, banco e tela.</p>
     <p>A estrutura segue a arquitetura hexagonal (portas e adaptadores). Cada frente tem um <code>core/</code>, dividido por contexto (<code>landing_page</code>, <code>hub</code>, <code>quest</code> e <code>commons</code>) e por feature, com o domínio, os casos de uso e as portas de entrada (<code>ports/in</code>) e de saída (<code>ports/out</code>). Os runtimes usam o core e têm os adaptadores: os primários em <code>infra/in</code>, que recebem as chamadas, e os secundários em <code>infra/out</code>, que falam com o mundo externo. No backend, o runtime é o <code>ms_mono</code>; no frontend, é um app (<code>apps/&lt;app&gt;</code>).</p>
     <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-24: o backend é um único serviço, <code>ms_mono</code>, com todos os contextos. A web é um único projeto com três builds, um por app, que compartilham os componentes do core sem cópia nem <em>module federation</em>. O mobile segue o mesmo desenho, com um projeto .NET MAUI por app, que gera o Android e o iOS.</p></aside>
+    <p>Os testes de qa ficam fora dos projetos, em <code>5_DEV/qa/</code>, e testam o que está rodando: a API do backend, as aplicações web e os apps. Cada suíte escolhe a própria ferramenta (por exemplo, xUnit para integração, Cypress para os fluxos da web, Appium para os fluxos dos apps e k6 para carga) e segue um contrato, que deixa o CI rodar qualquer uma sem conhecer a ferramenta. Dentro de cada projeto ficam só os testes unitários e os de integração entre poucos componentes.</p>
   </section>
 
   <section id="regras-de-negocio">
@@ -944,6 +945,12 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-147"><td><code class="id">RN-147</code></td><td>O <code>core/</code> não importa runtimes nem bibliotecas de entrada e saída (servidor HTTP, cliente HTTP, banco, cache, armazenamento do dispositivo); no frontend, só <code>components/</code> usa o framework de interface (Vue ou .NET MAUI)</td></tr>
         <tr id="RN-148"><td><code class="id">RN-148</code></td><td><code>usecases/</code> implementa as interfaces de <code>ports/in/</code> e usa as de <code>ports/out/</code>; <code>infra/in/</code> chama a feature somente por <code>ports/in/</code>, e <code>infra/out/</code> implementa as interfaces de <code>ports/out/</code></td></tr>
         <tr id="RN-149"><td><code class="id">RN-149</code></td><td>Só o runtime liga as portas aos adaptadores, no ponto de composição da injeção de dependências: <code>Program.cs</code> no backend, <code>main.ts</code> de cada app na web e <code>MauiProgram.cs</code> de cada app no mobile</td></tr>
+        <tr id="RN-151"><td><code class="id">RN-151</code></td><td>O qa testa só pelo que está rodando (caixa-preta): nenhuma suíte de <code>5_DEV/qa/</code> importa código de <code>5_DEV/backend/</code> ou de <code>5_DEV/frontend/</code></td></tr>
+        <tr id="RN-152"><td><code class="id">RN-152</code></td><td>O qa tem três tipos de teste: <strong>integração</strong>, os fluxos e as regras dos requisitos pela API do backend, com banco e cache reais; <strong>funcional</strong>, os fluxos do usuário de ponta a ponta pela interface, com o backend no ar; e <strong>carga</strong>, o tempo de resposta e os erros do backend sob volume</td></tr>
+        <tr id="RN-153"><td><code class="id">RN-153</code></td><td>Cada suíte de qa escolhe a própria ferramenta; trocar ou somar uma ferramenta não muda o CI, desde que a suíte siga o contrato dela (<code class="id">RNF-191</code> ou, no funcional do mobile, <code class="id">RNF-196</code>)</td></tr>
+        <tr id="RN-154"><td><code class="id">RN-154</code></td><td>Dentro de cada suíte os testes ficam em <code>&lt;contexto&gt;/&lt;feature&gt;/</code>, com os nomes do core (<code class="id">RN-145</code>), e cada teste cita o ID do requisito de funcionalidade que cobre</td></tr>
+        <tr id="RN-155"><td><code class="id">RN-155</code></td><td>Os limites de um teste de carga (volume, tempo de resposta e taxa de erro) vêm do requisito de funcionalidade da feature; o qa não define limite próprio</td></tr>
+        <tr id="RN-156"><td><code class="id">RN-156</code></td><td>Os testes de carga não rodam em pull request nem contra produção: rodam sob demanda, contra as aplicações em contêiner do CI local ou contra homologação</td></tr>
       </tbody>
     </table>
   </section>
@@ -965,6 +972,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
       <thead><tr><th>ID</th><th>Frente</th><th>Requisito</th></tr></thead>
       <tbody>
         <tr id="RNF-179"><td><code class="id">RNF-179</code></td><td><span class="tag">Web</span></td><td><code>5_DEV/frontend/web/</code> é um único projeto Vite, com um <code>package.json</code> e um <code>pnpm-lock.yaml</code>, o <code>core/&lt;contexto&gt;/&lt;feature&gt;/</code> com <code>components/</code>, <code>domain/</code>, <code>usecases/</code>, <code>ports/in/</code> e <code>ports/out/</code>, os apps em <code>apps/landing_page/</code>, <code>apps/hub/</code> e <code>apps/quest/</code> e os testes em <code>tests/</code></td></tr>
+        <tr id="RNF-193"><td><code class="id">RNF-193</code></td><td><span class="tag">Web</span></td><td><code>tests/</code> tem só testes unitários e de integração entre poucos componentes, que rodam sem navegador e sem backend; os testes de ponta a ponta ficam no qa (<code class="id">RNF-192</code>)</td></tr>
         <tr id="RNF-180"><td><code class="id">RNF-180</code></td><td><span class="tag">Web</span></td><td>Cada app tem o próprio <code>index.html</code>, <code>main.ts</code> e configuração do Vite, com <code>infra/in/</code> (páginas e rotas) e <code>infra/out/</code> (clientes HTTP e armazenamento do navegador), e importa o core pelo alias <code>@core</code></td></tr>
         <tr id="RNF-181"><td><code class="id">RNF-181</code></td><td><span class="tag">Web</span></td><td>O build de cada app gera um pacote estático próprio, e um Dockerfile único, com o argumento <code>APP</code>, gera as imagens <code>frontend-landing-page</code>, <code>frontend-hub</code> e <code>frontend-quest</code> (<a class="ref" href="04_publicacao-imagens.html#RNF-27">Publicação das imagens <code class="id">RNF-27</code></a>)</td></tr>
         <tr id="RNF-182"><td><code class="id">RNF-182</code></td><td><span class="tag">Web</span></td><td><code>core/commons/</code> guarda os componentes comuns em <code>components/</code> e os arquivos gerados do design system em <code>design/</code>; o lint do CI reprova import que viole <code class="id">RN-146</code> ou <code class="id">RN-147</code></td></tr>
@@ -979,6 +987,17 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RNF-185"><td><code class="id">RNF-185</code></td><td><span class="tag">Mobile</span></td><td>Cada app é um único projeto .NET MAUI que gera o Android (<code>net10.0-android</code>) e o iOS (<code>net10.0-ios</code>), com <code>infra/in/</code> (Shell e páginas), <code>infra/out/</code> (clientes HTTP e armazenamento seguro) e o <code>MauiProgram.cs</code> como ponto de composição</td></tr>
         <tr id="RNF-186"><td><code class="id">RNF-186</code></td><td><span class="tag">Mobile</span></td><td><code>tests/</code> espelha <code>core/</code> e <code>apps/</code>, com um projeto xUnit por projeto testado</td></tr>
         <tr id="RNF-187"><td><code class="id">RNF-187</code></td><td><span class="tag">Mobile</span></td><td>Os apps declaram <code>$(MobileAppTargetFrameworks)</code> e as bibliotecas do core <code>$(MobileCoreTargetFrameworks)</code>, de <code>5_DEV/frontend/Directory.Build.props</code>: <code>net10.0-android</code> em todo sistema, <code>net10.0-ios</code> só no macOS e, nas bibliotecas, também <code>net10.0</code>, alvo dos testes</td></tr>
+        <tr id="RNF-198"><td><code class="id">RNF-198</code></td><td><span class="tag">Mobile</span></td><td>O endereço do backend entra no build dos apps pela propriedade <code>ApiUrl</code> (<code>dotnet build -p:ApiUrl=…</code>), gravada no assembly como <code>AssemblyMetadata</code> por <code>5_DEV/frontend/Directory.Build.props</code> e lida pelo app na inicialização; o build do qa funcional usa <code>API_URL_DISPOSITIVO</code>, e os de homologação e produção, o endereço do ambiente</td></tr>
+      </tbody>
+    </table>
+    <table>
+      <caption>QA · <code>5_DEV/qa/</code></caption>
+      <thead><tr><th>ID</th><th>Frente</th><th>Requisito</th></tr></thead>
+      <tbody>
+        <tr id="RNF-190"><td><code class="id">RNF-190</code></td><td><span class="tag">QA</span></td><td>Cada suíte é uma pasta <code>&lt;alvo&gt;/&lt;tipo&gt;/</code>: <code>backend/integracao/</code>, <code>backend/carga/</code>, <code>frontend/web/funcional/</code> e <code>frontend/mobile/funcional/</code></td></tr>
+        <tr id="RNF-191"><td><code class="id">RNF-191</code></td><td><span class="tag">QA</span></td><td>Contrato das suítes que rodam em contêiner (todas, menos <code>frontend/mobile/funcional/</code>): um <code>Dockerfile</code> na raiz da pasta, que é todo o contexto do build e traz a ferramenta; a imagem roda todos os testes da suíte, lê o alvo das variáveis <code>API_URL</code> (backend), <code>APP_URL</code> e <code>APP</code> (app web), grava o resultado em JUnit XML em <code>/resultados</code> e termina com código 0 se tudo passou e diferente de 0 se algo falhou</td></tr>
+        <tr id="RNF-192"><td><code class="id">RNF-192</code></td><td><span class="tag">QA</span></td><td><code>frontend/web/funcional/</code> usa Cypress e roda uma vez por app web, contra a imagem dele, com as pastas do contexto do app e de <code>commons/</code></td></tr>
+        <tr id="RNF-196"><td><code class="id">RNF-196</code></td><td><span class="tag">QA</span></td><td><code>frontend/mobile/funcional/</code> usa Appium, com os testes em C# (xUnit e Appium.WebDriver), e roda na máquina, no emulador Android e no simulador iOS, uma vez por app e plataforma; o contrato é um <code>executar.sh</code> na raiz da pasta, que recebe <code>PLATAFORMA</code>, <code>APP</code>, <code>APP_PACOTE</code> (o <code>.apk</code> ou o <code>.app</code> compilado), <code>APPIUM_URL</code>, <code>API_URL</code> e <code>API_URL_DISPOSITIVO</code> (o backend visto do aparelho), grava o JUnit XML em <code>RESULTADOS</code> e termina com código 0 só se tudo passou; o Appium e os drivers UiAutomator2 e XCUITest têm versão exata no <code>package.json</code> da pasta</td></tr>
       </tbody>
     </table>
   </section>
@@ -986,8 +1005,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../2_Diagramas/estrutura-projetos_v02_20261024-2115.svg"><img src="../2_Diagramas/estrutura-projetos_v02_20261024-2115.svg" alt="Estrutura dos projetos: padrão de cada feature (infra/in, components, ports/in, usecases, domain, ports/out, infra/out) e as pastas do backend (core e ms_mono), da web (core e apps landing_page, hub, quest) e do mobile (core e apps hub, quest), com as regras de dependência"></a>
-      <figcaption><strong>Estrutura dos projetos</strong><code>2_Diagramas/estrutura-projetos_v02_20261024-2115.svg</code></figcaption>
+      <a href="../2_Diagramas/estrutura-projetos_v04_20261024-2247.svg"><img src="../2_Diagramas/estrutura-projetos_v04_20261024-2247.svg" alt="Estrutura dos projetos: padrão de cada feature (infra/in, components, ports/in, usecases, domain, ports/out, infra/out) e as pastas do backend (core e ms_mono), da web (core e apps landing_page, hub, quest) e do mobile (core e apps hub, quest), as suítes do qa por alvo e tipo (backend/integracao, backend/carga, frontend/web/funcional com Cypress, frontend/mobile/funcional com Appium) com o contrato de cada uma, e as regras de dependência"></a>
+      <figcaption><strong>Estrutura dos projetos</strong><code>2_Diagramas/estrutura-projetos_v04_20261024-2247.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -997,14 +1016,17 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v04</span></td><td>2026-10-24 21:32</td><td>Status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v07</span></td><td>2026-10-24 23:21</td><td>Pendência respondida: <code class="id">RNF-198</code> (endereço do backend no build, pela propriedade <code>ApiUrl</code>) incluído; <code class="id">RNF-196</code> com as versões do Appium e dos drivers no <code>package.json</code> da suíte; seção Em aberto removida</td></tr>
+      <tr><td>v06</td><td>2026-10-24 22:47</td><td>Pendência respondida: o funcional do mobile usa Appium com testes em C# (<code class="id">RNF-196</code>, contrato <code>executar.sh</code> na máquina); <code class="id">RN-153</code> e <code class="id">RNF-191</code> alterados; Em aberto com o endereço do backend de teste no app; diagrama <code>estrutura-projetos_v04</code></td></tr>
+      <tr><td>v05</td><td>2026-10-24 22:25</td><td>Estrutura do qa: <code class="id">RN-151</code> a <code class="id">RN-156</code> e <code class="id">RNF-190</code> a <code class="id">RNF-193</code> incluídos (suítes por alvo e tipo, contrato por imagem, carga sob demanda, testes de ponta a ponta da web fora do projeto); Em aberto com o qa funcional do mobile; diagrama <code>estrutura-projetos_v03</code>; status → Em revisão</td></tr>
+      <tr><td>v04</td><td>2026-10-24 21:32</td><td>Status → Aprovado</td></tr>
       <tr><td>v03</td><td>2026-10-24 21:28</td><td>Pendência respondida: o requisito 06 (<code class="id">RNF-108</code> a <code class="id">RNF-110</code>) passa a usar <code>core/commons/</code>; seção Em aberto removida</td></tr>
       <tr><td>v02</td><td>2026-10-24 21:16</td><td>Sem microsserviços futuros: <code class="id">RN-150</code> removida, <code class="id">RNF-175</code> e <code class="id">RNF-178</code> com o <code>ms_mono</code>; <code class="id">RNF-187</code> (TFMs do mobile) incluído; Em aberto só com o alinhamento do requisito 06; diagrama <code>estrutura-projetos_v02</code></td></tr>
       <tr><td>v01</td><td>2026-10-24 20:41</td><td>Criação: <code class="id">RN-143</code> a <code class="id">RN-150</code> e <code class="id">RNF-175</code> a <code class="id">RNF-186</code> (estrutura hexagonal de backend, web e mobile); diagrama <code>estrutura-projetos_v01</code></td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v04 · 2026-10-24 21:32</span>
+    <span>boaz · v07 · 2026-10-24 23:21</span>
     <span class="boaz-arquivo">1_Requisitos/14_estrutura-projetos.html</span>
   </div>
 </footer>

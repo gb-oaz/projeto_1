@@ -9,16 +9,19 @@
 #
 #   ./4_CI_CD/local/ci.sh              componentes alterados em relação à master
 #   ./4_CI_CD/local/ci.sh --tudo       todos os componentes
-#   ./4_CI_CD/local/ci.sh --qa backend só o qa do backend (testes de API)
-#   ./4_CI_CD/local/ci.sh --qa frontend só o qa do frontend (Cypress)
-#   ./4_CI_CD/local/ci.sh --qa todos   os dois em conjunto (padrão)
+#   ./4_CI_CD/local/ci.sh --qa backend só a suíte de integração do backend
+#   ./4_CI_CD/local/ci.sh --qa frontend só a suíte funcional da web
+#   ./4_CI_CD/local/ci.sh --qa todos   as duas em conjunto (padrão)
+#   ./4_CI_CD/local/ci.sh --qa carga   só a suíte de carga do backend (sob demanda)
+#   ./4_CI_CD/local/ci.sh --qa mobile  só a suíte funcional do mobile (Appium, sob demanda)
 #   ./4_CI_CD/local/ci.sh --sem-qa     só a etapa 1 (verificação)
+#   ./4_CI_CD/local/ci.sh --so-qa      só as etapas 2 e 3 (o job qa do GitHub)
 #   ./4_CI_CD/local/ci.sh --manter     deixa as aplicações no ar ao terminar
 #
 #   mudancas ─► 1 · verificação ─► 2 · aplicações ─► 3 · qa ─► resultado
-#               backend-ci          backend           qa-backend (API)
-#               web-ci              frontend-<app>    qa-web (Cypress)
-#               android e ios na máquina, fora do Docker
+#               backend-ci          backend           suítes de 5_DEV/qa/, cada
+#               web-ci              frontend-<app>    uma pela própria imagem
+#               android e ios na máquina, fora do Docker · funcional mobile (Appium)
 #
 # Precisa de: Docker com Compose v2, git e bash; para o mobile, o SDK .NET do
 # global.json e o workload do MAUI; Android: JDK 17 e SDK do Android; iOS:
@@ -31,23 +34,32 @@ RAIZ=$(cd "$AQUI/../.." && pwd)
 GERADO="$AQUI/.gerado"
 cd "$RAIZ"
 
-TUDO=false SEM_QA=false MANTER=false QA=todos
+TUDO=false SEM_QA=false SO_QA=false MANTER=false QA=todos
 while [ $# -gt 0 ]; do
   case "$1" in
     --tudo) TUDO=true ;;
     --sem-qa) SEM_QA=true ;;
+    --so-qa) SO_QA=true ;;
     --manter) MANTER=true ;;
     --qa) QA=${2:-}; shift ;;
     --qa=*) QA=${1#--qa=} ;;
-    -h|--help) sed -n '5,25p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '5,29p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "opção desconhecida: $1 (use --help)"; exit 2 ;;
   esac
   shift
 done
-case "$QA" in backend|frontend|todos) ;; *) echo "--qa aceita backend, frontend ou todos"; exit 2 ;; esac
-QA_BACKEND=false QA_FRONTEND=false
-[ "$QA" != frontend ] && QA_BACKEND=true
-[ "$QA" != backend ] && QA_FRONTEND=true
+case "$QA" in backend|frontend|todos|carga|mobile) ;; *) echo "--qa aceita backend, frontend, todos, carga ou mobile"; exit 2 ;; esac
+$SEM_QA && $SO_QA && { echo "--sem-qa e --so-qa não combinam"; exit 2; }
+# Suítes de 5_DEV/qa/ (14_estrutura-projetos, RNF-190): integração e funcional
+# por padrão; a carga (RN-156) e o funcional do mobile só quando pedidos
+QA_BACKEND=false QA_FRONTEND=false QA_CARGA=false QA_MOBILE=false
+case "$QA" in
+  backend) QA_BACKEND=true ;;
+  frontend) QA_FRONTEND=true ;;
+  todos) QA_BACKEND=true QA_FRONTEND=true ;;
+  carga) QA_CARGA=true ;;
+  mobile) QA_MOBILE=true ;;
+esac
 
 titulo() { printf '\n\033[1m━━ %s ━━\033[0m\n' "$*"; }
 aviso() { printf '\033[33m! %s\033[0m\n' "$*"; }
@@ -81,6 +93,13 @@ else
   done <<<"$ALTERADOS"
   echo "base: $(git rev-parse --short "$BASE")  ·  arquivos alterados: $(grep -c . <<<"$ALTERADOS")"
 fi
+# a carga mira o backend: sobe o backend mesmo sem mudança nele
+$QA_CARGA && BACKEND_MUDOU=true
+# o funcional do mobile testa os apps com o backend no ar
+$QA_MOBILE && BACKEND_MUDOU=true ANDROID_MUDOU=true IOS_MUDOU=true
+# --so-qa: as verificações já rodaram (jobs do GitHub); fora do --qa mobile,
+# o mobile não tem qa
+$SO_QA && ! $QA_MOBILE && ANDROID_MUDOU=false IOS_MUDOU=false
 
 # Frente que mudou só roda se já tiver projeto; apps de apps/<app>/, como no
 # CI (14_estrutura-projetos)
@@ -108,17 +127,14 @@ if ! $BACKEND && [ ${#APPS[@]} -eq 0 ] && [ ${#ANDROID[@]} -eq 0 ] && [ ${#IOS[@
   exit 0
 fi
 
-# Versões do ambiente local e do CI (RN-02, RNF-19)
-if $BACKEND || [ ${#ANDROID[@]} -gt 0 ] || [ ${#IOS[@]} -gt 0 ]; then
+# Versões do ambiente local e do CI (RN-02, RNF-19), para a etapa 1
+# (--so-qa não a roda: as aplicações e as suítes trazem as próprias imagens)
+if { ! $SO_QA && $BACKEND; } || [ ${#ANDROID[@]} -gt 0 ] || [ ${#IOS[@]} -gt 0 ]; then
   DOTNET_SDK=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' global.json 2>/dev/null | head -1)
   [ -n "$DOTNET_SDK" ] || { echo "✗ global.json sem a versão do SDK .NET"; exit 2; }
   export DOTNET_SDK
-elif [ -f global.json ]; then
-  # o qa do backend (imagem do SDK) pode rodar mesmo quando só a web mudou
-  DOTNET_SDK=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' global.json | head -1)
-  export DOTNET_SDK
 fi
-if [ ${#APPS[@]} -gt 0 ]; then
+if ! $SO_QA && [ ${#APPS[@]} -gt 0 ]; then
   NODE_VERSION=$(tr -d ' \nv' < .nvmrc 2>/dev/null)
   [ -n "$NODE_VERSION" ] || { echo "✗ .nvmrc sem a versão do Node.js"; exit 2; }
   export NODE_VERSION
@@ -151,13 +167,14 @@ trap encerrar EXIT
 # Um componente que falha não interrompe os outros (fail-fast: false).
 # -----------------------------------------------------------------------------
 VERDE=true
-[ ${#APPS[@]} -gt 0 ] && "${COMPOSE[@]}" --profile verificacao build web-ci
-if $BACKEND; then
+$SO_QA && echo "--so-qa: etapa 1 pulada"
+$SO_QA || [ ${#APPS[@]} -eq 0 ] || "${COMPOSE[@]}" --profile verificacao build web-ci
+if $BACKEND && ! $SO_QA; then
   titulo "1 · verificação · backend"
   if "${COMPOSE[@]}" --profile verificacao "${RUN[@]}" backend-ci; then registrar "backend" "verificação" "passou"
   else registrar "backend" "verificação" "falhou"; VERDE=false; fi
 fi
-if [ ${#APPS[@]} -gt 0 ]; then
+if [ ${#APPS[@]} -gt 0 ] && ! $SO_QA; then
   titulo "1 · verificação · web · ${APPS[*]}"
   if "${COMPOSE[@]}" --profile verificacao "${RUN[@]}" web-ci "${APPS[@]}"; then registrar "web" "verificação" "passou"
   else registrar "web" "verificação" "falhou"; VERDE=false; fi
@@ -217,6 +234,7 @@ fi
 verificar_mobile() { # $1 = android|ios  $2 = o que falta  $3... = apps
   local p=$1 f=$2; shift 2
   [ $# -gt 0 ] || return 0
+  $SO_QA && return 0
   titulo "1 · verificação · $p · $*"
   if [ -n "$f" ]; then
     aviso "falta $f nesta máquina; $p não verificado"
@@ -227,19 +245,69 @@ verificar_mobile() { # $1 = android|ios  $2 = o que falta  $3... = apps
 verificar_mobile android "$ANDROID_FALTA" ${ANDROID[@]+"${ANDROID[@]}"}
 verificar_mobile ios "$IOS_FALTA" ${IOS[@]+"${IOS[@]}"}
 
+# Funcional do mobile (--qa mobile, RNF-196): além do que a verificação
+# pede, o Node.js (o Appium e os drivers vêm do package.json da suíte) e o
+# emulador ou o simulador ligado
+falta_qa_mobile() { # $1 = android|ios
+  if ! command -v npm >/dev/null; then echo "Node.js do .nvmrc (npm)"
+  elif [ "$1" = android ]; then
+    "$ASDK/platform-tools/adb" devices 2>/dev/null | grep -qE '^emulator-[0-9]+[[:space:]]+device' \
+      || echo "emulador Android ligado (adb devices)"
+  else
+    xcrun simctl list devices booted 2>/dev/null | grep -q Booted || echo "simulador iOS ligado (xcrun simctl boot <aparelho>)"
+  fi
+}
+QA_ANDROID_FALTA="" QA_IOS_FALTA=""
+if $QA_MOBILE; then
+  [ ${#ANDROID[@]} -gt 0 ] && QA_ANDROID_FALTA=${ANDROID_FALTA:-$(falta_qa_mobile android)}
+  [ ${#IOS[@]} -gt 0 ] && QA_IOS_FALTA=${IOS_FALTA:-$(falta_qa_mobile ios)}
+fi
+
 # -----------------------------------------------------------------------------
-# Etapas 2 e 3 · aplicações em contêiner e qa (RNF-162)
+# Etapas 2 e 3 · aplicações em contêiner e qa (RNF-162, RNF-172)
 # Só com a etapa 1 verde. As imagens saem dos mesmos Dockerfiles da publicação
 # (5_DEV/backend/Dockerfile e 5_DEV/frontend/web/Dockerfile, este com o
 # argumento APP de cada app), com a tag
 # local boaz-ci-local/<imagem>:ci, e nunca são enviadas a um registro (RN-140).
-# O qa (--qa) testa o backend sozinho (API), o frontend (Cypress, com o backend
-# no ar) ou os dois em conjunto, sobre a mesma pilha de contêineres.
+# Cada suíte de 5_DEV/qa/<alvo>/<tipo>/ roda pela própria imagem, gerada do
+# Dockerfile dela, na rede das aplicações (contrato de RNF-191): recebe
+# API_URL, APP_URL e APP e grava o JUnit XML em .gerado/resultados/.
 # -----------------------------------------------------------------------------
+REDE=boaz-ci-local_default
+RESULTADOS="$GERADO/resultados"
+# porta da máquina em que o backend fica no --qa mobile (o emulador e o
+# simulador não entram na rede do Docker)
+PORTA_API=""
+
+# Gera a imagem da suíte $1 (pasta em 5_DEV/qa/); sem Dockerfile, pula com aviso
+imagem_suite() {
+  local dir="5_DEV/qa/$1"
+  if [ ! -f "$dir/Dockerfile" ]; then
+    aviso "sem $dir/Dockerfile: suíte $1 pulada"; return 1
+  fi
+  docker build -q -t "boaz-ci-local/qa-${1//\//-}:ci" "$dir" >/dev/null
+}
+# Roda a suíte $1, registrada como $2, com as variáveis $3... (VAR=valor)
+rodar_suite() {
+  local suite=$1 nome=$2 args=() v; shift 2
+  local saida # qa · web · funcional · hub → resultados/web-funcional-hub/
+  saida="$RESULTADOS/$(printf '%s' "${nome#qa · }" | tr -cs 'a-z0-9_' '-' | sed 's/-$//')"
+  for v in "$@"; do args+=(-e "$v"); done
+  mkdir -p "$saida"
+  titulo "3 · $nome"
+  if docker run --rm --network "$REDE" -v "$saida:/resultados" "${args[@]}" "boaz-ci-local/qa-${suite//\//-}:ci"; then
+    registrar "$nome" "qa" "passou"
+  else registrar "$nome" "qa" "falhou"; VERDE=false; fi
+}
+suite() { # $1 = suíte  $2 = nome  $3... = variáveis
+  if imagem_suite "$1"; then rodar_suite "$@"
+  else registrar "$2" "qa" "pulado"; fi
+}
+
 if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
   # apps da web com imagem (o qa do frontend sobe todos, mesmo sem mudança)
   APPS_IMAGEM=()
-  if [ -f 5_DEV/frontend/web/Dockerfile ]; then
+  if $QA_FRONTEND && [ -f 5_DEV/frontend/web/Dockerfile ]; then
     for d in 5_DEV/frontend/web/apps/*/; do [ -d "$d" ] && APPS_IMAGEM+=("$(basename "$d")"); done
   fi
   titulo "2 · aplicações"
@@ -252,6 +320,7 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
     build: { context: ../../5_DEV/backend }
     image: boaz-ci-local/backend-mono:ci
     profiles: [aplicacoes]
+$($QA_MOBILE && echo '    ports: ["127.0.0.1:18080:8080"]')
     environment:
       AMBIENTE: local
       ConnectionStrings__Mongo: mongodb://mongodb:27017
@@ -263,7 +332,6 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
 EOF
     fi
     for app in ${APPS_IMAGEM[@]+"${APPS_IMAGEM[@]}"}; do
-      $QA_FRONTEND || break
       n="frontend-${app//_/-}"
       cat <<EOF
   $n:
@@ -284,30 +352,30 @@ EOF
     registrar "aplicações" "qa" "pulado"
   else
     COMPOSE+=(-f "$GERADO/compose.apps.yml")
+    rm -rf "$RESULTADOS"
     if "${COMPOSE[@]}" --profile aplicacoes up -d --build \
        && "${COMPOSE[@]}" --profile qa "${RUN[@]}" --no-deps saude "${SAUDE[@]}"; then
       registrar "aplicações" "/health" "passou"
-      titulo "3 · qa · $QA"
-      # backend: testes de API de 5_DEV/qa/backend/api/ contra o contêiner
-      if $QA_BACKEND; then
-        if ! grep -q '^  backend:' "$GERADO/compose.apps.yml"; then
-          aviso "sem 5_DEV/backend/Dockerfile: qa do backend pulado"; registrar "qa · backend" "qa" "pulado"
-        elif ! projeto_dotnet 5_DEV/qa/backend/api/; then
-          aviso "sem projeto de teste em 5_DEV/qa/backend/api/: qa do backend pulado"; registrar "qa · backend" "qa" "pulado"
-        elif "${COMPOSE[@]}" --profile qa "${RUN[@]}" --no-deps qa-backend; then registrar "qa · backend" "qa" "passou"
-        else registrar "qa · backend" "qa" "falhou"; VERDE=false; fi
+      API=http://backend:8080
+      TEM_BACKEND=false; grep -q '^  backend:' "$GERADO/compose.apps.yml" && TEM_BACKEND=true
+      $TEM_BACKEND && $QA_MOBILE && PORTA_API=18080
+      # integração e carga: contra o contêiner do backend
+      for t in integracao carga; do
+        [ $t = integracao ] && ! $QA_BACKEND && continue
+        [ $t = carga ] && ! $QA_CARGA && continue
+        if $TEM_BACKEND; then suite "backend/$t" "qa · backend · $t" "API_URL=$API"
+        else aviso "sem 5_DEV/backend/Dockerfile: suíte backend/$t pulada"; registrar "qa · backend · $t" "qa" "pulado"; fi
+      done
+      # funcional da web: uma vez por app, contra o contêiner dele (RNF-192)
+      if $QA_FRONTEND && [ ${#APPS_IMAGEM[@]} -gt 0 ]; then
+        if imagem_suite frontend/web/funcional; then
+          for app in "${APPS_IMAGEM[@]}"; do
+            rodar_suite frontend/web/funcional "qa · web · funcional · $app" \
+              "API_URL=$API" "APP=$app" "APP_URL=http://frontend-${app//_/-}:8080"
+          done
+        else registrar "qa · web · funcional" "qa" "pulado"; fi
       fi
-      # frontend: Cypress de cada app web com imagem, contra o contêiner dele
-      if $QA_FRONTEND; then
-        for n in $(sed -n 's/^  frontend-\([a-z0-9-]*\):$/\1/p' "$GERADO/compose.apps.yml"); do
-          a="${n//-/_}"
-          if ! grep -q '"test:e2e:imagem"' 5_DEV/frontend/web/package.json 2>/dev/null; then
-            aviso "web sem o script test:e2e:imagem: qa do frontend pulado"; registrar "qa · $a" "qa" "pulado"; continue
-          fi
-          if "${COMPOSE[@]}" --profile qa "${RUN[@]}" --no-deps qa-web "$a"; then registrar "qa · $a" "qa" "passou"
-          else registrar "qa · $a" "qa" "falhou"; VERDE=false; fi
-        done
-      fi
+      echo "resultados (JUnit XML): ${RESULTADOS#"$RAIZ"/}/"
     else
       registrar "aplicações" "/health" "falhou"; VERDE=false
       "${COMPOSE[@]}" --profile aplicacoes logs --tail 50
@@ -315,6 +383,25 @@ EOF
   fi
 elif ! $VERDE; then
   aviso "etapa 1 com falha: aplicações e qa não rodam"
+fi
+
+# funcional do mobile: na máquina, uma vez por app e plataforma, com o
+# backend da etapa 2 na porta $PORTA_API (scripts/qa-mobile.sh)
+qa_mobile() { # $1 = android|ios  $2 = o que falta  $3... = apps
+  local p=$1 f=$2 nome="qa · mobile · funcional · $1"; shift 2
+  [ $# -gt 0 ] || return 0
+  titulo "3 · mobile · funcional · $p · $*"
+  if [ ! -f 5_DEV/qa/frontend/mobile/funcional/executar.sh ]; then
+    aviso "sem 5_DEV/qa/frontend/mobile/funcional/executar.sh: suíte pulada"; registrar "$nome" "qa" "pulado"
+  elif [ -n "$f" ]; then
+    aviso "falta $f nesta máquina; funcional $p não rodou"; registrar "$nome" "qa" "pulado"
+  elif PORTA_API=$PORTA_API bash "$AQUI/scripts/qa-mobile.sh" "$p" "$@"; then registrar "$nome" "qa" "passou"
+  else registrar "$nome" "qa" "falhou"; VERDE=false; fi
+}
+if $VERDE && ! $SEM_QA && $QA_MOBILE; then
+  [ -n "$PORTA_API" ] || aviso "backend fora do ar: o funcional do mobile roda sem ele"
+  qa_mobile android "$QA_ANDROID_FALTA" ${ANDROID[@]+"${ANDROID[@]}"}
+  qa_mobile ios "$QA_IOS_FALTA" ${IOS[@]+"${IOS[@]}"}
 fi
 
 # -----------------------------------------------------------------------------
