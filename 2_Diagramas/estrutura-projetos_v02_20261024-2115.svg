@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1592 1512" width="1592" height="1512">
+  <title>Estrutura dos projetos</title>
+  <desc>Diagrama de pacotes da estrutura hexagonal comum de 5_DEV/: em cada frente (backend C#, web Vue e mobile .NET MAUI), core/&lt;contexto&gt;/&lt;feature&gt;/ com domain, usecases, ports/in e ports/out (e components no frontend), e runtimes (ms_mono no backend, apps/&lt;app&gt; no frontend) com os adaptadores primários (infra/in) e secundários (infra/out). v01: criação. v02: sem microsserviços futuros; ms_mono como runtime do backend.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+
+
+  </defs>
+<rect class="bg" x="0" y="0" width="1592" height="1512"/>
+<g id="marca-topo">
+<rect class="wm-band" x="0" y="0" width="1592" height="112"/><rect class="wm-accent" x="0" y="110" width="1592" height="2"/>
+<text class="wm-eyebrow" x="40" y="40">BOAZ · UML PACOTES</text>
+<text class="title" x="40" y="72">Estrutura dos projetos</text>
+<text class="subtitle" x="40" y="94">Hexagonal nas três frentes: core por contexto e feature; runtimes (ms_mono, apps/&lt;app&gt;) com adaptadores primários (in) e secundários (out)</text>
+<text class="wm-meta-label" x="1304" y="44">VERSÃO</text><rect class="wm-badge" x="1304" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1328" y="71" text-anchor="middle">v02</text>
+<line class="wm-sep" x1="1376" y1="32" x2="1376" y2="80"/><text class="wm-meta-label" x="1400" y="44">DATA</text><text class="wm-meta-value" x="1400" y="72">2026-10-24 · 21:15</text>
+</g>
+<g id="padrao-feature">
+<text class="section" x="40" y="160">1 · PADRÃO DE CADA FEATURE — IGUAL NO BACKEND, NA WEB E NO MOBILE</text>
+<rect class="boundary" x="144" y="184" width="232" height="272" rx="14"/><text class="boundary-label" x="160" y="208">MS_MONO · APPS/&lt;APP&gt;</text>
+<rect class="boundary" x="408" y="184" width="1040" height="272" rx="14"/><text class="boundary-label" x="424" y="208">CORE/&lt;CONTEXTO&gt;/&lt;FEATURE&gt;/</text>
+<g id="infra-in" filter="url(#sombra)"><rect class="node-blue" x="168" y="224" width="184" height="72" rx="10"/><text class="label-strong" x="260.0" y="256.0" text-anchor="middle">infra/in/</text><text class="mono" x="260.0" y="276.0" text-anchor="middle">adaptador primário</text></g>
+<g id="components" filter="url(#sombra)"><rect class="node-purple" x="432" y="224" width="184" height="72" rx="10"/><text class="label-strong" x="524.0" y="256.0" text-anchor="middle">components/</text><text class="mono" x="524.0" y="276.0" text-anchor="middle">só na web e no mobile</text></g>
+<g id="ports-in" filter="url(#sombra)"><rect class="node-purple" x="696" y="224" width="184" height="72" rx="10"/><text class="label-strong" x="788.0" y="256.0" text-anchor="middle">ports/in/</text><text class="mono" x="788.0" y="276.0" text-anchor="middle">o que a feature oferece</text></g>
+<g id="usecases" filter="url(#sombra)"><rect class="node-purple" x="960" y="224" width="184" height="72" rx="10"/><text class="label-strong" x="1052.0" y="256.0" text-anchor="middle">usecases/</text><text class="mono" x="1052.0" y="276.0" text-anchor="middle">casos de uso</text></g>
+<g id="domain" filter="url(#sombra)"><rect class="node-purple" x="1224" y="224" width="184" height="72" rx="10"/><text class="label-strong" x="1316.0" y="256.0" text-anchor="middle">domain/</text><text class="mono" x="1316.0" y="276.0" text-anchor="middle">entidades e regras</text></g>
+<g id="ports-out" filter="url(#sombra)"><rect class="node-purple" x="960" y="368" width="184" height="72" rx="10"/><text class="label-strong" x="1052.0" y="400.0" text-anchor="middle">ports/out/</text><text class="mono" x="1052.0" y="420.0" text-anchor="middle">o que a feature precisa</text></g>
+<g id="infra-out" filter="url(#sombra)"><rect class="node-blue" x="168" y="368" width="184" height="72" rx="10"/><text class="label-strong" x="260.0" y="400.0" text-anchor="middle">infra/out/</text><text class="mono" x="260.0" y="420.0" text-anchor="middle">adaptador secundário</text></g>
+<line class="edge edge-async" x1="352" y1="260" x2="430" y2="260" marker-end="url(#seta-aberta)"/>
+<rect class="edge-label-bg" x="361.6" y="240" width="60.8" height="16"/>
+<text class="uml-keyword" x="392" y="252" text-anchor="middle">«import»</text>
+<line class="edge edge-async" x1="616" y1="260" x2="694" y2="260" marker-end="url(#seta-aberta)"/>
+<rect class="edge-label-bg" x="625.6" y="240" width="60.8" height="16"/>
+<text class="uml-keyword" x="656" y="252" text-anchor="middle">«import»</text>
+<line class="edge edge-async" x1="960" y1="260" x2="882" y2="260" marker-end="url(#heranca)"/>
+<rect class="edge-label-bg" x="883.0" y="240" width="74.0" height="16"/>
+<text class="muted" x="920" y="252" text-anchor="middle">implementa</text>
+<line class="edge edge-async" x1="1144" y1="260" x2="1222" y2="260" marker-end="url(#seta-aberta)"/>
+<rect class="edge-label-bg" x="1153.6" y="240" width="60.8" height="16"/>
+<text class="uml-keyword" x="1184" y="252" text-anchor="middle">«import»</text>
+<line class="edge edge-async" x1="1052" y1="296" x2="1052" y2="366" marker-end="url(#seta-aberta)"/>
+<text class="uml-keyword" x="1060" y="336" text-anchor="start">«import»</text>
+<line class="edge edge-async" x1="352" y1="404" x2="958" y2="404" marker-end="url(#heranca)"/>
+<rect class="edge-label-bg" x="586.0" y="384" width="140.0" height="16"/>
+<text class="muted" x="656" y="396" text-anchor="middle">implementa ports/out</text>
+<text class="muted" x="524" y="328" text-anchor="middle">no backend, infra/in importa ports/in direto</text>
+</g>
+<text class="section" x="40" y="512">2 · ESTRUTURA DE CADA FRENTE EM 5_DEV/</text>
+<rect class="boundary" x="40" y="536" width="472" height="680" rx="14"/><text class="boundary-label" x="56" y="560">BACKEND · 5_DEV/backend/</text><text class="mono" x="56" y="582">C# · .NET 10 · uma solution (Boaz.slnx)</text>
+<rect class="boundary" x="560" y="536" width="472" height="680" rx="14"/><text class="boundary-label" x="576" y="560">WEB · 5_DEV/frontend/web/</text><text class="mono" x="576" y="582">Vue 3 · TypeScript · Vite · um package.json</text>
+<rect class="boundary" x="1080" y="536" width="472" height="680" rx="14"/><text class="boundary-label" x="1096" y="560">MOBILE · 5_DEV/frontend/mobile/</text><text class="mono" x="1096" y="582">.NET MAUI · uma solution (Boaz.Mobile.slnx)</text>
+<g id="backend-runtime">
+<g filter="url(#sombra)"><rect class="node-blue" x="56" y="608" width="56" height="14" rx="2"/><rect class="node-blue" x="56" y="622" width="440" height="120" rx="4"/><text class="label-strong" x="276" y="648" text-anchor="middle">ms_mono/</text></g>
+<rect class="node" x="72" y="660" width="196" height="74" rx="8"/><text class="label" x="170" y="682" text-anchor="middle">infra/in/</text><text class="mono" x="170" y="702" text-anchor="middle">&lt;contexto&gt;/&lt;feature&gt;/</text><text class="mono" x="170" y="722" text-anchor="middle">endpoints HTTP</text>
+<rect class="node" x="284" y="660" width="196" height="74" rx="8"/><text class="label" x="382" y="682" text-anchor="middle">infra/out/</text><text class="mono" x="382" y="702" text-anchor="middle">&lt;contexto&gt;/&lt;feature&gt;/</text><text class="mono" x="382" y="722" text-anchor="middle">MongoDB · Redis</text>
+<text class="muted" x="56" y="768">ms_mono/: runtime e composição (Program.cs)</text>
+<g><rect class="chip" x="56" y="784" width="95" height="22" rx="11"/><text class="chip-text" x="103.5" y="799" text-anchor="middle">backend-mono</text></g>
+<text class="mono" x="56" y="836">Dockerfile em 5_DEV/backend/</text>
+</g>
+<g id="web-runtime">
+<g id="web-app-0" filter="url(#sombra)"><rect class="node-blue" x="576" y="608" width="56" height="14" rx="2"/><rect class="node-blue" x="576" y="622" width="120" height="120" rx="4"/><text class="label-strong" x="636.0" y="648" text-anchor="middle">landing_page/</text><text class="mono" x="636.0" y="670" text-anchor="middle">infra/in/</text><text class="mono" x="636.0" y="690" text-anchor="middle">infra/out/</text></g>
+<g id="web-app-1" filter="url(#sombra)"><rect class="node-blue" x="736" y="608" width="56" height="14" rx="2"/><rect class="node-blue" x="736" y="622" width="120" height="120" rx="4"/><text class="label-strong" x="796.0" y="648" text-anchor="middle">hub/</text><text class="mono" x="796.0" y="670" text-anchor="middle">infra/in/</text><text class="mono" x="796.0" y="690" text-anchor="middle">infra/out/</text></g>
+<g id="web-app-2" filter="url(#sombra)"><rect class="node-blue" x="896" y="608" width="56" height="14" rx="2"/><rect class="node-blue" x="896" y="622" width="120" height="120" rx="4"/><text class="label-strong" x="956.0" y="648" text-anchor="middle">quest/</text><text class="mono" x="956.0" y="670" text-anchor="middle">infra/in/</text><text class="mono" x="956.0" y="690" text-anchor="middle">infra/out/</text></g>
+<text class="muted" x="576" y="768">apps/&lt;app&gt;: um build Vite por app, uma imagem por app</text>
+<g><rect class="chip" x="576" y="784" width="155" height="22" rx="11"/><text class="chip-text" x="653.5" y="799" text-anchor="middle">frontend-landing-page</text></g>
+<g><rect class="chip" x="743" y="784" width="95" height="22" rx="11"/><text class="chip-text" x="790.5" y="799" text-anchor="middle">frontend-hub</text></g>
+<g><rect class="chip" x="850" y="784" width="108" height="22" rx="11"/><text class="chip-text" x="904.0" y="799" text-anchor="middle">frontend-quest</text></g>
+<text class="mono" x="576" y="836">Dockerfile único com ARG APP</text>
+</g>
+<g id="mobile-runtime">
+<g id="mob-app-0" filter="url(#sombra)"><rect class="node-blue" x="1096" y="608" width="56" height="14" rx="2"/><rect class="node-blue" x="1096" y="622" width="196" height="120" rx="4"/><text class="label-strong" x="1194.0" y="648" text-anchor="middle">hub/</text><text class="mono" x="1194.0" y="670" text-anchor="middle">infra/in/ · páginas</text><text class="mono" x="1194.0" y="690" text-anchor="middle">infra/out/ · HTTP</text></g>
+<g id="mob-app-1" filter="url(#sombra)"><rect class="node-blue" x="1340" y="608" width="56" height="14" rx="2"/><rect class="node-blue" x="1340" y="622" width="196" height="120" rx="4"/><text class="label-strong" x="1438.0" y="648" text-anchor="middle">quest/</text><text class="mono" x="1438.0" y="670" text-anchor="middle">infra/in/ · páginas</text><text class="mono" x="1438.0" y="690" text-anchor="middle">infra/out/ · HTTP</text></g>
+<text class="muted" x="1096" y="768">apps/&lt;app&gt;: um projeto MAUI gera Android e iOS</text>
+<g><rect class="chip" x="1096" y="784" width="115" height="22" rx="11"/><text class="chip-text" x="1153.5" y="799" text-anchor="middle">net10.0-android</text></g>
+<g><rect class="chip" x="1223" y="784" width="89" height="22" rx="11"/><text class="chip-text" x="1267.5" y="799" text-anchor="middle">net10.0-ios</text></g>
+<text class="mono" x="1096" y="836">landing_page só no backend e na web</text>
+</g>
+<line class="edge edge-async" x1="276" y1="856" x2="276" y2="902" marker-end="url(#seta-aberta)"/>
+<text class="uml-keyword" x="284" y="884" text-anchor="start">«import»</text>
+<text class="mono" x="56" y="884">core/&lt;contexto&gt;/</text>
+<g id="core-40-0" filter="url(#sombra)"><rect class="node-purple" x="56" y="904" width="56" height="14" rx="2"/><rect class="node-purple" x="56" y="918" width="120" height="88" rx="4"/><text class="label-strong" x="116.0" y="944" text-anchor="middle">landing_page/</text><text class="mono" x="116.0" y="966" text-anchor="middle">feature_1/ … n/</text></g>
+<g id="core-40-1" filter="url(#sombra)"><rect class="node-purple" x="216" y="904" width="56" height="14" rx="2"/><rect class="node-purple" x="216" y="918" width="120" height="88" rx="4"/><text class="label-strong" x="276.0" y="944" text-anchor="middle">hub/</text><text class="mono" x="276.0" y="966" text-anchor="middle">feature_1/ … n/</text></g>
+<g id="core-40-2" filter="url(#sombra)"><rect class="node-purple" x="376" y="904" width="56" height="14" rx="2"/><rect class="node-purple" x="376" y="918" width="120" height="88" rx="4"/><text class="label-strong" x="436.0" y="944" text-anchor="middle">quest/</text><text class="mono" x="436.0" y="966" text-anchor="middle">feature_1/ … n/</text></g>
+<line class="edge edge-async" x1="276" y1="1006" x2="276" y2="1048" marker-end="url(#seta-aberta)"/>
+<text class="uml-keyword" x="284" y="1032" text-anchor="start">«import»</text>
+<line class="edge edge-async" x1="796" y1="856" x2="796" y2="902" marker-end="url(#seta-aberta)"/>
+<text class="uml-keyword" x="804" y="884" text-anchor="start">«import»</text>
+<text class="mono" x="576" y="884">core/&lt;contexto&gt;/</text>
+<g id="core-560-0" filter="url(#sombra)"><rect class="node-purple" x="576" y="904" width="56" height="14" rx="2"/><rect class="node-purple" x="576" y="918" width="120" height="88" rx="4"/><text class="label-strong" x="636.0" y="944" text-anchor="middle">landing_page/</text><text class="mono" x="636.0" y="966" text-anchor="middle">feature_1/ … n/</text></g>
+<g id="core-560-1" filter="url(#sombra)"><rect class="node-purple" x="736" y="904" width="56" height="14" rx="2"/><rect class="node-purple" x="736" y="918" width="120" height="88" rx="4"/><text class="label-strong" x="796.0" y="944" text-anchor="middle">hub/</text><text class="mono" x="796.0" y="966" text-anchor="middle">feature_1/ … n/</text></g>
+<g id="core-560-2" filter="url(#sombra)"><rect class="node-purple" x="896" y="904" width="56" height="14" rx="2"/><rect class="node-purple" x="896" y="918" width="120" height="88" rx="4"/><text class="label-strong" x="956.0" y="944" text-anchor="middle">quest/</text><text class="mono" x="956.0" y="966" text-anchor="middle">feature_1/ … n/</text></g>
+<line class="edge edge-async" x1="796" y1="1006" x2="796" y2="1048" marker-end="url(#seta-aberta)"/>
+<text class="uml-keyword" x="804" y="1032" text-anchor="start">«import»</text>
+<line class="edge edge-async" x1="1316" y1="856" x2="1316" y2="902" marker-end="url(#seta-aberta)"/>
+<text class="uml-keyword" x="1324" y="884" text-anchor="start">«import»</text>
+<text class="mono" x="1096" y="884">core/&lt;contexto&gt;/</text>
+<g id="core-1080-0" filter="url(#sombra)"><rect class="node-purple" x="1096" y="904" width="56" height="14" rx="2"/><rect class="node-purple" x="1096" y="918" width="196" height="88" rx="4"/><text class="label-strong" x="1194.0" y="944" text-anchor="middle">hub/</text><text class="mono" x="1194.0" y="966" text-anchor="middle">feature_1/ … n/</text></g>
+<g id="core-1080-1" filter="url(#sombra)"><rect class="node-purple" x="1340" y="904" width="56" height="14" rx="2"/><rect class="node-purple" x="1340" y="918" width="196" height="88" rx="4"/><text class="label-strong" x="1438.0" y="944" text-anchor="middle">quest/</text><text class="mono" x="1438.0" y="966" text-anchor="middle">feature_1/ … n/</text></g>
+<line class="edge edge-async" x1="1316" y1="1006" x2="1316" y2="1048" marker-end="url(#seta-aberta)"/>
+<text class="uml-keyword" x="1324" y="1032" text-anchor="start">«import»</text>
+<g id="commons-40" filter="url(#sombra)"><rect class="node-green" x="56" y="1050" width="56" height="14" rx="2"/><rect class="node-green" x="56" y="1064" width="440" height="72" rx="4"/><text class="label-strong" x="276.0" y="1090" text-anchor="middle">core/commons/</text><text class="mono" x="276.0" y="1112" text-anchor="middle">feature_n/ · tipos e regras comuns</text></g>
+<text class="muted" x="56" y="1168">um .csproj por contexto: Boaz.Core.Hub…</text><text class="muted" x="56" y="1192">tests/ espelha core/ e ms_mono/</text>
+<g id="commons-560" filter="url(#sombra)"><rect class="node-green" x="576" y="1050" width="56" height="14" rx="2"/><rect class="node-green" x="576" y="1064" width="440" height="72" rx="4"/><text class="label-strong" x="796.0" y="1090" text-anchor="middle">core/commons/</text><text class="mono" x="796.0" y="1112" text-anchor="middle">components/ · design/ · feature_n/</text></g>
+<text class="muted" x="576" y="1168">core/ e apps/ no mesmo package.json (pnpm)</text><text class="muted" x="576" y="1192">tests/ espelha core/ e apps/</text>
+<g id="commons-1080" filter="url(#sombra)"><rect class="node-green" x="1096" y="1050" width="56" height="14" rx="2"/><rect class="node-green" x="1096" y="1064" width="440" height="72" rx="4"/><text class="label-strong" x="1316.0" y="1090" text-anchor="middle">core/commons/</text><text class="mono" x="1316.0" y="1112" text-anchor="middle">components/ · design/ · feature_n/</text></g>
+<text class="muted" x="1096" y="1168">um .csproj por contexto: Boaz.Mobile.Core.Hub…</text><text class="muted" x="1096" y="1192">tests/ espelha core/ e apps/</text>
+<g id="regras">
+<text class="section" x="40" y="1264">3 · REGRAS DE DEPENDÊNCIA</text>
+<text class="label" x="40" y="1296">• infra/in só chama ports/in; infra/out implementa ports/out</text><text class="label" x="816" y="1296">• um contexto não importa outro: o que é comum vai para core/commons/</text>
+<text class="label" x="40" y="1320">• core/ não importa ms_mono, apps/ nem bibliotecas de I/O (HTTP, banco, cache)</text><text class="label" x="816" y="1320">• só o runtime (ms_mono, apps/&lt;app&gt;) liga as portas aos adaptadores</text>
+<text class="label" x="40" y="1344">• mesmos nomes de contexto e de feature em todas as frentes, em snake_case</text><text class="label" x="816" y="1344">• mobile: net10.0-ios só no macOS (5_DEV/frontend/Directory.Build.props)</text>
+</g>
+<g id="marca-rodape" transform="translate(0,1396)"><rect class="wm-band" x="0" y="0" width="1592" height="116"/><line class="wm-sep" x1="0" y1="0.5" x2="1592" y2="0.5"/><text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+<rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">runtime (ms_mono, apps/&lt;app&gt;)</text>
+<rect class="node-purple" x="293" y="47" width="14" height="14" rx="3"/><text class="label" x="315" y="58">core de um contexto</text>
+<rect class="node-green" x="476" y="47" width="14" height="14" rx="3"/><text class="label" x="498" y="58">core/commons/</text>
+<rect class="node" x="617" y="47" width="14" height="14" rx="3"/><text class="label" x="639" y="58">pasta interna do runtime</text>
+<rect class="chip" x="835" y="45" width="32" height="18" rx="9"/><text class="label" x="875" y="58">alvo de build ou imagem</text>
+<line class="edge edge-async" x1="1064" y1="54" x2="1092" y2="54" marker-end="url(#seta-aberta)"/><text class="label" x="1104" y="58">«import» · depende de</text>
+<line class="edge edge-async" x1="1279" y1="54" x2="1307" y2="54" marker-end="url(#heranca)"/><text class="label" x="1319" y="58">implementa (realização)</text>
+<line class="divider" x1="40" y1="76" x2="1552" y2="76"/><text class="footer" x="40" y="100">v02 · sem microsserviços futuros: ms_mono é o runtime do backend; regra dos TFMs do mobile</text><text class="wm-file" x="1552" y="100" text-anchor="end">estrutura-projetos_v02_20261024-2115.svg</text></g>
+</svg>

@@ -65,8 +65,12 @@ dist/
 *.local
 npm-debug.log*
 pnpm-debug.log*
+.pnpm-store/
+*.tsbuildinfo
+.eslintcache
 cypress/videos/
 cypress/screenshots/
+cypress/downloads/
 
 # ── mobile (.NET MAUI) ───────────────────────────────────────────────────────
 *.apk

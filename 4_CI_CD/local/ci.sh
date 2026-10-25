@@ -74,43 +74,42 @@ else
       .github/*|global.json|.xcode-version|.nvmrc|*docker-compose*.yml|*compose*.yml|4_CI_CD/local/*)
         BACKEND_MUDOU=true WEB_MUDOU=true ANDROID_MUDOU=true IOS_MUDOU=true ;;
       5_DEV/backend/*|5_DEV/qa/backend/*) BACKEND_MUDOU=true ;;
-      5_DEV/frontend/web_*|5_DEV/qa/frontend/web_*) WEB_MUDOU=true ;;
-      5_DEV/frontend/Directory.Build.props) ANDROID_MUDOU=true IOS_MUDOU=true ;;
-      5_DEV/frontend/mob_and*|5_DEV/qa/frontend/mob_and*) ANDROID_MUDOU=true ;;
-      5_DEV/frontend/mob_ios_*|5_DEV/qa/frontend/mob_ios_*) IOS_MUDOU=true ;;
+      5_DEV/frontend/web/*|5_DEV/qa/frontend/web/*) WEB_MUDOU=true ;;
+      5_DEV/frontend/Directory.Build.props|5_DEV/frontend/mobile/*|5_DEV/qa/frontend/mobile/*)
+        ANDROID_MUDOU=true IOS_MUDOU=true ;;
     esac
   done <<<"$ALTERADOS"
   echo "base: $(git rev-parse --short "$BASE")  ·  arquivos alterados: $(grep -c . <<<"$ALTERADOS")"
 fi
 
-# Pastas com arquivo de projeto (pasta vazia fica de fora), como no CI
-projeto_dotnet() { compgen -G "$1*.sln" >/dev/null || compgen -G "$1*.slnx" >/dev/null || compgen -G "$1*.csproj" >/dev/null; }
-SERVICOS=() APPS=() ANDROID=() IOS=()
-if $BACKEND_MUDOU; then
-  for d in 5_DEV/backend/*/; do projeto_dotnet "$d" && SERVICOS+=("$(basename "$d")"); done
+# Frente que mudou só roda se já tiver projeto; apps de apps/<app>/, como no
+# CI (14_estrutura-projetos)
+solution() { compgen -G "$1*.sln" >/dev/null || compgen -G "$1*.slnx" >/dev/null; }
+BACKEND=false APPS=() ANDROID=() IOS=()
+$BACKEND_MUDOU && solution 5_DEV/backend/ && BACKEND=true
+if $WEB_MUDOU && [ -f 5_DEV/frontend/web/package.json ]; then
+  for d in 5_DEV/frontend/web/apps/*/; do [ -d "$d" ] && APPS+=("$(basename "$d")"); done
 fi
-if $WEB_MUDOU; then
-  for d in 5_DEV/frontend/web_*/; do [ -f "${d}package.json" ] && APPS+=("$(basename "$d")"); done
+if solution 5_DEV/frontend/mobile/; then
+  for d in 5_DEV/frontend/mobile/apps/*/; do
+    compgen -G "$d*.csproj" >/dev/null || continue
+    $ANDROID_MUDOU && ANDROID+=("$(basename "$d")")
+    $IOS_MUDOU && IOS+=("$(basename "$d")")
+  done
 fi
-if $ANDROID_MUDOU; then
-  for d in 5_DEV/frontend/mob_and*/; do projeto_dotnet "$d" && ANDROID+=("$(basename "$d")"); done
-fi
-if $IOS_MUDOU; then
-  for d in 5_DEV/frontend/mob_ios_*/; do projeto_dotnet "$d" && IOS+=("$(basename "$d")"); done
-fi
-echo "backend: ${SERVICOS[*]:-—}"
+echo "backend: $($BACKEND && echo 5_DEV/backend || echo —)"
 echo "web:     ${APPS[*]:-—}"
 echo "android: ${ANDROID[*]:-—}"
 echo "ios:     ${IOS[*]:-—}"
 
-if [ ${#SERVICOS[@]} -eq 0 ] && [ ${#APPS[@]} -eq 0 ] && [ ${#ANDROID[@]} -eq 0 ] && [ ${#IOS[@]} -eq 0 ]; then
+if ! $BACKEND && [ ${#APPS[@]} -eq 0 ] && [ ${#ANDROID[@]} -eq 0 ] && [ ${#IOS[@]} -eq 0 ]; then
   titulo "resultado"
   echo "✓ nada a verificar (nenhum componente alterado)"
   exit 0
 fi
 
 # Versões do ambiente local e do CI (RN-02, RNF-19)
-if [ ${#SERVICOS[@]} -gt 0 ] || [ ${#ANDROID[@]} -gt 0 ] || [ ${#IOS[@]} -gt 0 ]; then
+if $BACKEND || [ ${#ANDROID[@]} -gt 0 ] || [ ${#IOS[@]} -gt 0 ]; then
   DOTNET_SDK=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' global.json 2>/dev/null | head -1)
   [ -n "$DOTNET_SDK" ] || { echo "✗ global.json sem a versão do SDK .NET"; exit 2; }
   export DOTNET_SDK
@@ -126,7 +125,7 @@ if [ ${#APPS[@]} -gt 0 ]; then
 fi
 # Docker só é preciso para backend e web (o mobile roda na máquina)
 USA_DOCKER=false
-if [ ${#SERVICOS[@]} -gt 0 ] || [ ${#APPS[@]} -gt 0 ]; then
+if $BACKEND || [ ${#APPS[@]} -gt 0 ]; then
   USA_DOCKER=true
   command -v docker >/dev/null && docker compose version >/dev/null 2>&1 && docker info >/dev/null 2>&1 \
     || { echo "✗ Docker com Compose v2 não encontrado ou parado"; exit 2; }
@@ -153,26 +152,30 @@ trap encerrar EXIT
 # -----------------------------------------------------------------------------
 VERDE=true
 [ ${#APPS[@]} -gt 0 ] && "${COMPOSE[@]}" --profile verificacao build web-ci
-for s in ${SERVICOS[@]+"${SERVICOS[@]}"}; do
-  titulo "1 · verificação · backend · $s"
-  if "${COMPOSE[@]}" --profile verificacao "${RUN[@]}" backend-ci "$s"; then registrar "backend · $s" "verificação" "passou"
-  else registrar "backend · $s" "verificação" "falhou"; VERDE=false; fi
-done
-for a in ${APPS[@]+"${APPS[@]}"}; do
-  titulo "1 · verificação · web · $a"
-  if "${COMPOSE[@]}" --profile verificacao "${RUN[@]}" web-ci "$a"; then registrar "web · $a" "verificação" "passou"
-  else registrar "web · $a" "verificação" "falhou"; VERDE=false; fi
-done
+if $BACKEND; then
+  titulo "1 · verificação · backend"
+  if "${COMPOSE[@]}" --profile verificacao "${RUN[@]}" backend-ci; then registrar "backend" "verificação" "passou"
+  else registrar "backend" "verificação" "falhou"; VERDE=false; fi
+fi
+if [ ${#APPS[@]} -gt 0 ]; then
+  titulo "1 · verificação · web · ${APPS[*]}"
+  if "${COMPOSE[@]}" --profile verificacao "${RUN[@]}" web-ci "${APPS[@]}"; then registrar "web" "verificação" "passou"
+  else registrar "web" "verificação" "falhou"; VERDE=false; fi
+fi
 
-# Android e iOS direto na máquina, fora do Docker (RNF-166). Faltando algum
-# pré-requisito, o app é pulado com aviso dizendo o que falta: o GitHub
-# Actions verifica (o iOS, no pull request para a master).
+# Android e iOS direto na máquina, fora do Docker (RNF-166), sobre a solution
+# de 5_DEV/frontend/mobile/. Faltando algum pré-requisito, a plataforma é
+# pulada com aviso dizendo o que falta: o GitHub Actions verifica (o iOS, no
+# pull request para a master).
 WORKLOADS=$(sed -n 's/.*"workloadVersion"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' global.json 2>/dev/null | head -1)
 falta_dotnet() {
   if ! command -v dotnet >/dev/null || ! dotnet --list-sdks | grep -q "^$DOTNET_SDK "; then echo "SDK .NET $DOTNET_SDK (global.json)"
   elif [ -n "$WORKLOADS" ] && [ "$(dotnet workload --version 2>/dev/null)" != "$WORKLOADS" ]; then
     echo "workloads $WORKLOADS do global.json (sudo dotnet workload install maui, na raiz do repositório)"
   elif ! dotnet workload list 2>/dev/null | grep -qE "^(maui|maui-$1) "; then echo "workload maui-$1 (dotnet workload install maui-$1)"
+  # no macOS os projetos declaram Android e iOS: a restauração pede os dois
+  elif [ "$1" = ios ] && ! dotnet workload list 2>/dev/null | grep -qE "^(maui|maui-android) "; then
+    echo "workload maui-android (dotnet workload install maui-android)"
   fi
 }
 ANDROID_FALTA="" IOS_FALTA=""
@@ -198,8 +201,8 @@ if [ ${#IOS[@]} -gt 0 ]; then
   if [ "$(uname -s)" != Darwin ]; then IOS_FALTA="macOS"
   elif ! xcodebuild -version >/dev/null 2>&1; then IOS_FALTA="Xcode (instalado e selecionado com xcode-select -s /Applications/Xcode.app)"
   else
-    # o workload iOS só aceita o Xcode do mesmo major.minor (.xcode-version),
-    # e o build do simulador precisa do runtime iOS da versão desse Xcode
+    # o Xcode é o de .xcode-version (RNF-170), e o build do simulador
+    # precisa do runtime iOS da versão desse Xcode
     XCODE=$(tr -d ' \n' < .xcode-version 2>/dev/null)
     XCODE_ATUAL=$(xcodebuild -version | sed -n 's/^Xcode \([0-9]*\.[0-9]*\).*/\1/p')
     SIM=$(xcrun --sdk iphonesimulator --show-sdk-version 2>/dev/null)
@@ -211,25 +214,34 @@ if [ ${#IOS[@]} -gt 0 ]; then
     fi
   fi
 fi
-for a in ${ANDROID[@]+"${ANDROID[@]}"} ${IOS[@]+"${IOS[@]}"}; do
-  case "$a" in mob_and*) p=android f=$ANDROID_FALTA ;; *) p=ios f=$IOS_FALTA ;; esac
-  titulo "1 · verificação · $p · $a"
+verificar_mobile() { # $1 = android|ios  $2 = o que falta  $3... = apps
+  local p=$1 f=$2; shift 2
+  [ $# -gt 0 ] || return 0
+  titulo "1 · verificação · $p · $*"
   if [ -n "$f" ]; then
-    aviso "$a: falta $f nesta máquina; $p não verificado"
-    registrar "$p · $a" "verificação" "pulado"
-  elif bash "$AQUI/scripts/verificar-mobile.sh" "$p" "$a"; then registrar "$p · $a" "verificação" "passou"
-  else registrar "$p · $a" "verificação" "falhou"; VERDE=false; fi
-done
+    aviso "falta $f nesta máquina; $p não verificado"
+    registrar "$p" "verificação" "pulado"
+  elif bash "$AQUI/scripts/verificar-mobile.sh" "$p" "$@"; then registrar "$p" "verificação" "passou"
+  else registrar "$p" "verificação" "falhou"; VERDE=false; fi
+}
+verificar_mobile android "$ANDROID_FALTA" ${ANDROID[@]+"${ANDROID[@]}"}
+verificar_mobile ios "$IOS_FALTA" ${IOS[@]+"${IOS[@]}"}
 
 # -----------------------------------------------------------------------------
 # Etapas 2 e 3 · aplicações em contêiner e qa (RNF-162)
 # Só com a etapa 1 verde. As imagens saem dos mesmos Dockerfiles da publicação
-# (5_DEV/backend/Dockerfile e 5_DEV/frontend/web_<app>/Dockerfile), com a tag
+# (5_DEV/backend/Dockerfile e 5_DEV/frontend/web/Dockerfile, este com o
+# argumento APP de cada app), com a tag
 # local boaz-ci-local/<imagem>:ci, e nunca são enviadas a um registro (RN-140).
 # O qa (--qa) testa o backend sozinho (API), o frontend (Cypress, com o backend
 # no ar) ou os dois em conjunto, sobre a mesma pilha de contêineres.
 # -----------------------------------------------------------------------------
-if $VERDE && ! $SEM_QA && { [ ${#SERVICOS[@]} -gt 0 ] || [ ${#APPS[@]} -gt 0 ]; }; then
+if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
+  # apps da web com imagem (o qa do frontend sobe todos, mesmo sem mudança)
+  APPS_IMAGEM=()
+  if [ -f 5_DEV/frontend/web/Dockerfile ]; then
+    for d in 5_DEV/frontend/web/apps/*/; do [ -d "$d" ] && APPS_IMAGEM+=("$(basename "$d")"); done
+  fi
   titulo "2 · aplicações"
   {
     echo "# gerado por ci.sh — não edite"
@@ -250,13 +262,12 @@ if $VERDE && ! $SEM_QA && { [ ${#SERVICOS[@]} -gt 0 ] || [ ${#APPS[@]} -gt 0 ]; 
       redis: { condition: service_healthy }
 EOF
     fi
-    for d in 5_DEV/frontend/web_*/; do
+    for app in ${APPS_IMAGEM[@]+"${APPS_IMAGEM[@]}"}; do
       $QA_FRONTEND || break
-      [ -f "${d}Dockerfile" ] || continue
-      app=$(basename "$d") n=${app#web_}; n="frontend-${n//_/-}"
+      n="frontend-${app//_/-}"
       cat <<EOF
   $n:
-    build: { context: ../../5_DEV/frontend/$app }
+    build: { context: ../../5_DEV/frontend/web, args: { APP: $app } }
     image: boaz-ci-local/$n:ci
     profiles: [aplicacoes]
     environment:
@@ -269,7 +280,7 @@ EOF
   for n in $(sed -n 's/^  \(frontend-[a-z0-9-]*\):$/\1/p' "$GERADO/compose.apps.yml"); do SAUDE+=("http://$n:8080/health"); done
 
   if [ ${#SAUDE[@]} -eq 0 ]; then
-    aviso "nenhum Dockerfile em 5_DEV/backend/ ou 5_DEV/frontend/web_*/: etapas 2 e 3 puladas"
+    aviso "nenhum Dockerfile em 5_DEV/backend/ ou 5_DEV/frontend/web/: etapas 2 e 3 puladas"
     registrar "aplicações" "qa" "pulado"
   else
     COMPOSE+=(-f "$GERADO/compose.apps.yml")
@@ -289,9 +300,9 @@ EOF
       # frontend: Cypress de cada app web com imagem, contra o contêiner dele
       if $QA_FRONTEND; then
         for n in $(sed -n 's/^  frontend-\([a-z0-9-]*\):$/\1/p' "$GERADO/compose.apps.yml"); do
-          a="web_${n//-/_}"
-          if ! grep -q '"test:e2e:imagem"' "5_DEV/frontend/$a/package.json" 2>/dev/null; then
-            aviso "$a sem o script test:e2e:imagem: qa do frontend pulado"; registrar "qa · $a" "qa" "pulado"; continue
+          a="${n//-/_}"
+          if ! grep -q '"test:e2e:imagem"' 5_DEV/frontend/web/package.json 2>/dev/null; then
+            aviso "web sem o script test:e2e:imagem: qa do frontend pulado"; registrar "qa · $a" "qa" "pulado"; continue
           fi
           if "${COMPOSE[@]}" --profile qa "${RUN[@]}" --no-deps qa-web "$a"; then registrar "qa · $a" "qa" "passou"
           else registrar "qa · $a" "qa" "falhou"; VERDE=false; fi

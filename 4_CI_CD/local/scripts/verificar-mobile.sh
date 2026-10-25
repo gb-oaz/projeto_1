@@ -1,23 +1,28 @@
 #!/usr/bin/env bash
-# Etapa 1 · verificação de um app mobile, direto na máquina, fora do Docker
-# (RNF-161, RNF-166) — mesmos passos dos jobs "Android · <app>" e "iOS · <app>"
-# de .github/workflows/ci.yml. Compatível com o bash 3.2 do macOS.
+# Etapa 1 · verificação do mobile, direto na máquina, fora do Docker
+# (RNF-161, RNF-166) — mesmos passos dos jobs "Android" e "iOS" de
+# .github/workflows/ci.yml, sobre a solution de 5_DEV/frontend/mobile/.
+# Compatível com o bash 3.2 do macOS.
 #
-# Uso (pelo ci.sh): verificar-mobile.sh <android|ios> <app>
-#   android  Release, com o JDK 17 e o SDK do Android da máquina
-#            (JavaSdkDirectory e AndroidSdkDirectory, achados pelo ci.sh)
-#   ios      Debug (simulador, sem certificado de assinatura), no macOS com Xcode
+# Uso (pelo ci.sh): verificar-mobile.sh <android|ios> <app> [<app>…]
+#   android  format, build Release e testes da solution, só com o
+#            net10.0-android (MobileSemIos, como no Linux do CI), com o JDK 17
+#            e o SDK do Android da máquina (JavaSdkDirectory e
+#            AndroidSdkDirectory, achados pelo ci.sh)
+#   ios      format e build Debug (simulador, sem certificado de assinatura)
+#            do net10.0-ios de cada app, no macOS com Xcode
 #
 # O código é copiado para uma pasta temporária: bin/ e obj/ não aparecem na
-# cópia de trabalho (RNF-164). A cobertura fica em .gerado/cobertura/<app>/.
+# cópia de trabalho (RNF-164). A cobertura fica em .gerado/cobertura/mobile/.
 set -euo pipefail
 
 AQUI=$(cd "$(dirname "$0")/.." && pwd)
 RAIZ=$(cd "$AQUI/../.." && pwd)
 plataforma=${1:?informe android ou ios}
-app=${2:?informe o app de 5_DEV/frontend/}
-saida="$AQUI/.gerado/cobertura/$app"
-case "$plataforma" in android) config=Release ;; ios) config=Debug ;; *) echo "plataforma inválida: $plataforma"; exit 2 ;; esac
+shift
+[ $# -gt 0 ] || { echo "informe os apps de 5_DEV/frontend/mobile/apps/"; exit 2; }
+saida="$AQUI/.gerado/cobertura/mobile"
+case "$plataforma" in android|ios) ;; *) echo "plataforma inválida: $plataforma"; exit 2 ;; esac
 
 passo() { printf '\n\033[1;34m▶ %s\033[0m\n' "$*"; "$@"; }
 
@@ -28,12 +33,22 @@ for i in global.json .nvmrc 5_DEV; do [ -e "$RAIZ/$i" ] && itens="$itens $i"; do
 # shellcheck disable=SC2086
 tar -C "$RAIZ" --exclude=node_modules --exclude=bin --exclude=obj --exclude=dist \
   --exclude=coverage --exclude=cobertura -cf - $itens | tar -C "$trabalho" -xf -
-cd "$trabalho/5_DEV/frontend/$app"
+cd "$trabalho/5_DEV/frontend/mobile"
 
+if [ "$plataforma" = ios ]; then
+  passo dotnet format --verify-no-changes                   # RNF-15
+  falhou=0
+  for app in "$@"; do                                       # RNF-22
+    passo dotnet build "apps/$app" -f net10.0-ios -c Debug -warnaserror || falhou=1
+  done
+  exit $falhou
+fi
+
+export MobileSemIos=true
 rm -rf "$saida"
 passo dotnet format --verify-no-changes                     # RNF-15
-passo dotnet build -c "$config" -warnaserror                # RNF-22
-passo dotnet test -c "$config" --no-build \
+passo dotnet build -c Release -warnaserror                  # RNF-22
+passo dotnet test -c Release --no-build \
   --collect:"XPlat Code Coverage" --results-directory "$saida"   # RNF-14
 
 # RNF-26: mede a cobertura, sem reprovar
