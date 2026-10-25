@@ -566,12 +566,15 @@ jobs:
             echo 'FIM'
           } >>"$GITHUB_OUTPUT"
 
-      # approvers: quem pode aprovar (usuários do GitHub separados por vírgula);
-      # o dono do repositório por padrão. O próprio autor do push pode aprovar.
+      # approvers: quem pode aprovar (usuários do GitHub separados por vírgula),
+      # da variável APROVADORES do repositório; sem ela, o dono do repositório.
+      # O dono aqui é a organização gb-oaz, que não pode ser responsável pela
+      # issue (a action atribui a issue aos aprovadores): a variável traz os
+      # usuários. O próprio autor do push pode aprovar.
       - uses: trstringer/manual-approval@v1
         with:
           secret: ${{ github.TOKEN }}
-          approvers: ${{ github.repository_owner }}
+          approvers: ${{ vars.APROVADORES || github.repository_owner }}
           minimum-approvals: 1
           exclude-workflow-initiator-as-approver: false
           issue-title: "Publicar imagens no Docker Hub · ${{ github.ref_name }} · ${{ github.sha }}"
