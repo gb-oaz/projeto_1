@@ -337,7 +337,7 @@ EOF
       n="frontend-${app//_/-}"
       cat <<EOF
   $n:
-    build: { context: ../../5_DEV/frontend/web, args: { APP: $app } }
+    build: { context: ../../5_DEV/frontend/web, args: { APP: $app, NODE_VERSION: "$(tr -d ' \nv' < .nvmrc)" } }
     image: boaz-ci-local/$n:ci
     profiles: [aplicacoes]
     environment:

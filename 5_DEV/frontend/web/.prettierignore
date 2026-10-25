@@ -1,0 +1,5 @@
+dist/
+coverage/
+pnpm-lock.yaml
+# cópias geradas do design system (pnpm run gerar em 0_Assets/design/)
+core/commons/design/

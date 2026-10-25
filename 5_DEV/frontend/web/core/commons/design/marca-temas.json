@@ -1,0 +1,728 @@
+{
+  "branco-preto": {
+    "nome": "Branco / Preto",
+    "mono": true,
+    "claro": {
+      "anel": "#1B1B1B",
+      "b": "#1B1B1B",
+      "d": "#1B1B1B",
+      "de": "#1B1B1B",
+      "boaz": "#1B1B1B",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E2E2E2",
+      "b": "#E2E2E2",
+      "d": "#E2E2E2",
+      "de": "#E2E2E2",
+      "boaz": "#E2E2E2",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    }
+  },
+  "roxo": {
+    "nome": "Roxo",
+    "mono": false,
+    "claro": {
+      "anel": "#7E5260",
+      "b": "#65558F",
+      "d": "#625B71",
+      "de": "#625B71",
+      "boaz": "#65558F",
+      "iconeFundo": "#65558F",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#EFB8C8",
+      "b": "#CFBDFE",
+      "d": "#CBC2DB",
+      "de": "#CBC2DB",
+      "boaz": "#CFBDFE",
+      "iconeFundo": "#CFBDFE",
+      "iconeCor": "#36275D"
+    }
+  },
+  "oceano": {
+    "nome": "Oceano",
+    "mono": false,
+    "claro": {
+      "anel": "#004F46",
+      "b": "#00477F",
+      "d": "#4B607C",
+      "de": "#4B607C",
+      "boaz": "#00477F",
+      "iconeFundo": "#00477F",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#70D8C8",
+      "b": "#A2C9FF",
+      "d": "#B2C8E9",
+      "de": "#B2C8E9",
+      "boaz": "#A2C9FF",
+      "iconeFundo": "#A2C9FF",
+      "iconeCor": "#00315B"
+    }
+  },
+  "floresta": {
+    "nome": "Floresta",
+    "mono": false,
+    "claro": {
+      "anel": "#7D4900",
+      "b": "#0D631B",
+      "d": "#476644",
+      "de": "#476644",
+      "boaz": "#0D631B",
+      "iconeFundo": "#0D631B",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFB86E",
+      "b": "#88D982",
+      "d": "#ADD0A6",
+      "de": "#ADD0A6",
+      "boaz": "#88D982",
+      "iconeFundo": "#88D982",
+      "iconeCor": "#003909"
+    }
+  },
+  "aurora": {
+    "nome": "Aurora",
+    "mono": false,
+    "claro": {
+      "anel": "#4153B7",
+      "b": "#A93200",
+      "d": "#98462A",
+      "de": "#98462A",
+      "boaz": "#A93200",
+      "iconeFundo": "#A93200",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#BAC3FF",
+      "b": "#FFB59E",
+      "d": "#FFB59E",
+      "de": "#FFB59E",
+      "boaz": "#FFB59E",
+      "iconeFundo": "#FFB59E",
+      "iconeCor": "#5D1800"
+    }
+  },
+  "grafite": {
+    "nome": "Grafite",
+    "mono": false,
+    "claro": {
+      "anel": "#006874",
+      "b": "#526068",
+      "d": "#586064",
+      "de": "#586064",
+      "boaz": "#526068",
+      "iconeFundo": "#526068",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#66D6E7",
+      "b": "#BAC9D1",
+      "d": "#C0C8CD",
+      "de": "#C0C8CD",
+      "boaz": "#BAC9D1",
+      "iconeFundo": "#BAC9D1",
+      "iconeCor": "#253239"
+    }
+  },
+  "magenta": {
+    "nome": "Magenta",
+    "mono": false,
+    "claro": {
+      "anel": "#005147",
+      "b": "#8A0062",
+      "d": "#914370",
+      "de": "#914370",
+      "boaz": "#8A0062",
+      "iconeFundo": "#8A0062",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#7AD7C6",
+      "b": "#FFAFD7",
+      "d": "#FFAFD7",
+      "de": "#FFAFD7",
+      "boaz": "#FFAFD7",
+      "iconeFundo": "#FFAFD7",
+      "iconeCor": "#620044"
+    }
+  },
+  "sol": {
+    "nome": "Sol",
+    "mono": false,
+    "claro": {
+      "anel": "#4059AA",
+      "b": "#785900",
+      "d": "#745B21",
+      "de": "#745B21",
+      "boaz": "#785900",
+      "iconeFundo": "#785900",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#D4DBFF",
+      "b": "#FFD782",
+      "d": "#E3C27E",
+      "de": "#E3C27E",
+      "boaz": "#FFD782",
+      "iconeFundo": "#FFD782",
+      "iconeCor": "#3F2E00"
+    }
+  },
+  "girassol": {
+    "nome": "Girassol",
+    "mono": false,
+    "claro": {
+      "anel": "#AC3400",
+      "b": "#785A00",
+      "d": "#735B1E",
+      "de": "#735B1E",
+      "boaz": "#785A00",
+      "iconeFundo": "#785A00",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFE2DA",
+      "b": "#FFE5B2",
+      "d": "#E3C37B",
+      "de": "#E3C37B",
+      "boaz": "#FFE5B2",
+      "iconeFundo": "#FFE5B2",
+      "iconeCor": "#3F2E00"
+    }
+  },
+  "rubi": {
+    "nome": "Rubi",
+    "mono": false,
+    "claro": {
+      "anel": "#5C4100",
+      "b": "#91000A",
+      "d": "#9E4038",
+      "de": "#9E4038",
+      "boaz": "#91000A",
+      "iconeFundo": "#91000A",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#F7BD48",
+      "b": "#FFB4AB",
+      "d": "#FFB4AB",
+      "de": "#FFB4AB",
+      "boaz": "#FFB4AB",
+      "iconeFundo": "#FFB4AB",
+      "iconeCor": "#690005"
+    }
+  },
+  "cereja": {
+    "nome": "Cereja",
+    "mono": false,
+    "claro": {
+      "anel": "#00685C",
+      "b": "#B7131A",
+      "d": "#A13D36",
+      "de": "#A13D36",
+      "boaz": "#B7131A",
+      "iconeFundo": "#B7131A",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#7AD7C6",
+      "b": "#FFB4AC",
+      "d": "#FFB4AC",
+      "de": "#FFB4AC",
+      "boaz": "#FFB4AC",
+      "iconeFundo": "#FFB4AC",
+      "iconeCor": "#690006"
+    }
+  },
+  "neon": {
+    "nome": "Neon",
+    "mono": false,
+    "claro": {
+      "anel": "#AD009B",
+      "b": "#106E00",
+      "d": "#006875",
+      "de": "#006875",
+      "boaz": "#106E00",
+      "iconeFundo": "#106E00",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFACE8",
+      "b": "#2AE500",
+      "d": "#00DAF3",
+      "de": "#00DAF3",
+      "boaz": "#2AE500",
+      "iconeFundo": "#2AE500",
+      "iconeCor": "#053900"
+    }
+  },
+  "vaporwave": {
+    "nome": "Vaporwave",
+    "mono": false,
+    "claro": {
+      "anel": "#006781",
+      "b": "#A72683",
+      "d": "#822CC7",
+      "de": "#822CC7",
+      "boaz": "#A72683",
+      "iconeFundo": "#A72683",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#58D5FF",
+      "b": "#FFAEDC",
+      "d": "#DFB7FF",
+      "de": "#DFB7FF",
+      "boaz": "#FFAEDC",
+      "iconeFundo": "#FFAEDC",
+      "iconeCor": "#600049"
+    }
+  },
+  "algodao-doce": {
+    "nome": "Algodão-doce",
+    "mono": false,
+    "claro": {
+      "anel": "#1A6A59",
+      "b": "#894A67",
+      "d": "#655591",
+      "de": "#655591",
+      "boaz": "#894A67",
+      "iconeFundo": "#894A67",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#9DE7D2",
+      "b": "#FFCADE",
+      "d": "#CFBDFF",
+      "de": "#CFBDFF",
+      "boaz": "#FFCADE",
+      "iconeFundo": "#FFCADE",
+      "iconeCor": "#531D38"
+    }
+  },
+  "terra": {
+    "nome": "Terra",
+    "mono": false,
+    "claro": {
+      "anel": "#735400",
+      "b": "#953F19",
+      "d": "#566427",
+      "de": "#566427",
+      "boaz": "#953F19",
+      "iconeFundo": "#953F19",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#F2BF50",
+      "b": "#FFB59A",
+      "d": "#BDCE85",
+      "de": "#BDCE85",
+      "boaz": "#FFB59A",
+      "iconeFundo": "#FFB59A",
+      "iconeCor": "#5A1B00"
+    }
+  },
+  "retro": {
+    "nome": "Retrô",
+    "mono": false,
+    "claro": {
+      "anel": "#066A61",
+      "b": "#795900",
+      "d": "#A04100",
+      "de": "#A04100",
+      "boaz": "#795900",
+      "iconeFundo": "#795900",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#85D5C9",
+      "b": "#F6BE39",
+      "d": "#FFB693",
+      "de": "#FFB693",
+      "boaz": "#F6BE39",
+      "iconeFundo": "#F6BE39",
+      "iconeCor": "#402D00"
+    }
+  },
+  "meia-noite": {
+    "nome": "Meia-noite",
+    "mono": false,
+    "claro": {
+      "anel": "#3B2600",
+      "b": "#0B1A7D",
+      "d": "#575C82",
+      "de": "#575C82",
+      "boaz": "#0B1A7D",
+      "iconeFundo": "#0B1A7D",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFBA38",
+      "b": "#BCC2FF",
+      "d": "#C0C4EF",
+      "de": "#C0C4EF",
+      "boaz": "#BCC2FF",
+      "iconeFundo": "#BCC2FF",
+      "iconeCor": "#152383"
+    }
+  },
+  "arco-iris": {
+    "nome": "Arco-íris",
+    "mono": false,
+    "claro": {
+      "anel": "#0060A8",
+      "b": "#BC004B",
+      "d": "#8B5000",
+      "de": "#8B5000",
+      "boaz": "#BC004B",
+      "iconeFundo": "#BC004B",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#A2C9FF",
+      "b": "#FFB2BE",
+      "d": "#FFB870",
+      "de": "#FFB870",
+      "boaz": "#FFB2BE",
+      "iconeFundo": "#FFB2BE",
+      "iconeCor": "#660025"
+    }
+  },
+  "salada-de-frutas": {
+    "nome": "Salada de frutas",
+    "mono": false,
+    "claro": {
+      "anel": "#3B6939",
+      "b": "#705D00",
+      "d": "#6F5D0D",
+      "de": "#6F5D0D",
+      "boaz": "#705D00",
+      "iconeFundo": "#705D00",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#A1D39A",
+      "b": "#E4C44A",
+      "d": "#DEC56E",
+      "de": "#DEC56E",
+      "boaz": "#E4C44A",
+      "iconeFundo": "#E4C44A",
+      "iconeCor": "#3B2F00"
+    }
+  },
+  "naruto": {
+    "nome": "Naruto",
+    "mono": false,
+    "claro": {
+      "anel": "#715D00",
+      "b": "#974900",
+      "d": "#4058B1",
+      "de": "#4058B1",
+      "boaz": "#974900",
+      "iconeFundo": "#974900",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#EBC300",
+      "b": "#FFB688",
+      "d": "#B7C4FF",
+      "de": "#B7C4FF",
+      "boaz": "#FFB688",
+      "iconeFundo": "#FFB688",
+      "iconeCor": "#512400"
+    }
+  },
+  "sasuke": {
+    "nome": "Sasuke",
+    "mono": false,
+    "claro": {
+      "anel": "#560000",
+      "b": "#142450",
+      "d": "#595E72",
+      "de": "#595E72",
+      "boaz": "#142450",
+      "iconeFundo": "#142450",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFB4A8",
+      "b": "#B6C5FB",
+      "d": "#C1C5DD",
+      "de": "#C1C5DD",
+      "boaz": "#B6C5FB",
+      "iconeFundo": "#B6C5FB",
+      "iconeCor": "#1F2E5A"
+    }
+  },
+  "sakura": {
+    "nome": "Sakura",
+    "mono": false,
+    "claro": {
+      "anel": "#006E1C",
+      "b": "#8E4767",
+      "d": "#B51A1E",
+      "de": "#B51A1E",
+      "boaz": "#8E4767",
+      "iconeFundo": "#8E4767",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#88ED85",
+      "b": "#FFC7DB",
+      "d": "#FFB4AC",
+      "de": "#FFB4AC",
+      "boaz": "#FFC7DB",
+      "iconeFundo": "#FFC7DB",
+      "iconeCor": "#561A38"
+    }
+  },
+  "hinata": {
+    "nome": "Hinata",
+    "mono": false,
+    "claro": {
+      "anel": "#6E517D",
+      "b": "#625195",
+      "d": "#5D5987",
+      "de": "#5D5987",
+      "boaz": "#625195",
+      "iconeFundo": "#625195",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#DDBAED",
+      "b": "#CEBDFF",
+      "d": "#C6C1F6",
+      "de": "#C6C1F6",
+      "boaz": "#CEBDFF",
+      "iconeFundo": "#CEBDFF",
+      "iconeCor": "#362465"
+    }
+  },
+  "kiba": {
+    "nome": "Kiba",
+    "mono": false,
+    "claro": {
+      "anel": "#553B32",
+      "b": "#7F1816",
+      "d": "#5F5D68",
+      "de": "#5F5D68",
+      "boaz": "#7F1816",
+      "iconeFundo": "#7F1816",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E4BEB2",
+      "b": "#FFB4AB",
+      "d": "#C8C5D1",
+      "de": "#C8C5D1",
+      "boaz": "#FFB4AB",
+      "iconeFundo": "#FFB4AB",
+      "iconeCor": "#670307"
+    }
+  },
+  "shino": {
+    "nome": "Shino",
+    "mono": false,
+    "claro": {
+      "anel": "#553C0A",
+      "b": "#37451A",
+      "d": "#5A614B",
+      "de": "#5A614B",
+      "boaz": "#37451A",
+      "iconeFundo": "#37451A",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E7C183",
+      "b": "#BCCD95",
+      "d": "#C3CAAE",
+      "de": "#C3CAAE",
+      "boaz": "#BCCD95",
+      "iconeFundo": "#BCCD95",
+      "iconeCor": "#27350B"
+    }
+  },
+  "shikamaru": {
+    "nome": "Shikamaru",
+    "mono": false,
+    "claro": {
+      "anel": "#835425",
+      "b": "#596150",
+      "d": "#5B6055",
+      "de": "#5B6055",
+      "boaz": "#596150",
+      "iconeFundo": "#596150",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#F9BA82",
+      "b": "#C1CAB4",
+      "d": "#C4C8BA",
+      "de": "#C4C8BA",
+      "boaz": "#C1CAB4",
+      "iconeFundo": "#C1CAB4",
+      "iconeCor": "#2B3324"
+    }
+  },
+  "ino": {
+    "nome": "Ino",
+    "mono": false,
+    "claro": {
+      "anel": "#6F5D00",
+      "b": "#610E75",
+      "d": "#006782",
+      "de": "#006782",
+      "boaz": "#610E75",
+      "iconeFundo": "#610E75",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E4C53F",
+      "b": "#F4AEFF",
+      "d": "#79D2F6",
+      "de": "#79D2F6",
+      "boaz": "#F4AEFF",
+      "iconeFundo": "#F4AEFF",
+      "iconeCor": "#55006A"
+    }
+  },
+  "choji": {
+    "nome": "Chōji",
+    "mono": false,
+    "claro": {
+      "anel": "#B1262B",
+      "b": "#984403",
+      "d": "#1B6D24",
+      "de": "#1B6D24",
+      "boaz": "#984403",
+      "iconeFundo": "#984403",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFB3AE",
+      "b": "#FFB68E",
+      "d": "#88D982",
+      "de": "#88D982",
+      "boaz": "#FFB68E",
+      "iconeFundo": "#FFB68E",
+      "iconeCor": "#532200"
+    }
+  },
+  "neji": {
+    "nome": "Neji",
+    "mono": false,
+    "claro": {
+      "anel": "#645495",
+      "b": "#6F5A4A",
+      "d": "#6A5C51",
+      "de": "#6A5C51",
+      "boaz": "#6F5A4A",
+      "iconeFundo": "#6F5A4A",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#CEBDFF",
+      "b": "#DCC2AE",
+      "d": "#D6C3B6",
+      "de": "#D6C3B6",
+      "boaz": "#DCC2AE",
+      "iconeFundo": "#DCC2AE",
+      "iconeCor": "#3D2D1F"
+    }
+  },
+  "rock-lee": {
+    "nome": "Rock Lee",
+    "mono": false,
+    "claro": {
+      "anel": "#904D00",
+      "b": "#006E2C",
+      "d": "#406653",
+      "de": "#406653",
+      "boaz": "#006E2C",
+      "iconeFundo": "#006E2C",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#FFB77D",
+      "b": "#00E563",
+      "d": "#A6D0B8",
+      "de": "#A6D0B8",
+      "boaz": "#00E563",
+      "iconeFundo": "#00E563",
+      "iconeCor": "#003913"
+    }
+  },
+  "tenten": {
+    "nome": "Tenten",
+    "mono": false,
+    "claro": {
+      "anel": "#5B5F62",
+      "b": "#9E3B60",
+      "d": "#396759",
+      "de": "#396759",
+      "boaz": "#9E3B60",
+      "iconeFundo": "#9E3B60",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#C4C7CB",
+      "b": "#FFB1C7",
+      "d": "#A0D1C0",
+      "de": "#A0D1C0",
+      "boaz": "#FFB1C7",
+      "iconeFundo": "#FFB1C7",
+      "iconeCor": "#620831"
+    }
+  },
+  "branco": {
+    "nome": "Branco",
+    "mono": true,
+    "claro": {
+      "anel": "#1B1B1B",
+      "b": "#1B1B1B",
+      "d": "#1B1B1B",
+      "de": "#1B1B1B",
+      "boaz": "#1B1B1B",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E2E2E2",
+      "b": "#E2E2E2",
+      "d": "#E2E2E2",
+      "de": "#E2E2E2",
+      "boaz": "#E2E2E2",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    }
+  },
+  "preto": {
+    "nome": "Preto",
+    "mono": true,
+    "claro": {
+      "anel": "#1B1B1B",
+      "b": "#1B1B1B",
+      "d": "#1B1B1B",
+      "de": "#1B1B1B",
+      "boaz": "#1B1B1B",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    },
+    "escuro": {
+      "anel": "#E2E2E2",
+      "b": "#E2E2E2",
+      "d": "#E2E2E2",
+      "de": "#E2E2E2",
+      "boaz": "#E2E2E2",
+      "iconeFundo": "#000000",
+      "iconeCor": "#FFFFFF"
+    }
+  }
+}

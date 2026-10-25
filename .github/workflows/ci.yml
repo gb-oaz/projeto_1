@@ -632,6 +632,9 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
+      # Node.js do .nvmrc para o build da web (RNF-168); o backend ignora.
+      - id: node
+        run: echo "versao=$(tr -d ' \nv' < .nvmrc)" >>"$GITHUB_OUTPUT"
       # Build com o Dockerfile da pasta da frente e envio ao Docker Hub.
       # O cache do GitHub Actions (type=gha) acelera os próximos builds.
       - uses: docker/build-push-action@v6
@@ -639,7 +642,9 @@ jobs:
           context: ${{ matrix.imagem.contexto }}
           # app da web (vazio no backend): o Dockerfile único da web gera a
           # imagem do app indicado
-          build-args: APP=${{ matrix.imagem.app }}
+          build-args: |
+            APP=${{ matrix.imagem.app }}
+            NODE_VERSION=${{ steps.node.outputs.versao }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
