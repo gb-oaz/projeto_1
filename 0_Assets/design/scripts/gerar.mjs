@@ -17,7 +17,7 @@
 //                         identidade/imagens/fundos    fundos oficiais; plataformas/web/fundos.mjs (scripts/fundos-arquivos.mjs)
 //                         design-system.html           só o bloco entre os marcadores
 //                                                      design:tokens:inicio/fim
-//                         + cópias em cada aplicação de 5_DEV/frontend (sincronizar.mjs)
+//                         + cópias em core/commons/ da web e do mobile (sincronizar.mjs)
 //   pnpm run conferir   não escreve nada; falha se algum arquivo gerado estiver
 //                       diferente do que seria gerado agora
 //

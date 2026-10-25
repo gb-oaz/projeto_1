@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v30</title>
+<title>Design system · boaz · v31</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v30">
-<meta name="design:data" content="2026-10-21 21:37">
+<meta name="design:versao" content="v31">
+<meta name="design:data" content="2026-10-24 21:25">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -25018,8 +25018,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v30</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-21 21:37</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v31</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-24 21:25</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -25581,7 +25581,7 @@ el.innerHTML = fundos.desenhar('halo', {
       <h2 class="md-typescale-headline-medium">Mascotes</h2>
       <p class="lead">Personagens com rosto expressivo que dão retorno emocional ao usuário: acerto, erro, dúvida, espera, progresso, despedida. Combinam quatro eixos — <b>expressão</b>, <b>forma</b>, <b>proporção</b> e <b>movimento</b> — e a cor. Nos temas coloridos o mascote usa a cor do tema; nos monocromáticos (o padrão Branco e Preto, Branco, Preto) cada expressão mantém a própria cor. Troque o tema no topo para ver.</p>
       <div class="grade">
-        <article class="md-card md-card--outlined"><h4>De onde vêm</h4><p>O núcleo <code>scripts/mascotes.mjs</code> desenha qualquer combinação, parada ou animada. <code>pnpm run gerar</code> grava os exemplos em <code>mascotes/</code> e copia o núcleo para <code>plataformas/web/mascotes.mjs</code> (e daí para <code>src/design/</code> de cada aplicação web).</p></article>
+        <article class="md-card md-card--outlined"><h4>De onde vêm</h4><p>O núcleo <code>scripts/mascotes.mjs</code> desenha qualquer combinação, parada ou animada. <code>pnpm run gerar</code> grava os exemplos em <code>mascotes/</code> e copia o núcleo para <code>plataformas/web/mascotes.mjs</code> (e daí para <code>core/commons/design/</code> do projeto web).</p></article>
         <article class="md-card md-card--outlined"><h4>Sempre com texto</h4><p>O mascote reforça a mensagem, nunca é a mensagem: “Acertou!”, “Quase!”, “Carregando…” vêm escritos ao lado. Mascote decorativo leva <code>alt=""</code>; se ele for a única pista, o <code>alt</code> diz o que ele expressa.</p></article>
         <article class="md-card md-card--outlined"><h4>Movimento com moderação</h4><p>Um mascote animado por vez na área de foco. Com <code>prefers-reduced-motion</code> (ou a preferência do sistema no app), use a versão parada (<code>estatico</code>).</p></article>
         <article class="md-card md-card--outlined"><h4>Não desenhe à mão</h4><p>Expressão, forma, proporção ou movimento novos entram primeiro no núcleo, com versão nova deste catálogo. Não recolora, não distorça e não recorte o mascote fora do que o sistema oferece.</p></article>
@@ -25723,6 +25723,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v31</td><td>2026-10-24 21:25</td><td>Cópias do design system numa por frente, em <code>core/commons/</code> da web e do mobile (<code>scripts/sincronizar.mjs</code>), conforme <code>14_estrutura-projetos</code>; componentes comuns da web sem cópia</td></tr>
           <tr><td>v30</td><td>2026-10-21 21:37</td><td>Fundo Halo: opção <code>nome</code> (logo inteiro, símbolo + nome, com a abertura) e <code>ciclo</code> (os brilhos passam pelas cores de uma lista de temas, suave e em laço: 6 s em cada, 2 s de troca; parado com movimento reduzido). Halo: <code>variante</code> (hastes do logo inteiro: curtas no quest). Compostos: boas-vindas com o logo (Halo com o logo na abertura e os brilhos passando pelos temas coloridos; texto e ações num painel de superfície; no compact do hub e do quest, o Halo numa faixa no alto que some antes do título; do medium em diante, só o logo centralizado) na apresentação da landing page, na entrada do hub e no acesso do quest, no lugar da turma e das boas-vindas com mascote.</td></tr>
           <tr><td>v29</td><td>2026-10-21 21:08</td><td>Temas de cor: 8 paletas bem diferentes do padrão — Neon (verde-limão, ciano e magenta sobre roxo-noite, prefere o escuro), Vaporwave (rosa, lilás e ciano), Algodão-doce (pastéis sobre creme), Terra (terracota, oliva e mostarda sobre areia), Retrô (mostarda, laranja-queimado e petróleo), Meia-noite (azul-noite e dourado), Arco-íris (rosa, laranja e azul) e Salada de frutas (fruit-salad do M3). Usam neutra tingida (superfícies coloridas) e secundária/terciária em outras matizes. E 12 paletas dos genins da Folha, inspiradas nas cores de cada personagem: Time 7 (Naruto, Sasuke, Sakura), Time 8 (Hinata, Kiba, Shino), Time 10 (Shikamaru, Ino, Chōji) e Time Guy (Neji, Rock Lee, Tenten).</td></tr>
           <tr><td>v28</td><td>2026-10-19 19:40</td><td>Quest: agenda em calendário vertical (dia em secondary, um dia por divisória) e card de tarefa com hora e borda em primary (no prazo) ou tertiary (vencida), ponto sucesso/erro (pode fazer ou bloqueada) e Símbolo recortado com mascote animado quando acontece agora; quem está acessando com parentesco e Entrar na largura toda; chip com largura; card de tarefa com os envios possíveis e feitos; topo com nome e foto a partir do medium e trilho sem Conta ou Perfil; gráfico de barras (componente base) e card de desafio do quest (tarefa sem prazo: pódio com mascotes em forma de número, 4º e 5º, sua posição, tentativas e Jogar de novo); pódio do card de desafio em festa: mascotes felizes com movimento composto (comemorar, pular, dançar, balançar); Estampa redesenhada como rabiscos espalhados (mascotes em contorno com rosto, números, sinais, o símbolo e miudezas, pequenos, girados e num tom discreto), também para a tela Fixos do quest; componentes sem fundo (campo outlined, botões outlined e de texto soltos na tela, segmentado, chip, controles do carrossel) ganham o fundo da tela, legíveis sobre a Estampa; parentesco num segmentado cheio; card de módulo com a métrica de quem cuida do módulo e uma série curta; vitrine de telas (computador e celular) para a página do módulo e o detalhe do catálogo; painel do módulo no hub: número principal com tendência (sucesso ou erro pelo significado), série ou progresso e números de apoio nas cores da paleta, sem mascotes, até dois por linha</td></tr>
@@ -25732,10 +25733,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v24</td><td>2026-10-19 04:05</td><td>Turma de mascotes: as 30 expressões, pequenas e lado a lado numa grade fechada, em formas variadas e só na proporção normal</td></tr>
           <tr><td>v23</td><td>2026-10-19 03:52</td><td>Compostos: turma de mascotes nas boas-vindas da apresentação da landing page (expressões de boas-vindas em formas e proporções diferentes, um animado por vez) e o menu da landing page (compact e medium: seções, tema e as três ações); desenhista do tema.svg com prefixo de mascotes e cores do logo por tema, para as vistas</td></tr>
           <tr><td>v22</td><td>2026-10-19 03:01</td><td>Identidade: no logo principal e nas animações, o nome deboaz fica centralizado na altura do símbolo de cada variação (hastes longas e curtas; MarcaNomeDeslocamento no app); topos com o logo centralizado na barra, e o topo da casca com avisos, o nome (instituição ou pessoa no hub, usuário no quest) e a foto, que abre a conta ou Trocar perfil</td></tr>
-          <tr><td>v21</td><td>2026-10-19 02:31</td><td>Logo na linha do topo: o nome deboaz fica na linha dos outros textos e ícones e o símbolo sobe, com a mesma escala no hub (hastes longas) e no quest (hastes curtas); topo da casca igual no hub e no quest (logo, avisos e foto), com o nome e Trocar perfil no toque da foto</td></tr>
         </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v30 · 2026-10-21 21:37</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v31 · 2026-10-24 21:25</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>

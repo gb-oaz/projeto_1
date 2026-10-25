@@ -11,10 +11,10 @@
 #     ┌──────────┐  1. descobre quais frentes mudaram (dorny/paths-filter)
 #     │ mudancas │  2. lista as pastas de projeto dessas frentes
 #     └────┬─────┘
-#          ├──► backend · <servico>   Linux, uma execução por serviço
-#          ├──► web · <app>           Linux, uma execução por app web_*
-#          ├──► android · <app>       Linux, uma execução por app mob_and*
-#          ├──► ios · <app>           macOS, só em PR/merge na master
+#          ├──► backend               Linux, a solution de 5_DEV/backend/
+#          ├──► web                   Linux, o projeto de 5_DEV/frontend/web/
+#          ├──► android               Linux, a solution de 5_DEV/frontend/mobile/
+#          ├──► ios                   macOS, só em PR/merge na master
 #          ▼
 #     ┌───────────┐
 #     │ resultado │  veredito único exigido pela proteção da master
@@ -29,20 +29,25 @@
 #     │ publicar · <imagem>  │  build da imagem e envio ao Docker Hub
 #     └──────────────────────┘
 #
-# Frente sem mudança recebe lista vazia ([]) e o job dela é pulado.
+# Frente sem mudança (ou ainda sem projeto) é pulada.
 # Enquanto não houver código em 5_DEV/, só "mudancas" e "resultado" rodam.
 # Branches de tarefa/correção e pull requests nunca chegam à aprovação (RNF-31).
 #
-# Convenções das pastas de 5_DEV/ (o CI depende delas):
-#   backend/<servico>/        .sln/.slnx na raiz, incluindo os testes de qa/backend/<servico>/
-#   frontend/web_<app>/       package.json + pnpm-lock.yaml; testes em qa/frontend/web_<app>/
-#   frontend/mob_and_<app>/   .sln/.csproj do app Android (.NET MAUI) e seus testes
-#   frontend/mob_ios_<app>/   .sln/.csproj do app iOS (.NET MAUI) e seus testes
+# Convenções das pastas de 5_DEV/ (o CI depende delas) — 14_estrutura-projetos:
+#   backend/                  Boaz.slnx na raiz (core/, ms_mono/, tests/)
+#   frontend/web/             package.json + pnpm-lock.yaml na raiz; um app por
+#                             pasta em apps/<app>/; os scripts build, test:e2e e
+#                             test:e2e:imagem leem o app da variável APP
+#   frontend/mobile/          Boaz.Mobile.slnx na raiz; um projeto .NET MAUI por
+#                             app em apps/<app>/, que gera o Android e o iOS
+#   frontend/Directory.Build.props   propriedades comuns do mobile (TFMs, Xcode)
+#   qa/backend/, qa/frontend/web/, qa/frontend/mobile/   testes de qa de cada frente
 #   raiz do repositório       global.json (SDK .NET e workloads), .xcode-version
 #                             (Xcode do iOS) e .nvmrc (Node.js) — RNF-19
-#   5_DEV/backend/Dockerfile          imagem backend-mono (todo o backend)
-#   5_DEV/frontend/web_<app>/Dockerfile   imagem frontend-<app> (_ vira -),
-#                                         ex.: web_landing_page → frontend-landing-page
+#   5_DEV/backend/Dockerfile        imagem backend-mono
+#   5_DEV/frontend/web/Dockerfile   imagem frontend-<app> de cada app, com o
+#                                   argumento APP (_ vira -),
+#                                   ex.: APP=landing_page → frontend-landing-page
 #
 # Configuração no GitHub (Settings → Environments → dockerhub-publish), RNF-33:
 #   - secrets DOCKERHUB_USERNAME e DOCKERHUB_TOKEN (token de leitura e escrita)
@@ -95,11 +100,12 @@ jobs:
   # ===========================================================================
   # JOB 1 · mudancas — decide O QUE roda (RNF-34, RNF-35)
   # ---------------------------------------------------------------------------
-  # Saídas: uma lista JSON de pastas por frente, por exemplo
-  #   backend=["usuarios","pagamentos"]  web=["web_hub"]  android=[]  ios=[]
+  # Saídas: backend=true|false, a lista JSON de apps da web e do mobile, por
+  # exemplo
+  #   backend=true  web=["hub","landing_page","quest"]  android=["hub","quest"]
   # e a lista de imagens a gerar (RNF-27, RNF-38), por exemplo
-  #   imagens=[{"nome":"backend-mono","contexto":"5_DEV/backend"}]
-  # Os jobs seguintes usam essas listas como matriz.
+  #   imagens=[{"nome":"frontend-hub","contexto":"5_DEV/frontend/web","app":"hub"}]
+  # O job publicar usa a lista de imagens como matriz.
   # ===========================================================================
   mudancas:
     name: Detectar mudanças
@@ -139,58 +145,57 @@ jobs:
               - '5_DEV/qa/backend/**'
             web:
               - *comum
-              - '5_DEV/frontend/web_*/**'
-              - '5_DEV/qa/frontend/web_*/**'
-            android:
+              - '5_DEV/frontend/web/**'
+              - '5_DEV/qa/frontend/web/**'
+            mobile:
               - *comum
               - '5_DEV/frontend/Directory.Build.props'
-              - '5_DEV/frontend/mob_and*/**'
-              - '5_DEV/qa/frontend/mob_and*/**'
-            ios:
-              - *comum
-              - '5_DEV/frontend/Directory.Build.props'
-              - '5_DEV/frontend/mob_ios_*/**'
-              - '5_DEV/qa/frontend/mob_ios_*/**'
+              - '5_DEV/frontend/mobile/**'
+              - '5_DEV/qa/frontend/mobile/**'
 
-      # Passo 2 · pastas: o paths-filter só diz "mudou ou não"; aqui viram a
-      # lista de pastas que a matriz precisa.
-      #   - frente que não mudou            → []
-      #   - frente que mudou                → nomes das pastas que têm arquivo
-      #                                       de projeto (pasta vazia fica de fora)
-      # Ex.: 5_DEV/backend/usuarios/Usuarios.slnx → "usuarios" (3º trecho do caminho)
+      # Passo 2 · pastas: o paths-filter só diz "mudou ou não"; aqui a frente
+      # que mudou só roda se já tiver projeto, e os apps viram listas.
+      #   - backend: true se a frente mudou e há .sln/.slnx em 5_DEV/backend/
+      #   - web, android, ios: nomes das pastas de apps/ (web: com o
+      #     package.json do projeto; mobile: com .csproj); [] se não mudou
+      # Ex.: 5_DEV/frontend/mobile/apps/hub/Hub.csproj → "hub" (5º trecho do caminho)
       # nullglob: um padrão sem correspondência some, em vez de virar texto literal.
       #
-      # Imagens (RNF-27, RNF-38): o backend inteiro gera a imagem backend-mono e
-      # cada web_<app> gera frontend-<app>, só nas frentes da lista e só quando
-      # a pasta já tem Dockerfile (sem ele, um aviso aparece no resumo do job).
+      # Imagens (RNF-27, RNF-38): o backend gera a imagem backend-mono e cada app
+      # da web gera frontend-<app>, só quando a frente está na lista e o
+      # Dockerfile existe (sem ele, um aviso aparece no resumo do job).
       - id: pastas
         env:
           TAG: ${{ github.ref_type == 'tag' }}
           BACKEND: ${{ steps.filtro.outputs.backend }}
           WEB: ${{ steps.filtro.outputs.web }}
-          ANDROID: ${{ steps.filtro.outputs.android }}
-          IOS: ${{ steps.filtro.outputs.ios }}
+          MOBILE: ${{ steps.filtro.outputs.mobile }}
         run: |
           shopt -s nullglob
-          if [ "$TAG" = true ]; then BACKEND=true WEB=true ANDROID=true IOS=true; fi
-          pastas() { # $1 = frente mudou?  $2... = arquivos de projeto encontrados
+          if [ "$TAG" = true ]; then BACKEND=true WEB=true MOBILE=true; fi
+          apps() { # $1 = frente mudou?  $2... = caminhos dentro de apps/<app>/
             if [ "$1" != true ] || [ $# -lt 2 ]; then echo '[]'; return; fi
-            shift; printf '%s\n' "$@" | cut -d/ -f3 | sort -u | jq -R . | jq -sc .
+            shift; printf '%s\n' "$@" | cut -d/ -f5 | sort -u | jq -R . | jq -sc .
           }
-          backend="$(pastas "$BACKEND" 5_DEV/backend/*/*.sln 5_DEV/backend/*/*.slnx 5_DEV/backend/*/*.csproj)"
-          web="$(pastas "$WEB" 5_DEV/frontend/web_*/package.json)"
-          android="$(pastas "$ANDROID" 5_DEV/frontend/mob_and*/*.sln 5_DEV/frontend/mob_and*/*.slnx 5_DEV/frontend/mob_and*/*.csproj)"
-          ios="$(pastas "$IOS" 5_DEV/frontend/mob_ios_*/*.sln 5_DEV/frontend/mob_ios_*/*.slnx 5_DEV/frontend/mob_ios_*/*.csproj)"
+          projeto_backend=(5_DEV/backend/*.sln 5_DEV/backend/*.slnx)
+          backend=false
+          [ "$BACKEND" = true ] && [ ${#projeto_backend[@]} -gt 0 ] && backend=true
+          web='[]'
+          [ -f 5_DEV/frontend/web/package.json ] && web="$(apps "$WEB" 5_DEV/frontend/web/apps/*/)"
+          mobile='[]'
+          projeto_mobile=(5_DEV/frontend/mobile/*.sln 5_DEV/frontend/mobile/*.slnx)
+          [ ${#projeto_mobile[@]} -gt 0 ] && mobile="$(apps "$MOBILE" 5_DEV/frontend/mobile/apps/*/*.csproj)"
 
           imagens="$(
             {
-              [ "$backend" = '[]' ] || echo "backend-mono 5_DEV/backend"
+              [ "$backend" = true ] && echo "backend-mono 5_DEV/backend -"
               for app in $(jq -r '.[]' <<<"$web"); do
-                echo "frontend-$(tr _ - <<<"${app#web_}") 5_DEV/frontend/$app"
+                echo "frontend-$(tr _ - <<<"$app") 5_DEV/frontend/web $app"
               done
-            } | while read -r nome contexto; do
+            } | while read -r nome contexto app; do
+              [ "$app" = - ] && app=""
               if [ -f "$contexto/Dockerfile" ]; then
-                jq -nc --arg nome "$nome" --arg contexto "$contexto" '$ARGS.named'
+                jq -nc --arg nome "$nome" --arg contexto "$contexto" --arg app "$app" '$ARGS.named'
               else
                 echo "::warning::$contexto não tem Dockerfile: a imagem $nome não será gerada" >>"$RUNNER_TEMP/avisos"
               fi
@@ -201,28 +206,23 @@ jobs:
           {
             echo "backend=$backend"
             echo "web=$web"
-            echo "android=$android"
-            echo "ios=$ios"
+            echo "android=$mobile"
+            echo "ios=$mobile"
             echo "imagens=$imagens"
           } | tee -a "$GITHUB_OUTPUT"
 
   # ===========================================================================
-  # JOB 2 · backend — um job por serviço de 5_DEV/backend/ (RNF-11, RNF-13)
+  # JOB 2 · backend — a solution de 5_DEV/backend/ (RNF-11, RNF-13)
   # ---------------------------------------------------------------------------
   # Sequência: format → build → testes com cobertura → mínimo de 80 %.
-  # Qualquer passo que falhar reprova o build do serviço.
+  # A solution reúne core/, ms_mono/ e tests/; qualquer passo que falhar
+  # reprova o backend.
   # ===========================================================================
   backend:
-    name: Backend · ${{ matrix.servico }}
+    name: Backend
     needs: mudancas
-    if: needs.mudancas.outputs.backend != '[]' # lista vazia = job pulado
+    if: needs.mudancas.outputs.backend == 'true'
     runs-on: ubuntu-latest
-    # Matriz: o GitHub cria uma execução paralela por serviço da lista.
-    # fail-fast: false → a falha de um serviço não cancela os outros.
-    strategy:
-      fail-fast: false
-      matrix:
-        servico: ${{ fromJSON(needs.mudancas.outputs.backend) }}
     # RNF-37: MongoDB e Redis sobem como contêineres ao lado do job, nas versões
     # de 01_stack-desenvolvimento, para os testes de integração.
     services:
@@ -236,10 +236,10 @@ jobs:
     env:
       ConnectionStrings__MongoDb: mongodb://localhost:27017
       ConnectionStrings__Redis: localhost:6379
-    # Todos os comandos "run" executam dentro da pasta do serviço.
+    # Todos os comandos "run" executam na raiz do backend.
     defaults:
       run:
-        working-directory: 5_DEV/backend/${{ matrix.servico }}
+        working-directory: 5_DEV/backend
     steps:
       - uses: actions/checkout@v4
       # SDK .NET na versão exata fixada no global.json (RNF-01, RNF-19).
@@ -265,24 +265,21 @@ jobs:
           output: both
 
   # ===========================================================================
-  # JOB 3 · web — um job por app 5_DEV/frontend/web_* (RNF-11, RNF-13)
+  # JOB 3 · web — o projeto de 5_DEV/frontend/web/ (RNF-11, RNF-13)
   # ---------------------------------------------------------------------------
-  # Sequência: install → lint → formatação → tipos → testes + cobertura →
-  # build → ponta a ponta. Os comandos rodam com pnpm exec, usando as versões
-  # das ferramentas fixadas no package.json do app.
+  # Sequência: install → lint → formatação → tipos → testes + cobertura, uma
+  # vez para o projeto inteiro (core/ e apps/); depois build e ponta a ponta de
+  # cada app, com o app na variável APP. Os comandos rodam com pnpm exec, nas
+  # versões das ferramentas fixadas no package.json.
   # ===========================================================================
   web:
-    name: Web · ${{ matrix.app }}
+    name: Web
     needs: mudancas
     if: needs.mudancas.outputs.web != '[]'
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        app: ${{ fromJSON(needs.mudancas.outputs.web) }}
     defaults:
       run:
-        working-directory: 5_DEV/frontend/${{ matrix.app }}
+        working-directory: 5_DEV/frontend/web
     steps:
       - uses: actions/checkout@v4
       # Node.js na versão do .nvmrc (RNF-04, RNF-19).
@@ -299,29 +296,35 @@ jobs:
       - run: pnpm exec vue-tsc --build --force
       # RNF-16 / RNF-25: Vitest + Vue Test Utils; cobertura de linhas < 80 % reprova.
       - run: pnpm exec vitest run --coverage.enabled --coverage.thresholds.lines=80
-      # Build de produção do Vite (garante que o app compila).
-      - run: pnpm run build
-      # RNF-18: Cypress pelo script test:e2e do package.json do app.
-      - run: pnpm run test:e2e
+      # Build de produção do Vite e RNF-18 (Cypress, script test:e2e) de cada
+      # app; um app que falha não interrompe os outros, mas reprova o job.
+      - env:
+          APPS: ${{ needs.mudancas.outputs.web }}
+        run: |
+          falhou=0
+          for app in $(jq -r '.[]' <<<"$APPS"); do
+            echo "::group::$app"
+            APP=$app pnpm run build && APP=$app pnpm run test:e2e || { echo "::error::$app reprovado"; falhou=1; }
+            echo "::endgroup::"
+          done
+          exit $falhou
 
   # ===========================================================================
-  # JOB 4 · android — um job por app 5_DEV/frontend/mob_and* (RNF-11, RNF-13)
+  # JOB 4 · android — a solution de 5_DEV/frontend/mobile/ (RNF-11, RNF-13)
   # ---------------------------------------------------------------------------
-  # Mesma sequência do backend, com o workload MAUI Android e o JDK.
+  # Mesma sequência do backend, com o workload MAUI Android e o JDK: compila
+  # core/, os apps (net10.0-android) e tests/, e roda os testes. No Linux os
+  # projetos não declaram o net10.0-ios (5_DEV/frontend/Directory.Build.props).
   # A cobertura é medida e publicada, sem reprovar (RNF-26).
   # ===========================================================================
   android:
-    name: Android · ${{ matrix.app }}
+    name: Android
     needs: mudancas
     if: needs.mudancas.outputs.android != '[]'
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        app: ${{ fromJSON(needs.mudancas.outputs.android) }}
     defaults:
       run:
-        working-directory: 5_DEV/frontend/${{ matrix.app }}
+        working-directory: 5_DEV/frontend/mobile
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -339,17 +342,19 @@ jobs:
       # RNF-26: a cobertura vira artefato para download na página da execução.
       - uses: actions/upload-artifact@v4
         with:
-          name: cobertura-${{ matrix.app }}
+          name: cobertura-mobile
           path: cobertura/
 
   # ===========================================================================
-  # JOB 5 · ios — um job por app 5_DEV/frontend/mob_ios_* (RNF-11, RNF-13)
+  # JOB 5 · ios — o iOS de cada app de 5_DEV/frontend/mobile/apps/ (RNF-11, RNF-13)
   # ---------------------------------------------------------------------------
   # Roda em macOS (o build iOS exige Xcode), que custa mais por minuto; por isso
-  # só em pull request para a master e no merge nela (RNF-24).
+  # só em pull request para a master e no merge nela (RNF-24). Os testes já
+  # rodam no job android; aqui entram o format (no macOS os projetos também
+  # declaram o net10.0-ios) e o build iOS de cada app.
   # ===========================================================================
   ios:
-    name: iOS · ${{ matrix.app }}
+    name: iOS
     needs: mudancas
     if: >-
       needs.mudancas.outputs.ios != '[]' && (
@@ -358,13 +363,9 @@ jobs:
     # Imagem fixa: tem o Xcode de .xcode-version; macos-latest muda de macOS
     # e de Xcodes instalados sem aviso.
     runs-on: macos-26
-    strategy:
-      fail-fast: false
-      matrix:
-        app: ${{ fromJSON(needs.mudancas.outputs.ios) }}
     defaults:
       run:
-        working-directory: 5_DEV/frontend/${{ matrix.app }}
+        working-directory: 5_DEV/frontend/mobile
     steps:
       - uses: actions/checkout@v4
       # Xcode de .xcode-version, cujo SDK iOS é o do workload fixado no
@@ -374,15 +375,21 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
-      - run: dotnet workload install maui-ios
+      # No macOS os projetos declaram Android e iOS: a restauração pede os dois.
+      - run: dotnet workload install maui-ios maui-android
       - run: dotnet format --verify-no-changes # RNF-15
-      # Debug compila para o simulador, que não exige certificado de assinatura.
-      - run: dotnet build -c Debug -warnaserror # RNF-22
-      - run: dotnet test -c Debug --no-build --collect:"XPlat Code Coverage" --results-directory "$GITHUB_WORKSPACE/cobertura" # RNF-14
-      - uses: actions/upload-artifact@v4 # RNF-26
-        with:
-          name: cobertura-${{ matrix.app }}
-          path: cobertura/
+      # RNF-22: Debug compila para o simulador, que não exige certificado de
+      # assinatura; um app que falha não interrompe os outros.
+      - env:
+          APPS: ${{ needs.mudancas.outputs.ios }}
+        run: |
+          falhou=0
+          for app in $(jq -r '.[]' <<<"$APPS"); do
+            echo "::group::$app"
+            dotnet build apps/$app -f net10.0-ios -c Debug -warnaserror || { echo "::error::$app reprovado"; falhou=1; }
+            echo "::endgroup::"
+          done
+          exit $falhou
 
   # ===========================================================================
   # JOB 6 · resultado — veredito único do CI (RNF-36)
@@ -514,11 +521,14 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
-      # Build com o Dockerfile da pasta do componente e envio ao Docker Hub.
+      # Build com o Dockerfile da pasta da frente e envio ao Docker Hub.
       # O cache do GitHub Actions (type=gha) acelera os próximos builds.
       - uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.imagem.contexto }}
+          # app da web (vazio no backend): o Dockerfile único da web gera a
+          # imagem do app indicado
+          build-args: APP=${{ matrix.imagem.app }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

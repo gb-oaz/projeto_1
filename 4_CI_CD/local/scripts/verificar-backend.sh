@@ -1,11 +1,10 @@
-# Etapa 1 · verificação de um serviço do backend — mesmos passos do job
-# "Backend · <servico>" de .github/workflows/ci.yml (RNF-161).
-# Uso (pelo ci.sh): docker compose run --rm backend-ci <servico>
+# Etapa 1 · verificação do backend — mesmos passos do job "Backend" de
+# .github/workflows/ci.yml (RNF-161), sobre a solution de 5_DEV/backend/.
+# Uso (pelo ci.sh): docker compose run --rm backend-ci
 source /ci/comum.sh
 
-servico=${1:?informe o serviço de 5_DEV/backend/}
 copiar
-cd "/trabalho/5_DEV/backend/$servico"
+cd /trabalho/5_DEV/backend
 
 passo dotnet format --verify-no-changes                     # RNF-15
 passo dotnet build -c Release -warnaserror                  # RNF-22

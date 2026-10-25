@@ -49,8 +49,7 @@ cobertura_medida() {
   cobertura_minima "$1" 0 || true
 }
 
-# Nome da imagem/serviço de um app web: web_landing_page → frontend-landing-page
+# Nome da imagem/serviço de um app web: landing_page → frontend-landing-page
 nome_frontend() {
-  local app=${1#web_}
-  echo "frontend-${app//_/-}"
+  echo "frontend-${1//_/-}"
 }

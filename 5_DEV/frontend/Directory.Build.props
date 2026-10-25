@@ -1,5 +1,20 @@
 <Project>
   <!--
+    TFMs do mobile (14_estrutura-projetos): os apps de mobile/apps/ usam
+    <TargetFrameworks>$(MobileAppTargetFrameworks)</TargetFrameworks> e as
+    bibliotecas de mobile/core/ usam $(MobileCoreTargetFrameworks), que soma o
+    net10.0 para os testes de mobile/tests/. O net10.0-ios só entra no macOS:
+    no Linux (job android do CI) a restauração não pede o workload do iOS.
+    MobileSemIos=true (variável de ambiente) deixa o macOS igual ao Linux; é
+    o que a verificação Android do CI local usa.
+  -->
+  <PropertyGroup>
+    <MobileAppTargetFrameworks>net10.0-android</MobileAppTargetFrameworks>
+    <MobileAppTargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx')) And '$(MobileSemIos)' != 'true'">$(MobileAppTargetFrameworks);net10.0-ios</MobileAppTargetFrameworks>
+    <MobileCoreTargetFrameworks>net10.0;$(MobileAppTargetFrameworks)</MobileCoreTargetFrameworks>
+  </PropertyGroup>
+
+  <!--
     iOS (RNF-170): o workload iOS fixado no global.json (workloadVersion
     10.0.111.1 → .NET para iOS 26.5) compila contra o SDK iOS 26.5, que é o
     SDK do Xcode de .xcode-version (26.6). Não há workload publicado para o

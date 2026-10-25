@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system nas telas · boaz · v10</title>
+<title>Design system nas telas · boaz · v12</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="06_design-system-telas">
 <meta name="boaz:caminho" content="1_Requisitos/06_design-system-telas.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v10">
-<meta name="boaz:data" content="2026-10-24 03:59">
+<meta name="boaz:versao" content="v12">
+<meta name="boaz:data" content="2026-10-24 21:32">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -790,8 +790,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>garantir que toda tela, do desenho ao código, no app e nas três aplicações web, seja construída só com a identidade visual e os componentes do design system do projeto.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>06_design-system-telas</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v10</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 03:59</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v12</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 21:32</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -851,20 +851,20 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RNF-93"><td><code class="id">RNF-93</code></td><td><span class="tag">Design system</span></td><td>A fonte única de identidade visual e de tokens é <code>0_Assets/design/</code>: cores e temas de cor, tipografia, forma, elevação, espaçamento, layout por janela, movimento e estados de todas as telas vêm de lá</td></tr>
         <tr id="RNF-94"><td><code class="id">RNF-94</code></td><td><span class="tag">Design system</span></td><td>As aplicações web usam os arquivos gerados em <code>0_Assets/design/plataformas/web/</code> (<code>tokens.css</code>, <code>tipografia.css</code>, <code>tokens.ts</code>) e o app usa os de <code>0_Assets/design/plataformas/maui/</code> (<code>Tokens.xaml</code> e <code>paletas/</code>)</td></tr>
         <tr id="RNF-95"><td><code class="id">RNF-95</code></td><td><span class="tag">Design system</span></td><td>Nenhuma frente edita os arquivos gerados do design system: a mudança é feita em <code>identidade/marca.json</code> ou <code>tokens/*.json</code> e gerada de novo com <code>pnpm run gerar</code></td></tr>
-        <tr id="RNF-108"><td><code class="id">RNF-108</code></td><td><span class="tag">Design system</span></td><td>Os arquivos gerados chegam às aplicações como cópias versionadas, escritas por <code>pnpm run gerar</code> em <code>0_Assets/design/</code>: <code>src/design/</code> em cada aplicação web (<code>5_DEV/frontend/web_&lt;app&gt;/</code>) e <code>Resources/Styles/Design/</code> em cada projeto do app (<code>5_DEV/frontend/mob_*/</code>); as cópias nunca são editadas à mão</td></tr>
+        <tr id="RNF-108"><td><code class="id">RNF-108</code></td><td><span class="tag">Design system</span></td><td>Os arquivos gerados chegam às aplicações como cópias versionadas, escritas por <code>pnpm run gerar</code> em <code>0_Assets/design/</code>: uma em <code>core/commons/design/</code> do projeto web (<code>5_DEV/frontend/web/</code>) e uma em <code>core/commons/Resources/Styles/Design/</code> do projeto mobile (<code>5_DEV/frontend/mobile/</code>), usadas por todos os apps de cada frente (<a class="ref" href="14_estrutura-projetos.html#RNF-182">Estrutura dos projetos <code class="id">RNF-182</code></a>, <code class="id">RNF-184</code>); as cópias nunca são editadas à mão</td></tr>
         <tr id="RNF-96"><td><code class="id">RNF-96</code></td><td><span class="tag">Estilização</span></td><td>Nenhuma tela ou componente usa cor, fonte, tamanho, espaçamento, canto, sombra ou duração fora dos tokens: valores soltos como <code>#hex</code>, <code>px</code>, <code>ms</code> ou nomes de fonte são proibidos no código das telas</td></tr>
         <tr id="RNF-97"><td><code class="id">RNF-97</code></td><td><span class="tag">Estilização</span></td><td>Nenhuma frente usa biblioteca externa de estilização ou de componentes visuais: na web, por exemplo, Tailwind, Bootstrap, Vuetify, Quasar, PrimeVue ou Element Plus; no app, bibliotecas de controles visuais de terceiros</td></tr>
         <tr id="RNF-98"><td><code class="id">RNF-98</code></td><td><span class="tag">Estilização</span></td><td>Ficam permitidos só os recursos que o próprio design system declara: as fontes da identidade e os ícones Material Symbols definidos em <code>identidade/marca.json</code>; bibliotecas sem visual próprio (roteamento, estado, testes, comunicação) não são afetadas por <code>RNF-97</code></td></tr>
         <tr id="RNF-99"><td><code class="id">RNF-99</code></td><td><span class="tag">Componentes</span></td><td>Todo componente segue a anatomia e os estados do Material Design 3 do catálogo <code>0_Assets/design/design-system.html</code>: normal, hover, foco visível, pressionado e desabilitado, com alvo de toque de no mínimo 48dp</td></tr>
         <tr id="RNF-100"><td><code class="id">RNF-100</code></td><td><span class="tag">Componentes</span></td><td>Um componente comum novo entra no design system no mesmo pull request em que é implementado: tokens em <code>tokens/componentes.json</code>, referência no catálogo <code>design-system.html</code> e desenho no <code>tema.svg</code></td></tr>
         <tr id="RNF-101"><td><code class="id">RNF-101</code></td><td><span class="tag">Componentes</span></td><td>Cada componente comum tem uma única implementação por frente, reutilizada por todas as aplicações daquela frente (as três aplicações web compartilham a mesma)</td></tr>
-        <tr id="RNF-109"><td><code class="id">RNF-109</code></td><td><span class="tag">Componentes</span></td><td>Os componentes comuns da web têm a implementação única em <code>5_DEV/frontend/web_comum/</code> e chegam a <code>src/comum/</code> de cada aplicação web pela mesma cópia sincronizada de <code>RNF-108</code></td></tr>
+        <tr id="RNF-109"><td><code class="id">RNF-109</code></td><td><span class="tag">Componentes</span></td><td>Os componentes comuns da web têm a implementação única em <code>core/commons/components/</code> do projeto web, importada por todos os apps sem cópia</td></tr>
         <tr id="RNF-102"><td><code class="id">RNF-102</code></td><td><span class="tag">Vistas</span></td><td>A vista é um <code>.svg</code> versionado em <code>2_Diagramas/</code> com o nome <code>vista-&lt;aplicacao&gt;-&lt;tela&gt;_vNN_&lt;AAAAMMDD-HHMM&gt;.svg</code>, desenhado pela skill <code>diagrama-dev</code> (tipo Vista) com os componentes e a identidade do <code>0_Assets/design/tema.svg</code></td></tr>
         <tr id="RNF-103"><td><code class="id">RNF-103</code></td><td><span class="tag">Vistas</span></td><td>A vista mostra a tela na janela compact e, nas aplicações web, também nas janelas medium e expanded, numa linha de molduras com todos os temas de cor do design system nos modos claro e escuro, escolhidos no documento pelo botão Paleta; sem escolha, abre no tema de cor padrão, claro</td></tr>
         <tr id="RNF-104"><td><code class="id">RNF-104</code></td><td><span class="tag">Vistas</span></td><td>A vista indica, para cada bloco da tela, o componente usado (comum, do módulo ou composto) e os elementos de identidade (logos, imagens, animações) com o caminho do arquivo</td></tr>
         <tr id="RNF-105"><td><code class="id">RNF-105</code></td><td><span class="tag">Vistas</span></td><td>A revisão do pull request compara a tela implementada com a vista; se a implementação precisar divergir, a vista é atualizada primeiro, numa nova versão</td></tr>
         <tr id="RNF-106"><td><code class="id">RNF-106</code></td><td><span class="tag">Identidade</span></td><td>Logos, ícones, imagens e animações usados nas telas vêm de <code>0_Assets/design/identidade/</code>; um arquivo novo entra lá antes de ser usado</td></tr>
-        <tr id="RNF-110"><td><code class="id">RNF-110</code></td><td><span class="tag">Mascotes</span></td><td>Os mascotes vêm só do núcleo <code>0_Assets/design/scripts/mascotes.mjs</code>: as aplicações web usam a cópia <code>plataformas/web/mascotes.mjs</code> (com <code>mascotes-temas.json</code>), sincronizada em <code>src/design/</code> como em <code>RNF-108</code>; o app usa os mascotes de <code>0_Assets/design/mascotes/</code>, parados e animados (<code>RNF-118</code>)</td></tr>
+        <tr id="RNF-110"><td><code class="id">RNF-110</code></td><td><span class="tag">Mascotes</span></td><td>Os mascotes vêm só do núcleo <code>0_Assets/design/scripts/mascotes.mjs</code>: as aplicações web usam a cópia <code>plataformas/web/mascotes.mjs</code> (com <code>mascotes-temas.json</code>), sincronizada em <code>core/commons/design/</code> como em <code>RNF-108</code>; o app usa os mascotes de <code>0_Assets/design/mascotes/</code>, parados e animados (<code>RNF-118</code>)</td></tr>
         <tr id="RNF-111"><td><code class="id">RNF-111</code></td><td><span class="tag">Mascotes</span></td><td>Uma expressão, forma, proporção ou movimento novo entra no núcleo junto com uma versão nova do catálogo <code>design-system.html</code> e do <code>tema.svg</code>, no mesmo pull request</td></tr>
         <tr id="RNF-112"><td><code class="id">RNF-112</code></td><td><span class="tag">Mascotes</span></td><td>Com a preferência de movimento reduzido do sistema ativa, todos os mascotes aparecem parados; sem ela, no máximo um mascote animado por vez na área de foco da tela</td></tr>
         <tr id="RNF-113"><td><code class="id">RNF-113</code></td><td><span class="tag">Mascotes</span></td><td>O mascote é decorativo para leitores de tela (a mensagem está no texto ao lado, <code>RN-37</code>) e não recebe foco</td></tr>
@@ -883,7 +883,9 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v10</span></td><td>2026-10-24 03:59</td><td><code class="id">RNF-103</code> alterado: a vista de tela traz todos os temas de cor do design system, claro e escuro, numa linha de molduras; o documento escolhe tema e modo pelo botão Paleta (padrão Branco e Preto, claro); status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v12</span></td><td>2026-10-24 21:32</td><td>Status → Aprovado</td></tr>
+      <tr><td>v11</td><td>2026-10-24 21:28</td><td><code class="id">RNF-108</code>, <code class="id">RNF-109</code> e <code class="id">RNF-110</code> alterados para a Estrutura dos projetos: uma cópia do design system por frente em <code>core/commons/</code> e componentes comuns da web em <code>core/commons/components/</code>, sem cópia; status → Em revisão</td></tr>
+      <tr><td>v10</td><td>2026-10-24 03:59</td><td><code class="id">RNF-103</code> alterado: a vista de tela traz todos os temas de cor do design system, claro e escuro, numa linha de molduras; o documento escolhe tema e modo pelo botão Paleta (padrão Branco e Preto, claro); status → Aprovado</td></tr>
       <tr><td>v09</td><td>2026-10-21 22:12</td><td><code class="id">RN-38</code> alterado: sai a exceção da turma de mascotes, que deixou a apresentação da landing page; status → Aprovado</td></tr>
       <tr><td>v08</td><td>2026-10-19 04:35</td><td>Status → Aprovado</td></tr>
       <tr><td>v07</td><td>2026-10-19 04:24</td><td><code class="id">RN-36</code> alterado: a opção Mascotes nas cores do tema, no seletor de tema, deixa cada expressão com a própria cor</td></tr>
@@ -891,12 +893,10 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <tr><td>v05</td><td>2026-10-17 23:40</td><td>Status → Aprovado</td></tr>
       <tr><td>v04</td><td>2026-10-17 21:19</td><td>Mascotes animados também no app (<code class="id">RNF-110</code>, <code class="id">RNF-118</code>); pendência respondida</td></tr>
       <tr><td>v03</td><td>2026-10-17 03:14</td><td>Mascotes na identidade visual: <code class="id">RN-34</code> a <code class="id">RN-38</code> e <code class="id">RNF-110</code> a <code class="id">RNF-115</code> incluídos; tabela de situações e expressões; termos ligados ao Glossário; seção Em aberto com a animação no app</td></tr>
-      <tr><td>v02</td><td>2026-10-16 22:10</td><td>Pendências respondidas: <code class="id">RN-33</code> (vista aprovada na revisão do pull request), <code class="id">RNF-108</code> e <code class="id">RNF-109</code> (cópias sincronizadas dos tokens e dos componentes comuns) incluídos; <code class="id">RNF-102</code> (vista pela skill diagrama-dev) e <code class="id">RNF-107</code> (CI confere as cópias) alterados; termos ligados ao Glossário; seção Em aberto removida</td></tr>
-      <tr><td>v01</td><td>2026-10-16 22:02</td><td>Criação: <code class="id">RN-27</code> a <code class="id">RN-32</code> e <code class="id">RNF-93</code> a <code class="id">RNF-107</code></td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v10 · 2026-10-24 03:59</span>
+    <span>boaz · v12 · 2026-10-24 21:32</span>
     <span class="boaz-arquivo">1_Requisitos/06_design-system-telas.html</span>
   </div>
 </footer>

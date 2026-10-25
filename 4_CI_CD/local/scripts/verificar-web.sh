@@ -1,16 +1,21 @@
-# Etapa 1 · verificação de um app web — mesmos passos do job "Web · <app>" de
-# .github/workflows/ci.yml (RNF-161).
-# Uso (pelo ci.sh): docker compose run --rm web-ci <app>
+# Etapa 1 · verificação da web — mesmos passos do job "Web" de
+# .github/workflows/ci.yml (RNF-161): lint, tipos e testes uma vez para o
+# projeto de 5_DEV/frontend/web/; build e ponta a ponta de cada app (APP).
+# Uso (pelo ci.sh): docker compose run --rm web-ci <app> [<app>…]
 source /ci/comum.sh
 
-app=${1:?informe o app de 5_DEV/frontend/web_*}
+[ $# -gt 0 ] || { echo "informe os apps de 5_DEV/frontend/web/apps/"; exit 2; }
 copiar
-cd "/trabalho/5_DEV/frontend/$app"
+cd /trabalho/5_DEV/frontend/web
 
 passo pnpm install --frozen-lockfile
 passo pnpm exec eslint . --max-warnings 0                   # RNF-17
 passo pnpm exec prettier --check .                          # RNF-17
 passo pnpm exec vue-tsc --build --force                     # RNF-17
 passo pnpm exec vitest run --coverage.enabled --coverage.thresholds.lines=80   # RNF-16, RNF-25
-passo pnpm run build
-passo pnpm run test:e2e                                     # RNF-18
+falhou=0
+for app in "$@"; do
+  APP=$app passo pnpm run build || falhou=1
+  APP=$app passo pnpm run test:e2e || falhou=1              # RNF-18
+done
+exit $falhou
