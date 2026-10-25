@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/apps/" />
+  <Folder Name="/apps/hub/">
+    <Project Path="apps/hub/Boaz.Mobile.Hub.csproj" />
+  </Folder>
+  <Folder Name="/apps/quest/">
+    <Project Path="apps/quest/Boaz.Mobile.Quest.csproj" />
+  </Folder>
+  <Folder Name="/core/" />
+  <Folder Name="/core/commons/">
+    <Project Path="core/commons/Boaz.Mobile.Core.Commons.csproj" />
+  </Folder>
+  <Folder Name="/core/hub/">
+    <Project Path="core/hub/Boaz.Mobile.Core.Hub.csproj" />
+  </Folder>
+  <Folder Name="/core/quest/">
+    <Project Path="core/quest/Boaz.Mobile.Core.Quest.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/core/commons/">
+    <Project Path="tests/core/commons/Boaz.Mobile.Core.Commons.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Contexto quest (RN-146: importa só Boaz.Mobile.Core.Commons) -->
+  <PropertyGroup>
+    <TargetFrameworks>$(MobileCoreTargetFrameworks)</TargetFrameworks>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <MauiXamlInflator>SourceGen</MauiXamlInflator>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../commons/Boaz.Mobile.Core.Commons.csproj" />
+  </ItemGroup>
+</Project>

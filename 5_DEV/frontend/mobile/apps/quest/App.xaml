@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Raiz do app quest: os tokens do design system vêm do Boaz.Mobile.Core.Commons
+     (RNF-184); as páginas entram por infra/in/ quando houver telas (toda tela
+     começa por uma vista aprovada, 06_design-system-telas). -->
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Boaz.Mobile.Quest.App">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Resources/Styles/Design/Tokens.xaml;assembly=Boaz.Mobile.Core.Commons" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

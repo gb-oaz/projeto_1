@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Stack de desenvolvimento · boaz · v15</title>
+<title>Stack de desenvolvimento · boaz · v16</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="01_stack-desenvolvimento">
 <meta name="boaz:caminho" content="1_Requisitos/01_stack-desenvolvimento.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v15">
-<meta name="boaz:data" content="2026-10-24 07:58">
+<meta name="boaz:versao" content="v16">
+<meta name="boaz:data" content="2026-10-25 03:57">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -791,8 +791,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>listar, antes de escrever código, as ferramentas e versões do ambiente de desenvolvimento, para que o ambiente local e o CI sejam configurados iguais.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>01_stack-desenvolvimento</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v15</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 07:58</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v16</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-25 · 03:57</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -854,7 +854,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RNF-168"><td><code class="id">RNF-168</code></td><td><span class="tag">Docker</span></td><td>O build e os testes do backend e da web em contêiner usam as imagens oficiais do SDK .NET (<code>mcr.microsoft.com/dotnet/sdk</code>) e do Node.js (<code>node:&lt;versão&gt;-bookworm</code>) com a versão exata de <code>global.json</code> e <code>.nvmrc</code> como tag, e as dependências usam <code>mongo:8.0</code> e <code>redis:8.0</code></td></tr>
         <tr id="RNF-169"><td><code class="id">RNF-169</code></td><td><span class="tag">Mobile</span></td><td>O Android é compilado direto na máquina, fora de contêiner, com o workload <code>maui-android</code>, o JDK 17 e o SDK do Android instalados nela (em <code>ANDROID_HOME</code> ou no local padrão do Android Studio)</td></tr>
         <tr id="RNF-170"><td><code class="id">RNF-170</code></td><td><span class="tag">Mobile</span></td><td>O iOS é compilado direto no macOS, fora de contêiner, com o Xcode de <code>.xcode-version</code> (hoje 26.6) selecionado com <code>xcode-select</code>, o runtime do simulador iOS desse Xcode, o SDK .NET de <code>global.json</code> e o conjunto de workloads de <code>workloadVersion</code> (hoje <code>10.0.111.1</code>, com o .NET para iOS 26.5, que compila contra o SDK iOS 26.5 incluído no Xcode 26.6)</td></tr>
-        <tr id="RNF-173"><td><code class="id">RNF-173</code></td><td><span class="tag">Mobile</span></td><td>Enquanto não houver workload iOS publicado com o mesmo número do Xcode de <code>.xcode-version</code>, a checagem de versão do Xcode do .NET (<code>ValidateXcodeVersion</code>) fica desligada em <code>5_DEV/frontend/Directory.Build.props</code>; ela é removida quando workload e Xcode passarem a casar</td></tr>
+        <tr id="RNF-173"><td><code class="id">RNF-173</code></td><td><span class="tag">Mobile</span></td><td>Enquanto não houver workload iOS publicado com o mesmo número do Xcode de <code>.xcode-version</code>, a checagem de versão do Xcode do .NET (<code>ValidateXcodeVersion</code>) fica desligada em <code>5_DEV/frontend/mobile/Directory.Build.props</code>; ela é removida quando workload e Xcode passarem a casar</td></tr>
         <tr id="RNF-174"><td><code class="id">RNF-174</code></td><td><span class="tag">Mobile</span></td><td>No GitHub Actions, o job iOS roda numa imagem de macOS fixa (<code>macos-26</code>, nunca <code>macos-latest</code>) e seleciona o Xcode de <code>.xcode-version</code> antes do build</td></tr>
         <tr id="RNF-171"><td><code class="id">RNF-171</code></td><td><span class="tag">Docker</span></td><td>Cada imagem das aplicações (<code>backend-mono</code> e <code>frontend-&lt;app&gt;</code>) escuta na porta 8080 e responde 200 em <code>/health</code> quando está pronta, no ambiente local, no CI e nos ambientes de implantação</td></tr>
       </tbody>
@@ -876,7 +876,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v15</span></td><td>2026-10-24 07:58</td><td>Status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v16</span></td><td>2026-10-25 03:57</td><td><code class="id">RNF-173</code> alterado: a checagem do Xcode fica em <code>5_DEV/frontend/mobile/Directory.Build.props</code>, que reúne as propriedades comuns do mobile; status: Aprovado</td></tr>
+      <tr><td>v15</td><td>2026-10-24 07:58</td><td>Status → Aprovado</td></tr>
       <tr><td>v14</td><td>2026-10-24 07:33</td><td><code class="id">RNF-19</code> passa a fixar também o <code>workloadVersion</code> do <code>global.json</code> e o <code>.xcode-version</code>; <code class="id">RNF-170</code> detalha Xcode 26.6, runtime do simulador e workloads <code>10.0.111.1</code> (.NET para iOS 26.5); <code class="id">RNF-173</code> (checagem de versão do Xcode desligada) e <code class="id">RNF-174</code> (imagem fixa <code>macos-26</code> no job iOS) incluídos</td></tr>
       <tr><td>v13</td><td>2026-10-24 06:06</td><td><code class="id">RNF-167</code> a <code class="id">RNF-171</code> incluídos (Docker e contêineres: Docker Engine com Compose v2, imagens de build e testes do backend e da web, Android e iOS direto na máquina, porta 8080 e <code>/health</code> nas imagens das aplicações); aviso de Android e iOS trocado por nota do CI local; status → Em revisão</td></tr>
       <tr><td>v12</td><td>2026-10-11 14:53</td><td>Status → Aprovado</td></tr>
@@ -885,11 +886,10 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <tr><td>v09</td><td>2026-10-11 04:39</td><td>Visual atualizado para o tema v04; diagrama atualizado para <code>ambiente-local_v02</code> (três aplicações web)</td></tr>
       <tr><td>v08</td><td>2026-10-11 04:36</td><td>Três aplicações web (<code>frontend-hub</code>, <code>frontend-landing-page</code>, <code>frontend-quest</code>): Contexto, <code class="id">RNF-02</code>, <code class="id">RNF-03</code>, <code class="id">RNF-10</code> e <code class="id">RNF-20</code> alterados; status → Em revisão</td></tr>
       <tr><td>v07</td><td>2026-10-11 03:22</td><td>Visual atualizado para o tema v03</td></tr>
-      <tr><td>v06</td><td>2026-10-11 03:16</td><td>Documento dividido: <code class="id">RNF-11</code>, <code class="id">RNF-13</code> a <code class="id">RNF-18</code> e <code class="id">RNF-21</code> a <code class="id">RNF-26</code> movidos para <code>02_ci-qualidade</code>; status mantido em Aprovado</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v15 · 2026-10-24 07:58</span>
+    <span>boaz · v16 · 2026-10-25 03:57</span>
     <span class="boaz-arquivo">1_Requisitos/01_stack-desenvolvimento.html</span>
   </div>
 </footer>
