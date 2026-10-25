@@ -132,7 +132,8 @@ fi
 if { ! $SO_QA && $BACKEND; } || [ ${#ANDROID[@]} -gt 0 ] || [ ${#IOS[@]} -gt 0 ]; then
   DOTNET_SDK=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' global.json 2>/dev/null | head -1)
   [ -n "$DOTNET_SDK" ] || { echo "✗ global.json sem a versão do SDK .NET"; exit 2; }
-  export DOTNET_SDK
+  DOTNET_WORKLOADS=$(sed -n 's/.*"workloadVersion"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' global.json 2>/dev/null | head -1)
+  export DOTNET_SDK DOTNET_WORKLOADS
 fi
 if ! $SO_QA && [ ${#APPS[@]} -gt 0 ]; then
   NODE_VERSION=$(tr -d ' \nv' < .nvmrc 2>/dev/null)
@@ -168,6 +169,7 @@ trap encerrar EXIT
 # -----------------------------------------------------------------------------
 VERDE=true
 $SO_QA && echo "--so-qa: etapa 1 pulada"
+$SO_QA || ! $BACKEND || "${COMPOSE[@]}" --profile verificacao build backend-ci
 $SO_QA || [ ${#APPS[@]} -eq 0 ] || "${COMPOSE[@]}" --profile verificacao build web-ci
 if $BACKEND && ! $SO_QA; then
   titulo "1 · verificação · backend"

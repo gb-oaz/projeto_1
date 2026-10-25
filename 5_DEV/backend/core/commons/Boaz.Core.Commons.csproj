@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    core/commons: o que os contextos compartilham (RN-146). Sem pacotes de
+    ASP.NET Core, MongoDB ou Redis (RN-147, RNF-176).
+    Features em <feature>/ com domain/, usecases/, ports/in/ e ports/out/.
+  -->
+</Project>

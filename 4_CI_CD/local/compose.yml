@@ -27,7 +27,8 @@
 name: boaz-ci-local
 
 # Variáveis lidas pelo ci.sh antes de chamar o compose (RNF-161, RN-02):
-#   DOTNET_SDK    versão do SDK .NET de global.json  (ex.: 10.0.100)
+#   DOTNET_SDK        versão do SDK .NET de global.json      (ex.: 10.0.113)
+#   DOTNET_WORKLOADS  workloadVersion de global.json         (ex.: 10.0.111.1)
 #   NODE_VERSION  versão do Node.js de .nvmrc        (ex.: 24.11.0)
 # Em todo serviço das etapas: ../.. (raiz do repositório) em /fonte, só
 # leitura, e ./scripts em /ci.
@@ -57,7 +58,13 @@ services:
   # ── etapa 1 · verificação do backend: a solution de 5_DEV/backend/ ───────
   # docker compose run --rm backend-ci
   backend-ci:
-    image: mcr.microsoft.com/dotnet/sdk:${DOTNET_SDK:-indefinido}
+    image: boaz-ci-local/dotnet-ci:${DOTNET_SDK:-indefinido}-${DOTNET_WORKLOADS:-}
+    build:
+      context: ./imagens
+      dockerfile: dotnet-ci.Dockerfile
+      args:
+        DOTNET_SDK: ${DOTNET_SDK:-indefinido}
+        DOTNET_WORKLOADS: ${DOTNET_WORKLOADS:-}
     profiles: [verificacao]
     entrypoint: ["bash", "/ci/verificar-backend.sh"]
     volumes:

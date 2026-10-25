@@ -99,6 +99,7 @@ As mesmas do `ci.yml` (cabeçalho do arquivo), mais:
 4_CI_CD/local/
 ├── ci.sh                     ponto de partida
 ├── compose.yml               MongoDB, Redis, backend-ci, web-ci e saude (as suítes de qa trazem a própria imagem)
+├── imagens/dotnet-ci.Dockerfile SDK .NET exato do global.json (dotnet-install.sh)
 ├── imagens/web-ci.Dockerfile Node.js do .nvmrc
 ├── scripts/                  o que roda em cada etapa (verificar-mobile.sh e qa-mobile.sh, na máquina)
 └── .gerado/                  compose das aplicações, cobertura do mobile e resultados do qa (fora do git)

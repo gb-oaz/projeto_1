@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/core/" />
+  <Folder Name="/core/commons/">
+    <Project Path="core/commons/Boaz.Core.Commons.csproj" />
+  </Folder>
+  <Folder Name="/core/hub/">
+    <Project Path="core/hub/Boaz.Core.Hub.csproj" />
+  </Folder>
+  <Folder Name="/core/landing_page/">
+    <Project Path="core/landing_page/Boaz.Core.LandingPage.csproj" />
+  </Folder>
+  <Folder Name="/core/quest/">
+    <Project Path="core/quest/Boaz.Core.Quest.csproj" />
+  </Folder>
+  <Folder Name="/ms_mono/">
+    <Project Path="ms_mono/Boaz.MsMono.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/ms_mono/">
+    <Project Path="tests/ms_mono/Boaz.MsMono.Tests.csproj" />
+  </Folder>
+</Solution>

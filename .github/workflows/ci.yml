@@ -254,6 +254,10 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
+      # Conjunto de workloads do workloadVersion do global.json, só os
+      # manifestos (nenhum workload): sem ele, o build falha mesmo num projeto
+      # que não usa workloads.
+      - run: dotnet workload update
       # RNF-15: falha se o código não estiver formatado conforme o .editorconfig.
       - run: dotnet format --verify-no-changes
       # RNF-22: avisos dos analisadores viram erro.
