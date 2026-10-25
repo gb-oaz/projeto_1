@@ -48,8 +48,9 @@
 #                             pasta em apps/<app>/; o script build lê o app da
 #                             variável APP
 #   frontend/mobile/          Boaz.Mobile.slnx na raiz; um projeto .NET MAUI por
-#                             app em apps/<app>/, que gera o Android e o iOS
-#   frontend/Directory.Build.props   propriedades comuns do mobile (TFMs, Xcode)
+#                             app em apps/<app>/, que gera o Android e o iOS;
+#                             Directory.Build.props com as propriedades comuns
+#                             (TFMs, ApiUrl, Xcode)
 #   qa/<alvo>/<tipo>/         uma suíte de qa por pasta, com o próprio
 #                             Dockerfile (backend/integracao, backend/carga,
 #                             frontend/web/funcional); a carga roda só em
@@ -162,7 +163,6 @@ jobs:
               - '5_DEV/qa/frontend/web/**'
             mobile:
               - *comum
-              - '5_DEV/frontend/Directory.Build.props'
               - '5_DEV/frontend/mobile/**'
               - '5_DEV/qa/frontend/mobile/**'
 
@@ -339,7 +339,7 @@ jobs:
   # ---------------------------------------------------------------------------
   # Mesma sequência do backend, com o workload MAUI Android e o JDK: compila
   # core/, os apps (net10.0-android) e tests/, e roda os testes. No Linux os
-  # projetos não declaram o net10.0-ios (5_DEV/frontend/Directory.Build.props).
+  # projetos não declaram o net10.0-ios (5_DEV/frontend/mobile/Directory.Build.props).
   # A cobertura é medida e publicada, sem reprovar (RNF-26).
   # ===========================================================================
   android:
@@ -394,7 +394,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # Xcode de .xcode-version, cujo SDK iOS é o do workload fixado no
-      # global.json (workloadVersion) — ver 5_DEV/frontend/Directory.Build.props
+      # global.json (workloadVersion) — ver 5_DEV/frontend/mobile/Directory.Build.props
       # (RNF-170).
       - run: sudo xcode-select -s "/Applications/Xcode_$(tr -d ' \n' < "$GITHUB_WORKSPACE/.xcode-version").app"
       - uses: actions/setup-dotnet@v4

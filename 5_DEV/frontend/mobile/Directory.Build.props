@@ -1,10 +1,19 @@
 <Project>
   <!--
-    TFMs do mobile (14_estrutura-projetos): os apps de mobile/apps/ usam
+    Propriedades comuns aos projetos do mobile (14_estrutura-projetos). O SDK
+    .NET e os workloads são os do global.json da raiz.
+  -->
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <!--
+    TFMs (14_estrutura-projetos RNF-187): os apps de apps/ usam
     <TargetFrameworks>$(MobileAppTargetFrameworks)</TargetFrameworks> e as
-    bibliotecas de mobile/core/ usam $(MobileCoreTargetFrameworks), que soma o
-    net10.0 para os testes de mobile/tests/. O net10.0-ios só entra no macOS:
-    no Linux (job android do CI) a restauração não pede o workload do iOS.
+    bibliotecas de core/ usam $(MobileCoreTargetFrameworks), que soma o
+    net10.0 para os testes de tests/. O net10.0-ios só entra no macOS: no
+    Linux (job android do CI) a restauração não pede o workload do iOS.
     MobileSemIos=true (variável de ambiente) deixa o macOS igual ao Linux; é
     o que a verificação Android do CI local usa.
   -->
@@ -12,6 +21,12 @@
     <MobileAppTargetFrameworks>net10.0-android</MobileAppTargetFrameworks>
     <MobileAppTargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx')) And '$(MobileSemIos)' != 'true'">$(MobileAppTargetFrameworks);net10.0-ios</MobileAppTargetFrameworks>
     <MobileCoreTargetFrameworks>net10.0;$(MobileAppTargetFrameworks)</MobileCoreTargetFrameworks>
+  </PropertyGroup>
+
+  <!-- Versões mínimas dos sistemas (as do modelo do .NET MAUI) -->
+  <PropertyGroup>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <!--
@@ -36,4 +51,17 @@
   <PropertyGroup>
     <ValidateXcodeVersion>false</ValidateXcodeVersion>
   </PropertyGroup>
+
+  <!--
+    iOS no macOS: com o repositório numa pasta do iCloud Drive (~/Documents,
+    ~/Desktop), a sincronização grava atributos estendidos nas pastas do .app
+    (com.apple.FinderInfo) e o codesign recusa o pacote ("resource fork,
+    Finder information, or similar detritus not allowed"). Os atributos saem
+    do pacote logo antes da assinatura; fora do iCloud, não muda nada.
+  -->
+  <Target Name="BoazLimparAtributosDoApp"
+          BeforeTargets="_CodesignAppBundle"
+          Condition="'$(AppBundleDir)' != '' And $([MSBuild]::IsOSPlatform('osx'))">
+    <Exec Command="xattr -cr &quot;$(AppBundleDir)&quot;" />
+  </Target>
 </Project>

@@ -87,7 +87,7 @@ else
         BACKEND_MUDOU=true WEB_MUDOU=true ANDROID_MUDOU=true IOS_MUDOU=true ;;
       5_DEV/backend/*|5_DEV/qa/backend/*) BACKEND_MUDOU=true ;;
       5_DEV/frontend/web/*|5_DEV/qa/frontend/web/*) WEB_MUDOU=true ;;
-      5_DEV/frontend/Directory.Build.props|5_DEV/frontend/mobile/*|5_DEV/qa/frontend/mobile/*)
+      5_DEV/frontend/mobile/*|5_DEV/qa/frontend/mobile/*)
         ANDROID_MUDOU=true IOS_MUDOU=true ;;
     esac
   done <<<"$ALTERADOS"

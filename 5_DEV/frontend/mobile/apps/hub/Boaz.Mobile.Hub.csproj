@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- App hub (RNF-185): um projeto .NET MAUI que gera o Android e o iOS -->
+  <PropertyGroup>
+    <TargetFrameworks>$(MobileAppTargetFrameworks)</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Boaz.Mobile.Hub</RootNamespace>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <MauiXamlInflator>SourceGen</MauiXamlInflator>
+
+    <ApplicationTitle>boaz hub</ApplicationTitle>
+    <ApplicationId>com.boaz.hub</ApplicationId>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../core/commons/Boaz.Mobile.Core.Commons.csproj" />
+    <ProjectReference Include="../../core/hub/Boaz.Mobile.Core.Hub.csproj" />
+  </ItemGroup>
+</Project>

@@ -35,7 +35,7 @@ repositório), mais:
   (`xcodebuild -downloadPlatform iOS`). O workload iOS fixado no `global.json`
   compila contra o SDK iOS desse Xcode; como não há workload publicado com o
   mesmo número do Xcode, a checagem de versão do .NET fica desligada em
-  [`5_DEV/frontend/Directory.Build.props`](../../5_DEV/frontend/Directory.Build.props).
+  [`5_DEV/frontend/mobile/Directory.Build.props`](../../5_DEV/frontend/mobile/Directory.Build.props).
 
 O funcional do mobile (`--qa mobile`) pede ainda o **Node.js** do `.nvmrc` e o
 **emulador Android** (`adb devices`) ou o **simulador iOS**
@@ -90,7 +90,7 @@ As mesmas do `ci.yml` (cabeçalho do arquivo), mais:
   mobile segue o contrato de `executar.sh` (RNF-196), chamado por
   `scripts/qa-mobile.sh`;
 - a verificação Android define `MobileSemIos=true`, que tira o `net10.0-ios`
-  dos projetos no macOS (`5_DEV/frontend/Directory.Build.props`), como no
+  dos projetos no macOS (`5_DEV/frontend/mobile/Directory.Build.props`), como no
   Linux do GitHub Actions.
 
 ## Arquivos
