@@ -1,0 +1,10 @@
+{
+  "name": "boaz-qa-mobile-funcional",
+  "private": true,
+  "description": "Servidor Appium e drivers da suíte funcional do mobile, com versão exata (14_estrutura-projetos, RNF-196). Os testes são em C# (xUnit e Appium.WebDriver).",
+  "devDependencies": {
+    "appium": "3.8.0",
+    "appium-uiautomator2-driver": "8.7.0",
+    "appium-xcuitest-driver": "12.20.0"
+  }
+}

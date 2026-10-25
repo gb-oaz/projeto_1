@@ -1,6 +1,7 @@
 # Etapa 1 · verificação da web — mesmos passos do job "Web" de
 # .github/workflows/ci.yml (RNF-161): lint, tipos e testes uma vez para o
-# projeto de 5_DEV/frontend/web/; build e ponta a ponta de cada app (APP).
+# projeto de 5_DEV/frontend/web/ e build de cada app (APP). Os testes de
+# ponta a ponta ficam no qa (5_DEV/qa/frontend/web/funcional/), na etapa 3.
 # Uso (pelo ci.sh): docker compose run --rm web-ci <app> [<app>…]
 source /ci/comum.sh
 
@@ -16,6 +17,5 @@ passo pnpm exec vitest run --coverage.enabled --coverage.thresholds.lines=80   #
 falhou=0
 for app in "$@"; do
   APP=$app passo pnpm run build || falhou=1
-  APP=$app passo pnpm run test:e2e || falhou=1              # RNF-18
 done
 exit $falhou

@@ -15,6 +15,10 @@
 #          ├──► web                   Linux, o projeto de 5_DEV/frontend/web/
 #          ├──► android               Linux, a solution de 5_DEV/frontend/mobile/
 #          ├──► ios                   macOS, só em PR/merge na master
+#          │
+#          ├──► qa                    depois de backend e web: aplicações em
+#          │                          contêiner e suítes de 5_DEV/qa/
+#          ├──► qa-mobile             Android em emulador, só em PR/merge na master
 #          ▼
 #     ┌───────────┐
 #     │ resultado │  veredito único exigido pela proteção da master
@@ -36,12 +40,16 @@
 # Convenções das pastas de 5_DEV/ (o CI depende delas) — 14_estrutura-projetos:
 #   backend/                  Boaz.slnx na raiz (core/, ms_mono/, tests/)
 #   frontend/web/             package.json + pnpm-lock.yaml na raiz; um app por
-#                             pasta em apps/<app>/; os scripts build, test:e2e e
-#                             test:e2e:imagem leem o app da variável APP
+#                             pasta em apps/<app>/; o script build lê o app da
+#                             variável APP
 #   frontend/mobile/          Boaz.Mobile.slnx na raiz; um projeto .NET MAUI por
 #                             app em apps/<app>/, que gera o Android e o iOS
 #   frontend/Directory.Build.props   propriedades comuns do mobile (TFMs, Xcode)
-#   qa/backend/, qa/frontend/web/, qa/frontend/mobile/   testes de qa de cada frente
+#   qa/<alvo>/<tipo>/         uma suíte de qa por pasta, com o próprio
+#                             Dockerfile (backend/integracao, backend/carga,
+#                             frontend/web/funcional); a carga roda só em
+#                             qa-carga.yml; frontend/mobile/funcional roda na
+#                             máquina, pelo executar.sh (Appium)
 #   raiz do repositório       global.json (SDK .NET e workloads), .xcode-version
 #                             (Xcode do iOS) e .nvmrc (Node.js) — RNF-19
 #   5_DEV/backend/Dockerfile        imagem backend-mono
@@ -268,9 +276,9 @@ jobs:
   # JOB 3 · web — o projeto de 5_DEV/frontend/web/ (RNF-11, RNF-13)
   # ---------------------------------------------------------------------------
   # Sequência: install → lint → formatação → tipos → testes + cobertura, uma
-  # vez para o projeto inteiro (core/ e apps/); depois build e ponta a ponta de
-  # cada app, com o app na variável APP. Os comandos rodam com pnpm exec, nas
-  # versões das ferramentas fixadas no package.json.
+  # vez para o projeto inteiro (core/ e apps/); depois o build de cada app,
+  # com o app na variável APP. Os testes de ponta a ponta são do job qa.
+  # Os comandos rodam com pnpm exec, nas versões fixadas no package.json.
   # ===========================================================================
   web:
     name: Web
@@ -294,17 +302,18 @@ jobs:
       - run: pnpm exec eslint . --max-warnings 0
       - run: pnpm exec prettier --check .
       - run: pnpm exec vue-tsc --build --force
-      # RNF-16 / RNF-25: Vitest + Vue Test Utils; cobertura de linhas < 80 % reprova.
+      # RNF-16 / RNF-25: Vitest + Vue Test Utils (unitários e de componentes);
+      # cobertura de linhas < 80 % reprova.
       - run: pnpm exec vitest run --coverage.enabled --coverage.thresholds.lines=80
-      # Build de produção do Vite e RNF-18 (Cypress, script test:e2e) de cada
-      # app; um app que falha não interrompe os outros, mas reprova o job.
+      # Build de produção do Vite de cada app (RNF-188); um app que falha não
+      # interrompe os outros, mas reprova o job.
       - env:
           APPS: ${{ needs.mudancas.outputs.web }}
         run: |
           falhou=0
           for app in $(jq -r '.[]' <<<"$APPS"); do
             echo "::group::$app"
-            APP=$app pnpm run build && APP=$app pnpm run test:e2e || { echo "::error::$app reprovado"; falhou=1; }
+            APP=$app pnpm run build || { echo "::error::$app reprovado"; falhou=1; }
             echo "::endgroup::"
           done
           exit $falhou
@@ -392,7 +401,84 @@ jobs:
           exit $falhou
 
   # ===========================================================================
-  # JOB 6 · resultado — veredito único do CI (RNF-36)
+  # JOB 6 · qa — suítes de integração e funcionais de 5_DEV/qa/ (RNF-194)
+  # ---------------------------------------------------------------------------
+  # Depois de backend e web aprovados (ou pulados), sobe o backend e todos os
+  # apps da web em contêiner, pelos Dockerfiles das imagens, e roda cada suíte
+  # pela própria imagem (14_estrutura-projetos, RNF-191). Usa a mesma etapa do
+  # CI local (ci.sh --so-qa): o que passa lá passa aqui. A carga não roda aqui
+  # (RN-156), só em qa-carga.yml. Os JUnit XML viram artefato.
+  # ===========================================================================
+  qa:
+    name: QA
+    needs: [mudancas, backend, web]
+    if: >-
+      always() &&
+      !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') &&
+      (needs.mudancas.outputs.backend == 'true' || needs.mudancas.outputs.web != '[]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./4_CI_CD/local/ci.sh --tudo --so-qa --qa todos
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-qa
+          path: 4_CI_CD/local/.gerado/resultados/
+          if-no-files-found: ignore
+
+  # ===========================================================================
+  # JOB 7 · qa-mobile — funcional do mobile com Appium (03 RNF-197, 14 RNF-196)
+  # ---------------------------------------------------------------------------
+  # Só em PR para a master e no merge nela, como o iOS (custo e tempo do
+  # emulador). Roda no Android: o emulador sobe no executor Linux, que também
+  # roda o backend em contêiner. O iOS funcional fica no CI local, porque o
+  # executor macOS do GitHub não roda contêineres. Usa a mesma etapa do CI
+  # local (ci.sh --so-qa --qa mobile); o JUnit XML vira artefato.
+  # ===========================================================================
+  qa-mobile:
+    name: QA · mobile
+    needs: [mudancas, backend, android]
+    if: >-
+      always() &&
+      !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') &&
+      needs.mudancas.outputs.android != '[]' && (
+        (github.event_name == 'pull_request' && github.base_ref == 'master') ||
+        (github.event_name == 'push' && github.ref == 'refs/heads/master'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: microsoft
+          java-version: "17"
+      - run: dotnet workload install maui-android
+      # Node.js do .nvmrc: o qa-mobile.sh instala o Appium e os drivers do
+      # package.json da suíte, nas versões fixadas lá
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      # aceleração do emulador no executor Linux
+      - run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          script: ./4_CI_CD/local/ci.sh --tudo --so-qa --qa mobile
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-qa-mobile
+          path: 4_CI_CD/local/.gerado/resultados/
+          if-no-files-found: ignore
+
+  # ===========================================================================
+  # JOB 8 · resultado — veredito único do CI (RNF-36)
   # ---------------------------------------------------------------------------
   # É o único status check exigido na proteção da master. Como os jobs que rodam
   # mudam a cada PR, a regra da branch não pode listar todos; este job os resume.
@@ -402,7 +488,7 @@ jobs:
   # ===========================================================================
   resultado:
     name: CI · resultado
-    needs: [mudancas, backend, web, android, ios]
+    needs: [mudancas, backend, web, android, ios, qa, qa-mobile]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -410,7 +496,7 @@ jobs:
         run: exit 1
 
   # ===========================================================================
-  # JOB 7 · aprovacao — pede aprovação manual antes de publicar (04_publicacao-imagens)
+  # JOB 9 · aprovacao — pede aprovação manual antes de publicar (04_publicacao-imagens)
   # ---------------------------------------------------------------------------
   # Só roda quando há o que publicar e é permitido publicar:
   #   - push na master (merge) ou tag vX.Y.Z (RNF-29, RNF-30); nunca em
@@ -479,7 +565,7 @@ jobs:
             Comente **approve** para publicar ou **deny** para cancelar.
 
   # ===========================================================================
-  # JOB 8 · publicar — gera e envia cada imagem ao Docker Hub (RNF-27 a RNF-33)
+  # JOB 10 · publicar — gera e envia cada imagem ao Docker Hub (RNF-27 a RNF-33)
   # ---------------------------------------------------------------------------
   # Uma execução por imagem da lista, só depois da aprovação.
   # Tags geradas (docker/metadata-action):

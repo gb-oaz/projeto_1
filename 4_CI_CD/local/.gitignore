@@ -1,2 +1,2 @@
-# compose das aplicações e cobertura do mobile, gerados a cada execução pelo ci.sh
+# compose das aplicações, cobertura do mobile e resultados do qa, gerados a cada execução pelo ci.sh
 .gerado/
