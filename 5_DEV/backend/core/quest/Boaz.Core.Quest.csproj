@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    core/quest: contexto quest. Importa só Boaz.Core.Commons (RN-146) e não tem
+    pacotes de ASP.NET Core, MongoDB ou Redis (RN-147, RNF-176).
+    Features em <feature>/ com domain/, usecases/, ports/in/ e ports/out/.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="../commons/Boaz.Core.Commons.csproj" />
+  </ItemGroup>
+</Project>

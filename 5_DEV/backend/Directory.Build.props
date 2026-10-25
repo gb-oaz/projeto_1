@@ -1,0 +1,11 @@
+<Project>
+  <!--
+    Propriedades comuns a todos os projetos do backend (14_estrutura-projetos).
+    O SDK .NET é o do global.json da raiz do repositório.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+</Project>

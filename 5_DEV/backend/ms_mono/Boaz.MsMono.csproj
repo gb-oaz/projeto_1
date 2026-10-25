@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!--
+    ms_mono: runtime do backend, gera a imagem backend-mono (RNF-177).
+    Adaptadores em infra/in/<contexto>/<feature>/ (endpoints HTTP) e
+    infra/out/<contexto>/<feature>/ (MongoDB e Redis); o Program.cs é o ponto
+    de composição que liga as portas do core aos adaptadores (RN-149).
+  -->
+  <ItemGroup>
+    <ProjectReference Include="../core/commons/Boaz.Core.Commons.csproj" />
+    <ProjectReference Include="../core/landing_page/Boaz.Core.LandingPage.csproj" />
+    <ProjectReference Include="../core/hub/Boaz.Core.Hub.csproj" />
+    <ProjectReference Include="../core/quest/Boaz.Core.Quest.csproj" />
+  </ItemGroup>
+</Project>

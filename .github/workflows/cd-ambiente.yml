@@ -38,7 +38,7 @@ on:
 jobs:
   implantar:
     name: Implantar · ${{ inputs.ambiente }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: azure-${{ inputs.ambiente }}
     # Uma implantação por ambiente por vez; a seguinte espera (RNF-53)
     concurrency:
