@@ -527,7 +527,11 @@ jobs:
   aprovacao:
     name: Aprovar publicação
     needs: [mudancas, resultado]
+    # always(): sem ele, o GitHub aplica success(), que pula o job quando algum
+    # job anterior da cadeia foi pulado (web, android, ios sem mudança), mesmo
+    # com o resultado verde.
     if: >-
+      always() &&
       needs.resultado.result == 'success' &&
       needs.mudancas.outputs.imagens != '[]' &&
       github.event_name == 'push' &&
@@ -593,6 +597,8 @@ jobs:
   publicar:
     name: Publicar · ${{ matrix.imagem.nome }}
     needs: [mudancas, aprovacao]
+    # always(): o mesmo motivo do job aprovacao
+    if: always() && needs.aprovacao.result == 'success'
     runs-on: ubuntu-24.04
     environment: dockerhub-publish
     permissions:
