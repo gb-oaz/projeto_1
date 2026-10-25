@@ -37,6 +37,11 @@
 # Enquanto não houver código em 5_DEV/, só "mudancas" e "resultado" rodam.
 # Branches de tarefa/correção e pull requests nunca chegam à aprovação (RNF-31).
 #
+# Imagens fixas dos executores: ubuntu-24.04 nos jobs Linux e macos-26 no iOS.
+# O ubuntu-latest passou ao 26.04, de kernel 6.19+, em que o mongo:8.0 se
+# recusa a iniciar (SERVER-121912: kernels 6.19 a 7.0.13); só trocar quando
+# a imagem nova tiver kernel 7.0.14 ou mais novo.
+#
 # Convenções das pastas de 5_DEV/ (o CI depende delas) — 14_estrutura-projetos:
 #   backend/                  Boaz.slnx na raiz (core/, ms_mono/, tests/)
 #   frontend/web/             package.json + pnpm-lock.yaml na raiz; um app por
@@ -117,7 +122,7 @@ jobs:
   # ===========================================================================
   mudancas:
     name: Detectar mudanças
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       backend: ${{ steps.pastas.outputs.backend }}
       web: ${{ steps.pastas.outputs.web }}
@@ -230,16 +235,23 @@ jobs:
     name: Backend
     needs: mudancas
     if: needs.mudancas.outputs.backend == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # RNF-37: MongoDB e Redis sobem como contêineres ao lado do job, nas versões
     # de 01_stack-desenvolvimento, para os testes de integração.
     services:
       mongodb:
         image: mongo:8.0
         ports: ["27017:27017"]
+        # sem health check, o job segue mesmo com o MongoDB fora do ar
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 5s --health-timeout 5s --health-retries 12
       redis:
         image: redis:8.0
         ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 12
     # Strings de conexão lidas pelo .NET (ConnectionStrings:MongoDb / :Redis).
     env:
       ConnectionStrings__MongoDb: mongodb://localhost:27017
@@ -288,7 +300,7 @@ jobs:
     name: Web
     needs: mudancas
     if: needs.mudancas.outputs.web != '[]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: 5_DEV/frontend/web
@@ -334,7 +346,7 @@ jobs:
     name: Android
     needs: mudancas
     if: needs.mudancas.outputs.android != '[]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: 5_DEV/frontend/mobile
@@ -420,7 +432,7 @@ jobs:
       always() &&
       !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') &&
       (needs.mudancas.outputs.backend == 'true' || needs.mudancas.outputs.web != '[]')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - run: ./4_CI_CD/local/ci.sh --tudo --so-qa --qa todos
@@ -449,7 +461,7 @@ jobs:
       needs.mudancas.outputs.android != '[]' && (
         (github.event_name == 'pull_request' && github.base_ref == 'master') ||
         (github.event_name == 'push' && github.ref == 'refs/heads/master'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -494,7 +506,7 @@ jobs:
     name: CI · resultado
     needs: [mudancas, backend, web, android, ios, qa, qa-mobile]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: exit 1
@@ -520,7 +532,7 @@ jobs:
       needs.mudancas.outputs.imagens != '[]' &&
       github.event_name == 'push' &&
       (github.ref == 'refs/heads/master' || github.ref_type == 'tag')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120 # sem resposta em 2 h, a publicação é cancelada
     permissions:
       contents: read
@@ -581,7 +593,7 @@ jobs:
   publicar:
     name: Publicar · ${{ matrix.imagem.nome }}
     needs: [mudancas, aprovacao]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: dockerhub-publish
     permissions:
       contents: read
