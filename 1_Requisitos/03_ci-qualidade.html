@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CI e qualidade · boaz · v21</title>
+<title>CI e qualidade · boaz · v22</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="03_ci-qualidade">
 <meta name="boaz:caminho" content="1_Requisitos/03_ci-qualidade.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v21">
-<meta name="boaz:data" content="2026-10-24 23:21">
-<meta name="boaz:status" content="Em revisão">
+<meta name="boaz:versao" content="v22">
+<meta name="boaz:data" content="2026-10-25 01:12">
+<meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -791,9 +791,9 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir onde e quando o CI roda e quais testes e verificações de qualidade reprovam um build.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>03_ci-qualidade</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v21</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 23:21</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v22</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-25 · 01:12</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
 
@@ -888,7 +888,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v21</span></td><td>2026-10-24 23:21</td><td><code class="id">RNF-160</code> alterado: o funcional do mobile pede o Node.js de <code>.nvmrc</code> e o emulador ou o simulador; o Appium e os drivers vêm do <code>package.json</code> da suíte</td></tr>
+      <tr><td><span class="boaz-versao">v22</span></td><td>2026-10-25 01:12</td><td>Status → Aprovado</td></tr>
+      <tr><td>v21</td><td>2026-10-24 23:21</td><td><code class="id">RNF-160</code> alterado: o funcional do mobile pede o Node.js de <code>.nvmrc</code> e o emulador ou o simulador; o Appium e os drivers vêm do <code>package.json</code> da suíte</td></tr>
       <tr><td>v20</td><td>2026-10-24 22:47</td><td>Funcional do mobile com Appium: <code class="id">RNF-160</code> (pré-requisitos) e <code class="id">RNF-172</code> (abordagem mobile) alterados; <code class="id">RNF-197</code> (job de qa do mobile, Android em emulador) incluído; diagramas <code>pipeline-ci_v10</code> e <code>ci-local_v06</code></td></tr>
       <tr><td>v19</td><td>2026-10-24 22:25</td><td>QA por suítes (<code>14_estrutura-projetos</code>): <code class="id">RNF-18</code> (ponta a ponta no qa), <code class="id">RNF-162</code>, <code class="id">RNF-172</code> (abordagem carga) e <code class="id">RNF-188</code> (job da web sem ponta a ponta) alterados; <code class="id">RNF-194</code> (job de qa) e <code class="id">RNF-195</code> (carga em homologação) incluídos; diagramas <code>pipeline-ci_v09</code> e <code>ci-local_v05</code></td></tr>
       <tr><td>v18</td><td>2026-10-24 21:15</td><td><code class="id">RNF-34</code>, <code class="id">RNF-35</code> e <code class="id">RNF-166</code> alterados para a estrutura de <code>14_estrutura-projetos</code> (backend, web e mobile num projeto cada); <code class="id">RNF-188</code> (job da web, com build e e2e por app) e <code class="id">RNF-189</code> (jobs Android e iOS) incluídos; diagrama atualizado para <code>ci-local_v04</code>; status → Em revisão</td></tr>
@@ -897,11 +898,10 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <tr><td>v15</td><td>2026-10-15 00:21</td><td>Diagrama atualizado para <code>pipeline-ci_v08</code> (environment do token do Docker Hub: <code>dockerhub-publish</code>)</td></tr>
       <tr><td>v14</td><td>2026-10-11 22:23</td><td>Diagrama atualizado para <code>pipeline-ci_v07</code> (aprovação manual antes da publicação, <a class="ref" href="04_publicacao-imagens.html#RNF-43">Publicação das imagens <code class="id">RNF-43</code></a>); status mantido Aprovado</td></tr>
       <tr><td>v13</td><td>2026-10-11 15:15</td><td>Status → Aprovado</td></tr>
-      <tr><td>v12</td><td>2026-10-11 15:02</td><td>Diagrama atualizado para <code>pipeline-ci_v06</code> (tag de imagem <code>master</code>)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v21 · 2026-10-24 23:21</span>
+    <span>boaz · v22 · 2026-10-25 01:12</span>
     <span class="boaz-arquivo">1_Requisitos/03_ci-qualidade.html</span>
   </div>
 </footer>
