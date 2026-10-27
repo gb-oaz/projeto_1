@@ -92,8 +92,9 @@ reaplica o Terraform sem mudar nada além do que estiver diferente.
   sonda do Application Gateway
 - web: encaminhar `/api/*` para `BACKEND_URL` (RNF-76)
 - backend: ler `ConnectionStrings__Mongo`, `ConnectionStrings__Redis`,
-  `APPLICATIONINSIGHTS_CONNECTION_STRING` e publicar o Swagger só quando
-  `Swagger__Habilitado=true` (RNF-73); validar o token de `X-App-Attestation`
+  `APPLICATIONINSIGHTS_CONNECTION_STRING` e publicar a documentação da API
+  em `/doc/api` só quando `Swagger__Habilitado=true` (RNF-73; o WAF de
+  produção bloqueia `/doc/api`, RNF-79); validar o token de `X-App-Attestation`
   em `/mobile/*` (RNF-78)
 
 Enquanto uma imagem não foi publicada, a aplicação roda uma imagem provisória da

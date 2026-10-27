@@ -6,6 +6,23 @@
     de composição que liga as portas do core aos adaptadores (RN-149).
   -->
   <ItemGroup>
+    <!-- Documentação da API em /doc/api (sistema/DocumentacaoApi.cs) -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.3.1" />
+  </ItemGroup>
+
+  <!--
+    Os textos da documentação vêm de WithSummary/WithDescription, não de
+    comentários XML: o gerador de comentários do OpenApi sai do build, e com
+    ele o código gerado que contaria na cobertura (RNF-25).
+  -->
+  <Target Name="BoazSemGeradorXmlOpenApi" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)" Condition="'%(Filename)' == 'Microsoft.AspNetCore.OpenApi.SourceGenerators'" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
     <ProjectReference Include="../core/commons/Boaz.Core.Commons.csproj" />
     <ProjectReference Include="../core/landing_page/Boaz.Core.LandingPage.csproj" />
     <ProjectReference Include="../core/hub/Boaz.Core.Hub.csproj" />

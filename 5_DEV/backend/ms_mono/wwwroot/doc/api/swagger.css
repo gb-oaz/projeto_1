@@ -1,0 +1,264 @@
+/* Swagger UI com a identidade do deboaz (sistema/DocumentacaoApi.cs).
+ * Cores só pelos papéis do design system (design/cores.css, gerado), que
+ * mudam sozinhos no modo escuro do Swagger UI (.dark-mode). As regras partem
+ * de #swagger-ui para valer sobre as do Swagger, inclusive as do modo escuro. */
+
+body,
+.dark-mode body {
+  margin: 0;
+  background: var(--md-sys-color-surface-container-low);
+}
+
+/* barra do topo: logo do deboaz no lugar do logo do Swagger */
+#swagger-ui .swagger-ui .topbar {
+  background: var(--md-sys-color-surface);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  padding: 12px 0;
+}
+
+#swagger-ui .swagger-ui .topbar .link svg,
+#swagger-ui .swagger-ui .topbar .link img {
+  display: none;
+}
+
+#swagger-ui .swagger-ui .topbar .link::before {
+  content: "";
+  display: block;
+  width: 132px;
+  height: 44px;
+  background: url("design/logo.svg") no-repeat left center / contain;
+}
+
+.dark-mode #swagger-ui .swagger-ui .topbar .link::before {
+  background-image: url("design/logo-negativo.svg");
+}
+
+/* seletor do topo, à direita: capa do catálogo e cada API */
+#swagger-ui .swagger-ui .topbar .download-url-wrapper .select-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 320px;
+  margin: 0;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+#swagger-ui .swagger-ui .topbar .download-url-wrapper .select-label span {
+  font-size: 0;
+}
+
+#swagger-ui .swagger-ui .topbar .download-url-wrapper .select-label span::after {
+  content: "API";
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#swagger-ui .swagger-ui .topbar .download-url-wrapper .select-label select {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 32px 8px 16px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 8px;
+  background-color: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
+  font-weight: 600;
+  box-shadow: none;
+}
+
+#swagger-ui .swagger-ui .topbar .download-url-wrapper .select-label select:focus {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 1px;
+}
+
+/* capa: banner, título e apresentação */
+#swagger-ui .swagger-ui .information-container.wrapper {
+  padding: 0 20px;
+}
+
+#swagger-ui .swagger-ui .info {
+  margin: 32px 0;
+}
+
+#swagger-ui .swagger-ui .info .title {
+  color: var(--md-sys-color-on-surface);
+}
+
+#swagger-ui .swagger-ui .info .title small {
+  background: var(--md-sys-color-primary);
+}
+
+#swagger-ui .swagger-ui .info .title small pre {
+  color: var(--md-sys-color-on-primary);
+}
+
+#swagger-ui .swagger-ui .info .title small.version-stamp {
+  background: var(--md-sys-color-secondary);
+}
+
+#swagger-ui .swagger-ui .info .description img[alt="deboaz"] {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 8px 0 24px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 24px;
+}
+
+.dark-mode #swagger-ui .swagger-ui .info .description img[alt="deboaz"] {
+  content: url("design/banner-escuro.svg");
+}
+
+/* o logo do banner abre, fica, fecha e recomeça; sem movimento, fica parado */
+@media (prefers-reduced-motion: reduce) {
+  #swagger-ui .swagger-ui .info .description img[alt="deboaz"] {
+    content: url("design/banner-parado.svg");
+  }
+
+  .dark-mode #swagger-ui .swagger-ui .info .description img[alt="deboaz"] {
+    content: url("design/banner-parado-escuro.svg");
+  }
+}
+
+#swagger-ui .swagger-ui .info .description,
+#swagger-ui .swagger-ui .info .description p,
+#swagger-ui .swagger-ui .info .description td,
+#swagger-ui .swagger-ui .info .description li {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+#swagger-ui .swagger-ui .info .description h3 {
+  color: var(--md-sys-color-on-surface);
+  margin-top: 28px;
+}
+
+#swagger-ui .swagger-ui .info .description table {
+  border-collapse: collapse;
+  width: 100%;
+  background: var(--md-sys-color-surface);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+#swagger-ui .swagger-ui .info .description th,
+#swagger-ui .swagger-ui .info .description td {
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  padding: 10px 16px;
+  text-align: left;
+}
+
+#swagger-ui .swagger-ui .info .description th {
+  color: var(--md-sys-color-on-surface);
+  background: var(--md-sys-color-surface-container-high);
+}
+
+#swagger-ui .swagger-ui .info .description code,
+#swagger-ui .swagger-ui .info a.link {
+  color: var(--md-sys-color-primary);
+}
+
+/* a capa do catálogo não tem endpoints: some o aviso "No operations defined in spec!" */
+#swagger-ui .swagger-ui .wrapper > section.block > h3:only-child {
+  display: none;
+}
+
+/* grupos (tags) e operações */
+#swagger-ui .swagger-ui .opblock-tag {
+  color: var(--md-sys-color-on-surface);
+  border-bottom-color: var(--md-sys-color-outline-variant);
+}
+
+#swagger-ui .swagger-ui .opblock-tag small {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+#swagger-ui .swagger-ui .opblock {
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+#swagger-ui .swagger-ui .opblock.opblock-get {
+  background: var(--md-sys-color-surface);
+  border-color: var(--md-sys-color-outline);
+}
+
+#swagger-ui .swagger-ui .opblock.opblock-get .opblock-summary {
+  border-color: var(--md-sys-color-outline-variant);
+}
+
+#swagger-ui .swagger-ui .opblock.opblock-get .opblock-summary-method {
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-radius: 8px;
+}
+
+#swagger-ui .swagger-ui .btn.execute {
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-radius: 20px;
+}
+
+#swagger-ui .swagger-ui .btn {
+  border-radius: 20px;
+}
+
+#swagger-ui .swagger-ui .scheme-container {
+  background: var(--md-sys-color-surface);
+  box-shadow: none;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+#swagger-ui .swagger-ui .opblock .opblock-summary-path,
+#swagger-ui .swagger-ui .opblock .opblock-summary-description,
+#swagger-ui .swagger-ui .opblock .opblock-section-header h4,
+#swagger-ui .swagger-ui .opblock-description-wrapper p,
+#swagger-ui .swagger-ui .responses-inner h4,
+#swagger-ui .swagger-ui .response-col_status,
+#swagger-ui .swagger-ui .response-col_description,
+#swagger-ui .swagger-ui table thead tr td,
+#swagger-ui .swagger-ui .parameters-col_description,
+#swagger-ui .swagger-ui .opblock-tag svg {
+  color: var(--md-sys-color-on-surface);
+  fill: var(--md-sys-color-on-surface);
+}
+
+#swagger-ui .swagger-ui .opblock .opblock-section-header {
+  background: var(--md-sys-color-surface-container);
+  box-shadow: none;
+}
+
+/* blocos de código (request URL, curl, corpo da resposta): sempre fundo escuro e
+ * texto claro, porque o realce de sintaxe do Swagger pinta o texto em claro; o
+ * !important vence o fundo fixo que o Swagger põe com !important e inline */
+#swagger-ui .swagger-ui .opblock-body pre.microlight,
+#swagger-ui .swagger-ui .highlight-code > .microlight,
+#swagger-ui .swagger-ui textarea.curl {
+  background: var(--md-sys-color-inverse-surface) !important;
+  color: var(--md-sys-color-inverse-on-surface);
+  border-radius: 8px;
+}
+
+.dark-mode #swagger-ui .swagger-ui .opblock-body pre.microlight,
+.dark-mode #swagger-ui .swagger-ui .highlight-code > .microlight,
+.dark-mode #swagger-ui .swagger-ui textarea.curl {
+  background: var(--md-sys-color-surface-container-lowest) !important;
+  color: var(--md-sys-color-on-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+}
+
+/* rótulos da resposta (Responses, Request URL, Request duration, Code, Details) */
+#swagger-ui .swagger-ui .responses-inner h5,
+#swagger-ui .swagger-ui .request-url h4,
+#swagger-ui .swagger-ui .opblock-body .response-col_status,
+#swagger-ui .swagger-ui .opblock-body .response-col_links,
+#swagger-ui .swagger-ui .responses-table .response td,
+#swagger-ui .swagger-ui .responses-header td {
+  color: var(--md-sys-color-on-surface);
+}
+
+/* o modo claro e o escuro seguem o sistema; o botão de troca do Swagger fica visível */
+#swagger-ui .swagger-ui .dark-mode-toggle svg {
+  fill: var(--md-sys-color-on-surface-variant);
+}

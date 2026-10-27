@@ -70,9 +70,9 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
     const k = alt / g.altura;
     return `<g transform="translate(${n(x)} ${n(y)}) scale(${n(k * 1e5) / 1e5}) translate(0 ${-g.y})" opacity="${op}"><path fill="${p.anel}" d="${g.anel}"/><path fill="${p.b}" d="${g.b}"/><path fill="${p.d}" d="${g.d}"/></g>`;
   };
-  // logo inteiro (símbolo + nome) centrado em cx, cy, com a altura do símbolo = alt; anima a abertura (toca uma vez)
+  // logo inteiro (símbolo + nome) centrado em cx, cy, com a altura do símbolo = alt; anima a abertura (toca uma vez) ou o ciclo (em laço)
   const logoInteiro = (cx, cy, alt, cor, anim, v = 'longo') => {
-    const svg = anim === 'abertura' ? marca.abertura(v, cor) : marca.logo(v, cor);
+    const svg = anim === 'abertura' ? marca.abertura(v, cor) : anim === 'ciclo' ? marca.ciclo(v, cor) : marca.logo(v, cor);
     const [, , vw, vh] = svg.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number), larg = alt * vw / vh;
     return encaixa(svg, cx - larg / 2, cy - alt / 2, larg, alt, 1);
   };
@@ -140,8 +140,8 @@ export function criarFundos({ marca, geometria, pecas, mascotes }) {
    * Desenha um fundo e devolve o SVG.
    * op = { largura, altura, cores (PAPEIS + mascote), pecas: 'ambos'|'logo'|'mascotes'|'nenhuma' (só o desenho, para fundo de card),
    *        origem: { x, y } (0 a 1; centro do anel e das ondas), celula (Estampa: tamanho da célula em px; no fundo de tela, fixo em ~48dp), raio (do anel gigante, em px; padrão 0,55 do lado maior),
-   *        mascote: { expressao, forma, proporcao, movimento }, logo: ''|'abertura'|'carregamento',
-   *        nome (Halo com pecas 'logo': o logo inteiro, símbolo + nome, centrado na origem e com altura = raio; com logo 'abertura', o nome entra depois do símbolo),
+   *        mascote: { expressao, forma, proporcao, movimento }, logo: ''|'abertura'|'carregamento'|'ciclo',
+   *        nome (Halo com pecas 'logo': o logo inteiro, símbolo + nome, centrado na origem e com altura = raio; com logo 'abertura', o nome entra depois do símbolo; com 'ciclo', abre, fica, fecha e recomeça),
    *        variante ('longo' | 'curto': hastes do logo inteiro do Halo; curto no quest),
    *        ciclo: [cores, …] (Halo: os brilhos passam pelas cores desses temas em laço, suave, começando no primeiro; parado, ficam no primeiro; a superfície fica a de `cores`),
    *        cicloTempo: { fica, troca } (segundos em cada tema e na troca; padrão 6 e 2),
