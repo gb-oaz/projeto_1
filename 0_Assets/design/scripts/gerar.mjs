@@ -15,9 +15,11 @@
 //                         identidade/logos, identidade/icones  símbolo, logo, ícone e favicon (scripts/marca-arquivos.mjs)
 //                         plataformas/web/marca.mjs    núcleo da marca (logo em qualquer cor) e marca-temas.json
 //                         identidade/imagens/fundos    fundos oficiais; plataformas/web/fundos.mjs (scripts/fundos-arquivos.mjs)
+//                         plataformas/api/             banner, logo, favicon e cores da documentação da API (scripts/api-arquivos.mjs)
 //                         design-system.html           só o bloco entre os marcadores
 //                                                      design:tokens:inicio/fim
-//                         + cópias em core/commons/ da web e do mobile (sincronizar.mjs)
+//                         + cópias em core/commons/ da web e do mobile e na documentação
+//                           da API do backend (sincronizar.mjs)
 //   pnpm run conferir   não escreve nada; falha se algum arquivo gerado estiver
 //                       diferente do que seria gerado agora
 //
@@ -38,6 +40,7 @@ import { copiasSincronizadas } from './sincronizar.mjs';
 import { arquivosMascotes, temasDosMascotes } from './mascotes-arquivos.mjs';
 import { arquivosMarca } from './marca-arquivos.mjs';
 import { arquivosFundos, fundosNode } from './fundos-arquivos.mjs';
+import { arquivosApi } from './api-arquivos.mjs';
 import { estatico as mascoteEstatico, animado as mascoteAnimado, embutir, EXPRESSOES as M_EXPR, FORMAS as M_FORMAS, PROPORCOES as M_PROP } from './mascotes.mjs';
 import { VITRINE as M_VITRINE } from './mascotes-arquivos.mjs';
 
@@ -534,6 +537,7 @@ const saidas = {
   ...arquivosMascotes(cores, marca),
   ...arqMarca,
   ...arqFundos,
+  ...arquivosApi(cores, arqMarca, arqFundos),
 };
 Object.assign(saidas, copiasSincronizadas(RAIZ, saidas));
 let diferentes = 0;

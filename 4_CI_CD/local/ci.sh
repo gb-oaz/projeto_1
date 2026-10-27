@@ -328,6 +328,7 @@ $($QA_MOBILE && echo '    ports: ["127.0.0.1:18080:8080"]')
       ConnectionStrings__Mongo: mongodb://mongodb:27017
       ConnectionStrings__MongoDb: mongodb://mongodb:27017
       ConnectionStrings__Redis: redis:6379
+      Swagger__Habilitado: "true"
     depends_on:
       mongodb: { condition: service_healthy }
       redis: { condition: service_healthy }

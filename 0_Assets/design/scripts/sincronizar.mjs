@@ -6,6 +6,7 @@
 //
 //   5_DEV/frontend/web/core/commons/design/                    ← plataformas/web/*
 //   5_DEV/frontend/mobile/core/commons/Resources/Styles/Design/ ← plataformas/maui/Tokens.xaml e paletas/*.xaml
+//   5_DEV/backend/ms_mono/wwwroot/doc/api/design/              ← plataformas/api/* (documentação da API)
 //
 // Os componentes comuns da web ficam direto em web/core/commons/components/ e
 // os apps os importam pelo alias @core, sem cópia.
@@ -21,13 +22,15 @@ import { join, relative } from 'node:path';
  * `gerados` são as saídas desta execução (o conteúdo novo de plataformas/*).
  */
 export function copiasSincronizadas(raizDesign, gerados) {
-  const frontend = join(raizDesign, '..', '..', '5_DEV', 'frontend');
+  const dev = join(raizDesign, '..', '..', '5_DEV');
+  const frontend = join(dev, 'frontend');
   const rel = (p) => relative(raizDesign, p);
   const copias = {};
   // frente que ainda não existe não recebe cópia
   const destinos = [
     ['plataformas/web/', join(frontend, 'web'), ['core', 'commons', 'design']],
     ['plataformas/maui/', join(frontend, 'mobile'), ['core', 'commons', 'Resources', 'Styles', 'Design']],
+    ['plataformas/api/', join(dev, 'backend'), ['ms_mono', 'wwwroot', 'doc', 'api', 'design']],
   ];
   for (const [origem, frente, pasta] of destinos) {
     if (!existsSync(frente)) continue;

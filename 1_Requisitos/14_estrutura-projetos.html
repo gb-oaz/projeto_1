@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Estrutura dos projetos · boaz · v09</title>
+<title>Estrutura dos projetos · boaz · v11</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="14_estrutura-projetos">
 <meta name="boaz:caminho" content="1_Requisitos/14_estrutura-projetos.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v09">
-<meta name="boaz:data" content="2026-10-25 03:57">
+<meta name="boaz:versao" content="v11">
+<meta name="boaz:data" content="2026-10-27 00:49">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,8 +918,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir uma organização de pastas e de dependências única para backend, web e mobile, que separa o domínio (core) dos adaptadores.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>14_estrutura-projetos</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-25 · 03:57</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v11</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-27 · 00:49</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -963,7 +963,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
       <tbody>
         <tr id="RNF-175"><td><code class="id">RNF-175</code></td><td><span class="tag">Backend</span></td><td><code>5_DEV/backend/</code> tem a solution <code>Boaz.slnx</code>, o <code>core/&lt;contexto&gt;/&lt;feature&gt;/</code> com <code>domain/</code>, <code>usecases/</code>, <code>ports/in/</code> e <code>ports/out/</code>, o runtime em <code>ms_mono/</code> e os testes em <code>tests/</code></td></tr>
         <tr id="RNF-176"><td><code class="id">RNF-176</code></td><td><span class="tag">Backend</span></td><td>Cada contexto de <code>core/</code> é um projeto <code>.csproj</code> (<code>Boaz.Core.&lt;Contexto&gt;</code>, ex.: <code>Boaz.Core.LandingPage</code>) que referencia só <code>Boaz.Core.Commons</code> e não tem pacote de ASP.NET Core, MongoDB ou Redis</td></tr>
-        <tr id="RNF-177"><td><code class="id">RNF-177</code></td><td><span class="tag">Backend</span></td><td><code>ms_mono/</code> é o projeto ASP.NET Core que gera a imagem <code>backend-mono</code>, referencia todos os contextos do core e tem <code>infra/in/&lt;contexto&gt;/&lt;feature&gt;/</code> (endpoints HTTP) e <code>infra/out/&lt;contexto&gt;/&lt;feature&gt;/</code> (MongoDB e Redis)</td></tr>
+        <tr id="RNF-177"><td><code class="id">RNF-177</code></td><td><span class="tag">Backend</span></td><td><code>ms_mono/</code> é o projeto ASP.NET Core que gera a imagem <code>backend-mono</code>, referencia todos os contextos do core e tem <code>infra/in/&lt;contexto&gt;/&lt;feature&gt;/</code> (endpoints HTTP) e <code>infra/out/&lt;contexto&gt;/&lt;feature&gt;/</code> (MongoDB e Redis); fora dos contextos, <code>sistema/</code> guarda os endpoints do próprio runtime (prontidão e documentação da API) e <code>wwwroot/doc/api/design/</code> a cópia gerada do design system usada na documentação</td></tr>
         <tr id="RNF-178"><td><code class="id">RNF-178</code></td><td><span class="tag">Backend</span></td><td><code>tests/</code> espelha <code>core/</code> e <code>ms_mono/</code>, com um projeto xUnit por projeto testado (ex.: <code>Boaz.Core.Hub.Tests</code>)</td></tr>
       </tbody>
     </table>
@@ -1016,7 +1016,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v09</span></td><td>2026-10-25 03:57</td><td><code class="id">RNF-187</code> e <code class="id">RNF-198</code> alterados: as propriedades comuns do mobile ficam em <code>5_DEV/frontend/mobile/Directory.Build.props</code>; diagrama <code>estrutura-projetos_v05</code>; status: Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v11</span></td><td>2026-10-27 00:49</td><td>Status → Aprovado</td></tr>
+      <tr><td>v10</td><td>2026-10-26 23:53</td><td><code class="id">RNF-177</code> alterado: <code>ms_mono/sistema/</code> (endpoints de sistema e documentação da API) e <code>wwwroot/doc/api/design/</code> (cópia gerada do design system)</td></tr>
+      <tr><td>v09</td><td>2026-10-25 03:57</td><td><code class="id">RNF-187</code> e <code class="id">RNF-198</code> alterados: as propriedades comuns do mobile ficam em <code>5_DEV/frontend/mobile/Directory.Build.props</code>; diagrama <code>estrutura-projetos_v05</code>; status: Aprovado</td></tr>
       <tr><td>v08</td><td>2026-10-25 01:12</td><td>Status → Aprovado</td></tr>
       <tr><td>v07</td><td>2026-10-24 23:21</td><td>Pendência respondida: <code class="id">RNF-198</code> (endereço do backend no build, pela propriedade <code>ApiUrl</code>) incluído; <code class="id">RNF-196</code> com as versões do Appium e dos drivers no <code>package.json</code> da suíte; seção Em aberto removida</td></tr>
       <tr><td>v06</td><td>2026-10-24 22:47</td><td>Pendência respondida: o funcional do mobile usa Appium com testes em C# (<code class="id">RNF-196</code>, contrato <code>executar.sh</code> na máquina); <code class="id">RN-153</code> e <code class="id">RNF-191</code> alterados; Em aberto com o endereço do backend de teste no app; diagrama <code>estrutura-projetos_v04</code></td></tr>
@@ -1024,11 +1026,10 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
       <tr><td>v04</td><td>2026-10-24 21:32</td><td>Status → Aprovado</td></tr>
       <tr><td>v03</td><td>2026-10-24 21:28</td><td>Pendência respondida: o requisito 06 (<code class="id">RNF-108</code> a <code class="id">RNF-110</code>) passa a usar <code>core/commons/</code>; seção Em aberto removida</td></tr>
       <tr><td>v02</td><td>2026-10-24 21:16</td><td>Sem microsserviços futuros: <code class="id">RN-150</code> removida, <code class="id">RNF-175</code> e <code class="id">RNF-178</code> com o <code>ms_mono</code>; <code class="id">RNF-187</code> (TFMs do mobile) incluído; Em aberto só com o alinhamento do requisito 06; diagrama <code>estrutura-projetos_v02</code></td></tr>
-      <tr><td>v01</td><td>2026-10-24 20:41</td><td>Criação: <code class="id">RN-143</code> a <code class="id">RN-150</code> e <code class="id">RNF-175</code> a <code class="id">RNF-186</code> (estrutura hexagonal de backend, web e mobile); diagrama <code>estrutura-projetos_v01</code></td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v09 · 2026-10-25 03:57</span>
+    <span>boaz · v11 · 2026-10-27 00:49</span>
     <span class="boaz-arquivo">1_Requisitos/14_estrutura-projetos.html</span>
   </div>
 </footer>

@@ -70,9 +70,9 @@ resource "azurerm_web_application_firewall_policy" "waf" {
     }
   }
 
-  # Swagger não existe em produção
+  # A documentação da API (/doc/api) não existe em produção (RNF-73, RNF-79)
   custom_rules {
-    name      = "BloqueiaSwagger"
+    name      = "BloqueiaDocumentacaoApi"
     priority  = 20
     rule_type = "MatchRule"
     action    = "Block"
@@ -82,7 +82,7 @@ resource "azurerm_web_application_firewall_policy" "waf" {
         variable_name = "RequestUri"
       }
       operator     = "Contains"
-      match_values = ["/swagger"]
+      match_values = ["/doc/api"]
       transforms   = ["Lowercase"]
     }
   }
