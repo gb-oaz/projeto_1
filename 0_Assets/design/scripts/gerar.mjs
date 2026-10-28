@@ -15,6 +15,8 @@
 //                         identidade/logos, identidade/icones  símbolo, logo, ícone e favicon (scripts/marca-arquivos.mjs)
 //                         plataformas/web/marca.mjs    núcleo da marca (logo em qualquer cor) e marca-temas.json
 //                         identidade/imagens/fundos    fundos oficiais; plataformas/web/fundos.mjs (scripts/fundos-arquivos.mjs)
+//                         identidade/imagens/status    status do servidor, parados, animados e selos (scripts/status-arquivos.mjs)
+//                         identidade/imagens/splash    splash screens nativas e animadas, hub e quest (scripts/splash-arquivos.mjs)
 //                         plataformas/api/             banner, logo, favicon e cores da documentação da API (scripts/api-arquivos.mjs)
 //                         design-system.html           só o bloco entre os marcadores
 //                                                      design:tokens:inicio/fim
@@ -40,6 +42,9 @@ import { copiasSincronizadas } from './sincronizar.mjs';
 import { arquivosMascotes, temasDosMascotes } from './mascotes-arquivos.mjs';
 import { arquivosMarca } from './marca-arquivos.mjs';
 import { arquivosFundos, fundosNode } from './fundos-arquivos.mjs';
+import { arquivosStatus } from './status-arquivos.mjs';
+import { coresDoStatus } from './status.mjs';
+import { arquivosSplash } from './splash-arquivos.mjs';
 import { arquivosApi } from './api-arquivos.mjs';
 import { estatico as mascoteEstatico, animado as mascoteAnimado, embutir, EXPRESSOES as M_EXPR, FORMAS as M_FORMAS, PROPORCOES as M_PROP } from './mascotes.mjs';
 import { VITRINE as M_VITRINE } from './mascotes-arquivos.mjs';
@@ -503,7 +508,9 @@ const arqMarca = arquivosMarca(cores, marca);
 const blocoMarca = `<script type="module" id="design-marca">\n${arqMarca['plataformas/web/marca.mjs']}\nwindow.boazMarca = { marca, FRENTES, VARIANTES, geometria, pecas, temas: ${arqMarca['plataformas/web/marca-temas.json'].trim()} };\nwindow.dispatchEvent(new Event('boaz-marca'));\n</script>\n`;
 const arqFundos = arquivosFundos(cores, marca);
 const blocoFundos = `<script type="module" id="design-fundos">\n${readFileSync(join(RAIZ, 'scripts', 'fundos.mjs'), 'utf8')}\nconst { marca: M, geometria: GEO, pecas: PC } = window.boazMarca;\nwindow.boazFundos = { ...criarFundos({ marca: M, geometria: GEO, pecas: PC, mascotes: window.boazMascotes }), CONCEITOS, FORMATOS, temas: ${arqFundos['plataformas/web/fundos-temas.json'].trim()} };\nwindow.dispatchEvent(new Event('boaz-fundos'));\n</script>\n`;
-const htmlNovo = html.slice(0, i) + novoBloco + blocoMascotes + blocoMarca + blocoFundos + html.slice(f);
+const blocoStatus = `<script type="module" id="design-status">\n${readFileSync(join(RAIZ, 'scripts', 'status.mjs'), 'utf8')}\nwindow.boazStatus = { ...criarStatus({ mascotes: window.boazMascotes }), ESTADOS, FORMATOS, temas: ${JSON.stringify(coresDoStatus(cores))} };\nwindow.dispatchEvent(new Event('boaz-status'));\n</script>\n`;
+const blocoSplash = `<script type="module" id="design-splash">\n${readFileSync(join(RAIZ, 'scripts', 'splash.mjs'), 'utf8')}\nwindow.boazSplash = { ...criarSplash({ marca: window.boazMarca.marca, fundos: window.boazFundos, mascotes: window.boazMascotes }), FRENTES, MOMENTOS, FORMATOS };\nwindow.dispatchEvent(new Event('boaz-splash'));\n</script>\n`;
+const htmlNovo = html.slice(0, i) + novoBloco + blocoMascotes + blocoMarca + blocoFundos + blocoStatus + blocoSplash + html.slice(f);
 
 // ── 7. quadro visual tema.svg (versão e data vêm do catálogo) ──────────────
 const meta = (n) => (html.match(new RegExp(`<meta name="design:${n}" content="([^"]*)"`)) || [])[1];
@@ -537,6 +544,8 @@ const saidas = {
   ...arquivosMascotes(cores, marca),
   ...arqMarca,
   ...arqFundos,
+  ...arquivosStatus(cores),
+  ...arquivosSplash(cores, marca),
   ...arquivosApi(cores, arqMarca, arqFundos),
 };
 Object.assign(saidas, copiasSincronizadas(RAIZ, saidas));

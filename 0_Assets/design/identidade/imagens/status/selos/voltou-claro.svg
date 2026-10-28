@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Status: Voltou!"><circle cx="128" cy="128" r="128" fill="#F5F5F5"/><circle cx="128" cy="128" r="117.76" fill="none" stroke-width="20.48" stroke="#C6C6C6"/><circle cx="128" cy="128" r="117.76" fill="none" stroke-width="20.48" stroke="#006D43" stroke-linecap="round" stroke-dasharray="739.91 739.91" transform="rotate(-90 128 128)"></circle><svg x="33.92" y="38.22" width="188.16" height="188.16" viewBox="16.2 17.2 223.6 223.6"><defs>
+<radialGradient id="status-m271-g-corpo" gradientUnits="userSpaceOnUse" cx="94.4" cy="76.72" r="184.8">
+<stop offset="0" stop-color="#B7E581"/><stop offset="0.45" stop-color="#8BD534"/><stop offset="1" stop-color="#6CA629"/></radialGradient>
+
+<radialGradient id="status-m271-g-olho" cx="0.4" cy="0.35" r="0.75"><stop offset="0.55" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D9DEE6"/></radialGradient>
+<radialGradient id="status-m271-g-iris" cx="0.45" cy="0.6" r="0.6"><stop offset="0" stop-color="#A8E067"/><stop offset="0.7" stop-color="#68A027"/><stop offset="1" stop-color="#3F6017"/></radialGradient>
+<linearGradient id="status-m271-g-lingua" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8FAB"/><stop offset="1" stop-color="#E5547A"/></linearGradient>
+<linearGradient id="status-m271-g-gota" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F7FF"/><stop offset="1" stop-color="#7CC8F2"/></linearGradient>
+<linearGradient id="status-m271-g-estrela" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF176"/><stop offset="1" stop-color="#FFB300"/></linearGradient>
+<radialGradient id="status-m271-g-esfera" cx="0.36" cy="0.3" r="0.78"><stop offset="0.5" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.38"/></radialGradient>
+<filter id="status-m271-f-adesivo" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="3.5" result="d"/><feFlood flood-color="#FFFFFF" flood-opacity="0.92"/><feComposite in2="d" operator="in" result="borda"/><feMerge><feMergeNode in="borda"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="status-m271-f-suave" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="status-m271-f-sombra" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
+</defs>
+<g filter="url(#status-m271-f-adesivo)"><g>
+<path d="M70 74 Q92 66 112 70" fill="none" stroke="#3A2A22" stroke-width="9" stroke-linecap="round"/><path d="M144 70 Q164 66 186 74" fill="none" stroke="#3A2A22" stroke-width="9" stroke-linecap="round"/>
+<path d="M70 108 Q92 124 114 108" fill="none" stroke="#3A2A22" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M142 108 Q164 124 186 108" fill="none" stroke="#3A2A22" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="62" cy="150" rx="18" ry="11" fill="#FF5C8A" opacity="0.35" filter="url(#status-m271-f-sombra)"/><ellipse cx="194" cy="150" rx="18" ry="11" fill="#FF5C8A" opacity="0.35" filter="url(#status-m271-f-sombra)"/>
+<g transform="translate(128 174) scale(0.7 0.6) translate(-128 -174)"><ellipse cx="128" cy="174" rx="12" ry="10" fill="#4A1616" stroke="#5A8A22" stroke-width="3"/></g></g><g transform="translate(150 172) scale(0.5 0.5) translate(-150 -172)" opacity="0"><path d="M150 172 q10 -12 22 -4 q10 -14 24 -2 q14 4 6 16 q-8 10 -22 4 q-10 10 -22 0 q-14 2 -8 -14 Z" fill="#FFFFFF" opacity="0.85" stroke="#C7CED6" stroke-width="2"/></g></g>
+</svg></svg>

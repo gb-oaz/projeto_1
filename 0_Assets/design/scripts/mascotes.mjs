@@ -534,8 +534,26 @@ function letraZ(x, y, s) {
   return traco(d, 9 * s, TINTA) + traco(d, 4 * s, '#FFFFFF');
 }
 
+/** Capacete de obra no alto da cabeça (aba em y ≈ 50). */
+function capacete() {
+  const casco = 'M70 50 C70 14 98 2 128 2 C158 2 186 14 186 50 Z';
+  return `<path d="${casco}" fill="#000000" opacity="0.14" filter="url(#f-suave)" transform="translate(0 5)"/>
+<path d="${casco}" fill="#FFC51A" stroke="#9A5B00" stroke-width="3.5" stroke-linejoin="round"/>
+<path d="M114 6 C116 22 116 38 114 50 H142 C140 38 140 22 142 6 C134 4 122 4 114 6 Z" fill="#FFD54A" stroke="#9A5B00" stroke-width="3" stroke-linejoin="round"/>
+<ellipse cx="96" cy="22" rx="12" ry="6" fill="#FFFFFF" opacity="0.55" transform="rotate(-28 96 22)"/>
+<rect x="52" y="44" width="152" height="14" rx="7" fill="#F2A900" stroke="#9A5B00" stroke-width="3.5"/>`;
+}
+/** Chave inglesa em pé, com a boca aberta para cima; (x, y) é o centro da cabeça. */
+function chaveInglesa(x, y) {
+  const mask = uid('mask-chave-');
+  return `<mask id="${mask}" maskUnits="userSpaceOnUse" x="${x - 30}" y="${y - 30}" width="60" height="100"><rect x="${x - 30}" y="${y - 30}" width="60" height="100" fill="#FFFFFF"/><rect x="${x - 7}" y="${y - 32}" width="14" height="26" rx="3" fill="#000000"/></mask>
+<g mask="url(#${mask})" stroke="${TINTA}" stroke-width="3.5" stroke-linejoin="round"><circle cx="${x}" cy="${y}" r="20" fill="#C7CED6"/><rect x="${x - 8}" y="${y + 12}" width="16" height="46" rx="8" fill="#AEB7C1"/></g>
+<circle cx="${x}" cy="${y + 48}" r="3.5" fill="${TINTA}"/><path d="M${x - 12} ${y - 4} A13 13 0 0 1 ${x - 6} ${y - 14}" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.8"/>`;
+}
+
 // ── expressões ───────────────────────────────────────────────────────────────
-// cada uma: nome, quando usar, cor, duração do laço, quadro da pose estática e desenho(c)
+// cada uma: nome, quando usar, cor, duração do laço, quadro da pose estática, desenho(c) e, se os enfeites
+// passarem da caixa do rosto, `alem` ([x0, y0, x1, y1]) para o enquadramento de "só o rosto"
 const centro = [128, 236]; // pivô da cabeça (base)
 
 export const EXPRESSOES = {
@@ -832,6 +850,19 @@ ${traco('M104 180 Q120 172 136 178', 7)}
 <g transform="rotate(-28 140 176)"><rect x="132" y="170" width="74" height="13" rx="6.5" fill="#FFFFFF" stroke="${TINTA}" stroke-width="3"/><rect x="138" y="174" width="44" height="5" rx="2.5" fill="#E5484D"/><circle cx="136" cy="176.5" r="8" fill="#E5484D" stroke="${TINTA}" stroke-width="3"/></g>`, (t) => ({ r: 3 * onda(t), ty: 2 * Math.abs(onda(t)) }), centro)
       + P(gota(56, 64, 0.8), (t) => ({ ty: 20 * rampa(t, 0.2, 0.9), o: 1 - rampa(t, 0.8, 1) }), [56, 64]),
   },
+  consertando: {
+    nome: 'Consertando', uso: 'manutenção, reparo em andamento, “já volta”', cor: 'laranja', dur: 1.6, alem: [40, 0, 252, 256],
+    desenho: (c) => rosto(c, `
+${capacete()}
+${sobrancelha('M70 74 Q92 70 112 76', 9)}${sobrancelha('M144 76 Q164 70 186 74', 9)}
+${olho(c, { cx: 92, cy: 112, palpebra: 0.3, olhar: (t) => ({ tx: 8 + 2 * onda(t, 2), ty: 6 }), piscada: (t) => piscar(t, 0.86, 0.06) })}
+${olho(c, { cx: 164, cy: 112, palpebra: 0.3, olhar: (t) => ({ tx: 8 + 2 * onda(t, 2), ty: 6 }), piscada: (t) => piscar(t, 0.86, 0.06) })}
+${traco('M100 170 Q124 182 150 168', 7)}
+${P(`<path d="M138 175 Q140 192 150 190 Q158 188 154 172 Z" fill="url(#g-lingua)" stroke="${LINGUA[1]}" stroke-width="2.5" stroke-linejoin="round"/>`, (t) => ({ tx: 2 * onda(t, 2) }), [146, 174])}`, (t) => ({ r: 3 * onda(t, 2), ty: 2 * Math.abs(onda(t, 2)) }), centro)
+      + P(gota(54, 70, 0.75), (t) => ({ ty: 18 * rampa(t, 0.1, 0.8), o: 1 - rampa(t, 0.7, 1) }), [54, 70])
+      + P(chaveInglesa(212, 196), (t) => ({ r: 22 * onda(t, 2) }), [212, 222])
+      + [[236, 150, 0], [244, 172, 0.5]].map(([x, y, fase]) => P(brilhinho(x, y, 8), (t) => ({ o: pulso((t * 2 + fase) % 1, 0.1, 0.45), sx: 0.4 + 0.8 * pulso((t * 2 + fase) % 1, 0.1, 0.45), sy: 0.4 + 0.8 * pulso((t * 2 + fase) % 1, 0.1, 0.45) }), [x, y])).join(''),
+  },
 };
 
 // ── movimentos do corpo (valem para qualquer expressão e forma) ─────────────
@@ -922,6 +953,8 @@ function svg(id, e, { modo, t = 0, cor, forma: idForma = 'bolha', proporcao = 'n
     const { x, y, w, h } = F.caixa;
     const justo = F.tipo === 'nenhuma';
     let x0 = justo ? x : Math.min(x, 4), y0 = justo ? y : Math.min(y, 4), x1 = justo ? x + w : Math.max(x + w, 252), y1 = justo ? y + h : Math.max(y + h, 252);
+    // enfeites que passam da caixa do rosto (capacete, ferramenta) entram no enquadramento justo
+    if (justo && e.alem) { x0 = Math.min(x0, e.alem[0]); y0 = Math.min(y0, e.alem[1]); x1 = Math.max(x1, e.alem[2]); y1 = Math.max(y1, e.alem[3]); }
     if (S) {
       // percorre o trajeto e junta por onde a forma passa
       // contorno real da forma + a área dos enfeites (brilhos, lágrima, "?")

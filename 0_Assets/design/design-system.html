@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v31</title>
+<title>Design system · boaz · v33</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v31">
-<meta name="design:data" content="2026-10-24 21:25">
+<meta name="design:versao" content="v33">
+<meta name="design:data" content="2026-10-27 23:16">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -21397,8 +21397,26 @@ function letraZ(x, y, s) {
   return traco(d, 9 * s, TINTA) + traco(d, 4 * s, '#FFFFFF');
 }
 
+/** Capacete de obra no alto da cabeça (aba em y ≈ 50). */
+function capacete() {
+  const casco = 'M70 50 C70 14 98 2 128 2 C158 2 186 14 186 50 Z';
+  return `<path d="${casco}" fill="#000000" opacity="0.14" filter="url(#f-suave)" transform="translate(0 5)"/>
+<path d="${casco}" fill="#FFC51A" stroke="#9A5B00" stroke-width="3.5" stroke-linejoin="round"/>
+<path d="M114 6 C116 22 116 38 114 50 H142 C140 38 140 22 142 6 C134 4 122 4 114 6 Z" fill="#FFD54A" stroke="#9A5B00" stroke-width="3" stroke-linejoin="round"/>
+<ellipse cx="96" cy="22" rx="12" ry="6" fill="#FFFFFF" opacity="0.55" transform="rotate(-28 96 22)"/>
+<rect x="52" y="44" width="152" height="14" rx="7" fill="#F2A900" stroke="#9A5B00" stroke-width="3.5"/>`;
+}
+/** Chave inglesa em pé, com a boca aberta para cima; (x, y) é o centro da cabeça. */
+function chaveInglesa(x, y) {
+  const mask = uid('mask-chave-');
+  return `<mask id="${mask}" maskUnits="userSpaceOnUse" x="${x - 30}" y="${y - 30}" width="60" height="100"><rect x="${x - 30}" y="${y - 30}" width="60" height="100" fill="#FFFFFF"/><rect x="${x - 7}" y="${y - 32}" width="14" height="26" rx="3" fill="#000000"/></mask>
+<g mask="url(#${mask})" stroke="${TINTA}" stroke-width="3.5" stroke-linejoin="round"><circle cx="${x}" cy="${y}" r="20" fill="#C7CED6"/><rect x="${x - 8}" y="${y + 12}" width="16" height="46" rx="8" fill="#AEB7C1"/></g>
+<circle cx="${x}" cy="${y + 48}" r="3.5" fill="${TINTA}"/><path d="M${x - 12} ${y - 4} A13 13 0 0 1 ${x - 6} ${y - 14}" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.8"/>`;
+}
+
 // ── expressões ───────────────────────────────────────────────────────────────
-// cada uma: nome, quando usar, cor, duração do laço, quadro da pose estática e desenho(c)
+// cada uma: nome, quando usar, cor, duração do laço, quadro da pose estática, desenho(c) e, se os enfeites
+// passarem da caixa do rosto, `alem` ([x0, y0, x1, y1]) para o enquadramento de "só o rosto"
 const centro = [128, 236]; // pivô da cabeça (base)
 
 export const EXPRESSOES = {
@@ -21695,6 +21713,19 @@ ${traco('M104 180 Q120 172 136 178', 7)}
 <g transform="rotate(-28 140 176)"><rect x="132" y="170" width="74" height="13" rx="6.5" fill="#FFFFFF" stroke="${TINTA}" stroke-width="3"/><rect x="138" y="174" width="44" height="5" rx="2.5" fill="#E5484D"/><circle cx="136" cy="176.5" r="8" fill="#E5484D" stroke="${TINTA}" stroke-width="3"/></g>`, (t) => ({ r: 3 * onda(t), ty: 2 * Math.abs(onda(t)) }), centro)
       + P(gota(56, 64, 0.8), (t) => ({ ty: 20 * rampa(t, 0.2, 0.9), o: 1 - rampa(t, 0.8, 1) }), [56, 64]),
   },
+  consertando: {
+    nome: 'Consertando', uso: 'manutenção, reparo em andamento, “já volta”', cor: 'laranja', dur: 1.6, alem: [40, 0, 252, 256],
+    desenho: (c) => rosto(c, `
+${capacete()}
+${sobrancelha('M70 74 Q92 70 112 76', 9)}${sobrancelha('M144 76 Q164 70 186 74', 9)}
+${olho(c, { cx: 92, cy: 112, palpebra: 0.3, olhar: (t) => ({ tx: 8 + 2 * onda(t, 2), ty: 6 }), piscada: (t) => piscar(t, 0.86, 0.06) })}
+${olho(c, { cx: 164, cy: 112, palpebra: 0.3, olhar: (t) => ({ tx: 8 + 2 * onda(t, 2), ty: 6 }), piscada: (t) => piscar(t, 0.86, 0.06) })}
+${traco('M100 170 Q124 182 150 168', 7)}
+${P(`<path d="M138 175 Q140 192 150 190 Q158 188 154 172 Z" fill="url(#g-lingua)" stroke="${LINGUA[1]}" stroke-width="2.5" stroke-linejoin="round"/>`, (t) => ({ tx: 2 * onda(t, 2) }), [146, 174])}`, (t) => ({ r: 3 * onda(t, 2), ty: 2 * Math.abs(onda(t, 2)) }), centro)
+      + P(gota(54, 70, 0.75), (t) => ({ ty: 18 * rampa(t, 0.1, 0.8), o: 1 - rampa(t, 0.7, 1) }), [54, 70])
+      + P(chaveInglesa(212, 196), (t) => ({ r: 22 * onda(t, 2) }), [212, 222])
+      + [[236, 150, 0], [244, 172, 0.5]].map(([x, y, fase]) => P(brilhinho(x, y, 8), (t) => ({ o: pulso((t * 2 + fase) % 1, 0.1, 0.45), sx: 0.4 + 0.8 * pulso((t * 2 + fase) % 1, 0.1, 0.45), sy: 0.4 + 0.8 * pulso((t * 2 + fase) % 1, 0.1, 0.45) }), [x, y])).join(''),
+  },
 };
 
 // ── movimentos do corpo (valem para qualquer expressão e forma) ─────────────
@@ -21785,6 +21816,8 @@ function svg(id, e, { modo, t = 0, cor, forma: idForma = 'bolha', proporcao = 'n
     const { x, y, w, h } = F.caixa;
     const justo = F.tipo === 'nenhuma';
     let x0 = justo ? x : Math.min(x, 4), y0 = justo ? y : Math.min(y, 4), x1 = justo ? x + w : Math.max(x + w, 252), y1 = justo ? y + h : Math.max(y + h, 252);
+    // enfeites que passam da caixa do rosto (capacete, ferramenta) entram no enquadramento justo
+    if (justo && e.alem) { x0 = Math.min(x0, e.alem[0]); y0 = Math.min(y0, e.alem[1]); x1 = Math.max(x1, e.alem[2]); y1 = Math.max(y1, e.alem[3]); }
     if (S) {
       // percorre o trajeto e junta por onde a forma passa
       // contorno real da forma + a área dos enfeites (brilhos, lágrima, "?")
@@ -24173,6 +24206,328 @@ window.boazFundos = { ...criarFundos({ marca: M, geometria: GEO, pecas: PC, masc
 } };
 window.dispatchEvent(new Event('boaz-fundos'));
 </script>
+<script type="module" id="design-status">
+// =============================================================================
+// boaz · status do servidor: ilustrações da saúde do sistema, para páginas de
+// status, avisos de instabilidade e telas de manutenção ou reparo
+//
+// O mascote é o servidor (cubo = aplicação, cilindro = banco, esfera = rede) e o
+// rosto diz como ele está. Em volta, peças da marca contam o resto:
+//   medidor   o anel do símbolo vira um medidor de saúde (0 a 100%, tracejado = programado)
+//   pulso     uma linha de batimento atravessa a tela por trás do anel
+//   sinal     quatro antenas do símbolo como barras de sinal (0 a 4 acesas)
+//   ondas     linhas concêntricas do vão e um brilho na cor do estado
+//
+//   operacional  feliz, tudo verde        lento        esperando, medidor pela metade
+//   instavel     um servidor tonto        fora         doente, pulso reto
+//   manutencao   sonolento, tracejado     reparo       consertando, medidor carregando
+//   voltou       aliviado comemorando
+//
+// A cor de cada estado é um papel do tema (sucesso, aviso, error, tertiary), então
+// as imagens seguem o tema e o modo; o mascote mantém a cor do estado em qualquer tema.
+// A imagem não tem texto: o título e a mensagem (ESTADOS[*].titulo / .mensagem)
+// vêm escritos ao lado, num painel de superfície.
+//
+// Este módulo não usa nada do Node nem importa nada: recebe o núcleo dos mascotes
+// em criarStatus. O gerador (scripts/status-arquivos.mjs) grava as imagens
+// oficiais em identidade/imagens/status/.
+//
+//   const st = criarStatus({ mascotes });
+//   st.desenhar('reparo', { largura: 1600, altura: 900, cores, movimentoReduzido });
+//   st.selo('reparo', { tamanho: 96, cores });           // selo pequeno: medidor + rosto
+// Regras de uso: catálogo design-system.html#status.
+// =============================================================================
+
+/** Os estados, do melhor ao pior e depois manutenção, reparo e volta. */
+export const ESTADOS = {
+  operacional: {
+    nome: 'Operacional', uso: 'tudo funcionando: página de status, rodapé de saúde', papel: 'sucesso',
+    medidor: 1, sinal: 4, pulso: 'normal', mascote: { expressao: 'feliz', forma: 'cubo', cor: 'verde', movimento: 'flutuar' },
+    titulo: 'Tudo de boa por aqui', mensagem: 'Todos os serviços estão funcionando normalmente.',
+  },
+  lento: {
+    nome: 'Lento', uso: 'tempo de resposta alto, fila cheia', papel: 'aviso',
+    medidor: 0.6, sinal: 2, pulso: 'fraco', mascote: { expressao: 'esperando', forma: 'cubo', cor: 'amarelo' },
+    titulo: 'Um pouco mais devagar', mensagem: 'O servidor está lento agora. Funciona, mas pode demorar um pouquinho.',
+  },
+  instavel: {
+    nome: 'Instabilidade parcial', uso: 'um serviço falhando, o resto de pé', papel: 'aviso',
+    medidor: 0.4, sinal: 2, pulso: 'irregular',
+    rack: [{ expressao: 'feliz', forma: 'cubo', cor: 'verde' }, { expressao: 'tonto', forma: 'cilindro', cor: 'laranja', movimento: 'tremer' }, { expressao: 'feliz', forma: 'esfera', cor: 'verde' }],
+    mascote: { expressao: 'tonto', forma: 'cilindro', cor: 'laranja' },
+    titulo: 'Parte do sistema instável', mensagem: 'Alguns recursos podem falhar. Já estamos olhando.',
+  },
+  fora: {
+    nome: 'Fora do ar', uso: 'servidor sem resposta (tom acolhedor, nunca alarmista)', papel: 'error',
+    medidor: 0.06, sinal: 0, pulso: 'reto', mascote: { expressao: 'doente', forma: 'cilindro', cor: 'azul' },
+    titulo: 'Fora do ar', mensagem: 'O servidor não está respondendo. A equipe já foi avisada e está cuidando disso.',
+  },
+  manutencao: {
+    nome: 'Manutenção programada', uso: 'pausa planejada, com hora para voltar', papel: 'tertiary',
+    medidor: 1, tracejado: true, sinal: 1, pulso: 'calmo', mascote: { expressao: 'sonolento', forma: 'cubo', cor: 'roxo' },
+    titulo: 'Pausa para manutenção', mensagem: 'Estamos cuidando do sistema. Voltamos às {hora}.',
+  },
+  reparo: {
+    nome: 'Reparo em andamento', uso: 'conserto acontecendo agora, tela de “já volta”', papel: 'aviso',
+    medidor: 'carregando', sinal: 'carregando', pulso: 'intermitente', mascote: { expressao: 'consertando', forma: 'cubo', cor: 'azul' },
+    titulo: 'Consertando…', mensagem: 'Encontramos um problema e já estamos arrumando. Volta já, de boa.',
+  },
+  voltou: {
+    nome: 'Voltou!', uso: 'serviço restabelecido, primeira abertura depois do reparo', papel: 'sucesso',
+    medidor: 1, sinal: 4, pulso: 'forte', brilhos: true, mascote: { expressao: 'aliviado', forma: 'cubo', cor: 'verde', movimento: 'comemorar' },
+    titulo: 'Voltamos!', mensagem: 'Tudo funcionando de novo. Obrigado pela paciência.',
+  },
+};
+/** Formatos de referência (a imagem serve em qualquer proporção) e o do selo. */
+export const FORMATOS = { horizontal: [1600, 900], vertical: [900, 1600], quadrado: [1000, 1000] };
+/** Papéis de cor que os status usam (de tokens/cores.json). */
+export const PAPEIS = ['surface', 'surface-container', 'surface-container-high', 'on-surface', 'outline-variant', 'sucesso', 'aviso', 'error', 'tertiary'];
+
+const n = (v) => Math.round(v * 100) / 100;
+const FZ = 'fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.3 0 0.2 1"';
+
+// batimento: pontos [u, v] de um período (u de 0 a 1; v negativo sobe)
+const BATIDA = [[0, 0], [0.3, 0], [0.35, -0.12], [0.41, 0], [0.47, 0], [0.5, 0.16], [0.54, -1], [0.59, 0.4], [0.63, 0], [0.72, 0], [0.79, -0.22], [0.87, 0], [1, 0]];
+/** Cada pulso: lista de batidas [largura relativa, amplitude] que se repete, segundos por período e traço. */
+const PULSOS = {
+  normal: { batidas: [[1, 1]], dur: 1.2 },
+  fraco: { batidas: [[1.6, 0.4]], dur: 2.4 },
+  irregular: { batidas: [[1, 1], [0.7, 0.35], [1.3, 0.8], [0.8, 0.15]], dur: 1.1 },
+  reto: { batidas: [[1, 0]], dur: 0 },
+  calmo: { batidas: [[1.4, 'onda']], dur: 3.2 },
+  intermitente: { batidas: [[1, 0.7], [1, 0.7]], dur: 1.4, tracejado: true },
+  forte: { batidas: [[1, 1.25]], dur: 0.9 },
+};
+
+export function criarStatus({ mascotes }) {
+  const { estatico, animado, embutir } = mascotes;
+  let seq = 0;
+
+  const masc = (m, cx, cy, t, parado, forma = m.forma) => {
+    const o = { forma, cor: m.cor };
+    const svg = parado ? estatico(m.expressao, o) : animado(m.expressao, { ...o, movimento: m.movimento || undefined });
+    return embutir(svg, `status-m${++seq}-`, cx - t / 2, cy - t / 2, t, t);
+  };
+
+  // anel do símbolo como medidor: trilho em outline-variant e o arco na cor do estado, a partir do topo
+  const medidor = (cx, cy, R, esp, cor, trilho, valor, tracejado, parado, encher) => {
+    const rm = R - esp / 2, volta = 2 * Math.PI * rm, gira = `transform="rotate(-90 ${n(cx)} ${n(cy)})"`;
+    const base = `cx="${n(cx)}" cy="${n(cy)}" r="${n(rm)}" fill="none" stroke-width="${n(esp)}"`;
+    let s = `<circle ${base} stroke="${trilho}"/>`;
+    if (valor === 'carregando') {
+      const arco = `<circle ${base} stroke="${cor}" stroke-linecap="round" stroke-dasharray="${n(volta * 0.3)} ${n(volta * 0.7)}" ${gira}`;
+      s += parado ? `${arco}/>` : `${arco}><animateTransform attributeName="transform" type="rotate" from="-90 ${n(cx)} ${n(cy)}" to="270 ${n(cx)} ${n(cy)}" dur="1.6s" repeatCount="indefinite"/></circle>`;
+    } else if (tracejado) {
+      const p = volta / 24;
+      s += `<circle ${base} stroke="${cor}" stroke-dasharray="${n(p * 0.55)} ${n(p * 0.45)}" ${gira}/>`;
+    } else {
+      // voltou: o arco se enche uma vez e fica cheio
+      const cheio = n(volta * valor);
+      s += `<circle ${base} stroke="${cor}" stroke-linecap="round" stroke-dasharray="${encher && !parado ? `0 ${n(volta)}` : `${cheio} ${n(volta)}`}" ${gira}>${encher && !parado ? `<animate attributeName="stroke-dasharray" from="0 ${n(volta)}" to="${cheio} ${n(volta)}" dur="1.2s" ${FZ}/>` : ''}</circle>`;
+    }
+    return s;
+  };
+
+  // linha de batimento de x0 a x1 na altura y; anima correndo para a esquerda, em laço
+  const pulso = (tipo, x0, x1, y, A, P, cor, larg, parado) => {
+    const def = PULSOS[tipo], id = `status-p${++seq}`;
+    const padrao = def.batidas.reduce((s, [k]) => s + k * P, 0);
+    const pts = [];
+    for (let x = x0 - padrao, i = 0; x < x1 + padrao; i++) {
+      const [k, amp] = def.batidas[i % def.batidas.length], L = k * P;
+      if (amp === 'onda') for (let j = 0; j <= 24; j++) pts.push([x + (L * j) / 24, y - A * 0.16 * Math.sin((2 * Math.PI * j) / 24)]);
+      else for (const [u, v] of BATIDA) pts.push([x + u * L, y + v * A * amp]);
+      x += L;
+    }
+    const tr = def.tracejado ? ` stroke-dasharray="${n(larg * 3)} ${n(larg * 2.4)}"` : '';
+    const linha = `<path d="M${pts.map(([a, b]) => `${n(a)} ${n(b)}`).join('L')}" fill="none" stroke="${cor}" stroke-width="${n(larg)}" stroke-linecap="round" stroke-linejoin="round"${tr}/>`;
+    const anda = !parado && def.dur ? `<animateTransform attributeName="transform" type="translate" from="0 0" to="${n(-padrao)} 0" dur="${n(def.dur * padrao / P)}s" repeatCount="indefinite"/>` : '';
+    // as pontas somem nas bordas da imagem
+    return `<defs><linearGradient id="${id}-g" x1="${n(x0)}" x2="${n(x1)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="0.12" stop-color="#FFFFFF"/><stop offset="0.88" stop-color="#FFFFFF"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>`
+      + `<mask id="${id}" maskUnits="userSpaceOnUse" x="${n(x0)}" y="${n(y - A * 2)}" width="${n(x1 - x0)}" height="${n(A * 4)}"><rect x="${n(x0)}" y="${n(y - A * 2)}" width="${n(x1 - x0)}" height="${n(A * 4)}" fill="url(#${id}-g)"/></mask></defs>`
+      + `<g mask="url(#${id})"><g>${anda}${linha}</g></g>`;
+  };
+
+  // antenas do símbolo como barras de sinal; 'carregando' acende uma de cada vez, em laço
+  const sinal = (x, yb, wb, hb, acesas, cor, apagada, parado) => {
+    let s = '';
+    for (let i = 0; i < 4; i++) {
+      const h = hb * (i + 1) / 4, bx = x + i * wb * 1.55, ry = wb / 2;
+      const d = `M${n(bx)} ${n(yb)}V${n(yb - h + ry)}A${n(wb / 2)} ${n(ry)} 0 0 1 ${n(bx + wb)} ${n(yb - h + ry)}V${n(yb)}Z`;
+      if (acesas === 'carregando') {
+        s += `<path d="${d}" fill="${apagada}"/>`;
+        const vals = [0, 1, 2, 3, 4].map((k) => (k > i ? 1 : 0)).join(';');
+        s += parado ? (i < 2 ? `<path d="${d}" fill="${cor}"/>` : '') : `<path d="${d}" fill="${cor}" opacity="0"><animate attributeName="opacity" values="${vals}" keyTimes="0;0.2;0.4;0.6;0.8" calcMode="discrete" dur="2s" repeatCount="indefinite"/></path>`;
+      } else s += `<path d="${d}" fill="${i < acesas ? cor : apagada}"/>`;
+    }
+    return s;
+  };
+
+  // brilhos em volta do anel (voltou)
+  const brilhos = (cx, cy, R, cor, parado) => [0, 1, 2, 3, 4, 5].map((i) => {
+    const a = -Math.PI / 2 + i * Math.PI / 3 - 0.25, x = cx + Math.cos(a) * R * 1.32, y = cy + Math.sin(a) * R * 1.32, u = R * (i % 2 ? 0.07 : 0.1);
+    const d = `M${n(x)} ${n(y - u)}Q${n(x)} ${n(y)} ${n(x + u)} ${n(y)}Q${n(x)} ${n(y)} ${n(x)} ${n(y + u)}Q${n(x)} ${n(y)} ${n(x - u)} ${n(y)}Q${n(x)} ${n(y)} ${n(x)} ${n(y - u)}Z`;
+    const pisca = parado ? '' : `<animate attributeName="opacity" values="0;1;0" dur="1.6s" begin="${n(i * 0.27)}s" repeatCount="indefinite"/>`;
+    return `<path d="${d}" fill="${cor}">${pisca}</path>`;
+  }).join('');
+
+  /**
+   * Desenha um estado e devolve o SVG.
+   * op = { largura, altura, cores (PAPEIS), movimentoReduzido }
+   */
+  function desenhar(estado, op = {}) {
+    const E = ESTADOS[estado];
+    if (!E) throw new Error(`status desconhecido: ${estado}`);
+    const { largura: w = 1600, altura: h = 900, cores: c, movimentoReduzido: parado = false } = op;
+    const b = Math.min(w, h), R = b * 0.28, esp = R * 0.2, cx = w / 2, cy = h / 2, ri = R - esp, cor = c[E.papel], id = `status-${++seq}`;
+    let s = `<defs><radialGradient id="${id}-brilho" cx="${n(cx)}" cy="${n(cy)}" r="${n(R * 2.8)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${cor}" stop-opacity=".24"/><stop offset="1" stop-color="${cor}" stop-opacity="0"/></radialGradient></defs>`;
+    s += `<rect width="${w}" height="${h}" fill="${c.surface}"/><rect width="${w}" height="${h}" fill="url(#${id}-brilho)"/>`;
+    for (let i = 1; i <= 7; i++) s += `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(R + i * b * 0.05)}" fill="none" stroke="${c['outline-variant']}" stroke-width="${n(b * 0.003)}" opacity="${n(0.9 - i * 0.11)}"/>`;
+    s += pulso(E.pulso, 0, w, cy, R * 0.5, b * 0.24, cor, b * 0.008, parado);
+    s += `<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(R)}" fill="${c['surface-container']}"/>`;
+    s += medidor(cx, cy, R, esp, cor, c['outline-variant'], E.medidor, E.tracejado, parado, E.brilhos);
+    if (E.rack) [0, 2, 1].map((i) => [E.rack[i], i]).forEach(([m, i]) => { s += masc(m, cx + (i - 1) * ri * 0.64, cy + ri * (i === 1 ? 0.02 : 0.14), ri * (i === 1 ? 1.12 : 0.74), parado); });
+    else s += masc(E.mascote, cx, cy + ri * 0.04, ri * 1.7, parado);
+    s += sinal(cx + R * 0.8, cy + R * 1.04, R * 0.11, R * 0.44, E.sinal, cor, c['outline-variant'], parado);
+    if (E.brilhos) s += brilhos(cx, cy, R, cor, parado);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="Status: ${E.nome}">${s}</svg>`;
+  }
+
+  /**
+   * Selo: só o medidor com o rosto dentro, para chips, listas de serviços e a barra do topo (mínimo 24dp).
+   * op = { tamanho, cores, movimentoReduzido }
+   */
+  function selo(estado, op = {}) {
+    const E = ESTADOS[estado];
+    if (!E) throw new Error(`status desconhecido: ${estado}`);
+    const { tamanho: t = 256, cores: c, movimentoReduzido: parado = false } = op;
+    const R = t / 2, esp = R * 0.16, ri = R - esp;
+    let s = `<circle cx="${n(R)}" cy="${n(R)}" r="${n(R)}" fill="${c['surface-container']}"/>`;
+    s += medidor(R, R, R, esp, c[E.papel], c['outline-variant'], E.medidor, E.tracejado, parado, false);
+    s += masc({ ...E.mascote, movimento: '' }, R, R + ri * 0.04, ri * 1.75, parado, 'rosto');
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n(t)} ${n(t)}" width="${n(t)}" height="${n(t)}" role="img" aria-label="Status: ${E.nome}">${s}</svg>`;
+  }
+
+  return { desenhar, selo };
+}
+
+/** Cores dos status por tema e modo: os PAPEIS de tokens/cores.json. */
+export function coresDoStatus(cores) {
+  const saida = {};
+  for (const [id, t] of Object.entries(cores.temas)) {
+    const modo = (esq) => Object.fromEntries(PAPEIS.map((p) => [p, esq[p].$value.toUpperCase()]));
+    saida[id] = { claro: modo(t.md.sys.color.light), escuro: modo(t.md.sys.color.dark) };
+  }
+  return saida;
+}
+
+window.boazStatus = { ...criarStatus({ mascotes: window.boazMascotes }), ESTADOS, FORMATOS, temas: {"branco-preto":{"claro":{"surface":"#FFFFFF","surface-container":"#F5F5F5","surface-container-high":"#EFEFEF","on-surface":"#1B1B1B","outline-variant":"#C6C6C6","sucesso":"#006D43","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#3B3B3B"},"escuro":{"surface":"#000000","surface-container":"#141414","surface-container-high":"#1C1C1C","on-surface":"#E2E2E2","outline-variant":"#474747","sucesso":"#76DAA1","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#E2E2E2"}},"roxo":{"claro":{"surface":"#FDF7FF","surface-container":"#F2ECF4","surface-container-high":"#ECE6EE","on-surface":"#1D1B20","outline-variant":"#CAC4CF","sucesso":"#006D43","aviso":"#AD3212","error":"#BA1A1A","tertiary":"#7E5260"},"escuro":{"surface":"#141218","surface-container":"#211F24","surface-container-high":"#2B292F","on-surface":"#E6E0E9","outline-variant":"#49454E","sucesso":"#76DAA1","aviso":"#FFB4A2","error":"#FFB4AB","tertiary":"#EFB8C8"}},"oceano":{"claro":{"surface":"#F8F9FF","surface-container":"#ECEDF4","surface-container-high":"#E7E8EE","on-surface":"#191C20","outline-variant":"#C1C7D2","sucesso":"#006D43","aviso":"#AD3212","error":"#BA1A1A","tertiary":"#004F46"},"escuro":{"surface":"#111418","surface-container":"#1D2024","surface-container-high":"#272A2F","on-surface":"#E1E2E9","outline-variant":"#414751","sucesso":"#76DAA1","aviso":"#FFB4A2","error":"#FFB4AB","tertiary":"#70D8C8"}},"floresta":{"claro":{"surface":"#F7FBF0","surface-container":"#EBEFE5","surface-container-high":"#E5EADF","on-surface":"#181D17","outline-variant":"#BFCABA","sucesso":"#1B6D24","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#7D4900"},"escuro":{"surface":"#10150F","surface-container":"#1C211B","surface-container-high":"#262B25","on-surface":"#E0E4DA","outline-variant":"#40493D","sucesso":"#88D982","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#FFB86E"}},"aurora":{"claro":{"surface":"#FFF8F6","surface-container":"#FFE9E3","surface-container-high":"#FEE2DA","on-surface":"#261814","outline-variant":"#E3BFB4","sucesso":"#426900","aviso":"#A33E00","error":"#BA1A1A","tertiary":"#4153B7"},"escuro":{"surface":"#1D100C","surface-container":"#2B1C17","surface-container-high":"#362621","on-surface":"#F8DDD5","outline-variant":"#5A4139","sucesso":"#A7D567","aviso":"#FFB596","error":"#FFB4AB","tertiary":"#BAC3FF"}},"grafite":{"claro":{"surface":"#FBF9F9","surface-container":"#EFEDEE","surface-container-high":"#E9E8E8","on-surface":"#1B1C1C","outline-variant":"#C7C6C7","sucesso":"#006D43","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#006874"},"escuro":{"surface":"#121314","surface-container":"#1F2020","surface-container-high":"#292A2B","on-surface":"#E3E2E2","outline-variant":"#464747","sucesso":"#76DAA1","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#66D6E7"}},"magenta":{"claro":{"surface":"#FFF8F8","surface-container":"#FFE8F0","surface-container-high":"#F9E2EB","on-surface":"#24181E","outline-variant":"#DCBFCB","sucesso":"#426900","aviso":"#AD3212","error":"#BA1A1A","tertiary":"#005147"},"escuro":{"surface":"#1B1016","surface-container":"#281C22","surface-container-high":"#33262C","on-surface":"#F3DDE5","outline-variant":"#56414B","sucesso":"#A7D567","aviso":"#FFB4A2","error":"#FFB4AB","tertiary":"#7AD7C6"}},"sol":{"claro":{"surface":"#FFF8F2","surface-container":"#F8ECDC","surface-container-high":"#F2E7D6","on-surface":"#201B11","outline-variant":"#D3C5AC","sucesso":"#426900","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#4059AA"},"escuro":{"surface":"#171309","surface-container":"#241F15","surface-container-high":"#2F291F","on-surface":"#ECE1D1","outline-variant":"#4F4633","sucesso":"#A7D567","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#D4DBFF"}},"girassol":{"claro":{"surface":"#FFF8F2","surface-container":"#F8ECDB","surface-container-high":"#F2E7D5","on-surface":"#201B10","outline-variant":"#D3C5AB","sucesso":"#426900","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#AC3400"},"escuro":{"surface":"#171309","surface-container":"#241F14","surface-container-high":"#2F291E","on-surface":"#ECE1D0","outline-variant":"#4F4632","sucesso":"#A7D567","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#FFE2DA"}},"rubi":{"claro":{"surface":"#FFF8F7","surface-container":"#FFE9E6","surface-container-high":"#FFE2DE","on-surface":"#271816","outline-variant":"#E4BEB9","sucesso":"#426900","aviso":"#AC3401","error":"#AD256A","tertiary":"#5C4100"},"escuro":{"surface":"#1E100E","surface-container":"#2B1C1A","surface-container-high":"#372624","on-surface":"#F9DCD8","outline-variant":"#5B403D","sucesso":"#A7D567","aviso":"#FFB59D","error":"#FFB0CC","tertiary":"#F7BD48"}},"cereja":{"claro":{"surface":"#FFF8F7","surface-container":"#FFE9E6","surface-container-high":"#FFE2DE","on-surface":"#271716","outline-variant":"#E4BEB9","sucesso":"#426900","aviso":"#AC3402","error":"#AD256A","tertiary":"#00685C"},"escuro":{"surface":"#1E0F0E","surface-container":"#2C1B1A","surface-container-high":"#372624","on-surface":"#FADCD8","outline-variant":"#5B403D","sucesso":"#A7D567","aviso":"#FFB59E","error":"#FFB0CC","tertiary":"#7AD7C6"}},"neon":{"claro":{"surface":"#FEF7FF","surface-container":"#F4EAFF","surface-container-high":"#F0E3FF","on-surface":"#240C4A","outline-variant":"#BFCAB7","sucesso":"#226C1F","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#AD009B"},"escuro":{"surface":"#1B0241","surface-container":"#28114E","surface-container-high":"#331D59","on-surface":"#EBDCFF","outline-variant":"#404A3B","sucesso":"#8CD97E","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#FFACE8"}},"vaporwave":{"claro":{"surface":"#FEF7FF","surface-container":"#F4EAFF","surface-container-high":"#EFE3FF","on-surface":"#221042","outline-variant":"#DABFCC","sucesso":"#426900","aviso":"#AD3212","error":"#BA1A1A","tertiary":"#006781"},"escuro":{"surface":"#1A073A","surface-container":"#261547","surface-container-high":"#312052","on-surface":"#EBDDFF","outline-variant":"#54414B","sucesso":"#A7D567","aviso":"#FFB4A2","error":"#FFB4AB","tertiary":"#58D5FF"}},"algodao-doce":{"claro":{"surface":"#FFF8F2","surface-container":"#F9ECDB","surface-container-high":"#F3E6D5","on-surface":"#201B10","outline-variant":"#D5C2C7","sucesso":"#426900","aviso":"#AD3212","error":"#BA1A1A","tertiary":"#1A6A59"},"escuro":{"surface":"#181309","surface-container":"#251F14","surface-container-high":"#2F291E","on-surface":"#EDE1D0","outline-variant":"#514348","sucesso":"#A7D567","aviso":"#FFB4A2","error":"#FFB4AB","tertiary":"#9DE7D2"}},"terra":{"claro":{"surface":"#FFF8F4","surface-container":"#FFEBD3","surface-container-high":"#FFE4C3","on-surface":"#291800","outline-variant":"#DCC1B7","sucesso":"#426900","aviso":"#A14000","error":"#BA1A1A","tertiary":"#735400"},"escuro":{"surface":"#1E1100","surface-container":"#2D1C02","surface-container-high":"#392609","on-surface":"#FFDDB2","outline-variant":"#56423C","sucesso":"#A7D567","aviso":"#FFB694","error":"#FFB4AB","tertiary":"#F2BF50"}},"retro":{"claro":{"surface":"#FFF8F2","surface-container":"#FFECC8","surface-container-high":"#FDE6B8","on-surface":"#251A01","outline-variant":"#D3C5AE","sucesso":"#426900","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#066A61"},"escuro":{"surface":"#1B1200","surface-container":"#291E02","surface-container-high":"#35280A","on-surface":"#F7E0B3","outline-variant":"#4F4634","sucesso":"#A7D567","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#85D5C9"}},"meia-noite":{"claro":{"surface":"#FAF8FF","surface-container":"#EBEDFF","surface-container-high":"#E3E7FF","on-surface":"#111A37","outline-variant":"#C6C5D4","sucesso":"#006D43","aviso":"#AD3212","error":"#BA1A1A","tertiary":"#3B2600"},"escuro":{"surface":"#08122E","surface-container":"#151E3B","surface-container-high":"#202946","on-surface":"#DBE1FF","outline-variant":"#454652","sucesso":"#76DAA1","aviso":"#FFB4A2","error":"#FFB4AB","tertiary":"#FFBA38"}},"arco-iris":{"claro":{"surface":"#FFF8F7","surface-container":"#FFE9EA","surface-container-high":"#FDE2E4","on-surface":"#26181A","outline-variant":"#DEBFC2","sucesso":"#426900","aviso":"#AD3212","error":"#BA1A1A","tertiary":"#0060A8"},"escuro":{"surface":"#1D1012","surface-container":"#2A1C1E","surface-container-high":"#362628","on-surface":"#F7DCDF","outline-variant":"#574144","sucesso":"#A7D567","aviso":"#FFB4A2","error":"#FFB4AB","tertiary":"#A2C9FF"}},"salada-de-frutas":{"claro":{"surface":"#F3FCEC","surface-container":"#E7F1E1","surface-container-high":"#E2EBDB","on-surface":"#161E14","outline-variant":"#BACCB3","sucesso":"#1B6D24","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#3B6939"},"escuro":{"surface":"#0E150C","surface-container":"#1A2218","surface-container-high":"#242C22","on-surface":"#DCE5D6","outline-variant":"#3B4B38","sucesso":"#88D982","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#A1D39A"}},"naruto":{"claro":{"surface":"#FFF8F5","surface-container":"#FFEADF","surface-container-high":"#FBE4D7","on-surface":"#251912","outline-variant":"#DFC0AF","sucesso":"#426900","aviso":"#994700","error":"#BA1A1A","tertiary":"#715D00"},"escuro":{"surface":"#1C110A","surface-container":"#291D16","surface-container-high":"#34271F","on-surface":"#F5DED2","outline-variant":"#584235","sucesso":"#A7D567","aviso":"#FFB68B","error":"#FFB4AB","tertiary":"#EBC300"}},"sasuke":{"claro":{"surface":"#FCF8FF","surface-container":"#EFECFF","surface-container-high":"#E8E5FF","on-surface":"#1A1A2E","outline-variant":"#C5C6D0","sucesso":"#006D43","aviso":"#AD3212","error":"#AD256A","tertiary":"#560000"},"escuro":{"surface":"#111125","surface-container":"#1E1E32","surface-container-high":"#28283D","on-surface":"#E2E0FC","outline-variant":"#45464F","sucesso":"#76DAA1","aviso":"#FFB4A2","error":"#FFB0CC","tertiary":"#FFB4A8"}},"sakura":{"claro":{"surface":"#FFF8F8","surface-container":"#F8EBED","surface-container-high":"#F2E5E8","on-surface":"#201A1C","outline-variant":"#D6C1C7","sucesso":"#426900","aviso":"#AD3212","error":"#AD256A","tertiary":"#006E1C"},"escuro":{"surface":"#181214","surface-container":"#251E20","surface-container-high":"#2F282A","on-surface":"#EDDFE2","outline-variant":"#524348","sucesso":"#A7D567","aviso":"#FFB4A2","error":"#FFB0CC","tertiary":"#88ED85"}},"hinata":{"claro":{"surface":"#FDF7FF","surface-container":"#F2EBFF","surface-container-high":"#EDE4FF","on-surface":"#1D1830","outline-variant":"#CAC4D1","sucesso":"#006D43","aviso":"#AD3212","error":"#BA1A1A","tertiary":"#6E517D"},"escuro":{"surface":"#151027","surface-container":"#211C34","surface-container-high":"#2C263F","on-surface":"#E7DEFF","outline-variant":"#494550","sucesso":"#76DAA1","aviso":"#FFB4A2","error":"#FFB4AB","tertiary":"#DDBAED"}},"kiba":{"claro":{"surface":"#FFF8F1","surface-container":"#F3EDE5","surface-container-high":"#EEE7E0","on-surface":"#1E1B17","outline-variant":"#DFBFBC","sucesso":"#426900","aviso":"#AC3402","error":"#AD256A","tertiary":"#553B32"},"escuro":{"surface":"#15130F","surface-container":"#221F1B","surface-container-high":"#2C2A25","on-surface":"#E8E1DA","outline-variant":"#58413F","sucesso":"#A7D567","aviso":"#FFB59E","error":"#FFB0CC","tertiary":"#E4BEB2"}},"shino":{"claro":{"surface":"#F7FCE3","surface-container":"#ECF0D8","surface-container-high":"#E6EBD3","on-surface":"#191D0F","outline-variant":"#C6C8BA","sucesso":"#376A10","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#553C0A"},"escuro":{"surface":"#101507","surface-container":"#1D2112","surface-container-high":"#272C1C","on-surface":"#E0E5CD","outline-variant":"#45483D","sucesso":"#9BD771","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#E7C183"}},"shikamaru":{"claro":{"surface":"#FBF9F8","surface-container":"#EFEDED","surface-container-high":"#E9E8E7","on-surface":"#1B1C1C","outline-variant":"#C8C6C3","sucesso":"#2C6C1A","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#835425"},"escuro":{"surface":"#131314","surface-container":"#1F2020","surface-container-high":"#292A2A","on-surface":"#E4E2E2","outline-variant":"#474744","sucesso":"#92D879","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#F9BA82"}},"ino":{"claro":{"surface":"#FFF7FA","surface-container":"#F7EAF3","surface-container-high":"#F1E5EE","on-surface":"#201A20","outline-variant":"#D2C2D0","sucesso":"#006D43","aviso":"#AD3212","error":"#BA1A1A","tertiary":"#6F5D00"},"escuro":{"surface":"#171118","surface-container":"#241E24","surface-container-high":"#2F282F","on-surface":"#EBDFE8","outline-variant":"#4F434F","sucesso":"#76DAA1","aviso":"#FFB4A2","error":"#FFB4AB","tertiary":"#E4C53F"}},"choji":{"claro":{"surface":"#FFF8F6","surface-container":"#FDEAE2","surface-container-high":"#F7E4DC","on-surface":"#231A15","outline-variant":"#DCC1B4","sucesso":"#426900","aviso":"#9C4500","error":"#BA1A1A","tertiary":"#B1262B"},"escuro":{"surface":"#1A110D","surface-container":"#271E19","surface-container-high":"#322823","on-surface":"#F1DFD7","outline-variant":"#554339","sucesso":"#A7D567","aviso":"#FFB68E","error":"#FFB4AB","tertiary":"#FFB3AE"}},"neji":{"claro":{"surface":"#FFF8F1","surface-container":"#F6EDDD","surface-container-high":"#F1E7D7","on-surface":"#1F1B12","outline-variant":"#CCC5C2","sucesso":"#426900","aviso":"#944A00","error":"#BA1A1A","tertiary":"#645495"},"escuro":{"surface":"#17130A","surface-container":"#231F16","surface-container-high":"#2E291F","on-surface":"#EBE1D2","outline-variant":"#4A4644","sucesso":"#A7D567","aviso":"#FFB784","error":"#FFB4AB","tertiary":"#CEBDFF"}},"rock-lee":{"claro":{"surface":"#F2FCEE","surface-container":"#E7F1E2","surface-container-high":"#E1EBDD","on-surface":"#151E15","outline-variant":"#BDCABA","sucesso":"#126D28","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#904D00"},"escuro":{"surface":"#0D150D","surface-container":"#192219","surface-container-high":"#232C23","on-surface":"#DBE5D7","outline-variant":"#3E4A3D","sucesso":"#83DA87","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#FFB77D"}},"tenten":{"claro":{"surface":"#FFF8F8","surface-container":"#FCE9EC","surface-container-high":"#F6E4E7","on-surface":"#22191B","outline-variant":"#DAC0C6","sucesso":"#426900","aviso":"#AD3212","error":"#BA1A1A","tertiary":"#5B5F62"},"escuro":{"surface":"#1A1113","surface-container":"#271D1F","surface-container-high":"#32272A","on-surface":"#F0DEE1","outline-variant":"#544246","sucesso":"#A7D567","aviso":"#FFB4A2","error":"#FFB4AB","tertiary":"#C4C7CB"}},"branco":{"claro":{"surface":"#FFFFFF","surface-container":"#F5F5F5","surface-container-high":"#EFEFEF","on-surface":"#1B1B1B","outline-variant":"#C6C6C6","sucesso":"#006D43","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#3B3B3B"},"escuro":{"surface":"#131313","surface-container":"#1F1F1F","surface-container-high":"#2A2A2A","on-surface":"#E2E2E2","outline-variant":"#474747","sucesso":"#76DAA1","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#E2E2E2"}},"preto":{"claro":{"surface":"#F9F9F9","surface-container":"#EEEEEE","surface-container-high":"#E8E8E8","on-surface":"#1B1B1B","outline-variant":"#C6C6C6","sucesso":"#006D43","aviso":"#8C4F00","error":"#BA1A1A","tertiary":"#3B3B3B"},"escuro":{"surface":"#000000","surface-container":"#141414","surface-container-high":"#1C1C1C","on-surface":"#E2E2E2","outline-variant":"#474747","sucesso":"#76DAA1","aviso":"#FFB874","error":"#FFB4AB","tertiary":"#E2E2E2"}}} };
+window.dispatchEvent(new Event('boaz-status'));
+</script>
+<script type="module" id="design-splash">
+// =============================================================================
+// boaz · splash screens: a tela de abertura do app e das frentes web, em duas camadas
+//
+//   nativa   o que o sistema mostra antes do app carregar: só o símbolo oficial,
+//            parado, sobre uma cor lisa (Android 12+, iOS, PWA); sem animação nem mascote
+//   animada  a primeira tela do app: o Halo com o logo inteiro se abrindo (RN-51) e,
+//            conforme a frente e o momento, um mascote que entra quando o nome termina
+//
+// Frentes: hub (hastes longas, só o logo) e quest (hastes curtas, logo + mascote).
+// Momentos (trocam o mascote): abertura de sempre, primeiro acesso, de volta depois
+// de um tempo, à noite e "voltamos" (primeira abertura depois de um reparo, ligado
+// ao status Voltou! de scripts/status.mjs).
+//
+// Este módulo não usa nada do Node nem importa nada: recebe o núcleo da marca, o
+// dos fundos e o dos mascotes em criarSplash. O gerador (scripts/splash-arquivos.mjs)
+// grava os oficiais em identidade/imagens/splash/.
+//
+//   const sp = criarSplash({ marca, fundos, mascotes });
+//   sp.animada('quest', { largura: 900, altura: 1600, cores, momento: 'primeiro-acesso', movimentoReduzido });
+//   sp.nativa('hub', { largura: 900, altura: 1600, fundo: '#000000', cor: '#FFFFFF' });
+//   sp.icone('hub', { cor: '#FFFFFF' });   // ícone da splash do Android 12+ (área segura de 2/3)
+// Regras de uso: 1_Requisitos/90_identidade-visual.html e o catálogo design-system.html#splash.
+// =============================================================================
+
+/** Frentes com splash: variação do símbolo e mascote da abertura de sempre (null = só o logo). */
+export const FRENTES = {
+  hub: { nome: 'Hub', variante: 'longo', mascote: null },
+  quest: { nome: 'Quest', variante: 'curto', mascote: { expressao: 'feliz', forma: 'bolha', movimento: 'pular' } },
+};
+/** Momentos da abertura animada; null = o mascote da frente. */
+export const MOMENTOS = {
+  padrao: { nome: 'Abertura', uso: 'toda abertura do app ou da frente', mascote: null },
+  'primeiro-acesso': { nome: 'Primeiro acesso', uso: 'a primeira vez que a pessoa abre a frente', mascote: { expressao: 'curioso', forma: 'bolha', movimento: 'flutuar' } },
+  retorno: { nome: 'De volta', uso: 'a pessoa volta depois de um tempo sem entrar', mascote: { expressao: 'tchau', forma: 'bolha' } },
+  noite: { nome: 'À noite', uso: 'abertura à noite', mascote: { expressao: 'sonolento', forma: 'meialua' } },
+  voltamos: { nome: 'Voltamos', uso: 'primeira abertura depois de um reparo (status Voltou!)', mascote: { expressao: 'aliviado', forma: 'cubo', movimento: 'comemorar' } },
+};
+/** Formatos de referência: celular em pé, computador e tablet/quadrado. */
+export const FORMATOS = { vertical: [900, 1600], horizontal: [1600, 900], quadrado: [1000, 1000] };
+
+const n = (v) => Math.round(v * 100) / 100;
+const FZ = 'fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.3 0 0.2 1"';
+/** O mascote entra quando o nome termina de entrar na abertura do logo (≈ 1,85 s). */
+const ENTRA = 1.7;
+
+export function criarSplash({ marca, fundos, mascotes }) {
+  const { estatico, animado, embutir } = mascotes;
+  let seq = 0;
+  // svg embutido na caixa (x, y, w, h), mantendo a proporção
+  const encaixa = (svg, x, y, w, h) => svg.replace(/^<svg[^>]*viewBox="([^"]+)"[^>]*>/, `<svg x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" viewBox="$1">`);
+
+  /**
+   * Splash animada. op = { largura, altura, cores (de fundos-temas: PAPEIS + mascote), momento,
+   *   carregando (símbolo de carregamento embaixo, para quando a abertura demora), ciclo ([cores, …] dos temas, como no Halo),
+   *   movimentoReduzido (tudo parado no quadro final) }
+   */
+  function animada(frente, op = {}) {
+    const F = FRENTES[frente];
+    if (!F) throw new Error(`frente desconhecida: ${frente}`);
+    const { largura: w = 900, altura: h = 1600, cores: c, momento = 'padrao', carregando = false, ciclo, movimentoReduzido: parado = false } = op;
+    const m = (MOMENTOS[momento] || MOMENTOS.padrao).mascote || F.mascote;
+    const b = Math.min(w, h), alt = b * 0.17, cy = h * (m ? 0.4 : 0.47);
+    // tema monocromático (sem cor de mascote): brilhos em tons de superfície, para não sujar o fundo de cinza
+    const halo = c.mascote ? c : { ...c, primary: c['surface-container-high'], secondary: c['surface-container-high'], tertiary: c['surface-container'] };
+    let s = fundos.desenhar('halo', { largura: w, altura: h, cores: halo, pecas: 'logo', nome: true, logo: parado ? '' : 'abertura', variante: F.variante, origem: { x: 0.5, y: cy / h }, raio: alt, ciclo, movimentoReduzido: parado })
+      .replace(/<\/svg>$/, '');
+    if (m) {
+      const t = b * 0.46, my = cy + alt * 0.5 + t * 0.5;
+      const o = { forma: m.forma, cor: c.mascote || undefined };
+      const svg = parado ? estatico(m.expressao, o) : animado(m.expressao, { ...o, movimento: m.movimento || undefined });
+      const corpo = embutir(svg, `splash-m${++seq}-`, w / 2 - t / 2, my - t / 2, t, t);
+      s += parado ? corpo : `<g opacity="0" transform="translate(0 ${n(t * 0.25)})"><animate attributeName="opacity" from="0" to="1" begin="${ENTRA}s" dur="0.35s" fill="freeze"/>`
+        + `<animateTransform attributeName="transform" type="translate" from="0 ${n(t * 0.25)}" to="0 0" begin="${ENTRA}s" dur="0.5s" ${FZ}/>${corpo}</g>`;
+    }
+    if (carregando) {
+      const ac = b * 0.07, sv = parado ? marca.simbolo(F.variante, c['on-surface-variant']) : marca.carregamento(F.variante, c['on-surface-variant']);
+      const [, , vw, vh] = sv.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number), al = ac * vw / vh;
+      s += encaixa(sv, w / 2 - al / 2, h - b * 0.1 - ac, al, ac);
+    }
+    return s.replace(/aria-label="[^"]*"/, 'aria-label="deboaz"') + '</svg>';
+  }
+
+  /** Splash nativa: o símbolo oficial parado no centro de uma cor lisa. op = { largura, altura, fundo, cor } */
+  function nativa(frente, op = {}) {
+    const F = FRENTES[frente];
+    const { largura: w = 900, altura: h = 1600, fundo = '#000000', cor = '#FFFFFF' } = op;
+    const ac = Math.min(w, h) * 0.22, sv = marca.simbolo(F.variante, cor);
+    const [, , vw, vh] = sv.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number), al = ac * vw / vh;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-label="deboaz"><rect width="${w}" height="${h}" fill="${fundo}"/>${encaixa(sv, w / 2 - al / 2, h / 2 - ac / 2, al, ac)}</svg>`;
+  }
+
+  /**
+   * Ícone da splash nativa do Android 12+ (e do MauiSplashScreen): quadrado de 1024 transparente com o
+   * símbolo dentro do círculo central de 2/3 (o sistema recorta o resto). op = { cor }
+   */
+  const icone = (frente, { cor = '#FFFFFF' } = {}) => marca.icone(FRENTES[frente].variante, { fundo: null, cor, area: 440 });
+
+  return { animada, nativa, icone };
+}
+
+window.boazSplash = { ...criarSplash({ marca: window.boazMarca.marca, fundos: window.boazFundos, mascotes: window.boazMascotes }), FRENTES, MOMENTOS, FORMATOS };
+window.dispatchEvent(new Event('boaz-splash'));
+</script>
 <!-- design:tokens:fim -->
 <style id="design-componentes">
 /* =============================================================================
@@ -24844,6 +25199,30 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
 @media (max-width: 599px) { .fundo__formatos { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .fundo__formatos > :first-child { grid-column: 1 / -1; } }
 .fundo__formatos > svg { display: block; width: 100%; height: auto; border-radius: var(--md-sys-shape-corner-medium); outline: 1px solid var(--md-sys-color-outline-variant); }
 
+/* status do servidor */
+.status-grade { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.status-grade--vertical { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+.status-card { display: grid; align-content: start; margin: 0; overflow: hidden; border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container); }
+.status-card > svg { display: block; width: 100%; height: auto; }
+.status-card figcaption { display: grid; gap: 4px; padding: 12px 16px 16px; }
+.status-card .md-chip { justify-self: start; }
+.status-card b { font: var(--md-sys-typescale-title-medium-weight) var(--md-sys-typescale-title-medium-size)/var(--md-sys-typescale-title-medium-line-height) var(--md-sys-typescale-title-medium-font); color: var(--md-sys-color-on-surface); }
+.status-card p { margin: 0; color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-body-medium-size); }
+.status-card small { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); }
+.status-ponto { width: 10px; height: 10px; border-radius: var(--md-sys-shape-corner-full); }
+.status-selos { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.status-selos figure { display: grid; justify-items: center; gap: 4px; margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); }
+.status-selos svg { display: block; width: 64px; height: 64px; }
+.status-selos svg.status-selo--24 { width: 24px; height: 24px; }
+
+/* splash screens */
+.splash-nativas { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+.splash-nativas figure { display: grid; justify-items: center; gap: 6px; margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); text-align: center; }
+.splash-nativas svg { display: block; width: 96px; height: auto; border-radius: var(--md-sys-shape-corner-medium); outline: 1px solid var(--md-sys-color-outline-variant); }
+.splash-icone { position: relative; width: 128px; height: 128px; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-inverse-surface); }
+.splash-icone svg { width: 100%; height: 100%; outline: 0; }
+.splash-icone::after { content: ""; position: absolute; inset: 16.7%; border: 1px dashed var(--md-sys-color-error); border-radius: var(--md-sys-shape-corner-full); }
+
 /* cores */
 .esquemas { display: grid; gap: 16px; grid-template-columns: 1fr; }
 @media (min-width: 840px) { .esquemas { grid-template-columns: 1fr 1fr; } }
@@ -24996,6 +25375,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
   <a class="md-drawer-item md-estado" href="#principios"><span class="material-symbols">flag</span>Princípios</a>
   <a class="md-drawer-item md-estado" href="#identidade"><span class="material-symbols">verified</span>Identidade</a>
   <a class="md-drawer-item md-estado" href="#fundos"><span class="material-symbols">wallpaper</span>Fundos</a>
+  <a class="md-drawer-item md-estado" href="#status"><span class="material-symbols">monitor_heart</span>Status do servidor</a>
+  <a class="md-drawer-item md-estado" href="#splash"><span class="material-symbols">rocket_launch</span>Splash screens</a>
   <a class="md-drawer-item md-estado" href="#temas"><span class="material-symbols">format_paint</span>Temas de cor</a>
   <a class="md-drawer-item md-estado" href="#cor"><span class="material-symbols">palette</span>Cor</a>
   <a class="md-drawer-item md-estado" href="#tipografia"><span class="material-symbols">text_fields</span>Tipografia</a>
@@ -25018,8 +25399,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v31</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-24 21:25</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v33</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-27 23:16</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -25098,6 +25479,71 @@ el.innerHTML = fundos.desenhar('halo', {
   mascote: { expressao: 'feliz', forma: 'bolha', proporcao: 'normal', movimento: 'flutuar' },
   logo: 'abertura',                     // '' | 'abertura' | 'fechamento' | 'ciclo' | 'carregamento'
   semente: Date.now(),                                     // sorteio novo a cada abertura da tela
+  movimentoReduzido: matchMedia('(prefers-reduced-motion: reduce)').matches,
+});</code></pre></div>
+    </section>
+
+    <section id="status">
+      <h2 class="md-typescale-headline-medium">Status do servidor</h2>
+      <p class="lead">Ilustrações da saúde do sistema para a página de status, os avisos de instabilidade e as telas de manutenção ou de reparo. O mascote é o servidor (cubo = aplicação, cilindro = banco, esfera = rede) e o rosto diz como ele está. Em volta, peças da marca: o anel do símbolo vira um medidor, uma linha de pulso atravessa a tela e as antenas viram barras de sinal. A cor de cada estado é um papel do tema (<code>sucesso</code>, <code>aviso</code>, <code>error</code>, <code>tertiary</code>); o mascote mantém a cor do estado em qualquer tema. Troque o tema no topo para ver.</p>
+      <div class="grade">
+        <article class="md-card md-card--outlined"><h4>Sempre com texto</h4><p>A imagem não tem texto. O título e a mensagem de cada estado (abaixo) vão ao lado, num painel de superfície, com a hora de volta quando houver. Imagem decorativa leva <code>alt=""</code>.</p></article>
+        <article class="md-card md-card--outlined"><h4>Tom acolhedor</h4><p>Fora do ar é o mascote doente, nunca chorando ou bravo. A mensagem diz o que está acontecendo e que a equipe já está cuidando, sem culpar a pessoa nem usar jargão.</p></article>
+        <article class="md-card md-card--outlined"><h4>Um estado por tela</h4><p>A ilustração grande mostra o pior estado no momento. Numa lista de serviços, cada linha usa o selo (24dp a 64dp) com o nome do serviço ao lado.</p></article>
+        <article class="md-card md-card--outlined"><h4>Movimento reduzido</h4><p>Pulso, medidor, sinal e mascote se movem em laço. Com <code>prefers-reduced-motion</code> (ou a preferência do sistema no app), use a versão parada.</p></article>
+      </div>
+      <div class="fundo__controles" style="margin-top: var(--md-sys-spacing-4)">
+        <label>Formato <select data-status-formato><option value="horizontal">Horizontal (16:9)</option><option value="vertical">Vertical (9:16)</option><option value="quadrado">Quadrado (1:1)</option></select></label>
+        <label>Movimento <select data-status-movimento><option value="">Animado</option><option value="parado">Parado</option></select></label>
+      </div>
+      <div class="status-grade" data-status style="margin-top: var(--md-sys-spacing-4)"></div>
+      <h3 class="sub md-typescale-title-large">Selos</h3>
+      <div class="palco"><span class="rotulo">Medidor com o rosto dentro, para chips, listas de serviços e a barra do topo — 64dp e 24dp (mínimo)</span><div class="status-selos" data-status-selos></div></div>
+      <h3 class="sub md-typescale-title-large">Arquivos e código</h3>
+      <div class="palco"><span class="rotulo">Oficiais (Branco e Preto) em <code>identidade/imagens/status/</code>: <code>&lt;estado&gt;-&lt;horizontal|vertical|quadrado&gt;-&lt;claro|escuro&gt;.svg</code> (parados), <code>animados/</code> (em laço) e <code>selos/&lt;estado&gt;-&lt;claro|escuro&gt;.svg</code>. Num tema de cor, desenhe na hora com o núcleo:</span><pre class="masc-codigo"><code>import * as mascotes from './mascotes.mjs';
+import { criarStatus, coresDoStatus, ESTADOS } from './status.mjs';
+
+const status = criarStatus({ mascotes });
+const cores = coresDoStatus(tokensDeCor)[paleta][modo];        // modo: 'claro' | 'escuro'
+el.innerHTML = status.desenhar('reparo', {
+  largura: 1600, altura: 900, cores,
+  movimentoReduzido: matchMedia('(prefers-reduced-motion: reduce)').matches,
+});
+titulo.textContent = ESTADOS.reparo.titulo;                     // “Consertando…”
+selo.innerHTML = status.selo('fora', { tamanho: 24, cores });</code></pre></div>
+    </section>
+
+    <section id="splash">
+      <h2 class="md-typescale-headline-medium">Splash screens</h2>
+      <p class="lead">A abertura do app e das frentes web tem duas camadas. A <b>nativa</b> é o que o sistema mostra antes do app carregar: só o símbolo oficial, parado, sobre uma cor lisa. A <b>animada</b> é a primeira tela do app: o Halo com o logo inteiro se abrindo e, conforme a frente e o momento, um mascote que entra quando o nome termina. O hub abre só com o logo (hastes longas); o quest, com o logo de hastes curtas e um mascote. Acompanham o tema no topo.</p>
+      <div class="grade">
+        <article class="md-card md-card--outlined"><h4>Nativa → animada, sem salto</h4><p>A nativa usa a mesma cor de superfície e o mesmo símbolo, no centro; a animada começa dali, com o anel se desenhando. Nada de texto, botão ou foto na splash.</p></article>
+        <article class="md-card md-card--outlined"><h4>Curta</h4><p>A abertura do logo termina em até 2,5 s e o mascote entra logo depois do nome. Se o app demorar mais, o carregamento da marca aparece embaixo, com o texto <q>Carregando…</q> ao lado.</p></article>
+        <article class="md-card md-card--outlined"><h4>Momentos</h4><p>O mascote muda com o momento: primeiro acesso (curioso), de volta depois de um tempo (tchau), à noite (sonolento) e <i>voltamos</i>, a primeira abertura depois de um reparo (aliviado, como o status Voltou!).</p></article>
+        <article class="md-card md-card--outlined"><h4>Movimento reduzido</h4><p>Com <code>prefers-reduced-motion</code> (ou a preferência do sistema no app), a splash animada aparece parada no quadro final: logo formado e mascote parado.</p></article>
+      </div>
+      <h3 class="sub md-typescale-title-large">Animada</h3>
+      <article class="fundo" id="splash-animada">
+        <div class="fundo__controles">
+          <label>Frente <select data-splash="frente"><option value="hub">Hub</option><option value="quest" selected>Quest</option></select></label>
+          <label>Momento <select data-splash="momento"></select></label>
+          <label>Carregamento <select data-splash="carregando"><option value="">Sem</option><option value="1">Com, embaixo</option></select></label>
+          <label>Movimento <select data-splash="movimento"><option value="">Animado</option><option value="parado">Parado</option></select></label>
+          <button class="md-button md-button--text md-estado" type="button" data-splash-repetir><span class="material-symbols">replay</span>Repetir</button>
+        </div>
+        <div class="fundo__formatos" data-splash-formatos></div>
+      </article>
+      <h3 class="sub md-typescale-title-large">Nativa</h3>
+      <div class="palco"><span class="rotulo">Símbolo oficial parado sobre a cor de superfície (preto no claro, branco no escuro); à direita, o ícone da splash do Android 12+ e do <code>MauiSplashScreen</code>: o sistema recorta tudo fora do círculo de 2/3 (tracejado)</span><div class="splash-nativas" data-splash-nativas></div></div>
+      <h3 class="sub md-typescale-title-large">Arquivos e código</h3>
+      <div class="palco"><span class="rotulo">Oficiais (Branco e Preto) em <code>identidade/imagens/splash/</code>: <code>&lt;hub|quest&gt;-&lt;vertical|horizontal|quadrado&gt;-&lt;claro|escuro&gt;.svg</code> (animadas), <code>parados/</code>, <code>momentos/&lt;momento&gt;-&lt;frente&gt;-&lt;modo&gt;.svg</code> (celular em pé) e <code>nativa/</code> (com <code>icone-&lt;frente&gt;-&lt;modo&gt;.svg</code>). No app, a nativa sai do ícone com a cor de fundo; num tema de cor, a animada é desenhada na hora:</span><pre class="masc-codigo"><code>import { criarSplash } from './splash.mjs';
+
+const splash = criarSplash({ marca, fundos, mascotes });
+el.innerHTML = splash.animada('quest', {
+  largura: innerWidth, altura: innerHeight,
+  cores: temasDosFundos[paleta][modo],                 // modo: 'claro' | 'escuro'
+  momento: 'primeiro-acesso',   // 'padrao' | 'primeiro-acesso' | 'retorno' | 'noite' | 'voltamos'
+  carregando: demorou,
   movimentoReduzido: matchMedia('(prefers-reduced-motion: reduce)').matches,
 });</code></pre></div>
     </section>
@@ -25597,6 +26043,7 @@ el.innerHTML = fundos.desenhar('halo', {
           <tr><td>Dúvida, dica, atenção</td><td>dúvida, pensando, curioso, desconfiado, concentrado, uau</td></tr>
           <tr><td>Espera e tempo</td><td>esperando, com pressa, sonolento</td></tr>
           <tr><td>Social e cuidado</td><td>beijo, silêncio (modo foco), doente (pausa), brincalhão</td></tr>
+          <tr><td>Sistema e manutenção</td><td>consertando (reparo em andamento), doente (fora do ar), sonolento (manutenção programada), aliviado (voltou) — ver <a href="#status">Status do servidor</a></td></tr>
         </tbody>
       </table></div>
 
@@ -25723,6 +26170,8 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v33</td><td>2026-10-27 23:16</td><td>Splash screens: nativa (símbolo oficial parado sobre a cor de superfície, com o ícone da splash do Android 12+ e do <code>MauiSplashScreen</code> na área segura de 2/3) e animada (Halo com a abertura do logo; hub só com o logo, quest com mascote que entra depois do nome), com momentos (primeiro acesso, de volta, à noite e voltamos) e carregamento embaixo; núcleo <code>scripts/splash.mjs</code> e oficiais em <code>identidade/imagens/splash/</code></td></tr>
+          <tr><td>v32</td><td>2026-10-27 23:00</td><td>Status do servidor: sete estados (operacional, lento, instabilidade parcial, fora do ar, manutenção programada, reparo em andamento e voltou) com o mascote como servidor, o anel do símbolo como medidor de saúde, a linha de pulso e as antenas como barras de sinal, nas cores sucesso, aviso, error e tertiary; selos com o rosto; núcleo <code>scripts/status.mjs</code> e imagens oficiais em <code>identidade/imagens/status/</code>. Nova expressão Consertando (capacete de obra e chave inglesa) e o campo <code>alem</code> das expressões para o enquadramento de só o rosto</td></tr>
           <tr><td>v31</td><td>2026-10-24 21:25</td><td>Cópias do design system numa por frente, em <code>core/commons/</code> da web e do mobile (<code>scripts/sincronizar.mjs</code>), conforme <code>14_estrutura-projetos</code>; componentes comuns da web sem cópia</td></tr>
           <tr><td>v30</td><td>2026-10-21 21:37</td><td>Fundo Halo: opção <code>nome</code> (logo inteiro, símbolo + nome, com a abertura) e <code>ciclo</code> (os brilhos passam pelas cores de uma lista de temas, suave e em laço: 6 s em cada, 2 s de troca; parado com movimento reduzido). Halo: <code>variante</code> (hastes do logo inteiro: curtas no quest). Compostos: boas-vindas com o logo (Halo com o logo na abertura e os brilhos passando pelos temas coloridos; texto e ações num painel de superfície; no compact do hub e do quest, o Halo numa faixa no alto que some antes do título; do medium em diante, só o logo centralizado) na apresentação da landing page, na entrada do hub e no acesso do quest, no lugar da turma e das boas-vindas com mascote.</td></tr>
           <tr><td>v29</td><td>2026-10-21 21:08</td><td>Temas de cor: 8 paletas bem diferentes do padrão — Neon (verde-limão, ciano e magenta sobre roxo-noite, prefere o escuro), Vaporwave (rosa, lilás e ciano), Algodão-doce (pastéis sobre creme), Terra (terracota, oliva e mostarda sobre areia), Retrô (mostarda, laranja-queimado e petróleo), Meia-noite (azul-noite e dourado), Arco-íris (rosa, laranja e azul) e Salada de frutas (fruit-salad do M3). Usam neutra tingida (superfícies coloridas) e secundária/terciária em outras matizes. E 12 paletas dos genins da Folha, inspiradas nas cores de cada personagem: Time 7 (Naruto, Sasuke, Sakura), Time 8 (Hinata, Kiba, Shino), Time 10 (Shikamaru, Ino, Chōji) e Time Guy (Neji, Rock Lee, Tenten).</td></tr>
@@ -25731,11 +26180,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v26</td><td>2026-10-19 13:37</td><td>Fundos: Anel gigante e Ondas do vão na forma escolhida do mascote; nas Antenas em ritmo os mascotes acompanham a animação da barra</td></tr>
           <tr><td>v25</td><td>2026-10-19 04:21</td><td>Interruptor (switch) entre os componentes básicos; card do catálogo com fundo cheio em secondary-container e o mascote padrinho do módulo à direita, metade cortada pela borda; seletor de tema com a opção Mascotes nas cores do tema</td></tr>
           <tr><td>v24</td><td>2026-10-19 04:05</td><td>Turma de mascotes: as 30 expressões, pequenas e lado a lado numa grade fechada, em formas variadas e só na proporção normal</td></tr>
-          <tr><td>v23</td><td>2026-10-19 03:52</td><td>Compostos: turma de mascotes nas boas-vindas da apresentação da landing page (expressões de boas-vindas em formas e proporções diferentes, um animado por vez) e o menu da landing page (compact e medium: seções, tema e as três ações); desenhista do tema.svg com prefixo de mascotes e cores do logo por tema, para as vistas</td></tr>
-          <tr><td>v22</td><td>2026-10-19 03:01</td><td>Identidade: no logo principal e nas animações, o nome deboaz fica centralizado na altura do símbolo de cada variação (hastes longas e curtas; MarcaNomeDeslocamento no app); topos com o logo centralizado na barra, e o topo da casca com avisos, o nome (instituição ou pessoa no hub, usuário no quest) e a foto, que abre a conta ou Trocar perfil</td></tr>
-        </tbody>
+                            </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v31 · 2026-10-24 21:25</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v33 · 2026-10-27 23:16</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>
@@ -26095,6 +26542,44 @@ function recorteDosCards() {
 }
 recorteDosCards();
 new ResizeObserver(() => recorteDosCards()).observe(document.body);
+</script>
+<script type="module">
+// ── status do servidor: cada estado no formato escolhido, nas cores do tema ativo ──
+const ST = window.boazStatus;
+const vv = (p) => `var(--md-sys-color-${p})`;
+const cores = Object.fromEntries(Object.keys(ST.temas['branco-preto'].claro).map((p) => [p, vv(p)]));
+const grade = document.querySelector('[data-status]'), selos = document.querySelector('[data-status-selos]');
+const formato = document.querySelector('[data-status-formato]'), movimento = document.querySelector('[data-status-movimento]');
+function desenharStatus() {
+  const [largura, altura] = ST.FORMATOS[formato.value], parado = movimento.value === 'parado' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  grade.classList.toggle('status-grade--vertical', formato.value === 'vertical');
+  grade.innerHTML = Object.entries(ST.ESTADOS).map(([k, e]) => `<figure class="status-card">${ST.desenhar(k, { largura, altura, cores, movimentoReduzido: parado }).replace('role="img"', 'aria-hidden="true"')}`
+    + `<figcaption><span class="md-chip"><span class="status-ponto" style="background:${vv(e.papel)}"></span>${e.nome}</span><b>${e.titulo}</b><p>${e.mensagem}</p><small>${e.uso} · <code>${k}</code> · ${e.papel}</small></figcaption></figure>`).join('');
+  selos.innerHTML = Object.entries(ST.ESTADOS).map(([k, e]) => `<figure>${ST.selo(k, { tamanho: 64, cores, movimentoReduzido: parado })}<span class="linha">${ST.selo(k, { tamanho: 24, cores, movimentoReduzido: true }).replace('<svg ', '<svg class="status-selo--24" ')}${e.nome}</span></figure>`).join('');
+}
+desenharStatus();
+formato.addEventListener('change', desenharStatus);
+movimento.addEventListener('change', desenharStatus);
+</script>
+<script type="module">
+// ── splash screens: animada nos três formatos e nativa, nas cores do tema ativo ──
+const SP = window.boazSplash, FT = window.boazFundos;
+const vv = (p) => `var(--md-sys-color-${p})`;
+const ctl = (k) => document.querySelector(`[data-splash="${k}"]`);
+ctl('momento').innerHTML = Object.entries(SP.MOMENTOS).map(([k, m]) => `<option value="${k}">${m.nome}</option>`).join('');
+function desenharSplash() {
+  const paleta = document.documentElement.dataset.paleta || 'branco-preto';
+  const cores = { ...Object.fromEntries(Object.keys(FT.temas[paleta].claro).filter((p) => p !== 'mascote').map((p) => [p, vv(p)])), mascote: FT.temas[paleta].claro.mascote || '' };
+  const parado = ctl('movimento').value === 'parado' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelector('[data-splash-formatos]').innerHTML = ['horizontal', 'vertical', 'quadrado'].map((fmt) => { const [largura, altura] = SP.FORMATOS[fmt];
+    return SP.animada(ctl('frente').value, { largura, altura, cores, momento: ctl('momento').value, carregando: !!ctl('carregando').value, movimentoReduzido: parado }).replace('role="img"', 'aria-hidden="true"'); }).join('');
+  document.querySelector('[data-splash-nativas]').innerHTML = Object.entries(SP.FRENTES).map(([k, f]) => `<figure>${SP.nativa(k, { fundo: vv('surface'), cor: vv('on-surface') })}${f.nome}</figure>`).join('')
+    + Object.entries(SP.FRENTES).map(([k, f]) => `<figure><span class="splash-icone">${SP.icone(k, { cor: vv('inverse-on-surface') })}</span>Ícone · ${f.nome}</figure>`).join('');
+}
+desenharSplash();
+document.querySelector('#splash-animada').addEventListener('change', desenharSplash);
+document.querySelector('[data-splash-repetir]').addEventListener('click', desenharSplash);
+new MutationObserver(() => desenharSplash()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-paleta'] });
 </script>
 </body>
 </html>
