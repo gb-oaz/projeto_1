@@ -38,9 +38,12 @@
 # Branches de tarefa/correção e pull requests nunca chegam à aprovação (RNF-31).
 #
 # Imagens fixas dos executores: ubuntu-24.04 nos jobs Linux e macos-26 no iOS.
-# O ubuntu-latest passou ao 26.04, de kernel 6.19+, em que o mongo:8.0 se
-# recusa a iniciar (SERVER-121912: kernels 6.19 a 7.0.13); só trocar quando
-# a imagem nova tiver kernel 7.0.14 ou mais novo.
+# Nos kernels 6.19 a 7.0.13 o mongo:8.0 se recusa a iniciar (SERVER-121912:
+# o TCMalloc dele disputa o rseq com o glibc), e o ubuntu-24.04 também passou
+# a vir com kernel 7.0. Por isso o MongoDB sobe com
+# GLIBC_TUNABLES=glibc.pthread.rseq=1 (aqui e em 4_CI_CD/local/compose.yml):
+# o glibc fica com o rseq e o TCMalloc usa cache por thread. Tirar quando o
+# executor tiver kernel 7.0.14 ou mais novo.
 #
 # Convenções das pastas de 5_DEV/ (o CI depende delas) — 14_estrutura-projetos:
 #   backend/                  Boaz.slnx na raiz (core/, ms_mono/, tests/)
@@ -242,6 +245,9 @@ jobs:
       mongodb:
         image: mongo:8.0
         ports: ["27017:27017"]
+        # kernel 6.19 a 7.0.13 (SERVER-121912): ver o cabeçalho
+        env:
+          GLIBC_TUNABLES: glibc.pthread.rseq=1
         # sem health check, o job segue mesmo com o MongoDB fora do ar
         options: >-
           --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
