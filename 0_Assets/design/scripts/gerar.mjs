@@ -15,7 +15,7 @@
 //                         identidade/logos, identidade/icones  símbolo, logo, ícone e favicon (scripts/marca-arquivos.mjs)
 //                         plataformas/web/marca.mjs    núcleo da marca (logo em qualquer cor) e marca-temas.json
 //                         identidade/imagens/fundos    fundos oficiais; plataformas/web/fundos.mjs (scripts/fundos-arquivos.mjs)
-//                         identidade/imagens/status    status do servidor, parados, animados e selos (scripts/status-arquivos.mjs)
+//                         identidade/imagens/status    status do servidor, parados, animados e selos; plataformas/web/status.mjs (scripts/status-arquivos.mjs)
 //                         identidade/imagens/splash    splash screens nativas e animadas, hub e quest (scripts/splash-arquivos.mjs)
 //                         plataformas/api/             banner, logo, favicon e cores da documentação da API (scripts/api-arquivos.mjs)
 //                         design-system.html           só o bloco entre os marcadores

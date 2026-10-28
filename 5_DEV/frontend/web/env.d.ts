@@ -15,6 +15,18 @@ declare module '@core/commons/design/mascotes.mjs' {
   export function animado(expressao: string, op?: Opcoes): string;
   export function estatico(expressao: string, op?: Opcoes): string;
 }
+declare module '@core/commons/design/status.mjs' {
+  type Estado = { nome: string; titulo: string; mensagem: string; uso: string; papel: string };
+  export const ESTADOS: Record<
+    'operacional' | 'lento' | 'instavel' | 'fora' | 'manutencao' | 'reparo' | 'voltou',
+    Estado
+  >;
+  export const PAPEIS: string[];
+  export function criarStatus(nucleos: { mascotes: unknown }): {
+    desenhar(estado: string, op?: Record<string, unknown>): string;
+    selo(estado: string, op?: Record<string, unknown>): string;
+  };
+}
 declare module '@core/commons/design/fundos.mjs' {
   export const PAPEIS: string[];
   export const fundos: { desenhar(conceito: string, op?: Record<string, unknown>): string };

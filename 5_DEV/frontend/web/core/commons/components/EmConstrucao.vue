@@ -1,18 +1,23 @@
 <!-- Tela de "em construção", comum aos três apps enquanto as telas reais não
-     chegam: fundo Estampa (90_identidade-visual RN-56), logo da frente e o
-     mascote Consertando, com o texto num painel de superfície (RNF-119).
-     Com movimento reduzido, o mascote fica parado (RNF-112). -->
+     chegam: fundo Estampa (90_identidade-visual RN-56), logo da frente e a
+     ilustração de status Manutenção programada (RN-157 a RN-159), com o texto
+     num painel de superfície (RNF-119, RNF-199). Com movimento reduzido, a
+     ilustração fica parada. -->
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { FRENTES, marca } from '@core/commons/design/marca.mjs';
-import { animado, estatico } from '@core/commons/design/mascotes.mjs';
+import * as mascotes from '@core/commons/design/mascotes.mjs';
 import { PAPEIS, fundos } from '@core/commons/design/fundos.mjs';
+import { ESTADOS, PAPEIS as PAPEIS_STATUS, criarStatus } from '@core/commons/design/status.mjs';
 
 const props = defineProps<{ frente: keyof typeof FRENTES }>();
 
 // cores por papel: o SVG embutido acompanha o tema e o modo pelo CSS
 const cor = (papel: string) => `var(--md-sys-color-${papel})`;
+const cores = (papeis: string[]) => Object.fromEntries(papeis.map((p) => [p, cor(p)]));
 const movimentoReduzido = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+// janela compact (< 600dp): ilustração quadrada; nas maiores, horizontal
+const compact = () => window.matchMedia?.('(max-width: 599px)').matches ?? false;
 
 const logo = computed(() =>
   marca.logo(FRENTES[props.frente], {
@@ -21,29 +26,36 @@ const logo = computed(() =>
     boaz: cor('on-surface'),
   }),
 );
-const mascote = computed(() => {
-  const svg = (movimentoReduzido() ? estatico : animado)('consertando');
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-});
 
-// Estampa no tamanho da janela, com rabiscos de ~48dp e sorteio novo a cada abertura
+const status = criarStatus({ mascotes });
+const manutencao = ESTADOS.manutencao;
+
 const estampa = ref('');
+const ilustracao = ref('');
+// Estampa no tamanho da janela, com rabiscos de ~48dp e sorteio novo a cada abertura
 const semente = Math.floor(Math.random() * 1e9);
-function desenharEstampa() {
+function desenhar() {
   estampa.value = fundos.desenhar('estampa', {
     largura: window.innerWidth,
     altura: window.innerHeight,
-    cores: { ...Object.fromEntries(PAPEIS.map((p) => [p, cor(p)])), mascote: '' },
+    cores: { ...cores(PAPEIS), mascote: '' },
     celula: 48,
     semente,
     movimentoReduzido: true,
   });
+  const [largura, altura] = compact() ? [1000, 1000] : [1600, 900];
+  ilustracao.value = status.desenhar('manutencao', {
+    largura,
+    altura,
+    cores: cores(PAPEIS_STATUS),
+    movimentoReduzido: movimentoReduzido(),
+  });
 }
 onMounted(() => {
-  desenharEstampa();
-  window.addEventListener('resize', desenharEstampa);
+  desenhar();
+  window.addEventListener('resize', desenhar);
 });
-onBeforeUnmount(() => window.removeEventListener('resize', desenharEstampa));
+onBeforeUnmount(() => window.removeEventListener('resize', desenhar));
 </script>
 
 <template>
@@ -51,10 +63,10 @@ onBeforeUnmount(() => window.removeEventListener('resize', desenharEstampa));
     <div class="estampa" aria-hidden="true" v-html="estampa"></div>
     <section class="painel" aria-labelledby="em-construcao-titulo">
       <span class="logo" role="img" aria-label="deboaz" v-html="logo"></span>
-      <img class="mascote" :src="mascote" alt="" />
-      <h1 id="em-construcao-titulo" class="md-typescale-headline-small">Estamos construindo o deboaz</h1>
+      <div class="ilustracao" aria-hidden="true" v-html="ilustracao"></div>
+      <h1 id="em-construcao-titulo" class="md-typescale-headline-small">{{ manutencao.titulo }}</h1>
       <p class="md-typescale-body-large">
-        Esta página ainda está em obra. Em breve, novidades por aqui. Volte logo, de boa.
+        Estamos construindo o deboaz e cuidando de cada detalhe. Em breve, novidades por aqui.
       </p>
     </section>
   </main>
@@ -88,9 +100,11 @@ onBeforeUnmount(() => window.removeEventListener('resize', desenharEstampa));
 }
 .painel {
   position: relative;
+  box-sizing: border-box;
   display: grid;
   justify-items: center;
   gap: var(--md-sys-spacing-4);
+  width: 100%;
   max-width: calc(var(--md-sys-layout-content-max-width) / 2);
   padding: var(--md-sys-spacing-8) var(--md-sys-spacing-6);
   border-radius: var(--md-sys-shape-corner-extra-large);
@@ -110,8 +124,14 @@ onBeforeUnmount(() => window.removeEventListener('resize', desenharEstampa));
   height: var(--md-sys-spacing-12);
   width: auto;
 }
-.mascote {
-  width: var(--md-sys-spacing-24);
-  height: var(--md-sys-spacing-24);
+.ilustracao {
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--md-sys-shape-corner-large);
+}
+.ilustracao :deep(svg) {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 </style>
