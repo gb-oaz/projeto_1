@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Símbolo da splash nativa no modo escuro, Android 11 ou mais antigo.
+  Mesmo nome do desenho que o MauiSplashScreen gera (maui_splash_image),
+  dentro de uma pasta "-night": no modo escuro, o Android usa este no lugar
+  daquele. Ele aponta para splash_quest_escuro (símbolo branco), uma imagem
+  gerada pelo MauiImage do .csproj.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item>
+    <bitmap android:gravity="center" android:src="@drawable/splash_quest_escuro" android:mipMap="true" />
+  </item>
+</layer-list>

@@ -14,6 +14,49 @@
     <ApplicationVersion>1</ApplicationVersion>
   </PropertyGroup>
 
+  <!--
+    Ícone e splash nativa (90_identidade-visual RN-54, RN-160, RNF-200).
+
+    No .csproj, o MAUI trata imagens por "itens" especiais e, na compilação,
+    converte cada SVG nos PNGs e tamanhos que o Android e o iOS pedem (a
+    ferramenta se chama Resizetizer). Os SVGs são cópias geradas pelo design
+    system (pnpm run gerar em 0_Assets/design); não edite à mão.
+
+    Passo 1, ícone (MauiIcon): Include é o fundo (preto) e ForegroundFile a
+    frente (o símbolo branco). No Android vira o ícone adaptativo, que o
+    sistema recorta em círculo, gota etc.; no iOS as duas camadas são unidas.
+    ForegroundScale="1" porque a nossa frente já vem desenhada na área segura
+    (o padrão do MAUI, 0.65, encolheria o símbolo).
+
+    Passo 2, splash nativa: o que o sistema mostra enquanto o app carrega,
+    antes da primeira tela; branca no modo claro e preta no escuro (RN-160).
+    O símbolo tem 96 dp nos dois sistemas, o mesmo tamanho do logo na
+    abertura animada, para não haver salto entre as duas.
+      - Android: MauiSplashScreen gera a splash clara (Color é o fundo e
+        BaseSize o tamanho do desenho em dp). O MauiImage gera o símbolo
+        branco, que Platforms/Android/Resources/*-night usa no modo escuro.
+      - iOS: a splash do MauiSplashScreen só tem uma cor, então o iOS usa a
+        própria: a chave UILaunchScreen do Info.plist aponta para uma cor e
+        uma imagem de Splash.xcassets, um catálogo de assets em que cada item
+        traz a variação clara e a escura. ImageAsset leva o catálogo para o
+        app; Link diz onde ele fica dentro do projeto (precisa estar numa
+        pasta .xcassets).
+      - Condition faz o item valer só na compilação daquele sistema.
+  -->
+  <PropertyGroup>
+    <DesignDir>../../core/commons/Resources/Styles/Design/</DesignDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <MauiIcon Include="$(DesignDir)icones/appicon.svg" ForegroundFile="$(DesignDir)icones/appiconfg.svg" ForegroundScale="1" />
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <MauiSplashScreen Include="$(DesignDir)splash/splash_hub.svg" Color="#FFFFFF" BaseSize="224,224" />
+    <MauiImage Include="$(DesignDir)splash/splash_hub_escuro.svg" BaseSize="224,224" />
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+    <ImageAsset Include="$(DesignDir)splash/Splash.xcassets/**/*" Link="Resources/Splash.xcassets/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
   </ItemGroup>

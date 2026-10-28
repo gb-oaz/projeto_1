@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- Raiz do app hub: os tokens do design system vêm do Boaz.Mobile.Core.Commons
+<!-- Raiz do app hub: os tokens e a marca do design system vêm do Boaz.Mobile.Core.Commons
      (RNF-184); as páginas entram por infra/in/ quando houver telas (toda tela
      começa por uma vista aprovada, 06_design-system-telas). -->
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -8,7 +8,12 @@
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
+        <!-- Passo 1: os dicionários de recursos ficam disponíveis para todas as telas do app.
+             Tokens.xaml: cores, espaçamentos, durações e estilos de texto do design system.
+             Marca.xaml: as peças do logo deboaz (anel, antenas e nome) como desenho vetorial.
+             O ";assembly=…" diz que os arquivos estão no projeto Boaz.Mobile.Core.Commons. -->
         <ResourceDictionary Source="/Resources/Styles/Design/Tokens.xaml;assembly=Boaz.Mobile.Core.Commons" />
+        <ResourceDictionary Source="/Resources/Styles/Design/Marca.xaml;assembly=Boaz.Mobile.Core.Commons" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>

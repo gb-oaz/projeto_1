@@ -15,6 +15,7 @@
 //   plataformas/web/marca.mjs                             o núcleo com o nome já medido
 //   plataformas/web/marca-temas.json                      cores da marca em cada tema e modo
 //   plataformas/maui/Marca.xaml                           as peças do símbolo e do nome como PathGeometry (app)
+//   plataformas/maui/icones/appicon.svg + appiconfg[_curto].svg  ícone do app (MauiIcon: fundo + frente)
 // Sem sufixo = hastes longas (landing page e hub); -curto = hastes curtas (quest).
 // O nome é medido na fonte da marca (identidade/fontes/fredoka-medium.ttf).
 // =============================================================================
@@ -53,6 +54,8 @@ export function arquivosMarca(cores, marca) {
     s[`${L}logo-principal${suf}-negativo.svg`] = m.logo(v, { simbolo: '#FFFFFF', de: '#FFFFFF', boaz: '#FFFFFF' }) + '\n';
     s[`${I}app-icone${suf}.svg`] = m.icone(v) + '\n';
     s[`${I}app-icone${suf}-frente.svg`] = m.icone(v, { fundo: null }) + '\n';
+    // no app, nomes que o Android aceita como recurso (só [a-z0-9_])
+    s[`plataformas/maui/icones/appiconfg${suf.replace('-', '_')}.svg`] = s[`${I}app-icone${suf}-frente.svg`];
     s[`${I}favicon${suf}.svg`] = m.favicon(v) + '\n';
     for (const [cor, neg] of [['#000000', ''], ['#FFFFFF', '-negativo']]) {
       s[`identidade/animacoes/abertura${suf}${neg}.svg`] = m.abertura(v, { simbolo: cor, de: cor, boaz: cor }) + '\n';
@@ -62,6 +65,7 @@ export function arquivosMarca(cores, marca) {
     }
   }
   s[`${I}app-icone-fundo.svg`] = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024"><rect width="1024" height="1024" fill="#000000"/></svg>\n';
+  s['plataformas/maui/icones/appicon.svg'] = s[`${I}app-icone-fundo.svg`];
   s['plataformas/web/marca.mjs'] = readFileSync(join(AQUI, 'marca.mjs'), 'utf8') +
     `\n// ── gerado: o nome deboaz em contorno (Fredoka Medium) ──\nexport const NOME = ${JSON.stringify(nome)};\nexport const marca = criarMarca(NOME);\n`;
   s['plataformas/maui/Marca.xaml'] = xamlMarca(nome);
@@ -72,7 +76,9 @@ export function arquivosMarca(cores, marca) {
 /** As peças do logo como PathGeometry, para o app desenhar em vetor com as cores do tema. */
 function xamlMarca(nome) {
   const g = { longo: geometria('longo'), curto: geometria('curto') };
-  const geo = (k, d) => `  <PathGeometry x:Key="${k}" FillRule="EvenOdd" Figures="${d}" />`;
+  // símbolo em EvenOdd (o miolo do anel é um furo); o nome em Nonzero, como a fonte e a web:
+  // na Fredoka a barriga e a haste do d e do b se sobrepõem, e o EvenOdd furaria a sobreposição
+  const geo = (k, d, regra = 'EvenOdd') => `  <PathGeometry x:Key="${k}" FillRule="${regra}" Figures="${d}" />`;
   return `<?xml version="1.0" encoding="UTF-8" ?>
 <!--
   boaz · marca deboaz para .NET MAUI · gerado por 0_Assets/design/scripts/marca-arquivos.mjs (não edite)
@@ -95,8 +101,8 @@ ${geo('MarcaAntenaB', g.longo.b)}
 ${geo('MarcaAntenaD', g.longo.d)}
 ${geo('MarcaAntenaBCurta', g.curto.b)}
 ${geo('MarcaAntenaDCurta', g.curto.d)}
-${geo('MarcaNomeDe', nome.de)}
-${geo('MarcaNomeBoaz', nome.boaz)}
+${geo('MarcaNomeDe', nome.de, 'Nonzero')}
+${geo('MarcaNomeBoaz', nome.boaz, 'Nonzero')}
   <x:Double x:Key="MarcaNomeDeslocamento">${deslocNome(nome, 'longo')}</x:Double>
   <x:Double x:Key="MarcaNomeDeslocamentoCurta">${deslocNome(nome, 'curto')}</x:Double>
 </ResourceDictionary>

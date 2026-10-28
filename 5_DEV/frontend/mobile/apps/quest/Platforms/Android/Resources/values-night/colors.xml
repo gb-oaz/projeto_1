@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash nativa no modo escuro do Android (90_identidade-visual RN-160).
+
+  Como funciona: o Android escolhe cada recurso pela configuração do aparelho.
+  Uma pasta com "-night" no nome só vale quando o aparelho está no modo
+  escuro, e ali ganha da pasta comum. O MauiSplashScreen do .csproj gera a
+  cor maui_splash_color (branco); este arquivo redefine a mesma cor como
+  preto no modo escuro. O tema de splash do MAUI (Maui.SplashTheme, em
+  MainActivity) usa essa cor no fundo.
+-->
+<resources>
+  <color name="maui_splash_color">#FF000000</color>
+</resources>
