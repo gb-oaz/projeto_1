@@ -6,10 +6,16 @@
 //   identidade/imagens/status/<estado>-<formato>-<claro|escuro>.svg            parado
 //   identidade/imagens/status/animados/<estado>-<formato>-<claro|escuro>.svg   em laço (SMIL)
 //   identidade/imagens/status/selos/<estado>-<claro|escuro>.svg                selo: medidor + rosto
-// Em tema de cor, desenhe na hora com o núcleo (scripts/status.mjs) e coresDoStatus.
+//   plataformas/web/status.mjs                    o núcleo, para desenhar qualquer estado na tela
+// Em tema de cor, desenhe na hora com o núcleo e coresDoStatus (ou var(--md-sys-color-…) em SVG embutido).
 // =============================================================================
+import { readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import * as mascotes from './mascotes.mjs';
 import { criarStatus, coresDoStatus, ESTADOS, FORMATOS } from './status.mjs';
+
+const AQUI = dirname(fileURLToPath(import.meta.url));
 
 export function arquivosStatus(cores) {
   const st = criarStatus({ mascotes });
@@ -22,5 +28,6 @@ export function arquivosStatus(cores) {
     }
     s[`identidade/imagens/status/selos/${id}-${modo}.svg`] = st.selo(id, { tamanho: 256, cores: c, movimentoReduzido: true }) + '\n';
   }
+  s['plataformas/web/status.mjs'] = readFileSync(join(AQUI, 'status.mjs'), 'utf8');
   return s;
 }

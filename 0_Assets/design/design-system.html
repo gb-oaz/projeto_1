@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v33</title>
+<title>Design system · boaz · v34</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v33">
-<meta name="design:data" content="2026-10-27 23:16">
+<meta name="design:versao" content="v34">
+<meta name="design:data" content="2026-10-28 00:16">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -24230,7 +24230,8 @@ window.dispatchEvent(new Event('boaz-fundos'));
 //
 // Este módulo não usa nada do Node nem importa nada: recebe o núcleo dos mascotes
 // em criarStatus. O gerador (scripts/status-arquivos.mjs) grava as imagens
-// oficiais em identidade/imagens/status/.
+// oficiais em identidade/imagens/status/ e copia o núcleo para
+// plataformas/web/status.mjs, de onde vai para core/commons/design/ da web.
 //
 //   const st = criarStatus({ mascotes });
 //   st.desenhar('reparo', { largura: 1600, altura: 900, cores, movimentoReduzido });
@@ -25399,8 +25400,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v33</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-27 23:16</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v34</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-28 00:16</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -25500,8 +25501,8 @@ el.innerHTML = fundos.desenhar('halo', {
       <h3 class="sub md-typescale-title-large">Selos</h3>
       <div class="palco"><span class="rotulo">Medidor com o rosto dentro, para chips, listas de serviços e a barra do topo — 64dp e 24dp (mínimo)</span><div class="status-selos" data-status-selos></div></div>
       <h3 class="sub md-typescale-title-large">Arquivos e código</h3>
-      <div class="palco"><span class="rotulo">Oficiais (Branco e Preto) em <code>identidade/imagens/status/</code>: <code>&lt;estado&gt;-&lt;horizontal|vertical|quadrado&gt;-&lt;claro|escuro&gt;.svg</code> (parados), <code>animados/</code> (em laço) e <code>selos/&lt;estado&gt;-&lt;claro|escuro&gt;.svg</code>. Num tema de cor, desenhe na hora com o núcleo:</span><pre class="masc-codigo"><code>import * as mascotes from './mascotes.mjs';
-import { criarStatus, coresDoStatus, ESTADOS } from './status.mjs';
+      <div class="palco"><span class="rotulo">Oficiais (Branco e Preto) em <code>identidade/imagens/status/</code>: <code>&lt;estado&gt;-&lt;horizontal|vertical|quadrado&gt;-&lt;claro|escuro&gt;.svg</code> (parados), <code>animados/</code> (em laço) e <code>selos/&lt;estado&gt;-&lt;claro|escuro&gt;.svg</code>. Na tela, desenhe na hora com o núcleo, que <code>pnpm run gerar</code> copia para <code>plataformas/web/status.mjs</code> (e daí para <code>core/commons/design/</code> da web):</span><pre class="masc-codigo"><code>import * as mascotes from '@core/commons/design/mascotes.mjs';
+import { criarStatus, coresDoStatus, ESTADOS } from '@core/commons/design/status.mjs';
 
 const status = criarStatus({ mascotes });
 const cores = coresDoStatus(tokensDeCor)[paleta][modo];        // modo: 'claro' | 'escuro'
@@ -26170,6 +26171,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v34</td><td>2026-10-28 00:16</td><td>Status do servidor na web: o núcleo <code>scripts/status.mjs</code> é copiado para <code>plataformas/web/status.mjs</code> (e para <code>core/commons/design/</code> da web), para as telas desenharem qualquer estado nas cores do tema</td></tr>
           <tr><td>v33</td><td>2026-10-27 23:16</td><td>Splash screens: nativa (símbolo oficial parado sobre a cor de superfície, com o ícone da splash do Android 12+ e do <code>MauiSplashScreen</code> na área segura de 2/3) e animada (Halo com a abertura do logo; hub só com o logo, quest com mascote que entra depois do nome), com momentos (primeiro acesso, de volta, à noite e voltamos) e carregamento embaixo; núcleo <code>scripts/splash.mjs</code> e oficiais em <code>identidade/imagens/splash/</code></td></tr>
           <tr><td>v32</td><td>2026-10-27 23:00</td><td>Status do servidor: sete estados (operacional, lento, instabilidade parcial, fora do ar, manutenção programada, reparo em andamento e voltou) com o mascote como servidor, o anel do símbolo como medidor de saúde, a linha de pulso e as antenas como barras de sinal, nas cores sucesso, aviso, error e tertiary; selos com o rosto; núcleo <code>scripts/status.mjs</code> e imagens oficiais em <code>identidade/imagens/status/</code>. Nova expressão Consertando (capacete de obra e chave inglesa) e o campo <code>alem</code> das expressões para o enquadramento de só o rosto</td></tr>
           <tr><td>v31</td><td>2026-10-24 21:25</td><td>Cópias do design system numa por frente, em <code>core/commons/</code> da web e do mobile (<code>scripts/sincronizar.mjs</code>), conforme <code>14_estrutura-projetos</code>; componentes comuns da web sem cópia</td></tr>
@@ -26179,10 +26181,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v27</td><td>2026-10-19 14:16</td><td>Botão segmentado cheio; topo da casca só com logo e avisos no compact e no medium (nome e foto a partir do expanded); foto ou mascote adotado no avatar; trilho com Conta embaixo; aviso com botão de ícone no compact; card do catálogo com as Ondas do vão na forma do padrinho; fundos com peças nenhuma, origem e raio do anel</td></tr>
           <tr><td>v26</td><td>2026-10-19 13:37</td><td>Fundos: Anel gigante e Ondas do vão na forma escolhida do mascote; nas Antenas em ritmo os mascotes acompanham a animação da barra</td></tr>
           <tr><td>v25</td><td>2026-10-19 04:21</td><td>Interruptor (switch) entre os componentes básicos; card do catálogo com fundo cheio em secondary-container e o mascote padrinho do módulo à direita, metade cortada pela borda; seletor de tema com a opção Mascotes nas cores do tema</td></tr>
-          <tr><td>v24</td><td>2026-10-19 04:05</td><td>Turma de mascotes: as 30 expressões, pequenas e lado a lado numa grade fechada, em formas variadas e só na proporção normal</td></tr>
-                            </tbody>
+                                      </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v33 · 2026-10-27 23:16</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v34 · 2026-10-28 00:16</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>

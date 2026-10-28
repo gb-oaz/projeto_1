@@ -21,7 +21,8 @@
 //
 // Este módulo não usa nada do Node nem importa nada: recebe o núcleo dos mascotes
 // em criarStatus. O gerador (scripts/status-arquivos.mjs) grava as imagens
-// oficiais em identidade/imagens/status/.
+// oficiais em identidade/imagens/status/ e copia o núcleo para
+// plataformas/web/status.mjs, de onde vai para core/commons/design/ da web.
 //
 //   const st = criarStatus({ mascotes });
 //   st.desenhar('reparo', { largura: 1600, altura: 900, cores, movimentoReduzido });
