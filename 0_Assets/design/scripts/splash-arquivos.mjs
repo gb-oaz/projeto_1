@@ -8,6 +8,7 @@
 //   identidade/imagens/splash/momentos/<momento>-<frente>-<claro|escuro>.svg   momentos, no celular em pé (vertical)
 //   identidade/imagens/splash/nativa/<frente>-<formato>-<claro|escuro>.svg     nativa: símbolo parado sobre cor lisa
 //   identidade/imagens/splash/nativa/icone-<frente>-<claro|escuro>.svg         ícone da splash do Android 12+ / MauiSplashScreen
+//   plataformas/maui/splash/splash_<frente>.svg   o ícone claro, para o MauiSplashScreen do app (fundo branco)
 // Em tema de cor, desenhe na hora com o núcleo (scripts/splash.mjs) e as cores dos fundos.
 // =============================================================================
 import { criarMarca } from './marca.mjs';
@@ -35,5 +36,6 @@ export function arquivosSplash(cores, marca) {
     for (const mo of Object.keys(MOMENTOS).filter((k) => k !== 'padrao')) s[`${P}momentos/${mo}-${fr}-${modo}.svg`] = sp.animada(fr, { largura: 900, altura: 1600, cores: c, momento: mo }) + '\n';
     s[`${P}nativa/icone-${fr}-${modo}.svg`] = sp.icone(fr, { cor: NATIVA[modo].cor }) + '\n';
   }
+  for (const fr of Object.keys(FRENTES)) s[`plataformas/maui/splash/splash_${fr}.svg`] = s[`${P}nativa/icone-${fr}-claro.svg`];
   return s;
 }

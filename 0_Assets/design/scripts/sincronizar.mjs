@@ -5,7 +5,7 @@
 // gerados ganham uma cópia por frente, em core/commons/, versionada no git:
 //
 //   5_DEV/frontend/web/core/commons/design/                    ← plataformas/web/*
-//   5_DEV/frontend/mobile/core/commons/Resources/Styles/Design/ ← plataformas/maui/Tokens.xaml e paletas/*.xaml
+//   5_DEV/frontend/mobile/core/commons/Resources/Styles/Design/ ← plataformas/maui/* (tokens, paletas, marca, ícone e splash)
 //   5_DEV/backend/ms_mono/wwwroot/doc/api/design/              ← plataformas/api/* (documentação da API)
 //
 // Os componentes comuns da web ficam direto em web/core/commons/components/ e

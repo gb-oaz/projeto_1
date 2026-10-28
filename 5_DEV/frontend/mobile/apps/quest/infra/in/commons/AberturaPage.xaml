@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Primeira tela do app quest: a abertura animada com o carregamento embaixo
+  (90_identidade-visual RN-160 a RN-162).
+
+  No MAUI, uma tela inteira é uma Page (aqui uma ContentPage, que tem um
+  único conteúdo). A página só embrulha o componente comum Abertura, que mora
+  no projeto Boaz.Mobile.Core.Commons e serve aos dois apps.
+    - xmlns:componentes cria um "apelido" para o namespace C# do componente,
+      dentro do assembly do Commons; depois usamos <componentes:Abertura />.
+    - BackgroundColor com AppThemeBinding pinta a página inteira (inclusive
+      atrás das barras do sistema) na cor de superfície do modo claro ou escuro.
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:componentes="clr-namespace:Boaz.Mobile.Core.Commons.Components;assembly=Boaz.Mobile.Core.Commons"
+             x:Class="Boaz.Mobile.Quest.Infra.In.Commons.AberturaPage"
+             BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}">
+  <!-- Curto="True": o quest usa o logo de antenas curtas. -->
+  <componentes:Abertura Curto="True" />
+</ContentPage>

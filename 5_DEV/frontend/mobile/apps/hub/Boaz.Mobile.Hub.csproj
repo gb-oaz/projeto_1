@@ -14,6 +14,33 @@
     <ApplicationVersion>1</ApplicationVersion>
   </PropertyGroup>
 
+  <!--
+    Ícone e splash nativa (90_identidade-visual RN-54, RN-160, RNF-200).
+
+    No .csproj, o MAUI trata imagens por "itens" especiais e, na compilação,
+    converte cada SVG nos PNGs e tamanhos que o Android e o iOS pedem (a
+    ferramenta se chama Resizetizer). Os SVGs são cópias geradas pelo design
+    system (pnpm run gerar em 0_Assets/design); não edite à mão.
+
+    Passo 1, ícone (MauiIcon): Include é o fundo (preto) e ForegroundFile a
+    frente (o símbolo branco). No Android vira o ícone adaptativo, que o
+    sistema recorta em círculo, gota etc.; no iOS as duas camadas são unidas.
+    ForegroundScale="1" porque a nossa frente já vem desenhada na área segura
+    (o padrão do MAUI, 0.65, encolheria o símbolo).
+
+    Passo 2, splash nativa (MauiSplashScreen): o que o sistema mostra enquanto
+    o app carrega, antes da primeira tela. Color é o fundo e BaseSize o
+    tamanho do desenho em dp: 224 dá ao símbolo 96 dp, o mesmo tamanho do
+    logo na abertura animada, sem salto entre as duas (RN-160).
+  -->
+  <PropertyGroup>
+    <DesignDir>../../core/commons/Resources/Styles/Design/</DesignDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <MauiIcon Include="$(DesignDir)icones/appicon.svg" ForegroundFile="$(DesignDir)icones/appiconfg.svg" ForegroundScale="1" />
+    <MauiSplashScreen Include="$(DesignDir)splash/splash_hub.svg" Color="#FFFFFF" BaseSize="224,224" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
   </ItemGroup>

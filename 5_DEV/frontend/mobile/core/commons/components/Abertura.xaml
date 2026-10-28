@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Abertura animada do app (90_identidade-visual RN-51, RN-52, RN-160 a RN-162):
+  o logo deboaz se forma no centro e o carregamento da marca aparece embaixo,
+  com o texto Carregando…
+
+  Este arquivo é só a estrutura visual; o comportamento (encaixar as peças e
+  animar) está em Abertura.xaml.cs. Para ler XAML:
+    - cada tag é um elemento da tela (Grid, Path, Label…) e os atributos são
+      as propriedades dele;
+    - x:Name="Logo" dá um nome ao elemento, que o .xaml.cs usa como um campo;
+    - {StaticResource Chave} busca um recurso (cor, tamanho, estilo) nos
+      dicionários juntados em App.xaml: aqui, os tokens do design system;
+    - {AppThemeBinding Light=…, Dark=…} troca o valor sozinho quando o
+      aparelho muda entre modo claro e escuro.
+-->
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Boaz.Mobile.Core.Commons.Components.Abertura"
+             BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}">
+  <ContentView.Resources>
+    <!--
+      Estilos locais. Um Style sem x:Key vale para todos os elementos do tipo
+      (aqui, todo Path deste componente); com x:Key, só para quem o pedir.
+      Aspect="None" desenha a geometria nas coordenadas originais, sem esticar:
+      é o que mantém cada peça no lugar certo em relação às outras.
+    -->
+    <Style TargetType="Path">
+      <Setter Property="Aspect" Value="None" />
+      <Setter Property="Fill" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+    </Style>
+    <Style x:Key="PecaCarregando" TargetType="Path">
+      <Setter Property="Aspect" Value="None" />
+      <Setter Property="Fill" Value="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+    </Style>
+  </ContentView.Resources>
+
+  <!--
+    Grade de duas linhas: "*" ocupa todo o espaço que sobra (o logo fica no
+    meio dele) e "Auto" tem a altura do conteúdo (o carregamento, embaixo).
+    Padding 48 dp (Spacing12) afasta o conteúdo das bordas.
+  -->
+  <Grid RowDefinitions="*,Auto" Padding="{StaticResource Spacing12}">
+    <!--
+      O logo. Num Grid sem linhas nem colunas, os filhos ficam um sobre o outro
+      (o último por cima). Todas as peças começam invisíveis (Opacity="0") e a
+      abertura as faz aparecer. O tamanho do Grid e o desenho (Data) de cada
+      Path são definidos no código, em Montar().
+      SemanticProperties.Description é o que o leitor de tela fala.
+    -->
+    <Grid x:Name="Logo"
+          HorizontalOptions="Center"
+          VerticalOptions="Center"
+          SemanticProperties.Description="deboaz">
+      <Path x:Name="AntenaB" Opacity="0" />
+      <Path x:Name="AntenaD" Opacity="0" />
+      <Path x:Name="Anel" Opacity="0" />
+      <Path x:Name="NomeDe" Opacity="0" />
+      <Path x:Name="NomeBoaz" Opacity="0" />
+    </Grid>
+
+    <!--
+      O carregamento, na segunda linha (Grid.Row="1"): símbolo pequeno e o
+      texto, empilhados (VerticalStackLayout) com 12 dp entre eles (Spacing3).
+    -->
+    <VerticalStackLayout x:Name="Carregando"
+                         Grid.Row="1"
+                         Opacity="0"
+                         Spacing="{StaticResource Spacing3}"
+                         HorizontalOptions="Center">
+      <Grid x:Name="Simbolo" HorizontalOptions="Center">
+        <Path x:Name="SimboloAntenaB" Style="{StaticResource PecaCarregando}" />
+        <Path x:Name="SimboloAntenaD" Style="{StaticResource PecaCarregando}" />
+        <Path x:Name="SimboloAnel" Style="{StaticResource PecaCarregando}" />
+      </Grid>
+      <!-- LabelLarge é o estilo de texto do design system (fonte, tamanho e espaçamento) -->
+      <Label Text="Carregando…"
+             Style="{StaticResource LabelLarge}"
+             TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
+             HorizontalOptions="Center" />
+    </VerticalStackLayout>
+  </Grid>
+</ContentView>
