@@ -7,7 +7,7 @@ using Path = Microsoft.Maui.Controls.Shapes.Path;
 
 namespace Boaz.Mobile.Core.Commons.Components;
 
-// Abertura animada do app (90_identidade-visual RN-51, RN-52, RN-162).
+// Abertura animada do app (90_identidade-visual RN-51, RN-52, RN-161, RN-162).
 //
 // Como funciona um componente no .NET MAUI: ele tem duas metades, que o
 // compilador junta numa classe só ("partial class").
@@ -23,9 +23,11 @@ namespace Boaz.Mobile.Core.Commons.Components;
 //   2. Iniciar(): roda quando o componente entra na tela (evento Loaded). Se o
 //      aparelho pede movimento reduzido, mostra tudo parado e para por aí.
 //   3. Abrir(): a abertura, que toca uma vez (cerca de 1,8 s, dentro dos 2,5 s
-//      da RN-51): o anel cresce, as antenas sobem de dentro do vão e o nome entra.
+//      da RN-51): o anel cresce, as antenas sobem de dentro do vão e o nome
+//      entra. Se houver mascote (quest), ele sobe e aparece logo depois do nome.
 //   4. Carregar(): mostra "Carregando…" embaixo e repete o carregamento em laço
-//      (as antenas descem para o vão e voltam) até a tela sair.
+//      (as antenas descem para o vão e voltam) até a tela sair. Ao mesmo
+//      tempo, Pular() faz o mascote pular em laço.
 //   5. Parar(): roda quando o componente sai da tela (evento Unloaded) e
 //      interrompe as animações, para não ficar trabalhando escondido.
 //
@@ -57,6 +59,18 @@ public partial class Abertura : ContentView
         set => SetValue(CurtoProperty, value);
     }
 
+    // Mascote embaixo do logo: o nome da imagem gerada pelo MauiImage do app
+    // (ex.: "mascote_quest.png"). Vazio = sem mascote, como no hub.
+    public static readonly BindableProperty MascoteProperty = BindableProperty.Create(
+        nameof(Mascote), typeof(string), typeof(Abertura), null, propertyChanged: (view, _, valor) => ((Abertura)view).MostrarMascote(valor as string));
+
+    /// <summary>Imagem do mascote da abertura (RN-161); null ou vazio = sem mascote.</summary>
+    public string? Mascote
+    {
+        get => (string?)GetValue(MascoteProperty);
+        set => SetValue(MascoteProperty, value);
+    }
+
     // Serve para cancelar o laço do carregamento quando a tela sai.
     private CancellationTokenSource? animacao;
 
@@ -84,11 +98,21 @@ public partial class Abertura : ContentView
         Posicionar(Simbolo, Recurso<double>("Spacing10"), topo, LarguraSimbolo,
             (SimboloAnel, "MarcaAnel", 0), (SimboloAntenaB, "MarcaAntenaB" + curta, 0), (SimboloAntenaD, "MarcaAntenaD" + curta, 0));
 
+        // o mascote tem o dobro da altura do logo: 192 dp (2 × Spacing24)
+        MascoteImagem.WidthRequest = MascoteImagem.HeightRequest = 2 * Recurso<double>("Spacing24");
+
         // AnchorX e AnchorY são o ponto em volta do qual o elemento cresce ou gira,
         // de 0 a 1 (0,5 = meio). O padrão é o meio do Path, que aqui é o logo
         // inteiro; apontamos para o centro do anel, para ele crescer no lugar.
         Anel.AnchorX = CentroAnelX / LarguraLogo;
         Anel.AnchorY = (CentroAnelY - topo) / (AlturaQuadro - topo);
+    }
+
+    // Chamado quando a página define Mascote: põe a imagem e mostra o elemento.
+    private void MostrarMascote(string? imagem)
+    {
+        MascoteImagem.Source = imagem;
+        MascoteImagem.IsVisible = !string.IsNullOrEmpty(imagem);
     }
 
     // Encaixa as peças num quadro (um Grid) com a altura pedida, em dp.
@@ -132,7 +156,7 @@ public partial class Abertura : ContentView
         // No XAML as peças começam invisíveis (Opacity="0"); aqui elas aparecem de uma vez.
         if (MovimentoReduzido())
         {
-            foreach (var peca in new View[] { Anel, AntenaB, AntenaD, NomeDe, NomeBoaz, Carregando })
+            foreach (var peca in new View[] { Anel, AntenaB, AntenaD, NomeDe, NomeBoaz, MascoteImagem, Carregando })
             {
                 peca.Opacity = 1;
             }
@@ -142,7 +166,8 @@ public partial class Abertura : ContentView
         try
         {
             await Abrir();
-            await Carregar(token);
+            // carregamento e pulo do mascote rodam juntos, cada um no seu laço
+            await Task.WhenAll(Carregar(token), Pular(token));
         }
         catch (OperationCanceledException)
         {
@@ -156,7 +181,7 @@ public partial class Abertura : ContentView
         animacao?.Cancel();
         animacao?.Dispose();
         animacao = null;
-        foreach (var peca in new View[] { Anel, AntenaB, AntenaD, NomeDe, NomeBoaz, Carregando, SimboloAntenaB, SimboloAntenaD })
+        foreach (var peca in new View[] { Anel, AntenaB, AntenaD, NomeDe, NomeBoaz, MascoteImagem, Carregando, SimboloAntenaB, SimboloAntenaD })
         {
             peca.CancelAnimations();
         }
@@ -188,6 +213,37 @@ public partial class Abertura : ContentView
         await Task.WhenAll(
             Mover(NomeDe, 0, 1, nome, Easing.CubicOut),
             Mover(NomeBoaz, 0, 1, nome, Easing.CubicOut));
+
+        // 3d. o mascote (se houver) sobe um quarto da própria altura enquanto aparece (500 ms)
+        if (MascoteImagem.IsVisible)
+        {
+            MascoteImagem.TranslationY = MascoteImagem.HeightRequest / 4;
+            await Mover(MascoteImagem, 0, 1, Duracao("MotionDurationLong2"), Easing.CubicOut);
+        }
+    }
+
+    // O mascote pula em laço, como o movimento "pular" dos mascotes
+    // (0_Assets/design/scripts/mascotes.mjs): sobe, desce e amassa um pouco
+    // ao tocar o chão. Sem mascote, termina na hora.
+    private async Task Pular(CancellationToken token)
+    {
+        if (!MascoteImagem.IsVisible)
+        {
+            return;
+        }
+        // amassa a partir da base (AnchorY = 1 é a borda de baixo), não do meio
+        MascoteImagem.AnchorY = 1;
+        var altura = MascoteImagem.HeightRequest / 12;
+        var subida = Duracao("MotionDurationMedium2");
+        var pouso = Duracao("MotionDurationShort3");
+        while (!token.IsCancellationRequested)
+        {
+            await MascoteImagem.TranslateToAsync(0, -altura, subida, Easing.CubicOut);
+            await MascoteImagem.TranslateToAsync(0, 0, subida, Easing.CubicIn);
+            await MascoteImagem.ScaleYToAsync(0.92, pouso, Easing.CubicOut);
+            await MascoteImagem.ScaleYToAsync(1, pouso, Easing.CubicOut);
+            await Task.Delay((int)Duracao("MotionDurationExtraLong4"), token);
+        }
     }
 
     // Passo 4: mostra o bloco de carregamento e repete o laço até o token ser

@@ -42,22 +42,35 @@
   -->
   <Grid RowDefinitions="*,Auto" Padding="{StaticResource Spacing12}">
     <!--
-      O logo. Num Grid sem linhas nem colunas, os filhos ficam um sobre o outro
+      O logo e, embaixo dele, o mascote, empilhados no meio da primeira linha.
+      Num Grid sem linhas nem colunas, os filhos ficam um sobre o outro
       (o último por cima). Todas as peças começam invisíveis (Opacity="0") e a
       abertura as faz aparecer. O tamanho do Grid e o desenho (Data) de cada
       Path são definidos no código, em Montar().
       SemanticProperties.Description é o que o leitor de tela fala.
     -->
-    <Grid x:Name="Logo"
-          HorizontalOptions="Center"
-          VerticalOptions="Center"
-          SemanticProperties.Description="deboaz">
-      <Path x:Name="AntenaB" Opacity="0" />
-      <Path x:Name="AntenaD" Opacity="0" />
-      <Path x:Name="Anel" Opacity="0" />
-      <Path x:Name="NomeDe" Opacity="0" />
-      <Path x:Name="NomeBoaz" Opacity="0" />
-    </Grid>
+    <VerticalStackLayout VerticalOptions="Center" Spacing="{StaticResource Spacing8}">
+      <Grid x:Name="Logo"
+            HorizontalOptions="Center"
+            SemanticProperties.Description="deboaz">
+        <Path x:Name="AntenaB" Opacity="0" />
+        <Path x:Name="AntenaD" Opacity="0" />
+        <Path x:Name="Anel" Opacity="0" />
+        <Path x:Name="NomeDe" Opacity="0" />
+        <Path x:Name="NomeBoaz" Opacity="0" />
+      </Grid>
+
+      <!--
+        Mascote (RN-161), 32 dp abaixo do logo (Spacing8). Só aparece se a
+        página preencher a propriedade Mascote (o quest preenche; o hub não).
+        É decorativo, então fica fora do leitor de tela (IsInAccessibleTree).
+      -->
+      <Image x:Name="MascoteImagem"
+             IsVisible="False"
+             Opacity="0"
+             HorizontalOptions="Center"
+             AutomationProperties.IsInAccessibleTree="False" />
+    </VerticalStackLayout>
 
     <!--
       O carregamento, na segunda linha (Grid.Row="1"): símbolo pequeno e o

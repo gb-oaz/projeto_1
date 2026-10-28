@@ -8,7 +8,11 @@
 //   identidade/imagens/splash/momentos/<momento>-<frente>-<claro|escuro>.svg   momentos, no celular em pé (vertical)
 //   identidade/imagens/splash/nativa/<frente>-<formato>-<claro|escuro>.svg     nativa: símbolo parado sobre cor lisa
 //   identidade/imagens/splash/nativa/icone-<frente>-<claro|escuro>.svg         ícone da splash do Android 12+ / MauiSplashScreen
-//   plataformas/maui/splash/splash_<frente>.svg   o ícone claro, para o MauiSplashScreen do app (fundo branco)
+//   plataformas/maui/splash/splash_<frente>[_escuro].svg   ícone da splash nativa do app: o claro no MauiSplashScreen,
+//                                                          o escuro no Android em modo noturno (values-night)
+//   plataformas/maui/splash/Splash.xcassets/               a splash nativa do iOS (UILaunchScreen): fundo e símbolo
+//                                                          com a variação clara e a escura
+//   plataformas/maui/splash/mascote_<frente>.svg   o mascote da abertura da frente, parado (o app anima)
 // Em tema de cor, desenhe na hora com o núcleo (scripts/splash.mjs) e as cores dos fundos.
 // =============================================================================
 import { criarMarca } from './marca.mjs';
@@ -36,6 +40,27 @@ export function arquivosSplash(cores, marca) {
     for (const mo of Object.keys(MOMENTOS).filter((k) => k !== 'padrao')) s[`${P}momentos/${mo}-${fr}-${modo}.svg`] = sp.animada(fr, { largura: 900, altura: 1600, cores: c, momento: mo }) + '\n';
     s[`${P}nativa/icone-${fr}-${modo}.svg`] = sp.icone(fr, { cor: NATIVA[modo].cor }) + '\n';
   }
-  for (const fr of Object.keys(FRENTES)) s[`plataformas/maui/splash/splash_${fr}.svg`] = s[`${P}nativa/icone-${fr}-claro.svg`];
+  const M = 'plataformas/maui/splash/', X = `${M}Splash.xcassets/`;
+  const json = (o) => JSON.stringify({ ...o, info: { author: 'xcode', version: 1 } }, null, 2) + '\n';
+  const escuro = [{ appearance: 'luminosity', value: 'dark' }];
+  const rgb = (hex) => Object.fromEntries(['red', 'green', 'blue'].map((k, i) => [k, (parseInt(hex.slice(1 + 2 * i, 3 + 2 * i), 16) / 255).toFixed(3)]));
+  const cor = (hex) => ({ 'color-space': 'srgb', components: { ...rgb(hex), alpha: '1.000' } });
+  s[`${X}Contents.json`] = json({});
+  s[`${X}splash_fundo.colorset/Contents.json`] = json({ colors: [
+    { idiom: 'universal', color: cor(NATIVA.claro.fundo) },
+    { idiom: 'universal', appearances: escuro, color: cor(NATIVA.escuro.fundo) },
+  ] });
+  for (const fr of Object.keys(FRENTES)) {
+    s[`${M}splash_${fr}.svg`] = s[`${P}nativa/icone-${fr}-claro.svg`];
+    s[`${M}splash_${fr}_escuro.svg`] = s[`${P}nativa/icone-${fr}-escuro.svg`];
+    // no iOS a imagem da splash aparece no tamanho do próprio arquivo: 224 pt, como o BaseSize do MauiSplashScreen
+    for (const modo of ['claro', 'escuro']) s[`${X}splash_${fr}.imageset/${modo}.svg`] = s[`${P}nativa/icone-${fr}-${modo}.svg`].replace('width="1024" height="1024"', 'width="224" height="224"');
+    s[`${X}splash_${fr}.imageset/Contents.json`] = json({
+      images: [{ idiom: 'universal', filename: 'claro.svg' }, { idiom: 'universal', appearances: escuro, filename: 'escuro.svg' }],
+      properties: { 'preserves-vector-representation': true },
+    });
+    const m = FRENTES[fr].mascote;
+    if (m) s[`${M}mascote_${fr}.svg`] = mascotes.estatico(m.expressao, { forma: m.forma }) + '\n';
+  }
   return s;
 }

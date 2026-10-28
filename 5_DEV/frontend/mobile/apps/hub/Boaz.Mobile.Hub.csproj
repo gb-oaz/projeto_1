@@ -28,17 +28,33 @@
     ForegroundScale="1" porque a nossa frente já vem desenhada na área segura
     (o padrão do MAUI, 0.65, encolheria o símbolo).
 
-    Passo 2, splash nativa (MauiSplashScreen): o que o sistema mostra enquanto
-    o app carrega, antes da primeira tela. Color é o fundo e BaseSize o
-    tamanho do desenho em dp: 224 dá ao símbolo 96 dp, o mesmo tamanho do
-    logo na abertura animada, sem salto entre as duas (RN-160).
+    Passo 2, splash nativa: o que o sistema mostra enquanto o app carrega,
+    antes da primeira tela; branca no modo claro e preta no escuro (RN-160).
+    O símbolo tem 96 dp nos dois sistemas, o mesmo tamanho do logo na
+    abertura animada, para não haver salto entre as duas.
+      - Android: MauiSplashScreen gera a splash clara (Color é o fundo e
+        BaseSize o tamanho do desenho em dp). O MauiImage gera o símbolo
+        branco, que Platforms/Android/Resources/*-night usa no modo escuro.
+      - iOS: a splash do MauiSplashScreen só tem uma cor, então o iOS usa a
+        própria: a chave UILaunchScreen do Info.plist aponta para uma cor e
+        uma imagem de Splash.xcassets, um catálogo de assets em que cada item
+        traz a variação clara e a escura. ImageAsset leva o catálogo para o
+        app; Link diz onde ele fica dentro do projeto (precisa estar numa
+        pasta .xcassets).
+      - Condition faz o item valer só na compilação daquele sistema.
   -->
   <PropertyGroup>
     <DesignDir>../../core/commons/Resources/Styles/Design/</DesignDir>
   </PropertyGroup>
   <ItemGroup>
     <MauiIcon Include="$(DesignDir)icones/appicon.svg" ForegroundFile="$(DesignDir)icones/appiconfg.svg" ForegroundScale="1" />
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
     <MauiSplashScreen Include="$(DesignDir)splash/splash_hub.svg" Color="#FFFFFF" BaseSize="224,224" />
+    <MauiImage Include="$(DesignDir)splash/splash_hub_escuro.svg" BaseSize="224,224" />
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+    <ImageAsset Include="$(DesignDir)splash/Splash.xcassets/**/*" Link="Resources/Splash.xcassets/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

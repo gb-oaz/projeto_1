@@ -16,6 +16,8 @@
              xmlns:componentes="clr-namespace:Boaz.Mobile.Core.Commons.Components;assembly=Boaz.Mobile.Core.Commons"
              x:Class="Boaz.Mobile.Quest.Infra.In.Commons.AberturaPage"
              BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}">
-  <!-- Curto="True": o quest usa o logo de antenas curtas. -->
-  <componentes:Abertura Curto="True" />
+  <!-- Curto="True": o quest usa o logo de antenas curtas.
+       Mascote: a imagem do mascote da abertura, gerada pelo MauiImage do .csproj
+       (o arquivo é mascote_quest.svg; no app ele vira mascote_quest.png). -->
+  <componentes:Abertura Curto="True" Mascote="mascote_quest.png" />
 </ContentPage>

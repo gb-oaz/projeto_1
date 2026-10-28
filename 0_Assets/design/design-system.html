@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v35</title>
+<title>Design system · boaz · v36</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v35">
-<meta name="design:data" content="2026-10-28 01:37">
+<meta name="design:versao" content="v36">
+<meta name="design:data" content="2026-10-28 02:35">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -25400,8 +25400,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v35</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-28 01:37</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v36</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-28 02:35</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -26171,6 +26171,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v36</td><td>2026-10-28 02:35</td><td>App (MAUI): splash nativa também no escuro (<code>plataformas/maui/splash/splash_&lt;frente&gt;_escuro.svg</code> para o Android em modo noturno e o catálogo <code>Splash.xcassets</code>, com fundo e símbolo claro/escuro, para o <code>UILaunchScreen</code> do iOS) e o mascote da abertura da frente parado (<code>mascote_&lt;frente&gt;.svg</code>), que o app anima</td></tr>
           <tr><td>v35</td><td>2026-10-28 01:37</td><td>App (MAUI): ícone oficial (<code>plataformas/maui/icones/appicon.svg</code> + <code>appiconfg[_curto].svg</code>, para o <code>MauiIcon</code>) e ícone da splash nativa no claro (<code>plataformas/maui/splash/splash_&lt;frente&gt;.svg</code>, para o <code>MauiSplashScreen</code>), copiados para <code>core/commons/Resources/Styles/Design/</code> do mobile; em <code>Marca.xaml</code>, o nome passa a <code>FillRule="Nonzero"</code> (no EvenOdd, a sobreposição da barriga com a haste do d e do b virava um risco vazado)</td></tr>
           <tr><td>v34</td><td>2026-10-28 00:16</td><td>Status do servidor na web: o núcleo <code>scripts/status.mjs</code> é copiado para <code>plataformas/web/status.mjs</code> (e para <code>core/commons/design/</code> da web), para as telas desenharem qualquer estado nas cores do tema</td></tr>
           <tr><td>v33</td><td>2026-10-27 23:16</td><td>Splash screens: nativa (símbolo oficial parado sobre a cor de superfície, com o ícone da splash do Android 12+ e do <code>MauiSplashScreen</code> na área segura de 2/3) e animada (Halo com a abertura do logo; hub só com o logo, quest com mascote que entra depois do nome), com momentos (primeiro acesso, de volta, à noite e voltamos) e carregamento embaixo; núcleo <code>scripts/splash.mjs</code> e oficiais em <code>identidade/imagens/splash/</code></td></tr>
@@ -26184,7 +26185,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v25</td><td>2026-10-19 04:21</td><td>Interruptor (switch) entre os componentes básicos; card do catálogo com fundo cheio em secondary-container e o mascote padrinho do módulo à direita, metade cortada pela borda; seletor de tema com a opção Mascotes nas cores do tema</td></tr>
                                       </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v35 · 2026-10-28 01:37</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v36 · 2026-10-28 02:35</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>

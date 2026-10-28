@@ -5,6 +5,15 @@
   <!-- ícone do app: o conjunto que o MauiIcon do .csproj gera ("appicon" vem de appicon.svg) -->
   <key>XSAppIconAssets</key>
   <string>Assets.xcassets/appicon.appiconset</string>
+  <!-- splash nativa (RN-160): fundo e símbolo do catálogo Splash.xcassets, que trocam
+       sozinhos entre claro e escuro (o .csproj explica) -->
+  <key>UILaunchScreen</key>
+  <dict>
+    <key>UIColorName</key>
+    <string>splash_fundo</string>
+    <key>UIImageName</key>
+    <string>splash_hub</string>
+  </dict>
   <key>LSRequiresIPhoneOS</key>
   <true/>
   <key>UIDeviceFamily</key>

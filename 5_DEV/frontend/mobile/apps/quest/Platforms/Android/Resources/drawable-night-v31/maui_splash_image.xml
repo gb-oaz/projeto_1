@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Símbolo da splash nativa no modo escuro, Android 12 ou mais novo ("-v31"
+  = API 31). A partir do 12, o próprio sistema desenha a splash: o ícone tem
+  108 dp e só o círculo central fica visível (RNF-200). Mesmo papel de
+  drawable-night/maui_splash_image.xml, no formato que o MAUI gera para o 12+.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:width="108dp" android:height="108dp" android:gravity="center">
+    <bitmap android:gravity="fill" android:src="@drawable/splash_quest_escuro" android:mipMap="true" />
+  </item>
+</layer-list>
