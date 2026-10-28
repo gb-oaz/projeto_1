@@ -40,6 +40,10 @@ services:
   mongodb:
     image: mongo:8.0
     tmpfs: [/data/db, /data/configdb]
+    # kernel 6.19 a 7.0.13 (SERVER-121912): o glibc fica com o rseq e o TCMalloc
+    # do MongoDB usa cache por thread; tirar com kernel 7.0.14 ou mais novo
+    environment:
+      GLIBC_TUNABLES: glibc.pthread.rseq=1
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
       interval: 5s
