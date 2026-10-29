@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Identidade e acesso · boaz · v13</title>
+<title>Identidade e acesso · boaz · v14</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="16_identidade-acesso">
 <meta name="boaz:caminho" content="1_Requisitos/16_identidade-acesso.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v13">
-<meta name="boaz:data" content="2026-10-29 04:49">
+<meta name="boaz:versao" content="v14">
+<meta name="boaz:data" content="2026-10-29 05:00">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>16_identidade-acesso</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v13</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 04:49</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v14</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 05:00</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1159,8 +1159,8 @@ Cenário: pagamento regularizado
       <figcaption><strong>Identidade e acesso · classes</strong><code>2_Diagramas/identidade-acesso-classes_v01_20261029-0445.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/identidade-acesso-er_v01_20261029-0448.svg"><img src="../2_Diagramas/identidade-acesso-er_v01_20261029-0448.svg" alt="Entidade-relacionamento de identidade e acesso: tabelas conta, usuario, permissao, responsavel, geracao_senha, sessao, auditoria e acesso_anonimo, ligadas a modulo"></a>
-      <figcaption><strong>Identidade e acesso · entidade-relacionamento</strong><code>2_Diagramas/identidade-acesso-er_v01_20261029-0448.svg</code></figcaption>
+      <a href="../2_Diagramas/identidade-acesso-documentos_v01_20261029-0500.svg"><img src="../2_Diagramas/identidade-acesso-documentos_v01_20261029-0500.svg" alt="Modelo de documentos de identidade e acesso: contas, usuarios particionados pela sigla com permissões e responsáveis embutidos, geracoesSenha, acessosAnonimos, auditoria e sessão no Redis"></a>
+      <figcaption><strong>Identidade e acesso · modelo de documentos</strong><code>2_Diagramas/identidade-acesso-documentos_v01_20261029-0500.svg</code></figcaption>
     </figure>
     <h3>Telas do hub: conta nova e entrada</h3>
     <p>Exemplo de ponta a ponta com a Escola Bento Freitas Gonçalves e a staff Maria Souza. As vistas estão em compact; o botão <strong>Paleta</strong> troca o tema de cor e o modo.</p>
@@ -1222,7 +1222,8 @@ Cenário: pagamento regularizado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v13</span></td><td>2026-10-29 04:49</td><td>Diagramas de classes e de entidade-relacionamento (identidade-acesso-classes v01, identidade-acesso-er v01)</td></tr>
+      <tr><td><span class="boaz-versao">v14</span></td><td>2026-10-29 05:00</td><td>Diagrama entidade-relacionamento trocado pelo modelo de documentos (identidade-acesso-documentos v01), para o MongoDB e o Cosmos DB for MongoDB</td></tr>
+      <tr><td>v13</td><td>2026-10-29 04:49</td><td>Diagramas de classes e de entidade-relacionamento (identidade-acesso-classes v01, identidade-acesso-er v01)</td></tr>
       <tr><td>v12</td><td>2026-10-29 04:21</td><td>SAC como módulo da conta que toda conta tem para falar com o time deboaz (<code class="id">RF-111</code>); vista do time deboaz v05</td></tr>
       <tr><td>v11</td><td>2026-10-29 04:07</td><td>Renumerado de 15_identidade-acesso para 16_identidade-acesso (o catálogo vem antes); vista do time deboaz v04 com o card do Catálogo</td></tr>
       <tr><td>v10</td><td>2026-10-29 03:31</td><td>Card do módulo Usuários em Meus módulos (<code class="id">RN-189</code>); administrador do deboaz com entrada e senha no Key Vault, que gera a senha dos membros do time (<code class="id">RN-190</code>, <code class="id">RN-169</code>, <code class="id">RN-170</code>); seção Em aberto removida</td></tr>
@@ -1231,11 +1232,10 @@ Cenário: pagamento regularizado
       <tr><td>v07</td><td>2026-10-29 02:23</td><td>Vistas atualizadas: cards dos módulos do time deboaz com dados e gráficos, tela Contas do painel movida para a vista do time deboaz, botões segmentados em Contas, SAC e Permissões; exemplo de senha trocado</td></tr>
       <tr><td>v06</td><td>2026-10-29 01:56</td><td>Acesso do time deboaz: sigla reservada <code>DBOAZ</code> e entrada <code>&lt;nome curto&gt;.dboaz@deboaz.com</code> (<code class="id">RN-179</code>, <code class="id">RN-180</code>), membros criados só pela conta master do time (<code class="id">RN-164</code>, <code class="id">RN-169</code>), vista do time deboaz com o passo a passo e pendência sobre a senha da conta master do time</td></tr>
       <tr><td>v05</td><td>2026-10-29 01:40</td><td>Vistas de tela incluídas em Diagramas, com o passo a passo e exemplos: acesso ao hub (criar conta, sua senha, entrar, código de liberação, esqueci a senha), módulo Usuários com o painel do time deboaz e sala anônima no quest</td></tr>
-      <tr><td>v04</td><td>2026-10-29 01:17</td><td>Pendências respondidas e seção Em aberto removida: código de liberação (<code class="id">RN-181</code>, <code class="id">RF-109</code>, <code class="id">RF-110</code>), validade de 72 h (<code class="id">RN-182</code>), tempo de sessão (<code class="id">RN-183</code>), bloqueio (<code class="id">RNF-204</code>), limite do SAC (<code class="id">RNF-205</code>) e token de 15 min (<code class="id">RNF-209</code>); senha de quem tem um nome só (<code class="id">RN-171</code>); sigla sem diferença entre maiúsculas e minúsculas (<code class="id">RN-179</code>, <code class="id">RN-180</code>); diagrama identidade-acesso-sequencia_v01; status → Em revisão</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v13 · 2026-10-29 04:49</span>
+    <span>boaz · v14 · 2026-10-29 05:00</span>
     <span class="boaz-arquivo">1_Requisitos/16_identidade-acesso.html</span>
   </div>
 </footer>

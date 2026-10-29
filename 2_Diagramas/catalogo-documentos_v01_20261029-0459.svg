@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1018" width="1400" height="1018">
+  <title>Catálogo · modelo de documentos</title>
+  <desc>Catálogo · modelo de documentos (requisito 15_catalogo), para o MongoDB local e o Cosmos DB for MongoDB (RU) dos ambientes. v01: criação — modulos com precos e politicas (faixas) embutidos; contratacoes e cobrancas particionadas por contaId, com cópias do fechamento; substitui catalogo-er v01.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1400" height="1018"/>
+  <g id="marca-topo"><rect class="wm-band" x="0" y="0" width="1400" height="112"/><rect class="wm-accent" x="0" y="110" width="1400" height="2"/><text class="wm-eyebrow" x="40" y="40">BOAZ · MODELO DE DOCUMENTOS</text><text class="title" x="40" y="72">Catálogo · modelo de documentos</text><text class="subtitle" x="40" y="94">Coleções do catálogo no Cosmos DB for MongoDB: o que fica embutido, o que é referência, partição e índices</text><text class="wm-meta-label" x="1112" y="44">VERSÃO</text><rect class="wm-badge" x="1112" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1136" y="71" text-anchor="middle">v01</text><line class="wm-sep" x1="1184" y1="32" x2="1184" y2="80"/><text class="wm-meta-label" x="1208" y="44">DATA</text><text class="wm-meta-value" x="1208" y="72">2026-10-29 · 04:59</text></g>
+  <g id="desenho" transform="translate(0,152)">
+<g id="c-modulos" filter="url(#sombra)"><rect class="node-green" x="40" y="0" width="400" height="540" rx="6"/></g><text class="label-strong" x="54" y="26">modulos</text><rect class="chip" x="320.4" y="12" width="108" height="20" rx="10"/><text class="chip-text" x="374" y="26" text-anchor="middle">sem partição</text><line class="divider" x1="40" y1="40" x2="440" y2="40"/><text class="mono" x="54" y="60">_id</text><text class="mono" x="54" y="78">nome</text><text class="mono" x="54" y="96">tipo: DA_CONTA | CONTRATAVEL | DO_TIME</text><text class="mono" x="54" y="114">temCusto</text><text class="mono" x="54" y="132">modeloCobranca: SEM_CUSTO | POR_USUARIO</text><text class="mono" x="54" y="150">catalogadoEm</text><text class="mono" x="54" y="168">catalogadoPor → usuarios</text><rect class="node-blue" x="52" y="182" width="376" height="108" rx="4"/><text class="label" x="62" y="201">precos[ ]  · histórico</text><text class="mono" x="66" y="222">valorPorStaff</text><text class="mono" x="66" y="240">valorPorParticipante</text><text class="mono" x="66" y="258">valeDesde · valeAte</text><text class="mono" x="66" y="276">definidoPor → usuarios · definidoEm</text><rect class="node-blue" x="52" y="300" width="376" height="170" rx="4"/><text class="label" x="62" y="319">politicas[ ]  · histórico</text><text class="mono" x="66" y="340">ligado</text><text class="mono" x="66" y="358">percentualAnual</text><text class="mono" x="66" y="376">valeDesde · valeAte</text><text class="mono" x="66" y="394">definidoPor → usuarios</text><rect class="node-blue" x="64" y="404" width="352" height="54" rx="4"/><text class="label" x="74" y="423">faixas[ ]</text><text class="mono" x="78" y="444">inicio · fim · percentual</text><line class="divider" x1="40" y1="482" x2="440" y2="482"/><text class="uml-keyword" x="54" y="502">índices</text><text class="mono" x="54" y="522">único: nome</text><g id="c-contratacoes" filter="url(#sombra)"><rect class="node-green" x="560" y="0" width="400" height="278" rx="6"/></g><text class="label-strong" x="574" y="26">contratacoes</text><rect class="chip" x="803.9" y="12" width="144" height="20" rx="10"/><text class="chip-text" x="876" y="26" text-anchor="middle">partição: contaId</text><line class="divider" x1="560" y1="40" x2="960" y2="40"/><text class="mono" x="574" y="60">_id</text><text class="mono" x="574" y="78">contaId → contas</text><text class="mono" x="574" y="96">sigla · nomeConta · tipoConta  (cópia)</text><text class="mono" x="574" y="114">moduloId → modulos</text><text class="mono" x="574" y="132">nomeModulo  (cópia)</text><text class="mono" x="574" y="150">plano: MENSAL | ANUAL</text><text class="mono" x="574" y="168">desde · ate</text><text class="mono" x="574" y="186">automatica</text><line class="divider" x1="560" y1="202" x2="960" y2="202"/><text class="uml-keyword" x="574" y="222">índices</text><text class="mono" x="574" y="242">único: contaId + moduloId + desde</text><text class="mono" x="574" y="260">moduloId + sigla  (clientes, RF-124)</text><g id="c-cobrancas" filter="url(#sombra)"><rect class="node-green" x="560" y="350" width="400" height="360" rx="6"/></g><text class="label-strong" x="574" y="376">cobrancas</text><rect class="chip" x="803.9" y="362" width="144" height="20" rx="10"/><text class="chip-text" x="876" y="376" text-anchor="middle">partição: contaId</text><line class="divider" x1="560" y1="390" x2="960" y2="390"/><text class="mono" x="574" y="410">_id</text><text class="mono" x="574" y="428">contaId → contas</text><text class="mono" x="574" y="446">contratacaoId → contratacoes</text><text class="mono" x="574" y="464">moduloId → modulos</text><text class="mono" x="574" y="482">competencia · fechadaEm</text><text class="mono" x="574" y="500">staffAtivos · participantesAtivos</text><text class="mono" x="574" y="518">valorPorStaff · valorPorParticipante</text><text class="mono" x="574" y="536">subtotal · descontoPorVolume</text><text class="mono" x="574" y="554">descontoAnual · total</text><rect class="node-blue" x="572" y="568" width="376" height="72" rx="4"/><text class="label" x="582" y="587">faixasAplicadas[ ]  · cópia do fechamento</text><text class="mono" x="586" y="608">inicio · fim · percentual</text><text class="mono" x="586" y="626">usuarios · desconto</text><line class="divider" x1="560" y1="652" x2="960" y2="652"/><text class="uml-keyword" x="574" y="672">índices</text><text class="mono" x="574" y="692">único: contaId + contratacaoId + competencia</text><g id="c-contas" filter="url(#sombra)"><rect class="node-external" x="1080" y="0" width="280" height="98" rx="6"/></g><text class="label-strong" x="1094" y="26">contas</text><rect class="chip" x="1233.1" y="12" width="115" height="20" rx="10"/><text class="chip-text" x="1291" y="26" text-anchor="middle">16_identidade</text><line class="divider" x1="1080" y1="40" x2="1360" y2="40"/><text class="mono" x="1094" y="60">_id</text><text class="mono" x="1094" y="78">sigla</text><g id="c-usuarios" filter="url(#sombra)"><rect class="node-external" x="1080" y="146" width="280" height="80" rx="6"/></g><text class="label-strong" x="1094" y="172">usuarios</text><rect class="chip" x="1233.1" y="158" width="115" height="20" rx="10"/><text class="chip-text" x="1291" y="172" text-anchor="middle">16_identidade</text><line class="divider" x1="1080" y1="186" x2="1360" y2="186"/><text class="mono" x="1094" y="206">_id</text><path class="edge edge-async" d="M560,110 L440,110" marker-end="url(#seta-aberta)"/><text class="muted" x="500" y="102" text-anchor="middle">moduloId</text><path class="edge edge-async" d="M960,74 L1080,74" marker-end="url(#seta-aberta)"/><text class="muted" x="1020" y="66" text-anchor="middle">contaId</text><path class="edge edge-async" d="M912,350 L912,278" marker-end="url(#seta-aberta)"/><text class="muted" x="920" y="320" text-anchor="start">contratacaoId</text><path class="node-note" d="M1080,274 H1313 L1325,286 V362 H1080 Z"/><text class="muted" x="1092" y="296" text-anchor="start">Sem chave estrangeira no banco:</text><text class="muted" x="1092" y="314" text-anchor="start">a aplicação confere contaId,</text><text class="muted" x="1092" y="332" text-anchor="start">moduloId, contratacaoId e as</text><text class="muted" x="1092" y="350" text-anchor="start">referências a usuarios ao gravar.</text><path class="node-note" d="M1080,386 H1294 L1306,398 V492 H1080 Z"/><text class="muted" x="1092" y="408" text-anchor="start">Preço e faixas ficam dentro do</text><text class="muted" x="1092" y="426" text-anchor="start">módulo: mudam poucas vezes por</text><text class="muted" x="1092" y="444" text-anchor="start">ano e o módulo é lido inteiro</text><text class="muted" x="1092" y="462" text-anchor="start">para calcular (limite de 2 MB</text><text class="muted" x="1092" y="480" text-anchor="start">por documento).</text><path class="node-note" d="M1080,516 H1300 L1312,528 V604 H1080 Z"/><text class="muted" x="1092" y="538" text-anchor="start">Contratação e cobrança da mesma</text><text class="muted" x="1092" y="556" text-anchor="start">conta ficam na mesma partição:</text><text class="muted" x="1092" y="574" text-anchor="start">fechar a fatura é uma transação</text><text class="muted" x="1092" y="592" text-anchor="start">só, numa partição só.</text><path class="node-note" d="M1080,628 H1307 L1319,640 V698 H1080 Z"/><text class="muted" x="1092" y="650" text-anchor="start">Cobrança copia preço e faixas do</text><text class="muted" x="1092" y="668" text-anchor="start">fechamento: fatura fechada não</text><text class="muted" x="1092" y="686" text-anchor="start">muda (RN-194).</text><path class="edge edge-async" d="M1080,658 L960,658"/>
+  </g>
+  <g id="marca-rodape" transform="translate(0,902)"><rect class="wm-band" x="0" y="0" width="1400" height="116"/><line class="wm-sep" x1="0" y1="0.5" x2="1400" y2="0.5"/><text class="wm-eyebrow" x="40" y="30">LEGENDA</text><rect class="node-green" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">coleção</text><rect class="node-blue" x="141.8" y="47" width="14" height="14" rx="3"/><text class="label" x="163.8" y="58">embutido no documento</text><rect class="node-external" x="347.20000000000005" y="47" width="14" height="14" rx="3"/><text class="label" x="369.20000000000005" y="58">coleção de outro requisito</text><rect class="node-note" x="589.6" y="47" width="14" height="14" rx="2"/><text class="label" x="611.6" y="58">nota</text><line class="edge edge-async" x1="669.2" y1="54" x2="711.2" y2="54" marker-end="url(#seta-aberta)"/><text class="label" x="725.2" y="58">referência por id</text><line class="divider" x1="40" y1="76" x2="1360" y2="76"/><text class="footer" x="40" y="100">v01 · criação: coleções do catálogo de módulos (15_catalogo), no lugar do ER</text><text class="wm-file" x="1360" y="100" text-anchor="end">catalogo-documentos_v01_20261029-0459.svg</text></g>
+</svg>
