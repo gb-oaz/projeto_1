@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Identidade e acesso · boaz · v09</title>
+<title>Identidade e acesso · boaz · v10</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="15_identidade-acesso">
 <meta name="boaz:caminho" content="1_Requisitos/15_identidade-acesso.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v09">
-<meta name="boaz:data" content="2026-10-29 03:18">
+<meta name="boaz:versao" content="v10">
+<meta name="boaz:data" content="2026-10-29 03:31">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>15_identidade-acesso</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 03:18</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v10</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 03:31</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -961,8 +961,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-166"><td><code class="id">RN-166</code></td><td>O staff só recebe permissão em módulo que a instituição contratou; o módulo descontratado suspende as permissões dele, que voltam se o módulo for recontratado</td></tr>
         <tr id="RN-167"><td><code class="id">RN-167</code></td><td>Ninguém concede permissão que não tem; a conta master tem todas as permissões da própria conta</td></tr>
         <tr id="RN-168"><td><code class="id">RN-168</code></td><td>A conta master pode conceder o próprio módulo Usuários a um staff, que passa a criar staff e participantes e a conceder permissões dentro das que tem</td></tr>
-        <tr id="RN-169"><td><code class="id">RN-169</code></td><td>A ordem de superior é: time deboaz (a conta master do time acima dos membros), conta master, staff com o módulo Usuários, demais staff e participantes; um usuário pede nova geração de senha, desativa e reativa só quem está abaixo dele, nunca um par</td></tr>
-        <tr id="RN-170"><td><code class="id">RN-170</code></td><td>Nenhuma pessoa escolhe nem vê a senha de outra: toda senha é gerada pelo sistema e mostrada só ao próprio usuário, e o deboaz não envia senha nem código de acesso por e-mail ou mensagem</td></tr>
+        <tr id="RN-169"><td><code class="id">RN-169</code></td><td>A ordem de superior é: time deboaz (o administrador do deboaz, conta master do time, acima dos membros, <a class="ref" href="#RN-190">RN-190</a>), conta master, staff com o módulo Usuários, demais staff e participantes; um usuário pede nova geração de senha, desativa e reativa só quem está abaixo dele, nunca um par</td></tr>
+        <tr id="RN-170"><td><code class="id">RN-170</code></td><td>Nenhuma pessoa escolhe nem vê a senha de outra: toda senha é gerada pelo sistema e mostrada só ao próprio usuário, exceto a do administrador do deboaz (<a class="ref" href="#RN-190">RN-190</a>), e o deboaz não envia senha nem código de acesso por e-mail ou mensagem</td></tr>
         <tr id="RN-171"><td><code class="id">RN-171</code></td><td>A senha gerada tem as 2 primeiras letras do primeiro nome, 1 caractere especial, o segundo nome e 6 números, com caractere especial e números aleatórios (Gustavo Boaz de Moura Souza → <code>Gu#Boaz507318</code>); o segundo nome ignora de, da, do, dos, das e e, e quem tem um nome só usa o restante dele (Xuxa → <code>Xu@Xa182482</code>)</td></tr>
         <tr id="RN-172"><td><code class="id">RN-172</code></td><td>O time deboaz pede a nova geração de senha da conta master só depois de conferir, pelo SAC, o CNPJ ou o CPF da conta e mais 2 destes 3 dados do cadastro: o nome de quem fez o cadastro, o telefone e a data da última contratação ou pagamento; o código de liberação vai ao contato do cadastro conferido</td></tr>
         <tr id="RN-173"><td><code class="id">RN-173</code></td><td>Uma conta de instituição ou de educador autônomo está ativa, suspensa (decisão temporária do time deboaz), desativada (falta de pagamento, volta com a regularização) ou encerrada (a pedido do cliente)</td></tr>
@@ -981,6 +981,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-186"><td><code class="id">RN-186</code></td><td>Cada staff, participante e conta mostra a data e a hora do último acesso (da conta, o da conta master); no participante, também quem entrou: ele ou o responsável, com o parentesco</td></tr>
         <tr id="RN-187"><td><code class="id">RN-187</code></td><td>Ver a conta, no painel do time deboaz, mostra só os dados do cadastro (tipo, nome, CNPJ ou CPF, sigla, entrada da conta master, responsável e telefone) e as datas de criação, do último contrato ou pagamento e do último acesso da conta master; nada dos usuários, turmas ou conteúdos da conta</td></tr>
         <tr id="RN-188"><td><code class="id">RN-188</code></td><td>Na conta de instituição (escola ou empresa), cada staff e participante tem um número de matrícula, único na instituição: quem cadastra informa o número que a instituição já usa ou toca Gerar automaticamente, e o sistema cria um de 8 números aleatórios; a matrícula identifica a pessoa na instituição e não substitui a entrada nem o código de acesso</td></tr>
+        <tr id="RN-189"><td><code class="id">RN-189</code></td><td>Na tela inicial do hub, aba Da conta, o card do módulo Usuários mostra à conta master e ao staff com o módulo Usuários o total de usuários, com staff e participantes num gráfico, os novos no mês, o staff ativo, com senha pendente e desativado, e os participantes ativos, sem acesso há 30 dias e desativados; o selo conta os códigos de liberação que vencem hoje; no educador autônomo, só os números dos participantes</td></tr>
+        <tr id="RN-190"><td><code class="id">RN-190</code></td><td>A conta master do time deboaz é a do <strong>administrador do deboaz</strong>: a entrada e a senha dela ficam num segredo do Key Vault (<a class="ref" href="05_cd-implantacao.html#RN-24">CD e implantação RN-24</a>) e só são definidas e trocadas ali, fora das telas, e o sistema guarda da senha só o resumo irreversível (<a class="ref" href="#RNF-201">RNF-201</a>); o administrador cria os membros do time e, quando um deles esquece a senha, pede a nova geração de senha e entrega o código de liberação para o primeiro acesso</td></tr>
       </tbody>
     </table>
   </section>
@@ -1141,12 +1143,6 @@ Cenário: pagamento regularizado
       <li>Usuário em várias unidades da mesma instituição (fase de escala, <a class="ref" href="00_visao-produto.html#fora-de-escopo">Visão do produto</a>)</li>
     </ul>
   </section>
-  <section id="em-aberto">
-    <h2>Em aberto</h2>
-    <ul class="pendencias">
-      <li>Quem pede a nova geração de senha da conta master do time deboaz, que está no topo da ordem de superior e não tem a quem pedir <span class="tag dono">Produto</span></li>
-    </ul>
-  </section>
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
@@ -1172,6 +1168,7 @@ Cenário: pagamento regularizado
     </figure>
     <h3>Telas do módulo Usuários</h3>
     <ol>
+      <li><strong>Meus módulos</strong>: na tela inicial do hub, aba Da conta, o card Usuários da escola mostra 352 usuários (40 staff e 312 participantes) e 12 novos no mês, 37 staff ativos, 2 com senha pendente e 1 desativado, e 298 participantes ativos, 27 sem acesso há 30 dias e 14 desativados; o selo avisa 2 códigos de liberação que vencem hoje (<a class="ref" href="#RN-189">RN-189</a>).</li>
       <li><strong>Staff</strong>: a conta master busca por nome, entrada ou matrícula, filtra pelos botões segmentados Ativos, Pendentes e Desativados e vê o staff de A a Z, com a entrada, a matrícula e o último acesso (Ana Prado, hoje, 08:42); toca Novo staff (<a class="ref" href="#RF-105">RF-105</a>, <a class="ref" href="#RF-112">RF-112</a>, <a class="ref" href="#RN-185">RN-185</a>, <a class="ref" href="#RN-186">RN-186</a>).</li>
       <li><strong>Novo staff</strong>: informa Maria Souza, o nome curto <code>maria</code> e a matrícula que a escola já usa, <code>20260087</code> (ou toca Gerar automaticamente); o apoio mostra a entrada <code>maria.ebfga@deboaz.com</code>, e ninguém digita senha (<a class="ref" href="#RN-188">RN-188</a>, <a class="ref" href="#RF-106">RF-106</a>, <a class="ref" href="#RN-170">RN-170</a>).</li>
       <li><strong>Código de liberação</strong>: o diálogo mostra <code>482 913</code> uma única vez, para entregar pessoalmente à Maria em até 72 h (<a class="ref" href="#RN-181">RN-181</a>, <a class="ref" href="#RN-182">RN-182</a>).</li>
@@ -1181,8 +1178,8 @@ Cenário: pagamento regularizado
       <li><strong>Tempo de sessão</strong>: staff no navegador 8 h, staff no app 7 dias e participantes 30 dias, dentro dos limites (<a class="ref" href="#RF-114">RF-114</a>, <a class="ref" href="#RN-183">RN-183</a>).</li>
     </ol>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-usuarios_v04_20261029-0317.svg"><img src="../2_Diagramas/vista-hub-usuarios_v04_20261029-0317.svg" alt="Vista do módulo Usuários: staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão"></a>
-      <figcaption><strong>Hub · usuários · vista</strong><code>2_Diagramas/vista-hub-usuarios_v04_20261029-0317.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-usuarios_v05_20261029-0330.svg"><img src="../2_Diagramas/vista-hub-usuarios_v05_20261029-0330.svg" alt="Vista do módulo Usuários: card do módulo em Meus módulos, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão"></a>
+      <figcaption><strong>Hub · usuários · vista</strong><code>2_Diagramas/vista-hub-usuarios_v05_20261029-0330.svg</code></figcaption>
     </figure>
     <h3>Telas do hub: acesso do time deboaz</h3>
     <ol>
@@ -1193,7 +1190,7 @@ Cenário: pagamento regularizado
       <li><strong>SAC</strong>: a mesma busca e os botões segmentados Novas, Conferindo e Respondidas separam, da mais antiga para a mais nova, as mensagens da ação Esqueci a senha da conta master, que chegam sem login com a conta e o CNPJ ou CPF (<a class="ref" href="#RF-111">RF-111</a>).</li>
       <li><strong>Conferir cadastro</strong>: o CNPJ <code>12.345.678/0001-90</code> confere, e mais 2 de 3 dados: nome de quem cadastrou e telefone conferem, a data do último pagamento não veio; Pedir nova geração de senha fica ativo (<a class="ref" href="#RN-172">RN-172</a>, <a class="ref" href="#RN-178">RN-178</a>).</li>
       <li><strong>Código da master</strong>: o diálogo mostra <code>715 204</code> uma única vez, para entregar ao contato conferido <code>(51) 99999-0000</code>; com ele, a conta master recebe a senha na tela Código de liberação (<a class="ref" href="#RN-181">RN-181</a>, <a class="ref" href="#RN-182">RN-182</a>).</li>
-      <li><strong>Usuários do time</strong>: só a conta master do time cria membros (<code>ana.dboaz@deboaz.com</code>) e pede a nova geração de senha deles (<a class="ref" href="#RN-164">RN-164</a>, <a class="ref" href="#RN-169">RN-169</a>).</li>
+      <li><strong>Usuários do time</strong>: só o administrador do deboaz, conta master do time, cria membros (<code>ana.dboaz@deboaz.com</code>); quando um membro esquece a senha, o administrador pede a nova geração de senha e entrega o código de liberação para o primeiro acesso. A entrada e a senha do próprio administrador ficam no Key Vault, fora das telas (<a class="ref" href="#RN-164">RN-164</a>, <a class="ref" href="#RN-169">RN-169</a>, <a class="ref" href="#RN-190">RN-190</a>).</li>
     </ol>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
       <a href="../2_Diagramas/vista-hub-time-deboaz_v03_20261029-0255.svg"><img src="../2_Diagramas/vista-hub-time-deboaz_v03_20261029-0255.svg" alt="Vista do acesso do time deboaz: entrar com a entrada .dboaz, cards dos módulos do time com dados e gráficos, contas com busca, dados da conta, SAC com busca, conferência do cadastro, código da conta master e membros do time"></a>
@@ -1216,7 +1213,8 @@ Cenário: pagamento regularizado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v09</span></td><td>2026-10-29 03:18</td><td>Número de matrícula do staff e do participante, informado ou gerado (<code class="id">RN-188</code>, <code class="id">RF-106</code>, <code class="id">RF-108</code>); código de acesso sempre em maiúsculas (<code class="id">RN-184</code>); turma e ano e formato do código da sala em Fora de escopo; pendência do formato antigo resolvida</td></tr>
+      <tr><td><span class="boaz-versao">v10</span></td><td>2026-10-29 03:31</td><td>Card do módulo Usuários em Meus módulos (<code class="id">RN-189</code>); administrador do deboaz com entrada e senha no Key Vault, que gera a senha dos membros do time (<code class="id">RN-190</code>, <code class="id">RN-169</code>, <code class="id">RN-170</code>); seção Em aberto removida</td></tr>
+      <tr><td>v09</td><td>2026-10-29 03:18</td><td>Número de matrícula do staff e do participante, informado ou gerado (<code class="id">RN-188</code>, <code class="id">RF-106</code>, <code class="id">RF-108</code>); código de acesso sempre em maiúsculas (<code class="id">RN-184</code>); turma e ano e formato do código da sala em Fora de escopo; pendência do formato antigo resolvida</td></tr>
       <tr><td>v08</td><td>2026-10-29 02:56</td><td>Participante com nome curto e um ou mais responsáveis com parentesco (<code class="id">RF-108</code>); código de acesso <code>&lt;sigla&gt;-&lt;nome curto&gt;-&lt;4 números&gt;</code> sem senha (<code class="id">RN-184</code>); busca, estado e ordem alfabética nas listas (<code class="id">RN-185</code>); último acesso (<code class="id">RN-186</code>); dados da conta (<code class="id">RN-187</code>); vistas novas: participantes, dados da conta e código da sala no quest</td></tr>
       <tr><td>v07</td><td>2026-10-29 02:23</td><td>Vistas atualizadas: cards dos módulos do time deboaz com dados e gráficos, tela Contas do painel movida para a vista do time deboaz, botões segmentados em Contas, SAC e Permissões; exemplo de senha trocado</td></tr>
       <tr><td>v06</td><td>2026-10-29 01:56</td><td>Acesso do time deboaz: sigla reservada <code>DBOAZ</code> e entrada <code>&lt;nome curto&gt;.dboaz@deboaz.com</code> (<code class="id">RN-179</code>, <code class="id">RN-180</code>), membros criados só pela conta master do time (<code class="id">RN-164</code>, <code class="id">RN-169</code>), vista do time deboaz com o passo a passo e pendência sobre a senha da conta master do time</td></tr>
@@ -1228,7 +1226,7 @@ Cenário: pagamento regularizado
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v09 · 2026-10-29 03:18</span>
+    <span>boaz · v10 · 2026-10-29 03:31</span>
     <span class="boaz-arquivo">1_Requisitos/15_identidade-acesso.html</span>
   </div>
 </footer>
