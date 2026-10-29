@@ -94,3 +94,6 @@ Thumbs.db
 
 # ── Claude Code: preferências locais ─────────────────────────────────────────
 .claude/settings.local.json
+
+# ── Claude Code: worktrees das tarefas (skill desenvolvimento) ───────────────
+.claude/worktrees/
