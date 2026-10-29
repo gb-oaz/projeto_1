@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v36</title>
+<title>Design system · boaz · v37</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v36">
-<meta name="design:data" content="2026-10-28 02:35">
+<meta name="design:versao" content="v37">
+<meta name="design:data" content="2026-10-29 02:50">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -604,6 +604,22 @@
   --md-comp-segmented-button-label-color: var(--md-sys-color-on-surface);
   --md-comp-segmented-button-selected-container-color: var(--md-sys-color-secondary-container);
   --md-comp-segmented-button-selected-label-color: var(--md-sys-color-on-secondary-container);
+  --md-comp-search-bar-height: 56px;
+  --md-comp-search-bar-padding: 16px;
+  --md-comp-search-bar-gap: 16px;
+  --md-comp-search-bar-icon-size: 24px;
+  --md-comp-search-bar-shape: var(--md-sys-shape-corner-full);
+  --md-comp-search-bar-container-color: var(--md-sys-color-surface-container-high);
+  --md-comp-search-bar-elevation: var(--md-sys-elevation-level0);
+  --md-comp-search-bar-leading-icon-color: var(--md-sys-color-on-surface);
+  --md-comp-search-bar-trailing-icon-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-search-bar-supporting-text-font: var(--md-sys-typescale-body-large-font);
+  --md-comp-search-bar-supporting-text-size: var(--md-sys-typescale-body-large-size);
+  --md-comp-search-bar-supporting-text-line-height: var(--md-sys-typescale-body-large-line-height);
+  --md-comp-search-bar-supporting-text-tracking: var(--md-sys-typescale-body-large-tracking);
+  --md-comp-search-bar-supporting-text-weight: var(--md-sys-typescale-body-large-weight);
+  --md-comp-search-bar-supporting-text-color: var(--md-sys-color-on-surface-variant);
+  --md-comp-search-bar-input-text-color: var(--md-sys-color-on-surface);
   --md-comp-menu-min-width: 112px;
   --md-comp-menu-max-width: 280px;
   --md-comp-menu-shape: var(--md-sys-shape-corner-extra-small);
@@ -24825,6 +24841,19 @@ window.dispatchEvent(new Event('boaz-splash'));
 .md-grafico .barra .rotulo-x { top: calc(100% + 4px); }
 .md-grafico--mini { --altura: 2.25rem; padding-bottom: 0; gap: var(--md-sys-spacing-1); }
 .md-grafico--mini .barra { max-width: var(--md-sys-spacing-4); }
+/* ── barra de busca (search bar) ── */
+.md-busca { display: flex; align-items: center; box-sizing: border-box; width: 100%; max-width: 22.5rem; gap: var(--md-comp-search-bar-gap); height: var(--md-comp-search-bar-height); padding: 0 var(--md-comp-search-bar-padding); border-radius: var(--md-comp-search-bar-shape); background: var(--md-comp-search-bar-container-color); color: var(--md-comp-search-bar-leading-icon-color); }
+.md-busca:focus-within { outline: var(--md-sys-state-focus-indicator-thickness) solid var(--md-sys-color-secondary); outline-offset: 2px; }
+.md-busca .material-symbols { font-size: var(--md-comp-search-bar-icon-size); }
+.md-busca input {
+  flex: 1 1 auto; min-width: 0; height: 100%; border: 0; background: none; outline: none; color: var(--md-comp-search-bar-input-text-color);
+  font-family: var(--md-comp-search-bar-supporting-text-font); font-size: var(--md-comp-search-bar-supporting-text-size);
+  letter-spacing: var(--md-comp-search-bar-supporting-text-tracking); font-weight: var(--md-comp-search-bar-supporting-text-weight);
+}
+.md-busca input::placeholder { color: var(--md-comp-search-bar-supporting-text-color); }
+.md-busca input:disabled { opacity: var(--md-sys-state-disabled-content-opacity, 0.38); }
+.md-busca .limpar { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin-right: calc(-1 * var(--md-comp-search-bar-padding) + 4px); border: 0; border-radius: 50%; background: none; color: var(--md-comp-search-bar-trailing-icon-color); cursor: pointer; }
+.md-busca input:placeholder-shown + .limpar { display: none; }
 /* segmentado cheio: ocupa o contêiner e divide por igual (formulários no compact) */
 .md-segmented--cheio { display: flex; width: 100%; }
 .md-segmented--cheio button { flex: 1 1 0; }
@@ -25400,8 +25429,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v36</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-28 02:35</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v37</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-29 02:50</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -25795,6 +25824,13 @@ el.innerHTML = splash.animada('quest', {
         </div>
       </div>
 
+      <h3 class="sub md-typescale-title-large">Barra de busca</h3>
+      <div class="palco linha">
+        <span class="rotulo">Pesquisa numa lista (nome, sigla, entrada), em surface-container-high e canto full; o ícone de busca vem na frente e, com texto, o botão de limpar. Fica no alto da lista, abaixo da barra do topo.</span>
+        <label class="md-busca"><span class="material-symbols" aria-hidden="true">search</span><input type="search" placeholder="Buscar por nome ou sigla" aria-label="Buscar por nome ou sigla"><button class="limpar md-estado" type="button" aria-label="Limpar a busca"><span class="material-symbols">close</span></button></label>
+        <label class="md-busca"><span class="material-symbols" aria-hidden="true">search</span><input type="search" value="maria" placeholder="Buscar staff" aria-label="Buscar staff"><button class="limpar md-estado" type="button" aria-label="Limpar a busca"><span class="material-symbols">close</span></button></label>
+      </div>
+
       <h3 class="sub md-typescale-title-large">Gráfico de barras</h3>
       <div class="palco linha">
         <span class="rotulo">Valores lado a lado com o topo arredondado: destaque em primary, os outros em secondary-container; o valor sempre também em texto (e no rótulo para leitor de tela).</span>
@@ -26171,6 +26207,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v37</td><td>2026-10-29 02:50</td><td>Componente Barra de busca (<code>md.comp.search-bar</code>, classe <code>md-busca</code>): pesquisa numa lista, em surface-container-high e canto full, com ícone de busca e botão de limpar; usada nas listas de staff, participantes, contas e SAC do requisito 15</td></tr>
           <tr><td>v36</td><td>2026-10-28 02:35</td><td>App (MAUI): splash nativa também no escuro (<code>plataformas/maui/splash/splash_&lt;frente&gt;_escuro.svg</code> para o Android em modo noturno e o catálogo <code>Splash.xcassets</code>, com fundo e símbolo claro/escuro, para o <code>UILaunchScreen</code> do iOS) e o mascote da abertura da frente parado (<code>mascote_&lt;frente&gt;.svg</code>), que o app anima</td></tr>
           <tr><td>v35</td><td>2026-10-28 01:37</td><td>App (MAUI): ícone oficial (<code>plataformas/maui/icones/appicon.svg</code> + <code>appiconfg[_curto].svg</code>, para o <code>MauiIcon</code>) e ícone da splash nativa no claro (<code>plataformas/maui/splash/splash_&lt;frente&gt;.svg</code>, para o <code>MauiSplashScreen</code>), copiados para <code>core/commons/Resources/Styles/Design/</code> do mobile; em <code>Marca.xaml</code>, o nome passa a <code>FillRule="Nonzero"</code> (no EvenOdd, a sobreposição da barriga com a haste do d e do b virava um risco vazado)</td></tr>
           <tr><td>v34</td><td>2026-10-28 00:16</td><td>Status do servidor na web: o núcleo <code>scripts/status.mjs</code> é copiado para <code>plataformas/web/status.mjs</code> (e para <code>core/commons/design/</code> da web), para as telas desenharem qualquer estado nas cores do tema</td></tr>
@@ -26180,12 +26217,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v30</td><td>2026-10-21 21:37</td><td>Fundo Halo: opção <code>nome</code> (logo inteiro, símbolo + nome, com a abertura) e <code>ciclo</code> (os brilhos passam pelas cores de uma lista de temas, suave e em laço: 6 s em cada, 2 s de troca; parado com movimento reduzido). Halo: <code>variante</code> (hastes do logo inteiro: curtas no quest). Compostos: boas-vindas com o logo (Halo com o logo na abertura e os brilhos passando pelos temas coloridos; texto e ações num painel de superfície; no compact do hub e do quest, o Halo numa faixa no alto que some antes do título; do medium em diante, só o logo centralizado) na apresentação da landing page, na entrada do hub e no acesso do quest, no lugar da turma e das boas-vindas com mascote.</td></tr>
           <tr><td>v29</td><td>2026-10-21 21:08</td><td>Temas de cor: 8 paletas bem diferentes do padrão — Neon (verde-limão, ciano e magenta sobre roxo-noite, prefere o escuro), Vaporwave (rosa, lilás e ciano), Algodão-doce (pastéis sobre creme), Terra (terracota, oliva e mostarda sobre areia), Retrô (mostarda, laranja-queimado e petróleo), Meia-noite (azul-noite e dourado), Arco-íris (rosa, laranja e azul) e Salada de frutas (fruit-salad do M3). Usam neutra tingida (superfícies coloridas) e secundária/terciária em outras matizes. E 12 paletas dos genins da Folha, inspiradas nas cores de cada personagem: Time 7 (Naruto, Sasuke, Sakura), Time 8 (Hinata, Kiba, Shino), Time 10 (Shikamaru, Ino, Chōji) e Time Guy (Neji, Rock Lee, Tenten).</td></tr>
           <tr><td>v28</td><td>2026-10-19 19:40</td><td>Quest: agenda em calendário vertical (dia em secondary, um dia por divisória) e card de tarefa com hora e borda em primary (no prazo) ou tertiary (vencida), ponto sucesso/erro (pode fazer ou bloqueada) e Símbolo recortado com mascote animado quando acontece agora; quem está acessando com parentesco e Entrar na largura toda; chip com largura; card de tarefa com os envios possíveis e feitos; topo com nome e foto a partir do medium e trilho sem Conta ou Perfil; gráfico de barras (componente base) e card de desafio do quest (tarefa sem prazo: pódio com mascotes em forma de número, 4º e 5º, sua posição, tentativas e Jogar de novo); pódio do card de desafio em festa: mascotes felizes com movimento composto (comemorar, pular, dançar, balançar); Estampa redesenhada como rabiscos espalhados (mascotes em contorno com rosto, números, sinais, o símbolo e miudezas, pequenos, girados e num tom discreto), também para a tela Fixos do quest; componentes sem fundo (campo outlined, botões outlined e de texto soltos na tela, segmentado, chip, controles do carrossel) ganham o fundo da tela, legíveis sobre a Estampa; parentesco num segmentado cheio; card de módulo com a métrica de quem cuida do módulo e uma série curta; vitrine de telas (computador e celular) para a página do módulo e o detalhe do catálogo; painel do módulo no hub: número principal com tendência (sucesso ou erro pelo significado), série ou progresso e números de apoio nas cores da paleta, sem mascotes, até dois por linha</td></tr>
-          <tr><td>v27</td><td>2026-10-19 14:16</td><td>Botão segmentado cheio; topo da casca só com logo e avisos no compact e no medium (nome e foto a partir do expanded); foto ou mascote adotado no avatar; trilho com Conta embaixo; aviso com botão de ícone no compact; card do catálogo com as Ondas do vão na forma do padrinho; fundos com peças nenhuma, origem e raio do anel</td></tr>
-          <tr><td>v26</td><td>2026-10-19 13:37</td><td>Fundos: Anel gigante e Ondas do vão na forma escolhida do mascote; nas Antenas em ritmo os mascotes acompanham a animação da barra</td></tr>
-          <tr><td>v25</td><td>2026-10-19 04:21</td><td>Interruptor (switch) entre os componentes básicos; card do catálogo com fundo cheio em secondary-container e o mascote padrinho do módulo à direita, metade cortada pela borda; seletor de tema com a opção Mascotes nas cores do tema</td></tr>
                                       </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v36 · 2026-10-28 02:35</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v37 · 2026-10-29 02:50</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>

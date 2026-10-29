@@ -237,6 +237,21 @@
         "selected-container-color": { "$value": "{md.sys.color.secondary-container}" },
         "selected-label-color": { "$value": "{md.sys.color.on-secondary-container}" }
       },
+      "search-bar": {
+        "$descricao": "Barra de busca: pesquisa numa lista (ex.: buscar por nome ou sigla), com o ícone de busca na frente e, ao digitar, o botão de limpar.",
+        "height": { "$value": 56 },
+        "padding": { "$value": 16 },
+        "gap": { "$value": 16 },
+        "icon-size": { "$value": 24 },
+        "shape": { "$value": "{md.sys.shape.corner.full}" },
+        "container-color": { "$value": "{md.sys.color.surface-container-high}" },
+        "elevation": { "$value": "{md.sys.elevation.level0}", "$descricao": "plana, como os cards do hub: o contêiner já destaca da Estampa" },
+        "leading-icon-color": { "$value": "{md.sys.color.on-surface}" },
+        "trailing-icon-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "supporting-text": { "$value": "{md.sys.typescale.body-large}" },
+        "supporting-text-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "input-text-color": { "$value": "{md.sys.color.on-surface}" }
+      },
 
       "menu": {
         "$descricao": "Menu: lista temporária de ações aberta a partir de um botão (ex.: ⋮ Remover).",

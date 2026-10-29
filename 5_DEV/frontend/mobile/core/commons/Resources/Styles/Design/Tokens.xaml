@@ -245,6 +245,10 @@
   <x:Double x:Key="SegmentedButtonPadding">12</x:Double>
   <x:Double x:Key="SegmentedButtonIconSize">18</x:Double>
   <x:Double x:Key="SegmentedButtonOutlineWidth">1</x:Double>
+  <x:Double x:Key="SearchBarHeight">56</x:Double>
+  <x:Double x:Key="SearchBarPadding">16</x:Double>
+  <x:Double x:Key="SearchBarGap">16</x:Double>
+  <x:Double x:Key="SearchBarIconSize">24</x:Double>
   <x:Double x:Key="MenuMinWidth">112</x:Double>
   <x:Double x:Key="MenuMaxWidth">280</x:Double>
   <x:Double x:Key="MenuItemHeight">48</x:Double>

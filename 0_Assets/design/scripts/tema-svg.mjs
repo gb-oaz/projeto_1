@@ -299,6 +299,15 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     });
     return { w, svg: s + rect(x + 0.5, y + 0.5, w - 1, h - 1, r, null, `stroke="${linha}" stroke-width="${num('segmented-button-outline-width')}"`) };
   }
+  // barra de busca: ícone de busca, texto de apoio (ou o que foi digitado) e, com texto, o botão de limpar
+  function busca(e, x, y, w, apoio, valor = '') {
+    const h = num('search-bar-height'), p = num('search-bar-padding'), g = num('search-bar-gap'), ti = num('search-bar-icon-size'), papel = tipoDe('search-bar-supporting-text');
+    let s = rect(x, y, w, h, canto('search-bar-shape', h), cor(e, 'search-bar-container-color'));
+    s += icone('buscar', x + p, y + (h - ti) / 2, ti, cor(e, 'search-bar-leading-icon-color'));
+    s += txt(x + p + ti + g, meio(y, h, papel), valor || apoio, papel, valor ? cor(e, 'search-bar-input-text-color') : cor(e, 'search-bar-supporting-text-color'));
+    if (valor) s += icone('close', x + w - p - ti, y + (h - ti) / 2, ti, cor(e, 'search-bar-trailing-icon-color'));
+    return s;
+  }
   function menu(e, x, y, w, itens) {
     const ih = num('menu-item-height'), p = num('menu-item-padding'), ti = num('menu-icon-size'), papel = tipoDe('menu-label');
     const h = itens.length * ih + 16;
@@ -626,11 +635,11 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     return s;
   }
 
-  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas };
+  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, busca, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas };
 }
 
 export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo }) {
-  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo });
+  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, busca, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo });
 
   // ── componentes no quadro: título, descrição, altura do conteúdo, desenho ──
   const COMPONENTES = [
@@ -678,6 +687,10 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     ['Botão segmentado', 'De 2 a 5 opções curtas lado a lado; a selecionada ganha secondary-container e marcação. Cheio: ocupa o contêiner e divide por igual (formulários no compact).', 96, (e, x, y) =>
       fila([(cx, cy) => segmentado(e, cx, cy, ['Mensal', 'Anual'], 0), (cx, cy) => segmentado(e, cx, cy, ['Claro', 'Escuro', 'Sistema'], 2)], x, y, 24)
       + segmentado(e, x, y + 56, ['Escola', 'Empresa', 'Autônomo'], 0, 328).svg],
+    ['Barra de busca', 'Pesquisa numa lista, em surface-container-high e canto full; o ícone de busca vem na frente e, com texto, o botão de limpar.', 56, (e, x, y) => {
+      const w = (PW - 2 * PAD - 24) / 2;
+      return busca(e, x, y, w, 'Buscar por nome ou sigla') + busca(e, x + w + 24, y, w, '', 'maria');
+    }],
     ['Gráfico de barras', 'Valores lado a lado com o topo arredondado: destaque em primary, os outros em secondary-container; rótulos e valores opcionais. Sempre com o valor também em texto.', 120, (e, x, y) =>
       graficoBarras(e, x, y, 300, 120, [900, 1200, 1350, 1720, 1600, 1500], { destaque: 3, rotulos: ['1ª', '2ª', '3ª', '4ª', '5ª', '6ª'], mostrarValores: true, gap: 8 })
       + graficoBarras(e, x + 340, y + 40, 120, 40, [980, 1240], { destaque: 1 })],
