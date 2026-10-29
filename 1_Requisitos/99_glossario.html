@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Glossário · boaz · v25</title>
+<title>Glossário · boaz · v26</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="99_glossario">
 <meta name="boaz:caminho" content="1_Requisitos/99_glossario.html">
 <meta name="boaz:tipo" content="Glossário">
-<meta name="boaz:versao" content="v25">
-<meta name="boaz:data" content="2026-10-29 04:07">
+<meta name="boaz:versao" content="v26">
+<meta name="boaz:data" content="2026-10-29 04:21">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -790,8 +790,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>dar um significado único aos termos do domínio usados nos documentos de requisito.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>99_glossario</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v25</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 04:07</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v26</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 04:21</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -819,7 +819,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <dt id="design-system">Design system</dt><dd>conjunto da identidade visual, dos tokens e dos componentes do projeto, mantido em <code>0_Assets/design/</code></dd>
       <dt id="educador">Educador</dt><dd>quem cria quizzes e conduz salas no hub: professor, instrutor ou responsável por um treinamento; contrata pela instituição ou como autônomo, gerenciando só a própria conta, o conteúdo e os custos</dd>
       <dt id="expressao">Expressão</dt><dd>estado emocional mostrado pelo rosto do mascote (feliz, acertou, errou, dúvida, esperando…), escolhido conforme a situação da tela</dd>
-      <dt id="faixa-de-desconto">Faixa de desconto</dt><dd>intervalo do total de usuários (staff + participantes) de uma conta com um percentual de desconto sobre a cobrança mensal do módulo Usuários; quanto mais usuários, maior ou igual o percentual</dd>
+      <dt id="faixa-de-desconto">Faixa de desconto</dt><dd>intervalo do total de usuários (staff + participantes) de uma conta com um percentual de desconto do módulo Usuários que vale só para os usuários dentro dele (desconto progressivo, como no imposto de renda); quanto mais usuários, maior ou igual o percentual</dd>
       <dt id="hub">Hub</dt><dd>frente do produto onde o educador cria quizzes, conduz salas, acompanha relatórios e administra a conta</dd>
       <dt id="identidade-da-instituicao">Identidade da instituição</dt><dd>módulo que uma escola ou empresa contrata para ter a identidade dela no lugar da padrão do deboaz; o símbolo do deboaz continua, menor</dd>
       <dt id="identidade-visual">Identidade visual</dt><dd>temas de cor, tipografia, logos, ícones, imagens e animações que dão a cara do produto</dd>
@@ -830,7 +830,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <dt id="modulo">Módulo</dt><dd>conjunto de telas e regras de uma mesma funcionalidade dentro de uma aplicação; é também a unidade contratável do catálogo de módulos</dd>
       <dt id="modulo-fixo">Módulo fixo</dt><dd>módulo sempre disponível ao participante na aba Fixos do quest, até a instituição revogar</dd>
       <dt id="modulo-usuarios">Módulo Usuários</dt><dd>módulo da conta em que a instituição cria o staff e os participantes e decide as permissões, e o educador autônomo cria os participantes</dd>
-      <dt id="modulos-da-conta">Módulos da conta</dt><dd>módulos que são requisito de toda conta: entram sozinhos quando a conta é criada, sem contratação, e não podem ser retirados (suporte, mensagens, contas, Usuários e, para quem trabalha numa instituição, sugestão), mostrados depois dos contratados; podem ter custo, como o Usuários</dd>
+      <dt id="modulos-da-conta">Módulos da conta</dt><dd>módulos que são requisito de toda conta: entram sozinhos quando a conta é criada, sem contratação, e não podem ser retirados (SAC, contas, Usuários e, para quem trabalha numa instituição, sugestão), mostrados depois dos contratados; podem ter custo, como o Usuários</dd>
       <dt id="nova-geracao-de-senha">Nova geração de senha</dt><dd>pedido de um usuário superior para que o sistema gere uma senha nova para quem está abaixo dele; a senha aparece uma única vez, só para o próprio usuário, no próximo acesso</dd>
       <dt id="pagina-do-modulo">Página do módulo</dt><dd>página da landing page que apresenta um módulo do catálogo, com estrutura fixa que o documento do módulo preenche</dd>
       <dt id="painel-de-administracao-do-deboaz">Painel de administração do deboaz</dt><dd>área do hub em que o time do deboaz administra escolas, empresas e educadores autônomos e responde às mensagens deles, guardando o histórico para auditoria</dd>
@@ -840,7 +840,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <dt id="proporcao">Proporção</dt><dd>variação do corpo do mascote (normal, alto, baixo, gordo ou magro); o rosto se ajusta para continuar cabendo</dd>
       <dt id="quest">Quest</dt><dd>frente do produto onde o participante entra numa sala pelo código e responde aos quizzes</dd>
       <dt id="ranking">Ranking</dt><dd>classificação dos participantes de uma sala pela pontuação</dd>
-      <dt id="sac">SAC</dt><dd>módulo que só o time deboaz usa, onde chegam as mensagens enviadas sem login pela tela Entrar do hub, como o pedido de senha da conta master</dd>
+      <dt id="sac">SAC</dt><dd>módulo da conta (suporte e mensagens) que toda conta do hub tem para falar com o time deboaz; o time atende pelo mesmo módulo, onde também chegam as mensagens enviadas sem login pela tela Entrar do hub, como o pedido de senha da conta master</dd>
       <dt id="sala">Sala</dt><dd>sessão de um quiz aberta por um educador, em tempo real ou no ritmo de cada participante</dd>
       <dt id="sequencia-de-movimentos">Sequência de movimentos</dt><dd>vários movimentos do mascote em seguida, num único laço (por exemplo, pular, girar e comemorar)</dd>
       <dt id="sigla">Sigla</dt><dd>código de 5 letras, único no sistema, que a instituição ou o educador autônomo define ao criar a conta; forma a entrada do staff e o apelido do acesso anônimo</dd>
@@ -861,7 +861,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v25</span></td><td>2026-10-29 04:07</td><td>Termo catálogo de preços vira <a class="ref" href="#catalogo">Catálogo</a>, só da conta do time deboaz; módulos da conta como requisito de toda conta; links para 15_catalogo e 16_identidade-acesso</td></tr>
+      <tr><td><span class="boaz-versao">v26</span></td><td>2026-10-29 04:21</td><td>SAC como módulo da conta; módulos da conta com o SAC; faixa de desconto progressiva</td></tr>
+      <tr><td>v25</td><td>2026-10-29 04:07</td><td>Termo catálogo de preços vira <a class="ref" href="#catalogo">Catálogo</a>, só da conta do time deboaz; módulos da conta como requisito de toda conta; links para 15_catalogo e 16_identidade-acesso</td></tr>
       <tr><td>v24</td><td>2026-10-29 03:47</td><td>Termos <a class="ref" href="#catalogo">catálogo de preços</a> e <a class="ref" href="#faixa-de-desconto">faixa de desconto</a> (<a class="ref" href="15_catalogo.html">Catálogo de preços</a>)</td></tr>
       <tr><td>v23</td><td>2026-10-29 03:31</td><td>Administrador do deboaz</td></tr>
       <tr><td>v22</td><td>2026-10-29 03:18</td><td>Matrícula; código de acesso sempre em maiúsculas</td></tr>
@@ -870,11 +871,10 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <tr><td>v19</td><td>2026-10-29 01:03</td><td>Termos nova geração de senha e sigla; senha provisória removido (toda senha é gerada pelo sistema); usuário superior atualizado</td></tr>
       <tr><td>v18</td><td>2026-10-29 00:10</td><td>Termos de identidade e acesso: acesso anônimo, módulo Usuários, SAC, senha provisória, staff e usuário superior; módulos da conta com o módulo Usuários; status → Em revisão</td></tr>
       <tr><td>v17</td><td>2026-10-19 04:35</td><td>Status → Aprovado</td></tr>
-      <tr><td>v16</td><td>2026-10-19 04:24</td><td>Termo mascote padrinho; status → Em revisão; status → Em revisão</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v25 · 2026-10-29 04:07</span>
+    <span>boaz · v26 · 2026-10-29 04:21</span>
     <span class="boaz-arquivo">1_Requisitos/99_glossario.html</span>
   </div>
 </footer>
