@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catálogo · boaz · v05</title>
+<title>Catálogo · boaz · v06</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="15_catalogo">
 <meta name="boaz:caminho" content="1_Requisitos/15_catalogo.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v05">
-<meta name="boaz:data" content="2026-10-29 05:00">
+<meta name="boaz:versao" content="v06">
+<meta name="boaz:data" content="2026-10-29 05:05">
 <meta name="boaz:status" content="Rascunho">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>15_catalogo</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v05</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 05:00</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v06</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 05:05</dd></div>
     <div><dt>Status</dt><dd><span class="status status-rascunho">Rascunho</span></dd></div>
   </dl>
 </header>
@@ -1141,6 +1141,77 @@ Cenário: buscar um autônomo
       <a href="../2_Diagramas/catalogo-documentos_v01_20261029-0459.svg"><img src="../2_Diagramas/catalogo-documentos_v01_20261029-0459.svg" alt="Modelo de documentos do catálogo: modulos com precos e politicas com faixas embutidos, contratacoes e cobrancas particionadas por contaId, com referências a contas e usuarios"></a>
       <figcaption><strong>Catálogo · modelo de documentos</strong><code>2_Diagramas/catalogo-documentos_v01_20261029-0459.svg</code></figcaption>
     </figure>
+    <h3>Exemplo de cada entidade do catálogo</h3>
+    <p>Dados fictícios, os mesmos das vistas: o módulo Usuários, contratado pela Escola Bento Freitas (<code>EBFGA</code>), com a fatura de dezembro de 2026. Os ids são legíveis só no exemplo; valores em reais são guardados como decimal exato (<a class="ref" href="#RNF-210">RNF-210</a>) e datas em UTC.</p>
+    <p><strong>modulos</strong> · um documento por módulo, com o histórico de preços e de políticas de desconto dentro dele (<a class="ref" href="#RF-123">RF-123</a>, <a class="ref" href="#RF-122">RF-122</a>)</p>
+<pre><code>{
+  "_id": "mod-usuarios",
+  "nome": "Usuários",
+  "tipo": "DA_CONTA",
+  "temCusto": true,
+  "modeloCobranca": "POR_USUARIO",
+  "catalogadoEm": "2026-08-01T12:00:00Z",
+  "catalogadoPor": "usr-gustavo-dboaz",
+  "precos": [
+    { "valorPorStaff": 17.90, "valorPorParticipante": 3.90,
+      "valeDesde": "2026-08-01", "valeAte": "2026-10-31",
+      "definidoPor": "usr-gustavo-dboaz", "definidoEm": "2026-07-25T14:10:00Z" },
+    { "valorPorStaff": 18.90, "valorPorParticipante": 4.50,
+      "valeDesde": "2026-11-01", "valeAte": "2026-11-30",
+      "definidoPor": "usr-gustavo-dboaz", "definidoEm": "2026-10-20T09:30:00Z" },
+    { "valorPorStaff": 19.90, "valorPorParticipante": 4.90,
+      "valeDesde": "2026-12-01", "valeAte": null,
+      "definidoPor": "usr-gustavo-dboaz", "definidoEm": "2026-10-29T03:40:00Z" }
+  ],
+  "politicas": [
+    { "ligado": true, "percentualAnual": 15,
+      "valeDesde": "2026-12-01", "valeAte": null,
+      "definidoPor": "usr-gustavo-dboaz",
+      "faixas": [
+        { "inicio": 1,    "fim": 100,  "percentual": 0 },
+        { "inicio": 101,  "fim": 300,  "percentual": 5 },
+        { "inicio": 301,  "fim": 1000, "percentual": 10 },
+        { "inicio": 1001, "fim": 3000, "percentual": 15 },
+        { "inicio": 3001, "fim": null, "percentual": 20 }
+      ] }
+  ]
+}</code></pre>
+    <p><strong>contratacoes</strong> · uma por conta e módulo; o módulo da conta entra sozinho quando a conta é criada (<a class="ref" href="#RN-198">RN-198</a>, <a class="ref" href="#RF-124">RF-124</a>)</p>
+<pre><code>{
+  "_id": "ctr-ebfga-usuarios",
+  "contaId": "conta-ebfga",
+  "sigla": "EBFGA",
+  "nomeConta": "Escola Bento Freitas",
+  "tipoConta": "INSTITUICAO",
+  "moduloId": "mod-usuarios",
+  "nomeModulo": "Usuários",
+  "plano": "MENSAL",
+  "desde": "2026-03-12",
+  "ate": null,
+  "automatica": true
+}</code></pre>
+    <p><strong>cobrancas</strong> · uma por contratação e mês, com os números do dia do fechamento e o desconto de cada faixa (<a class="ref" href="#RF-121">RF-121</a>, <a class="ref" href="#RN-192">RN-192</a>, <a class="ref" href="#RN-194">RN-194</a>, <a class="ref" href="#RN-195">RN-195</a>)</p>
+<pre><code>{
+  "_id": "cob-ebfga-usuarios-2026-12",
+  "contaId": "conta-ebfga",
+  "contratacaoId": "ctr-ebfga-usuarios",
+  "moduloId": "mod-usuarios",
+  "competencia": "2026-12",
+  "fechadaEm": "2026-12-31T23:59:59Z",
+  "staffAtivos": 40,
+  "participantesAtivos": 312,
+  "valorPorStaff": 19.90,
+  "valorPorParticipante": 4.90,
+  "subtotal": 2324.80,
+  "faixasAplicadas": [
+    { "inicio": 1,   "fim": 100,  "percentual": 0,  "usuarios": 100, "desconto": 0.00 },
+    { "inicio": 101, "fim": 300,  "percentual": 5,  "usuarios": 200, "desconto": 66.05 },
+    { "inicio": 301, "fim": 1000, "percentual": 10, "usuarios": 52,  "desconto": 34.34 }
+  ],
+  "descontoPorVolume": 100.39,
+  "descontoAnual": 0.00,
+  "total": 2224.41
+}</code></pre>
     <h3>Telas do hub: catálogo</h3>
     <ol>
       <li><strong>Meus módulos</strong>: só na conta do time deboaz, o card Catálogo mostra R$ 201,0 mil de receita prevista no mês, as barras dos últimos 5 meses, 3 módulos da conta, 5 contratáveis e 2 do time, 6 com custo, 4 sem custo e 5 com custo ainda sem preço (<a class="ref" href="#RF-116">RF-116</a>, <a class="ref" href="#RN-200">RN-200</a>).</li>
@@ -1162,7 +1233,8 @@ Cenário: buscar um autônomo
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v05</span></td><td>2026-10-29 05:00</td><td>Diagrama entidade-relacionamento trocado pelo modelo de documentos (catalogo-documentos v01), para o MongoDB e o Cosmos DB for MongoDB</td></tr>
+      <tr><td><span class="boaz-versao">v06</span></td><td>2026-10-29 05:05</td><td>Exemplo completo, com dados fictícios, de cada entidade do catálogo: modulos, contratacoes e cobrancas</td></tr>
+      <tr><td>v05</td><td>2026-10-29 05:00</td><td>Diagrama entidade-relacionamento trocado pelo modelo de documentos (catalogo-documentos v01), para o MongoDB e o Cosmos DB for MongoDB</td></tr>
       <tr><td>v04</td><td>2026-10-29 04:49</td><td>Diagramas de classes e de entidade-relacionamento do catálogo (catalogo-classes v01, catalogo-er v01)</td></tr>
       <tr><td>v03</td><td>2026-10-29 04:21</td><td>Pendências respondidas e seção Em aberto removida: SAC é o módulo da conta Suporte e mensagens (<code class="id">RN-198</code>); desconto por volume progressivo, cada % só na sua faixa (<code class="id">RN-192</code>); contagem no dia do fechamento, sem proporção (<code class="id">RN-195</code>); plano anual com % configurável (<code class="id">RF-125</code>, <code class="id">RN-201</code>); valores como exemplo, em Fora de escopo; exemplo de receita recalculado (R$ 200.996,76/mês); vista vista-hub-catalogo-deboaz v02</td></tr>
       <tr><td>v02</td><td>2026-10-29 04:07</td><td>Renomeado de 16_catalogo-precos para 15_catalogo e título Catálogo: todo módulo é catalogado (<code class="id">RN-197</code>), com nome, tipo, custo e precificação (<code class="id">RF-123</code>) e as siglas das instituições e dos autônomos que o contrataram (<code class="id">RF-124</code>); módulo da conta como requisito de toda conta (<code class="id">RN-198</code>), custo (<code class="id">RN-199</code>), Catálogo só na conta do time deboaz (<code class="id">RN-200</code>); <code class="id">RF-116</code>, <code class="id">RF-117</code> e <code class="id">RN-191</code> alterados; pendência SAC; vista vista-hub-catalogo-deboaz v01</td></tr>
@@ -1170,7 +1242,7 @@ Cenário: buscar um autônomo
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v05 · 2026-10-29 05:00</span>
+    <span>boaz · v06 · 2026-10-29 05:05</span>
     <span class="boaz-arquivo">1_Requisitos/15_catalogo.html</span>
   </div>
 </footer>

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Identidade e acesso · boaz · v14</title>
+<title>Identidade e acesso · boaz · v15</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="16_identidade-acesso">
 <meta name="boaz:caminho" content="1_Requisitos/16_identidade-acesso.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v14">
-<meta name="boaz:data" content="2026-10-29 05:00">
+<meta name="boaz:versao" content="v15">
+<meta name="boaz:data" content="2026-10-29 05:05">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>16_identidade-acesso</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v14</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 05:00</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v15</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 05:05</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1162,6 +1162,113 @@ Cenário: pagamento regularizado
       <a href="../2_Diagramas/identidade-acesso-documentos_v01_20261029-0500.svg"><img src="../2_Diagramas/identidade-acesso-documentos_v01_20261029-0500.svg" alt="Modelo de documentos de identidade e acesso: contas, usuarios particionados pela sigla com permissões e responsáveis embutidos, geracoesSenha, acessosAnonimos, auditoria e sessão no Redis"></a>
       <figcaption><strong>Identidade e acesso · modelo de documentos</strong><code>2_Diagramas/identidade-acesso-documentos_v01_20261029-0500.svg</code></figcaption>
     </figure>
+    <h3>Exemplo de cada entidade de identidade e acesso</h3>
+    <p>Dados fictícios, os mesmos das vistas: a Escola Bento Freitas (<code>EBFGA</code>), a conta master dela, a staff Maria Souza e o participante Lucas Andrade. Os ids são legíveis só no exemplo, datas em UTC; senha e código de liberação nunca ficam guardados como texto, só o resumo irreversível (<a class="ref" href="#RNF-201">RNF-201</a>).</p>
+    <p><strong>contas</strong> · uma por instituição ou educador autônomo, com a sigla e o domínio únicos (<a class="ref" href="#RF-104">RF-104</a>, <a class="ref" href="#RN-179">RN-179</a>, <a class="ref" href="#RN-183">RN-183</a>)</p>
+<pre><code>{
+  "_id": "conta-ebfga",
+  "sigla": "EBFGA",
+  "dominio": "objetivo_unidade1",
+  "nome": "Escola Bento Freitas",
+  "tipo": "INSTITUICAO",
+  "estado": "ATIVA",
+  "documento": "12.345.678/0001-90",
+  "responsavel": "Gustavo Boaz de Moura Souza",
+  "telefone": "(51) 99999-0000",
+  "criadaEm": "2026-03-12T13:05:00Z",
+  "ultimoAcessoMaster": "2026-10-29T11:15:00Z",
+  "tempoSessao": {
+    "staffNavegador": "PT8H",
+    "staffApp": "P7D",
+    "participante": "P30D"
+  }
+}</code></pre>
+    <p><strong>usuarios</strong> · conta master: entra com o domínio da conta e tem todas as permissões dela (<a class="ref" href="#RF-104">RF-104</a>, <a class="ref" href="#RN-167">RN-167</a>, <a class="ref" href="#RN-180">RN-180</a>)</p>
+<pre><code>{
+  "_id": "usr-ebfga-master",
+  "sigla": "EBFGA",
+  "contaId": "conta-ebfga",
+  "tipo": "MASTER",
+  "nome": "Escola Bento Freitas",
+  "nomeCurto": "objetivo_unidade1",
+  "estado": "ATIVO",
+  "login": "objetivo_unidade1@deboaz.com",
+  "resumoSenha": "(resumo irreversível da senha)",
+  "criadoEm": "2026-03-12T13:05:00Z",
+  "ultimoAcesso": "2026-10-29T11:15:00Z"
+}</code></pre>
+    <p><strong>usuarios</strong> · staff: entrada com o nome curto e a sigla, matrícula informada e permissões por módulo (<a class="ref" href="#RF-106">RF-106</a>, <a class="ref" href="#RF-107">RF-107</a>, <a class="ref" href="#RN-188">RN-188</a>)</p>
+<pre><code>{
+  "_id": "usr-ebfga-maria",
+  "sigla": "EBFGA",
+  "contaId": "conta-ebfga",
+  "tipo": "STAFF",
+  "nome": "Maria Souza",
+  "nomeCurto": "maria",
+  "estado": "ATIVO",
+  "login": "maria.ebfga@deboaz.com",
+  "matricula": "20260087",
+  "resumoSenha": "(resumo irreversível da senha)",
+  "permissoes": [
+    { "moduloId": "mod-usuarios", "abaConfiguracao": true,  "abaUtilizacao": true, "suspensa": false },
+    { "moduloId": "mod-quiz",     "abaConfiguracao": false, "abaUtilizacao": true, "suspensa": false }
+  ],
+  "criadoEm": "2026-03-14T10:20:00Z",
+  "ultimoAcesso": "2026-10-29T09:42:00Z"
+}</code></pre>
+    <p><strong>usuarios</strong> · participante: sem senha, entra com o código de acesso, que vale também para os responsáveis (<a class="ref" href="#RF-108">RF-108</a>, <a class="ref" href="#RN-184">RN-184</a>, <a class="ref" href="#RN-186">RN-186</a>)</p>
+<pre><code>{
+  "_id": "usr-ebfga-lucas",
+  "sigla": "EBFGA",
+  "contaId": "conta-ebfga",
+  "tipo": "PARTICIPANTE",
+  "nome": "Lucas Andrade",
+  "nomeCurto": "lucas",
+  "estado": "ATIVO",
+  "login": "EBFGA-LUCAS-0412",
+  "matricula": "48201755",
+  "responsaveis": [
+    { "nome": "Carla Andrade", "parentesco": "Mãe" },
+    { "nome": "Paulo Andrade", "parentesco": "Pai" }
+  ],
+  "criadoEm": "2026-03-20T15:00:00Z",
+  "ultimoAcesso": "2026-10-28T22:10:00Z"
+}</code></pre>
+    <p><strong>geracoesSenha</strong> · cada geração de senha, com o código de liberação que vale 72 h (<a class="ref" href="#RF-110">RF-110</a>, <a class="ref" href="#RN-181">RN-181</a>, <a class="ref" href="#RN-182">RN-182</a>)</p>
+<pre><code>{
+  "_id": "ger-ebfga-maria-0001",
+  "sigla": "EBFGA",
+  "usuarioId": "usr-ebfga-maria",
+  "pedidaPor": "usr-ebfga-master",
+  "resumoCodigo": "(resumo irreversível do código de liberação)",
+  "pedidaEm": "2026-10-27T13:00:00Z",
+  "usadaEm": "2026-10-27T13:12:00Z"
+}</code></pre>
+    <p><strong>acessosAnonimos</strong> · um por pessoa sem código de acesso numa sala que aceita anônimo; some quando a sala fecha (<a class="ref" href="#RF-115">RF-115</a>, <a class="ref" href="#RN-177">RN-177</a>)</p>
+<pre><code>{
+  "_id": "anon-ebfga-482107-13465",
+  "sigla": "EBFGA",
+  "sala": "482107",
+  "apelido": "PUPIL-EBFGA-13465"
+}</code></pre>
+    <p><strong>auditoria</strong> · um registro por ação de criar usuário, gerar senha, mudar permissão ou estado; nunca muda (<a class="ref" href="#RN-178">RN-178</a>, <a class="ref" href="#RNF-206">RNF-206</a>)</p>
+<pre><code>{
+  "_id": "aud-ebfga-000154",
+  "contaId": "conta-ebfga",
+  "quem": "usr-ebfga-maria",
+  "acao": "CRIAR_USUARIO",
+  "alvo": "usr-ebfga-lucas",
+  "quando": "2026-03-20T15:00:00Z"
+}</code></pre>
+    <p><strong>sessão no Redis</strong> · chave <code>sessao:&lt;id&gt;</code>, que expira pelo tempo de sessão da conta, aqui 8 h do staff no navegador (<a class="ref" href="#RF-114">RF-114</a>, <a class="ref" href="#RN-183">RN-183</a>)</p>
+<pre><code>sessao:3f9c2a71   expira em 28800 s
+{
+  "usuarioId": "usr-ebfga-maria",
+  "sigla": "EBFGA",
+  "aparelho": "NAVEGADOR",
+  "quemEntrou": null,
+  "ultimaAcao": "2026-10-29T09:42:00Z"
+}</code></pre>
     <h3>Telas do hub: conta nova e entrada</h3>
     <p>Exemplo de ponta a ponta com a Escola Bento Freitas Gonçalves e a staff Maria Souza. As vistas estão em compact; o botão <strong>Paleta</strong> troca o tema de cor e o modo.</p>
     <ol>
@@ -1222,7 +1329,8 @@ Cenário: pagamento regularizado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v14</span></td><td>2026-10-29 05:00</td><td>Diagrama entidade-relacionamento trocado pelo modelo de documentos (identidade-acesso-documentos v01), para o MongoDB e o Cosmos DB for MongoDB</td></tr>
+      <tr><td><span class="boaz-versao">v15</span></td><td>2026-10-29 05:05</td><td>Exemplo completo, com dados fictícios, de cada entidade: contas, usuarios (conta master, staff e participante), geracoesSenha, acessosAnonimos, auditoria e sessão</td></tr>
+      <tr><td>v14</td><td>2026-10-29 05:00</td><td>Diagrama entidade-relacionamento trocado pelo modelo de documentos (identidade-acesso-documentos v01), para o MongoDB e o Cosmos DB for MongoDB</td></tr>
       <tr><td>v13</td><td>2026-10-29 04:49</td><td>Diagramas de classes e de entidade-relacionamento (identidade-acesso-classes v01, identidade-acesso-er v01)</td></tr>
       <tr><td>v12</td><td>2026-10-29 04:21</td><td>SAC como módulo da conta que toda conta tem para falar com o time deboaz (<code class="id">RF-111</code>); vista do time deboaz v05</td></tr>
       <tr><td>v11</td><td>2026-10-29 04:07</td><td>Renumerado de 15_identidade-acesso para 16_identidade-acesso (o catálogo vem antes); vista do time deboaz v04 com o card do Catálogo</td></tr>
@@ -1231,11 +1339,10 @@ Cenário: pagamento regularizado
       <tr><td>v08</td><td>2026-10-29 02:56</td><td>Participante com nome curto e um ou mais responsáveis com parentesco (<code class="id">RF-108</code>); código de acesso <code>&lt;sigla&gt;-&lt;nome curto&gt;-&lt;4 números&gt;</code> sem senha (<code class="id">RN-184</code>); busca, estado e ordem alfabética nas listas (<code class="id">RN-185</code>); último acesso (<code class="id">RN-186</code>); dados da conta (<code class="id">RN-187</code>); vistas novas: participantes, dados da conta e código da sala no quest</td></tr>
       <tr><td>v07</td><td>2026-10-29 02:23</td><td>Vistas atualizadas: cards dos módulos do time deboaz com dados e gráficos, tela Contas do painel movida para a vista do time deboaz, botões segmentados em Contas, SAC e Permissões; exemplo de senha trocado</td></tr>
       <tr><td>v06</td><td>2026-10-29 01:56</td><td>Acesso do time deboaz: sigla reservada <code>DBOAZ</code> e entrada <code>&lt;nome curto&gt;.dboaz@deboaz.com</code> (<code class="id">RN-179</code>, <code class="id">RN-180</code>), membros criados só pela conta master do time (<code class="id">RN-164</code>, <code class="id">RN-169</code>), vista do time deboaz com o passo a passo e pendência sobre a senha da conta master do time</td></tr>
-      <tr><td>v05</td><td>2026-10-29 01:40</td><td>Vistas de tela incluídas em Diagramas, com o passo a passo e exemplos: acesso ao hub (criar conta, sua senha, entrar, código de liberação, esqueci a senha), módulo Usuários com o painel do time deboaz e sala anônima no quest</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v14 · 2026-10-29 05:00</span>
+    <span>boaz · v15 · 2026-10-29 05:05</span>
     <span class="boaz-arquivo">1_Requisitos/16_identidade-acesso.html</span>
   </div>
 </footer>
