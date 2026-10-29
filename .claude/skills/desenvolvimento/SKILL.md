@@ -34,7 +34,7 @@ A tarefa vive numa branch própria **dentro de um worktree próprio**, para que 
    git fetch origin master
    git worktree add .claude/worktrees/<branch> -b <branch> origin/master
    ```
-   Se a ferramenta `EnterWorktree` estiver disponível, prefira-a (com o nome da branch), porque ela também leva a sessão para dentro do worktree; depois confira `git branch --show-current`.
+   Se a ferramenta `EnterWorktree` estiver disponível, prefira-a (com o nome da branch), porque ela também leva a sessão para dentro do worktree; depois confira `git rev-parse --abbrev-ref HEAD`.
 4. **Trabalhe só dentro do worktree** daí em diante: todo caminho, comando, build e teste roda em `.claude/worktrees/<branch>/`. Nunca rode `git checkout`/`git switch` na cópia principal, nunca commite na `master`, nunca leve para a branch arquivos alheios à tarefa (como os `* 2.*` não rastreados da cópia principal).
 5. O worktree não herda dependências: rode `pnpm install` em `5_DEV/frontend/web/` (e em `0_Assets/design/` se gerar tokens) e `dotnet restore` antes do primeiro build.
 6. Tarefas em paralelo = um worktree por tarefa. Uma tarefa que depende de outra ainda não mergeada parte da branch dela (`… -b <branch> <branch-da-outra>`), e isso vai escrito no PR.
