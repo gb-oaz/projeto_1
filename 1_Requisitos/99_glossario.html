@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Glossário · boaz · v21</title>
+<title>Glossário · boaz · v22</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="99_glossario">
 <meta name="boaz:caminho" content="1_Requisitos/99_glossario.html">
 <meta name="boaz:tipo" content="Glossário">
-<meta name="boaz:versao" content="v21">
-<meta name="boaz:data" content="2026-10-29 02:56">
+<meta name="boaz:versao" content="v22">
+<meta name="boaz:data" content="2026-10-29 03:18">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -790,8 +790,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>dar um significado único aos termos do domínio usados nos documentos de requisito.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>99_glossario</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v21</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 02:56</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v22</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 03:18</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -805,7 +805,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <dt id="catalogo-de-modulos">Catálogo de módulos</dt><dd>lista dos módulos que uma escola ou empresa pode contratar, cada um com preço próprio controlado no hub</dd>
       <dt id="classe-de-janela">Classe de janela</dt><dd>faixa de largura disponível para a tela (compact, medium, expanded, large ou extra-large) que define margem, colunas, painéis e navegação</dd>
       <dt id="codigo-da-sala">Código da sala</dt><dd>código que o educador passa aos participantes para entrarem numa sala pelo quest</dd>
-      <dt id="codigo-de-acesso">Código de acesso</dt><dd>código único que a instituição gera para cada participante, no formato <code>&lt;sigla&gt;-&lt;nome curto&gt;-&lt;4 números&gt;</code> (<code>EBFGA-lucas-0412</code>), e que abre o perfil dele no quest sem senha; vale para o participante e para os responsáveis, e cada ano tem o seu (<a class="ref" href="15_identidade-acesso.html#RN-184">Identidade e acesso RN-184</a>)</dd>
+      <dt id="codigo-de-acesso">Código de acesso</dt><dd>código único que a instituição gera para cada participante, no formato <code>&lt;SIGLA&gt;-&lt;NOME CURTO&gt;-&lt;4 números&gt;</code> (<code>EBFGA-LUCAS-0412</code>, sempre em maiúsculas), e que abre o perfil dele no quest sem senha; vale para o participante e para os responsáveis, e cada ano tem o seu (<a class="ref" href="15_identidade-acesso.html#RN-184">Identidade e acesso RN-184</a>)</dd>
       <dt id="codigo-de-liberacao">Código de liberação</dt><dd>código de 6 números que acompanha cada geração de senha; quem pediu a geração o entrega pessoalmente, e a senha só aparece a quem informa a entrada e esse código</dd>
       <dt id="componente">Componente</dt><dd>elemento de tela reutilizável do design system, como botão, campo de texto ou card, construído só com tokens</dd>
       <dt id="componente-comum">Componente comum</dt><dd>componente usado por mais de um módulo, com uma única implementação compartilhada por frente</dd>
@@ -823,6 +823,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <dt id="landing-page">Landing page</dt><dd>frente do produto que apresenta o deboaz a quem ainda não o usa</dd>
       <dt id="mascote">Mascote</dt><dd>personagem da identidade visual com rosto expressivo, que reforça uma mensagem da tela; combina expressão, forma, proporção, movimento e cor</dd>
       <dt id="mascote-padrinho">Mascote padrinho</dt><dd>mascote (expressão e forma) que representa um módulo, definido no documento dele e mostrado no card do catálogo, no destaque e na página do módulo</dd>
+      <dt id="matricula">Matrícula</dt><dd>número que identifica o staff ou o participante dentro da instituição (escola ou empresa), único nela: informado por quem cadastra ou gerado pelo sistema com 8 números; não é a entrada nem o código de acesso (<a class="ref" href="15_identidade-acesso.html#RN-188">Identidade e acesso RN-188</a>)</dd>
       <dt id="modulo">Módulo</dt><dd>conjunto de telas e regras de uma mesma funcionalidade dentro de uma aplicação; é também a unidade contratável do catálogo de módulos</dd>
       <dt id="modulo-fixo">Módulo fixo</dt><dd>módulo sempre disponível ao participante na aba Fixos do quest, até a instituição revogar</dd>
       <dt id="modulo-usuarios">Módulo Usuários</dt><dd>módulo da conta em que a instituição cria o staff e os participantes e decide as permissões, e o educador autônomo cria os participantes</dd>
@@ -857,7 +858,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v21</span></td><td>2026-10-29 02:56</td><td>Código de acesso no formato <code>&lt;sigla&gt;-&lt;nome curto&gt;-&lt;4 números&gt;</code>, sem senha (<a class="ref" href="15_identidade-acesso.html#RN-184">15 RN-184</a>)</td></tr>
+      <tr><td><span class="boaz-versao">v22</span></td><td>2026-10-29 03:18</td><td>Matrícula; código de acesso sempre em maiúsculas</td></tr>
+      <tr><td>v21</td><td>2026-10-29 02:56</td><td>Código de acesso no formato <code>&lt;sigla&gt;-&lt;nome curto&gt;-&lt;4 números&gt;</code>, sem senha (<a class="ref" href="15_identidade-acesso.html#RN-184">15 RN-184</a>)</td></tr>
       <tr><td>v20</td><td>2026-10-29 01:17</td><td>Termo código de liberação</td></tr>
       <tr><td>v19</td><td>2026-10-29 01:03</td><td>Termos nova geração de senha e sigla; senha provisória removido (toda senha é gerada pelo sistema); usuário superior atualizado</td></tr>
       <tr><td>v18</td><td>2026-10-29 00:10</td><td>Termos de identidade e acesso: acesso anônimo, módulo Usuários, SAC, senha provisória, staff e usuário superior; módulos da conta com o módulo Usuários; status → Em revisão</td></tr>
@@ -866,11 +868,10 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <tr><td>v15</td><td>2026-10-19 00:53</td><td>Status → Aprovado</td></tr>
       <tr><td>v14</td><td>2026-10-19 00:53</td><td>Termos da UX do quest: código de acesso, módulo fixo, perfis acessados e tarefa; status → Em revisão</td></tr>
       <tr><td>v13</td><td>2026-10-18 23:51</td><td>Status → Aprovado</td></tr>
-      <tr><td>v12</td><td>2026-10-18 23:51</td><td>Termos da UX do hub: conta master, contas acessadas, módulos da conta, pessoa delegada e time deboaz; status → Em revisão</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v21 · 2026-10-29 02:56</span>
+    <span>boaz · v22 · 2026-10-29 03:18</span>
     <span class="boaz-arquivo">1_Requisitos/99_glossario.html</span>
   </div>
 </footer>

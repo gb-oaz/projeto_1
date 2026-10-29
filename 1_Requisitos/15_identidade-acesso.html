@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Identidade e acesso · boaz · v08</title>
+<title>Identidade e acesso · boaz · v09</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="15_identidade-acesso">
 <meta name="boaz:caminho" content="1_Requisitos/15_identidade-acesso.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v08">
-<meta name="boaz:data" content="2026-10-29 02:56">
+<meta name="boaz:versao" content="v09">
+<meta name="boaz:data" content="2026-10-29 03:18">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>15_identidade-acesso</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v08</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 02:56</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 03:18</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -937,9 +937,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
       <tbody>
         <tr id="RF-104"><td><code class="id">RF-104</code></td><td>O sistema deve tornar <a class="ref" href="99_glossario.html#conta-master">conta master</a> quem cria em Criar conta a conta de uma instituição ou de um educador autônomo, com um domínio de entrada e uma <strong>sigla</strong> únicos no sistema</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-105"><td><code class="id">RF-105</code></td><td>O sistema deve incluir o módulo Usuários entre os módulos da conta da instituição, com staff, participantes e permissões, e do educador autônomo, só com participantes</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-106"><td><code class="id">RF-106</code></td><td>O sistema deve permitir que a conta master de uma instituição, e não a de um educador autônomo, crie no módulo Usuários um usuário <strong>staff</strong> com nome e nome curto, que forma a entrada <code>&lt;nome curto&gt;.&lt;sigla&gt;@deboaz.com</code></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-106"><td><code class="id">RF-106</code></td><td>O sistema deve permitir que a conta master de uma instituição, e não a de um educador autônomo, crie no módulo Usuários um usuário <strong>staff</strong> com nome, nome curto e número de matrícula; o nome curto forma a entrada <code>&lt;nome curto&gt;.&lt;sigla&gt;@deboaz.com</code></td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-107"><td><code class="id">RF-107</code></td><td>O sistema deve definir as permissões de cada staff por módulo contratado, marcando a aba Configuração, a aba Utilização ou as duas</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-108"><td><code class="id">RF-108</code></td><td>O sistema deve criar no módulo Usuários um participante com nome, nome curto e um ou mais responsáveis, cada um com o parentesco, gerando o código de acesso dele</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-108"><td><code class="id">RF-108</code></td><td>O sistema deve criar no módulo Usuários um participante com nome, nome curto, número de matrícula (na conta de instituição) e um ou mais responsáveis, cada um com o parentesco, gerando o código de acesso dele</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-109"><td><code class="id">RF-109</code></td><td>O sistema deve gerar e mostrar uma única vez a senha do usuário, para ele anotar, no primeiro acesso e no primeiro acesso depois de cada nova geração de senha</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-110"><td><code class="id">RF-110</code></td><td>O sistema deve permitir que um usuário superior peça uma <strong>nova geração de senha</strong> para quem está abaixo dele, que vale no próximo acesso desse usuário</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-111"><td><code class="id">RF-111</code></td><td>O sistema deve levar, sem login, a mensagem enviada pela ação <q class="ui">Esqueci a senha da conta master</q> da tela Entrar ao <strong>SAC</strong>, módulo que só o time deboaz usa</td><td><span class="prio prio-deve">Deve</span></td></tr>
@@ -976,10 +976,11 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-181"><td><code class="id">RN-181</code></td><td>Toda geração de senha, a do primeiro acesso e cada nova geração, vem com um <strong>código de liberação</strong> de 6 números, que quem a pediu vê uma única vez e entrega pessoalmente; a senha só aparece para quem informa a entrada e esse código</td></tr>
         <tr id="RN-182"><td><code class="id">RN-182</code></td><td>A geração de senha e o código de liberação valem por 72 h; vencidos, o superior pede outra geração</td></tr>
         <tr id="RN-183"><td><code class="id">RN-183</code></td><td>O tempo de sessão sem uso fica entre os limites abaixo, com o valor padrão até a instituição mudar: staff no navegador de 15 min a 12 h (padrão 8 h), staff no app de 1 a 30 dias (padrão 7 dias) e participante de 1 a 90 dias (padrão 30 dias)</td></tr>
-        <tr id="RN-184"><td><code class="id">RN-184</code></td><td>O código de acesso do participante é <code>&lt;sigla&gt;-&lt;nome curto&gt;-&lt;4 números aleatórios&gt;</code> (<code>EBFGA-lucas-0412</code>), único no sistema e sem diferença entre maiúsculas e minúsculas; o participante não tem senha, e ele e os responsáveis entram com esse mesmo código (<a class="ref" href="09_quest-ux.html#RN-94">Quest · UX base RN-94</a>)</td></tr>
-        <tr id="RN-185"><td><code class="id">RN-185</code></td><td>As listas de staff, participantes, contas e membros do time ficam em ordem alfabética, com busca por nome e por entrada, código de acesso, sigla ou CNPJ/CPF, e filtro pelo estado; o SAC busca do mesmo jeito e mostra primeiro a mensagem mais antiga</td></tr>
+        <tr id="RN-184"><td><code class="id">RN-184</code></td><td>O código de acesso do participante é <code>&lt;SIGLA&gt;-&lt;NOME CURTO&gt;-&lt;4 números aleatórios&gt;</code> (<code>EBFGA-LUCAS-0412</code>), único no sistema; aparece sempre em maiúsculas e é aceito sem diferença entre maiúsculas e minúsculas; o participante não tem senha, e ele e os responsáveis entram com esse mesmo código (<a class="ref" href="09_quest-ux.html#RN-94">Quest · UX base RN-94</a>)</td></tr>
+        <tr id="RN-185"><td><code class="id">RN-185</code></td><td>As listas de staff, participantes, contas e membros do time ficam em ordem alfabética, com busca por nome e por entrada, código de acesso, matrícula, sigla ou CNPJ/CPF, e filtro pelo estado; o SAC busca do mesmo jeito e mostra primeiro a mensagem mais antiga</td></tr>
         <tr id="RN-186"><td><code class="id">RN-186</code></td><td>Cada staff, participante e conta mostra a data e a hora do último acesso (da conta, o da conta master); no participante, também quem entrou: ele ou o responsável, com o parentesco</td></tr>
         <tr id="RN-187"><td><code class="id">RN-187</code></td><td>Ver a conta, no painel do time deboaz, mostra só os dados do cadastro (tipo, nome, CNPJ ou CPF, sigla, entrada da conta master, responsável e telefone) e as datas de criação, do último contrato ou pagamento e do último acesso da conta master; nada dos usuários, turmas ou conteúdos da conta</td></tr>
+        <tr id="RN-188"><td><code class="id">RN-188</code></td><td>Na conta de instituição (escola ou empresa), cada staff e participante tem um número de matrícula, único na instituição: quem cadastra informa o número que a instituição já usa ou toca Gerar automaticamente, e o sistema cria um de 8 números aleatórios; a matrícula identifica a pessoa na instituição e não substitui a entrada nem o código de acesso</td></tr>
       </tbody>
     </table>
   </section>
@@ -1052,7 +1053,7 @@ Cenário: módulo não contratado
       <pre class="gherkin">Cenário: aluno novo com dois responsáveis
   Dado o staff com o módulo Usuários da escola de sigla "EBFGA"
   Quando cria o participante "Lucas Andrade", nome curto "lucas", com a mãe "Carla Andrade" e o pai "Paulo Andrade"
-  Então o Lucas aparece entre os participantes com um código como "EBFGA-lucas-0412", sem senha
+  Então o Lucas aparece entre os participantes com um código como "EBFGA-LUCAS-0412", sem senha
   E esse código abre o perfil dele no quest, para ele e para os dois responsáveis</pre>
     </article>
     <article class="criterio" id="ca-RF-109">
@@ -1135,6 +1136,8 @@ Cenário: pagamento regularizado
       <li>Segundo fator de autenticação, inclusive para o time deboaz (decisão de 2026-10-29)</li>
       <li>Senha escolhida pela pessoa e envio de senha, código ou aviso por e-mail ou mensagem</li>
       <li>Recuperação de senha por perguntas de segurança</li>
+      <li>Turma e ano do participante: ficam no módulo de gestão de turmas</li>
+      <li>Formato do código da sala: fica no módulo de aula ao vivo; as vistas usam 6 números só como exemplo</li>
       <li>Usuário em várias unidades da mesma instituição (fase de escala, <a class="ref" href="00_visao-produto.html#fora-de-escopo">Visão do produto</a>)</li>
     </ul>
   </section>
@@ -1142,7 +1145,6 @@ Cenário: pagamento regularizado
     <h2>Em aberto</h2>
     <ul class="pendencias">
       <li>Quem pede a nova geração de senha da conta master do time deboaz, que está no topo da ordem de superior e não tem a quem pedir <span class="tag dono">Produto</span></li>
-      <li>Alinhar ao formato do código de acesso deste documento (RN-184) a regra do quest em que a empresa usa a identificação do funcionário como código (09, RN-91) e o exemplo HZ7A-2026-0412 da vista de acesso do quest (13) <span class="tag dono">Produto</span></li>
     </ul>
   </section>
   <section id="diagramas">
@@ -1170,17 +1172,17 @@ Cenário: pagamento regularizado
     </figure>
     <h3>Telas do módulo Usuários</h3>
     <ol>
-      <li><strong>Staff</strong>: a conta master busca por nome ou entrada, filtra pelos botões segmentados Ativos, Pendentes e Desativados e vê o staff de A a Z, com a entrada e o último acesso (Ana Prado, hoje, 08:42); toca Novo staff (<a class="ref" href="#RF-105">RF-105</a>, <a class="ref" href="#RF-112">RF-112</a>, <a class="ref" href="#RN-185">RN-185</a>, <a class="ref" href="#RN-186">RN-186</a>).</li>
-      <li><strong>Novo staff</strong>: informa Maria Souza e o nome curto <code>maria</code>; o apoio mostra a entrada <code>maria.ebfga@deboaz.com</code>, e ninguém digita senha (<a class="ref" href="#RF-106">RF-106</a>, <a class="ref" href="#RN-170">RN-170</a>).</li>
+      <li><strong>Staff</strong>: a conta master busca por nome, entrada ou matrícula, filtra pelos botões segmentados Ativos, Pendentes e Desativados e vê o staff de A a Z, com a entrada, a matrícula e o último acesso (Ana Prado, hoje, 08:42); toca Novo staff (<a class="ref" href="#RF-105">RF-105</a>, <a class="ref" href="#RF-112">RF-112</a>, <a class="ref" href="#RN-185">RN-185</a>, <a class="ref" href="#RN-186">RN-186</a>).</li>
+      <li><strong>Novo staff</strong>: informa Maria Souza, o nome curto <code>maria</code> e a matrícula que a escola já usa, <code>20260087</code> (ou toca Gerar automaticamente); o apoio mostra a entrada <code>maria.ebfga@deboaz.com</code>, e ninguém digita senha (<a class="ref" href="#RN-188">RN-188</a>, <a class="ref" href="#RF-106">RF-106</a>, <a class="ref" href="#RN-170">RN-170</a>).</li>
       <li><strong>Código de liberação</strong>: o diálogo mostra <code>482 913</code> uma única vez, para entregar pessoalmente à Maria em até 72 h (<a class="ref" href="#RN-181">RN-181</a>, <a class="ref" href="#RN-182">RN-182</a>).</li>
       <li><strong>Permissões</strong>: nos botões segmentados de cada módulo contratado, marca Utilização em Presença e Configuração em Turmas; pode conceder Administrar usuários, pedir nova geração de senha ou desativar a Maria (<a class="ref" href="#RF-107">RF-107</a>, <a class="ref" href="#RF-110">RF-110</a>, <a class="ref" href="#RN-166">RN-166</a>, <a class="ref" href="#RN-168">RN-168</a>).</li>
-      <li><strong>Participantes</strong>: a mesma busca, por nome ou código, e o filtro Ativos ou Desativados (sem pendente, porque o participante não tem senha); cada um mostra o código de acesso, como <code>EBFGA-lucas-0412</code>, e o último acesso com quem entrou: hoje, 07:55, a mãe (<a class="ref" href="#RN-184">RN-184</a>, <a class="ref" href="#RN-186">RN-186</a>).</li>
-      <li><strong>Novo participante</strong>: informa Lucas Andrade, o nome curto <code>lucas</code> e os responsáveis Carla Andrade (mãe) e Paulo Andrade (pai), com Adicionar responsável para mais um; o código <code>EBFGA-lucas-&lt;4 números&gt;</code> vale para todos, sem senha (<a class="ref" href="#RF-108">RF-108</a>, <a class="ref" href="#RN-184">RN-184</a>).</li>
+      <li><strong>Participantes</strong>: a mesma busca, por nome, código ou matrícula, e o filtro Ativos ou Desativados (sem pendente, porque o participante não tem senha); cada um mostra o código de acesso em maiúsculas, como <code>EBFGA-LUCAS-0412</code>, a matrícula e o último acesso com quem entrou: hoje, 07:55, a mãe (<a class="ref" href="#RN-184">RN-184</a>, <a class="ref" href="#RN-186">RN-186</a>).</li>
+      <li><strong>Novo participante</strong>: informa Lucas Andrade e o nome curto <code>lucas</code>, toca Gerar automaticamente para a matrícula (<code>48201755</code>) e informa os responsáveis Carla Andrade (mãe) e Paulo Andrade (pai), com Adicionar responsável para mais um; o código <code>EBFGA-LUCAS-&lt;4 números&gt;</code> vale para todos, sem senha (<a class="ref" href="#RN-188">RN-188</a>, <a class="ref" href="#RF-108">RF-108</a>, <a class="ref" href="#RN-184">RN-184</a>).</li>
       <li><strong>Tempo de sessão</strong>: staff no navegador 8 h, staff no app 7 dias e participantes 30 dias, dentro dos limites (<a class="ref" href="#RF-114">RF-114</a>, <a class="ref" href="#RN-183">RN-183</a>).</li>
     </ol>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-usuarios_v03_20261029-0255.svg"><img src="../2_Diagramas/vista-hub-usuarios_v03_20261029-0255.svg" alt="Vista do módulo Usuários: staff e participantes com busca, estado, ordem alfabética e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão"></a>
-      <figcaption><strong>Hub · usuários · vista</strong><code>2_Diagramas/vista-hub-usuarios_v03_20261029-0255.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-usuarios_v04_20261029-0317.svg"><img src="../2_Diagramas/vista-hub-usuarios_v04_20261029-0317.svg" alt="Vista do módulo Usuários: staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão"></a>
+      <figcaption><strong>Hub · usuários · vista</strong><code>2_Diagramas/vista-hub-usuarios_v04_20261029-0317.svg</code></figcaption>
     </figure>
     <h3>Telas do hub: acesso do time deboaz</h3>
     <ol>
@@ -1214,7 +1216,8 @@ Cenário: pagamento regularizado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v08</span></td><td>2026-10-29 02:56</td><td>Participante com nome curto e um ou mais responsáveis com parentesco (<code class="id">RF-108</code>); código de acesso <code>&lt;sigla&gt;-&lt;nome curto&gt;-&lt;4 números&gt;</code> sem senha (<code class="id">RN-184</code>); busca, estado e ordem alfabética nas listas (<code class="id">RN-185</code>); último acesso (<code class="id">RN-186</code>); dados da conta (<code class="id">RN-187</code>); vistas novas: participantes, dados da conta e código da sala no quest</td></tr>
+      <tr><td><span class="boaz-versao">v09</span></td><td>2026-10-29 03:18</td><td>Número de matrícula do staff e do participante, informado ou gerado (<code class="id">RN-188</code>, <code class="id">RF-106</code>, <code class="id">RF-108</code>); código de acesso sempre em maiúsculas (<code class="id">RN-184</code>); turma e ano e formato do código da sala em Fora de escopo; pendência do formato antigo resolvida</td></tr>
+      <tr><td>v08</td><td>2026-10-29 02:56</td><td>Participante com nome curto e um ou mais responsáveis com parentesco (<code class="id">RF-108</code>); código de acesso <code>&lt;sigla&gt;-&lt;nome curto&gt;-&lt;4 números&gt;</code> sem senha (<code class="id">RN-184</code>); busca, estado e ordem alfabética nas listas (<code class="id">RN-185</code>); último acesso (<code class="id">RN-186</code>); dados da conta (<code class="id">RN-187</code>); vistas novas: participantes, dados da conta e código da sala no quest</td></tr>
       <tr><td>v07</td><td>2026-10-29 02:23</td><td>Vistas atualizadas: cards dos módulos do time deboaz com dados e gráficos, tela Contas do painel movida para a vista do time deboaz, botões segmentados em Contas, SAC e Permissões; exemplo de senha trocado</td></tr>
       <tr><td>v06</td><td>2026-10-29 01:56</td><td>Acesso do time deboaz: sigla reservada <code>DBOAZ</code> e entrada <code>&lt;nome curto&gt;.dboaz@deboaz.com</code> (<code class="id">RN-179</code>, <code class="id">RN-180</code>), membros criados só pela conta master do time (<code class="id">RN-164</code>, <code class="id">RN-169</code>), vista do time deboaz com o passo a passo e pendência sobre a senha da conta master do time</td></tr>
       <tr><td>v05</td><td>2026-10-29 01:40</td><td>Vistas de tela incluídas em Diagramas, com o passo a passo e exemplos: acesso ao hub (criar conta, sua senha, entrar, código de liberação, esqueci a senha), módulo Usuários com o painel do time deboaz e sala anônima no quest</td></tr>
@@ -1225,7 +1228,7 @@ Cenário: pagamento regularizado
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v08 · 2026-10-29 02:56</span>
+    <span>boaz · v09 · 2026-10-29 03:18</span>
     <span class="boaz-arquivo">1_Requisitos/15_identidade-acesso.html</span>
   </div>
 </footer>
