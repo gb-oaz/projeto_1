@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catálogo · boaz · v03</title>
+<title>Catálogo · boaz · v04</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="15_catalogo">
 <meta name="boaz:caminho" content="1_Requisitos/15_catalogo.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v03">
-<meta name="boaz:data" content="2026-10-29 04:21">
+<meta name="boaz:versao" content="v04">
+<meta name="boaz:data" content="2026-10-29 04:49">
 <meta name="boaz:status" content="Rascunho">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>15_catalogo</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v03</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 04:21</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v04</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 04:49</dd></div>
     <div><dt>Status</dt><dd><span class="status status-rascunho">Rascunho</span></dd></div>
   </dl>
 </header>
@@ -1132,6 +1132,15 @@ Cenário: buscar um autônomo
   </section>
   <section id="diagramas">
     <h2>Diagramas</h2>
+    <h3>Entidades do catálogo</h3>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/catalogo-classes_v01_20261029-0443.svg"><img src="../2_Diagramas/catalogo-classes_v01_20261029-0443.svg" alt="Diagrama de classes do catálogo: Módulo com tipo, custo e modelo de cobrança, Preço e PolíticaDeDesconto com vigência, FaixaDeDesconto, Contratação por conta e Cobrança mensal"></a>
+      <figcaption><strong>Catálogo · classes</strong><code>2_Diagramas/catalogo-classes_v01_20261029-0443.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/catalogo-er_v01_20261029-0444.svg"><img src="../2_Diagramas/catalogo-er_v01_20261029-0444.svg" alt="Entidade-relacionamento do catálogo: tabelas modulo, preco, politica_desconto, faixa_desconto, contratacao e cobranca, ligadas a conta e usuario"></a>
+      <figcaption><strong>Catálogo · entidade-relacionamento</strong><code>2_Diagramas/catalogo-er_v01_20261029-0444.svg</code></figcaption>
+    </figure>
     <h3>Telas do hub: catálogo</h3>
     <ol>
       <li><strong>Meus módulos</strong>: só na conta do time deboaz, o card Catálogo mostra R$ 201,0 mil de receita prevista no mês, as barras dos últimos 5 meses, 3 módulos da conta, 5 contratáveis e 2 do time, 6 com custo, 4 sem custo e 5 com custo ainda sem preço (<a class="ref" href="#RF-116">RF-116</a>, <a class="ref" href="#RN-200">RN-200</a>).</li>
@@ -1153,13 +1162,14 @@ Cenário: buscar um autônomo
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v03</span></td><td>2026-10-29 04:21</td><td>Pendências respondidas e seção Em aberto removida: SAC é o módulo da conta Suporte e mensagens (<code class="id">RN-198</code>); desconto por volume progressivo, cada % só na sua faixa (<code class="id">RN-192</code>); contagem no dia do fechamento, sem proporção (<code class="id">RN-195</code>); plano anual com % configurável (<code class="id">RF-125</code>, <code class="id">RN-201</code>); valores como exemplo, em Fora de escopo; exemplo de receita recalculado (R$ 200.996,76/mês); vista vista-hub-catalogo-deboaz v02</td></tr>
+      <tr><td><span class="boaz-versao">v04</span></td><td>2026-10-29 04:49</td><td>Diagramas de classes e de entidade-relacionamento do catálogo (catalogo-classes v01, catalogo-er v01)</td></tr>
+      <tr><td>v03</td><td>2026-10-29 04:21</td><td>Pendências respondidas e seção Em aberto removida: SAC é o módulo da conta Suporte e mensagens (<code class="id">RN-198</code>); desconto por volume progressivo, cada % só na sua faixa (<code class="id">RN-192</code>); contagem no dia do fechamento, sem proporção (<code class="id">RN-195</code>); plano anual com % configurável (<code class="id">RF-125</code>, <code class="id">RN-201</code>); valores como exemplo, em Fora de escopo; exemplo de receita recalculado (R$ 200.996,76/mês); vista vista-hub-catalogo-deboaz v02</td></tr>
       <tr><td>v02</td><td>2026-10-29 04:07</td><td>Renomeado de 16_catalogo-precos para 15_catalogo e título Catálogo: todo módulo é catalogado (<code class="id">RN-197</code>), com nome, tipo, custo e precificação (<code class="id">RF-123</code>) e as siglas das instituições e dos autônomos que o contrataram (<code class="id">RF-124</code>); módulo da conta como requisito de toda conta (<code class="id">RN-198</code>), custo (<code class="id">RN-199</code>), Catálogo só na conta do time deboaz (<code class="id">RN-200</code>); <code class="id">RF-116</code>, <code class="id">RF-117</code> e <code class="id">RN-191</code> alterados; pendência SAC; vista vista-hub-catalogo-deboaz v01</td></tr>
       <tr><td>v01</td><td>2026-10-29 03:46</td><td>Criação</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v03 · 2026-10-29 04:21</span>
+    <span>boaz · v04 · 2026-10-29 04:49</span>
     <span class="boaz-arquivo">1_Requisitos/15_catalogo.html</span>
   </div>
 </footer>
