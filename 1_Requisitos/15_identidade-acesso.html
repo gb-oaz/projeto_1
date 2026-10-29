@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Identidade e acesso · boaz · v03</title>
+<title>Identidade e acesso · boaz · v04</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="15_identidade-acesso">
 <meta name="boaz:caminho" content="1_Requisitos/15_identidade-acesso.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v03">
-<meta name="boaz:data" content="2026-10-29 01:04">
-<meta name="boaz:status" content="Rascunho">
+<meta name="boaz:versao" content="v04">
+<meta name="boaz:data" content="2026-10-29 01:17">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -917,9 +917,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>15_identidade-acesso</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v03</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 01:04</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-rascunho">Rascunho</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v04</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 01:17</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
@@ -963,16 +963,19 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-168"><td><code class="id">RN-168</code></td><td>A conta master pode conceder o próprio módulo Usuários a um staff, que passa a criar staff e participantes e a conceder permissões dentro das que tem</td></tr>
         <tr id="RN-169"><td><code class="id">RN-169</code></td><td>A ordem de superior é: time deboaz, conta master, staff com o módulo Usuários, demais staff e participantes; um usuário pede nova geração de senha, desativa e reativa só quem está abaixo dele, nunca um par</td></tr>
         <tr id="RN-170"><td><code class="id">RN-170</code></td><td>Nenhuma pessoa escolhe nem vê a senha de outra: toda senha é gerada pelo sistema e mostrada só ao próprio usuário, e o deboaz não envia senha nem código de acesso por e-mail ou mensagem</td></tr>
-        <tr id="RN-171"><td><code class="id">RN-171</code></td><td>A senha gerada tem as 2 primeiras letras do primeiro nome, 1 caractere especial, o segundo nome e 6 números, com caractere especial e números aleatórios (Gustavo Boaz de Moura Souza → <code>Gu#Boaz507318</code>); o segundo nome ignora de, da, do, dos, das e e</td></tr>
-        <tr id="RN-172"><td><code class="id">RN-172</code></td><td>O time deboaz pede a nova geração de senha da conta master só depois de conferir, pelo SAC, o CNPJ ou o CPF da conta e mais 2 destes 3 dados do cadastro: o nome de quem fez o cadastro, o telefone e a data da última contratação ou pagamento</td></tr>
+        <tr id="RN-171"><td><code class="id">RN-171</code></td><td>A senha gerada tem as 2 primeiras letras do primeiro nome, 1 caractere especial, o segundo nome e 6 números, com caractere especial e números aleatórios (Gustavo Boaz de Moura Souza → <code>Gu#Boaz507318</code>); o segundo nome ignora de, da, do, dos, das e e, e quem tem um nome só usa o restante dele (Xuxa → <code>Xu@Xa182482</code>)</td></tr>
+        <tr id="RN-172"><td><code class="id">RN-172</code></td><td>O time deboaz pede a nova geração de senha da conta master só depois de conferir, pelo SAC, o CNPJ ou o CPF da conta e mais 2 destes 3 dados do cadastro: o nome de quem fez o cadastro, o telefone e a data da última contratação ou pagamento; o código de liberação vai ao contato do cadastro conferido</td></tr>
         <tr id="RN-173"><td><code class="id">RN-173</code></td><td>Uma conta de instituição ou de educador autônomo está ativa, suspensa (decisão temporária do time deboaz), desativada (falta de pagamento, volta com a regularização) ou encerrada (a pedido do cliente)</td></tr>
         <tr id="RN-174"><td><code class="id">RN-174</code></td><td>Nenhuma conta ou usuário é apagado; na conta encerrada, os dados do cliente são apagados em cascata (<a class="ref" href="00_visao-produto.html#escopo">Visão do produto</a>) e fica só o registro mínimo para histórico, auditoria e cobrança, anonimizado depois de 5 anos</td></tr>
         <tr id="RN-175"><td><code class="id">RN-175</code></td><td>Conta suspensa, desativada ou encerrada bloqueia a entrada de todo staff e participante dela; usuário desativado não entra até ser reativado</td></tr>
         <tr id="RN-176"><td><code class="id">RN-176</code></td><td>O tempo de sessão vale para a entrada no hub e no quest; não se aplica à duração de salas, quizzes ou aulas ao vivo, definida pelos módulos</td></tr>
         <tr id="RN-177"><td><code class="id">RN-177</code></td><td>O acesso anônimo termina quando a sala fecha e não abre perfil, tarefa nem outra sala; o apelido é <code>PUPIL-&lt;sigla&gt;-&lt;5 números aleatórios&gt;</code>, com a sigla da conta dona da sala e o número único na sala (<code>PUPIL-EBFGA-13465</code>)</td></tr>
         <tr id="RN-178"><td><code class="id">RN-178</code></td><td>Criar usuário, pedir nova geração de senha, mudar permissão e mudar o estado de uma conta ou de um usuário ficam na auditoria por 5 anos, com quem fez, o quê e quando</td></tr>
-        <tr id="RN-179"><td><code class="id">RN-179</code></td><td>A sigla tem 5 letras, é sugerida pelas iniciais do nome (Escola Bento Freitas Gonçalves Araújo → <code>EBFGA</code>), é recusada se já existir no sistema e não muda depois da criação da conta, porque forma as entradas do staff</td></tr>
-        <tr id="RN-180"><td><code class="id">RN-180</code></td><td>A conta master entra com <code>&lt;domínio&gt;@deboaz.com</code> (<code>objetivo_unidade1@deboaz.com</code>) e o staff com <code>&lt;nome curto&gt;.&lt;sigla&gt;@deboaz.com</code> (<code>maria.eejsa@deboaz.com</code>); o nome curto não se repete na instituição, e esses endereços só identificam a entrada, sem caixa de e-mail</td></tr>
+        <tr id="RN-179"><td><code class="id">RN-179</code></td><td>A sigla tem 5 letras, é sugerida pelas iniciais do nome (Escola Bento Freitas Gonçalves Araújo → <code>EBFGA</code>), é comparada sem diferença entre maiúsculas e minúsculas (<code>EBFGA</code> e <code>ebfga</code> são a mesma), é recusada se já existir no sistema e não muda depois da criação da conta, porque forma as entradas do staff</td></tr>
+        <tr id="RN-180"><td><code class="id">RN-180</code></td><td>A conta master entra com <code>&lt;domínio&gt;@deboaz.com</code> (<code>objetivo_unidade1@deboaz.com</code>) e o staff com <code>&lt;nome curto&gt;.&lt;sigla&gt;@deboaz.com</code> (<code>maria.eejsa@deboaz.com</code>); o nome curto não se repete na instituição, a entrada não diferencia maiúsculas de minúsculas, e esses endereços só identificam a entrada, sem caixa de e-mail</td></tr>
+        <tr id="RN-181"><td><code class="id">RN-181</code></td><td>Toda geração de senha, a do primeiro acesso e cada nova geração, vem com um <strong>código de liberação</strong> de 6 números, que quem a pediu vê uma única vez e entrega pessoalmente; a senha só aparece para quem informa a entrada e esse código</td></tr>
+        <tr id="RN-182"><td><code class="id">RN-182</code></td><td>A geração de senha e o código de liberação valem por 72 h; vencidos, o superior pede outra geração</td></tr>
+        <tr id="RN-183"><td><code class="id">RN-183</code></td><td>O tempo de sessão sem uso fica entre os limites abaixo, com o valor padrão até a instituição mudar: staff no navegador de 15 min a 12 h (padrão 8 h), staff no app de 1 a 30 dias (padrão 7 dias) e participante de 1 a 90 dias (padrão 30 dias)</td></tr>
       </tbody>
     </table>
   </section>
@@ -984,11 +987,12 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RNF-201"><td><code class="id">RNF-201</code></td><td><span class="tag">Segurança</span></td><td>A senha é guardada só de forma irreversível: ninguém, nem o time deboaz, consegue ler a senha de um usuário</td></tr>
         <tr id="RNF-202"><td><code class="id">RNF-202</code></td><td><span class="tag">Segurança</span></td><td>Toda senha tem ao menos 8 caracteres, com letra maiúscula, letra minúscula, caractere especial e número</td></tr>
         <tr id="RNF-203"><td><code class="id">RNF-203</code></td><td><span class="tag">Segurança</span></td><td>Depois de desativar, suspender, pedir nova geração de senha, mudar permissão ou descontratar um módulo, a credencial de acesso emitida antes deixa de valer na próxima ação do usuário, em qualquer aparelho</td></tr>
-        <tr id="RNF-204"><td><code class="id">RNF-204</code></td><td><span class="tag">Segurança</span></td><td>A entrada é bloqueada por um tempo depois de tentativas erradas seguidas, com o mesmo limite no hub e no quest</td></tr>
-        <tr id="RNF-205"><td><code class="id">RNF-205</code></td><td><span class="tag">Segurança</span></td><td>O atendimento sem login aceita um número limitado de envios por aparelho</td></tr>
+        <tr id="RNF-204"><td><code class="id">RNF-204</code></td><td><span class="tag">Segurança</span></td><td>5 tentativas erradas seguidas, de senha, de código de acesso ou de código de liberação, bloqueiam a entrada por 15 min; cada bloqueio seguido dobra o tempo, até 24 h, no hub e no quest</td></tr>
+        <tr id="RNF-205"><td><code class="id">RNF-205</code></td><td><span class="tag">Segurança</span></td><td>O atendimento sem login aceita até 3 envios por aparelho a cada 24 h</td></tr>
         <tr id="RNF-206"><td><code class="id">RNF-206</code></td><td><span class="tag">Conformidade</span></td><td>Um registro da auditoria não pode ser alterado nem apagado, nem pelo time deboaz</td></tr>
         <tr id="RNF-207"><td><code class="id">RNF-207</code></td><td><span class="tag">Segurança</span></td><td>A credencial de acesso é um token JWT assinado com RS256 e chave RSA de 2048 bits; a chave privada fica no Key Vault do ambiente e nunca sai dele, e as aplicações validam o token com a chave pública</td></tr>
         <tr id="RNF-208"><td><code class="id">RNF-208</code></td><td><span class="tag">Segurança</span></td><td>O token traz os papéis do usuário (tipo de usuário, módulos e abas permitidas), e cada ação é autorizada ou recusada pelos papéis do token</td></tr>
+        <tr id="RNF-209"><td><code class="id">RNF-209</code></td><td><span class="tag">Segurança</span></td><td>O token de acesso vale no máximo 15 min e é renovado enquanto a sessão estiver dentro do tempo configurado (<code class="id">RN-183</code>)</td></tr>
       </tbody>
     </table>
   </section>
@@ -1050,18 +1054,24 @@ Cenário: módulo não contratado
     <article class="criterio" id="ca-RF-109">
       <h3><code class="id">RF-109</code> Senha gerada no acesso</h3>
       <pre class="gherkin">Cenário: primeiro acesso do staff
-  Dado o staff "Gustavo Boaz de Moura Souza", recém-criado
-  Quando entra pela primeira vez com a entrada dele
+  Dado o staff "Gustavo Boaz de Moura Souza", recém-criado, com o código de liberação entregue pela secretaria
+  Quando entra pela primeira vez com a entrada dele e o código
   Então vê uma única vez uma senha como "Gu#Boaz507318", para anotar
-  E nenhum superior consegue ver essa senha</pre>
+  E nenhum superior consegue ver essa senha
+
+Cenário: sem o código de liberação
+  Dado um staff com a geração de senha pendente
+  Quando alguém informa a entrada dele sem o código de liberação certo
+  Então o sistema não mostra a senha
+  E conta uma tentativa errada</pre>
     </article>
     <article class="criterio" id="ca-RF-110">
       <h3><code class="id">RF-110</code> Senha esquecida</h3>
       <pre class="gherkin">Cenário: professor esqueceu a senha
   Dado o staff "Paulo", que esqueceu a senha
   Quando o staff com o módulo Usuários pede uma nova geração de senha para ele
-  Então no próximo acesso o Paulo vê a senha nova gerada, uma única vez
-  E a senha antiga deixa de valer
+  Então vê uma única vez o código de liberação, para entregar ao Paulo
+  E a senha antiga do Paulo deixa de valer
 
 Cenário: par não pede a geração
   Dado dois staff com o módulo Usuários
@@ -1124,22 +1134,15 @@ Cenário: pagamento regularizado
       <li>Usuário em várias unidades da mesma instituição (fase de escala, <a class="ref" href="00_visao-produto.html#fora-de-escopo">Visão do produto</a>)</li>
     </ul>
   </section>
-  <section id="em-aberto">
-    <h2>Em aberto</h2>
-    <ul class="pendencias">
-      <li>Como o sistema garante que só o próprio staff recebe a senha gerada, já que a entrada é previsível: sugestão, um código de liberação de 6 números que o superior entrega pessoalmente ao pedir a geração <span class="tag dono">Segurança</span></li>
-      <li>Tempo de sessão: mínimo, máximo e padrão do staff e dos participantes, no navegador e no app, e a validade do token; sugestão: staff 15 min a 12 h no navegador (padrão 8 h) e 1 a 30 dias no app (padrão 7), participante 1 a 90 dias (padrão 30) <span class="tag dono">Produto</span></li>
-      <li>Quantas tentativas erradas seguidas bloqueiam a entrada e por quanto tempo (<code class="id">RNF-204</code>); sugestão: 5 tentativas, 15 min, dobrando até 24 h <span class="tag dono">Segurança</span></li>
-      <li>Validade de uma nova geração de senha que ninguém usou; sugestão: 72 h <span class="tag dono">Segurança</span></li>
-      <li>Quantos envios do atendimento sem login por aparelho e por período (<code class="id">RNF-205</code>); sugestão: 3 a cada 24 h <span class="tag dono">Segurança</span></li>
-      <li>Senha gerada para quem tem um só nome ou um segundo nome com menos de 2 letras <span class="tag dono">Produto</span></li>
-    </ul>
-  </section>
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
       <a href="../2_Diagramas/identidade-acesso_v02_20261029-0103.svg"><img src="../2_Diagramas/identidade-acesso_v02_20261029-0103.svg" alt="Casos de uso de identidade e acesso: conta master, staff, participantes, permissões, senhas, SAC, painel do time deboaz e entradas no quest"></a>
       <figcaption><strong>Identidade e acesso · casos de uso</strong><code>2_Diagramas/identidade-acesso_v02_20261029-0103.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/identidade-acesso-sequencia_v01_20261029-0117.svg"><img src="../2_Diagramas/identidade-acesso-sequencia_v01_20261029-0117.svg" alt="Sequência do cadastro do staff ao uso do token: código de liberação, senha gerada pelo sistema, token assinado no Key Vault e revogação conferida a cada ação"></a>
+      <figcaption><strong>Identidade e acesso · sequência</strong><code>2_Diagramas/identidade-acesso-sequencia_v01_20261029-0117.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -1148,13 +1151,14 @@ Cenário: pagamento regularizado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v03</span></td><td>2026-10-29 01:04</td><td>Pendências respondidas: senha sempre gerada pelo sistema e vista só pelo próprio usuário (<code class="id">RF-109</code>, <code class="id">RF-110</code>, <code class="id">RN-169</code> a <code class="id">RN-171</code>, <code class="id">RNF-202</code>, <code class="id">RNF-203</code>); domínio, sigla e entrada <code>&lt;nome curto&gt;.&lt;sigla&gt;@deboaz.com</code> (<code class="id">RF-104</code>, <code class="id">RF-106</code>, <code class="id">RN-179</code>, <code class="id">RN-180</code>); conferência do SAC (<code class="id">RN-172</code>); apelido PUPIL do acesso anônimo (<code class="id">RF-115</code>, <code class="id">RN-177</code>); guarda de 5 anos (<code class="id">RN-174</code>, <code class="id">RN-178</code>); token JWT RS256 com chave no Key Vault e papéis (<code class="id">RNF-207</code>, <code class="id">RNF-208</code>); sem segundo fator; diagrama identidade-acesso_v02</td></tr>
+      <tr><td><span class="boaz-versao">v04</span></td><td>2026-10-29 01:17</td><td>Pendências respondidas e seção Em aberto removida: código de liberação (<code class="id">RN-181</code>, <code class="id">RF-109</code>, <code class="id">RF-110</code>), validade de 72 h (<code class="id">RN-182</code>), tempo de sessão (<code class="id">RN-183</code>), bloqueio (<code class="id">RNF-204</code>), limite do SAC (<code class="id">RNF-205</code>) e token de 15 min (<code class="id">RNF-209</code>); senha de quem tem um nome só (<code class="id">RN-171</code>); sigla sem diferença entre maiúsculas e minúsculas (<code class="id">RN-179</code>, <code class="id">RN-180</code>); diagrama identidade-acesso-sequencia_v01; status → Em revisão</td></tr>
+      <tr><td>v03</td><td>2026-10-29 01:04</td><td>Pendências respondidas: senha sempre gerada pelo sistema e vista só pelo próprio usuário (<code class="id">RF-109</code>, <code class="id">RF-110</code>, <code class="id">RN-169</code> a <code class="id">RN-171</code>, <code class="id">RNF-202</code>, <code class="id">RNF-203</code>); domínio, sigla e entrada <code>&lt;nome curto&gt;.&lt;sigla&gt;@deboaz.com</code> (<code class="id">RF-104</code>, <code class="id">RF-106</code>, <code class="id">RN-179</code>, <code class="id">RN-180</code>); conferência do SAC (<code class="id">RN-172</code>); apelido PUPIL do acesso anônimo (<code class="id">RF-115</code>, <code class="id">RN-177</code>); guarda de 5 anos (<code class="id">RN-174</code>, <code class="id">RN-178</code>); token JWT RS256 com chave no Key Vault e papéis (<code class="id">RNF-207</code>, <code class="id">RNF-208</code>); sem segundo fator; diagrama identidade-acesso_v02</td></tr>
       <tr><td>v02</td><td>2026-10-29 00:23</td><td><code class="id">RF-106</code> alterado: só a conta master de uma instituição cria staff, nunca a de um educador autônomo; cenário do educador autônomo incluído</td></tr>
       <tr><td>v01</td><td>2026-10-29 00:09</td><td>Criação</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v03 · 2026-10-29 01:04</span>
+    <span>boaz · v04 · 2026-10-29 01:17</span>
     <span class="boaz-arquivo">1_Requisitos/15_identidade-acesso.html</span>
   </div>
 </footer>
