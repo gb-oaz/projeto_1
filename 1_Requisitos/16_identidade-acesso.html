@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Identidade e acesso · boaz · v10</title>
+<title>Identidade e acesso · boaz · v11</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
-<meta name="boaz:documento" content="15_identidade-acesso">
-<meta name="boaz:caminho" content="1_Requisitos/15_identidade-acesso.html">
+<meta name="boaz:documento" content="16_identidade-acesso">
+<meta name="boaz:caminho" content="1_Requisitos/16_identidade-acesso.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v10">
-<meta name="boaz:data" content="2026-10-29 03:31">
+<meta name="boaz:versao" content="v11">
+<meta name="boaz:data" content="2026-10-29 04:07">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -916,9 +916,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <h1>Identidade e acesso</h1>
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
-    <div><dt>Documento</dt><dd>15_identidade-acesso</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v10</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 03:31</dd></div>
+    <div><dt>Documento</dt><dd>16_identidade-acesso</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v11</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 04:07</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1184,7 +1184,7 @@ Cenário: pagamento regularizado
     <h3>Telas do hub: acesso do time deboaz</h3>
     <ol>
       <li><strong>Entrar</strong>: o membro do time entra na mesma tela das contas com <code>gustavo.dboaz@deboaz.com</code> e a senha gerada pelo sistema, sem segundo fator (<a class="ref" href="#RN-179">RN-179</a>, <a class="ref" href="#RN-180">RN-180</a>).</li>
-      <li><strong>Meus módulos</strong>: a conta do time (<code>DBOAZ</code>, sem custos) mostra o card de cada módulo com os dados dele (<a class="ref" href="08_hub-ux.html#RN-84">Hub · UX base RN-84</a>): o painel de administração com 128 contas (96 instituições e 32 autônomos), 112 ativas, 4 suspensas e 12 desativadas, 105 pagamentos em dia, 7 em atraso e 9 contas novas no mês; o SAC com 42 atendimentos no mês, 39 atendidos e 3 não atendidos; e Usuários com os membros do time por estado.</li>
+      <li><strong>Meus módulos</strong>: a conta do time (<code>DBOAZ</code>, sem custos) mostra o card de cada módulo com os dados dele (<a class="ref" href="08_hub-ux.html#RN-84">Hub · UX base RN-84</a>): o painel de administração com 128 contas (96 instituições e 32 autônomos), 112 ativas, 4 suspensas e 12 desativadas, 105 pagamentos em dia, 7 em atraso e 9 contas novas no mês; o SAC com 42 atendimentos no mês, 39 atendidos e 3 não atendidos; Usuários com os membros do time por estado; e, rolando a tela, o <a class="ref" href="15_catalogo.html#RF-116">Catálogo</a>, que só esta conta tem.</li>
       <li><strong>Contas</strong>: a busca por nome, sigla ou CNPJ e os botões segmentados Ativas, Suspensas e Desativadas filtram as contas, de A a Z, com a sigla, o pagamento em dia ou em atraso e o último acesso (<a class="ref" href="#RN-185">RN-185</a>, <a class="ref" href="#RN-186">RN-186</a>); o menu de cada conta vê, suspende, desativa, gera o código da master e encerra, e numa conta desativada, reativa (<a class="ref" href="#RF-113">RF-113</a>, <a class="ref" href="#RN-173">RN-173</a>, <a class="ref" href="#RN-174">RN-174</a>).</li>
       <li><strong>Dados da conta</strong>: Ver a conta abre só o cadastro da Escola Bento Freitas (tipo, CNPJ, entrada da conta master, responsável e telefone) e as datas: criada em 12/03/2026, último pagamento em 05/10/2026 e último acesso da conta master hoje, 08:15 (<a class="ref" href="#RN-187">RN-187</a>).</li>
       <li><strong>SAC</strong>: a mesma busca e os botões segmentados Novas, Conferindo e Respondidas separam, da mais antiga para a mais nova, as mensagens da ação Esqueci a senha da conta master, que chegam sem login com a conta e o CNPJ ou CPF (<a class="ref" href="#RF-111">RF-111</a>).</li>
@@ -1193,8 +1193,8 @@ Cenário: pagamento regularizado
       <li><strong>Usuários do time</strong>: só o administrador do deboaz, conta master do time, cria membros (<code>ana.dboaz@deboaz.com</code>); quando um membro esquece a senha, o administrador pede a nova geração de senha e entrega o código de liberação para o primeiro acesso. A entrada e a senha do próprio administrador ficam no Key Vault, fora das telas (<a class="ref" href="#RN-164">RN-164</a>, <a class="ref" href="#RN-169">RN-169</a>, <a class="ref" href="#RN-190">RN-190</a>).</li>
     </ol>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-time-deboaz_v03_20261029-0255.svg"><img src="../2_Diagramas/vista-hub-time-deboaz_v03_20261029-0255.svg" alt="Vista do acesso do time deboaz: entrar com a entrada .dboaz, cards dos módulos do time com dados e gráficos, contas com busca, dados da conta, SAC com busca, conferência do cadastro, código da conta master e membros do time"></a>
-      <figcaption><strong>Hub · time deboaz · vista</strong><code>2_Diagramas/vista-hub-time-deboaz_v03_20261029-0255.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-time-deboaz_v04_20261029-0405.svg"><img src="../2_Diagramas/vista-hub-time-deboaz_v04_20261029-0405.svg" alt="Vista do acesso do time deboaz: entrar com a entrada .dboaz, cards dos módulos do time com dados e gráficos, inclusive o Catálogo, contas com busca, dados da conta, SAC com busca, conferência do cadastro, código da conta master e membros do time"></a>
+      <figcaption><strong>Hub · time deboaz · vista</strong><code>2_Diagramas/vista-hub-time-deboaz_v04_20261029-0405.svg</code></figcaption>
     </figure>
     <h3>Telas do quest: sala anônima</h3>
     <ol>
@@ -1213,7 +1213,8 @@ Cenário: pagamento regularizado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v10</span></td><td>2026-10-29 03:31</td><td>Card do módulo Usuários em Meus módulos (<code class="id">RN-189</code>); administrador do deboaz com entrada e senha no Key Vault, que gera a senha dos membros do time (<code class="id">RN-190</code>, <code class="id">RN-169</code>, <code class="id">RN-170</code>); seção Em aberto removida</td></tr>
+      <tr><td><span class="boaz-versao">v11</span></td><td>2026-10-29 04:07</td><td>Renumerado de 15_identidade-acesso para 16_identidade-acesso (o catálogo vem antes); vista do time deboaz v04 com o card do Catálogo</td></tr>
+      <tr><td>v10</td><td>2026-10-29 03:31</td><td>Card do módulo Usuários em Meus módulos (<code class="id">RN-189</code>); administrador do deboaz com entrada e senha no Key Vault, que gera a senha dos membros do time (<code class="id">RN-190</code>, <code class="id">RN-169</code>, <code class="id">RN-170</code>); seção Em aberto removida</td></tr>
       <tr><td>v09</td><td>2026-10-29 03:18</td><td>Número de matrícula do staff e do participante, informado ou gerado (<code class="id">RN-188</code>, <code class="id">RF-106</code>, <code class="id">RF-108</code>); código de acesso sempre em maiúsculas (<code class="id">RN-184</code>); turma e ano e formato do código da sala em Fora de escopo; pendência do formato antigo resolvida</td></tr>
       <tr><td>v08</td><td>2026-10-29 02:56</td><td>Participante com nome curto e um ou mais responsáveis com parentesco (<code class="id">RF-108</code>); código de acesso <code>&lt;sigla&gt;-&lt;nome curto&gt;-&lt;4 números&gt;</code> sem senha (<code class="id">RN-184</code>); busca, estado e ordem alfabética nas listas (<code class="id">RN-185</code>); último acesso (<code class="id">RN-186</code>); dados da conta (<code class="id">RN-187</code>); vistas novas: participantes, dados da conta e código da sala no quest</td></tr>
       <tr><td>v07</td><td>2026-10-29 02:23</td><td>Vistas atualizadas: cards dos módulos do time deboaz com dados e gráficos, tela Contas do painel movida para a vista do time deboaz, botões segmentados em Contas, SAC e Permissões; exemplo de senha trocado</td></tr>
@@ -1222,12 +1223,11 @@ Cenário: pagamento regularizado
       <tr><td>v04</td><td>2026-10-29 01:17</td><td>Pendências respondidas e seção Em aberto removida: código de liberação (<code class="id">RN-181</code>, <code class="id">RF-109</code>, <code class="id">RF-110</code>), validade de 72 h (<code class="id">RN-182</code>), tempo de sessão (<code class="id">RN-183</code>), bloqueio (<code class="id">RNF-204</code>), limite do SAC (<code class="id">RNF-205</code>) e token de 15 min (<code class="id">RNF-209</code>); senha de quem tem um nome só (<code class="id">RN-171</code>); sigla sem diferença entre maiúsculas e minúsculas (<code class="id">RN-179</code>, <code class="id">RN-180</code>); diagrama identidade-acesso-sequencia_v01; status → Em revisão</td></tr>
       <tr><td>v03</td><td>2026-10-29 01:04</td><td>Pendências respondidas: senha sempre gerada pelo sistema e vista só pelo próprio usuário (<code class="id">RF-109</code>, <code class="id">RF-110</code>, <code class="id">RN-169</code> a <code class="id">RN-171</code>, <code class="id">RNF-202</code>, <code class="id">RNF-203</code>); domínio, sigla e entrada <code>&lt;nome curto&gt;.&lt;sigla&gt;@deboaz.com</code> (<code class="id">RF-104</code>, <code class="id">RF-106</code>, <code class="id">RN-179</code>, <code class="id">RN-180</code>); conferência do SAC (<code class="id">RN-172</code>); apelido PUPIL do acesso anônimo (<code class="id">RF-115</code>, <code class="id">RN-177</code>); guarda de 5 anos (<code class="id">RN-174</code>, <code class="id">RN-178</code>); token JWT RS256 com chave no Key Vault e papéis (<code class="id">RNF-207</code>, <code class="id">RNF-208</code>); sem segundo fator; diagrama identidade-acesso_v02</td></tr>
       <tr><td>v02</td><td>2026-10-29 00:23</td><td><code class="id">RF-106</code> alterado: só a conta master de uma instituição cria staff, nunca a de um educador autônomo; cenário do educador autônomo incluído</td></tr>
-      <tr><td>v01</td><td>2026-10-29 00:09</td><td>Criação</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v10 · 2026-10-29 03:31</span>
-    <span class="boaz-arquivo">1_Requisitos/15_identidade-acesso.html</span>
+    <span>boaz · v11 · 2026-10-29 04:07</span>
+    <span class="boaz-arquivo">1_Requisitos/16_identidade-acesso.html</span>
   </div>
 </footer>
 </body>
