@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Identidade e acesso · boaz · v01</title>
+<!-- boaz:marca -->
+<meta name="boaz:projeto" content="boaz">
+<meta name="boaz:documento" content="15_identidade-acesso">
+<meta name="boaz:caminho" content="1_Requisitos/15_identidade-acesso.html">
+<meta name="boaz:tipo" content="Funcionalidade">
+<meta name="boaz:versao" content="v01">
+<meta name="boaz:data" content="2026-10-29 00:09">
+<meta name="boaz:status" content="Rascunho">
+<!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style id="boaz-tema">
+/* ════════════════════════════════════════════════════════════
+   boaz · tema dos documentos de requisito · v06
+   Paleta do tema.svg (dark) com a variante light equivalente.
+   Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
+   Paleta: vistas com data-paletas trocam tema de cor e modo das telas.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── tokens: claro ───────────────────────────────────────── */
+:root {
+  color-scheme: light;
+  --canvas: #eceff3;
+  --page: #ffffff;
+  --band: #f6f8fa;
+  --surface: #f6f8fa;
+  --surface-2: #eef1f4;
+  --border: #d1d9e0;
+  --border-soft: #e4e8ec;
+  --text: #1f2328;
+  --text-strong: #0d1117;
+  --muted: #59636e;
+  --faint: #818b98;
+  --accent: #0969da;
+  --accent-ink: #0550ae;
+  --accent-soft: #ddf4ff;
+  --accent-2: #8250df;
+  --accent-2-soft: #fbefff;
+  --green: #1a7f37;   --green-soft: #dafbe1;
+  --orange: #bc4c00;  --orange-soft: #fff1e5;
+  --red: #cf222e;     --red-soft: #ffebe9;
+  --yellow: #9a6700;  --yellow-soft: #fff8c5;
+  --shadow: 0 1px 2px rgba(31, 35, 40, .06), 0 12px 32px rgba(31, 35, 40, .10);
+  --marca-dagua: rgba(9, 105, 218, .055);
+  --font: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* ── tokens: escuro (o mesmo do tema.svg) ────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --canvas: #010409;
+    --page: #0d1117;
+    --band: #11161e;
+    --surface: #161b22;
+    --surface-2: #1c2128;
+    --border: #30363d;
+    --border-soft: #21262d;
+    --text: #e6edf3;
+    --text-strong: #f0f6fc;
+    --muted: #8b949e;
+    --faint: #6e7681;
+    --accent: #58a6ff;
+    --accent-ink: #79c0ff;
+    --accent-soft: #0c2d4a;
+    --accent-2: #bc8cff;
+    --accent-2-soft: #271a45;
+    --green: #3fb950;   --green-soft: #0f2e1b;
+    --orange: #f0883e;  --orange-soft: #3a2410;
+    --red: #f85149;     --red-soft: #3b1219;
+    --yellow: #d29922;  --yellow-soft: #2b2311;
+    --shadow: 0 0 0 1px #21262d, 0 16px 40px rgba(0, 0, 0, .55);
+    --marca-dagua: rgba(88, 166, 255, .05);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #010409;
+  --page: #0d1117;
+  --band: #11161e;
+  --surface: #161b22;
+  --surface-2: #1c2128;
+  --border: #30363d;
+  --border-soft: #21262d;
+  --text: #e6edf3;
+  --text-strong: #f0f6fc;
+  --muted: #8b949e;
+  --faint: #6e7681;
+  --accent: #58a6ff;
+  --accent-ink: #79c0ff;
+  --accent-soft: #0c2d4a;
+  --accent-2: #bc8cff;
+  --accent-2-soft: #271a45;
+  --green: #3fb950;   --green-soft: #0f2e1b;
+  --orange: #f0883e;  --orange-soft: #3a2410;
+  --red: #f85149;     --red-soft: #3b1219;
+  --yellow: #d29922;  --yellow-soft: #2b2311;
+  --shadow: 0 0 0 1px #21262d, 0 16px 40px rgba(0, 0, 0, .55);
+  --marca-dagua: rgba(88, 166, 255, .05);
+}
+
+/* ── base ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  background: var(--canvas);
+  -webkit-text-size-adjust: 100%;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+body {
+  max-width: 920px;
+  margin: 56px auto 96px;
+  background: var(--page);
+  color: var(--text);
+  font: 400 15.5px/1.68 var(--font);
+  font-optical-sizing: auto;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--accent-soft); color: var(--text-strong); }
+main { padding: 8px 56px 56px; }
+
+h1, h2, h3 { color: var(--text-strong); text-wrap: balance; }
+h2 {
+  margin: 56px 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.012em;
+  scroll-margin-top: 24px;
+}
+h3 {
+  margin: 28px 0 10px;
+  font-size: 1.04rem;
+  font-weight: 650;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  scroll-margin-top: 24px;
+}
+p { margin: 0 0 14px; text-wrap: pretty; }
+a { color: var(--accent); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--accent); }
+strong, b { font-weight: 650; color: var(--text-strong); }
+em { font-style: italic; }
+ul, ol { margin: 0 0 16px; padding-left: 22px; }
+li { margin: 4px 0; }
+li::marker { color: var(--faint); }
+hr { border: 0; border-top: 1px solid var(--border-soft); margin: 32px 0; }
+
+/* código, IDs, nomes de arquivo, valores literais */
+code, kbd, samp, pre { font-family: var(--mono); font-size: .86em; font-variant-ligatures: none; }
+code {
+  padding: .12em .42em;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text-strong);
+  overflow-wrap: anywhere;
+}
+code.id {
+  white-space: nowrap;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+pre {
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-x: auto;
+  tab-size: 2;
+}
+pre code { padding: 0; background: none; font-size: inherit; white-space: pre; }
+
+/* texto exibido ao usuário, exatamente como aparece */
+q.ui { quotes: "“" "”"; font-family: var(--mono); font-size: .9em; color: var(--text-strong); }
+
+/* ── marca d'água · topo ─────────────────────────────────── */
+.boaz-marca-topo {
+  position: relative;
+  padding: 44px 56px 0;
+  border-radius: 14px 14px 0 0;
+  background: var(--band);
+  border-bottom: 1px solid var(--border-soft);
+}
+.boaz-marca-topo::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2) 50%, transparent);
+}
+.boaz-eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.boaz-marca-topo h1 {
+  margin: 0 0 12px;
+  font-size: 2.15rem;
+  font-weight: 760;
+  line-height: 1.15;
+  letter-spacing: -.024em;
+}
+.boaz-objetivo {
+  max-width: 64ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.04rem;
+  line-height: 1.6;
+}
+.boaz-objetivo > span:first-child {
+  margin-right: 8px;
+  color: var(--faint);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.boaz-carimbo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  margin: 32px -56px 0;
+  padding: 0;
+  border-top: 1px solid var(--border-soft);
+}
+.boaz-carimbo > div { padding: 14px 24px 16px; border-left: 1px solid var(--border-soft); min-width: 0; }
+.boaz-carimbo > div:first-child { padding-left: 56px; border-left: 0; }
+.boaz-carimbo > div:last-child { padding-right: 56px; }
+.boaz-carimbo dt {
+  margin-bottom: 6px;
+  color: var(--faint);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.boaz-carimbo dd { margin: 0; color: var(--text-strong); font-family: var(--mono); font-size: 13px; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.boaz-versao {
+  display: inline-block;
+  padding: 0 10px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+/* status do documento */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px 0 9px;
+  border-radius: 999px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 22px;
+  white-space: nowrap;
+}
+.status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.status-rascunho   { background: var(--yellow-soft); color: var(--yellow); }
+.status-em-revisao { background: var(--accent-2-soft); color: var(--accent-2); }
+.status-aprovado   { background: var(--green-soft); color: var(--green); }
+.status-obsoleto   { background: var(--red-soft); color: var(--red); text-decoration: line-through; }
+
+/* ── marca d'água · rodapé ───────────────────────────────── */
+.boaz-marca-rodape {
+  padding: 32px 56px 28px;
+  border-radius: 0 0 14px 14px;
+  background: var(--band);
+  border-top: 1px solid var(--border-soft);
+}
+.boaz-marca-rodape table { margin-bottom: 20px; font-size: 13px; }
+.boaz-marca-rodape .boaz-tabela { margin-bottom: 20px; }
+.boaz-marca-rodape td:nth-child(2) { color: var(--muted); font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+.boaz-rodape-linha {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+  color: var(--faint);
+  font-size: 12px;
+}
+.boaz-arquivo { font-family: var(--mono); font-size: 11.5px; }
+
+/* marca d'água diagonal: só para Rascunho, Em revisão e Obsoleto (o script lê o status) */
+body[data-marca]::after {
+  content: attr(data-marca);
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--marca-dagua);
+  font: 800 clamp(64px, 13vw, 150px)/1 var(--font);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transform: rotate(-28deg);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ── sumário ─────────────────────────────────────────────── */
+.sumario {
+  margin: 36px 0 8px;
+  padding: 18px 22px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.sumario > p { margin: 0 0 8px; }
+.sumario ol { columns: 2; column-gap: 32px; margin: 0; padding-left: 20px; font-size: 14px; }
+.sumario li { break-inside: avoid; }
+.sumario a { color: var(--text); text-decoration: none; }
+.sumario a:hover { color: var(--accent); }
+
+/* ── tabelas ─────────────────────────────────────────────── */
+table {
+  width: 100%;
+  margin: 0 0 20px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  font-size: 14.5px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+th {
+  padding: 9px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+td { padding: 11px 14px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+tr:last-child > td { border-bottom: 0; }
+tbody tr:target > td { background: var(--accent-soft); }
+td:has(> code.id:only-child), td:has(> .prio:only-child), td:has(> .tag:only-child) { width: 1%; white-space: nowrap; }
+td code:not(.id) { white-space: normal; }
+.boaz-tabela { margin: 0 0 20px; overflow-x: auto; overscroll-behavior-x: contain; }
+.boaz-tabela > table { margin: 0; }
+caption { caption-side: top; padding: 0 0 8px; color: var(--muted); font-size: 13px; text-align: left; }
+
+/* prioridade MoSCoW */
+.prio {
+  display: inline-block;
+  padding: 0 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 22px;
+  white-space: nowrap;
+}
+.prio-deve      { background: var(--accent); color: var(--page); }
+.prio-deveria   { background: var(--accent-2-soft); color: var(--accent-2); }
+.prio-poderia   { background: var(--surface-2); color: var(--muted); }
+.prio-nao-agora { border: 1px dashed var(--border); color: var(--faint); line-height: 20px; }
+
+/* etiqueta neutra (categoria de RNF, responsável…) */
+.tag {
+  display: inline-block;
+  padding: 0 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 21px;
+  white-space: nowrap;
+}
+
+/* ── história de usuário ─────────────────────────────────── */
+.historia {
+  margin: 0 0 12px;
+  padding: 10px 0 10px 18px;
+  border-left: 3px solid var(--accent-2);
+  font-size: 1.02rem;
+}
+.historia > span { color: var(--accent-2); font-size: .74em; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+
+/* ── critérios de aceite (Gherkin) ───────────────────────── */
+.criterio { margin: 0 0 24px; break-inside: avoid; }
+.criterio h3 { margin-top: 24px; }
+pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); }
+pre.gherkin::before {
+  content: "GHERKIN";
+  position: absolute;
+  top: 9px; right: 14px;
+  color: var(--faint);
+  font: 700 9.5px/1 var(--font);
+  letter-spacing: .14em;
+}
+pre.gherkin .g-cenario { color: var(--accent-2); font-weight: 700; }
+pre.gherkin .g-passo   { color: var(--accent); font-weight: 700; }
+pre.gherkin .g-texto   { color: var(--green); }
+
+/* ── personas ────────────────────────────────────────────── */
+.personas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin: 0 0 20px; }
+.persona {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 4px 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--surface);
+  break-inside: avoid;
+}
+.persona::before {
+  content: attr(data-inicial);
+  grid-row: span 3;
+  display: grid;
+  place-items: center;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 700;
+  font-size: 17px;
+}
+.persona h3 { margin: 0; font-size: 1rem; }
+.persona p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.persona p > span { color: var(--faint); font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-right: 6px; }
+
+/* ── objetivos e métricas ────────────────────────────────── */
+.metricas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin: 0 0 20px; }
+.metrica {
+  padding: 18px 20px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--surface);
+  break-inside: avoid;
+}
+.metrica h3 { margin: 0 0 4px; font-size: .98rem; }
+.metrica .meta { margin: 10px 0 2px; color: var(--accent); font-family: var(--mono); font-size: 1.7rem; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
+.metrica p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+
+/* ── escopo, fora de escopo, pendências ──────────────────── */
+ul.escopo, ul.fora, ul.pendencias { list-style: none; padding: 0; }
+ul.escopo > li, ul.fora > li, ul.pendencias > li { position: relative; padding-left: 28px; margin: 7px 0; }
+ul.escopo > li::before, ul.fora > li::before {
+  position: absolute; left: 0; top: .2em;
+  display: grid; place-items: center;
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  font-size: 11px; font-weight: 800; line-height: 1;
+}
+ul.escopo > li::before { content: "✓"; background: var(--green-soft); color: var(--green); }
+ul.fora > li::before { content: "✕"; background: var(--surface-2); color: var(--faint); }
+ul.fora > li { color: var(--muted); }
+ul.pendencias > li {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  padding: 10px 14px 10px 42px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--surface);
+}
+ul.pendencias > li::before {
+  content: "";
+  position: absolute; left: 14px; top: 13px;
+  width: 15px; height: 15px;
+  border: 1.5px solid var(--yellow);
+  border-radius: 4px;
+}
+ul.pendencias .dono { flex: none; }
+
+/* ── destaques (no máximo 2 por documento) ───────────────── */
+.destaque {
+  --cor: var(--accent); --fundo: var(--accent-soft);
+  margin: 0 0 18px;
+  padding: 14px 18px 14px 18px;
+  border: 1px solid color-mix(in srgb, var(--cor) 35%, transparent);
+  border-left: 4px solid var(--cor);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--fundo) 70%, var(--page));
+  break-inside: avoid;
+}
+.destaque > :last-child { margin-bottom: 0; }
+.destaque::before {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--cor);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.destaque.nota::before       { content: "ⓘ  Nota"; }
+.destaque.importante         { --cor: var(--accent-2); --fundo: var(--accent-2-soft); }
+.destaque.importante::before { content: "◆  Importante"; }
+.destaque.aviso              { --cor: var(--orange); --fundo: var(--orange-soft); }
+.destaque.aviso::before      { content: "▲  Aviso"; }
+
+/* ── diagramas (.svg de 2_Diagramas e 3_Arquitetura) ─────── */
+figure.diagrama {
+  margin: 0 0 24px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: #0d1117; /* os diagramas são dark: a moldura acompanha em qualquer tema */
+  overflow: hidden;
+  break-inside: avoid;
+}
+figure.diagrama > a { display: block; }
+figure.diagrama img { display: block; width: 100%; height: auto; }
+figure.diagrama.recorte > a { aspect-ratio: var(--recorte-proporcao); overflow: hidden; }
+figure.diagrama.recorte img { margin-top: calc(-1 * var(--recorte-y)); }
+figure.diagrama figcaption {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px;
+  padding: 12px 18px;
+  background: var(--page);
+  border-top: 1px solid var(--border-soft);
+  font-size: 14px;
+}
+figure.diagrama figcaption code { font-size: 11.5px; color: var(--muted); background: none; padding: 0; }
+
+/* ── amostras da marca (só na Identidade da visão do produto) ─ */
+.marcas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 0 0 24px;
+}
+figure.marca {
+  margin: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  overflow: hidden;
+  break-inside: avoid;
+}
+figure.marca > div {
+  box-sizing: border-box;
+  height: 140px;
+  padding: 18px;
+  background: var(--surface);
+}
+figure.marca.fundo-claro > div { background: #ffffff; } /* fundo claro fixo, para arquivos feitos para fundo branco */
+figure.marca.fundo-medio > div { background: #8c8c8c; } /* tom médio fixo: contrasta com o preto e com o branco do símbolo de duas cores */
+figure.marca.fundo-escuro > div { background: #0d1117; } /* fundo escuro fixo, como a moldura dos diagramas */
+figure.marca img { display: block; width: 100%; height: 100%; object-fit: contain; }
+figure.marca figcaption {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--page);
+  border-top: 1px solid var(--border-soft);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+figure.marca figcaption code { font-size: 11px; font-weight: 400; color: var(--muted); background: none; padding: 0; overflow-wrap: anywhere; }
+
+/* ── referência a outro documento ────────────────────────── */
+a.ref { font-weight: 550; text-decoration: none; white-space: nowrap; }
+a.ref::after { content: " ↗"; font-size: .85em; }
+a.ref code.id { margin-left: 2px; }
+
+/* ── glossário ───────────────────────────────────────────── */
+dl.glossario {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
+  margin: 0 0 20px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  overflow: hidden;
+}
+dl.glossario > dt, dl.glossario > dd { margin: 0; padding: 11px 16px; border-bottom: 1px solid var(--border-soft); }
+dl.glossario > dt { background: var(--surface); color: var(--text-strong); font-weight: 650; }
+dl.glossario > dd { color: var(--muted); }
+dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
+
+/* ── barra: tema e PDF (criada pelo script; some na impressão) ── */
+.boaz-barra {
+  position: fixed;
+  top: 16px; right: 16px;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--page) 86%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+  font: 600 12.5px/1 var(--font);
+}
+.boaz-seg { display: flex; gap: 2px; padding: 2px; border-radius: 8px; background: var(--surface-2); }
+.boaz-barra button {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 9px;
+  border: 0; border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+.boaz-barra button:hover { color: var(--text-strong); }
+.boaz-barra button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.boaz-seg button[aria-pressed="true"] { background: var(--page); color: var(--text-strong); box-shadow: 0 1px 3px rgba(0, 0, 0, .15); }
+.boaz-barra svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.boaz-barra .boaz-pdf { padding: 0 12px; background: var(--accent); color: #fff; }
+.boaz-barra .boaz-pdf:hover { color: #fff; filter: brightness(1.08); }
+.boaz-barra[data-alerta] .boaz-pdf { background: var(--red); }
+
+/* ── paleta das vistas: tema de cor e modo das telas (figure.diagrama[data-paletas]) ── */
+.boaz-barra .boaz-paleta[aria-expanded="true"] { background: var(--surface-2); color: var(--text-strong); }
+.boaz-paletas {
+  position: absolute;
+  top: calc(100% + 8px); right: 0;
+  width: min(320px, calc(100vw - 24px));
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--page);
+  box-shadow: var(--shadow);
+}
+.boaz-paletas[hidden] { display: none; }
+.boaz-paletas .boaz-eyebrow { margin: 4px 4px 8px; }
+.boaz-paletas .boaz-seg { margin-bottom: 12px; }
+.boaz-paletas .boaz-seg button { flex: 1; justify-content: center; }
+.boaz-paletas ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.boaz-paletas li button { width: 100%; height: 34px; justify-content: flex-start; gap: 10px; color: var(--text); font-weight: 500; }
+.boaz-paletas li button:hover { background: var(--surface); }
+.boaz-paletas li button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 650; }
+.boaz-amostras { display: inline-flex; flex: none; }
+.boaz-amostras i { width: 14px; height: 14px; margin-left: -4px; border: 1.5px solid var(--page); border-radius: 50%; }
+.boaz-amostras i:first-child { margin-left: 0; }
+figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weight: 600; }
+
+/* ── telas estreitas ─────────────────────────────────────── */
+@media screen and (max-width: 760px) {
+  body { margin: 0; border-radius: 0; box-shadow: none; font-size: 15px; }
+  main { padding: 0 16px 40px; }
+  .boaz-marca-topo { padding: 72px 16px 0; }
+  .boaz-marca-topo h1 { font-size: 1.7rem; }
+  .boaz-carimbo { grid-template-columns: 1fr 1fr; margin: 24px -16px 0; }
+  .boaz-carimbo > div, .boaz-carimbo > div:first-child, .boaz-carimbo > div:last-child { padding: 12px 16px; border-left: 0; border-top: 1px solid var(--border-soft); }
+  .boaz-carimbo > div:nth-child(even) { border-left: 1px solid var(--border-soft); }
+  .boaz-carimbo > div:nth-child(-n + 2) { border-top: 0; }
+  .boaz-marca-rodape { padding: 24px 16px; }
+  .sumario ol { columns: 1; }
+  dl.glossario { grid-template-columns: minmax(0, 1fr); }
+  dl.glossario > dt { border-bottom: 0; padding-bottom: 2px; }
+  .boaz-barra { top: 12px; right: 12px; }
+  .boaz-barra .rotulo { display: none; }
+}
+
+/* ── impressão / PDF: sempre claro, A4 ───────────────────── */
+@page { size: A4; margin: 18mm 15mm 18mm; }
+@media print {
+  :root:root:root {
+    color-scheme: light;
+    --canvas: #ffffff; --page: #ffffff; --band: #f6f8fa; --surface: #f6f8fa; --surface-2: #eef1f4;
+    --border: #d1d9e0; --border-soft: #e4e8ec; --text: #1f2328; --text-strong: #0d1117;
+    --muted: #59636e; --faint: #818b98; --accent: #0969da; --accent-ink: #0550ae; --accent-soft: #ddf4ff;
+    --accent-2: #8250df; --accent-2-soft: #fbefff; --green: #1a7f37; --green-soft: #dafbe1;
+    --orange: #bc4c00; --orange-soft: #fff1e5; --red: #cf222e; --red-soft: #ffebe9;
+    --yellow: #9a6700; --yellow-soft: #fff8c5; --marca-dagua: rgba(9, 105, 218, .06);
+  }
+  html { background: #fff; }
+  body { max-width: none; margin: 0; border-radius: 0; box-shadow: none; overflow: visible; font-size: 10pt; }
+  main { padding: 0 2mm; }
+  .boaz-marca-topo { padding: 9mm 8mm 0; border-radius: 8px 8px 0 0; }
+  .boaz-carimbo { margin: 7mm -8mm 0; }
+  .boaz-carimbo > div:first-child { padding-left: 8mm; }
+  .boaz-carimbo > div:last-child { padding-right: 8mm; }
+  .boaz-marca-rodape { margin-top: 10mm; padding: 7mm 8mm 6mm; border-radius: 0 0 8px 8px; }
+  .boaz-marca-rodape > .boaz-eyebrow { break-after: avoid; }
+  .boaz-rodape-linha { break-inside: avoid; break-before: avoid; }
+  .boaz-barra, .sumario, details.boaz-snippet { display: none !important; }
+  body[data-marca]::after { font-size: 92px; }
+  h2 { margin-top: 9mm; break-after: avoid; }
+  h3 { break-after: avoid; }
+  .boaz-tabela { overflow: visible; }
+  caption, thead { break-after: avoid; }
+  tbody > tr:first-child { break-before: avoid; }
+  figure.diagrama:not(.recorte) img { width: auto; max-width: 100%; max-height: 75mm; margin: 0 auto; }
+  .marcas { grid-template-columns: repeat(auto-fill, minmax(30mm, 1fr)); gap: 3mm; }
+  figure.marca > div { height: 24mm; padding: 3mm; }
+  tr, pre, .persona, .metrica, ul.pendencias > li { break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+  a.ref { color: var(--accent); }
+}
+</style>
+<script id="boaz-tema-js">
+/* boaz · tema dos documentos de requisito · v06 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+(function () {
+  var d = document, h = d.documentElement, CHAVE = "boaz-tema";
+  function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
+  function guardado() { try { return localStorage.getItem(CHAVE) || "system"; } catch (e) { return "system"; } }
+  function aplicar(t) {
+    if (t === "light" || t === "dark") h.setAttribute("data-theme", t); else h.removeAttribute("data-theme");
+    var bs = d.querySelectorAll(".boaz-barra > .boaz-seg button");
+    for (var i = 0; i < bs.length; i++) bs[i].setAttribute("aria-pressed", String(bs[i].getAttribute("data-tema") === t));
+  }
+  aplicar(guardado());
+
+
+  // Cabeçalho e rodapé de cada página do PDF (margin boxes do @page, Chrome/Edge 131+)
+  var q = function (s) { return JSON.stringify(s); };
+  var caixa = "font-family:Inter,'Segoe UI',Roboto,Arial,sans-serif;font-size:7.5pt;color:#818b98;";
+  var pagina = d.createElement("style");
+  pagina.textContent = "@page{" +
+    "@top-left{" + caixa + "content:" + q(meta("projeto") + " · " + meta("documento")) + "}" +
+    "@top-right{" + caixa + "content:" + q(meta("versao") + " · " + meta("data") + " · " + meta("status")) + "}" +
+    "@bottom-left{" + caixa + "font-family:'JetBrains Mono',Menlo,monospace;content:" + q(meta("caminho")) + "}" +
+    "@bottom-right{" + caixa + "content:\"Página \" counter(page) \" de \" counter(pages)}}" +
+    "@page:first{@top-left{content:none}@top-right{content:none}}";
+  d.head.appendChild(pagina);
+
+  // Nome sugerido do PDF: <documento>_v<NN>_<AAAAMMDD-HHMM>
+  function nomePdf() {
+    return meta("documento") + "_" + meta("versao") + "_" + meta("data").replace(/[^0-9 ]/g, "").replace(" ", "-");
+  }
+  var tituloOriginal = d.title, temaAntes = null;
+  function antes() {
+    tituloOriginal = d.title; d.title = nomePdf();
+    temaAntes = h.getAttribute("data-theme"); h.setAttribute("data-theme", "light");
+  }
+  function depois() {
+    d.title = tituloOriginal;
+    if (temaAntes) h.setAttribute("data-theme", temaAntes); else h.removeAttribute("data-theme");
+  }
+  window.addEventListener("beforeprint", antes);
+  window.addEventListener("afterprint", depois);
+
+  var ICONES = {
+    light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><\/svg>',
+    system: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><\/svg>',
+    dark: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/><\/svg>',
+    pdf: '<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/><\/svg>',
+    paleta: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16a5 5 0 0 0 5-5c0-4-4-7.2-9-7.2z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="15.5" cy="7.5" r="1"/><\/svg>'
+  };
+  function norm(s) { return (s || "").replace(/[^0-9a-z]/gi, "").toLowerCase(); }
+
+  function montar() {
+    // Marca diagonal: Rascunho, Em revisão e Obsoleto
+    if (/rascunho|revis|obsoleto/i.test(meta("status"))) d.body.setAttribute("data-marca", meta("status"));
+
+    // Barra: tema + PDF
+    var barra = d.createElement("div");
+    barra.className = "boaz-barra";
+    barra.setAttribute("role", "toolbar");
+    barra.setAttribute("aria-label", "Visualização do documento");
+    var temas = [["light", "Claro"], ["system", "Sistema"], ["dark", "Escuro"]], seg = '<div class="boaz-seg" role="group" aria-label="Tema">';
+    for (var i = 0; i < temas.length; i++) {
+      seg += '<button type="button" data-tema="' + temas[i][0] + '" title="Tema ' + temas[i][1].toLowerCase() + '" aria-label="Tema ' + temas[i][1].toLowerCase() + '">' + ICONES[temas[i][0]] + "<\/button>";
+    }
+    barra.innerHTML = seg + '<\/div><button type="button" class="boaz-pdf" title="Gerar PDF (' + nomePdf() + '.pdf)">' + ICONES.pdf + '<span class="rotulo">PDF ' + meta("versao") + "<\/span><\/button>";
+    d.body.appendChild(barra);
+    barra.addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      if (b.classList.contains("boaz-pdf")) { window.print(); return; }
+      var t = b.getAttribute("data-tema");
+      try { localStorage.setItem(CHAVE, t); } catch (x) {}
+      aplicar(t);
+    });
+    aplicar(guardado());
+
+    // Paleta das vistas: figure.diagrama[data-paletas="id|Nome|#cor|#cor|#cor,…"] aponta para um .svg que traz
+    // todos os temas nos dois modos; a escolha vira o fragmento #paleta-<id>-<claro|escuro> do <img> e do link
+    var vistas = d.querySelectorAll("figure.diagrama[data-paletas]");
+    if (vistas.length) {
+      var lista = vistas[0].getAttribute("data-paletas").split(",").map(function (p) { return p.split("|"); });
+      var escolha = { tema: lista[0][0], modo: "claro" };
+      var pb = d.createElement("button");
+      pb.type = "button"; pb.className = "boaz-paleta"; pb.title = "Tema de cor e modo das vistas";
+      pb.setAttribute("aria-expanded", "false"); pb.setAttribute("aria-haspopup", "true");
+      pb.innerHTML = ICONES.paleta + '<span class="rotulo">Paleta<\/span>';
+      var painel = d.createElement("div");
+      painel.className = "boaz-paletas"; painel.hidden = true;
+      painel.setAttribute("role", "dialog"); painel.setAttribute("aria-label", "Paleta das vistas");
+      var htm = '<p class="boaz-eyebrow">Modo das telas<\/p><div class="boaz-seg" role="group" aria-label="Modo das telas">' +
+        '<button type="button" data-modo="claro">' + ICONES.light + 'Claro<\/button><button type="button" data-modo="escuro">' + ICONES.dark + 'Escuro<\/button><\/div>' +
+        '<p class="boaz-eyebrow">Tema de cor · ' + lista.length + '<\/p><ul>';
+      for (var p = 0; p < lista.length; p++) {
+        htm += '<li><button type="button" data-paleta="' + lista[p][0] + '"><span class="boaz-amostras"><i><\/i><i><\/i><i><\/i><\/span>' + lista[p][1] + "<\/button><\/li>";
+      }
+      painel.innerHTML = htm + "<\/ul>";
+      var bolas = painel.querySelectorAll(".boaz-amostras");
+      for (var p2 = 0; p2 < bolas.length; p2++) {
+        var is = bolas[p2].children;
+        for (var c = 0; c < 3; c++) is[c].style.background = lista[p2][c + 2];
+      }
+      barra.insertBefore(pb, barra.querySelector(".boaz-pdf"));
+      barra.appendChild(painel);
+      for (var f = 0; f < vistas.length; f++) {
+        var leg = vistas[f].querySelector("figcaption strong");
+        if (leg) { var at = d.createElement("span"); at.className = "boaz-paleta-atual"; leg.appendChild(d.createTextNode(" · ")); leg.appendChild(at); }
+      }
+      var mostrar = function () {
+        var frag = "#paleta-" + escolha.tema + "-" + escolha.modo, nome = "";
+        for (var i = 0; i < lista.length; i++) if (lista[i][0] === escolha.tema) nome = lista[i][1];
+        for (var j = 0; j < vistas.length; j++) {
+          var img = vistas[j].querySelector("img"), a = vistas[j].querySelector("a"), sp = vistas[j].querySelector(".boaz-paleta-atual");
+          if (img) img.src = img.getAttribute("src").split("#")[0] + frag;
+          if (a) a.href = a.getAttribute("href").split("#")[0] + frag;
+          if (sp) sp.textContent = nome + ", " + escolha.modo;
+        }
+        var bs = painel.querySelectorAll("button");
+        for (var k = 0; k < bs.length; k++) {
+          var b = bs[k], on = b.getAttribute("data-modo") ? b.getAttribute("data-modo") === escolha.modo : b.getAttribute("data-paleta") === escolha.tema;
+          b.setAttribute("aria-pressed", String(on));
+        }
+      };
+      var abrir = function (sim) { painel.hidden = !sim; pb.setAttribute("aria-expanded", String(sim)); };
+      pb.addEventListener("click", function (e) { e.stopPropagation(); abrir(painel.hidden); });
+      painel.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var b = e.target.closest("button");
+        if (!b) return;
+        if (b.getAttribute("data-modo")) escolha.modo = b.getAttribute("data-modo");
+        if (b.getAttribute("data-paleta")) escolha.tema = b.getAttribute("data-paleta");
+        mostrar();
+      });
+      d.addEventListener("click", function () { abrir(false); });
+      d.addEventListener("keydown", function (e) { if (e.key === "Escape" && !painel.hidden) { abrir(false); pb.focus(); } });
+      mostrar();
+    }
+
+    // Tabelas largas rolam na horizontal dentro do documento, sem cortar conteúdo
+    var ts = d.querySelectorAll("table");
+    for (var t = 0; t < ts.length; t++) {
+      if (ts[t].parentNode.classList && ts[t].parentNode.classList.contains("boaz-tabela")) continue;
+      var envolve = d.createElement("div");
+      envolve.className = "boaz-tabela";
+      ts[t].parentNode.insertBefore(envolve, ts[t]);
+      envolve.appendChild(ts[t]);
+    }
+
+    // Gherkin: destaca palavras-chave e textos entre aspas
+    var gs = d.querySelectorAll("pre.gherkin");
+    for (var g = 0; g < gs.length; g++) {
+      if (gs[g].getAttribute("data-pronto")) continue;
+      // aspas antes das palavras-chave: os class="…" inseridos depois não podem ser pegos
+      gs[g].innerHTML = gs[g].innerHTML
+        .replace(/"([^"<\n]*)"/g, '<span class="g-texto">"$1"<\/span>')
+        .replace(/^(\s*)(Funcionalidade|Contexto|Cenário|Esquema do Cenário|Exemplos):/gm, '$1<span class="g-cenario">$2:<\/span>')
+        .replace(/^(\s*)(Dado|Dada|Dados|Dadas|Quando|Então|E|Mas)(?= )/gm, '$1<span class="g-passo">$2<\/span>');
+      gs[g].setAttribute("data-pronto", "1");
+    }
+
+    // Sumário automático: <nav class="sumario"><\/nav> recebe os <h2> de <main>
+    var nav = d.querySelector("nav.sumario");
+    if (nav && !nav.querySelector("ol")) {
+      var hs = d.querySelectorAll("main > section > h2"), ol = d.createElement("ol");
+      for (var k = 0; k < hs.length; k++) {
+        var sec = hs[k].closest("section"), id = (sec && sec.id) || hs[k].id;
+        if (!id) continue;
+        var li = d.createElement("li"), a = d.createElement("a");
+        a.href = "#" + id; a.textContent = hs[k].textContent; li.appendChild(a); ol.appendChild(li);
+      }
+      nav.innerHTML = '<p class="boaz-eyebrow">Sumário<\/p>'; nav.appendChild(ol);
+    }
+
+    // Conferência da marca d'água: versão e data iguais em <meta>, carimbo, histórico e rodapé
+    var v = meta("versao"), dt = meta("data"), erros = [];
+    var cv = d.querySelector(".boaz-carimbo .boaz-versao"), cd = d.querySelector(".boaz-carimbo .boaz-data");
+    var h1 = d.querySelector(".boaz-historico tbody tr"), lr = d.querySelector(".boaz-rodape-linha");
+    if (!cv || norm(cv.textContent) !== norm(v)) erros.push("versão do carimbo");
+    if (!cd || norm(cd.textContent) !== norm(dt)) erros.push("data do carimbo");
+    if (!h1 || norm(h1.cells[0].textContent) !== norm(v) || norm(h1.cells[1].textContent) !== norm(dt)) erros.push("1ª linha do histórico");
+    if (!lr || norm(lr.textContent).indexOf(norm(v) + norm(dt)) < 0) erros.push("linha do rodapé");
+    if (erros.length) {
+      barra.setAttribute("data-alerta", "");
+      barra.querySelector(".boaz-pdf").title = "Marca d'água diferente de <meta boaz:versao/data>: " + erros.join(", ");
+      if (window.console) console.warn("boaz: marca d'água inconsistente →", erros.join(", "));
+    }
+  }
+  if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", montar); else montar();
+})();
+</script>
+<!-- boaz:casca:fim -->
+</head>
+<body>
+<header class="boaz-marca-topo">
+  <p class="boaz-eyebrow">boaz · Funcionalidade</p>
+  <h1>Identidade e acesso</h1>
+  <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
+  <dl class="boaz-carimbo">
+    <div><dt>Documento</dt><dd>15_identidade-acesso</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v01</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 00:09</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-rascunho">Rascunho</span></dd></div>
+  </dl>
+</header>
+<main>
+  <nav class="sumario"></nav>
+  <section id="contexto">
+    <h2>Contexto</h2>
+    <p>A <a class="ref" href="07_landing-page-ux.html#RF-06">landing page</a> leva ao cadastro no hub, o <a class="ref" href="08_hub-ux.html#RF-16">hub</a> tem as telas Entrar e Criar conta e o <a class="ref" href="09_quest-ux.html#RN-91">quest</a> abre o perfil pelo código de acesso. Faltava dizer quem cria cada usuário, que permissões ele recebe, como recupera o acesso e quanto tempo fica conectado. Este documento define isso para as três frentes: a instituição e o educador autônomo se cadastram sozinhos; os demais usuários nascem no <strong>módulo Usuários</strong>, onde também se decidem as permissões; e o time deboaz administra as contas pelo <a class="ref" href="99_glossario.html#painel-de-administracao-do-deboaz">painel de administração do deboaz</a>.</p>
+    <p class="historia"><span>Como</span> <strong>instituição</strong>, <span>quero</span> criar as contas de quem trabalha e estuda comigo e decidir o que cada uma pode fazer, <span>para</span> controlar o acesso sem depender de ninguém de fora</p>
+    <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-29: o deboaz não usa provedor externo de login nem envia e-mail ou mensagem com senha; quem esquece a senha recebe uma nova de um usuário superior, e a conta master, do time deboaz. Nenhuma conta é apagada: ela é desativada ou encerrada. O atendimento sem login fica na tela Entrar do hub, e a landing page continua sem receber mensagens (<a class="ref" href="07_landing-page-ux.html#RN-72">Landing page · UX base <code class="id">RN-72</code></a>).</p></aside>
+  </section>
+  <section id="requisitos-funcionais">
+    <h2>Requisitos funcionais</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
+      <tbody>
+        <tr id="RF-104"><td><code class="id">RF-104</code></td><td>O sistema deve tornar <a class="ref" href="99_glossario.html#conta-master">conta master</a> quem cria em Criar conta a conta de uma instituição ou de um educador autônomo</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-105"><td><code class="id">RF-105</code></td><td>O sistema deve incluir o módulo Usuários entre os módulos da conta da instituição, com staff, participantes e permissões, e do educador autônomo, só com participantes</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-106"><td><code class="id">RF-106</code></td><td>O sistema deve criar no módulo Usuários um usuário <strong>staff</strong> com nome, identificação de entrada e senha provisória</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-107"><td><code class="id">RF-107</code></td><td>O sistema deve definir as permissões de cada staff por módulo contratado, marcando a aba Configuração, a aba Utilização ou as duas</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-108"><td><code class="id">RF-108</code></td><td>O sistema deve criar no módulo Usuários um participante com nome, turma e ano, gerando o código de acesso dele</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-109"><td><code class="id">RF-109</code></td><td>O sistema deve exigir uma senha nova no primeiro acesso com senha provisória, antes de abrir o hub</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-110"><td><code class="id">RF-110</code></td><td>O sistema deve permitir que um usuário superior gere uma senha provisória para quem está abaixo dele</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-111"><td><code class="id">RF-111</code></td><td>O sistema deve levar, sem login, a mensagem enviada pela ação <q class="ui">Esqueci a senha da conta master</q> da tela Entrar ao <strong>SAC</strong>, módulo que só o time deboaz usa</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-112"><td><code class="id">RF-112</code></td><td>O sistema deve permitir que a conta master e o staff com o módulo Usuários desativem e reativem staff e participantes abaixo deles</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-113"><td><code class="id">RF-113</code></td><td>O sistema deve permitir que o time deboaz veja, suspenda, reative, desative e encerre contas de instituição e de educador autônomo no painel de administração do deboaz</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-114"><td><code class="id">RF-114</code></td><td>O sistema deve deixar a instituição configurar o tempo de sessão do staff e o dos participantes, e o educador autônomo, o dos participantes dele</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-115"><td><code class="id">RF-115</code></td><td>O sistema deve dar um <strong>acesso anônimo</strong>, válido só para aquela sala, a quem entra sem código de acesso numa sala que aceita participante anônimo</td><td><span class="prio prio-deve">Deve</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="regras-de-negocio">
+    <h2>Regras de negócio</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Regra</th></tr></thead>
+      <tbody>
+        <tr id="RN-163"><td><code class="id">RN-163</code></td><td>Os tipos de usuário são instituição e educador autônomo (contas master), staff, participante e time deboaz; o responsável não é usuário e entra com o código de acesso do participante (<a class="ref" href="09_quest-ux.html#RN-94">Quest · UX base <code class="id">RN-94</code></a>), e o acesso anônimo não é usuário</td></tr>
+        <tr id="RN-164"><td><code class="id">RN-164</code></td><td>Só a instituição e o educador autônomo se cadastram sozinhos; staff e participantes nascem no módulo Usuários, e o usuário do time deboaz é criado pelo próprio time, fora das telas das contas</td></tr>
+        <tr id="RN-165"><td><code class="id">RN-165</code></td><td>O educador autônomo cria só participantes: a conta dele não tem staff nem permissões</td></tr>
+        <tr id="RN-166"><td><code class="id">RN-166</code></td><td>O staff só recebe permissão em módulo que a instituição contratou; o módulo descontratado suspende as permissões dele, que voltam se o módulo for recontratado</td></tr>
+        <tr id="RN-167"><td><code class="id">RN-167</code></td><td>Ninguém concede permissão que não tem; a conta master tem todas as permissões da própria conta</td></tr>
+        <tr id="RN-168"><td><code class="id">RN-168</code></td><td>A conta master pode conceder o próprio módulo Usuários a um staff, que passa a criar staff e participantes e a conceder permissões dentro das que tem</td></tr>
+        <tr id="RN-169"><td><code class="id">RN-169</code></td><td>A ordem de superior é: time deboaz, conta master, staff com o módulo Usuários, demais staff e participantes; um usuário gera senha provisória, desativa e reativa só quem está abaixo dele, nunca um par</td></tr>
+        <tr id="RN-170"><td><code class="id">RN-170</code></td><td>O deboaz não envia senha, senha provisória nem código de acesso por e-mail ou mensagem: o superior os entrega pessoalmente, como na secretaria da escola</td></tr>
+        <tr id="RN-171"><td><code class="id">RN-171</code></td><td>A senha provisória vale para um único acesso, e só a própria pessoa conhece a senha nova que define nele</td></tr>
+        <tr id="RN-172"><td><code class="id">RN-172</code></td><td>O time deboaz gera a senha provisória da conta master só depois de conferir, pelo SAC, os dados do cadastro da conta</td></tr>
+        <tr id="RN-173"><td><code class="id">RN-173</code></td><td>Uma conta de instituição ou de educador autônomo está ativa, suspensa (decisão temporária do time deboaz), desativada (falta de pagamento, volta com a regularização) ou encerrada (a pedido do cliente)</td></tr>
+        <tr id="RN-174"><td><code class="id">RN-174</code></td><td>Nenhuma conta ou usuário é apagado; na conta encerrada, os dados do cliente são apagados em cascata (<a class="ref" href="00_visao-produto.html#escopo">Visão do produto</a>) e fica só o registro mínimo para histórico, auditoria e cobrança</td></tr>
+        <tr id="RN-175"><td><code class="id">RN-175</code></td><td>Conta suspensa, desativada ou encerrada bloqueia a entrada de todo staff e participante dela; usuário desativado não entra até ser reativado</td></tr>
+        <tr id="RN-176"><td><code class="id">RN-176</code></td><td>O tempo de sessão vale para a entrada no hub e no quest; não se aplica à duração de salas, quizzes ou aulas ao vivo, definida pelos módulos</td></tr>
+        <tr id="RN-177"><td><code class="id">RN-177</code></td><td>O acesso anônimo termina quando a sala fecha e não abre perfil, tarefa nem outra sala</td></tr>
+        <tr id="RN-178"><td><code class="id">RN-178</code></td><td>Criar usuário, gerar senha provisória, mudar permissão e mudar o estado de uma conta ou de um usuário ficam na auditoria, com quem fez, o quê e quando</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="requisitos-nao-funcionais">
+    <h2>Requisitos não funcionais</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
+      <tbody>
+        <tr id="RNF-201"><td><code class="id">RNF-201</code></td><td><span class="tag">Segurança</span></td><td>A senha é guardada só de forma irreversível: ninguém, nem o time deboaz, consegue ler a senha de um usuário</td></tr>
+        <tr id="RNF-202"><td><code class="id">RNF-202</code></td><td><span class="tag">Segurança</span></td><td>A senha provisória é exibida uma única vez, a quem a gerou</td></tr>
+        <tr id="RNF-203"><td><code class="id">RNF-203</code></td><td><span class="tag">Segurança</span></td><td>Depois de desativar, suspender ou bloquear, a próxima ação do usuário em qualquer aparelho é recusada e leva à tela de entrada</td></tr>
+        <tr id="RNF-204"><td><code class="id">RNF-204</code></td><td><span class="tag">Segurança</span></td><td>A entrada é bloqueada por um tempo depois de tentativas erradas seguidas, com o mesmo limite no hub e no quest</td></tr>
+        <tr id="RNF-205"><td><code class="id">RNF-205</code></td><td><span class="tag">Segurança</span></td><td>O atendimento sem login aceita um número limitado de envios por aparelho</td></tr>
+        <tr id="RNF-206"><td><code class="id">RNF-206</code></td><td><span class="tag">Conformidade</span></td><td>Um registro da auditoria não pode ser alterado nem apagado, nem pelo time deboaz</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="criterios-de-aceite">
+    <h2>Critérios de aceite</h2>
+    <article class="criterio" id="ca-RF-104">
+      <h3><code class="id">RF-104</code> Conta master</h3>
+      <pre class="gherkin">Cenário: escola cria a conta
+  Dado a pessoa na tela Criar conta
+  Quando escolhe "Instituição", preenche os dados e toca em "Criar conta"
+  Então entra no hub como conta master da instituição
+  E vê o módulo Usuários entre os módulos da conta</pre>
+    </article>
+    <article class="criterio" id="ca-RF-105">
+      <h3><code class="id">RF-105</code> Módulo Usuários</h3>
+      <pre class="gherkin">Cenário: educador autônomo
+  Dado a conta master de um educador autônomo
+  Quando abre o módulo Usuários
+  Então vê só os participantes, sem staff nem permissões</pre>
+    </article>
+    <article class="criterio" id="ca-RF-106">
+      <h3><code class="id">RF-106</code> Criar staff</h3>
+      <pre class="gherkin">Cenário: secretária cadastrada pela escola
+  Dado a conta master no módulo Usuários
+  Quando cria o staff "Marta" com a identificação de entrada dela
+  Então vê a senha provisória da Marta uma única vez
+  E a Marta aparece na lista do staff, sem permissões</pre>
+    </article>
+    <article class="criterio" id="ca-RF-107">
+      <h3><code class="id">RF-107</code> Permissões do staff</h3>
+      <pre class="gherkin">Cenário: professor com a Presença
+  Dado a instituição com o módulo Presença contratado
+  Quando a conta master marca a aba Utilização da Presença para o staff "Paulo"
+  Então o Paulo vê a Presença em Meus módulos só com a aba Utilização
+
+Cenário: módulo não contratado
+  Dado a instituição sem o módulo Carteirinha contratado
+  Quando a conta master define as permissões de um staff
+  Então a Carteirinha não aparece entre os módulos que ela pode marcar</pre>
+    </article>
+    <article class="criterio" id="ca-RF-108">
+      <h3><code class="id">RF-108</code> Criar participante</h3>
+      <pre class="gherkin">Cenário: aluno novo
+  Dado o staff com o módulo Usuários
+  Quando cria o participante "Lia", da turma 5A de 2027
+  Então a Lia aparece entre os participantes com um código de acesso único
+  E esse código abre o perfil dela no quest</pre>
+    </article>
+    <article class="criterio" id="ca-RF-109">
+      <h3><code class="id">RF-109</code> Primeiro acesso</h3>
+      <pre class="gherkin">Cenário: senha provisória
+  Dado o staff "Marta" com uma senha provisória
+  Quando entra no hub com ela
+  Então o sistema pede uma senha nova antes de abrir Meus módulos
+  E a senha provisória deixa de valer</pre>
+    </article>
+    <article class="criterio" id="ca-RF-110">
+      <h3><code class="id">RF-110</code> Senha esquecida</h3>
+      <pre class="gherkin">Cenário: professor na secretaria
+  Dado o staff "Paulo", que esqueceu a senha
+  Quando o staff com o módulo Usuários gera uma senha provisória para ele
+  Então o Paulo entra com ela e define uma senha nova
+
+Cenário: par não troca a senha
+  Dado dois staff com o módulo Usuários
+  Quando um tenta gerar a senha provisória do outro
+  Então o sistema não oferece a ação</pre>
+    </article>
+    <article class="criterio" id="ca-RF-111">
+      <h3><code class="id">RF-111</code> Atendimento sem login</h3>
+      <pre class="gherkin">Cenário: conta master esqueceu a senha
+  Dado a pessoa na tela Entrar do hub, sem login
+  Quando toca em "Esqueci a senha da conta master", informa a instituição e um contato e envia
+  Então a mensagem aparece no SAC do time deboaz
+  E a pessoa vê que o time deboaz vai conferir os dados do cadastro</pre>
+    </article>
+    <article class="criterio" id="ca-RF-112">
+      <h3><code class="id">RF-112</code> Desativar e reativar</h3>
+      <pre class="gherkin">Cenário: professor que saiu da escola
+  Dado o staff "Paulo" com o hub aberto no celular
+  Quando a conta master desativa o Paulo
+  Então a próxima ação do Paulo no celular leva à tela Entrar
+  E o Paulo continua na lista do staff, como desativado</pre>
+    </article>
+    <article class="criterio" id="ca-RF-113">
+      <h3><code class="id">RF-113</code> Painel do time deboaz</h3>
+      <pre class="gherkin">Cenário: falta de pagamento
+  Dado uma escola ativa com o pagamento em atraso
+  Quando o time deboaz desativa a conta no painel
+  Então o staff e os participantes da escola não entram mais
+  E a conta continua no painel, como desativada, com os dados guardados
+
+Cenário: pagamento regularizado
+  Dado a mesma escola desativada
+  Quando o time deboaz reativa a conta
+  Então o staff e os participantes voltam a entrar com as mesmas permissões</pre>
+    </article>
+    <article class="criterio" id="ca-RF-114">
+      <h3><code class="id">RF-114</code> Tempo de sessão</h3>
+      <pre class="gherkin">Cenário: sessão do staff termina
+  Dado a instituição com um tempo de sessão do staff configurado
+  Quando um staff fica sem usar o hub por mais que esse tempo
+  Então a próxima ação dele leva à tela Entrar
+  E uma sala ao vivo aberta por ele não é encerrada por isso</pre>
+    </article>
+    <article class="criterio" id="ca-RF-115">
+      <h3><code class="id">RF-115</code> Acesso anônimo</h3>
+      <pre class="gherkin">Cenário: visitante de evento aberto
+  Dado uma sala aberta que aceita participante anônimo
+  Quando a pessoa entra pelo código da sala sem código de acesso
+  Então participa da sala
+  E não consegue abrir perfil, tarefa ou outra sala com esse acesso</pre>
+    </article>
+  </section>
+  <section id="fora-de-escopo">
+    <h2>Fora de escopo</h2>
+    <ul class="fora">
+      <li>Entrada por provedor externo de login, como conta Google ou Microsoft (decisão de 2026-10-29)</li>
+      <li>Envio de senha, código ou aviso por e-mail ou mensagem</li>
+      <li>Recuperação de senha por perguntas de segurança</li>
+      <li>Usuário em várias unidades da mesma instituição (fase de escala, <a class="ref" href="00_visao-produto.html#fora-de-escopo">Visão do produto</a>)</li>
+    </ul>
+  </section>
+  <section id="em-aberto">
+    <h2>Em aberto</h2>
+    <ul class="pendencias">
+      <li>Tempo de sessão: mínimo, máximo e valor padrão do staff e dos participantes, no navegador e no app <span class="tag dono">Produto</span></li>
+      <li>Quantas tentativas erradas seguidas bloqueiam a entrada e por quanto tempo (<code class="id">RNF-204</code>) <span class="tag dono">Segurança</span></li>
+      <li>Regras da senha: tamanho mínimo e composição <span class="tag dono">Segurança</span></li>
+      <li>Validade da senha provisória que não foi usada <span class="tag dono">Segurança</span></li>
+      <li>A identificação de entrada do staff é o e-mail ou um nome de usuário criado pela instituição, já que nada é enviado por e-mail <span class="tag dono">Produto</span></li>
+      <li>Quais dados do cadastro o time deboaz confere no SAC antes de gerar a senha provisória da conta master <span class="tag dono">Produto</span></li>
+      <li>Quantos envios do atendimento sem login por aparelho e por período (<code class="id">RNF-205</code>) <span class="tag dono">Segurança</span></li>
+      <li>Segundo fator de autenticação para a conta master e o time deboaz <span class="tag dono">Segurança</span></li>
+      <li>O participante anônimo informa um apelido ao entrar na sala <span class="tag dono">Produto</span></li>
+      <li>Prazo de guarda da auditoria e do registro mínimo da conta encerrada <span class="tag dono">Conformidade</span></li>
+      <li>Formato da credencial de acesso, renovação da sessão e bibliotecas: decisão de tecnologia, fora deste documento <span class="tag dono">Time</span></li>
+    </ul>
+  </section>
+  <section id="diagramas">
+    <h2>Diagramas</h2>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/identidade-acesso_v01_20261029-0008.svg"><img src="../2_Diagramas/identidade-acesso_v01_20261029-0008.svg" alt="Casos de uso de identidade e acesso: conta master, staff, participantes, permissões, senhas, SAC, painel do time deboaz e entradas no quest"></a>
+      <figcaption><strong>Identidade e acesso · casos de uso</strong><code>2_Diagramas/identidade-acesso_v01_20261029-0008.svg</code></figcaption>
+    </figure>
+  </section>
+</main>
+<footer class="boaz-marca-rodape">
+  <p class="boaz-eyebrow">Histórico</p>
+  <table class="boaz-historico">
+    <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
+    <tbody>
+      <tr><td><span class="boaz-versao">v01</span></td><td>2026-10-29 00:09</td><td>Criação</td></tr>
+    </tbody>
+  </table>
+  <div class="boaz-rodape-linha">
+    <span>boaz · v01 · 2026-10-29 00:09</span>
+    <span class="boaz-arquivo">1_Requisitos/15_identidade-acesso.html</span>
+  </div>
+</footer>
+</body>
+</html>
