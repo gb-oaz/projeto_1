@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Glossário · boaz · v23</title>
+<title>Glossário · boaz · v24</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="99_glossario">
 <meta name="boaz:caminho" content="1_Requisitos/99_glossario.html">
 <meta name="boaz:tipo" content="Glossário">
-<meta name="boaz:versao" content="v23">
-<meta name="boaz:data" content="2026-10-29 03:31">
+<meta name="boaz:versao" content="v24">
+<meta name="boaz:data" content="2026-10-29 03:47">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -790,8 +790,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>dar um significado único aos termos do domínio usados nos documentos de requisito.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>99_glossario</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v23</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 03:31</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v24</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 03:47</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -804,6 +804,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <dt id="blueprint">Blueprint</dt><dd>desenho de baixa fidelidade de uma tela, feito no documento de UX, que mostra só a distribuição dos blocos, as ações e os espaços reservados aos módulos, no celular e na web; vem antes da vista</dd>
       <dt id="cartao-do-mascote">Cartão do mascote</dt><dd>forma de mascote em que o fundo colorido ocupa um cartão vertical ou horizontal e só o rosto se move</dd>
       <dt id="catalogo-de-modulos">Catálogo de módulos</dt><dd>lista dos módulos que uma escola ou empresa pode contratar, cada um com preço próprio controlado no hub</dd>
+      <dt id="catalogo-de-precos">Catálogo de preços</dt><dd>módulo da conta do time deboaz em que o administrador do deboaz define o preço de cada módulo, a data a partir da qual vale e o desconto por volume</dd>
       <dt id="classe-de-janela">Classe de janela</dt><dd>faixa de largura disponível para a tela (compact, medium, expanded, large ou extra-large) que define margem, colunas, painéis e navegação</dd>
       <dt id="codigo-da-sala">Código da sala</dt><dd>código que o educador passa aos participantes para entrarem numa sala pelo quest</dd>
       <dt id="codigo-de-acesso">Código de acesso</dt><dd>código único que a instituição gera para cada participante, no formato <code>&lt;SIGLA&gt;-&lt;NOME CURTO&gt;-&lt;4 números&gt;</code> (<code>EBFGA-LUCAS-0412</code>, sempre em maiúsculas), e que abre o perfil dele no quest sem senha; vale para o participante e para os responsáveis, e cada ano tem o seu (<a class="ref" href="15_identidade-acesso.html#RN-184">Identidade e acesso RN-184</a>)</dd>
@@ -818,6 +819,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <dt id="design-system">Design system</dt><dd>conjunto da identidade visual, dos tokens e dos componentes do projeto, mantido em <code>0_Assets/design/</code></dd>
       <dt id="educador">Educador</dt><dd>quem cria quizzes e conduz salas no hub: professor, instrutor ou responsável por um treinamento; contrata pela instituição ou como autônomo, gerenciando só a própria conta, o conteúdo e os custos</dd>
       <dt id="expressao">Expressão</dt><dd>estado emocional mostrado pelo rosto do mascote (feliz, acertou, errou, dúvida, esperando…), escolhido conforme a situação da tela</dd>
+      <dt id="faixa-de-desconto">Faixa de desconto</dt><dd>intervalo do total de usuários (staff + participantes) de uma conta com um percentual de desconto sobre a cobrança mensal do módulo Usuários; quanto mais usuários, maior ou igual o percentual</dd>
       <dt id="hub">Hub</dt><dd>frente do produto onde o educador cria quizzes, conduz salas, acompanha relatórios e administra a conta</dd>
       <dt id="identidade-da-instituicao">Identidade da instituição</dt><dd>módulo que uma escola ou empresa contrata para ter a identidade dela no lugar da padrão do deboaz; o símbolo do deboaz continua, menor</dd>
       <dt id="identidade-visual">Identidade visual</dt><dd>temas de cor, tipografia, logos, ícones, imagens e animações que dão a cara do produto</dd>
@@ -859,7 +861,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v23</span></td><td>2026-10-29 03:31</td><td>Administrador do deboaz</td></tr>
+      <tr><td><span class="boaz-versao">v24</span></td><td>2026-10-29 03:47</td><td>Termos <a class="ref" href="#catalogo-de-precos">catálogo de preços</a> e <a class="ref" href="#faixa-de-desconto">faixa de desconto</a> (<a class="ref" href="16_catalogo-precos.html">Catálogo de preços</a>)</td></tr>
+      <tr><td>v23</td><td>2026-10-29 03:31</td><td>Administrador do deboaz</td></tr>
       <tr><td>v22</td><td>2026-10-29 03:18</td><td>Matrícula; código de acesso sempre em maiúsculas</td></tr>
       <tr><td>v21</td><td>2026-10-29 02:56</td><td>Código de acesso no formato <code>&lt;sigla&gt;-&lt;nome curto&gt;-&lt;4 números&gt;</code>, sem senha (<a class="ref" href="15_identidade-acesso.html#RN-184">15 RN-184</a>)</td></tr>
       <tr><td>v20</td><td>2026-10-29 01:17</td><td>Termo código de liberação</td></tr>
@@ -868,11 +871,10 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <tr><td>v17</td><td>2026-10-19 04:35</td><td>Status → Aprovado</td></tr>
       <tr><td>v16</td><td>2026-10-19 04:24</td><td>Termo mascote padrinho; status → Em revisão; status → Em revisão</td></tr>
       <tr><td>v15</td><td>2026-10-19 00:53</td><td>Status → Aprovado</td></tr>
-      <tr><td>v14</td><td>2026-10-19 00:53</td><td>Termos da UX do quest: código de acesso, módulo fixo, perfis acessados e tarefa; status → Em revisão</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v23 · 2026-10-29 03:31</span>
+    <span>boaz · v24 · 2026-10-29 03:47</span>
     <span class="boaz-arquivo">1_Requisitos/99_glossario.html</span>
   </div>
 </footer>
