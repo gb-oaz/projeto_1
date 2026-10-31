@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quest · UX base · boaz · v12</title>
+<title>Quest · UX base · boaz · v13</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="09_quest-ux">
 <meta name="boaz:caminho" content="1_Requisitos/09_quest-ux.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v12">
-<meta name="boaz:data" content="2026-10-29 04:07">
+<meta name="boaz:versao" content="v13">
+<meta name="boaz:data" content="2026-10-31 12:45">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -827,8 +827,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir como o participante e o responsável acessam o quest pelo código de acesso e como tarefas, módulos fixos e perfil se distribuem no celular e na web.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>09_quest-ux</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v12</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 04:07</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v13</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-31 · 12:45</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -865,7 +865,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     <table>
       <thead><tr><th>ID</th><th>Regra</th></tr></thead>
       <tbody>
-        <tr id="RN-91"><td><code class="id">RN-91</code></td><td>A instituição gera um código de acesso único ao cadastrar cada participante, no formato <code>&lt;SIGLA&gt;-&lt;NOME CURTO&gt;-&lt;4 números&gt;</code> (<a class="ref" href="16_identidade-acesso.html#RN-184">Identidade e acesso RN-184</a>); a matrícula do aluno ou do funcionário é um campo do cadastro, informado ou gerado, e não o código (<a class="ref" href="16_identidade-acesso.html#RN-188">RN-188</a>)</td></tr>
+        <tr id="RN-91"><td><code class="id">RN-91</code></td><td>A instituição gera um código de acesso único ao cadastrar cada participante, no formato <code>&lt;SIGLA&gt;-&lt;NOME CURTO&gt;-&lt;4 números&gt;</code> (<a class="ref" href="17_modulo-usuario.html#RN-184">Módulo Usuários RN-184</a>); a matrícula do aluno ou do funcionário é um campo do cadastro, informado ou gerado, e não o código (<a class="ref" href="17_modulo-usuario.html#RN-188">RN-188</a>)</td></tr>
         <tr id="RN-92"><td><code class="id">RN-92</code></td><td>O código de acesso do estudante menor de idade é entregue aos responsáveis; nos outros casos, ao próprio participante</td></tr>
         <tr id="RN-93"><td><code class="id">RN-93</code></td><td>Só a instituição gera, troca e recupera códigos de acesso; quem esquece o código pede à instituição</td></tr>
         <tr id="RN-94"><td><code class="id">RN-94</code></td><td>O estudante e os responsáveis entram com o mesmo código de acesso; a sessão registra quem acessou e o parentesco</td></tr>
@@ -1040,7 +1040,8 @@ Cenário: sem prazo, várias vezes
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v12</span></td><td>2026-10-29 04:07</td><td>Link para Identidade e acesso atualizado (16_identidade-acesso)</td></tr>
+      <tr><td><span class="boaz-versao">v13</span></td><td>2026-10-31 12:45</td><td>Link para o Módulo Usuários atualizado (17_modulo-usuario)</td></tr>
+      <tr><td>v12</td><td>2026-10-29 04:07</td><td>Link para Identidade e acesso atualizado (16_identidade-acesso)</td></tr>
       <tr><td>v11</td><td>2026-10-29 03:18</td><td><code class="id">RN-91</code>: código de acesso no formato <code>&lt;SIGLA&gt;-&lt;NOME CURTO&gt;-&lt;4 números&gt;</code> e matrícula como campo do cadastro, não o código (15 RN-184, RN-188)</td></tr>
       <tr><td>v10</td><td>2026-10-21 22:12</td><td>Blueprint do acesso v03: logo na abertura sobre o fundo Halo no lugar do mascote de boas-vindas; status → Aprovado</td></tr>
       <tr><td>v09</td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
@@ -1049,11 +1050,10 @@ Cenário: sem prazo, várias vezes
       <tr><td>v06</td><td>2026-10-19 03:04</td><td><code class="id">RF-34</code> e <code class="id">RF-35</code> alterados: nome do usuário ao lado da foto no topo, e Trocar perfil no toque do nome ou da foto; blueprint da casca v05</td></tr>
       <tr><td>v05</td><td>2026-10-19 02:32</td><td><code class="id">RF-34</code> e <code class="id">RF-35</code> alterados: topo igual ao do hub, com a foto do perfil ativo, e o nome e Trocar perfil no toque da foto; blueprint da casca v04</td></tr>
       <tr><td>v04</td><td>2026-10-19 02:25</td><td>Blueprint da casca v03: topo com logo do quest, avisos, nome com Trocar perfil e foto; status → Em revisão</td></tr>
-      <tr><td>v03</td><td>2026-10-19 00:53</td><td>Status → Aprovado</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v12 · 2026-10-29 04:07</span>
+    <span>boaz · v13 · 2026-10-31 12:45</span>
     <span class="boaz-arquivo">1_Requisitos/09_quest-ux.html</span>
   </div>
 </footer>

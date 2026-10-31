@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catálogo · boaz · v06</title>
+<title>Módulos · boaz · v01</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
-<meta name="boaz:documento" content="15_catalogo">
-<meta name="boaz:caminho" content="1_Requisitos/15_catalogo.html">
+<meta name="boaz:documento" content="15_modulos">
+<meta name="boaz:caminho" content="1_Requisitos/15_modulos.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v06">
-<meta name="boaz:data" content="2026-10-29 05:05">
+<meta name="boaz:versao" content="v01">
+<meta name="boaz:data" content="2026-10-31 12:43">
 <meta name="boaz:status" content="Rascunho">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -913,319 +913,31 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
 <body>
 <header class="boaz-marca-topo">
   <p class="boaz-eyebrow">boaz · Funcionalidade</p>
-  <h1>Catálogo</h1>
-  <p class="boaz-objetivo"><span>Objetivo</span>catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante.</p>
+  <h1>Módulos</h1>
+  <p class="boaz-objetivo"><span>Objetivo</span>definir como um módulo do deboaz é construído, para que todo módulo siga o mesmo molde antes de entrar no catálogo.</p>
   <dl class="boaz-carimbo">
-    <div><dt>Documento</dt><dd>15_catalogo</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v06</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-29 · 05:05</dd></div>
+    <div><dt>Documento</dt><dd>15_modulos</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v01</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-10-31 · 12:43</dd></div>
     <div><dt>Status</dt><dd><span class="status status-rascunho">Rascunho</span></dd></div>
   </dl>
 </header>
 <main>
-  <nav class="sumario"></nav>
   <section id="contexto">
     <h2>Contexto</h2>
-    <p>O deboaz é feito de módulos: os <a class="ref" href="99_glossario.html#modulos-da-conta">módulos da conta</a>, que toda conta precisa ter (<a class="ref" href="08_hub-ux.html#RN-79">Hub · UX base <code class="id">RN-79</code></a>), os contratáveis, que a instituição escolhe na vitrine do hub (<a class="ref" href="08_hub-ux.html#RF-23">Hub · UX base <code class="id">RF-23</code></a>), e os do time deboaz (<a class="ref" href="08_hub-ux.html#RN-84">Hub · UX base <code class="id">RN-84</code></a>). O preço de um módulo depende do número de pessoas que vão usá-lo (<a class="ref" href="08_hub-ux.html#RN-82">Hub · UX base <code class="id">RN-82</code></a>). Faltava um lugar onde cada módulo existe uma vez, com o tipo, o custo, a precificação e quem o contratou.</p>
-    <p>Este documento cria o módulo <strong>Catálogo</strong>, que existe só na conta do time deboaz e é usado pelo <a class="ref" href="99_glossario.html#administrador-do-deboaz">administrador do deboaz</a> (<a class="ref" href="16_identidade-acesso.html#RN-190">Identidade e acesso <code class="id">RN-190</code></a>). Todo módulo é catalogado nele; a vitrine do hub só mostra o que está no catálogo. O primeiro módulo com preço é o <strong>Usuários</strong> (<a class="ref" href="16_identidade-acesso.html#RF-105">Identidade e acesso <code class="id">RF-105</code></a>), módulo da conta com custo: por mês, staff ativos × valor por staff + participantes ativos × valor por participante, menos o desconto da <a class="ref" href="99_glossario.html#faixa-de-desconto">faixa de desconto</a> do total de usuários.</p>
-    <p class="historia"><span>Como</span> <strong>administrador do deboaz</strong>, <span>quero</span> ver cada módulo do deboaz com o tipo, o custo, o preço e quem o contratou, e definir o preço do módulo Usuários com desconto por volume, <span>para</span> cobrar de cada conta pelo tamanho dela e premiar quem tem mais usuários</p>
-    <aside class="destaque nota"><p>Exemplo de receita: os valores são configuração do administrador do deboaz, não regra deste documento. Com staff a R$ 19,90 e participante a R$ 4,90 por mês e faixas progressivas de 0% (1 a 100), 5% (101 a 300), 10% (301 a 1.000), 15% (1.001 a 3.000) e 20% (acima de 3.000), as 128 contas do painel do time deboaz dão ao módulo Usuários <strong>R$ 200.996,76 por mês</strong>, ou <strong>R$ 2.411.961,12 por ano</strong> no plano mensal; a tabela abaixo detalha o cálculo por perfil de conta.</p></aside>
-    <table>
-      <thead><tr><th>Perfil de conta</th><th>Contas</th><th>Staff + participantes</th><th>Desconto por volume</th><th>Por conta/mês</th><th>Total/mês</th></tr></thead>
-      <tbody>
-        <tr><td>Escola pequena</td><td>50</td><td>15 + 135</td><td>R$ 16,00</td><td>R$ 944,00</td><td>R$ 47.200,00</td></tr>
-        <tr><td>Escola média, como a EBFGA</td><td>36</td><td>40 + 312</td><td>R$ 100,39</td><td>R$ 2.224,41</td><td>R$ 80.078,76</td></tr>
-        <tr><td>Escola grande</td><td>10</td><td>80 + 1.120</td><td>R$ 649,00</td><td>R$ 6.431,00</td><td>R$ 64.310,00</td></tr>
-        <tr><td>Educador autônomo</td><td>32</td><td>0 + 60</td><td>R$ 0,00</td><td>R$ 294,00</td><td>R$ 9.408,00</td></tr>
-        <tr><td><strong>Total</strong></td><td>128</td><td></td><td></td><td></td><td><strong>R$ 200.996,76</strong></td></tr>
-      </tbody>
-    </table>
+    <p>Tudo o que a instituição, o educador autônomo e o time deboaz fazem no hub chega como um <a class="ref" href="99_glossario.html#modulo">módulo</a>: um card em <a class="ref" href="12_hub-ui.html">Meus módulos</a>, telas liberadas pelas permissões do <a class="ref" href="17_modulo-usuario.html">Módulo Usuários</a> e um registro no <a class="ref" href="16_catalogo.html">Catálogo</a>, com tipo, custo e preço. O catálogo só faz sentido se todo módulo for construído do mesmo jeito; este documento vem antes dele e do Módulo Usuários, que é o primeiro módulo a seguir o molde.</p>
+    <p class="historia"><span>Como</span> <strong>time deboaz</strong>, <span>quero</span> um molde único para construir módulos, <span>para</span> catalogar, liberar e cobrar cada um do mesmo jeito</p>
+    <aside class="destaque nota"><p>Documento aberto em 2026-10-31 com a renumeração: Catálogo passou de 15 para 16 e Identidade e acesso passou de 16 para 17, como Módulo Usuários. Os requisitos deste documento ainda serão especificados.</p></aside>
   </section>
-  <section id="requisitos-funcionais">
-    <h2>Requisitos funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
-      <tbody>
-        <tr id="RF-116"><td><code class="id">RF-116</code></td><td>O sistema deve mostrar em Meus módulos da conta do time deboaz o card do Catálogo com a receita prevista no mês, a dos últimos 5 meses em barras, o número de módulos da conta, contratáveis e do time, e o de módulos com custo, sem custo e com custo ainda sem preço</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-117"><td><code class="id">RF-117</code></td><td>O sistema deve listar no Catálogo todos os módulos, de A a Z, com busca pelo nome e separados em da conta, contratáveis e do time, cada um com o custo, o número de contas que o têm e a próxima mudança de preço agendada</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-118"><td><code class="id">RF-118</code></td><td>O sistema deve permitir que o administrador do deboaz defina, no módulo Usuários do catálogo, o valor mensal por staff, o valor mensal por participante e a data a partir da qual eles valem</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-119"><td><code class="id">RF-119</code></td><td>O sistema deve permitir que o administrador do deboaz ligue ou desligue o desconto por volume do módulo Usuários e crie, mude e apague faixas de desconto, cada uma com o início, o fim e o percentual</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-120"><td><code class="id">RF-120</code></td><td>O sistema deve simular o valor do módulo Usuários a partir de um número de staff e de participantes, mostrando cada parcela, o subtotal, o desconto da faixa, o total do mês e o total em 12 meses, sem salvar nada</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-121"><td><code class="id">RF-121</code></td><td>O sistema deve lançar no módulo Contas de cada instituição e de cada educador autônomo a cobrança mensal do módulo Usuários, com o número de staff, de participantes, os valores, a faixa e o desconto</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-122"><td><code class="id">RF-122</code></td><td>O sistema deve mostrar o histórico de preços e de faixas de cada módulo, com o período em que valeu e quem mudou</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-123"><td><code class="id">RF-123</code></td><td>O sistema deve permitir que o administrador do deboaz catalogue cada módulo com o nome, o tipo (da conta, contratável ou do time), se tem custo ou não e a precificação, o modelo de cobrança e o preço</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-124"><td><code class="id">RF-124</code></td><td>O sistema deve mostrar, em cada módulo do catálogo, a lista das siglas das instituições e a lista dos educadores autônomos que o contrataram, de A a Z pela sigla, com o nome, a data de início e o estado da conta, e busca por sigla ou nome</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-125"><td><code class="id">RF-125</code></td><td>O sistema deve permitir que o administrador do deboaz defina o percentual de desconto do plano anual do módulo Usuários e a data a partir da qual ele vale</td><td><span class="prio prio-deve">Deve</span></td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="regras-de-negocio">
-    <h2>Regras de negócio</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Regra</th></tr></thead>
-      <tbody>
-        <tr id="RN-191"><td><code class="id">RN-191</code></td><td>Só o administrador do deboaz cataloga módulos e muda preços e faixas; os demais membros do time deboaz veem o catálogo e simulam, sem salvar</td></tr>
-        <tr id="RN-192"><td><code class="id">RN-192</code></td><td>Valor do módulo Usuários no mês = staff ativos × valor por staff + participantes ativos × valor por participante; menos o desconto por volume, que é progressivo: cada percentual vale só para os usuários dentro da sua faixa, como no imposto de renda. Desconto por volume = esse valor × (soma, faixa a faixa, de usuários na faixa × percentual da faixa) ÷ total de usuários (staff + participantes); assim, um usuário a mais nunca deixa a conta mais barata</td></tr>
-        <tr id="RN-193"><td><code class="id">RN-193</code></td><td>As faixas começam em 1 usuário, seguem sem buraco e sem sobreposição até a última, que não tem fim, e o percentual de uma faixa nunca é menor que o da anterior; o percentual vai de 0% a 50%</td></tr>
-        <tr id="RN-194"><td><code class="id">RN-194</code></td><td>Preço e faixas novos valem a partir da data escolhida, que não pode ser anterior ao dia seguinte; fatura já fechada nunca muda</td></tr>
-        <tr id="RN-195"><td><code class="id">RN-195</code></td><td>Conta-se o usuário ativo no dia do fechamento da fatura, sem proporção aos dias do mês: entram staff e participantes ativos, inclusive os que ainda não fizeram o primeiro acesso; desativados, a conta master e acessos anônimos não entram; o educador autônomo paga só participantes; a conta do time deboaz não paga (<a class="ref" href="08_hub-ux.html#RN-84">Hub · UX base <code class="id">RN-84</code></a>)</td></tr>
-        <tr id="RN-196"><td><code class="id">RN-196</code></td><td>Valores em reais com centavos; o desconto e o total são arredondados ao centavo, com meio centavo para cima, só no fim do cálculo</td></tr>
-        <tr id="RN-197"><td><code class="id">RN-197</code></td><td>Todo módulo do deboaz é catalogado, um registro por módulo; módulo fora do catálogo não entra em conta nenhuma nem aparece na vitrine do hub</td></tr>
-        <tr id="RN-198"><td><code class="id">RN-198</code></td><td>Módulo da conta é requisito de toda conta de instituição e de educador autônomo: entra sozinho quando a conta é criada, não pode ser retirado nem aparece na vitrine; pode ter custo, como o Usuários, ou não, como o Contas e o SAC, por onde toda conta fala com o time deboaz</td></tr>
-        <tr id="RN-199"><td><code class="id">RN-199</code></td><td>Módulo sem custo não tem preço nem desconto e não entra na cobrança; módulo com custo só aparece na vitrine ou entra numa conta depois de ter preço valendo</td></tr>
-        <tr id="RN-200"><td><code class="id">RN-200</code></td><td>O módulo Catálogo existe só na conta do time deboaz: é do time, sem custo, e nunca vira módulo da conta nem contratável</td></tr>
-        <tr id="RN-201"><td><code class="id">RN-201</code></td><td>Plano anual do módulo Usuários: a conta assume 12 meses; cada fatura do mês segue a contagem do fechamento e recebe o percentual do plano anual depois do desconto por volume (<a class="ref" href="08_hub-ux.html#RN-82">Hub · UX base <code class="id">RN-82</code></a>)</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="requisitos-nao-funcionais">
-    <h2>Requisitos não funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
-      <tbody>
-        <tr id="RNF-210"><td><code class="id">RNF-210</code></td><td>Exatidão</td><td>O cálculo da cobrança deve dar o mesmo valor, ao centavo, na simulação, no módulo Contas e na fatura, para os exemplos da tabela do Contexto</td></tr>
-        <tr id="RNF-211"><td><code class="id">RNF-211</code></td><td>Auditoria</td><td>Toda mudança de preço ou de faixa deve ficar registrada com quem mudou, quando, o valor anterior e o novo, sem poder ser alterada nem apagada</td></tr>
-        <tr id="RNF-212"><td><code class="id">RNF-212</code></td><td>Desempenho</td><td>A simulação deve mostrar o novo total em até 1 segundo depois de cada mudança no número de staff ou de participantes</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="criterios-de-aceite">
-    <h2>Critérios de aceite</h2>
-    <article class="criterio" id="ca-RF-116">
-      <h3><code class="id">RF-116</code> Card do Catálogo</h3>
-      <pre class="gherkin">Cenário: administrador vê o resumo do catálogo
-  Dado o administrador do deboaz em Meus módulos
-  Quando a tela abre
-  Então vê o card "Catálogo" com a receita prevista no mês e as barras dos últimos 5 meses
-  E 3 módulos da conta, 5 contratáveis e 2 do time
-  E 6 com custo, 4 sem custo e 5 com custo ainda sem preço
-
-Cenário: conta de instituição
-  Dado a conta master da Escola Bento Freitas em Meus módulos
-  Quando a tela abre
-  Então não vê o card "Catálogo"</pre>
-    </article>
-    <article class="criterio" id="ca-RF-117">
-      <h3><code class="id">RF-117</code> Lista do catálogo</h3>
-      <pre class="gherkin">Cenário: módulos da conta
-  Dado o Catálogo aberto em "Da conta"
-  Quando a lista aparece
-  Então vê "Contas", "SAC" e "Usuários", de A a Z
-  E "Usuários" mostra "Com custo", "Em 128 contas" e o novo preço em 01/12
-
-Cenário: buscar um módulo
-  Dado o Catálogo aberto
-  Quando o administrador busca "pres"
-  Então vê só o módulo "Presença", em "Contratáveis"</pre>
-    </article>
-    <article class="criterio" id="ca-RF-118">
-      <h3><code class="id">RF-118</code> Preço do módulo Usuários</h3>
-      <pre class="gherkin">Cenário: agendar preço novo
-  Dado o administrador do deboaz na aba Preço do módulo Usuários
-  Quando informa "R$ 19,90" por staff, "R$ 4,90" por participante, a partir de "01/12/2026", e toca em "Salvar preço"
-  Então o catálogo mostra o preço atual até 30/11/2026 e o novo a partir de 01/12/2026
-
-Cenário: membro do time sem permissão
-  Dado um membro do time deboaz que não é o administrador
-  Quando abre a aba Preço
-  Então vê os valores sem poder salvar</pre>
-    </article>
-    <article class="criterio" id="ca-RF-119">
-      <h3><code class="id">RF-119</code> Faixas de desconto</h3>
-      <pre class="gherkin">Cenário: faixa com buraco
-  Dado as faixas "1 a 100" e "101 a 300"
-  Quando o administrador cria a faixa "350 a 1.000"
-  Então o sistema recusa e avisa que falta a faixa de 301 a 349
-
-Cenário: percentual menor que o da faixa anterior
-  Dado a faixa "101 a 300" com 5%
-  Quando o administrador põe 3% na faixa "301 a 1.000"
-  Então o sistema recusa e pede um percentual de 5% ou mais
-
-Cenário: desconto desligado
-  Dado o desconto por volume desligado
-  Quando a fatura de uma conta com 352 usuários fecha
-  Então o desconto é R$ 0,00
-
-Cenário: um usuário a mais nunca baixa a conta
-  Dado as faixas de exemplo e o preço de R$ 19,90 por staff e R$ 4,90 por participante
-  Quando uma conta com 40 staff passa de 260 para 261 participantes
-  Então o valor do mês passa de R$ 2.001,00 para R$ 2.005,28</pre>
-    </article>
-    <article class="criterio" id="ca-RF-120">
-      <h3><code class="id">RF-120</code> Simulação</h3>
-      <pre class="gherkin">Cenário: escola média
-  Dado o preço de R$ 19,90 por staff e R$ 4,90 por participante, as faixas de exemplo e o plano anual com 15%
-  Quando o administrador simula 40 staff e 312 participantes
-  Então vê R$ 796,00 de staff, R$ 1.528,80 de participantes e subtotal R$ 2.324,80
-  E desconto por volume de R$ 100,39: 0% em 100 usuários, 5% em 200 e 10% em 52
-  E total de R$ 2.224,41 no mês, R$ 26.692,92 em 12 meses e R$ 22.688,98 no plano anual
-  E nada é salvo</pre>
-    </article>
-    <article class="criterio" id="ca-RF-121">
-      <h3><code class="id">RF-121</code> Cobrança no módulo Contas</h3>
-      <pre class="gherkin">Cenário: fatura de dezembro
-  Dado a Escola Bento Freitas com 40 staff e 312 participantes ativos no fechamento de dezembro
-  E 3 staff desativados
-  Quando a fatura fecha
-  Então o módulo Contas da escola mostra 40 staff, 312 participantes, o desconto por volume de R$ 100,39 e o total de R$ 2.224,41
-
-Cenário: educador autônomo
-  Dado um educador autônomo com 60 participantes ativos
-  Quando a fatura fecha
-  Então paga R$ 294,00, sem parcela de staff
-
-Cenário: staff criado no meio do mês
-  Dado um staff criado em 10/12 e outro desativado em 20/12
-  Quando a fatura de dezembro fecha
-  Então o criado conta inteiro e o desativado não conta</pre>
-    </article>
-    <article class="criterio" id="ca-RF-122">
-      <h3><code class="id">RF-122</code> Histórico de preços</h3>
-      <pre class="gherkin">Cenário: ver quem mudou
-  Dado preços que valeram de 01/08 a 31/10/2026 e desde 01/11/2026
-  Quando o administrador abre a aba Preço do módulo Usuários
-  Então vê cada período com os valores e o nome de quem mudou</pre>
-    </article>
-    <article class="criterio" id="ca-RF-123">
-      <h3><code class="id">RF-123</code> Catalogar um módulo</h3>
-      <pre class="gherkin">Cenário: dados do módulo Usuários
-  Dado o administrador do deboaz no módulo "Usuários" do catálogo
-  Quando abre a aba Dados
-  Então vê o tipo "Da conta", "Com custo", a precificação "Por staff e por participante, ao mês" e o preço de hoje
-
-Cenário: módulo com custo sem preço
-  Dado o módulo contratável "Presença" catalogado com custo e sem preço
-  Quando uma instituição abre a vitrine do hub
-  Então não vê o módulo "Presença"</pre>
-    </article>
-    <article class="criterio" id="ca-RF-124">
-      <h3><code class="id">RF-124</code> Clientes do módulo</h3>
-      <pre class="gherkin">Cenário: instituições que contrataram
-  Dado o módulo "Usuários" com 96 instituições e 32 educadores autônomos
-  Quando o administrador abre a aba Clientes em "Instituições"
-  Então vê 96 siglas de A a Z, como "CLARR" e "EBFGA", com o nome, a data de início e o estado
-
-Cenário: buscar um autônomo
-  Dado a aba Clientes em "Autônomos"
-  Quando o administrador busca "marina"
-  Então vê "MRNCS · Marina Costa"</pre>
-    </article>
-    <article class="criterio" id="ca-RF-125">
-      <h3><code class="id">RF-125</code> Plano anual</h3>
-      <pre class="gherkin">Cenário: escola no plano anual
-  Dado o plano anual do módulo Usuários com 15%
-  E a Escola Bento Freitas no plano anual, com 40 staff e 312 participantes no fechamento
-  Quando a fatura do mês fecha
-  Então o total é R$ 2.224,41 menos 15%, ou seja, R$ 1.890,75</pre>
-    </article>
-  </section>
-  <section id="fora-de-escopo">
-    <h2>Fora de escopo</h2>
-    <ul class="fora">
-      <li>Modelo de preço dos módulos contratáveis: cada um ganha o seu em documento próprio; aqui eles só são catalogados</li>
-      <li>Cupom, preço especial para uma conta e período de teste grátis</li>
-      <li>Impostos, emissão de nota fiscal e formas de pagamento</li>
-      <li>Reajuste automático por índice de inflação</li>
-      <li>Valores definitivos de preço, faixas e plano anual: são configuração do administrador do deboaz; os do documento são exemplo</li>
+  <section id="em-aberto">
+    <h2>Em aberto</h2>
+    <ul class="pendencias">
+      <li><span>Partes que todo módulo tem: card em Meus módulos, telas, abas Configuração e Utilização e o que é obrigatório em cada uma</span> <span class="tag dono">Produto</span></li>
+      <li><span>Ciclo de vida de um módulo: da vista aprovada à catalogação, ao preço, à vitrine e à retirada</span> <span class="tag dono">Produto</span></li>
+      <li><span>Tipos de módulo (da conta, contratável e do time): ficam no <a class="ref" href="16_catalogo.html#RN-198">Catálogo <code class="id">RN-198</code></a> ou passam para este documento</span> <span class="tag dono">Produto</span></li>
+      <li><span>O que todo módulo expõe para o <a class="ref" href="17_modulo-usuario.html">Módulo Usuários</a> decidir as permissões</span> <span class="tag dono">Produto</span></li>
+      <li><span>Em quais frentes o módulo aparece: hub, quest e página do módulo na landing page</span> <span class="tag dono">Produto</span></li>
     </ul>
-  </section>
-  <section id="diagramas">
-    <h2>Diagramas</h2>
-    <h3>Entidades do catálogo</h3>
-    <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-classes_v01_20261029-0443.svg"><img src="../2_Diagramas/catalogo-classes_v01_20261029-0443.svg" alt="Diagrama de classes do catálogo: Módulo com tipo, custo e modelo de cobrança, Preço e PolíticaDeDesconto com vigência, FaixaDeDesconto, Contratação por conta e Cobrança mensal"></a>
-      <figcaption><strong>Catálogo · classes</strong><code>2_Diagramas/catalogo-classes_v01_20261029-0443.svg</code></figcaption>
-    </figure>
-    <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-documentos_v01_20261029-0459.svg"><img src="../2_Diagramas/catalogo-documentos_v01_20261029-0459.svg" alt="Modelo de documentos do catálogo: modulos com precos e politicas com faixas embutidos, contratacoes e cobrancas particionadas por contaId, com referências a contas e usuarios"></a>
-      <figcaption><strong>Catálogo · modelo de documentos</strong><code>2_Diagramas/catalogo-documentos_v01_20261029-0459.svg</code></figcaption>
-    </figure>
-    <h3>Exemplo de cada entidade do catálogo</h3>
-    <p>Dados fictícios, os mesmos das vistas: o módulo Usuários, contratado pela Escola Bento Freitas (<code>EBFGA</code>), com a fatura de dezembro de 2026. Os ids são legíveis só no exemplo; valores em reais são guardados como decimal exato (<a class="ref" href="#RNF-210">RNF-210</a>) e datas em UTC.</p>
-    <p><strong>modulos</strong> · um documento por módulo, com o histórico de preços e de políticas de desconto dentro dele (<a class="ref" href="#RF-123">RF-123</a>, <a class="ref" href="#RF-122">RF-122</a>)</p>
-<pre><code>{
-  "_id": "mod-usuarios",
-  "nome": "Usuários",
-  "tipo": "DA_CONTA",
-  "temCusto": true,
-  "modeloCobranca": "POR_USUARIO",
-  "catalogadoEm": "2026-08-01T12:00:00Z",
-  "catalogadoPor": "usr-gustavo-dboaz",
-  "precos": [
-    { "valorPorStaff": 17.90, "valorPorParticipante": 3.90,
-      "valeDesde": "2026-08-01", "valeAte": "2026-10-31",
-      "definidoPor": "usr-gustavo-dboaz", "definidoEm": "2026-07-25T14:10:00Z" },
-    { "valorPorStaff": 18.90, "valorPorParticipante": 4.50,
-      "valeDesde": "2026-11-01", "valeAte": "2026-11-30",
-      "definidoPor": "usr-gustavo-dboaz", "definidoEm": "2026-10-20T09:30:00Z" },
-    { "valorPorStaff": 19.90, "valorPorParticipante": 4.90,
-      "valeDesde": "2026-12-01", "valeAte": null,
-      "definidoPor": "usr-gustavo-dboaz", "definidoEm": "2026-10-29T03:40:00Z" }
-  ],
-  "politicas": [
-    { "ligado": true, "percentualAnual": 15,
-      "valeDesde": "2026-12-01", "valeAte": null,
-      "definidoPor": "usr-gustavo-dboaz",
-      "faixas": [
-        { "inicio": 1,    "fim": 100,  "percentual": 0 },
-        { "inicio": 101,  "fim": 300,  "percentual": 5 },
-        { "inicio": 301,  "fim": 1000, "percentual": 10 },
-        { "inicio": 1001, "fim": 3000, "percentual": 15 },
-        { "inicio": 3001, "fim": null, "percentual": 20 }
-      ] }
-  ]
-}</code></pre>
-    <p><strong>contratacoes</strong> · uma por conta e módulo; o módulo da conta entra sozinho quando a conta é criada (<a class="ref" href="#RN-198">RN-198</a>, <a class="ref" href="#RF-124">RF-124</a>)</p>
-<pre><code>{
-  "_id": "ctr-ebfga-usuarios",
-  "contaId": "conta-ebfga",
-  "sigla": "EBFGA",
-  "nomeConta": "Escola Bento Freitas",
-  "tipoConta": "INSTITUICAO",
-  "moduloId": "mod-usuarios",
-  "nomeModulo": "Usuários",
-  "plano": "MENSAL",
-  "desde": "2026-03-12",
-  "ate": null,
-  "automatica": true
-}</code></pre>
-    <p><strong>cobrancas</strong> · uma por contratação e mês, com os números do dia do fechamento e o desconto de cada faixa (<a class="ref" href="#RF-121">RF-121</a>, <a class="ref" href="#RN-192">RN-192</a>, <a class="ref" href="#RN-194">RN-194</a>, <a class="ref" href="#RN-195">RN-195</a>)</p>
-<pre><code>{
-  "_id": "cob-ebfga-usuarios-2026-12",
-  "contaId": "conta-ebfga",
-  "contratacaoId": "ctr-ebfga-usuarios",
-  "moduloId": "mod-usuarios",
-  "competencia": "2026-12",
-  "fechadaEm": "2026-12-31T23:59:59Z",
-  "staffAtivos": 40,
-  "participantesAtivos": 312,
-  "valorPorStaff": 19.90,
-  "valorPorParticipante": 4.90,
-  "subtotal": 2324.80,
-  "faixasAplicadas": [
-    { "inicio": 1,   "fim": 100,  "percentual": 0,  "usuarios": 100, "desconto": 0.00 },
-    { "inicio": 101, "fim": 300,  "percentual": 5,  "usuarios": 200, "desconto": 66.05 },
-    { "inicio": 301, "fim": 1000, "percentual": 10, "usuarios": 52,  "desconto": 34.34 }
-  ],
-  "descontoPorVolume": 100.39,
-  "descontoAnual": 0.00,
-  "total": 2224.41
-}</code></pre>
-    <h3>Telas do hub: catálogo</h3>
-    <ol>
-      <li><strong>Meus módulos</strong>: só na conta do time deboaz, o card Catálogo mostra R$ 201,0 mil de receita prevista no mês, as barras dos últimos 5 meses, 3 módulos da conta, 5 contratáveis e 2 do time, 6 com custo, 4 sem custo e 5 com custo ainda sem preço (<a class="ref" href="#RF-116">RF-116</a>, <a class="ref" href="#RN-200">RN-200</a>).</li>
-      <li><strong>Catálogo</strong>: a busca e os botões segmentados Da conta, Contratáveis e Do time filtram os módulos, de A a Z; em Da conta, Contas e SAC não têm custo e Usuários tem, os três em 128 contas (<a class="ref" href="#RF-117">RF-117</a>, <a class="ref" href="#RN-197">RN-197</a>, <a class="ref" href="#RN-198">RN-198</a>).</li>
-      <li><strong>Dados</strong>: o módulo Usuários é da conta, obrigatório em toda conta, com custo, cobrado por staff e por participante ao mês, com o preço de hoje (R$ 18,90 e R$ 4,50), contratado por 96 instituições e 32 autônomos e catalogado em 01/08/2026 (<a class="ref" href="#RF-123">RF-123</a>, <a class="ref" href="#RN-199">RN-199</a>).</li>
-      <li><strong>Clientes</strong>: os botões segmentados separam Instituições (96) e Autônomos (32); a lista vem de A a Z pela sigla (CLARR, EBFGA, EHRZN, ICVVR, MNTSR), com o nome, a data de início e o estado da conta (<a class="ref" href="#RF-124">RF-124</a>).</li>
-      <li><strong>Preço</strong>: o administrador informa R$ 19,90 por staff e R$ 4,90 por participante, a partir de 01/12/2026, e salva; o histórico mostra os preços anteriores, com o período e quem mudou (<a class="ref" href="#RF-118">RF-118</a>, <a class="ref" href="#RN-194">RN-194</a>, <a class="ref" href="#RF-122">RF-122</a>).</li>
-      <li><strong>Desconto</strong>: o interruptor liga o desconto por volume e as faixas ficam 0% de 1 a 100, 5% de 101 a 300, 10% de 301 a 1.000, 15% de 1.001 a 3.000 e 20% acima de 3.000, cada percentual só para os usuários dentro da faixa; Adicionar faixa abre uma faixa nova para editar; o plano anual tem 15% depois do desconto por volume (<a class="ref" href="#RF-119">RF-119</a>, <a class="ref" href="#RN-192">RN-192</a>, <a class="ref" href="#RN-193">RN-193</a>, <a class="ref" href="#RF-125">RF-125</a>).</li>
-      <li><strong>Simular</strong>: 40 staff e 312 participantes dão R$ 796,00 + R$ 1.528,80 = R$ 2.324,80; o desconto por volume é R$ 100,39 (0% em 100 usuários, 5% em 200 e 10% em 52), e o total é R$ 2.224,41 no mês, R$ 26.692,92 em 12 meses e R$ 22.688,98 no plano anual (<a class="ref" href="#RF-120">RF-120</a>, <a class="ref" href="#RN-192">RN-192</a>, <a class="ref" href="#RN-196">RN-196</a>, <a class="ref" href="#RN-201">RN-201</a>).</li>
-    </ol>
-    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-catalogo-deboaz_v02_20261029-0420.svg"><img src="../2_Diagramas/vista-hub-catalogo-deboaz_v02_20261029-0420.svg" alt="Vista do catálogo do time deboaz: card do Catálogo em Meus módulos, módulos por tipo, dados e clientes do módulo Usuários, preço por staff e por participante, faixas de desconto e simulação"></a>
-      <figcaption><strong>Hub · catálogo · vista</strong><code>2_Diagramas/vista-hub-catalogo-deboaz_v02_20261029-0420.svg</code></figcaption>
-    </figure>
   </section>
 </main>
 <footer class="boaz-marca-rodape">
@@ -1233,17 +945,12 @@ Cenário: buscar um autônomo
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v06</span></td><td>2026-10-29 05:05</td><td>Exemplo completo, com dados fictícios, de cada entidade do catálogo: modulos, contratacoes e cobrancas</td></tr>
-      <tr><td>v05</td><td>2026-10-29 05:00</td><td>Diagrama entidade-relacionamento trocado pelo modelo de documentos (catalogo-documentos v01), para o MongoDB e o Cosmos DB for MongoDB</td></tr>
-      <tr><td>v04</td><td>2026-10-29 04:49</td><td>Diagramas de classes e de entidade-relacionamento do catálogo (catalogo-classes v01, catalogo-er v01)</td></tr>
-      <tr><td>v03</td><td>2026-10-29 04:21</td><td>Pendências respondidas e seção Em aberto removida: SAC é o módulo da conta Suporte e mensagens (<code class="id">RN-198</code>); desconto por volume progressivo, cada % só na sua faixa (<code class="id">RN-192</code>); contagem no dia do fechamento, sem proporção (<code class="id">RN-195</code>); plano anual com % configurável (<code class="id">RF-125</code>, <code class="id">RN-201</code>); valores como exemplo, em Fora de escopo; exemplo de receita recalculado (R$ 200.996,76/mês); vista vista-hub-catalogo-deboaz v02</td></tr>
-      <tr><td>v02</td><td>2026-10-29 04:07</td><td>Renomeado de 16_catalogo-precos para 15_catalogo e título Catálogo: todo módulo é catalogado (<code class="id">RN-197</code>), com nome, tipo, custo e precificação (<code class="id">RF-123</code>) e as siglas das instituições e dos autônomos que o contrataram (<code class="id">RF-124</code>); módulo da conta como requisito de toda conta (<code class="id">RN-198</code>), custo (<code class="id">RN-199</code>), Catálogo só na conta do time deboaz (<code class="id">RN-200</code>); <code class="id">RF-116</code>, <code class="id">RF-117</code> e <code class="id">RN-191</code> alterados; pendência SAC; vista vista-hub-catalogo-deboaz v01</td></tr>
-      <tr><td>v01</td><td>2026-10-29 03:46</td><td>Criação</td></tr>
+      <tr><td><span class="boaz-versao">v01</span></td><td>2026-10-31 12:43</td><td>Criação: documento dos módulos, antes do Catálogo (16) e do Módulo Usuários (17); requisitos a especificar</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v06 · 2026-10-29 05:05</span>
-    <span class="boaz-arquivo">1_Requisitos/15_catalogo.html</span>
+    <span>boaz · v01 · 2026-10-31 12:43</span>
+    <span class="boaz-arquivo">1_Requisitos/15_modulos.html</span>
   </div>
 </footer>
 </body>
