@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v37</title>
+<title>Design system · boaz · v43</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v37">
-<meta name="design:data" content="2026-10-29 02:50">
+<meta name="design:versao" content="v43">
+<meta name="design:data" content="2026-10-31 23:44">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -426,6 +426,18 @@
   --md-comp-card-body-line-height: var(--md-sys-typescale-body-medium-line-height);
   --md-comp-card-body-tracking: var(--md-sys-typescale-body-medium-tracking);
   --md-comp-card-body-weight: var(--md-sys-typescale-body-medium-weight);
+  --md-comp-module-card-cell-min-size: 76px;
+  --md-comp-module-card-grid-columns-min: 4;
+  --md-comp-module-card-grid-gap: 8px;
+  --md-comp-module-card-minimal-columns: 1;
+  --md-comp-module-card-minimal-rows: 1;
+  --md-comp-module-card-reduced-columns: 2;
+  --md-comp-module-card-reduced-rows: 2;
+  --md-comp-module-card-normal-columns: 4;
+  --md-comp-module-card-normal-rows: 4;
+  --md-comp-module-card-expanded-columns: 4;
+  --md-comp-module-card-expanded-rows: 8;
+  --md-comp-module-card-options-icon-size: 24px;
   --md-comp-text-field-height: 56px;
   --md-comp-text-field-padding: 16px;
   --md-comp-text-field-label-font: var(--md-sys-typescale-body-large-font);
@@ -534,6 +546,17 @@
   --md-comp-navigation-drawer-headline-line-height: var(--md-sys-typescale-title-small-line-height);
   --md-comp-navigation-drawer-headline-tracking: var(--md-sys-typescale-title-small-tracking);
   --md-comp-navigation-drawer-headline-weight: var(--md-sys-typescale-title-small-weight);
+  --md-comp-navigation-drawer-side-width: 280px;
+  --md-comp-navigation-drawer-side-container-color: var(--md-sys-color-surface-container);
+  --md-comp-navigation-drawer-subitem-height: 48px;
+  --md-comp-navigation-drawer-subitem-inset: 40px;
+  --md-comp-navigation-drawer-subitem-label-font: var(--md-sys-typescale-label-large-font);
+  --md-comp-navigation-drawer-subitem-label-size: var(--md-sys-typescale-label-large-size);
+  --md-comp-navigation-drawer-subitem-label-line-height: var(--md-sys-typescale-label-large-line-height);
+  --md-comp-navigation-drawer-subitem-label-tracking: var(--md-sys-typescale-label-large-tracking);
+  --md-comp-navigation-drawer-subitem-label-weight: var(--md-sys-typescale-label-large-weight);
+  --md-comp-navigation-drawer-expand-icon-size: 24px;
+  --md-comp-navigation-drawer-side-collapsed-width: 80px;
   --md-comp-dialog-shape: var(--md-sys-shape-corner-extra-large);
   --md-comp-dialog-container-color: var(--md-sys-color-surface-container-high);
   --md-comp-dialog-elevation: var(--md-sys-elevation-level3);
@@ -24771,6 +24794,28 @@ window.dispatchEvent(new Event('boaz-splash'));
   letter-spacing: var(--md-comp-navigation-drawer-label-tracking); font-weight: var(--md-comp-navigation-drawer-label-weight);
 }
 .md-drawer-item[aria-current="page"] { background: var(--md-comp-navigation-drawer-indicator-color); color: var(--md-sys-color-on-secondary-container); }
+/* barra lateral em acordeão (hub e quest, medium e expanded): destino com subníveis abre pela seta */
+.md-acordeao {
+  box-sizing: border-box; width: var(--md-comp-navigation-drawer-side-width); padding: 12px;
+  background: var(--md-comp-navigation-drawer-side-container-color);
+}
+.md-acordeao details > summary { list-style: none; cursor: pointer; }
+.md-acordeao details > summary::-webkit-details-marker { display: none; }
+.md-acordeao summary .seta { margin-left: auto; font-size: var(--md-comp-navigation-drawer-expand-icon-size); }
+.md-acordeao details[open] > summary .seta { transform: rotate(180deg); }
+.md-acordeao details:has([aria-current="page"]) > summary { color: var(--md-sys-color-on-surface); }
+.md-drawer-subitem {
+  display: flex; align-items: center; height: var(--md-comp-navigation-drawer-subitem-height);
+  margin-left: calc(var(--md-comp-navigation-drawer-subitem-inset) - 12px); padding-left: calc(64px - var(--md-comp-navigation-drawer-subitem-inset));
+  border-radius: var(--md-comp-navigation-drawer-item-shape); color: var(--md-sys-color-on-surface-variant); text-decoration: none;
+  font-family: var(--md-comp-navigation-drawer-subitem-label-font); font-size: var(--md-comp-navigation-drawer-subitem-label-size);
+  letter-spacing: var(--md-comp-navigation-drawer-subitem-label-tracking); font-weight: var(--md-comp-navigation-drawer-subitem-label-weight);
+}
+.md-drawer-subitem[aria-current="page"] { background: var(--md-comp-navigation-drawer-indicator-color); color: var(--md-sys-color-on-secondary-container); }
+.md-acordeao .encolher { margin: 0 0 4px 4px; }
+/* encolhida: só ícones e rótulos curtos, como o trilho, para dar espaço ao editar e ordenar módulos */
+.md-acordeao--encolhido { width: var(--md-comp-navigation-drawer-side-collapsed-width); padding: 12px 0; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.md-acordeao--encolhido .encolher { margin: 0; }
 
 /* ── diálogo e snackbar ── */
 .md-dialog {
@@ -25047,6 +25092,33 @@ window.dispatchEvent(new Event('boaz-splash'));
 .cx-card-modulo .apoio-numeros small { color: var(--md-sys-color-on-surface-variant); }
 .cx-cor-secondary { color: var(--md-sys-color-secondary); } .cx-cor-tertiary { color: var(--md-sys-color-tertiary); } .cx-cor-sucesso { color: var(--md-sys-color-sucesso); } .cx-cor-erro { color: var(--md-sys-color-error); }
 .cx-grade-paineis { display: grid; gap: var(--md-sys-spacing-3); }
+/* grade dos cards de módulo (estilo Windows Phone): células quadradas, largura × altura em células — mínima 1x1, reduzida 2x2,
+   normal 4x4 (o padrão) e expandida 4x8; a caixa é o contêiner que dá a largura e a altura da célula é igual à da coluna.
+   A célula tem lado mínimo (cell-min-size, 76dp): a grade põe quantas colunas couberem, no mínimo 4, e o card fica do mesmo
+   tamanho em qualquer janela; os passos abaixo são n × (76 + 8) − 8, a largura em que cabe a coluna n */
+.cx-grade-caixa { container-type: inline-size; }
+.cx-grade-modulos { --cx-colunas: var(--md-comp-module-card-grid-columns-min); --cx-gap: var(--md-comp-module-card-grid-gap); display: grid; grid-template-columns: repeat(var(--cx-colunas), minmax(0, 1fr)); grid-auto-rows: calc((100cqw - (var(--cx-colunas) - 1) * var(--cx-gap)) / var(--cx-colunas)); gap: var(--cx-gap); grid-auto-flow: dense; }
+@container (min-width: 412px) { .cx-grade-modulos { --cx-colunas: 5; } }
+@container (min-width: 496px) { .cx-grade-modulos { --cx-colunas: 6; } }
+@container (min-width: 580px) { .cx-grade-modulos { --cx-colunas: 7; } }
+@container (min-width: 664px) { .cx-grade-modulos { --cx-colunas: 8; } }
+@container (min-width: 748px) { .cx-grade-modulos { --cx-colunas: 9; } }
+@container (min-width: 832px) { .cx-grade-modulos { --cx-colunas: 10; } }
+@container (min-width: 916px) { .cx-grade-modulos { --cx-colunas: 11; } }
+@container (min-width: 1000px) { .cx-grade-modulos { --cx-colunas: 12; } }
+@container (min-width: 1084px) { .cx-grade-modulos { --cx-colunas: 13; } }
+@container (min-width: 1168px) { .cx-grade-modulos { --cx-colunas: 14; } }
+.cx-grade-modulos .cx-card-modulo { grid-column: span var(--md-comp-module-card-normal-columns); grid-row: span var(--md-comp-module-card-normal-rows); min-height: 0; overflow: hidden; }
+.cx-grade-modulos .cx-card-modulo--minima { grid-column: span var(--md-comp-module-card-minimal-columns); grid-row: span var(--md-comp-module-card-minimal-rows); place-content: center; padding: 0; }
+.cx-grade-modulos .cx-card-modulo--minima > :not(.cx-icone):not(.md-badge):not(.opcoes) { display: none; }
+.cx-grade-modulos .cx-card-modulo--minima .md-badge { top: var(--md-sys-spacing-1); right: var(--md-sys-spacing-1); }
+.cx-grade-modulos .cx-card-modulo--reduzida { grid-column: span var(--md-comp-module-card-reduced-columns); grid-row: span var(--md-comp-module-card-reduced-rows); }
+.cx-grade-modulos .cx-card-modulo--reduzida .metrica { margin-top: auto; }
+.cx-grade-modulos .cx-card-modulo--expandida { grid-column: span var(--md-comp-module-card-expanded-columns); grid-row: span var(--md-comp-module-card-expanded-rows); }
+.cx-card-modulo .lista-modulo { display: grid; margin: 0; padding: 0; list-style: none; text-align: start; }
+.cx-card-modulo .lista-modulo li { display: flex; justify-content: space-between; padding: var(--md-sys-spacing-3) 0; border-top: 1px solid var(--md-sys-color-outline-variant); }
+.cx-card-modulo .lista-modulo b { color: var(--md-sys-color-primary); }
+.cx-card-modulo--ordenando .opcoes { position: absolute; right: var(--md-sys-spacing-1); bottom: var(--md-sys-spacing-1); }
 @media (min-width: 600px) { .cx-grade-paineis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* vitrine de telas: computador (hub) e celular (quest) com as telas do módulo; até ficar pronto, um espaço com o nome da tela */
 .cx-vitrine { position: relative; display: grid; gap: var(--md-sys-spacing-4); max-width: 30rem; }
@@ -25055,7 +25127,6 @@ window.dispatchEvent(new Event('boaz-splash'));
 .cx-vitrine .celular { position: absolute; right: 0; top: 20%; width: 24%; aspect-ratio: 1 / 1.9; padding: var(--md-sys-spacing-3) var(--md-sys-spacing-1-5, 6px); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-inverse-surface); box-shadow: var(--md-sys-elevation-level2); }
 .cx-vitrine .tela { display: grid; place-items: center; align-content: center; height: 100%; padding: var(--md-sys-spacing-2); border: 1px dashed var(--md-sys-color-outline); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface-variant); text-align: center; font-family: var(--md-sys-typescale-label-medium-font); font-size: var(--md-sys-typescale-label-medium-size); }
 .cx-card-modulo--ordenando { cursor: grab; outline: 1px dashed var(--md-sys-color-outline); }
-.cx-card-modulo--ordenando .mover { display: flex; gap: var(--md-sys-spacing-1); margin-top: auto; }
 .cx-simulador { display: grid; gap: var(--md-sys-spacing-4); padding: var(--md-comp-card-padding); border-radius: var(--md-comp-card-shape); background: var(--md-comp-card-outlined-container-color); border: 1px solid var(--md-comp-card-outlined-outline-color); max-width: 26rem; }
 .cx-simulador .total { display: grid; gap: var(--md-sys-spacing-1); padding: var(--md-sys-spacing-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-highest); }
 .cx-simulador .total b { color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); font-weight: var(--md-sys-typescale-headline-small-weight); }
@@ -25429,8 +25500,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v37</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-29 02:50</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v43</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-10-31 23:44</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -25802,6 +25873,27 @@ el.innerHTML = splash.animada('quest', {
         </div>
       </div>
 
+      <h3 class="sub md-typescale-title-large">Barra lateral em acordeão</h3>
+      <div class="palco">
+        <span class="rotulo">Navegação do hub e do quest no medium e no expanded, em 280dp abaixo do topo: o destino com subníveis abre pela seta e mostra os subníveis recuados, sem ícone; o indicador marca o ativo. O botão do alto encolhe a barra para 80dp (só ícones e rótulos), para dar espaço ao editar e ordenar módulos, e abre de novo.</span>
+        <nav class="md-acordeao" aria-label="Navegação do hub">
+          <button class="md-icon-button md-estado md-alvo encolher" aria-label="Encolher a barra lateral"><span class="material-symbols">menu_open</span></button>
+          <details open><summary class="md-drawer-item md-estado"><span class="material-symbols">dashboard</span>Módulos<span class="material-symbols seta" aria-hidden="true">expand_more</span></summary>
+            <a class="md-drawer-subitem md-estado" href="#componentes" aria-current="page">Contratados</a>
+            <a class="md-drawer-subitem md-estado" href="#componentes">Da conta</a>
+            <a class="md-drawer-subitem md-estado" href="#componentes">A contratar</a>
+          </details>
+          <a class="md-drawer-item md-estado" href="#componentes"><span class="material-symbols">dynamic_feed</span>Feed</a>
+          <a class="md-drawer-item md-estado" href="#componentes"><span class="material-symbols">account_circle</span>Conta</a>
+        </nav>
+        <nav class="md-acordeao md-acordeao--encolhido" aria-label="Navegação do hub, encolhida">
+          <button class="md-icon-button md-estado md-alvo encolher" aria-label="Abrir a barra lateral"><span class="material-symbols">menu</span></button>
+          <a class="md-nav-item" href="#componentes" aria-current="page"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">dashboard</span></span>Módulos</a>
+          <a class="md-nav-item" href="#componentes"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">dynamic_feed</span></span>Feed</a>
+          <a class="md-nav-item" href="#componentes"><span class="md-nav-item__indicador md-estado"><span class="material-symbols">account_circle</span></span>Conta</a>
+        </nav>
+      </div>
+
       <h3 class="sub md-typescale-title-large">Botão segmentado</h3>
       <div class="palco linha">
         <span class="rotulo">De 2 a 5 opções curtas; a selecionada ganha secondary-container e marcação.</span>
@@ -25886,21 +25978,26 @@ el.innerHTML = splash.animada('quest', {
         <div class="cx-topo" style="margin-top: var(--md-sys-spacing-3)"><span class="cx-logo cx-logo--curto" data-marca-logo="curto" role="img" aria-label="deboaz"></span><span class="vao"></span><span class="md-badge-ancora"><button class="md-icon-button md-estado md-alvo" aria-label="Avisos, 2 não lidos"><span class="material-symbols">notifications</span></button><span class="md-badge" aria-hidden="true">2</span></span><button class="conta md-estado" aria-label="Perfil de Lucas Andrade: trocar perfil"><span class="nome">Lucas Andrade</span><span class="avatar avatar--mascote" aria-hidden="true"><img data-mascote="feliz" data-forma="estrela" alt=""></span></button></div>
       </div>
       <div class="palco">
-        <span class="rotulo">Navegação da casca · hub e quest: barra com três destinos no compact; a partir do medium, trilho (gaveta no large) abaixo do topo, sem Conta ou Perfil, que abrem pelo nome e pela foto do topo</span>
+        <span class="rotulo">Navegação da casca · hub e quest: no compact, barra com os destinos (hub: Módulos, Feed e Conta; quest: Tarefas, Feed, Carteira e Perfil) e, abaixo do topo, abas primárias com os subníveis do destino (Módulos: Contratados, Da conta e A contratar); no medium e no expanded, barra lateral em acordeão com os destinos e os subníveis dentro deles, sem abas</span>
+        <div class="md-tabs" role="tablist"><button class="md-tab md-estado" role="tab" aria-selected="true">Contratados</button><button class="md-tab md-estado" role="tab" aria-selected="false">Da conta</button><button class="md-tab md-estado" role="tab" aria-selected="false">A contratar</button></div>
         <nav class="md-navigation-bar" aria-label="Navegação do hub">
-          <a class="md-nav-item" href="#compostos" aria-current="page"><span class="md-nav-item__indicador"><span class="material-symbols">dashboard</span></span>Meus módulos</a>
-          <a class="md-nav-item" href="#compostos"><span class="md-nav-item__indicador"><span class="material-symbols">add</span></span>Catálogo</a>
+          <a class="md-nav-item" href="#compostos" aria-current="page"><span class="md-nav-item__indicador"><span class="material-symbols">dashboard</span></span>Módulos</a>
+          <a class="md-nav-item" href="#compostos"><span class="md-nav-item__indicador"><span class="material-symbols">dynamic_feed</span></span>Feed</a>
           <a class="md-nav-item" href="#compostos"><span class="md-nav-item__indicador"><span class="material-symbols">account_circle</span></span>Conta</a>
         </nav>
       </div>
       <div class="palco">
-        <span class="rotulo">Card de módulo · Meus módulos (hub) e Fixos (quest): nome, selo e, na capa, a métrica que importa para quem cuida do módulo, com uma série curta; sem métrica ainda, o estado Configurar ou Completar</span>
-        <div class="cx-grade-paineis">
-          <button class="cx-card-modulo md-estado" aria-label="Presença: 94% de presença na semana, 2 pontos a mais; 12 turmas, 3 sem chamada hoje, 18 faltas seguidas"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="md-badge" aria-hidden="true">3</span><span class="cx-texto-titulo">Presença</span><span class="linha-metrica"><span class="metrica">94%</span><span class="tendencia"><span class="material-symbols">arrow_upward</span>+2 pts</span></span><span class="cx-texto-apoio">presença na semana</span><span class="md-grafico md-grafico--mini" aria-hidden="true"><span class="barra" style="--v: .94"></span><span class="barra" style="--v: .97"></span><span class="barra" style="--v: .96"></span><span class="barra" style="--v: .98"></span><span class="barra barra--destaque" style="--v: 1"></span></span><span class="apoio-numeros"><span><b class="cx-cor-secondary">12</b><small>turmas</small></span><span><b class="cx-cor-tertiary">3</b><small>sem chamada hoje</small></span><span><b class="cx-cor-erro">18</b><small>faltas seguidas</small></span></span></button>
-          <button class="cx-card-modulo md-estado" aria-label="Carteirinha: 312 de 340 prontas"><span class="cx-icone"><span class="material-symbols">badge</span></span><span class="cx-texto-titulo">Carteirinha</span><span class="metrica">312 de 340</span><span class="cx-texto-apoio">carteirinhas prontas</span></button>
-          <button class="cx-card-modulo md-estado"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span><span class="cx-texto-apoio">Configure para ver as métricas</span><span class="estado">Configurar</span></button>
-          <button class="cx-card-modulo md-estado" aria-label="Suporte: 2 conversas abertas"><span class="cx-icone"><span class="material-symbols">support_agent</span></span><span class="cx-texto-titulo">Suporte</span><span class="metrica">2</span><span class="cx-texto-apoio">conversas abertas</span></button>
-        </div>
+        <span class="rotulo">Card de módulo · quatro tamanhos em células quadradas, como os blocos do Windows Phone (largura × altura em células): mínima 1x1 (ícone e selo), reduzida 2x2 (ícone, nome e dado macro), normal 4x4 (o padrão: números e gráfico) e expandida 4x8 (painel completo); células de 76dp ou mais, no mínimo 4 colunas, e mais colunas nas janelas largas; a pessoa escolhe ao ordenar, fica guardado no aparelho, e qualquer tamanho abre o módulo; sem métrica ainda, o estado Configurar ou Completar</span>
+        <div class="cx-grade-caixa"><div class="cx-grade-modulos">
+          <button class="cx-card-modulo cx-card-modulo--expandida md-estado" aria-label="Presença: 94% de presença na semana, 2 pontos a mais; 12 turmas, 3 sem chamada hoje, 18 faltas seguidas"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="md-badge" aria-hidden="true">3</span><span class="cx-texto-titulo">Presença</span><span class="linha-metrica"><span class="metrica">94%</span><span class="tendencia"><span class="material-symbols">arrow_upward</span>+2 pts</span></span><span class="cx-texto-apoio">presença na semana</span><span class="apoio-numeros"><span><b class="cx-cor-secondary">12</b><small>turmas</small></span><span><b class="cx-cor-tertiary">3</b><small>sem chamada hoje</small></span><span><b class="cx-cor-erro">18</b><small>faltas seguidas</small></span></span><span class="cx-texto-rotulo">Últimas semanas</span><span class="md-grafico md-grafico--mini" aria-hidden="true"><span class="barra" style="--v: .91"></span><span class="barra" style="--v: .94"></span><span class="barra" style="--v: .97"></span><span class="barra" style="--v: .96"></span><span class="barra" style="--v: .95"></span><span class="barra" style="--v: .98"></span><span class="barra barra--destaque" style="--v: 1"></span></span><ul class="lista-modulo"><li>7º A<b>98%</b></li><li>8º B<b>91%</b></li><li>9º C<b>87%</b></li></ul></button>
+          <button class="cx-card-modulo md-estado" aria-label="Carteirinha: 312 de 340 prontas"><span class="cx-icone"><span class="material-symbols">badge</span></span><span class="cx-texto-titulo">Carteirinha</span><span class="metrica">312 de 340</span><span class="cx-texto-apoio">carteirinhas prontas</span><span class="apoio-numeros"><span><b class="cx-cor-tertiary">28</b><small>esperando a foto</small></span><span><b class="cx-cor-erro">4</b><small>vencendo</small></span></span></button>
+          <button class="cx-card-modulo cx-card-modulo--reduzida md-estado" aria-label="Mensagens: 5 novas"><span class="cx-icone"><span class="material-symbols">chat</span></span><span class="md-badge" aria-hidden="true">5</span><span class="cx-texto-titulo">Mensagens</span><span class="metrica">5</span></button>
+          <button class="cx-card-modulo cx-card-modulo--minima md-estado" aria-label="Flashcards: 2 novos"><span class="cx-icone"><span class="material-symbols">bookmark</span></span><span class="md-badge" aria-hidden="true">2</span><span class="cx-texto-titulo">Flashcards</span></button>
+          <button class="cx-card-modulo cx-card-modulo--minima md-estado" aria-label="Agenda"><span class="cx-icone"><span class="material-symbols">event</span></span><span class="cx-texto-titulo">Agenda</span></button>
+          <button class="cx-card-modulo cx-card-modulo--minima md-estado" aria-label="Suporte"><span class="cx-icone"><span class="material-symbols">support_agent</span></span><span class="cx-texto-titulo">Suporte</span></button>
+          <button class="cx-card-modulo cx-card-modulo--minima md-estado" aria-label="Quiz: configure o módulo"><span class="cx-icone"><span class="material-symbols">quiz</span></span><span class="cx-texto-titulo">Quiz</span></button>
+        </div></div>
+      </div>
       </div>
       <div class="palco">
         <span class="rotulo">Vitrine de telas · página do módulo (landing) e detalhe no catálogo (hub): as telas do módulo num computador e num celular, com o carrossel; até o módulo ficar pronto, cada tela é um espaço com o nome dela</span>
@@ -25992,11 +26089,21 @@ el.innerHTML = splash.animada('quest', {
 
       <h3 class="sub md-typescale-title-large">Hub</h3>
       <div class="palco">
-        <span class="rotulo">Grade de módulos ordenando: arrastar ou mover para cima e para baixo; os módulos da conta ficam fora</span>
-        <div class="cx-grade-modulos">
-          <div class="cx-card-modulo cx-card-modulo--ordenando"><span class="material-symbols">drag_indicator</span><span class="cx-texto-titulo">Presença</span><span class="mover"><button class="md-icon-button md-estado md-alvo" aria-label="Mover para cima"><span class="material-symbols">arrow_upward</span></button><button class="md-icon-button md-estado md-alvo" aria-label="Mover para baixo"><span class="material-symbols">arrow_downward</span></button></span></div>
-          <div class="cx-card-modulo cx-card-modulo--ordenando"><span class="material-symbols">drag_indicator</span><span class="cx-texto-titulo">Quiz</span><span class="mover"><button class="md-icon-button md-estado md-alvo" aria-label="Mover para cima"><span class="material-symbols">arrow_upward</span></button><button class="md-icon-button md-estado md-alvo" aria-label="Mover para baixo"><span class="material-symbols">arrow_downward</span></button></span></div>
-        </div>
+        <span class="rotulo">Ordenando módulos · hub (Módulos) e quest (Carteira): arrastar pela alça (a mínima, pelo card inteiro) ou o botão de opções, com Mover para cima, Mover para baixo e os quatro tamanhos, o atual marcado; os módulos da conta ficam fora</span>
+        <div class="cx-grade-caixa"><div class="cx-grade-modulos">
+          <div class="cx-card-modulo cx-card-modulo--reduzida cx-card-modulo--ordenando"><span class="material-symbols">drag_indicator</span><span class="cx-texto-titulo">Mensagens</span><span class="metrica">5</span><button class="md-icon-button md-estado md-alvo opcoes" aria-label="Opções de Mensagens: mover e tamanho"><span class="material-symbols">more_vert</span></button></div>
+          <div class="cx-card-modulo cx-card-modulo--minima cx-card-modulo--ordenando"><span class="cx-icone"><span class="material-symbols">event</span></span><button class="md-icon-button md-estado md-alvo opcoes" aria-label="Opções da Agenda: mover e tamanho"><span class="material-symbols">more_vert</span></button></div>
+          <div class="cx-card-modulo cx-card-modulo--minima cx-card-modulo--ordenando"><span class="cx-icone"><span class="material-symbols">quiz</span></span><button class="md-icon-button md-estado md-alvo opcoes" aria-label="Opções do Quiz: mover e tamanho"><span class="material-symbols">more_vert</span></button></div>
+        </div></div>
+        <ul class="md-menu" role="menu">
+          <li><button class="md-estado" role="menuitem"><span class="material-symbols">arrow_upward</span>Mover para cima</button></li>
+          <li><button class="md-estado" role="menuitem"><span class="material-symbols">arrow_downward</span>Mover para baixo</button></li>
+          <li><button class="md-estado" role="menuitemradio" aria-checked="false"><span class="material-symbols"></span>Mínima</button></li>
+          <li><button class="md-estado" role="menuitemradio" aria-checked="true"><span class="material-symbols">check</span>Reduzida</button></li>
+          <li><button class="md-estado" role="menuitemradio" aria-checked="false"><span class="material-symbols"></span>Normal</button></li>
+          <li><button class="md-estado" role="menuitemradio" aria-checked="false"><span class="material-symbols"></span>Expandida</button></li>
+        </ul>
+      </div>
       </div>
       <div class="cx-par">
         <div class="palco cx-centro">
@@ -26207,19 +26314,19 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v43</td><td>2026-10-31 23:44</td><td>Ícones <code>pessoas</code> (Material group), do módulo Usuários, e <code>loja</code> (Material store), do módulo Catálogo, para a ficha do módulo (RN-217, RN-219)</td></tr>
+          <tr><td>v42</td><td>2026-10-31 23:26</td><td>Grade dos cards de módulo com célula de lado mínimo (<code>md.comp.module-card.cell-min-size</code>, 76dp) e no mínimo 4 colunas (<code>grid-columns-min</code>), no lugar das colunas fixas por janela: a grade põe quantas colunas couberem, o card tem o mesmo tamanho em qualquer janela e as largas mostram mais cards lado a lado; a expandida (4x8) cabe na área visível com a barra do topo e as abas escondidas na rolagem</td></tr>
+          <tr><td>v41</td><td>2026-10-31 22:49</td><td>Card de módulo em quatro tamanhos de células quadradas (largura × altura): mínima 1x1, reduzida 2x2, normal 4x4 (o padrão) e expandida 4x8; grade de 4 colunas no compact e no medium e 8 a partir do expanded, com a altura da célula igual à da coluna (<code>md.comp.module-card.*-columns</code> e <code>*-rows</code>, no lugar das alturas fixas; colunas e linhas saem sem unidade); menu de opções ao ordenar com Mínima; exemplo de ordenação com o botão de opções no lugar das setas</td></tr>
+          <tr><td>v40</td><td>2026-10-31 22:03</td><td>Card de módulo em três tamanhos numa grade estilo Windows Phone (<code>md.comp.module-card.*</code>: reduzida, normal e expandida), com o menu de opções ao ordenar (mover e tamanho); barra lateral em acordeão com o botão de encolher e a versão encolhida de 80dp (<code>side-collapsed-width</code>); ícone <code>encolher</code>; item de menu sem ícone</td></tr>
+          <tr><td>v39</td><td>2026-10-31 18:36</td><td>Barra lateral em acordeão (<code>md.comp.navigation-drawer.side-*</code>, <code>subitem-*</code>, <code>expand-icon-size</code>) para a navegação do hub e do quest no medium e no expanded, com os subníveis dentro dos destinos; ícones <code>expandir</code> e <code>recolher</code>; navegação da casca com abas primárias para os subníveis no compact e os destinos novos (Módulos, Feed, Conta; Tarefas, Feed, Carteira, Perfil)</td></tr>
+          <tr><td>v38</td><td>2026-10-31 16:23</td><td>Ícones <code>feed</code> (Material dynamic_feed) e <code>carteira</code> (Material account_balance_wallet), para os destinos Feed do hub e do quest e Carteira do quest nas barras de navegação e no trilho</td></tr>
           <tr><td>v37</td><td>2026-10-29 02:50</td><td>Componente Barra de busca (<code>md.comp.search-bar</code>, classe <code>md-busca</code>): pesquisa numa lista, em surface-container-high e canto full, com ícone de busca e botão de limpar; usada nas listas de staff, participantes, contas e SAC do requisito 15</td></tr>
           <tr><td>v36</td><td>2026-10-28 02:35</td><td>App (MAUI): splash nativa também no escuro (<code>plataformas/maui/splash/splash_&lt;frente&gt;_escuro.svg</code> para o Android em modo noturno e o catálogo <code>Splash.xcassets</code>, com fundo e símbolo claro/escuro, para o <code>UILaunchScreen</code> do iOS) e o mascote da abertura da frente parado (<code>mascote_&lt;frente&gt;.svg</code>), que o app anima</td></tr>
           <tr><td>v35</td><td>2026-10-28 01:37</td><td>App (MAUI): ícone oficial (<code>plataformas/maui/icones/appicon.svg</code> + <code>appiconfg[_curto].svg</code>, para o <code>MauiIcon</code>) e ícone da splash nativa no claro (<code>plataformas/maui/splash/splash_&lt;frente&gt;.svg</code>, para o <code>MauiSplashScreen</code>), copiados para <code>core/commons/Resources/Styles/Design/</code> do mobile; em <code>Marca.xaml</code>, o nome passa a <code>FillRule="Nonzero"</code> (no EvenOdd, a sobreposição da barriga com a haste do d e do b virava um risco vazado)</td></tr>
           <tr><td>v34</td><td>2026-10-28 00:16</td><td>Status do servidor na web: o núcleo <code>scripts/status.mjs</code> é copiado para <code>plataformas/web/status.mjs</code> (e para <code>core/commons/design/</code> da web), para as telas desenharem qualquer estado nas cores do tema</td></tr>
-          <tr><td>v33</td><td>2026-10-27 23:16</td><td>Splash screens: nativa (símbolo oficial parado sobre a cor de superfície, com o ícone da splash do Android 12+ e do <code>MauiSplashScreen</code> na área segura de 2/3) e animada (Halo com a abertura do logo; hub só com o logo, quest com mascote que entra depois do nome), com momentos (primeiro acesso, de volta, à noite e voltamos) e carregamento embaixo; núcleo <code>scripts/splash.mjs</code> e oficiais em <code>identidade/imagens/splash/</code></td></tr>
-          <tr><td>v32</td><td>2026-10-27 23:00</td><td>Status do servidor: sete estados (operacional, lento, instabilidade parcial, fora do ar, manutenção programada, reparo em andamento e voltou) com o mascote como servidor, o anel do símbolo como medidor de saúde, a linha de pulso e as antenas como barras de sinal, nas cores sucesso, aviso, error e tertiary; selos com o rosto; núcleo <code>scripts/status.mjs</code> e imagens oficiais em <code>identidade/imagens/status/</code>. Nova expressão Consertando (capacete de obra e chave inglesa) e o campo <code>alem</code> das expressões para o enquadramento de só o rosto</td></tr>
-          <tr><td>v31</td><td>2026-10-24 21:25</td><td>Cópias do design system numa por frente, em <code>core/commons/</code> da web e do mobile (<code>scripts/sincronizar.mjs</code>), conforme <code>14_estrutura-projetos</code>; componentes comuns da web sem cópia</td></tr>
-          <tr><td>v30</td><td>2026-10-21 21:37</td><td>Fundo Halo: opção <code>nome</code> (logo inteiro, símbolo + nome, com a abertura) e <code>ciclo</code> (os brilhos passam pelas cores de uma lista de temas, suave e em laço: 6 s em cada, 2 s de troca; parado com movimento reduzido). Halo: <code>variante</code> (hastes do logo inteiro: curtas no quest). Compostos: boas-vindas com o logo (Halo com o logo na abertura e os brilhos passando pelos temas coloridos; texto e ações num painel de superfície; no compact do hub e do quest, o Halo numa faixa no alto que some antes do título; do medium em diante, só o logo centralizado) na apresentação da landing page, na entrada do hub e no acesso do quest, no lugar da turma e das boas-vindas com mascote.</td></tr>
-          <tr><td>v29</td><td>2026-10-21 21:08</td><td>Temas de cor: 8 paletas bem diferentes do padrão — Neon (verde-limão, ciano e magenta sobre roxo-noite, prefere o escuro), Vaporwave (rosa, lilás e ciano), Algodão-doce (pastéis sobre creme), Terra (terracota, oliva e mostarda sobre areia), Retrô (mostarda, laranja-queimado e petróleo), Meia-noite (azul-noite e dourado), Arco-íris (rosa, laranja e azul) e Salada de frutas (fruit-salad do M3). Usam neutra tingida (superfícies coloridas) e secundária/terciária em outras matizes. E 12 paletas dos genins da Folha, inspiradas nas cores de cada personagem: Time 7 (Naruto, Sasuke, Sakura), Time 8 (Hinata, Kiba, Shino), Time 10 (Shikamaru, Ino, Chōji) e Time Guy (Neji, Rock Lee, Tenten).</td></tr>
-          <tr><td>v28</td><td>2026-10-19 19:40</td><td>Quest: agenda em calendário vertical (dia em secondary, um dia por divisória) e card de tarefa com hora e borda em primary (no prazo) ou tertiary (vencida), ponto sucesso/erro (pode fazer ou bloqueada) e Símbolo recortado com mascote animado quando acontece agora; quem está acessando com parentesco e Entrar na largura toda; chip com largura; card de tarefa com os envios possíveis e feitos; topo com nome e foto a partir do medium e trilho sem Conta ou Perfil; gráfico de barras (componente base) e card de desafio do quest (tarefa sem prazo: pódio com mascotes em forma de número, 4º e 5º, sua posição, tentativas e Jogar de novo); pódio do card de desafio em festa: mascotes felizes com movimento composto (comemorar, pular, dançar, balançar); Estampa redesenhada como rabiscos espalhados (mascotes em contorno com rosto, números, sinais, o símbolo e miudezas, pequenos, girados e num tom discreto), também para a tela Fixos do quest; componentes sem fundo (campo outlined, botões outlined e de texto soltos na tela, segmentado, chip, controles do carrossel) ganham o fundo da tela, legíveis sobre a Estampa; parentesco num segmentado cheio; card de módulo com a métrica de quem cuida do módulo e uma série curta; vitrine de telas (computador e celular) para a página do módulo e o detalhe do catálogo; painel do módulo no hub: número principal com tendência (sucesso ou erro pelo significado), série ou progresso e números de apoio nas cores da paleta, sem mascotes, até dois por linha</td></tr>
-                                      </tbody>
+</tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v37 · 2026-10-29 02:50</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v43 · 2026-10-31 23:44</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>

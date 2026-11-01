@@ -279,7 +279,7 @@ const dependentes = [
   '/* componentes */',
   ...tokensComp.flatMap(({ nome, valor, ref: r }) => {
     const v = `--md-comp-${nome}`;
-    if (!r) return [`${v}: ${typeof valor === 'number' ? (/opacity/.test(nome) ? valor : px(valor)) : valor};`];
+    if (!r) return [`${v}: ${typeof valor === 'number' ? (/opacity|-columns|-rows/.test(nome) ? valor : px(valor)) : valor};`];
     if (r.grupo === 'typescale') return tipoVars(v, r.nome);
     const alvo = { color: 'color', shape: 'shape-corner', elevation: 'elevation' }[r.grupo];
     return [`${v}: var(--md-sys-${alvo}-${r.nome});`];
