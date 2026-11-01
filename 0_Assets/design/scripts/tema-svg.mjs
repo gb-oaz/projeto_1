@@ -11,6 +11,18 @@
 // apoio abaixo e os tokens recebidos — nada de cor ou medida solta.
 // =============================================================================
 
+import * as NUCLEO_MASCOTES from './mascotes.mjs';
+import { criarStatus } from './status.mjs';
+const STATUS = criarStatus({ mascotes: NUCLEO_MASCOTES });
+// Aviso de ação: tom → selo de status (sempre animado) e as cores do token md.comp.action-notice
+export const TONS_AVISO = {
+  concluido: { selo: 'voltou', token: 'concluded' },      // ação feita: Voltou!, rosto aliviado
+  informacao: { selo: 'operacional', token: 'info' },     // informação que não depende de ação
+  recusado: { selo: 'instavel', token: 'refused' },       // ação recusada pela pessoa ou pelos dados
+  indisponivel: { selo: 'fora', token: 'refused' },       // ação impossível agora: conta, acesso ou servidor
+  espera: { selo: 'manutencao', token: 'waiting' },       // ação liberada mais tarde, com a hora
+};
+
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 // Ícones Material (Apache 2.0), viewBox 24×24, preenchidos com a cor do <use>
@@ -684,6 +696,17 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
       + ls.map((l, i) => txt(x + 56, ty + i * lh, l, 'body-medium', fg)).join('')
       + (acao ? (compacto ? iconButton(e, x + w - 16 - ib, y + (h - ib) / 2, iconeAcao, 'filled').svg : botao(e, x + w - 16 - b, y + 16, acao, 'filled').svg) : '');
   }
+  // aviso de ação: selo de status animado, texto e a cor do tom; flutuante ganha elevação
+  let nSelo = 0;
+  function avisoAcao(e, x, y, w, tom, texto, { flutuante = false } = {}) {
+    const T = TONS_AVISO[tom], h = num('action-notice-min-height'), t = num('action-notice-badge-size'), papel = tipoDe('action-notice-label');
+    const fg = cor(e, `action-notice-${T.token}-label-color`), lh = tipos[papel]['line-height'];
+    const ls = quebrar(texto, w - 16 - t - 12 - 16, papel).slice(0, 2), hh = Math.max(h, 16 + ls.length * lh + 16);
+    const ty = meio(y, hh, papel) - (ls.length - 1) * lh / 2;
+    const selo = STATUS.selo(T.selo, { tamanho: t, cores: e }).replace('<svg ', `<svg x="${x + 16}" y="${y + (hh - t) / 2}" `).replace(/status-m/g, `${prefixo}aa${++nSelo}-m`);
+    return rect(x, y, w, hh, canto('action-notice-shape', hh), cor(e, `action-notice-${T.token}-container-color`), flutuante ? sombra(nivel('action-notice-floating-elevation')) : '')
+      + selo + ls.map((l, i) => txt(x + 16 + t + 12, ty + i * lh, l, papel, fg)).join('');
+  }
   function indicador(e, x, y, w, valor, rotulo) {
     return rect(x, y, w, 88, canto('card-shape', 88), cor(e, 'card-filled-container-color')) + txt(x + 16, y + 44, valor, 'headline-medium', e['on-surface']) + txt(x + 16, y + 68, rotulo, 'label-medium', e['on-surface-variant']);
   }
@@ -720,11 +743,11 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     return s;
   }
 
-  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, busca, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, acordeao, acordeaoEncolhido, cardTamanho, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas };
+  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, busca, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, avisoAcao, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, acordeao, acordeaoEncolhido, cardTamanho, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas };
 }
 
 export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo }) {
-  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, busca, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, acordeao, acordeaoEncolhido, cardTamanho, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo });
+  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, busca, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, avisoAcao, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, acordeao, acordeaoEncolhido, cardTamanho, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo });
 
   // ── componentes no quadro: título, descrição, altura do conteúdo, desenho ──
   const COMPONENTES = [
@@ -840,6 +863,14 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
       aviso(e, x, y, PW - 2 * PAD, 'camera', 'Envie a foto 3x4 para a carteirinha ficar pronta.', 'Enviar foto')
       + aviso(e, x, y + 88, 360, 'avisos', 'Cadastre as turmas para começar a chamada.', 'Configurar', { compacto: true })
       + aviso(e, x, y + 176, PW - 2 * PAD, 'avisos', 'Os códigos de acesso são entregues pela sua instituição.')],
+    ['Comum · Aviso de ação', 'Resultado de toda ação, bom ou ruim: selo de status animado, texto e a cor do tom (concluído, informação, recusado, indisponível, espera).', 344, (e, x, y) => {
+      const w = PW - 2 * PAD;
+      return avisoAcao(e, x, y, w, 'concluido', 'Você entrou. Que bom te ver de novo!')
+        + avisoAcao(e, x, y + 68, w, 'informacao', 'Os códigos de acesso são entregues pela sua instituição.')
+        + avisoAcao(e, x, y + 136, w, 'recusado', 'Entrada ou senha incorretas.')
+        + avisoAcao(e, x, y + 204, w, 'indisponivel', 'Acesso indisponível. Fale com quem administra a sua conta.')
+        + avisoAcao(e, x, y + 272, Math.min(400, w), 'espera', 'Muitas tentativas erradas. Tente de novo às 09:15.', { flutuante: true });
+    }],
     ['Comum · Topo do módulo', 'Hub e quest: voltar, nome do módulo e avisos dele; no hub, abas Configuração e Utilização por permissão.', 112, (e, x, y) => {
       const w = PW - 2 * PAD, h = num('top-app-bar-height'), ib = num('icon-button-size');
       return rect(x, y, w, h, 0, cor(e, 'top-app-bar-container-color')) + iconButton(e, x + 4, y + (h - ib) / 2, 'voltar', 'padrao').svg

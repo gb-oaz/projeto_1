@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v43</title>
+<title>Design system · boaz · v44</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v43">
-<meta name="design:data" content="2026-10-31 23:44">
+<meta name="design:versao" content="v44">
+<meta name="design:data" content="2026-11-01 13:05">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -587,6 +587,23 @@
   --md-comp-snackbar-label-line-height: var(--md-sys-typescale-body-medium-line-height);
   --md-comp-snackbar-label-tracking: var(--md-sys-typescale-body-medium-tracking);
   --md-comp-snackbar-label-weight: var(--md-sys-typescale-body-medium-weight);
+  --md-comp-action-notice-min-height: 56px;
+  --md-comp-action-notice-shape: var(--md-sys-shape-corner-medium);
+  --md-comp-action-notice-badge-size: 32px;
+  --md-comp-action-notice-label-font: var(--md-sys-typescale-body-medium-font);
+  --md-comp-action-notice-label-size: var(--md-sys-typescale-body-medium-size);
+  --md-comp-action-notice-label-line-height: var(--md-sys-typescale-body-medium-line-height);
+  --md-comp-action-notice-label-tracking: var(--md-sys-typescale-body-medium-tracking);
+  --md-comp-action-notice-label-weight: var(--md-sys-typescale-body-medium-weight);
+  --md-comp-action-notice-floating-elevation: var(--md-sys-elevation-level3);
+  --md-comp-action-notice-concluded-container-color: var(--md-sys-color-sucesso-container);
+  --md-comp-action-notice-concluded-label-color: var(--md-sys-color-on-sucesso-container);
+  --md-comp-action-notice-info-container-color: var(--md-sys-color-secondary-container);
+  --md-comp-action-notice-info-label-color: var(--md-sys-color-on-secondary-container);
+  --md-comp-action-notice-refused-container-color: var(--md-sys-color-error-container);
+  --md-comp-action-notice-refused-label-color: var(--md-sys-color-on-error-container);
+  --md-comp-action-notice-waiting-container-color: var(--md-sys-color-aviso-container);
+  --md-comp-action-notice-waiting-label-color: var(--md-sys-color-on-aviso-container);
   --md-comp-badge-small-size: 6px;
   --md-comp-badge-large-height: 16px;
   --md-comp-badge-large-min-width: 16px;
@@ -25012,6 +25029,17 @@ window.dispatchEvent(new Event('boaz-splash'));
 @media (max-width: 599px) { .cx-aviso { flex-wrap: nowrap; } .cx-aviso .acao-texto { display: none; } .cx-aviso .acao-icone { display: inline-grid; flex: none; } }
 .cx-aviso p { margin: 0; font-family: var(--md-sys-typescale-body-medium-font); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
 
+/* comuns · aviso de ação: resultado de toda ação confirmada, com o selo de status animado e a cor do tom */
+.cx-aviso-acao { display: flex; align-items: center; gap: var(--md-sys-spacing-3); min-height: var(--md-comp-action-notice-min-height); padding: var(--md-sys-spacing-3) var(--md-sys-spacing-4); border-radius: var(--md-comp-action-notice-shape); }
+.cx-aviso-acao .selo { flex: none; width: var(--md-comp-action-notice-badge-size); height: var(--md-comp-action-notice-badge-size); }
+.cx-aviso-acao .selo svg { display: block; width: 100%; height: 100%; }
+.cx-aviso-acao p { margin: 0; font-family: var(--md-sys-typescale-body-medium-font); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+.cx-aviso-acao--concluido { background: var(--md-comp-action-notice-concluded-container-color); color: var(--md-comp-action-notice-concluded-label-color); }
+.cx-aviso-acao--informacao { background: var(--md-comp-action-notice-info-container-color); color: var(--md-comp-action-notice-info-label-color); }
+.cx-aviso-acao--recusado, .cx-aviso-acao--indisponivel { background: var(--md-comp-action-notice-refused-container-color); color: var(--md-comp-action-notice-refused-label-color); }
+.cx-aviso-acao--espera { background: var(--md-comp-action-notice-waiting-container-color); color: var(--md-comp-action-notice-waiting-label-color); }
+.cx-aviso-acao--flutuante { box-shadow: var(--md-comp-action-notice-floating-elevation); max-width: 25rem; }
+
 /* comuns · boas-vindas com mascote */
 /* boas-vindas com o logo (landing, hub e quest): fundo Halo (brilhos que passam pelos temas) com o logo na abertura; texto e ações num painel de superfície */
 /* compact: logo no alto, painel embaixo; a partir de 40rem, painel à esquerda e logo à direita */
@@ -25500,8 +25528,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v43</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-10-31 23:44</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v44</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-11-01 13:05</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -25591,7 +25619,8 @@ el.innerHTML = fundos.desenhar('halo', {
         <article class="md-card md-card--outlined"><h4>Sempre com texto</h4><p>A imagem não tem texto. O título e a mensagem de cada estado (abaixo) vão ao lado, num painel de superfície, com a hora de volta quando houver. Imagem decorativa leva <code>alt=""</code>.</p></article>
         <article class="md-card md-card--outlined"><h4>Tom acolhedor</h4><p>Fora do ar é o mascote doente, nunca chorando ou bravo. A mensagem diz o que está acontecendo e que a equipe já está cuidando, sem culpar a pessoa nem usar jargão.</p></article>
         <article class="md-card md-card--outlined"><h4>Um estado por tela</h4><p>A ilustração grande mostra o pior estado no momento. Numa lista de serviços, cada linha usa o selo (24dp a 64dp) com o nome do serviço ao lado.</p></article>
-        <article class="md-card md-card--outlined"><h4>Movimento reduzido</h4><p>Pulso, medidor, sinal e mascote se movem em laço. Com <code>prefers-reduced-motion</code> (ou a preferência do sistema no app), use a versão parada.</p></article>
+        <article class="md-card md-card--outlined"><h4>Sempre animados</h4><p>Ilustrações e selos de status aparecem sempre animados: pulso, medidor, sinal e mascote se movem em laço. Só com <code>prefers-reduced-motion</code> (ou a preferência do sistema no app) usam a versão parada.</p></article>
+        <article class="md-card md-card--outlined"><h4>Toda ação tem resposta</h4><p>Toda ação confirmada mostra o resultado com o Aviso de ação: o que deu certo e o que não deu. O selo diz o tom — Voltou! (concluído), Operacional (informação), Instabilidade (recusado), Fora do ar (indisponível) e Manutenção (espera, com a hora) — e o texto diz o que aconteceu.</p></article>
       </div>
       <div class="fundo__controles" style="margin-top: var(--md-sys-spacing-4)">
         <label>Formato <select data-status-formato><option value="horizontal">Horizontal (16:9)</option><option value="vertical">Vertical (9:16)</option><option value="quadrado">Quadrado (1:1)</option></select></label>
@@ -26018,6 +26047,14 @@ el.innerHTML = splash.animada('quest', {
         <div class="cx-card-acesso"><span class="foto foto--mascote"><img data-mascote="feliz" data-forma="hexagono" alt=""></span><span><span class="cx-texto-titulo">Lucas Andrade</span><span class="cx-texto-apoio">Escola Horizonte · 7º A · 2026</span></span><button class="md-icon-button md-estado md-alvo" aria-label="Mais opções"><span class="material-symbols">more_vert</span></button></div>
       </div>
       <div class="palco">
+        <span class="rotulo">Aviso de ação · toda ação confirmada mostra o resultado, bom ou ruim, com o selo de status animado e a cor do tom; flutuante acima da navegação depois de trocar de tela</span>
+        <div class="cx-aviso-acao cx-aviso-acao--concluido" role="status"><span class="selo" data-selo="voltou"></span><p>Você entrou. Que bom te ver de novo!</p></div>
+        <div class="cx-aviso-acao cx-aviso-acao--informacao" role="status"><span class="selo" data-selo="operacional"></span><p>Os códigos de acesso são entregues pela sua instituição.</p></div>
+        <div class="cx-aviso-acao cx-aviso-acao--recusado" role="alert"><span class="selo" data-selo="instavel"></span><p>Entrada ou senha incorretas.</p></div>
+        <div class="cx-aviso-acao cx-aviso-acao--indisponivel" role="alert"><span class="selo" data-selo="fora"></span><p>Acesso indisponível. Fale com quem administra a sua conta.</p></div>
+        <div class="cx-aviso-acao cx-aviso-acao--espera cx-aviso-acao--flutuante" role="alert"><span class="selo" data-selo="manutencao"></span><p>Muitas tentativas erradas. Tente de novo às 09:15.</p></div>
+      </div>
+      <div class="palco">
         <span class="rotulo">Aviso para completar · módulo aberto (hub e quest) e tela de acesso: ícone, texto e ação; no compact a ação vira botão de ícone</span>
         <div class="cx-aviso"><span class="material-symbols">photo_camera</span><span><p>Envie a foto 3x4 para a carteirinha ficar pronta.</p></span><button class="md-button md-button--filled md-estado acao-texto">Enviar foto</button><button class="md-icon-button md-icon-button--filled md-estado md-alvo acao-icone" aria-label="Enviar foto"><span class="material-symbols">chevron_right</span></button></div>
       </div>
@@ -26314,6 +26351,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v44</td><td>2026-11-01 13:05</td><td>Componente comum Aviso de ação (<code>md.comp.action-notice</code>, classe <code>cx-aviso-acao</code>): toda ação confirmada mostra o resultado, bom ou ruim, com o selo de status animado e a cor do tom — concluído (Voltou!), informação (Operacional), recusado (Instabilidade), indisponível (Fora do ar) e espera (Manutenção), na tela ou flutuante; selos e ilustrações de status sempre animados, parados só com movimento reduzido</td></tr>
           <tr><td>v43</td><td>2026-10-31 23:44</td><td>Ícones <code>pessoas</code> (Material group), do módulo Usuários, e <code>loja</code> (Material store), do módulo Catálogo, para a ficha do módulo (RN-217, RN-219)</td></tr>
           <tr><td>v42</td><td>2026-10-31 23:26</td><td>Grade dos cards de módulo com célula de lado mínimo (<code>md.comp.module-card.cell-min-size</code>, 76dp) e no mínimo 4 colunas (<code>grid-columns-min</code>), no lugar das colunas fixas por janela: a grade põe quantas colunas couberem, o card tem o mesmo tamanho em qualquer janela e as largas mostram mais cards lado a lado; a expandida (4x8) cabe na área visível com a barra do topo e as abas escondidas na rolagem</td></tr>
           <tr><td>v41</td><td>2026-10-31 22:49</td><td>Card de módulo em quatro tamanhos de células quadradas (largura × altura): mínima 1x1, reduzida 2x2, normal 4x4 (o padrão) e expandida 4x8; grade de 4 colunas no compact e no medium e 8 a partir do expanded, com a altura da célula igual à da coluna (<code>md.comp.module-card.*-columns</code> e <code>*-rows</code>, no lugar das alturas fixas; colunas e linhas saem sem unidade); menu de opções ao ordenar com Mínima; exemplo de ordenação com o botão de opções no lugar das setas</td></tr>
@@ -26323,10 +26361,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v37</td><td>2026-10-29 02:50</td><td>Componente Barra de busca (<code>md.comp.search-bar</code>, classe <code>md-busca</code>): pesquisa numa lista, em surface-container-high e canto full, com ícone de busca e botão de limpar; usada nas listas de staff, participantes, contas e SAC do requisito 15</td></tr>
           <tr><td>v36</td><td>2026-10-28 02:35</td><td>App (MAUI): splash nativa também no escuro (<code>plataformas/maui/splash/splash_&lt;frente&gt;_escuro.svg</code> para o Android em modo noturno e o catálogo <code>Splash.xcassets</code>, com fundo e símbolo claro/escuro, para o <code>UILaunchScreen</code> do iOS) e o mascote da abertura da frente parado (<code>mascote_&lt;frente&gt;.svg</code>), que o app anima</td></tr>
           <tr><td>v35</td><td>2026-10-28 01:37</td><td>App (MAUI): ícone oficial (<code>plataformas/maui/icones/appicon.svg</code> + <code>appiconfg[_curto].svg</code>, para o <code>MauiIcon</code>) e ícone da splash nativa no claro (<code>plataformas/maui/splash/splash_&lt;frente&gt;.svg</code>, para o <code>MauiSplashScreen</code>), copiados para <code>core/commons/Resources/Styles/Design/</code> do mobile; em <code>Marca.xaml</code>, o nome passa a <code>FillRule="Nonzero"</code> (no EvenOdd, a sobreposição da barriga com a haste do d e do b virava um risco vazado)</td></tr>
-          <tr><td>v34</td><td>2026-10-28 00:16</td><td>Status do servidor na web: o núcleo <code>scripts/status.mjs</code> é copiado para <code>plataformas/web/status.mjs</code> (e para <code>core/commons/design/</code> da web), para as telas desenharem qualquer estado nas cores do tema</td></tr>
 </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v43 · 2026-10-31 23:44</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v44 · 2026-11-01 13:05</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>
@@ -26699,9 +26736,11 @@ function desenharStatus() {
   grade.classList.toggle('status-grade--vertical', formato.value === 'vertical');
   grade.innerHTML = Object.entries(ST.ESTADOS).map(([k, e]) => `<figure class="status-card">${ST.desenhar(k, { largura, altura, cores, movimentoReduzido: parado }).replace('role="img"', 'aria-hidden="true"')}`
     + `<figcaption><span class="md-chip"><span class="status-ponto" style="background:${vv(e.papel)}"></span>${e.nome}</span><b>${e.titulo}</b><p>${e.mensagem}</p><small>${e.uso} · <code>${k}</code> · ${e.papel}</small></figcaption></figure>`).join('');
-  selos.innerHTML = Object.entries(ST.ESTADOS).map(([k, e]) => `<figure>${ST.selo(k, { tamanho: 64, cores, movimentoReduzido: parado })}<span class="linha">${ST.selo(k, { tamanho: 24, cores, movimentoReduzido: true }).replace('<svg ', '<svg class="status-selo--24" ')}${e.nome}</span></figure>`).join('');
+  selos.innerHTML = Object.entries(ST.ESTADOS).map(([k, e]) => `<figure>${ST.selo(k, { tamanho: 64, cores, movimentoReduzido: parado })}<span class="linha">${ST.selo(k, { tamanho: 24, cores, movimentoReduzido: parado }).replace('<svg ', '<svg class="status-selo--24" ')}${e.nome}</span></figure>`).join('');
 }
 desenharStatus();
+// aviso de ação: selo de status sempre animado (parado só com movimento reduzido), decorativo para o leitor de tela
+for (const el of document.querySelectorAll('.cx-aviso-acao [data-selo]')) el.innerHTML = ST.selo(el.dataset.selo, { tamanho: 32, cores, movimentoReduzido: matchMedia('(prefers-reduced-motion: reduce)').matches }).replace('role="img"', 'aria-hidden="true"');
 formato.addEventListener('change', desenharStatus);
 movimento.addEventListener('change', desenharStatus);
 </script>
