@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulos · boaz · v17</title>
+<title>Módulos · boaz · v20</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="15_modulos">
 <meta name="boaz:caminho" content="1_Requisitos/15_modulos.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v17">
-<meta name="boaz:data" content="2026-11-01 01:20">
+<meta name="boaz:versao" content="v20">
+<meta name="boaz:data" content="2026-11-01 03:57">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como um módulo do deboaz é construído, para que todo módulo siga o mesmo molde antes de entrar no catálogo.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>15_modulos</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v17</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 01:20</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v20</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 03:57</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -930,7 +930,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
     <p>Todo card de módulo, em Módulos no hub e na Carteira do quest, tem quatro tamanhos, em células quadradas, como os blocos da tela inicial do Windows Phone (largura × altura em células): <strong>mínima</strong> 1x1, <strong>reduzida</strong> 2x2, <strong>normal</strong> 4x4 (o padrão) e <strong>expandida</strong> 4x8. A pessoa escolhe o tamanho de cada card ao ordenar, a escolha fica só no aparelho dela e o toque em qualquer tamanho abre o módulo.</p>
     <p>Para cada tamanho funcionar, todo módulo entrega os mesmos dados, reunidos na <strong>Ficha do módulo</strong>: a mínima mostra só o ícone, então todo módulo precisa de um ícone; a reduzida mostra o nome e um dado macro, então todo módulo precisa de um nome curto e de um dado macro, e assim por diante. A ficha é o que o desenvolvimento pede de cada módulo antes das vistas e do código.</p>
     <p class="historia"><span>Como</span> <strong>time deboaz</strong>, <span>quero</span> registrar cada módulo num molde único antes de especificá-lo, <span>para</span> saber sempre quem usa cada módulo, onde e para quê, e catalogar, liberar e cobrar todos do mesmo jeito</p>
-    <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-31: todo módulo é registrado neste documento antes de ter documento próprio; a definição dos tipos de módulo (da conta, contratável e do time) sai do Catálogo e passa a viver aqui (<code class="id">RN-203</code>, no lugar do antigo <code class="id">RN-198</code>); documento grande se divide em <code>NN_a_modulo-&lt;nome&gt;.html</code>, <code>NN_b_modulo-&lt;nome&gt;.html</code>.</p></aside>
+    <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-31: todo módulo é registrado neste documento antes de ter documento próprio; a definição dos tipos de módulo (da conta, contratável e do time) sai do Catálogo e passa a viver aqui (<code class="id">RN-203</code>, no lugar do antigo <code class="id">RN-198</code>); documento grande se divide em <code>NN_modulo-&lt;nome&gt;-a-&lt;assunto&gt;.html</code>, <code>NN_modulo-&lt;nome&gt;-b-&lt;assunto&gt;.html</code>.</p></aside>
   </section>
   <section id="requisitos-funcionais">
     <h2>Requisitos funcionais</h2>
@@ -957,7 +957,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-205"><td><code class="id">RN-205</code></td><td>Perfis: só estes podem aparecer em Quem usa cada módulo, com o nome escrito igual: <a class="ref" href="99_glossario.html#administrador-do-deboaz">Administrador do deboaz</a>, Membro do <a class="ref" href="99_glossario.html#time-deboaz">time deboaz</a>, <a class="ref" href="99_glossario.html#conta-master">Conta master</a> da instituição, Educador autônomo, <a class="ref" href="99_glossario.html#staff">Staff</a>, <a class="ref" href="99_glossario.html#participante">Participante</a>, Responsável e <a class="ref" href="99_glossario.html#acesso-anonimo">Acesso anônimo</a>; perfil novo entra primeiro nesta regra</td></tr>
         <tr id="RN-206"><td><code class="id">RN-206</code></td><td>Frentes: cada perfil usa o módulo no <a class="ref" href="99_glossario.html#hub">hub</a>, no <a class="ref" href="99_glossario.html#quest">quest</a> ou nos dois; o módulo contratável também tem a <a class="ref" href="99_glossario.html#pagina-do-modulo">página do módulo</a> na landing page</td></tr>
         <tr id="RN-207"><td><code class="id">RN-207</code></td><td>Ciclo de vida, sempre nesta ordem: <strong>Registrado</strong> (linha neste documento) → <strong>Especificado</strong> (documento próprio) → <strong>Vistas aprovadas</strong> (uma por perfil, aprovada em pull request) → <strong>Catalogado</strong> (no Catálogo, com o custo) → <strong>Disponível</strong> (com preço valendo, se tiver custo) → <strong>Retirado</strong>; um módulo pode ir para Retirado de qualquer estado, inclusive quando é juntado a outro, e o registro dele fica, com o estado Retirado e o módulo que o recebeu</td></tr>
-        <tr id="RN-208"><td><code class="id">RN-208</code></td><td>Documento do módulo: arquivo <code>NN_modulo-&lt;nome&gt;.html</code>; quando passar de 12 requisitos funcionais ou de 4 páginas A4, divide-se em <code>NN_a_modulo-&lt;nome&gt;.html</code>, <code>NN_b_modulo-&lt;nome&gt;.html</code>, com o mesmo <code>NN</code>; cada linha de Quem usa cada módulo vira ao menos um requisito funcional, um ator no diagrama de casos de uso e uma vista <code>vista-&lt;aplicação&gt;-&lt;módulo&gt;-&lt;perfil&gt;</code>; todo documento de módulo traz a tabela <strong>Ficha do módulo</strong> em Regras de negócio (<a class="ref" href="#RN-217">RN-217</a>)</td></tr>
+        <tr id="RN-208"><td><code class="id">RN-208</code></td><td>Documento do módulo: arquivo <code>NN_modulo-&lt;nome&gt;.html</code>; quando passar de 12 requisitos funcionais ou de 4 páginas A4, divide-se em <code>NN_modulo-&lt;nome&gt;-a-&lt;assunto&gt;.html</code>, <code>NN_modulo-&lt;nome&gt;-b-&lt;assunto&gt;.html</code>, com o mesmo <code>NN</code>; cada linha de Quem usa cada módulo vira ao menos um requisito funcional, um ator no diagrama de casos de uso e uma vista <code>vista-&lt;aplicação&gt;-&lt;módulo&gt;-&lt;perfil&gt;</code>; todo documento de módulo traz a tabela <strong>Ficha do módulo</strong> em Regras de negócio (<a class="ref" href="#RN-217">RN-217</a>)</td></tr>
         <tr id="RN-209"><td><code class="id">RN-209</code></td><td>Mudança de nome, tipo, cobrança, perfil, frente ou objetivo acontece primeiro neste registro, com versão nova, e depois no documento do módulo e no Catálogo</td></tr>
         <tr id="RN-213"><td><code class="id">RN-213</code></td><td>Tamanho do card: todo card começa no tamanho <strong>normal</strong>; o documento de cada módulo define o que o card mostra em cada tamanho (o ícone da mínima, o dado macro da reduzida, os números e o gráfico da normal e o painel da expandida); enquanto o documento não existir, o card mostra só a carcaça: o ícone, o nome, o selo de notificações e o espaço do conteúdo</td></tr>
         <tr id="RN-214"><td><code class="id">RN-214</code></td><td>Grade dos cards: células quadradas, com a altura igual à largura da coluna e lado mínimo de 76dp; a grade põe quantas colunas couberem na janela, no mínimo 4, e estica a célula até caber a próxima, então o card tem o mesmo tamanho em qualquer janela e as janelas largas mostram mais cards lado a lado; a mínima ocupa 1 coluna × 1 linha, a reduzida 2 × 2, a normal 4 × 4 e a expandida 4 × 8; cada card entra no primeiro lugar livre da grade, na ordem da pessoa; a ordem da pessoa vale em Contratados, no hub, e na Carteira, no quest</td></tr>
@@ -975,7 +975,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
       <tbody>
         <tr id="MOD-01"><td><code class="id">MOD-01</code></td><td>Contas</td><td>Da conta</td><td>Sem custo</td><td>a criar</td><td>Registrado</td></tr>
         <tr id="MOD-02"><td><code class="id">MOD-02</code></td><td>SAC</td><td>Da conta</td><td>Sem custo</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-03"><td><code class="id">MOD-03</code></td><td>Usuários</td><td>Da conta</td><td>Com custo · por usuário</td><td><a class="ref" href="17_modulo-usuario.html">17_modulo-usuario</a></td><td>Especificado</td></tr>
+        <tr id="MOD-03"><td><code class="id">MOD-03</code></td><td>Usuários</td><td>Da conta</td><td>Com custo · por usuário</td><td><a class="ref" href="17_modulo-usuario.html">17_modulo-usuario</a>, <a class="ref" href="17_modulo-usuario-a-autenticacao.html">17_modulo-usuario-a-autenticacao</a> e <a class="ref" href="17_modulo-usuario-b-autorizacao.html">17_modulo-usuario-b-autorizacao</a></td><td>Especificado</td></tr>
         <tr id="MOD-04"><td><code class="id">MOD-04</code></td><td>Sugestão</td><td>Da conta</td><td>Sem custo</td><td>a criar</td><td>Registrado</td></tr>
         <tr id="MOD-05"><td><code class="id">MOD-05</code></td><td>Quiz</td><td>Contratável</td><td>Com custo · por participante</td><td>a criar</td><td>Registrado</td></tr>
         <tr id="MOD-06"><td><code class="id">MOD-06</code></td><td>Presença</td><td>Contratável</td><td>Com custo · por participante</td><td>a criar</td><td>Registrado</td></tr>
@@ -987,7 +987,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="MOD-12"><td><code class="id">MOD-12</code></td><td>Agenda</td><td>Contratável</td><td>Com custo · por participante</td><td>a criar</td><td>Registrado</td></tr>
         <tr id="MOD-13"><td><code class="id">MOD-13</code></td><td>Perfil</td><td>Da conta</td><td>Sem custo</td><td>a criar</td><td>Registrado</td></tr>
         <tr id="MOD-14"><td><code class="id">MOD-14</code></td><td>Catálogo</td><td>Do time</td><td>Sem custo</td><td><a class="ref" href="16_catalogo.html">16_catalogo</a></td><td>Especificado</td></tr>
-        <tr id="MOD-15"><td><code class="id">MOD-15</code></td><td>Painel de administração</td><td>Do time</td><td>Sem custo</td><td>a criar</td><td>Registrado</td></tr>
+        <tr id="MOD-15"><td><code class="id">MOD-15</code></td><td>Painel de administração</td><td>—</td><td>—</td><td>—</td><td>Retirado: juntado ao <a class="ref" href="#MOD-03">MOD-03</a></td></tr>
         <tr id="MOD-16"><td><code class="id">MOD-16</code></td><td>Mensagens</td><td>Contratável</td><td>Com custo · por participante</td><td>a criar</td><td>Registrado</td></tr>
       </tbody>
     </table>
@@ -998,7 +998,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr><td><code class="id">MOD-01</code> Contas</td><td>Conta master da instituição e educador autônomo</td><td>Hub</td><td>ver e pagar a cobrança mensal dos módulos da conta e dos contratados (<a class="ref" href="16_catalogo.html#RF-121">16 RF-121</a>)</td></tr>
         <tr><td><code class="id">MOD-02</code> SAC</td><td>Conta master da instituição e educador autônomo</td><td>Hub</td><td>falar com o time deboaz; o SAC liga a escola ou a instituição ao deboaz, e a conversa com pais e alunos é do Mensagens (<a class="ref" href="08_hub-ux.html#RN-79">08 RN-79</a>)</td></tr>
         <tr><td><code class="id">MOD-02</code> SAC</td><td>Membro do time deboaz</td><td>Hub</td><td>atender as contas, inclusive o pedido de nova senha da conta master (<a class="ref" href="17_modulo-usuario.html#RF-111">17 RF-111</a>)</td></tr>
-        <tr><td><code class="id">MOD-03</code> Usuários</td><td>Administrador do deboaz</td><td>Hub</td><td>criar os membros do time deboaz e pedir a nova geração de senha deles (<a class="ref" href="17_modulo-usuario.html#RN-190">17 RN-190</a>)</td></tr>
+        <tr><td><code class="id">MOD-03</code> Usuários</td><td>Administrador do deboaz</td><td>Hub</td><td>criar os membros do time deboaz e pedir a nova geração de senha deles, e cuidar das contas de instituição e de educador autônomo: ver, suspender, desativar, reativar, encerrar e gerar o código da conta master (17 RF-113) (<a class="ref" href="17_modulo-usuario.html#RN-190">17 RN-190</a>)</td></tr>
+        <tr><td><code class="id">MOD-03</code> Usuários</td><td>Membro do time deboaz</td><td>Hub</td><td>cuidar das contas de instituição e de educador autônomo na lista Contas (17 <a class="ref" href="17_modulo-usuario.html#RF-113">RF-113</a>)</td></tr>
         <tr><td><code class="id">MOD-03</code> Usuários</td><td>Conta master da instituição</td><td>Hub</td><td>criar o staff e os participantes e decidir as permissões (<a class="ref" href="17_modulo-usuario.html#RF-105">17 RF-105</a>)</td></tr>
         <tr><td><code class="id">MOD-03</code> Usuários</td><td>Educador autônomo</td><td>Hub</td><td>criar os participantes</td></tr>
         <tr><td><code class="id">MOD-03</code> Usuários</td><td>Staff</td><td>Hub</td><td>com a permissão Administrar usuários, criar e cuidar dos usuários abaixo dele (<a class="ref" href="17_modulo-usuario.html#RF-107">17 RF-107</a>)</td></tr>
@@ -1022,7 +1023,6 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr><td><code class="id">MOD-13</code> Perfil</td><td>Participante e responsável</td><td>Quest</td><td>acompanhar agenda, notas, pontuação e engajamento do ano (<a class="ref" href="09_quest-ux.html#RF-39">09 RF-39</a>)</td></tr>
         <tr><td><code class="id">MOD-14</code> Catálogo</td><td>Administrador do deboaz</td><td>Hub</td><td>catalogar os módulos e definir preço, faixas e plano anual (<a class="ref" href="16_catalogo.html#RN-191">16 RN-191</a>)</td></tr>
         <tr><td><code class="id">MOD-14</code> Catálogo</td><td>Membro do time deboaz</td><td>Hub</td><td>ver o catálogo e simular, sem salvar</td></tr>
-        <tr><td><code class="id">MOD-15</code> Painel de administração</td><td>Administrador e membro do time deboaz</td><td>Hub</td><td>administrar instituições e educadores autônomos e responder a eles</td></tr>
         <tr><td><code class="id">MOD-16</code> Mensagens</td><td>Participante e responsável</td><td>Quest</td><td>conversar entre si, também no chat da turma, e com a instituição</td></tr>
         <tr><td><code class="id">MOD-16</code> Mensagens</td><td>Conta master da instituição e staff</td><td>Hub</td><td>conversar com os participantes e os responsáveis</td></tr>
       </tbody>
@@ -1189,20 +1189,20 @@ Cenário: escolha no quest
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v17</span></td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
+      <tr><td><span class="boaz-versao">v20</span></td><td>2026-11-01 03:57</td><td>Aprovado</td></tr>
+      <tr><td>v19</td><td>2026-11-01 03:38</td><td><code class="id">MOD-15</code> Painel de administração retirado: juntado ao <code class="id">MOD-03</code> Usuários, que no time deboaz cuida também das contas de instituição e de educador autônomo</td></tr>
+      <tr><td>v18</td><td>2026-11-01 02:08</td><td>Registro do Usuários (<code class="id">MOD-03</code>) aponta também para 17-a (autenticação) e 17-b (autorização)</td></tr>
+      <tr><td>v17</td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
       <tr><td>v16</td><td>2026-11-01 01:14</td><td>Tarefas (<code class="id">MOD-09</code>) passa a ser da conta, base da aplicação, cobrado por participante (<code class="id">RN-204</code>); ficha do módulo ganha Publicações no Feed</td></tr>
       <tr><td>v15</td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
       <tr><td>v14</td><td>2026-11-01 00:43</td><td>Atualização dos cards guardada na conta, valendo em todos os aparelhos (<code class="id">RN-220</code>); cenário de outro aparelho em <code class="id">RF-133</code></td></tr>
       <tr><td>v13</td><td>2026-11-01 00:37</td><td>Decisões da atualização dos cards: escolha em <q class="ui">Atualização dos cards</q> na Conta (hub) e no Perfil (quest), não em Ordenar; vale para todos os cards; padrão <q class="ui">Na abertura</q>; selo segue a escolha (<code class="id">RF-133</code>, <code class="id">RN-220</code>)</td></tr>
       <tr><td>v12</td><td>2026-11-01 00:29</td><td>Atualização dos números dos cards configurável pela pessoa em Ordenar, <q class="ui">Na abertura</q> (padrão) ou <q class="ui">Ao vivo</q> (<code class="id">RF-133</code>, <code class="id">RN-220</code>); pendência respondida e seção Em aberto retirada</td></tr>
       <tr><td>v11</td><td>2026-10-31 23:46</td><td>Fichas de Usuários (<code class="id">MOD-03</code>) e Catálogo (<code class="id">MOD-14</code>) preenchidas nos documentos dos módulos e retiradas de Em aberto; <code class="id">RN-208</code>: a ficha é uma tabela em Regras de negócio</td></tr>
-      <tr><td>v10</td><td>2026-10-31 23:33</td><td>Ficha do módulo: os dados que todo módulo entrega para os quatro tamanhos do card, o Catálogo e o módulo aberto, como o ícone, único dado da mínima (<code class="id">RN-217</code>, <code class="id">RN-208</code>); limites para caber sem corte (<code class="id">RN-218</code>); ícone só de cada módulo (<code class="id">RN-219</code>); ficha completa para passar a Disponível, com o que falta marcado no Catálogo (<code class="id">RF-132</code>); seção Em aberto</td></tr>
-      <tr><td>v09</td><td>2026-10-31 23:30</td><td>Grade com célula de 76dp ou mais, no mínimo 4 colunas e quantas couberem na janela, com o card do mesmo tamanho em qualquer janela (<code class="id">RN-214</code>); topo e abas escondidos ao rolar, para a expandida caber inteira (<code class="id">RN-216</code>)</td></tr>
-      <tr><td>v08</td><td>2026-10-31 22:55</td><td>Card de módulo em quatro tamanhos de células quadradas (largura × altura): mínima 1x1, reduzida 2x2, normal 4x4 (o padrão) e expandida 4x8, numa grade de 4 colunas no compact e no medium e 8 a partir do expanded (<code class="id">RF-128</code>, <code class="id">RN-213</code>, <code class="id">RN-214</code>); Mínima no menu do card (<code class="id">RF-129</code>)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v17 · 2026-11-01 01:20</span>
+    <span>boaz · v20 · 2026-11-01 03:57</span>
     <span class="boaz-arquivo">1_Requisitos/15_modulos.html</span>
   </div>
 </footer>

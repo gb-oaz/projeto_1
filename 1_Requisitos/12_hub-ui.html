@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hub · UI · boaz · v21</title>
+<title>Hub · UI · boaz · v23</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="12_hub-ui">
 <meta name="boaz:caminho" content="1_Requisitos/12_hub-ui.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v21">
-<meta name="boaz:data" content="2026-11-01 01:20">
+<meta name="boaz:versao" content="v23">
+<meta name="boaz:data" content="2026-11-01 03:57">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>12_hub-ui</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v21</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 01:20</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v23</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 03:57</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -1116,7 +1116,7 @@ Cenário: enviar foto
     <ul class="fora">
       <li>Telas internas e conteúdo do card de cada módulo e campos do cadastro: documentos dos módulos</li>
       <li>Conteúdo de cada publicação do Feed: documento do módulo que publica (<a class="ref" href="08_hub-ux.html#RN-221">Hub · UX base <code class="id">RN-221</code></a>)</li>
-      <li>Telas do painel de administração do deboaz: módulos do time deboaz</li>
+      <li>Telas do time deboaz (membros e contas no módulo Usuários, SAC e Catálogo): documentos dos módulos</li>
       <li>UI do quest: 13_quest_ui</li>
     </ul>
   </section>
@@ -1146,7 +1146,9 @@ Cenário: enviar foto
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v21</span></td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
+      <tr><td><span class="boaz-versao">v23</span></td><td>2026-11-01 03:57</td><td>Aprovado</td></tr>
+      <tr><td>v22</td><td>2026-11-01 03:48</td><td>Painel de administração do deboaz retirado (Módulos <code class="id">MOD-15</code>): as mensagens chegam ao SAC e o time deboaz cuida das contas no módulo Usuários</td></tr>
+      <tr><td>v21</td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
       <tr><td>v20</td><td>2026-11-01 01:14</td><td>Feed com as publicações dos módulos e conta do time deboaz só com Módulos e Conta (<code class="id">RF-85</code>, 08 RN-221)</td></tr>
       <tr><td>v19</td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
       <tr><td>v18</td><td>2026-11-01 00:43</td><td>Vista de Módulos v12: item Atualização dos cards na Conta, com Na abertura e Ao vivo (<code class="id">RF-81</code>) (<a class="ref" href="15_modulos.html#RF-133">15 RF-133</a>)</td></tr>
@@ -1154,12 +1156,10 @@ Cenário: enviar foto
       <tr><td>v16</td><td>2026-10-31 22:55</td><td>Card de módulo em quatro tamanhos de células quadradas (largura × altura): mínima 1x1, reduzida 2x2, normal 4x4 (o padrão) e expandida 4x8, numa grade de 4 colunas no compact e no medium e 8 a partir do expanded (<code class="id">RF-79</code>); Mínima no menu do card (<code class="id">RF-80</code>); vista de Módulos v10</td></tr>
       <tr><td>v15</td><td>2026-10-31 22:17</td><td>Entrada no aparelho sem contas com Entrar e Criar conta (<code class="id">RF-75</code>, <code class="id">RF-78</code>); cards de Módulos em grade nos tamanhos reduzida, normal e expandida (<code class="id">RF-79</code>); ordenação na grade com o menu do card, mover e tamanho (<code class="id">RF-80</code>); botão de encolher a barra lateral (<code class="id">RF-85</code>); vistas entrada v06, módulos v09, a contratar v07 e módulo aberto v06</td></tr>
       <tr><td>v14</td><td>2026-10-31 18:44</td><td>Abas primárias no compact no lugar do botão segmentado (<code class="id">RF-79</code>); barra lateral em acordeão com Módulos aberto, Feed e Conta (<code class="id">RF-85</code>, <code class="id">RN-124</code>, <code class="id">RN-138</code>); ordenação em lista, um por linha (<code class="id">RF-80</code>); vistas novas</td></tr>
-      <tr><td>v13</td><td>2026-10-31 16:41</td><td>Só a carcaça: Módulos com <q class="ui">Contratados</q> | <q class="ui">Da conta</q> | <q class="ui">A contratar</q> e cards com o ícone, o nome, as notificações e o espaço do conteúdo do módulo (<code class="id">RF-79</code>, <code class="id">RNF-153</code>, <code class="id">RN-210</code> novo); o Catálogo vira a aba A contratar (<code class="id">RF-82</code>); navegação com Módulos, Feed e Conta e Feed reservado (<code class="id">RF-85</code>); módulo aberto genérico (<code class="id">RF-84</code>); vistas de módulos v07, a contratar v05 e módulo aberto v05; status → Em revisão</td></tr>
-      <tr><td>v12</td><td>2026-10-31 15:53</td><td>Aprovado</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v21 · 2026-11-01 01:20</span>
+    <span>boaz · v23 · 2026-11-01 03:57</span>
     <span class="boaz-arquivo">1_Requisitos/12_hub-ui.html</span>
   </div>
 </footer>

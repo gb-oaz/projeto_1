@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catálogo · boaz · v16</title>
+<title>Catálogo · boaz · v17</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="16_catalogo">
 <meta name="boaz:caminho" content="1_Requisitos/16_catalogo.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v16">
-<meta name="boaz:data" content="2026-11-01 01:20">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v17">
+<meta name="boaz:data" content="2026-11-01 03:48">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -917,9 +917,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>16_catalogo</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v16</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 01:20</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v17</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 03:48</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
@@ -929,7 +929,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
     <p>O deboaz é feito de módulos: os <a class="ref" href="99_glossario.html#modulos-da-conta">módulos da conta</a>, que toda conta precisa ter (<a class="ref" href="08_hub-ux.html#RN-79">Hub · UX base <code class="id">RN-79</code></a>), os contratáveis, que a instituição escolhe na vitrine do hub (<a class="ref" href="08_hub-ux.html#RF-23">Hub · UX base <code class="id">RF-23</code></a>), e os do time deboaz (<a class="ref" href="08_hub-ux.html#RN-84">Hub · UX base <code class="id">RN-84</code></a>). O preço de um módulo depende do número de pessoas que vão usá-lo (<a class="ref" href="08_hub-ux.html#RN-82">Hub · UX base <code class="id">RN-82</code></a>). Faltava um lugar onde cada módulo existe uma vez, com o tipo, o custo, a precificação e quem o contratou.</p>
     <p>Este documento cria o módulo <strong>Catálogo</strong>, que existe só na conta do time deboaz e é usado pelo <a class="ref" href="99_glossario.html#administrador-do-deboaz">administrador do deboaz</a> (<a class="ref" href="17_modulo-usuario.html#RN-190">Módulo Usuários <code class="id">RN-190</code></a>). Todo módulo é catalogado nele; a vitrine do hub só mostra o que está no catálogo. O primeiro módulo com preço é o <strong>Usuários</strong> (<a class="ref" href="17_modulo-usuario.html#RF-105">Módulo Usuários <code class="id">RF-105</code></a>), módulo da conta com custo: por mês, staff ativos × valor por staff + participantes ativos × valor por participante, menos o desconto da <a class="ref" href="99_glossario.html#faixa-de-desconto">faixa de desconto</a> do total de usuários.</p>
     <p class="historia"><span>Como</span> <strong>administrador do deboaz</strong>, <span>quero</span> ver cada módulo do deboaz com o tipo, o custo, o preço e quem o contratou, e definir o preço do módulo Usuários com desconto por volume, <span>para</span> cobrar de cada conta pelo tamanho dela e premiar quem tem mais usuários</p>
-    <aside class="destaque nota"><p>Exemplo de receita: os valores são configuração do administrador do deboaz, não regra deste documento. Com staff a R$ 19,90 e participante a R$ 4,90 por mês e faixas progressivas de 0% (1 a 100), 5% (101 a 300), 10% (301 a 1.000), 15% (1.001 a 3.000) e 20% (acima de 3.000), as 128 contas do painel do time deboaz dão ao módulo Usuários <strong>R$ 200.996,76 por mês</strong>, ou <strong>R$ 2.411.961,12 por ano</strong> no plano mensal; a tabela abaixo detalha o cálculo por perfil de conta.</p></aside>
+    <aside class="destaque nota"><p>Exemplo de receita: os valores são configuração do administrador do deboaz, não regra deste documento. Com staff a R$ 19,90 e participante a R$ 4,90 por mês e faixas progressivas de 0% (1 a 100), 5% (101 a 300), 10% (301 a 1.000), 15% (1.001 a 3.000) e 20% (acima de 3.000), as 128 contas da lista Contas do módulo Usuários do time deboaz dão ao módulo Usuários <strong>R$ 200.996,76 por mês</strong>, ou <strong>R$ 2.411.961,12 por ano</strong> no plano mensal; a tabela abaixo detalha o cálculo por perfil de conta.</p></aside>
     <table>
       <thead><tr><th>Perfil de conta</th><th>Contas</th><th>Staff + participantes</th><th>Desconto por volume</th><th>Por conta/mês</th><th>Total/mês</th></tr></thead>
       <tbody>
@@ -1263,7 +1263,8 @@ Cenário: buscar um autônomo
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v16</span></td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
+      <tr><td><span class="boaz-versao">v17</span></td><td>2026-11-01 03:48</td><td>Exemplo de receita: as 128 contas vêm da lista Contas do módulo Usuários do time deboaz, no lugar do painel retirado (Módulos <code class="id">MOD-15</code>)</td></tr>
+      <tr><td>v16</td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
       <tr><td>v15</td><td>2026-11-01 01:14</td><td>Exemplo do card com 7 módulos da conta e 5 contratáveis, depois de Tarefas virar da conta (ca-RF-116)</td></tr>
       <tr><td>v14</td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
       <tr><td>v13</td><td>2026-10-31 23:46</td><td>Ficha do módulo <code class="id">MOD-14</code> em Regras de negócio: ícone <code>loja</code>, dados de cada tamanho do card para o administrador e o membro do time deboaz, a partir de <code class="id">RF-116</code></td></tr>
@@ -1272,11 +1273,10 @@ Cenário: buscar um autônomo
       <tr><td>v10</td><td>2026-10-31 15:29</td><td>Exemplos pelo registro de módulos (15_modulos): 6 da conta, 6 contratáveis e 2 do time, 7 com custo, 7 sem custo e 6 sem preço (<code class="id">RF-116</code>, <code class="id">RF-117</code>); valor por participante dos contratáveis em Fora de escopo; catalogo-classes v03, catalogo-documentos v03 (POR_PARTICIPANTE) e vista do catálogo do deboaz v03</td></tr>
       <tr><td>v09</td><td>2026-10-31 13:23</td><td><code class="id">RN-198</code> removido: os tipos de módulo passam para <a class="ref" href="15_modulos.html#RN-203">Módulos RN-203</a></td></tr>
       <tr><td>v08</td><td>2026-10-31 12:45</td><td>Renumerado de 15_catalogo para 16_catalogo (15_modulos vem antes); links para 17_modulo-usuario; diagramas catalogo-classes v02, catalogo-documentos v02, catalogo-casos-de-uso v01 e catalogo-sequencia v01</td></tr>
-      <tr><td>v07</td><td>2026-10-30 22:28</td><td>Diagramas de casos de uso e de sequência do catálogo: agendar preço, simular e fechar a cobrança do mês (RF-116 a RF-125)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v16 · 2026-11-01 01:20</span>
+    <span>boaz · v17 · 2026-11-01 03:48</span>
     <span class="boaz-arquivo">1_Requisitos/16_catalogo.html</span>
   </div>
 </footer>

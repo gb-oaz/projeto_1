@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landing page · UX base · boaz · v07</title>
+<title>Landing page · UX base · boaz · v09</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="07_landing-page-ux">
 <meta name="boaz:caminho" content="1_Requisitos/07_landing-page-ux.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v07">
-<meta name="boaz:data" content="2026-10-21 22:12">
+<meta name="boaz:versao" content="v09">
+<meta name="boaz:data" content="2026-11-01 03:57">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -827,8 +827,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir como os blocos da landing page se distribuem no celular e na web e como o visitante se move entre eles, deixando espaços fixos para cada módulo se apresentar.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>07_landing-page-ux</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v07</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-21 · 22:12</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 03:57</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -839,7 +839,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     <p>Este é o primeiro de três documentos de UX base: landing page (07), hub (08) e quest (09). Ele não trata de nenhum módulo em particular: define a distribuição dos blocos e a experiência do <a class="ref" href="00_visao-produto.html#personas">Visitante</a>, primeiro no celular (janela compact) e depois na web (medium e expanded, ver <a class="ref" href="99_glossario.html#classe-de-janela">classe de janela</a>). Cada <a class="ref" href="99_glossario.html#modulo">módulo</a> entra por espaços reservados, desenhados em roxo tracejado nas blueprints: o documento do módulo diz o que aparece no card, na página do módulo, no destaque e nos depoimentos, sem mudar a estrutura daqui.</p>
     <p class="historia"><span>Como</span> <strong>visitante</strong>, <span>quero</span> entender o que o deboaz oferece, ver quem já usa e chegar ao hub ou ao quest, <span>para</span> decidir se começo a usar</p>
     <aside class="destaque nota"><p>Sequência das telas: UX base (07 a 09) → componentes compostos (10) → UI (11 a 13), em que as vistas de <a class="ref" href="06_design-system-telas.html#RN-27">Design system nas telas <code class="id">RN-27</code></a> juntam os componentes compostos e o design system sobre esta distribuição. A blueprint não é vista: mostra só blocos e ações, sem cores, textos finais nem componentes do design system.</p></aside>
-    <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-18: a landing page não tem formulário de contato. Quem quer usar o deboaz cria a conta; dentro dela, um módulo de suporte e um módulo de mensagens levam conversas e reclamações da escola, da empresa ou do educador autônomo ao painel de administração do deboaz, acessado pelo hub, com histórico guardado para auditoria. Esses módulos têm documentos próprios.</p></aside>
+    <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-18: a landing page não tem formulário de contato. Quem quer usar o deboaz cria a conta; dentro dela, um módulo de suporte e um módulo de mensagens levam conversas e reclamações da escola, da empresa ou do educador autônomo ao SAC do time deboaz, acessado pelo hub, com histórico guardado para auditoria. Esses módulos têm documentos próprios.</p></aside>
   </section>
   <section id="requisitos-funcionais">
     <h2>Requisitos funcionais</h2>
@@ -999,7 +999,7 @@ Cenário: primeira visita
     <h2>Fora de escopo</h2>
     <ul class="fora">
       <li>Conteúdo de cada módulo: card, página e destaque ficam no documento do módulo</li>
-      <li>Suporte, mensagens e painel de administração do deboaz: módulos próprios dentro da conta</li>
+      <li>Suporte (SAC), mensagens e a administração das contas pelo time deboaz, no módulo Usuários: módulos próprios dentro da conta</li>
       <li>Regras do depoimento (imagem, nome e texto de até 150 caracteres): documento do módulo depoimento</li>
       <li>Preço de cada módulo: aparece só na contratação, no hub</li>
       <li>Texto dos termos de uso e da política de privacidade: Jurídico</li>
@@ -1025,7 +1025,9 @@ Cenário: primeira visita
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v07</span></td><td>2026-10-21 22:12</td><td><code class="id">RF-05</code> alterado: o logo na abertura no lugar do mascote de boas-vindas; blueprint v05; status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v09</span></td><td>2026-11-01 03:57</td><td>Aprovado</td></tr>
+      <tr><td>v08</td><td>2026-11-01 03:48</td><td>Painel de administração do deboaz retirado (Módulos <code class="id">MOD-15</code>): as mensagens chegam ao SAC e o time deboaz cuida das contas no módulo Usuários</td></tr>
+      <tr><td>v07</td><td>2026-10-21 22:12</td><td><code class="id">RF-05</code> alterado: o logo na abertura no lugar do mascote de boas-vindas; blueprint v05; status → Aprovado</td></tr>
       <tr><td>v06</td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
       <tr><td>v05</td><td>2026-10-20 01:27</td><td>Destaque antes de Como funciona, que mostra os passos do módulo em destaque, e dos Módulos (<code class="id">RF-01</code>, <code class="id">RN-62</code>, <code class="id">RN-74</code>); página do módulo com a vitrine das telas dele (<code class="id">RF-09</code>); blueprints da página e da página do módulo v04; status → Em revisão</td></tr>
       <tr><td>v04</td><td>2026-10-18 22:27</td><td>Status → Aprovado</td></tr>
@@ -1035,7 +1037,7 @@ Cenário: primeira visita
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v07 · 2026-10-21 22:12</span>
+    <span>boaz · v09 · 2026-11-01 03:57</span>
     <span class="boaz-arquivo">1_Requisitos/07_landing-page-ux.html</span>
   </div>
 </footer>
