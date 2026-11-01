@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autenticação · boaz · v03</title>
+<title>Módulo Usuários · Autenticação · boaz · v07</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-a-autenticacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-a-autenticacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v03">
-<meta name="boaz:data" content="2026-11-01 03:38">
-<meta name="boaz:status" content="Rascunho">
+<meta name="boaz:versao" content="v07">
+<meta name="boaz:data" content="2026-11-01 12:35">
+<meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -917,9 +917,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-a-autenticacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v03</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 03:38</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-rascunho">Rascunho</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v07</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 12:35</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
 <main>
@@ -953,7 +953,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RF-140"><td><code class="id">RF-140</code></td><td>O sistema deve recusar a entrada certa de usuário desativado ou de conta suspensa, desativada ou encerrada (<a class="ref" href="17_modulo-usuario.html#RN-175">Usuários <code class="id">RN-175</code></a>) com <q class="ui">Acesso indisponível. Fale com quem administra a sua conta.</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-141"><td><code class="id">RF-141</code></td><td>O sistema deve encerrar todas as sessões de um usuário, em todos os aparelhos, quando ele é desativado ou recebe uma nova geração de senha, e todas as sessões de uma conta quando ela é suspensa, desativada ou encerrada</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-142"><td><code class="id">RF-142</code></td><td>O sistema deve levar a pessoa à tela de entrada da frente, Entrar no hub ou o acesso no quest, com o aviso <q class="ui">Sua sessão terminou. Entre de novo.</q>, quando a sessão termina por tempo sem uso ou é encerrada</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-143"><td><code class="id">RF-143</code></td><td>O sistema deve abrir a sessão logo depois que a pessoa marca <q class="ui">Anotei a senha</q> no primeiro acesso ou depois de uma nova geração de senha (<a class="ref" href="17_modulo-usuario.html#RF-109">Usuários <code class="id">RF-109</code></a>), sem pedir a senha de novo</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-143"><td><code class="id">RF-143</code></td><td>O sistema deve abrir a sessão logo depois que a pessoa marca <q class="ui">Anotei a senha</q> no primeiro acesso ou depois de uma nova geração de senha (<a class="ref" href="17_modulo-usuario.html#RF-109">Usuários <code class="id">RF-109</code></a>), sem pedir a senha de novo, com um comprovante de uso único entregue junto com a senha gerada</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-156"><td><code class="id">RF-156</code></td><td>O sistema deve mostrar em Conta, no hub, os aparelhos conectados da própria pessoa, cada um com o tipo (navegador ou app) e a hora da última ação, com o aparelho em uso marcado como <q class="ui">Este aparelho</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-157"><td><code class="id">RF-157</code></td><td>O sistema deve encerrar, a pedido da própria pessoa em Conta, a sessão de um aparelho escolhido, com <q class="ui">Sair deste aparelho</q>, ou as de todos, com <q class="ui">Sair de todos os aparelhos</q>, levando a Entrar quem estava no aparelho encerrado</td><td><span class="prio prio-deve">Deve</span></td></tr>
       </tbody>
     </table>
   </section>
@@ -970,6 +972,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-229"><td><code class="id">RN-229</code></td><td>Tokens: o <strong>token de acesso</strong> vale 15 min (<a class="ref" href="#RNF-209">RNF-209</a>), não fica guardado no servidor e leva só o que identifica a sessão e autoriza (<a class="ref" href="#RNF-215">RNF-215</a>); o <strong>token de renovação</strong> é um valor aleatório de uso único, que vale enquanto a sessão estiver ativa</td></tr>
         <tr id="RN-230"><td><code class="id">RN-230</code></td><td>Fim antecipado: desativar o usuário, uma nova geração de senha ou mudar o estado da conta encerram as sessões (<a class="ref" href="#RF-141">RF-141</a>); mudar permissões ou a contratação não encerra: só pede um token novo, que o aparelho busca sozinho com o token de renovação (<a class="ref" href="17_modulo-usuario-b-autorizacao.html#RF-148">Autorização <code class="id">RF-148</code></a>)</td></tr>
         <tr id="RN-231"><td><code class="id">RN-231</code></td><td>A sessão do acesso anônimo vale só para a sala, não tem tempo sem uso e termina quando a sala fecha; ela não abre perfil, tarefa nem outra sala (<a class="ref" href="17_modulo-usuario.html#RN-177">Usuários <code class="id">RN-177</code></a>)</td></tr>
+        <tr id="RN-247"><td><code class="id">RN-247</code></td><td>Limite de sessões: cada usuário tem no máximo 5 sessões do hub ao mesmo tempo; ao abrir a sexta, termina a de última ação mais antiga, que vai para Entrar com o aviso de sessão terminada (<a class="ref" href="#RF-142">RF-142</a>); o quest não tem limite, porque a família divide o mesmo código</td></tr>
       </tbody>
     </table>
     <p><strong>Token de acesso de exemplo</strong> (<a class="ref" href="#RNF-207">RNF-207</a>, <a class="ref" href="#RNF-215">RNF-215</a>): a staff Maria Souza, da Escola Bento Freitas (<code>EBFGA</code>), no navegador. O cabeçalho e a identidade estão aqui; as claims <code>papel</code>, <code>mods</code> e <code>pv</code> são da autorização (<a class="ref" href="17_modulo-usuario-b-autorizacao.html#RNF-219">Autorização <code class="id">RNF-219</code></a>). Horários em segundos desde 1970, em UTC.</p>
@@ -1014,16 +1017,16 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
     <table>
       <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
       <tbody>
-        <tr id="RNF-207"><td><code class="id">RNF-207</code></td><td><span class="tag">Segurança</span></td><td>A credencial de acesso é um token JWT assinado com RS256 e chave RSA de 2048 bits; a chave privada fica no Key Vault do ambiente e nunca sai dele, e as aplicações validam o token com a chave pública</td></tr>
+        <tr id="RNF-207"><td><code class="id">RNF-207</code></td><td><span class="tag">Segurança</span></td><td>A credencial de acesso é um token JWT assinado com RS256 e chave RSA de 2048 bits; a chave privada fica no Key Vault do ambiente e nunca sai dele, e as aplicações validam o token com a chave pública, publicada com o <code>kid</code> no endereço de chaves da autenticação</td></tr>
         <tr id="RNF-209"><td><code class="id">RNF-209</code></td><td><span class="tag">Segurança</span></td><td>O token de acesso vale no máximo 15 min e é renovado enquanto a sessão estiver dentro do tempo configurado (<a class="ref" href="17_modulo-usuario.html#RN-183">Usuários <code class="id">RN-183</code></a>)</td></tr>
         <tr id="RNF-203"><td><code class="id">RNF-203</code></td><td><span class="tag">Segurança</span></td><td>Depois de desativar, suspender, pedir nova geração de senha, mudar permissão ou descontratar um módulo, a credencial de acesso emitida antes deixa de valer na próxima ação do usuário, em qualquer aparelho</td></tr>
         <tr id="RNF-204"><td><code class="id">RNF-204</code></td><td><span class="tag">Segurança</span></td><td>5 tentativas erradas seguidas, de senha, de código de acesso ou de código de liberação, bloqueiam a entrada por 15 min; cada bloqueio seguido dobra o tempo, até 24 h, no hub e no quest</td></tr>
-        <tr id="RNF-213"><td><code class="id">RNF-213</code></td><td><span class="tag">Segurança</span></td><td>O token de renovação tem 256 bits aleatórios, a sessão guarda só o resumo irreversível dele, e cada uso o troca por um novo; apresentar um token de renovação já trocado encerra a sessão, porque é sinal de cópia</td></tr>
+        <tr id="RNF-213"><td><code class="id">RNF-213</code></td><td><span class="tag">Segurança</span></td><td>O token de renovação é o id da sessão seguido de 256 bits aleatórios, a sessão guarda só o resumo irreversível dele, e cada uso o troca por um novo; apresentar um token de renovação já trocado encerra a sessão, porque é sinal de cópia</td></tr>
         <tr id="RNF-214"><td><code class="id">RNF-214</code></td><td><span class="tag">Segurança</span></td><td>Na web, o token de acesso fica só na memória da página e o token de renovação num cookie HttpOnly, Secure e SameSite=Strict, enviado só ao endereço de renovação; no app, o token de renovação fica no armazenamento seguro do sistema (Keychain no iOS, Keystore no Android) e o token de acesso só na memória</td></tr>
         <tr id="RNF-215"><td><code class="id">RNF-215</code></td><td><span class="tag">Segurança</span></td><td>A identidade no token de acesso é: <code>iss</code> (deboaz), <code>aud</code> (hub ou quest), <code>sub</code> (id do usuário), <code>sid</code> (id da sessão), <code>conta</code>, <code>sigla</code>, <code>tipo</code> de usuário, <code>aparelho</code>, <code>quem</code> (no quest, o responsável e o parentesco), <code>iat</code>, <code>exp</code> e <code>jti</code>; o token nunca leva nome, documento, matrícula ou senha</td></tr>
         <tr id="RNF-216"><td><code class="id">RNF-216</code></td><td><span class="tag">Segurança</span></td><td>Cada requisição confere a assinatura, a validade, a frente (<code>aud</code>) e se a sessão (<code>sid</code>) continua ativa com a mesma versão das permissões (<code>pv</code>); se algo falhar, a resposta é 401, e a web e o mobile tentam uma renovação antes de levar à tela de entrada</td></tr>
-        <tr id="RNF-217"><td><code class="id">RNF-217</code></td><td><span class="tag">Dados</span></td><td>A sessão fica no Redis, na chave <code>sessao:&lt;sid&gt;</code>, com expiração igual ao tempo sem uso, refeita a cada ação; o índice <code>sessoes:&lt;usuário&gt;</code> lista as sessões de cada usuário, para encerrar todas de uma vez</td></tr>
-        <tr id="RNF-218"><td><code class="id">RNF-218</code></td><td><span class="tag">Segurança</span></td><td>O cabeçalho do token traz o <code>kid</code> da chave que assinou; na troca de chave, a anterior continua aceita até o último token assinado com ela vencer, sem encerrar sessões</td></tr>
+        <tr id="RNF-217"><td><code class="id">RNF-217</code></td><td><span class="tag">Dados</span></td><td>A sessão fica no Redis, na chave <code>sessao:&lt;sid&gt;</code>, com expiração igual ao tempo sem uso, refeita a cada ação; o índice <code>sessoes:&lt;usuário&gt;</code> lista as sessões de cada usuário, para encerrar todas de uma vez; as tentativas erradas e os bloqueios de cada entrada e de cada código também ficam no Redis, com expiração igual ao tempo do bloqueio (<a class="ref" href="#RNF-204">RNF-204</a>)</td></tr>
+        <tr id="RNF-218"><td><code class="id">RNF-218</code></td><td><span class="tag">Segurança</span></td><td>O cabeçalho do token traz o <code>kid</code> da chave que assinou; a chave é trocada a cada 90 dias e na hora quando houver suspeita de vazamento; na troca de chave, a anterior continua aceita até o último token assinado com ela vencer, sem encerrar sessões, menos na troca por vazamento, em que a anterior é recusada na hora e as sessões renovam com a nova</td></tr>
       </tbody>
     </table>
   </section>
@@ -1115,6 +1118,26 @@ Cenário: entrada que não existe
   Quando marca "Anotei a senha" e toca em "Continuar"
   Então entra no hub sem digitar a senha</pre>
     </article>
+    <article class="criterio" id="ca-RF-156">
+      <h3><code class="id">RF-156</code> Aparelhos conectados</h3>
+      <pre class="gherkin">Cenário: navegador e app
+  Dado a Maria conectada no navegador da escola e no app do celular
+  Quando abre Conta no navegador
+  Então vê os dois aparelhos com a hora da última ação
+  E o navegador marcado como "Este aparelho"</pre>
+    </article>
+    <article class="criterio" id="ca-RF-157">
+      <h3><code class="id">RF-157</code> Sair dos aparelhos</h3>
+      <pre class="gherkin">Cenário: esqueceu o computador da escola aberto
+  Dado a Maria conectada no navegador da escola e no app
+  Quando, no app, escolhe o navegador em Conta e toca em "Sair deste aparelho"
+  Então a sessão do navegador termina e, na próxima ação nele, aparece Entrar
+  E o app continua conectado
+
+Cenário: sair de todos
+  Quando a Maria toca em "Sair de todos os aparelhos"
+  Então as sessões do navegador e do app terminam e ela vai para Entrar</pre>
+    </article>
   </section>
   <section id="fora-de-escopo">
     <h2>Fora de escopo</h2>
@@ -1122,16 +1145,24 @@ Cenário: entrada que não existe
       <li>Entrada por provedor externo e segundo fator de autenticação (<a class="ref" href="17_modulo-usuario.html#contexto">Usuários <code class="id">contexto</code></a>, decisão de 2026-10-29)</li>
       <li>O que cada pessoa pode ver e fazer: <a class="ref" href="17_modulo-usuario-b-autorizacao.html#contexto">Módulo Usuários · Autorização</a></li>
       <li>Geração de senha, código de liberação e código de acesso: <a class="ref" href="17_modulo-usuario.html#RN-181">Usuários <code class="id">RN-181</code></a></li>
+      <li>Entrada por biometria no app: o token de renovação já fica no armazenamento seguro do aparelho e a pessoa não digita a senha de novo (<a class="ref" href="#RNF-214">RNF-214</a>)</li>
+      <li>Aparelhos conectados e sair de todos no quest</li>
     </ul>
   </section>
-  <section id="em-aberto">
-    <h2>Em aberto</h2>
-    <ul class="pendencias">
-      <li>Ação para a própria pessoa ver os aparelhos conectados e sair de todos de uma vez <span class="tag dono">Produto</span></li>
-      <li>Limite de sessões ao mesmo tempo para um mesmo usuário <span class="tag dono">Produto</span></li>
-      <li>De quanto em quanto tempo a chave de assinatura do token é trocada (<a class="ref" href="#RNF-218">RNF-218</a>) <span class="tag dono">Segurança</span></li>
-      <li>Entrada por biometria no app depois da primeira entrada com a senha <span class="tag dono">Produto</span></li>
-    </ul>
+  <section id="diagramas">
+    <h2>Diagramas</h2>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/autenticacao-sequencia_v02_20261101-1214.svg"><img src="../2_Diagramas/autenticacao-sequencia_v02_20261101-1214.svg" alt="Sequência da autenticação: entrada no hub com limite de 5 sessões, entrada do participante no quest com o código de acesso, recusas e bloqueio por tentativas, conferência de cada ação pela sessão e pela versão das permissões, renovação com troca do token e detecção de cópia, e sair de todos os aparelhos"></a>
+      <figcaption><strong>Autenticação · sequência</strong><code>2_Diagramas/autenticacao-sequencia_v02_20261101-1214.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/autenticacao-contrato-api_v01_20261101-1143.svg"><img src="../2_Diagramas/autenticacao-contrato-api_v01_20261101-1143.svg" alt="Contrato de API da autenticação: entrar no hub, no quest e na sala, confirmar a senha anotada, renovar, sair, listar e encerrar sessões e chaves públicas do token, com pedido, respostas e códigos de erro"></a>
+      <figcaption><strong>Autenticação · contrato de API</strong><code>2_Diagramas/autenticacao-contrato-api_v01_20261101-1143.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg"><img src="../2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg" alt="Vista dos aparelhos conectados no hub: linha Aparelhos conectados na Conta, lista com este aparelho marcado, sair de um aparelho e sair de todos com confirmação, no compact, no medium e no expanded"></a>
+      <figcaption><strong>Hub · aparelhos conectados · vista</strong><code>2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg</code></figcaption>
+    </figure>
   </section>
 </main>
 <footer class="boaz-marca-rodape">
@@ -1139,13 +1170,17 @@ Cenário: entrada que não existe
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v03</span></td><td>2026-11-01 03:38</td><td><code class="id">RN-226</code>: o tempo da conta master e dos membros do time tem limites próprios (Usuários <code class="id">RN-243</code>)</td></tr>
+      <tr><td><span class="boaz-versao">v07</span></td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
+      <tr><td>v06</td><td>2026-11-01 12:20</td><td>Sequência v02 com a entrada do participante no quest; vista-hub-aparelhos v01 (<code class="id">RF-156</code>, <code class="id">RF-157</code>); escolhas do contrato: token de renovação com o id da sessão (<code class="id">RNF-213</code>), comprovante do primeiro acesso (<code class="id">RF-143</code>), chave pública publicada (<code class="id">RNF-207</code>) e tentativas no Redis (<code class="id">RNF-217</code>)</td></tr>
+      <tr><td>v05</td><td>2026-11-01 11:46</td><td>Diagramas autenticacao-sequencia v01 (entrar, cada ação, renovar e sair) e autenticacao-contrato-api v01 (10 endereços /auth)</td></tr>
+      <tr><td>v04</td><td>2026-11-01 11:41</td><td>Aparelhos conectados e sair de um ou de todos em Conta (<code class="id">RF-156</code>, <code class="id">RF-157</code>); até 5 sessões do hub por usuário (<code class="id">RN-247</code>); chave trocada a cada 90 dias ou na hora por vazamento (<code class="id">RNF-218</code>); biometria fora de escopo; Em aberto resolvido</td></tr>
+      <tr><td>v03</td><td>2026-11-01 03:38</td><td><code class="id">RN-226</code>: o tempo da conta master e dos membros do time tem limites próprios (Usuários <code class="id">RN-243</code>)</td></tr>
       <tr><td>v02</td><td>2026-11-01 03:14</td><td><code class="id">RN-226</code>: a conta master, o educador autônomo e os membros do time seguem os tempos que o time deboaz configura (Usuários <code class="id">RF-152</code>, <code class="id">RN-243</code>)</td></tr>
       <tr><td>v01</td><td>2026-11-01 02:10</td><td>Criação: entrada no hub e no quest, sessão, token de acesso JWT e token de renovação, renovação, saída e fim antecipado (<code class="id">RF-134</code> a <code class="id">RF-143</code>, <code class="id">RN-224</code> a <code class="id">RN-231</code>); <code class="id">RNF-203</code>, <code class="id">RNF-204</code>, <code class="id">RNF-207</code> e <code class="id">RNF-209</code> vêm do 17</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v03 · 2026-11-01 03:38</span>
+    <span>boaz · v07 · 2026-11-01 12:35</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-a-autenticacao.html</span>
   </div>
 </footer>

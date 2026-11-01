@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · boaz · v32</title>
+<title>Módulo Usuários · boaz · v35</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v32">
-<meta name="boaz:data" content="2026-11-01 03:52">
-<meta name="boaz:status" content="Em revisão">
+<meta name="boaz:versao" content="v35">
+<meta name="boaz:data" content="2026-11-01 12:35">
+<meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -917,9 +917,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v32</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 03:52</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v35</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 12:35</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
 <main>
@@ -950,6 +950,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RF-152"><td><code class="id">RF-152</code></td><td>O sistema deve deixar o time deboaz configurar, na aba Configuração do módulo Usuários da conta do time, o tempo de sessão dos membros do time e o das contas master de instituição e de educador autônomo, no navegador e no app</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-153"><td><code class="id">RF-153</code></td><td>O sistema deve permitir que quem administra os usuários edite, no staff ou no participante selecionado abaixo dele, o nome completo, o nome curto e a matrícula e, no participante, também os responsáveis e o parentesco de cada um</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-154"><td><code class="id">RF-154</code></td><td>O sistema deve gerar, pela opção Gerar novo código de acesso do participante selecionado, um código de acesso novo, depois de uma confirmação</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-155"><td><code class="id">RF-155</code></td><td>O sistema deve deixar o administrador do deboaz definir as permissões de cada membro do time por módulo da conta do time, marcando a aba Configuração, a aba Utilização ou as duas, como a conta master faz com o staff (<a class="ref" href="#RF-107">RF-107</a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-115"><td><code class="id">RF-115</code></td><td>O sistema deve dar um <strong>acesso anônimo</strong>, válido só para aquela sala e com um apelido gerado pelo sistema, a quem entra sem código de acesso numa sala que aceita participante anônimo</td><td><span class="prio prio-deve">Deve</span></td></tr>
       </tbody>
     </table>
@@ -981,9 +982,10 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-181"><td><code class="id">RN-181</code></td><td>Toda geração de senha, a do primeiro acesso e cada nova geração, vem com um <strong>código de liberação</strong> de 6 números, que quem a pediu vê uma única vez e entrega pessoalmente; a senha só aparece para quem informa a entrada e esse código</td></tr>
         <tr id="RN-182"><td><code class="id">RN-182</code></td><td>A geração de senha e o código de liberação valem por 72 h; vencidos, o superior pede outra geração</td></tr>
         <tr id="RN-183"><td><code class="id">RN-183</code></td><td>O tempo de sessão sem uso fica entre os limites abaixo, com o valor padrão até a instituição mudar: staff no navegador de 15 min a 12 h (padrão 8 h), staff no app de 1 a 30 dias (padrão 7 dias) e participante de 1 a 90 dias (padrão 30 dias)</td></tr>
-        <tr id="RN-243"><td><code class="id">RN-243</code></td><td>O tempo de sessão dos membros do time e o das contas master têm limites e padrão próprios, diferentes dos do staff, que valem até o time deboaz mudar; a instituição e o educador autônomo não mudam o tempo da própria conta master</td></tr>
+        <tr id="RN-243"><td><code class="id">RN-243</code></td><td>O tempo de sessão dos membros do time e o das contas master têm limites e padrão próprios, diferentes dos do staff, com o valor padrão até o time deboaz mudar, iguais no navegador e no app: membros do time de 15 min a 12 h (padrão 8 h) e contas master de instituição e de educador autônomo de 15 min a 24 h (padrão 8 h); a instituição e o educador autônomo não mudam o tempo da própria conta master</td></tr>
         <tr id="RN-244"><td><code class="id">RN-244</code></td><td>O nome curto e a matrícula continuam únicos na instituição depois da edição; mudar o nome curto do staff troca a entrada (<code>&lt;nome curto&gt;.&lt;sigla&gt;@deboaz.com</code>), mantém a senha e encerra as sessões abertas dele, e mudar o nome curto do participante gera um código de acesso novo com o nome novo</td></tr>
         <tr id="RN-245"><td><code class="id">RN-245</code></td><td>Com o código de acesso novo, o anterior deixa de valer na hora, as sessões abertas com ele, do participante e dos responsáveis, terminam, e o novo aparece no participante selecionado para ser entregue à família</td></tr>
+        <tr id="RN-246"><td><code class="id">RN-246</code></td><td>Membro do time recém-criado começa sem módulos até o administrador do deboaz marcar; só o administrador muda as permissões dos membros (<a class="ref" href="#RN-190">RN-190</a>), e as permissões novas chegam ao membro sem nova entrada (<a class="ref" href="17_modulo-usuario-b-autorizacao.html#RF-148">Autorização <code class="id">RF-148</code></a>)</td></tr>
         <tr id="RN-184"><td><code class="id">RN-184</code></td><td>O código de acesso do participante é <code>&lt;SIGLA&gt;-&lt;NOME CURTO&gt;-&lt;4 números aleatórios&gt;</code> (<code>EBFGA-LUCAS-0412</code>), único no sistema; aparece sempre em maiúsculas e é aceito sem diferença entre maiúsculas e minúsculas; o participante não tem senha, e ele e os responsáveis entram com esse mesmo código (<a class="ref" href="09_quest-ux.html#RN-94">Quest · UX base RN-94</a>)</td></tr>
         <tr id="RN-185"><td><code class="id">RN-185</code></td><td>As listas de staff, participantes, contas e membros do time ficam em ordem alfabética, com busca por nome e por entrada, código de acesso, matrícula, sigla ou CNPJ/CPF, e filtro pelo estado; o SAC busca do mesmo jeito e mostra primeiro a mensagem mais antiga</td></tr>
         <tr id="RN-186"><td><code class="id">RN-186</code></td><td>Cada staff, participante e conta mostra a data e a hora do último acesso (da conta, o da conta master); no participante, também quem entrou: ele ou o responsável, com o parentesco</td></tr>
@@ -993,7 +995,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-190"><td><code class="id">RN-190</code></td><td>A conta master do time deboaz é a do <strong>administrador do deboaz</strong>: a entrada e a senha dela ficam num segredo do Key Vault (<a class="ref" href="05_cd-implantacao.html#RN-24">CD e implantação RN-24</a>) e só são definidas e trocadas ali, fora das telas, e o sistema guarda da senha só o resumo irreversível (<a class="ref" href="#RNF-201">RNF-201</a>); o administrador cria os membros do time e, quando um deles esquece a senha, pede a nova geração de senha e entrega o código de liberação para o primeiro acesso</td></tr>
       </tbody>
     </table>
-    <p><strong>Ficha do módulo</strong> <code class="id">MOD-03</code> (<a class="ref" href="15_modulos.html#RN-217">Módulos RN-217</a>, <a class="ref" href="15_modulos.html#RN-218">RN-218</a>): os dados do card em cada tamanho, por perfil que vê o card, a partir de <a class="ref" href="#RN-189">RN-189</a>. Usuário ativo é o que conta na cobrança (<a class="ref" href="16_catalogo.html#RN-195">Catálogo RN-195</a>); o Membro do time deboaz não usa este módulo.</p>
+    <p><strong>Ficha do módulo</strong> <code class="id">MOD-03</code> (<a class="ref" href="15_modulos.html#RN-217">Módulos RN-217</a>, <a class="ref" href="15_modulos.html#RN-218">RN-218</a>): os dados do card em cada tamanho, por perfil que vê o card, a partir de <a class="ref" href="#RN-189">RN-189</a>. Usuário ativo é o que conta na cobrança (<a class="ref" href="16_catalogo.html#RN-195">Catálogo RN-195</a>); o Membro do time deboaz vê este módulo só quando o administrador do deboaz o libera para ele (<a class="ref" href="#RF-155">RF-155</a>).</p>
     <table>
       <thead><tr><th>Dado</th><th>Conta master e staff com Usuários</th><th>Educador autônomo</th><th>Administrador do deboaz</th></tr></thead>
       <tbody>
@@ -1184,6 +1186,14 @@ Cenário: nome curto repetido
   Então o código EBFGA-LUCAS-0412 deixa de valer e a sessão do celular da mãe termina
   E o participante selecionado mostra o código novo, EBFGA-LUCAS-&lt;4 números&gt;</pre>
     </article>
+    <article class="criterio" id="ca-RF-155">
+      <h3><code class="id">RF-155</code> Permissões do membro do time</h3>
+      <pre class="gherkin">Cenário: membro só com o SAC
+  Dado o membro do time Caio Lima, sem módulos
+  Quando o administrador do deboaz marca para ele a Utilização do SAC e salva
+  Então, na próxima ação, o Caio vê só o card do SAC em Módulos
+  E não vê os cards de Usuários nem do Catálogo</pre>
+    </article>
     <article class="criterio" id="ca-RF-115">
       <h3><code class="id">RF-115</code> Acesso anônimo</h3>
       <pre class="gherkin">Cenário: visitante de evento aberto
@@ -1203,12 +1213,6 @@ Cenário: nome curto repetido
       <li>Turma e ano do participante: ficam no módulo de gestão de turmas</li>
       <li>Formato do código da sala: fica no módulo de aula ao vivo; as vistas usam 6 números só como exemplo</li>
       <li>Usuário em várias unidades da mesma instituição (fase de escala, <a class="ref" href="00_visao-produto.html#fora-de-escopo">Visão do produto</a>)</li>
-    </ul>
-  </section>
-  <section id="em-aberto">
-    <h2>Em aberto</h2>
-    <ul class="pendencias">
-      <li>Limites e padrão do tempo de sessão dos membros do time e das contas master, no navegador e no app, que não são os do staff (<a class="ref" href="#RN-243">RN-243</a>) <span class="tag dono">Produto</span></li>
     </ul>
   </section>
   <section id="diagramas">
@@ -1378,16 +1382,17 @@ Cenário: nome curto repetido
       <li><strong>Card nos quatro tamanhos</strong>: na aba Da conta, o card Usuários do administrador do deboaz traz as contas assinantes, que são as assinaturas do deboaz, e os membros do time: na mínima, o ícone e o selo com 1 código de liberação que vence hoje; na reduzida, <q class="ui">112</q> · <q class="ui">contas ativas</q>; na normal, <q class="ui">128</q> · <q class="ui">contas assinantes</q>, <q class="ui">+9 no mês</q>, 96 instituições e 32 autônomos numa barra dividida e 112 ativas, 4 suspensas e 12 desativadas; na expandida, também as contas ativas nas 7 últimas semanas (104 a 112) e a lista Pagamentos em atraso (7), Membros do time ativos (2) e o membro com senha pendente, <q class="ui">CAIO</q>, com o código vencendo em 9 h; no compact, no medium e no expanded (<a class="ref" href="#RN-189">RN-189</a>).</li>
       <li><strong>Membros</strong>: no módulo aberto, aba Utilização, o segmentado Membros | Contas começa em Membros; a busca por nome ou entrada e os chips Ativos, Pendentes e Desativados filtram os membros, de A a Z, com a entrada e o último acesso (Ana Lima e Gustavo Boaz) (<a class="ref" href="#RN-164">RN-164</a>, <a class="ref" href="#RN-185">RN-185</a>, <a class="ref" href="#RN-186">RN-186</a>).</li>
       <li><strong>Novo membro</strong>: só o administrador do deboaz, conta master do time, cria membros: informa Caio Reis e o nome curto <code>caio</code>, que forma a entrada <code>caio.dboaz@deboaz.com</code>, e ninguém digita senha; o diálogo mostra o código de liberação <code>305 871</code> uma única vez, para entregar ao Caio em até 72 h (<a class="ref" href="#RN-164">RN-164</a>, <a class="ref" href="#RN-181">RN-181</a>, <a class="ref" href="#RN-182">RN-182</a>, <a class="ref" href="#RN-188">RN-188</a>).</li>
-      <li><strong>Membro pendente</strong>: o detalhe do Caio mostra a entrada, a criação, o código que vence em 9 h e Ainda sem acesso; o administrador pede a nova geração de senha ou desativa o membro, que está abaixo dele. A entrada e a senha do próprio administrador ficam no Key Vault, fora das telas (<a class="ref" href="#RN-169">RN-169</a>, <a class="ref" href="#RN-190">RN-190</a>).</li>
+      <li><strong>Membro pendente</strong>: o detalhe do Caio mostra a entrada, a criação, o código que vence em 9 h e Ainda sem acesso; as opções Permissões, Pedir nova geração de senha e Desativar membro valem só para o administrador, sobre os membros. A entrada e a senha do próprio administrador ficam no Key Vault, fora das telas (<a class="ref" href="#RN-169">RN-169</a>, <a class="ref" href="#RN-190">RN-190</a>).</li>
+      <li><strong>Permissões do membro</strong>: para cada módulo do time — SAC, Usuários e Catálogo — o administrador marca Configuração, Utilização ou as duas; o Caio, novo, começa sem módulos e recebe só a Utilização do SAC (<a class="ref" href="#RF-155">RF-155</a>, <a class="ref" href="#RN-246">RN-246</a>).</li>
       <li><strong>Contas</strong>: em Contas, a busca por nome, sigla, CNPJ ou CPF e os chips Ativas, Suspensas e Desativadas filtram as contas de instituição e de educador autônomo, de A a Z, com a sigla, o pagamento em dia ou em atraso e o último acesso da conta master; o menu de cada conta vê, suspende, desativa, gera o código da master e encerra, e numa conta desativada, reativa (<a class="ref" href="#RF-113">RF-113</a>, <a class="ref" href="#RN-173">RN-173</a>, <a class="ref" href="#RN-174">RN-174</a>, <a class="ref" href="#RN-185">RN-185</a>, <a class="ref" href="#RN-186">RN-186</a>).</li>
       <li><strong>Dados da conta</strong>: Ver a conta abre só o cadastro da Escola Bento Freitas (tipo, CNPJ, entrada da conta master, responsável e telefone) e as datas: criada em 12/03/2026, último pagamento em 05/10/2026 e último acesso da conta master hoje, 08:15 (<a class="ref" href="#RN-187">RN-187</a>).</li>
       <li><strong>Senha da conta master</strong>: Código da master abre a tela da nova geração de senha da conta master, com o resultado da conferência feita no SAC (CNPJ e 2 de 3 dados conferem, hoje, 09:20, por Ana Lima), a entrada da conta master e o contato conferido <code>(51) 99999-0000</code>; Gerar código da master só fica ativo com a conferência, e o diálogo mostra <code>715 204</code> uma única vez, para entregar ao contato conferido; com ele, a conta master recebe a senha na tela Código de liberação (<a class="ref" href="#RF-111">RF-111</a>, <a class="ref" href="#RN-172">RN-172</a>, <a class="ref" href="#RN-178">RN-178</a>, <a class="ref" href="#RN-181">RN-181</a>, <a class="ref" href="#RN-182">RN-182</a>).</li>
-      <li><strong>Configuração</strong>: na aba Configuração, o tempo de sessão dos membros do time e o das contas master de instituição e de autônomo, no navegador e no app, com limites e padrão próprios, ainda em aberto (<a class="ref" href="#RF-152">RF-152</a>, <a class="ref" href="#RN-243">RN-243</a>).</li>
+      <li><strong>Configuração</strong>: na aba Configuração, o tempo de sessão dos membros do time e o das contas master de instituição e de autônomo, no navegador e no app, com o padrão de 8 h e os limites de 15 min a 12 h para os membros e de 15 min a 24 h para as contas master (<a class="ref" href="#RF-152">RF-152</a>, <a class="ref" href="#RN-243">RN-243</a>).</li>
       <li><strong>Módulo aberto na carcaça</strong>: as telas ficam só na área abaixo do topo com voltar, <q class="ui">Usuários</q> e os avisos e das abas Configuração | Utilização, acima da navegação; no medium e no expanded, ao lado da barra lateral, com a lista e o detalhe das contas lado a lado no expanded.</li>
     </ol>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-time-deboaz_v07_20261101-0337.svg"><img src="../2_Diagramas/vista-hub-time-deboaz_v07_20261101-0337.svg" alt="Vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card nos quatro tamanhos com as contas assinantes e os membros do time, membros, novo membro, código de liberação, membro pendente, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded"></a>
-      <figcaption><strong>Hub · time deboaz · usuários · vista</strong><code>2_Diagramas/vista-hub-time-deboaz_v07_20261101-0337.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-time-deboaz_v08_20261101-1216.svg"><img src="../2_Diagramas/vista-hub-time-deboaz_v08_20261101-1216.svg" alt="Vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card nos quatro tamanhos com as contas assinantes e os membros do time, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded"></a>
+      <figcaption><strong>Hub · time deboaz · usuários · vista</strong><code>2_Diagramas/vista-hub-time-deboaz_v08_20261101-1216.svg</code></figcaption>
     </figure>
     <h3>Telas do quest: sala anônima</h3>
     <ol>
@@ -1406,20 +1411,20 @@ Cenário: nome curto repetido
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v32</span></td><td>2026-11-01 03:52</td><td>Casos de uso identidade-acesso v04: editar staff e participante (<code class="id">RF-153</code>), gerar novo código de acesso (<code class="id">RF-154</code>) e tempo de sessão do time e das contas master (<code class="id">RF-152</code>)</td></tr>
+      <tr><td><span class="boaz-versao">v35</span></td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
+      <tr><td>v34</td><td>2026-11-01 12:20</td><td>vista-hub-time-deboaz v08: opções e permissões do membro do time (<code class="id">RF-155</code>, <code class="id">RN-246</code>) e limites do tempo de sessão na Configuração (<code class="id">RN-243</code>)</td></tr>
+      <tr><td>v33</td><td>2026-11-01 11:41</td><td>Tempo de sessão dos membros do time (15 min a 12 h) e das contas master (15 min a 24 h), padrão 8 h, no navegador e no app (<code class="id">RN-243</code>), sai de Em aberto; permissões do membro do time por módulo, como o staff (<code class="id">RF-155</code>, <code class="id">RN-246</code>)</td></tr>
+      <tr><td>v32</td><td>2026-11-01 03:52</td><td>Casos de uso identidade-acesso v04: editar staff e participante (<code class="id">RF-153</code>), gerar novo código de acesso (<code class="id">RF-154</code>) e tempo de sessão do time e das contas master (<code class="id">RF-152</code>)</td></tr>
       <tr><td>v31</td><td>2026-11-01 03:50</td><td>Casos de uso identidade-acesso v03: o time deboaz cuida das contas no módulo Usuários, sem o painel de administração</td></tr>
       <tr><td>v30</td><td>2026-11-01 03:48</td><td>Contexto e telas do time deboaz sem o painel de administração retirado: o time administra as contas pela lista Contas do módulo Usuários</td></tr>
       <tr><td>v29</td><td>2026-11-01 03:38</td><td>Novas <code class="id">RF-153</code> (editar nome, nome curto, matrícula e responsáveis), <code class="id">RF-154</code> (gerar novo código de acesso), <code class="id">RN-244</code> e <code class="id">RN-245</code>; vista-hub-usuarios v06 com staff e participante selecionados e as opções deles; <code class="id">RN-243</code>: limites do tempo de sessão do time e das contas master não são os do staff, em Em aberto</td></tr>
       <tr><td>v28</td><td>2026-11-01 03:20</td><td>Card do módulo Usuários do administrador do deboaz com as contas assinantes (assinaturas do deboaz) e os membros do time em cada tamanho, na ficha e na vista-hub-time-deboaz v07</td></tr>
       <tr><td>v27</td><td>2026-11-01 03:14</td><td>No time deboaz, o módulo Usuários cuida também das contas de instituição e de educador autônomo: <code class="id">RF-113</code> e <code class="id">RN-187</code> passam da lista do painel para a lista Contas do módulo; nova <code class="id">RF-152</code> e <code class="id">RN-243</code>: o time deboaz configura o tempo de sessão dos membros e das contas master; vista-hub-time-deboaz v07 com Membros | Contas, dados da conta, nova geração do código da conta master e Configuração</td></tr>
       <tr><td>v26</td><td>2026-11-01 03:06</td><td>Telas do time deboaz só com o módulo Usuários (vista-hub-time-deboaz v07): card nos quatro tamanhos, membros, novo membro, código de liberação e membro pendente dentro da carcaça do hub, sem Feed; Painel de administração, Catálogo e SAC saem das telas deste documento</td></tr>
-      <tr><td>v25</td><td>2026-11-01 02:55</td><td>vista-hub-time-deboaz v07 na carcaça do hub: abas Contratados (Painel de administração e Catálogo), Da conta (SAC e Usuários) e A contratar, navegação só com Módulos e Conta (a conta do time não tem Feed) e módulos abertos com as abas Configuração | Utilização; texto das telas do time e ficha do módulo com 2 membros ativos</td></tr>
-      <tr><td>v24</td><td>2026-11-01 02:37</td><td>Nova <code class="id">RN-242</code>: escola, empresa e educador autônomo criam a conta no mesmo formulário, e só o autônomo informa CPF no lugar do CNPJ (vista-hub-acesso v03); vista-hub-usuarios v06 com o card do módulo nos quatro tamanhos no compact, no medium e no expanded e as telas do módulo dentro da área da carcaça do módulo aberto; ficha com 335 usuários ativos</td></tr>
-      <tr><td>v23</td><td>2026-11-01 02:08</td><td>Autenticação e autorização em documentos próprios, 17-a e 17-b: <code class="id">RNF-203</code>, <code class="id">RNF-204</code>, <code class="id">RNF-207</code> e <code class="id">RNF-209</code> vão para o 17-a e <code class="id">RNF-208</code>, para o 17-b</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v32 · 2026-11-01 03:52</span>
+    <span>boaz · v35 · 2026-11-01 12:35</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario.html</span>
   </div>
 </footer>
