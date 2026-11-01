@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catálogo · boaz · v14</title>
+<title>Catálogo · boaz · v16</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="16_catalogo">
 <meta name="boaz:caminho" content="1_Requisitos/16_catalogo.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v14">
-<meta name="boaz:data" content="2026-11-01 01:00">
+<meta name="boaz:versao" content="v16">
+<meta name="boaz:data" content="2026-11-01 01:20">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>16_catalogo</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v14</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 01:00</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v16</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 01:20</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -1018,7 +1018,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   Dado o administrador do deboaz em Módulos
   Quando a tela abre
   Então vê o card "Catálogo" com a receita prevista no mês e as barras dos últimos 5 meses
-  E 6 módulos da conta, 6 contratáveis e 2 do time
+  E 7 módulos da conta, 5 contratáveis e 2 do time
   E 7 com custo, 7 sem custo e 6 com custo ainda sem preço
 
 Cenário: conta de instituição
@@ -1263,7 +1263,9 @@ Cenário: buscar um autônomo
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v14</span></td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
+      <tr><td><span class="boaz-versao">v16</span></td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
+      <tr><td>v15</td><td>2026-11-01 01:14</td><td>Exemplo do card com 7 módulos da conta e 5 contratáveis, depois de Tarefas virar da conta (ca-RF-116)</td></tr>
+      <tr><td>v14</td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
       <tr><td>v13</td><td>2026-10-31 23:46</td><td>Ficha do módulo <code class="id">MOD-14</code> em Regras de negócio: ícone <code>loja</code>, dados de cada tamanho do card para o administrador e o membro do time deboaz, a partir de <code class="id">RF-116</code></td></tr>
       <tr><td>v12</td><td>2026-10-31 16:46</td><td>Meus módulos vira Módulos em <code class="id">RF-116</code>, nos critérios e nos exemplos</td></tr>
       <tr><td>v11</td><td>2026-10-31 15:55</td><td>Aprovado</td></tr>
@@ -1271,12 +1273,10 @@ Cenário: buscar um autônomo
       <tr><td>v09</td><td>2026-10-31 13:23</td><td><code class="id">RN-198</code> removido: os tipos de módulo passam para <a class="ref" href="15_modulos.html#RN-203">Módulos RN-203</a></td></tr>
       <tr><td>v08</td><td>2026-10-31 12:45</td><td>Renumerado de 15_catalogo para 16_catalogo (15_modulos vem antes); links para 17_modulo-usuario; diagramas catalogo-classes v02, catalogo-documentos v02, catalogo-casos-de-uso v01 e catalogo-sequencia v01</td></tr>
       <tr><td>v07</td><td>2026-10-30 22:28</td><td>Diagramas de casos de uso e de sequência do catálogo: agendar preço, simular e fechar a cobrança do mês (RF-116 a RF-125)</td></tr>
-      <tr><td>v06</td><td>2026-10-29 05:05</td><td>Exemplo completo, com dados fictícios, de cada entidade do catálogo: modulos, contratacoes e cobrancas</td></tr>
-      <tr><td>v05</td><td>2026-10-29 05:00</td><td>Diagrama entidade-relacionamento trocado pelo modelo de documentos (catalogo-documentos v01), para o MongoDB e o Cosmos DB for MongoDB</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v14 · 2026-11-01 01:00</span>
+    <span>boaz · v16 · 2026-11-01 01:20</span>
     <span class="boaz-arquivo">1_Requisitos/16_catalogo.html</span>
   </div>
 </footer>
