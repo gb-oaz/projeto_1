@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quest · UX base · boaz · v10</title>
+<title>Quest · UX base · boaz · v21</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="09_quest-ux">
 <meta name="boaz:caminho" content="1_Requisitos/09_quest-ux.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v10">
-<meta name="boaz:data" content="2026-10-21 22:12">
+<meta name="boaz:versao" content="v21">
+<meta name="boaz:data" content="2026-11-01 01:20">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -824,11 +824,11 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 <header class="boaz-marca-topo">
   <p class="boaz-eyebrow">boaz · Funcionalidade</p>
   <h1>Quest · UX base</h1>
-  <p class="boaz-objetivo"><span>Objetivo</span>definir como o participante e o responsável acessam o quest pelo código de acesso e como tarefas, módulos fixos e perfil se distribuem no celular e na web.</p>
+  <p class="boaz-objetivo"><span>Objetivo</span>definir como o participante e o responsável acessam o quest pelo código de acesso e como Tarefas, Feed, Carteira e Perfil se distribuem no celular e na web.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>09_quest-ux</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v10</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-21 · 22:12</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v21</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 01:20</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -838,7 +838,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     <h2>Contexto</h2>
     <p>Terceiro documento de UX base, depois de <a class="ref" href="07_landing-page-ux.html">Landing page · UX base</a> e <a class="ref" href="08_hub-ux.html">Hub · UX base</a>. O <a class="ref" href="99_glossario.html#quest">quest</a> é onde o <a class="ref" href="00_visao-produto.html#personas">Participante</a> (estudante ou colaborador de empresa) e o Responsável acompanham tarefas, resultados e os módulos que a instituição liberou, no navegador e no app. Não há cadastro no quest: a instituição entrega um código de acesso, e esse código abre o perfil. Cada <a class="ref" href="99_glossario.html#modulo">módulo</a> ocupa os espaços em roxo tracejado das <a class="ref" href="99_glossario.html#blueprint">blueprints</a>; a sala do quiz também é um módulo.</p>
     <p class="historia"><span>Como</span> <strong>estudante ou responsável</strong>, <span>quero</span> entrar só com o código que a escola me deu e ver primeiro o que vence antes, <span>para</span> não perder prazos nem procurar onde cada coisa fica</p>
-    <aside class="destaque nota"><p>Exemplo de um módulo de carteirinha, só para mostrar a estrutura. A instituição contrata e configura o módulo no hub. No quest, a carteirinha já traz o nome do estudante, a série e os responsáveis, e aparece em Fixos com o aviso para completar. O estudante envia a foto pelo app, com a autorização dos responsáveis, e a carteirinha fica pronta.</p></aside>
+    <aside class="destaque nota"><p>Exemplo de um módulo de carteirinha, só para mostrar a estrutura. A instituição contrata e configura o módulo no hub. No quest, a carteirinha já traz o nome do estudante, a série e os responsáveis, e aparece na Carteira com o aviso para completar. O estudante envia a foto pelo app, com a autorização dos responsáveis, e a carteirinha fica pronta.</p></aside>
   </section>
   <section id="requisitos-funcionais">
     <h2>Requisitos funcionais</h2>
@@ -850,12 +850,12 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
         <tr id="RF-31"><td><code class="id">RF-31</code></td><td>O sistema deve guardar no aparelho o código de acesso de cada perfil que entrou por ele, até a pessoa tocar em <q class="ui">Remover</q> no card do perfil, que apaga o código guardado</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-32"><td><code class="id">RF-32</code></td><td>O sistema deve perguntar, ao entrar com um código de acesso, quem está acessando: o próprio participante ou um responsável, com o parentesco</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-33"><td><code class="id">RF-33</code></td><td>O sistema deve oferecer na tela de acesso a ação <q class="ui">Entrar numa sala</q>, que leva pelo <a class="ref" href="99_glossario.html#codigo-da-sala">código da sala</a> ao módulo da sala</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-34"><td><code class="id">RF-34</code></td><td>O sistema deve manter, em toda tela do perfil, a casca com o logo e os avisos no topo (com o nome e a foto ou o mascote do perfil ativo a partir da janela medium) e a navegação entre Tarefas, Fixos e Perfil como barra inferior na janela compact; a partir da medium, trilho (gaveta a partir da large) só com Tarefas e Fixos, abaixo do topo, que ocupa a largura toda, e o Perfil abre pelo nome e pela foto do topo</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-34"><td><code class="id">RF-34</code></td><td>O sistema deve manter, em toda tela do perfil, a casca com o logo e os avisos no topo (com o nome e a foto ou o mascote do perfil ativo a partir da janela medium) e a navegação entre Tarefas, Feed, Carteira e Perfil como barra inferior na janela compact; a partir da medium, barra lateral em acordeão com Tarefas, Feed, Carteira e Perfil, abaixo do topo, que ocupa a largura toda, com o botão de encolher no alto, que deixa a barra só com os ícones (80dp) e a abre de novo, e o Perfil abre também pelo nome e pela foto do topo; o destino que tiver subníveis mostra-os em abas primárias abaixo do topo no compact e dentro dele na barra lateral; o Feed mostra as publicações dos módulos para o participante (<a class="ref" href="#RN-222">RN-222</a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-35"><td><code class="id">RF-35</code></td><td>O sistema deve mostrar a ação <q class="ui">Trocar perfil</q>, que volta à tela de acesso, em Perfil, que a partir da janela medium abre pelo toque no nome ou na foto do topo</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-36"><td><code class="id">RF-36</code></td><td>O sistema deve abrir o perfil em Tarefas, com as tarefas com prazo pendentes, da que vence primeiro à que vence por último, e as sem prazo separadas: numa aba própria na janela compact e numa coluna à direita a partir da medium</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-37"><td><code class="id">RF-37</code></td><td>O sistema deve mostrar em cada card de tarefa o módulo de origem, o título, o prazo restante e quantos envios a tarefa aceita e quantos já foram feitos</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-38"><td><code class="id">RF-38</code></td><td>O sistema deve mostrar em Fixos, em grade, os módulos sempre disponíveis ao participante, cada um com o número de notificações não lidas</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-39"><td><code class="id">RF-39</code></td><td>O sistema deve mostrar em Perfil o painel do módulo de perfil, com agenda, notas, pontuação e engajamento do ano do código de acesso</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-36"><td><code class="id">RF-36</code></td><td>O sistema deve abrir o perfil em Tarefas, com o espaço do módulo Tarefas (<a class="ref" href="15_modulos.html#MOD-09">registro de módulos <code class="id">MOD-09</code></a>), cujo documento define as tarefas, a ordem, os prazos e os envios</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-38"><td><code class="id">RF-38</code></td><td>O sistema deve mostrar na Carteira as coisas particulares do estudante ou do funcionário: os módulos sempre disponíveis a ele, em cards em grade, cada um num dos quatro tamanhos de células quadradas — mínima 1x1, reduzida 2x2, normal 4x4 (o padrão) e expandida 4x8 — do <a class="ref" href="15_modulos.html#RF-128">registro de módulos <code class="id">RF-128</code></a>, só com a carcaça: o ícone, o nome e o número de notificações não lidas do módulo; o toque no card, em qualquer tamanho, abre o módulo</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-130"><td><code class="id">RF-130</code></td><td>O sistema deve abrir, com um toque longo num card da Carteira, a tela Ordenar a Carteira, em que o participante muda a ordem dos cards, arrastando-os ou pelo menu do card, e o tamanho de cada um pelo mesmo menu, e guardar a ordem e os tamanhos só no aparelho (<a class="ref" href="15_modulos.html#RF-129">registro de módulos <code class="id">RF-129</code></a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-39"><td><code class="id">RF-39</code></td><td>O sistema deve mostrar em Perfil o perfil ativo e o espaço do módulo Perfil (<a class="ref" href="15_modulos.html#MOD-13">registro de módulos <code class="id">MOD-13</code></a>), com o painel do ano do código de acesso</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-40"><td><code class="id">RF-40</code></td><td>O sistema deve mostrar um aviso para completar, no card e no módulo aberto, quando um módulo pede algo ao participante ou ao responsável</td><td><span class="prio prio-deve">Deve</span></td></tr>
       </tbody>
     </table>
@@ -865,23 +865,22 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     <table>
       <thead><tr><th>ID</th><th>Regra</th></tr></thead>
       <tbody>
-        <tr id="RN-91"><td><code class="id">RN-91</code></td><td>A instituição gera um código de acesso único ao cadastrar cada participante; a empresa pode usar a identificação do funcionário como base</td></tr>
+        <tr id="RN-222"><td><code class="id">RN-222</code></td><td>Feed do quest: mostra as publicações dos módulos para toda a instituição e para as turmas ou equipes em que o participante está, da mais recente para a mais antiga, cada uma com o ícone e o nome do módulo, o público e a data; o conteúdo e o público de cada publicação são definidos no documento do módulo que publica; o responsável, que entra com o mesmo código de acesso, vê o mesmo Feed</td></tr>
+        <tr id="RN-223"><td><code class="id">RN-223</code></td><td>Tarefas existe em todo perfil do quest: o módulo Tarefas é base da aplicação, da conta, e entra em toda contratação (<a class="ref" href="15_modulos.html#MOD-09">registro de módulos <code class="id">MOD-09</code></a>)</td></tr>
+        <tr id="RN-91"><td><code class="id">RN-91</code></td><td>A instituição gera um código de acesso único ao cadastrar cada participante, no formato <code>&lt;SIGLA&gt;-&lt;NOME CURTO&gt;-&lt;4 números&gt;</code> (<a class="ref" href="17_modulo-usuario.html#RN-184">Módulo Usuários RN-184</a>); a matrícula do aluno ou do funcionário é um campo do cadastro, informado ou gerado, e não o código (<a class="ref" href="17_modulo-usuario.html#RN-188">RN-188</a>)</td></tr>
         <tr id="RN-92"><td><code class="id">RN-92</code></td><td>O código de acesso do estudante menor de idade é entregue aos responsáveis; nos outros casos, ao próprio participante</td></tr>
         <tr id="RN-93"><td><code class="id">RN-93</code></td><td>Só a instituição gera, troca e recupera códigos de acesso; quem esquece o código pede à instituição</td></tr>
         <tr id="RN-94"><td><code class="id">RN-94</code></td><td>O estudante e os responsáveis entram com o mesmo código de acesso; a sessão registra quem acessou e o parentesco</td></tr>
         <tr id="RN-95"><td><code class="id">RN-95</code></td><td>Quem acompanha mais de um estudante entra com o código de cada um, e cada perfil acessado fica na tela de acesso do aparelho</td></tr>
         <tr id="RN-96"><td><code class="id">RN-96</code></td><td>Na troca de ano ou de turma, a instituição gera um novo código de acesso para o ano novo, que começa sem dados; o código de cada ano anterior continua abrindo os dados daquele ano</td></tr>
-        <tr id="RN-97"><td><code class="id">RN-97</code></td><td>Uma tarefa com prazo fica em Tarefas até o prazo vencer; o módulo da tarefa define se aceita entrega depois do prazo</td></tr>
-        <tr id="RN-98"><td><code class="id">RN-98</code></td><td>Um módulo fixo, como uma tarefa de estudo com flashcards, fica disponível ao participante até a instituição revogar</td></tr>
+        <tr id="RN-98"><td><code class="id">RN-98</code></td><td>A Carteira é pessoal: mostra só o que é do participante, estudante ou funcionário, e cada módulo dela fica disponível até a instituição revogar</td></tr>
         <tr id="RN-99"><td><code class="id">RN-99</code></td><td>A instituição contrata e configura no hub os módulos que o participante usa no quest; o participante só usa</td></tr>
         <tr id="RN-100"><td><code class="id">RN-100</code></td><td>A sala é um módulo: espera, perguntas, ranking e resultado ficam no documento do módulo da sala</td></tr>
         <tr id="RN-101"><td><code class="id">RN-101</code></td><td>Numa sala aberta de evento público, o evento define se aceita participante anônimo ou se pede o código de acesso</td></tr>
         <tr id="RN-102"><td><code class="id">RN-102</code></td><td>Um dado que o estudante menor de idade envia a pedido de um módulo, como a foto da carteirinha, depende da autorização dos responsáveis</td></tr>
-        <tr id="RN-103"><td><code class="id">RN-103</code></td><td>O documento de cada módulo define o card, a tarefa, o aviso para completar e o conteúdo, sem mudar a casca desta UX base</td></tr>
+        <tr id="RN-103"><td><code class="id">RN-103</code></td><td>O documento de cada módulo define o conteúdo do card, as tarefas, o aviso para completar e as telas, sem mudar a casca desta UX base</td></tr>
         <tr id="RN-104"><td><code class="id">RN-104</code></td><td>Mudar a casca ou a estrutura das telas exige uma nova versão deste documento e das blueprints antes de chegar à UI (13_quest_ui)</td></tr>
         <tr id="RN-105"><td><code class="id">RN-105</code></td><td>O responsável vê o perfil do mesmo jeito que o estudante; cabe a ele deixar que o próprio estudante responda às tarefas</td></tr>
-        <tr id="RN-134"><td><code class="id">RN-134</code></td><td>O módulo da tarefa define quantos envios ela aceita: um só dentro do prazo, um número limitado ou envios livres (como a tarefa sem prazo que pode ser feita várias vezes); quando os envios acabam, a tarefa fica bloqueada</td></tr>
-        <tr id="RN-136"><td><code class="id">RN-136</code></td><td>Uma tarefa sem prazo pode ser competitiva, como um jogo de somar ou de memória: ela mostra o ranking da tarefa, com os 5 primeiros e a posição de quem está vendo, que muda a cada envio enquanto houver envios (<a class="ref" href="10_componentes-compostos-quest.html#RN-135">Componentes compostos · quest <code class="id">RN-135</code></a>)</td></tr>
       </tbody>
     </table>
   </section>
@@ -891,10 +890,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
       <tbody>
         <tr id="RNF-136"><td><code class="id">RNF-136</code></td><td><span class="tag">Usabilidade</span></td><td>Um perfil já acessado abre com 1 toque na tela de acesso, sem digitar o código de novo</td></tr>
-        <tr id="RNF-137"><td><code class="id">RNF-137</code></td><td><span class="tag">Usabilidade</span></td><td>O prazo da tarefa aparece em texto relativo e em data, como <q class="ui">vence em 2 dias · 21/10</q></td></tr>
-        <tr id="RNF-138"><td><code class="id">RNF-138</code></td><td><span class="tag">Compatibilidade</span></td><td>A grade de Fixos tem 2 colunas no compact, 3 no medium e 4 a partir do expanded</td></tr>
-        <tr id="RNF-139"><td><code class="id">RNF-139</code></td><td><span class="tag">Compatibilidade</span></td><td>A partir do medium, Tarefas mostra as com prazo à esquerda e as sem prazo à direita; o resumo do perfil fica só em Perfil</td></tr>
-        <tr id="RNF-140"><td><code class="id">RNF-140</code></td><td><span class="tag">Acessibilidade</span></td><td>A tarefa que vence hoje é indicada em texto, não só por cor</td></tr>
+        <tr id="RNF-138"><td><code class="id">RNF-138</code></td><td><span class="tag">Compatibilidade</span></td><td>A grade da Carteira, também ao ordenar, é de células quadradas de 76dp ou mais, com quantas colunas couberem na janela (no mínimo 4), e o topo se esconde ao rolar (<a class="ref" href="15_modulos.html#RN-216">registro de módulos <code class="id">RN-216</code></a>): a mínima ocupa 1 × 1, a reduzida 2 × 2, a normal 4 × 4 e a expandida 4 × 8 (largura × altura) (<a class="ref" href="15_modulos.html#RN-214">registro de módulos <code class="id">RN-214</code></a>)</td></tr>
         <tr id="RNF-141"><td><code class="id">RNF-141</code></td><td><span class="tag">Acessibilidade</span></td><td>O leitor de tela anuncia o número de notificações junto com o nome do módulo</td></tr>
       </tbody>
     </table>
@@ -948,8 +944,14 @@ Cenário: remover de um aparelho compartilhado
       <pre class="gherkin">Cenário: do celular para a web
   Dado o perfil aberto numa janela compact com a barra inferior
   Quando a janela passa a expanded
-  Então a navegação vira trilho à esquerda, abaixo do topo, com Tarefas e Fixos
-  E o nome e a foto do perfil aparecem no topo e abrem o Perfil</pre>
+  Então a navegação vira a barra lateral em acordeão, abaixo do topo, com Tarefas, Feed, Carteira e Perfil
+  E o nome e a foto do perfil aparecem no topo e abrem o Perfil
+Cenário: Feed da turma
+  Dado um módulo que publicou no Feed um aviso para a turma 7º A e outro para a turma 8º B
+  E o Lucas Andrade, da turma 7º A
+  Quando ele toca em "Feed"
+  Então vê o aviso da 7º A, com o ícone e o nome do módulo e a data
+  E não vê o aviso da 8º B</pre>
     </article>
     <article class="criterio" id="ca-RF-35">
       <h3><code class="id">RF-35</code> Trocar de perfil</h3>
@@ -959,38 +961,33 @@ Cenário: remover de um aparelho compartilhado
   Então volta à tela de acesso com os dois perfis</pre>
     </article>
     <article class="criterio" id="ca-RF-36">
-      <h3><code class="id">RF-36</code> Ordem das tarefas</h3>
-      <pre class="gherkin">Cenário: prazos diferentes
-  Dado uma tarefa que vence em 5 dias, uma que vence hoje e uma sem prazo
-  Quando o estudante abre Tarefas no celular
-  Então vê a que vence hoje e depois a de 5 dias
-  E a sem prazo fica na aba Sem prazo
-
-Cenário: tablet
-  Dado o quest numa janela medium
-  Quando o estudante abre Tarefas
-  Então vê as com prazo à esquerda e as sem prazo à direita, na mesma tela</pre>
-    </article>
-    <article class="criterio" id="ca-RF-37">
-      <h3><code class="id">RF-37</code> Card de tarefa</h3>
-      <pre class="gherkin">Cenário: tarefa com prazo
-  Dado uma tarefa do módulo de exercícios que vence em 2 dias
-  Então o card mostra o módulo de exercícios, o título e "vence em 2 dias"
-
-Cenário: envios
-  Dado uma tarefa que aceita até 3 envios, com 1 já feito
-  Então o card mostra "Até 3 envios · 1 de 3"
-
-Cenário: sem prazo, várias vezes
-  Dado uma tarefa sem prazo que aceita envios livres, feita 2 vezes
-  Então o card mostra "Envios livres · 2 feitos"</pre>
+      <h3><code class="id">RF-36</code> Tarefas</h3>
+      <pre class="gherkin">Cenário: abrir o perfil
+  Quando o estudante entra no perfil
+  Então vê Tarefas marcada na navegação e o espaço do módulo Tarefas
+  E as tarefas aparecem como o documento do módulo Tarefas define</pre>
     </article>
     <article class="criterio" id="ca-RF-38">
-      <h3><code class="id">RF-38</code> Fixos</h3>
-      <pre class="gherkin">Cenário: chat da turma com mensagens novas
-  Dado cinco mensagens não lidas no chat da turma
-  Quando o estudante abre Fixos
-  Então o card do chat da turma mostra 5</pre>
+      <h3><code class="id">RF-38</code> Carteira</h3>
+      <pre class="gherkin">Cenário: mensagens novas
+  Dado cinco mensagens não lidas no módulo Mensagens
+  Quando o estudante abre a Carteira
+  Então o card de Mensagens mostra 5
+
+Cenário: tamanhos
+  Dado a Carteirinha na reduzida e Mensagens na normal
+  Quando o estudante abre a Carteira no compact
+  Então Mensagens ocupa a linha toda num quadrado e a Carteirinha metade de uma linha num quadrado
+  E o toque na Carteirinha abre o módulo</pre>
+    </article>
+    <article class="criterio" id="ca-RF-130">
+      <h3><code class="id">RF-130</code> Ordenar a Carteira</h3>
+      <pre class="gherkin">Cenário: mudar o tamanho
+  Dado o estudante na Carteira
+  Quando faz um toque longo no card de Mensagens
+  Então vê Ordenar a Carteira
+  E, no menu do card de Mensagens, escolhe "Expandida"
+  Então Mensagens passa a mostrar o painel completo, na linha toda, só neste aparelho</pre>
     </article>
     <article class="criterio" id="ca-RF-39">
       <h3><code class="id">RF-39</code> Perfil</h3>
@@ -1004,7 +1001,7 @@ Cenário: sem prazo, várias vezes
       <h3><code class="id">RF-40</code> Aviso para completar</h3>
       <pre class="gherkin">Cenário: carteirinha sem foto
   Dado o módulo de carteirinha esperando a foto do estudante
-  Quando o estudante abre Fixos
+  Quando o estudante abre a Carteira
   Então o card da carteirinha mostra o aviso para completar
   E o módulo aberto pede a foto</pre>
     </article>
@@ -1013,7 +1010,8 @@ Cenário: sem prazo, várias vezes
     <h2>Fora de escopo</h2>
     <ul class="fora">
       <li>Sala do quiz (espera, perguntas, ranking, resultado e o apelido do visitante anônimo): documento do módulo da sala</li>
-      <li>Telas internas de cada módulo (tarefas, flashcards, chat da turma, carteirinha, perfil): documentos dos módulos</li>
+      <li>Telas internas e conteúdo do card de cada módulo (tarefas, flashcards, mensagens, carteirinha, perfil): documentos dos módulos</li>
+      <li>Agenda, ordem, prazos, envios e ranking das tarefas: documento do módulo Tarefas (<a class="ref" href="15_modulos.html#MOD-09">registro de módulos <code class="id">MOD-09</code></a>), que traz de volta as regras que saíram desta UX base na v15</li>
       <li>Geração, formato e entrega dos códigos de acesso pela instituição: módulo de cadastro, no hub</li>
       <li>Regras de login, inclusive tentativas erradas do código de acesso: documento das regras de login</li>
       <li>Textos finais, cores, tipografia e componentes: componentes compostos (10) e UI do quest (13)</li>
@@ -1026,12 +1024,12 @@ Cenário: sem prazo, várias vezes
       <figcaption><strong>Quest · acesso · blueprint de UX</strong><code>2_Diagramas/blueprint-quest-acesso_v03_20261021-2153.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/blueprint-quest-casca_v06_20261019-1944.svg"><img src="../2_Diagramas/blueprint-quest-casca_v06_20261019-1944.svg" alt="Blueprint da casca do perfil no quest: tarefas por prazo, módulos fixos com notificações e painel do perfil"></a>
-      <figcaption><strong>Quest · tarefas, fixos e perfil · blueprint de UX</strong><code>2_Diagramas/blueprint-quest-casca_v06_20261019-1944.svg</code></figcaption>
+      <a href="../2_Diagramas/blueprint-quest-casca_v11_20261031-2329.svg"><img src="../2_Diagramas/blueprint-quest-casca_v11_20261031-2329.svg" alt="Blueprint da casca do perfil no quest: Tarefas e Feed como espaços, Carteira com as coisas do participante em grade nos quatro tamanhos, Ordenar a Carteira com o menu do card e a barra lateral aberta e encolhida"></a>
+      <figcaption><strong>Quest · tarefas, feed, carteira e perfil · blueprint de UX</strong><code>2_Diagramas/blueprint-quest-casca_v11_20261031-2329.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/blueprint-quest-modulo_v02_20261019-1944.svg"><img src="../2_Diagramas/blueprint-quest-modulo_v02_20261019-1944.svg" alt="Blueprint do módulo aberto no quest: aviso para completar e espaço do módulo"></a>
-      <figcaption><strong>Quest · módulo aberto · blueprint de UX</strong><code>2_Diagramas/blueprint-quest-modulo_v02_20261019-1944.svg</code></figcaption>
+      <a href="../2_Diagramas/blueprint-quest-modulo_v04_20261031-1842.svg"><img src="../2_Diagramas/blueprint-quest-modulo_v04_20261031-1842.svg" alt="Blueprint do módulo aberto no quest: aviso para completar e espaço do módulo"></a>
+      <figcaption><strong>Quest · módulo aberto · blueprint de UX</strong><code>2_Diagramas/blueprint-quest-modulo_v04_20261031-1842.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -1040,20 +1038,20 @@ Cenário: sem prazo, várias vezes
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v10</span></td><td>2026-10-21 22:12</td><td>Blueprint do acesso v03: logo na abertura sobre o fundo Halo no lugar do mascote de boas-vindas; status → Aprovado</td></tr>
-      <tr><td>v09</td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
-      <tr><td>v08</td><td>2026-10-19 23:46</td><td><code class="id">RF-34</code> e <code class="id">RF-35</code> alterados: nas janelas compact e medium o topo mostra só o logo e os avisos (nome e foto a partir do expanded) e Trocar perfil fica em Perfil, como no hub (<a class="ref" href="13_quest-ui.html#RN-127">Quest · UI <code class="id">RN-127</code></a>); blueprint da casca v06; status → Em revisão; topo na largura toda, com o trilho abaixo dele (<code class="id">RF-34</code>); blueprint do módulo aberto v02; nome e foto no topo a partir da janela medium e trilho sem Perfil (<code class="id">RF-34</code>, <code class="id">RF-35</code>); envios possíveis e feitos no card de tarefa (<code class="id">RF-37</code>, <code class="id">RN-134</code>); tarefas sem prazo separadas das com prazo (aba no compact, coluna à direita a partir da medium) e resumo do perfil só em Perfil (<code class="id">RF-36</code>, <code class="id">RNF-139</code>); tarefas sem prazo competitivas com o ranking da tarefa (<code class="id">RN-136</code>)</td></tr>
-      <tr><td>v07</td><td>2026-10-19 03:07</td><td>Status → Aprovado</td></tr>
-      <tr><td>v06</td><td>2026-10-19 03:04</td><td><code class="id">RF-34</code> e <code class="id">RF-35</code> alterados: nome do usuário ao lado da foto no topo, e Trocar perfil no toque do nome ou da foto; blueprint da casca v05</td></tr>
-      <tr><td>v05</td><td>2026-10-19 02:32</td><td><code class="id">RF-34</code> e <code class="id">RF-35</code> alterados: topo igual ao do hub, com a foto do perfil ativo, e o nome e Trocar perfil no toque da foto; blueprint da casca v04</td></tr>
-      <tr><td>v04</td><td>2026-10-19 02:25</td><td>Blueprint da casca v03: topo com logo do quest, avisos, nome com Trocar perfil e foto; status → Em revisão</td></tr>
-      <tr><td>v03</td><td>2026-10-19 00:53</td><td>Status → Aprovado</td></tr>
-      <tr><td>v02</td><td>2026-10-19 00:41</td><td>Pendências respondidas: <code class="id">RN-105</code> incluído; <code class="id">RF-29</code>, <code class="id">RF-31</code>, <code class="id">RF-39</code> e <code class="id">RN-96</code> alterados (cada código abre o seu ano; Remover no card); apelido do anônimo e formato do código fora de escopo; blueprints de acesso e da casca v02; seção Em aberto removida</td></tr>
-      <tr><td>v01</td><td>2026-10-19 00:30</td><td>Criação: <code class="id">RF-29</code> a <code class="id">RF-40</code>, <code class="id">RN-91</code> a <code class="id">RN-104</code>, <code class="id">RNF-136</code> a <code class="id">RNF-141</code> e blueprints de acesso, casca do perfil e módulo aberto</td></tr>
+      <tr><td><span class="boaz-versao">v21</span></td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
+      <tr><td>v20</td><td>2026-11-01 01:14</td><td>Feed respondido: publicações dos módulos para a instituição e para a turma ou equipe do participante (<code class="id">RF-34</code>, <code class="id">RN-222</code>); Tarefas é módulo da conta e existe em todo perfil (<code class="id">RN-223</code>); Em aberto retirado</td></tr>
+      <tr><td>v19</td><td>2026-10-31 23:30</td><td>Carteira com célula de 76dp ou mais, no mínimo 4 colunas e quantas couberem na janela, com o card do mesmo tamanho em qualquer janela, e topo escondido ao rolar (<code class="id">RNF-138</code>); blueprint da casca v11</td></tr>
+      <tr><td>v18</td><td>2026-10-31 22:55</td><td>Carteira com os quatro tamanhos de células quadradas, mínima 1x1, reduzida 2x2, normal 4x4 e expandida 4x8 (<code class="id">RF-38</code>, <code class="id">RNF-138</code>); blueprint da casca v10</td></tr>
+      <tr><td>v17</td><td>2026-10-31 22:18</td><td>Carteira como as coisas particulares do estudante ou do funcionário, com os cards nos quatro tamanhos do registro de módulos (<code class="id">RF-38</code>, <code class="id">RN-98</code>, <code class="id">RNF-138</code>); Ordenar a Carteira, com ordem e tamanho só no aparelho (<code class="id">RF-130</code>); botão de encolher a barra lateral (<code class="id">RF-34</code>); blueprint da casca v09</td></tr>
+      <tr><td>v16</td><td>2026-10-31 18:44</td><td>Barra lateral em acordeão com Tarefas, Feed, Carteira e Perfil a partir do medium, no lugar do trilho; subníveis em abas primárias no compact (<code class="id">RF-34</code>); blueprints novos</td></tr>
+      <tr><td>v15</td><td>2026-10-31 16:42</td><td>Casca só com a carcaça: navegação com Tarefas, Feed, Carteira e Perfil e trilho com Tarefas, Feed e Carteira (<code class="id">RF-34</code>); Tarefas vira o espaço do módulo Tarefas (<code class="id">RF-36</code>), e as regras de tarefas saem para o documento do módulo (MOD-09): saem <code class="id">RF-37</code>, <code class="id">RN-97</code>, <code class="id">RN-134</code>, <code class="id">RN-136</code>, <code class="id">RNF-137</code>, <code class="id">RNF-139</code> e <code class="id">RNF-140</code>; Fixos vira Carteira, com cards só de carcaça (<code class="id">RF-38</code>, <code class="id">RN-98</code>, <code class="id">RNF-138</code>); Perfil com o espaço do módulo Perfil (<code class="id">RF-39</code>, <code class="id">RN-103</code>); Feed e Tarefas sem contratação em aberto; blueprints da casca v07 e do módulo aberto v03; status → Em revisão</td></tr>
+      <tr><td>v14</td><td>2026-10-31 15:53</td><td>Aprovado</td></tr>
+      <tr><td>v13</td><td>2026-10-31 12:45</td><td>Link para o Módulo Usuários atualizado (17_modulo-usuario)</td></tr>
+      <tr><td>v12</td><td>2026-10-29 04:07</td><td>Link para Identidade e acesso atualizado (16_identidade-acesso)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v10 · 2026-10-21 22:12</span>
+    <span>boaz · v21 · 2026-11-01 01:20</span>
     <span class="boaz-arquivo">1_Requisitos/09_quest-ux.html</span>
   </div>
 </footer>

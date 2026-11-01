@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hub · UX base · boaz · v09</title>
+<title>Hub · UX base · boaz · v23</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="08_hub-ux">
 <meta name="boaz:caminho" content="1_Requisitos/08_hub-ux.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v09">
-<meta name="boaz:data" content="2026-10-21 22:12">
+<meta name="boaz:versao" content="v23">
+<meta name="boaz:data" content="2026-11-01 01:20">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -824,11 +824,11 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 <header class="boaz-marca-topo">
   <p class="boaz-eyebrow">boaz · Funcionalidade</p>
   <h1>Hub · UX base</h1>
-  <p class="boaz-objetivo"><span>Objetivo</span>definir como o hub se organiza no celular e na web — entrada, navegação, módulos contratados, catálogo, módulo aberto e conta — com espaços fixos para cada módulo trabalhar.</p>
+  <p class="boaz-objetivo"><span>Objetivo</span>definir como o hub se organiza no celular e na web — entrada, navegação, módulos (contratados, da conta e a contratar), feed, módulo aberto e conta — com espaços fixos para cada módulo trabalhar.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>08_hub-ux</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-21 · 22:12</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v23</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 01:20</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -838,7 +838,7 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     <h2>Contexto</h2>
     <p>Segundo documento de UX base, depois de <a class="ref" href="07_landing-page-ux.html">Landing page · UX base</a>. O <a class="ref" href="99_glossario.html#hub">hub</a> é onde o <a class="ref" href="00_visao-produto.html#personas">Educador</a>, o Gestor da escola, o Gestor corporativo e o time do deboaz trabalham, no navegador e no app. A casca é a mesma para todos: muda só o que cada pessoa pode ver. Tudo o que a pessoa faz acontece dentro de um <a class="ref" href="99_glossario.html#modulo">módulo</a>, e cada módulo ocupa os espaços em roxo tracejado das <a class="ref" href="99_glossario.html#blueprint">blueprints</a>. O documento do módulo diz o que aparece neles.</p>
     <p class="historia"><span>Como</span> <strong>educador ou gestor</strong>, <span>quero</span> achar meus módulos, ver o que pede atenção e contratar o que falta, <span>para</span> trabalhar sem procurar onde cada coisa fica</p>
-    <aside class="destaque nota"><p>Exemplo de um módulo de presença, só para mostrar a estrutura. A conta master contrata o módulo no Catálogo. A administração da instituição cadastra as turmas no módulo de turmas e delega os professores na aba Configuração. O professor faz a chamada na aba Utilização, na sala de aula. O estudante e os responsáveis acompanham a presença pelo quest (09), e o registro fica guardado para a escola analisar.</p></aside>
+    <aside class="destaque nota"><p>Exemplo de um módulo de presença, só para mostrar a estrutura. A conta master contrata o módulo na aba A contratar de Módulos. A administração da instituição cadastra as turmas no módulo de turmas e delega os professores na aba Configuração. O professor faz a chamada na aba Utilização, na sala de aula. O estudante e os responsáveis acompanham a presença pelo quest (09), e o registro fica guardado para a escola analisar.</p></aside>
   </section>
   <section id="requisitos-funcionais">
     <h2>Requisitos funcionais</h2>
@@ -846,17 +846,17 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
       <tbody>
         <tr id="RF-16"><td><code class="id">RF-16</code></td><td>O sistema deve dar acesso ao hub pelas telas Entrar e Criar conta, com a escolha entre instituição (escola ou empresa) e educador autônomo na criação da conta</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-17"><td><code class="id">RF-17</code></td><td>O sistema deve manter, em toda tela depois da entrada, a casca com o topo e a navegação entre Meus módulos, Catálogo e Conta como barra inferior na janela compact; a partir da medium, o topo ocupa a largura toda, com o nome e a foto que abrem a Conta, e o trilho (gaveta a partir da large) fica abaixo dele só com Meus módulos e Catálogo</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-19"><td><code class="id">RF-19</code></td><td>O sistema deve abrir o hub em Meus módulos, com duas abas num botão segmentado — Contratados e Da conta —, com um card por linha no compact e até dois a partir do medium, e cada card com a métrica que importa para quem cuida do módulo na capa (a instituição vê a gestão do módulo; o educador, a gestão das turmas dele); o toque no card abre o módulo para administrar</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-17"><td><code class="id">RF-17</code></td><td>O sistema deve manter, em toda tela depois da entrada, a casca com o topo e a navegação entre Módulos, Feed e Conta como barra inferior na janela compact; a partir da medium, o topo ocupa a largura toda, com o nome e a foto que abrem a Conta, e a barra lateral em acordeão fica abaixo dele com Módulos, Feed e Conta, os subníveis de Módulos dentro dele e, no alto, o botão de encolher, que deixa a barra só com os ícones (80dp) e a abre de novo; o Feed mostra as publicações dos módulos (<a class="ref" href="#RN-221">RN-221</a>); na conta do time deboaz não há Feed, e a navegação fica só com Módulos e Conta</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-19"><td><code class="id">RF-19</code></td><td>O sistema deve abrir o hub em Módulos, com três subníveis — Contratados, Da conta e A contratar —, em abas primárias abaixo do topo na janela compact e dentro de Módulos na barra lateral em acordeão a partir da medium, com os cards em grade, cada um num dos quatro tamanhos de células quadradas — mínima 1x1, reduzida 2x2, normal 4x4 (o padrão) e expandida 4x8 — do <a class="ref" href="15_modulos.html#RF-128">registro de módulos <code class="id">RF-128</code></a>; o card traz o cabeçalho do módulo (ícone, nome e notificações) e o espaço do conteúdo, que o documento do módulo define para cada tamanho; o toque no card, em qualquer tamanho, abre o módulo para administrar</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-20"><td><code class="id">RF-20</code></td><td>O sistema deve mostrar sobre o card de cada módulo o número de notificações não lidas dele</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-21"><td><code class="id">RF-21</code></td><td>O sistema deve permitir que cada pessoa reordene os módulos contratados arrastando os cards e guardar essa ordem no aparelho</td><td><span class="prio prio-deveria">Deveria</span></td></tr>
+        <tr id="RF-21"><td><code class="id">RF-21</code></td><td>O sistema deve permitir que cada pessoa, em Ordenar, mude a ordem dos módulos contratados, arrastando o card pela alça ou pelo menu do card, e o tamanho de cada card pelo mesmo menu, e guardar a ordem e os tamanhos só no aparelho (<a class="ref" href="15_modulos.html#RF-129">registro de módulos <code class="id">RF-129</code></a>)</td><td><span class="prio prio-deveria">Deveria</span></td></tr>
         <tr id="RF-22"><td><code class="id">RF-22</code></td><td>O sistema deve abrir o módulo mostrando só as abas, Configuração e Utilização, que a pessoa tem permissão de ver</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-23"><td><code class="id">RF-23</code></td><td>O sistema deve mostrar no Catálogo os módulos ainda não contratados, cada card com a descrição simples e o preço inicial; o detalhe do módulo mostra as telas dele (vitrine), o que é, como funciona, quem usa, o custo e a ação de incluir, para o cliente saber o que está contratando</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-23"><td><code class="id">RF-23</code></td><td>O sistema deve mostrar na aba A contratar de Módulos os módulos ainda não contratados, cada card com a descrição simples e o preço inicial; o detalhe do módulo mostra as telas dele (vitrine), o que é, como funciona, quem usa, o custo e a ação de incluir, para o cliente saber o que está contratando</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-24"><td><code class="id">RF-24</code></td><td>O sistema deve calcular no detalhe do módulo o custo pelo número de pessoas que vão usar e pelo prazo escolhido, mensal ou anual, com os prazos de pagamento, antes de <q class="ui">Incluir na conta</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-25"><td><code class="id">RF-25</code></td><td>O sistema deve mostrar em Meus módulos o módulo recém-contratado, com o aviso de configuração até ele ser configurado</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-25"><td><code class="id">RF-25</code></td><td>O sistema deve mostrar em Contratados o módulo recém-contratado, com o aviso de configuração até ele ser configurado</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-26"><td><code class="id">RF-26</code></td><td>O sistema deve pedir um código ao adicionar um módulo do time deboaz e incluí-lo na conta só quando o código confere</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-27"><td><code class="id">RF-27</code></td><td>O sistema deve reunir em Conta o perfil, os dados da instituição ou do educador autônomo, o seletor de tema e a ação <q class="ui">Sair</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-28"><td><code class="id">RF-28</code></td><td>O sistema deve mostrar em Entrar as contas que já entraram naquele aparelho, uma por instituição, e a ação <q class="ui">Outra conta</q>, que entra com e-mail e senha</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-28"><td><code class="id">RF-28</code></td><td>O sistema deve mostrar em Entrar as contas que já entraram naquele aparelho, uma por instituição, e a ação <q class="ui">Outra conta</q>, que entra com e-mail e senha; no aparelho que ainda não tem contas, a tela mostra primeiro só <q class="ui">Entrar</q> e <q class="ui">Criar conta</q>, e as contas passam a aparecer depois da primeira entrada</td><td><span class="prio prio-deve">Deve</span></td></tr>
       </tbody>
     </table>
   </section>
@@ -866,19 +866,20 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <thead><tr><th>ID</th><th>Regra</th></tr></thead>
       <tbody>
         <tr id="RN-76"><td><code class="id">RN-76</code></td><td>Só a conta master contrata módulos; o educador autônomo é a conta master da própria conta</td></tr>
-        <tr id="RN-77"><td><code class="id">RN-77</code></td><td>Quem trabalha para uma instituição e não é conta master vê o Catálogo com os preços, só para consulta, sem <q class="ui">Incluir na conta</q>; sugere módulos pelo módulo de sugestão</td></tr>
+        <tr id="RN-77"><td><code class="id">RN-77</code></td><td>Quem trabalha para uma instituição e não é conta master vê a aba A contratar com os preços, só para consulta, sem <q class="ui">Incluir na conta</q>; sugere módulos pelo módulo de sugestão</td></tr>
         <tr id="RN-78"><td><code class="id">RN-78</code></td><td>A casca é a mesma para todos os perfis; cada pessoa vê só os módulos e as abas que a instituição contratou e permitiu para ela</td></tr>
-        <tr id="RN-79"><td><code class="id">RN-79</code></td><td>Toda conta de instituição ou de educador autônomo vem com os módulos da conta: suporte e mensagens, para falar com o time deboaz, e contas, que calcula o pagamento das contratações</td></tr>
+        <tr id="RN-79"><td><code class="id">RN-79</code></td><td>Toda conta de instituição ou de educador autônomo vem com os módulos da conta: SAC, para a escola ou a instituição falar com o time deboaz, contas, que calcula o pagamento das contratações, Usuários, que cria os usuários da conta e decide as permissões deles (<a class="ref" href="17_modulo-usuario.html#RF-105">Módulo Usuários <code class="id">RF-105</code></a>), Turmas, que cadastra as turmas, e Perfil, o painel do participante no quest; a lista completa fica no <a class="ref" href="15_modulos.html#RN-203">registro de módulos</a></td></tr>
         <tr id="RN-80"><td><code class="id">RN-80</code></td><td>Quem trabalha para uma instituição também recebe o módulo de sugestão entre os módulos da conta</td></tr>
         <tr id="RN-81"><td><code class="id">RN-81</code></td><td>Os módulos da conta ficam na aba Da conta e fora da ordem personalizada</td></tr>
         <tr id="RN-82"><td><code class="id">RN-82</code></td><td>O preço de um módulo depende do número de pessoas que vão usá-lo e do prazo de contratação, mensal ou anual</td></tr>
         <tr id="RN-83"><td><code class="id">RN-83</code></td><td>A aba Configuração é da administração da instituição; a aba Utilização é de quem foi delegado para usar o módulo; o acompanhamento pelo estudante e pelos responsáveis acontece no quest</td></tr>
-        <tr id="RN-84"><td><code class="id">RN-84</code></td><td>Uma conta do time deboaz não tem custos, começa sem módulos e vê no Catálogo só os módulos do time deboaz</td></tr>
+        <tr id="RN-84"><td><code class="id">RN-84</code></td><td>Uma conta do time deboaz não tem custos, começa sem módulos e vê em A contratar só os módulos do time deboaz</td></tr>
         <tr id="RN-85"><td><code class="id">RN-85</code></td><td>Um módulo do time deboaz é solicitado ao time e entra na conta só com o código entregue junto da solicitação</td></tr>
-        <tr id="RN-86"><td><code class="id">RN-86</code></td><td>O documento de cada módulo define o card, as abas que ele tem e o conteúdo delas, sem mudar a casca desta UX base</td></tr>
+        <tr id="RN-86"><td><code class="id">RN-86</code></td><td>O documento de cada módulo define o conteúdo do card, as abas que ele tem e o conteúdo delas, sem mudar a casca desta UX base</td></tr>
         <tr id="RN-87"><td><code class="id">RN-87</code></td><td>Mudar a casca ou a estrutura das telas exige uma nova versão deste documento e das blueprints antes de chegar à UI (12_hub_ui)</td></tr>
         <tr id="RN-88"><td><code class="id">RN-88</code></td><td>Não há lista única de notificações: cada módulo mostra as próprias notificações quando aberto</td></tr>
-        <tr id="RN-89"><td><code class="id">RN-89</code></td><td>O tema e a ordem dos módulos ficam guardados no aparelho</td></tr>
+        <tr id="RN-89"><td><code class="id">RN-89</code></td><td>O tema, a ordem dos módulos e o tamanho de cada card ficam guardados só no aparelho (<a class="ref" href="15_modulos.html#RN-215">registro de módulos <code class="id">RN-215</code></a>)</td></tr>
+        <tr id="RN-221"><td><code class="id">RN-221</code></td><td>Feed do hub: cada módulo decide, no documento dele, se publica no Feed e para quem, toda a instituição ou uma turma ou equipe; a pessoa vê as publicações para toda a instituição e para as turmas e equipes em que está, e a conta master e o educador autônomo veem todas as da conta; as publicações vêm da mais recente para a mais antiga, cada uma com o ícone e o nome do módulo, o público e a data, e o conteúdo é o que o documento do módulo define; a conta do time deboaz não tem Feed</td></tr>
         <tr id="RN-90"><td><code class="id">RN-90</code></td><td>Cada instituição cria a conta de quem trabalha nela: quem trabalha em duas instituições tem duas contas, cada uma com as regras da sua instituição</td></tr>
       </tbody>
     </table>
@@ -888,11 +889,11 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     <table>
       <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
       <tbody>
-        <tr id="RNF-130"><td><code class="id">RNF-130</code></td><td><span class="tag">Usabilidade</span></td><td>Meus módulos, Catálogo e Conta ficam a 1 toque de qualquer tela da casca</td></tr>
+        <tr id="RNF-130"><td><code class="id">RNF-130</code></td><td><span class="tag">Usabilidade</span></td><td>Módulos, Feed e Conta ficam a 1 toque de qualquer tela da casca</td></tr>
         <tr id="RNF-131"><td><code class="id">RNF-131</code></td><td><span class="tag">Usabilidade</span></td><td>O custo do detalhe do módulo é recalculado a cada mudança do número de pessoas ou do prazo, sem sair da tela</td></tr>
-        <tr id="RNF-132"><td><code class="id">RNF-132</code></td><td><span class="tag">Compatibilidade</span></td><td>A grade de Meus módulos tem 2 colunas no compact, 3 no medium e 4 a partir do expanded</td></tr>
-        <tr id="RNF-133"><td><code class="id">RNF-133</code></td><td><span class="tag">Compatibilidade</span></td><td>No expanded e acima, o Catálogo mostra a lista e o detalhe do módulo lado a lado</td></tr>
-        <tr id="RNF-134"><td><code class="id">RNF-134</code></td><td><span class="tag">Acessibilidade</span></td><td>A ordem dos módulos também pode ser mudada sem arrastar, pelas ações mover para cima e mover para baixo, inclusive pelo teclado</td></tr>
+        <tr id="RNF-132"><td><code class="id">RNF-132</code></td><td><span class="tag">Compatibilidade</span></td><td>Os cards de Módulos, também ao ordenar, ficam numa grade de células quadradas de 76dp ou mais, com quantas colunas couberem na janela (no mínimo 4), e o topo e as abas se escondem ao rolar (<a class="ref" href="15_modulos.html#RN-216">registro de módulos <code class="id">RN-216</code></a>): a mínima ocupa 1 × 1, a reduzida 2 × 2, a normal 4 × 4 e a expandida 4 × 8 (largura × altura) (<a class="ref" href="15_modulos.html#RN-214">registro de módulos <code class="id">RN-214</code></a>)</td></tr>
+        <tr id="RNF-133"><td><code class="id">RNF-133</code></td><td><span class="tag">Compatibilidade</span></td><td>No expanded e acima, a aba A contratar mostra a lista e o detalhe do módulo lado a lado</td></tr>
+        <tr id="RNF-134"><td><code class="id">RNF-134</code></td><td><span class="tag">Acessibilidade</span></td><td>A ordem dos módulos também pode ser mudada sem arrastar, pelas ações mover para cima e mover para baixo do menu do card, que também muda o tamanho, inclusive pelo teclado</td></tr>
         <tr id="RNF-135"><td><code class="id">RNF-135</code></td><td><span class="tag">Acessibilidade</span></td><td>O leitor de tela anuncia o número de notificações junto com o nome do módulo</td></tr>
       </tbody>
     </table>
@@ -904,38 +905,64 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       <pre class="gherkin">Cenário: criar conta de educador autônomo
   Dado a pessoa na tela Criar conta
   Quando escolhe "Educador autônomo", preenche os dados e toca em "Criar conta"
-  Então entra no hub em Meus módulos, com os módulos da conta</pre>
+  Então entra no hub em Módulos, com os módulos da conta</pre>
     </article>
     <article class="criterio" id="ca-RF-17">
       <h3><code class="id">RF-17</code> Casca e navegação por janela</h3>
       <pre class="gherkin">Cenário: casca em toda tela
   Dado a pessoa dentro de um módulo
-  Então o topo e a navegação entre Meus módulos, Catálogo e Conta continuam na tela
+  Então o topo e a navegação entre Módulos, Feed e Conta continuam na tela
 
 Cenário: do celular para a web
   Dado o hub aberto numa janela compact com a barra inferior
   Quando a janela passa a expanded
-  Então a navegação vira trilho à esquerda, abaixo do topo, com Meus módulos e Catálogo
-  E o topo continua na largura toda da janela, com o nome e a foto que abrem a Conta</pre>
+  Então a navegação vira a barra lateral em acordeão, abaixo do topo, com Módulos, Feed e Conta
+  E Contratados, Da conta e A contratar ficam dentro de Módulos, sem as abas
+  E o topo continua na largura toda da janela, com o nome e a foto que abrem a Conta
+
+Cenário: encolher a barra lateral
+  Dado o hub numa janela expanded com a barra lateral aberta
+  Quando a pessoa toca no botão de encolher, no alto da barra
+  Então a barra fica só com os ícones de Módulos, Feed e Conta
+  E o conteúdo ganha a largura que a barra liberou
+
+Cenário: publicação para uma turma
+  Dado um módulo que publicou no Feed um aviso para a turma 7º A
+  E o professor Caio, staff da turma 7º A, e a professora Rita, de outra turma
+  Quando cada um abre o Feed
+  Então o Caio vê o aviso com o ícone e o nome do módulo, "7º A" e a data
+  E a Rita não vê o aviso
+
+Cenário: conta do time deboaz
+  Dado o administrador do deboaz no hub
+  Então a navegação mostra só "Módulos" e "Conta"</pre>
     </article>
     <article class="criterio" id="ca-RF-19">
-      <h3><code class="id">RF-19</code> Meus módulos</h3>
-      <pre class="gherkin">Cenário: duas abas
+      <h3><code class="id">RF-19</code> Módulos</h3>
+      <pre class="gherkin">Cenário: três subníveis
   Dado uma conta com dois módulos contratados
   Quando a pessoa entra no hub
-  Então vê a aba Contratados marcada, com os dois módulos, e a aba Da conta ao lado
+  Então vê a aba Contratados marcada, com os dois módulos, e as abas Da conta e A contratar ao lado
 
-Cenário: métrica na capa
-  Dado a instituição com a Presença contratada
-  Então o card da Presença mostra a presença da semana
-  E, para o educador, o card mostra as turmas dele ainda sem chamada hoje</pre>
+Cenário: carcaça do card
+  Dado um módulo contratado
+  Então o card mostra o ícone, o nome e as notificações do módulo
+  E o espaço do conteúdo, preenchido como define o documento do módulo
+
+Cenário: tamanhos do card
+  Dado o SAC na normal, o Quiz na reduzida, duas mínimas e a Presença na expandida
+  Quando a pessoa abre Contratados no compact
+  Então o SAC ocupa a linha toda num quadrado, com os números
+  E o Quiz ocupa metade de uma linha num quadrado, com as duas mínimas ao lado
+  E a Presença ocupa a linha toda com o dobro da altura do SAC
+  E o toque em qualquer um dos cards abre o módulo</pre>
     </article>
     <article class="criterio" id="ca-RF-20">
       <h3><code class="id">RF-20</code> Notificação no módulo</h3>
       <pre class="gherkin">Cenário: três notificações não lidas
-  Dado três notificações não lidas no módulo de suporte
-  Quando a pessoa abre Meus módulos
-  Então o card do suporte mostra 3</pre>
+  Dado três notificações não lidas no SAC
+  Quando a pessoa abre Da conta
+  Então o card do SAC mostra 3</pre>
     </article>
     <article class="criterio" id="ca-RF-22">
       <h3><code class="id">RF-22</code> Abas por permissão</h3>
@@ -945,10 +972,10 @@ Cenário: métrica na capa
   Então vê o conteúdo de Utilização, sem a aba Configuração</pre>
     </article>
     <article class="criterio" id="ca-RF-23">
-      <h3><code class="id">RF-23</code> Catálogo</h3>
+      <h3><code class="id">RF-23</code> A contratar</h3>
       <pre class="gherkin">Cenário: só o que falta contratar
   Dado uma conta com o módulo A contratado
-  Quando a conta master abre o Catálogo
+  Quando a conta master abre a aba A contratar
   Então o módulo A não aparece
   E cada módulo listado mostra a descrição simples e o preço inicial
 
@@ -967,15 +994,15 @@ Cenário: conhecer antes de contratar
       <h3><code class="id">RF-25</code> Módulo recém-contratado</h3>
       <pre class="gherkin">Cenário: contratar e configurar
   Dado a conta master incluiu um módulo na conta
-  Quando volta a Meus módulos
+  Quando volta a Contratados
   Então o módulo aparece com o aviso "Configurar"</pre>
     </article>
     <article class="criterio" id="ca-RF-26">
       <h3><code class="id">RF-26</code> Código do time deboaz</h3>
       <pre class="gherkin">Cenário: código certo
-  Dado uma conta do time deboaz no Catálogo
+  Dado uma conta do time deboaz na aba A contratar
   Quando toca em "Adicionar" num módulo e informa o código recebido
-  Então o módulo aparece em Meus módulos
+  Então o módulo aparece em Contratados
 
 Cenário: código errado
   Dado um código que não confere
@@ -996,13 +1023,18 @@ Cenário: código errado
   Dado um professor que já entrou neste aparelho com a conta da escola A e com a da escola B
   Quando abre a tela Entrar
   Então vê as duas contas, cada uma com o nome da escola
-  E a ação "Outra conta"</pre>
+  E a ação "Outra conta"
+
+Cenário: primeiro acesso no aparelho
+  Dado um aparelho em que ninguém entrou no hub
+  Quando a pessoa abre o hub
+  Então vê só "Entrar" e "Criar conta", sem lista de contas</pre>
     </article>
   </section>
   <section id="fora-de-escopo">
     <h2>Fora de escopo</h2>
     <ul class="fora">
-      <li>Telas internas de cada módulo: ficam no documento do módulo</li>
+      <li>Telas internas e conteúdo do card de cada módulo: ficam no documento do módulo</li>
       <li>Campos do cadastro e mais de uma conta master por instituição: módulo de cadastro</li>
       <li>Cobrança e meios de pagamento: módulo de contas</li>
       <li>Suporte, mensagens, sugestão e painel de administração do deboaz: documentos dos próprios módulos</li>
@@ -1018,16 +1050,16 @@ Cenário: código errado
       <figcaption><strong>Hub · entrada · blueprint de UX</strong><code>2_Diagramas/blueprint-hub-entrada_v03_20261021-2153.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/blueprint-hub-meus-modulos_v05_20261019-1944.svg"><img src="../2_Diagramas/blueprint-hub-meus-modulos_v05_20261019-1944.svg" alt="Blueprint de Meus módulos e Conta: módulos contratados com notificações, módulos da conta, ordenação e navegação por barra e trilho"></a>
-      <figcaption><strong>Hub · meus módulos · blueprint de UX</strong><code>2_Diagramas/blueprint-hub-meus-modulos_v05_20261019-1944.svg</code></figcaption>
+      <a href="../2_Diagramas/blueprint-hub-meus-modulos_v10_20261031-2329.svg"><img src="../2_Diagramas/blueprint-hub-meus-modulos_v10_20261031-2329.svg" alt="Blueprint de Módulos, Feed e Conta, com os cards em grade nos quatro tamanhos, o menu do card ao ordenar e a barra lateral encolhida: abas primárias Contratados, Da conta e A contratar no compact, cards só com a carcaça, ordenação em lista, Feed reservado e barra lateral em acordeão no expanded"></a>
+      <figcaption><strong>Hub · módulos, feed e conta · blueprint de UX</strong><code>2_Diagramas/blueprint-hub-meus-modulos_v10_20261031-2329.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/blueprint-hub-catalogo_v04_20261019-1944.svg"><img src="../2_Diagramas/blueprint-hub-catalogo_v04_20261019-1944.svg" alt="Blueprint do Catálogo: módulos a contratar, detalhe com custo por pessoas e prazo, código do time deboaz e lista com detalhe no expanded"></a>
-      <figcaption><strong>Hub · catálogo · blueprint de UX</strong><code>2_Diagramas/blueprint-hub-catalogo_v04_20261019-1944.svg</code></figcaption>
+      <a href="../2_Diagramas/blueprint-hub-catalogo_v06_20261031-1842.svg"><img src="../2_Diagramas/blueprint-hub-catalogo_v06_20261031-1842.svg" alt="Blueprint da aba A contratar de Módulos: módulos a contratar, detalhe com custo, código do time deboaz e lista com detalhe ao lado da barra lateral em acordeão no expanded"></a>
+      <figcaption><strong>Hub · módulos · a contratar · blueprint de UX</strong><code>2_Diagramas/blueprint-hub-catalogo_v06_20261031-1842.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/blueprint-hub-modulo_v02_20261019-1944.svg"><img src="../2_Diagramas/blueprint-hub-modulo_v02_20261019-1944.svg" alt="Blueprint do módulo aberto: aviso de configuração, abas por permissão e espaço do módulo, para a administração e para a pessoa delegada"></a>
-      <figcaption><strong>Hub · módulo aberto · blueprint de UX</strong><code>2_Diagramas/blueprint-hub-modulo_v02_20261019-1944.svg</code></figcaption>
+      <a href="../2_Diagramas/blueprint-hub-modulo_v04_20261031-1842.svg"><img src="../2_Diagramas/blueprint-hub-modulo_v04_20261031-1842.svg" alt="Blueprint do módulo aberto: aviso de configuração, abas por permissão e espaço do módulo, para a administração e para a pessoa delegada"></a>
+      <figcaption><strong>Hub · módulo aberto · blueprint de UX</strong><code>2_Diagramas/blueprint-hub-modulo_v04_20261031-1842.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -1036,19 +1068,20 @@ Cenário: código errado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v09</span></td><td>2026-10-21 22:12</td><td>Blueprint da entrada v03: logo na abertura sobre o fundo Halo no lugar do mascote de boas-vindas; status → Aprovado</td></tr>
-      <tr><td>v08</td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
-      <tr><td>v07</td><td>2026-10-20 01:47</td><td><code class="id">RF-17</code> alterado: o topo ocupa a largura toda e o trilho fica abaixo dele; blueprints de meus módulos v05 e do catálogo v04 (também com o topo só com logo e avisos até o medium e Conta embaixo no trilho, como <a class="ref" href="12_hub-ui.html#RN-124">Hub · UI <code class="id">RN-124</code></a>) e do módulo aberto v02; status → Em revisão; trilho e gaveta sem Conta, que abre pelo nome e pela foto do topo a partir da janela medium; Meus módulos em duas abas (Contratados e Da conta) com a métrica de quem cuida do módulo na capa (<code class="id">RF-19</code>, <code class="id">RN-81</code>); detalhe do catálogo com as telas, como funciona e quem usa (<code class="id">RF-23</code>); cards de Meus módulos um por linha no compact e até dois depois (<code class="id">RF-19</code>)</td></tr>
-      <tr><td>v06</td><td>2026-10-19 03:07</td><td>Status → Aprovado</td></tr>
-      <tr><td>v05</td><td>2026-10-19 03:04</td><td>Blueprints de meus módulos v04 e do catálogo v03: nome da instituição ou da pessoa ao lado da foto no topo</td></tr>
-      <tr><td>v04</td><td>2026-10-19 02:16</td><td>Blueprints de meus módulos v03 e do catálogo v02: topo com logo, avisos e conta, sem o título da tela, que a navegação já marca; status → Em revisão</td></tr>
-      <tr><td>v03</td><td>2026-10-18 23:51</td><td>Status → Aprovado</td></tr>
-      <tr><td>v02</td><td>2026-10-18 23:24</td><td>Pendências respondidas: <code class="id">RF-18</code> incorporado a <code class="id">RF-17</code> e removido; <code class="id">RF-28</code>, <code class="id">RN-88</code> a <code class="id">RN-90</code> incluídos; <code class="id">RF-21</code> e <code class="id">RN-77</code> alterados; regras de login fora de escopo; blueprints de entrada e de meus módulos v02; seção Em aberto removida</td></tr>
-      <tr><td>v01</td><td>2026-10-18 23:07</td><td>Criação: <code class="id">RF-16</code> a <code class="id">RF-27</code>, <code class="id">RN-76</code> a <code class="id">RN-87</code>, <code class="id">RNF-130</code> a <code class="id">RNF-135</code> e blueprints de entrada, meus módulos, catálogo e módulo aberto</td></tr>
+      <tr><td><span class="boaz-versao">v23</span></td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
+      <tr><td>v22</td><td>2026-11-01 01:14</td><td>Feed respondido: publicações dos módulos para toda a instituição ou para uma turma ou equipe, e a conta do time deboaz sem Feed (<code class="id">RF-17</code>, <code class="id">RN-221</code>); Em aberto retirado</td></tr>
+      <tr><td>v21</td><td>2026-10-31 23:30</td><td>Cards de Módulos com célula de 76dp ou mais, no mínimo 4 colunas e quantas couberem na janela, com o card do mesmo tamanho em qualquer janela, e topo e abas escondidos ao rolar (<code class="id">RNF-132</code>); blueprint de Módulos v10</td></tr>
+      <tr><td>v20</td><td>2026-10-31 22:55</td><td>Card de módulo em quatro tamanhos de células quadradas (largura × altura): mínima 1x1, reduzida 2x2, normal 4x4 (o padrão) e expandida 4x8, numa grade de 4 colunas no compact e no medium e 8 a partir do expanded (<code class="id">RF-19</code>, <code class="id">RNF-132</code>); blueprint de Módulos v09</td></tr>
+      <tr><td>v19</td><td>2026-10-31 22:16</td><td>Cards de Módulos em grade nos quatro tamanhos do registro de módulos (<code class="id">RF-19</code>, <code class="id">RNF-132</code>); ordem e tamanho pelo menu do card, só no aparelho (<code class="id">RF-21</code>, <code class="id">RN-89</code>, <code class="id">RNF-134</code>); botão de encolher a barra lateral (<code class="id">RF-17</code>); Entrar e Criar conta primeiro no aparelho sem contas (<code class="id">RF-28</code>); blueprint de Módulos v08</td></tr>
+      <tr><td>v18</td><td>2026-10-31 18:44</td><td>Subníveis de Módulos em abas primárias no compact e dentro de Módulos na barra lateral em acordeão a partir do medium, no lugar do trilho e do botão segmentado (<code class="id">RF-17</code>, <code class="id">RF-19</code>, <code class="id">RNF-132</code>); cards em 1 coluna no medium; blueprints novos</td></tr>
+      <tr><td>v17</td><td>2026-10-31 16:40</td><td>Casca só com a carcaça: navegação com Módulos, Feed e Conta e trilho com Módulos e Feed (<code class="id">RF-17</code>, <code class="id">RNF-130</code>); Módulos com as abas Contratados, Da conta e A contratar, card com o cabeçalho e o espaço do conteúdo do módulo (<code class="id">RF-19</code>, <code class="id">RF-25</code>, <code class="id">RN-86</code>, <code class="id">RNF-132</code>); o Catálogo vira a aba A contratar (<code class="id">RF-23</code>, <code class="id">RF-26</code>, <code class="id">RN-77</code>, <code class="id">RN-84</code>, <code class="id">RNF-133</code>); Feed com o conteúdo em aberto; blueprints de módulos v06, a contratar v05 e módulo aberto v03; status → Em revisão</td></tr>
+      <tr><td>v16</td><td>2026-10-31 15:53</td><td>Aprovado</td></tr>
+      <tr><td>v15</td><td>2026-10-31 15:51</td><td><code class="id">RN-79</code>: módulos da conta com Turmas e Perfil e a lista completa no registro de módulos (15_modulos)</td></tr>
+      <tr><td>v14</td><td>2026-10-31 13:35</td><td><code class="id">RN-79</code>: SAC é o módulo da escola ou da instituição para falar com o time deboaz, sem a menção a mensagens (Mensagens é outro módulo, 15_modulos MOD-16)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v09 · 2026-10-21 22:12</span>
+    <span>boaz · v23 · 2026-11-01 01:20</span>
     <span class="boaz-arquivo">1_Requisitos/08_hub-ux.html</span>
   </div>
 </footer>

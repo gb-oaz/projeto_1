@@ -93,6 +93,22 @@
         "body": { "$value": "{md.sys.typescale.body-medium}" }
       },
 
+      "module-card": {
+        "$descricao": "Card de módulo em quatro tamanhos, em células quadradas numa grade como os blocos do Windows Phone (largura × altura em células): mínima 1x1 (ícone e selo), reduzida 2x2 (ícone, nome e dado macro), normal 4x4 (o padrão, números e gráfico) e expandida 4x8 (painel completo). A altura da célula é igual à largura da coluna; a célula tem um lado mínimo e a grade põe quantas colunas couberem, então o card tem o mesmo tamanho em qualquer janela e as janelas largas mostram mais cards lado a lado.",
+        "cell-min-size": { "$value": 76, "$descricao": "lado mínimo da célula: a célula estica até caber mais uma coluna (de 76 a cerca de 100dp)" },
+        "grid-columns-min": { "$value": 4, "$descricao": "a grade nunca tem menos de 4 colunas: abaixo disso, a célula encolhe" },
+        "grid-gap": { "$value": 8 },
+        "minimal-columns": { "$value": 1 },
+        "minimal-rows": { "$value": 1 },
+        "reduced-columns": { "$value": 2 },
+        "reduced-rows": { "$value": 2 },
+        "normal-columns": { "$value": 4 },
+        "normal-rows": { "$value": 4 },
+        "expanded-columns": { "$value": 4 },
+        "expanded-rows": { "$value": 8 },
+        "options-icon-size": { "$value": 24, "$descricao": "botão de opções do card, só ordenando: mover para cima ou para baixo e o tamanho" }
+      },
+
       "text-field": {
         "height": { "$value": 56 },
         "padding": { "$value": 16 },
@@ -171,7 +187,14 @@
         "item-shape": { "$value": "{md.sys.shape.corner.full}" },
         "indicator-color": { "$value": "{md.sys.color.secondary-container}" },
         "label": { "$value": "{md.sys.typescale.label-large}" },
-        "headline": { "$value": "{md.sys.typescale.title-small}" }
+        "headline": { "$value": "{md.sys.typescale.title-small}" },
+        "side-width": { "$value": 280, "$descricao": "barra lateral em acordeão do hub e do quest nas janelas medium e expanded, abaixo do topo" },
+        "side-container-color": { "$value": "{md.sys.color.surface-container}", "$descricao": "a mesma da barra de navegação do compact" },
+        "subitem-height": { "$value": 48, "$descricao": "subnível dentro de um destino aberto no acordeão" },
+        "subitem-inset": { "$value": 40, "$descricao": "início do indicador do subnível, recuado em relação ao destino" },
+        "subitem-label": { "$value": "{md.sys.typescale.label-large}" },
+        "expand-icon-size": { "$value": 24, "$descricao": "seta de abrir (expandir) e fechar (recolher) o destino com subníveis" },
+        "side-collapsed-width": { "$value": 80, "$descricao": "barra lateral encolhida: só os ícones e os rótulos curtos, para dar espaço ao editar e ordenar módulos" }
       },
 
       "dialog": {
@@ -236,6 +259,21 @@
         "label-color": { "$value": "{md.sys.color.on-surface}" },
         "selected-container-color": { "$value": "{md.sys.color.secondary-container}" },
         "selected-label-color": { "$value": "{md.sys.color.on-secondary-container}" }
+      },
+      "search-bar": {
+        "$descricao": "Barra de busca: pesquisa numa lista (ex.: buscar por nome ou sigla), com o ícone de busca na frente e, ao digitar, o botão de limpar.",
+        "height": { "$value": 56 },
+        "padding": { "$value": 16 },
+        "gap": { "$value": 16 },
+        "icon-size": { "$value": 24 },
+        "shape": { "$value": "{md.sys.shape.corner.full}" },
+        "container-color": { "$value": "{md.sys.color.surface-container-high}" },
+        "elevation": { "$value": "{md.sys.elevation.level0}", "$descricao": "plana, como os cards do hub: o contêiner já destaca da Estampa" },
+        "leading-icon-color": { "$value": "{md.sys.color.on-surface}" },
+        "trailing-icon-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "supporting-text": { "$value": "{md.sys.typescale.body-large}" },
+        "supporting-text-color": { "$value": "{md.sys.color.on-surface-variant}" },
+        "input-text-color": { "$value": "{md.sys.color.on-surface}" }
       },
 
       "menu": {

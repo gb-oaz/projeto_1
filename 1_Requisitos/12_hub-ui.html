@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hub · UI · boaz · v07</title>
+<title>Hub · UI · boaz · v21</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="12_hub-ui">
 <meta name="boaz:caminho" content="1_Requisitos/12_hub-ui.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v07">
-<meta name="boaz:data" content="2026-10-24 03:59">
+<meta name="boaz:versao" content="v21">
+<meta name="boaz:data" content="2026-11-01 01:20">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -914,11 +914,11 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
 <header class="boaz-marca-topo">
   <p class="boaz-eyebrow">boaz · Funcionalidade</p>
   <h1>Hub · UI</h1>
-  <p class="boaz-objetivo"><span>Objetivo</span>definir como as telas do hub ficam no celular e na web — entrada, meus módulos, conta, catálogo e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco.</p>
+  <p class="boaz-objetivo"><span>Objetivo</span>definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>12_hub-ui</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v07</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 03:59</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v21</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 01:20</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -935,17 +935,17 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
     <table>
       <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
       <tbody>
-        <tr id="RF-75"><td><code class="id">RF-75</code></td><td>O sistema deve mostrar na entrada as <a class="ref" href="10_componentes-compostos-comuns.html#RF-48">boas-vindas com o logo</a>: o logo inteiro do hub na animação de abertura sobre o fundo Halo, o título <q class="ui">Que bom te ver!</q>, o apoio <q class="ui">Escolha a conta para entrar</q>, os cards das contas acessadas, com a foto ou a inicial de cada uma, e a ação <q class="ui">Outra conta</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-75"><td><code class="id">RF-75</code></td><td>O sistema deve mostrar na entrada as <a class="ref" href="10_componentes-compostos-comuns.html#RF-48">boas-vindas com o logo</a>: o logo inteiro do hub na animação de abertura sobre o fundo Halo, o título <q class="ui">Que bom te ver!</q>, o apoio <q class="ui">Escolha a conta para entrar</q>, os cards das contas acessadas, com a foto ou a inicial de cada uma, e a ação <q class="ui">Outra conta</q>; no aparelho ainda sem contas, o apoio <q class="ui">Entre ou crie a conta para começar</q> e só as ações <q class="ui">Entrar</q> (cheia) e <q class="ui">Criar conta</q> (contornada), no lugar dos cards</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-76"><td><code class="id">RF-76</code></td><td>O sistema deve mostrar em Entrar os campos <q class="ui">E-mail</q> e <q class="ui">Senha</q> e as ações <q class="ui">Entrar</q>, <q class="ui">Esqueci a senha</q> e <q class="ui">Criar conta</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-77"><td><code class="id">RF-77</code></td><td>O sistema deve mostrar em Criar conta o <q class="ui">Tipo de conta</q> num botão segmentado cheio, na largura do formulário, em que a opção marcada preenche o segmento inteiro (<q class="ui">Escola</q>, <q class="ui">Empresa</q> e <q class="ui">Autônomo</q>), o espaço do módulo de cadastro e as ações <q class="ui">Criar conta</q> e <q class="ui">Já tenho conta · Entrar</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-78"><td><code class="id">RF-78</code></td><td>O sistema deve mostrar a entrada, a partir da janela medium, em duas colunas, sem barra do topo: o logo centralizado sobre o fundo Halo, sem painel de texto, e as contas acessadas ao lado</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-79"><td><code class="id">RF-79</code></td><td>O sistema deve mostrar em Meus módulos o botão segmentado <q class="ui">Contratados</q> | <q class="ui">Da conta</q> e os cards de módulo — um por linha no compact e até dois a partir do medium — com o número principal e a tendência, a série ou o progresso e os números de apoio nas cores da paleta, como <q class="ui">94%</q> · <q class="ui">presença na semana</q> para a instituição e <q class="ui">2 turmas</q> · <q class="ui">ainda sem chamada hoje</q> para o educador</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-80"><td><code class="id">RF-80</code></td><td>O sistema deve mostrar na ordenação o topo <q class="ui">Ordenar módulos</q> com <q class="ui">Concluir</q>, o apoio <q class="ui">Arraste ou use as setas para mudar a ordem</q> e só os módulos contratados (os da conta ficam na outra aba)</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-81"><td><code class="id">RF-81</code></td><td>O sistema deve mostrar em Conta a foto ou a inicial, o nome da instituição (ou da pessoa, na conta do educador autônomo), a pessoa responsável, como <q class="ui">Responsável · Ana Souza</q>, e os itens <q class="ui">Dados da instituição</q>, <q class="ui">Foto</q>, <q class="ui">Tema</q> (com o nome do tema ativo) e <q class="ui">Sair</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-82"><td><code class="id">RF-82</code></td><td>O sistema deve mostrar no Catálogo o título <q class="ui">Módulos para contratar</q> e os cards do catálogo com o preço inicial, <q class="ui">Ver detalhes</q> e o fundo Ondas do vão na forma do padrinho do módulo; na conta do time deboaz, o título <q class="ui">Módulos do time deboaz</q>, <q class="ui">sem custo</q> e <q class="ui">Adicionar</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-78"><td><code class="id">RF-78</code></td><td>O sistema deve mostrar a entrada, a partir da janela medium, em duas colunas, sem barra do topo: o logo centralizado sobre o fundo Halo, sem painel de texto, e as contas acessadas ao lado, ou, no aparelho ainda sem contas, <q class="ui">Entrar</q> e <q class="ui">Criar conta</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-79"><td><code class="id">RF-79</code></td><td>O sistema deve mostrar em Módulos, no compact, as abas primárias <q class="ui">Contratados</q>, <q class="ui">Da conta</q> e <q class="ui">A contratar</q> logo abaixo do topo, e os cards de módulo numa grade de células quadradas — células de 76dp ou mais, no mínimo 4 colunas e quantas couberem na janela —, cada um num tamanho (largura × altura): <strong>mínima</strong> 1x1, só com o ícone e o selo; <strong>reduzida</strong> 2x2, com o espaço <q class="ui">dado macro</q>; <strong>normal</strong> 4x4, o padrão, com o espaço <q class="ui">números e gráfico do módulo</q>; e <strong>expandida</strong> 4x8, com o espaço <q class="ui">painel completo do módulo</q> (<a class="ref" href="15_modulos.html#RF-128">registro de módulos <code class="id">RF-128</code></a>), todos só com a carcaça: o ícone e o nome do módulo, o selo de notificações e o espaço do conteúdo, que o documento do módulo define; em <q class="ui">A contratar</q>, o catálogo (<code class="id">RF-82</code>); no módulo recém-contratado, o espaço mostra <q class="ui">Configure o módulo para começar</q> e <q class="ui">Configurar</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-80"><td><code class="id">RF-80</code></td><td>O sistema deve mostrar na ordenação o topo <q class="ui">Ordenar módulos</q> com <q class="ui">Concluir</q>, o apoio <q class="ui">Arraste ou use o menu do card para mudar a ordem e o tamanho</q> e só os módulos contratados (os da conta ficam na outra aba), na mesma grade, cada card com a alça de arrastar no alto (a mínima arrasta pelo card inteiro) e o botão do menu embaixo, à direita; o menu traz <q class="ui">Mover para cima</q>, <q class="ui">Mover para baixo</q>, <q class="ui">Mínima</q>, <q class="ui">Reduzida</q>, <q class="ui">Normal</q> e <q class="ui">Expandida</q>, com o tamanho atual marcado; no expanded, a barra lateral aparece encolhida</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-81"><td><code class="id">RF-81</code></td><td>O sistema deve mostrar em Conta a foto ou a inicial, o nome da instituição (ou da pessoa, na conta do educador autônomo), a pessoa responsável, como <q class="ui">Responsável · Ana Souza</q>, e os itens <q class="ui">Dados da instituição</q>, <q class="ui">Foto</q>, <q class="ui">Tema</q> (com o nome do tema ativo), <q class="ui">Atualização dos cards</q> (<a class="ref" href="15_modulos.html#RF-133">15 RF-133</a>) e <q class="ui">Sair</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-82"><td><code class="id">RF-82</code></td><td>O sistema deve mostrar na aba <q class="ui">A contratar</q> o título <q class="ui">Módulos para contratar</q> e os cards do catálogo com o preço inicial, <q class="ui">Ver detalhes</q> e o fundo Ondas do vão na forma do padrinho do módulo; na conta do time deboaz, o título <q class="ui">Módulos do time deboaz</q>, <q class="ui">sem custo</q> e <q class="ui">Adicionar</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-83"><td><code class="id">RF-83</code></td><td>O sistema deve mostrar no detalhe do módulo a vitrine de telas, a descrição, <q class="ui">Como funciona</q> com os passos, <q class="ui">Quem usa</q> (<q class="ui">Configura</q>, <q class="ui">Usa</q> e <q class="ui">Acompanha</q>), a seção <q class="ui">Custo</q> com o simulador e o preço inicial, e <q class="ui">Incluir na conta</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-84"><td><code class="id">RF-84</code></td><td>O sistema deve mostrar no módulo aberto o aviso para completar com a ação <q class="ui">Configurar</q> enquanto falta configurar, acima do espaço do módulo; no compact, a ação é um botão de ícone e o texto do aviso fica inteiro à vista</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-85"><td><code class="id">RF-85</code></td><td>O sistema deve mostrar no trilho, abaixo do topo, que ocupa a largura toda, só <q class="ui">Módulos</q> e <q class="ui">Catálogo</q> (a conta abre pelo nome e pela foto do topo), e na barra inferior <q class="ui">Meus módulos</q>, <q class="ui">Catálogo</q> e <q class="ui">Conta</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-85"><td><code class="id">RF-85</code></td><td>O sistema deve mostrar na barra lateral em acordeão, abaixo do topo, que ocupa a largura toda, <q class="ui">Módulos</q> aberto com <q class="ui">Contratados</q>, <q class="ui">Da conta</q> e <q class="ui">A contratar</q> recuados, <q class="ui">Feed</q> e <q class="ui">Conta</q>, com o indicador no subnível ativo e, no alto, o botão de encolher, que deixa a barra só com os ícones dos destinos (80dp) e a abre de novo; na barra inferior <q class="ui">Módulos</q>, <q class="ui">Feed</q> e <q class="ui">Conta</q>, e em Feed as publicações dos módulos, que a vista mostra como o espaço reservado <q class="ui">Conteúdo do feed</q> (<a class="ref" href="08_hub-ux.html#RN-221">Hub · UX base <code class="id">RN-221</code></a>); na conta do time deboaz, só <q class="ui">Módulos</q> e <q class="ui">Conta</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-86"><td><code class="id">RF-86</code></td><td>O sistema deve mostrar em Foto a foto atual ou a inicial, o nome e a pessoa responsável, o apoio <q class="ui">Sem foto, aparece a primeira letra do nome. Use o logo da instituição ou a sua foto.</q> e as ações <q class="ui">Enviar foto</q> e <q class="ui">Usar a inicial</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
       </tbody>
     </table>
@@ -959,9 +959,10 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-121"><td><code class="id">RN-121</code></td><td>Num tema de cor, o hub segue a mesma regra da landing page: logo nas cores da marca do tema, mascotes e ações nas cores do tema (<a class="ref" href="11_landing-page-ui.html#RN-118">Landing page · UI <code class="id">RN-118</code></a>)</td></tr>
         <tr id="RN-122"><td><code class="id">RN-122</code></td><td>Mudar um texto, uma tela ou um bloco do hub exige uma nova versão deste documento e das vistas antes do código</td></tr>
         <tr id="RN-123"><td><code class="id">RN-123</code></td><td>O código das telas do hub só começa depois que as vistas forem aprovadas na revisão do pull request</td></tr>
-        <tr id="RN-124"><td><code class="id">RN-124</code></td><td>Na janela compact, o topo da casca mostra só o logo e os avisos, e a conta abre pelo destino Conta da barra; a partir da janela medium, o nome e a foto da conta aparecem no topo e abrem a Conta, e o trilho fica sem o destino Conta</td></tr>
+        <tr id="RN-124"><td><code class="id">RN-124</code></td><td>Na janela compact, o topo da casca mostra só o logo e os avisos, e a conta abre pelo destino Conta da barra; a partir da janela medium, o nome e a foto da conta aparecem no topo e também abrem a Conta, que segue como destino da barra lateral</td></tr>
         <tr id="RN-125"><td><code class="id">RN-125</code></td><td>No hub não há mascote no lugar da foto: a instituição e o profissional usam a própria foto (ou o logo da instituição) e, sem foto, a primeira letra do nome; a instituição é identificada pelo nome, único no deboaz, e pela pessoa responsável pela conta</td></tr>
-        <tr id="RN-138"><td><code class="id">RN-138</code></td><td>Todas as telas do hub usam o fundo Estampa abaixo da barra do topo; a barra do topo, a barra inferior e o trilho ficam limpos, e os fundos próprios de cada bloco (Halo na entrada, Ondas do vão nos cards do catálogo) ficam por cima (<a class="ref" href="90_identidade-visual.html#RN-56">Identidade visual <code class="id">RN-56</code></a>)</td></tr>
+        <tr id="RN-210"><td><code class="id">RN-210</code></td><td>As vistas do hub mostram só a carcaça: o conteúdo dos cards de módulo e do Feed é um espaço reservado, e as telas de cada módulo, com a visão de cada perfil, ficam no documento do módulo</td></tr>
+        <tr id="RN-138"><td><code class="id">RN-138</code></td><td>Todas as telas do hub usam o fundo Estampa abaixo da barra do topo; a barra do topo, as abas, a barra inferior e a barra lateral ficam limpas, e os fundos próprios de cada bloco (Halo na entrada, Ondas do vão nos cards do catálogo) ficam por cima (<a class="ref" href="90_identidade-visual.html#RN-56">Identidade visual <code class="id">RN-56</code></a>)</td></tr>
       </tbody>
     </table>
   </section>
@@ -972,7 +973,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
       <tbody>
         <tr id="RNF-151"><td><code class="id">RNF-151</code></td><td><span class="tag">Usabilidade</span></td><td>Os títulos de seção usam o papel title-medium, os títulos de tela headline-small, e as telas internas mostram o título no topo, com voltar</td></tr>
         <tr id="RNF-152"><td><code class="id">RNF-152</code></td><td><span class="tag">Compatibilidade</span></td><td>A entrada tem uma coluna no compact e duas (boas-vindas e contas) a partir do medium</td></tr>
-        <tr id="RNF-153"><td><code class="id">RNF-153</code></td><td><span class="tag">Acessibilidade</span></td><td>O leitor de tela anuncia a métrica de cada card junto com o nome do módulo, e o gráfico da capa é decorativo</td></tr>
+        <tr id="RNF-153"><td><code class="id">RNF-153</code></td><td><span class="tag">Acessibilidade</span></td><td>O leitor de tela anuncia o nome do módulo junto com o número de notificações do card, e o conteúdo do card segue o que o documento do módulo define</td></tr>
         <tr id="RNF-154"><td><code class="id">RNF-154</code></td><td><span class="tag">Acessibilidade</span></td><td>Na entrada compact, o fundo Halo atrás do logo some antes do título, e nenhum texto fica sobre o desenho; a inicial no lugar da foto é decorativa, e o leitor de tela anuncia o nome da conta</td></tr>
       </tbody>
     </table>
@@ -985,7 +986,13 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   Dado três contas acessadas neste aparelho
   Quando a pessoa abre o hub
   Então vê o logo do hub se montando sobre o fundo Halo, "Que bom te ver!", os três cards de conta e "Outra conta"
-  E nenhum mascote aparece na entrada</pre>
+  E nenhum mascote aparece na entrada
+
+Cenário: aparelho sem contas
+  Dado um aparelho em que ninguém entrou no hub
+  Quando a pessoa abre o hub
+  Então vê "Que bom te ver!", "Entre ou crie a conta para começar", "Entrar" e "Criar conta"
+  E nenhum card de conta</pre>
     </article>
     <article class="criterio" id="ca-RF-76">
       <h3><code class="id">RF-76</code> Entrar</h3>
@@ -1008,17 +1015,35 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   E não mostra a barra do topo nem o painel "Que bom te ver!"</pre>
     </article>
     <article class="criterio" id="ca-RF-79">
-      <h3><code class="id">RF-79</code> Seções de Meus módulos</h3>
-      <pre class="gherkin">Cenário: abas e métricas
-  Quando a conta master abre Meus módulos
-  Então vê "Contratados" marcado e o card da Presença com "94%" e "presença na semana"
-  E, ao tocar em "Da conta", vê Suporte, Mensagens, Contas e Sugestão com as métricas deles</pre>
+      <h3><code class="id">RF-79</code> Abas de Módulos</h3>
+      <pre class="gherkin">Cenário: abas e carcaça dos cards
+  Quando a conta master abre Módulos
+  Então vê "Contratados" marcado, "Da conta" e "A contratar"
+  E cada card mostra o ícone, o nome e as notificações do módulo, com o espaço do conteúdo
+  E, ao tocar em "Da conta", vê SAC, Contas, Turmas, Usuários e Sugestão com a mesma carcaça
+Cenário: recém-contratado
+  Dado um módulo incluído na conta e ainda não configurado
+  Então o card dele mostra "Configure o módulo para começar" e "Configurar" no espaço do conteúdo
+Cenário: tamanhos na grade
+  Dado Contratados com um card na normal, um na reduzida, quatro na mínima e um na expandida
+  Quando a conta master abre Módulos no compact
+  Então a normal ocupa a linha toda num quadrado e a reduzida metade da linha num quadrado, com as quatro mínimas ao lado, duas a duas
+  E a expandida ocupa a linha toda com o dobro da altura da normal
+  E, no expanded, os cards têm o mesmo tamanho do compact, e a normal e a expandida ficam lado a lado com mais cards ao lado
+Cenário: rolagem
+  Quando a conta master rola Contratados até a expandida
+  Então o topo e as abas se escondem e a expandida aparece inteira acima da barra inferior
+  E, ao rolar para cima, o topo e as abas voltam</pre>
     </article>
     <article class="criterio" id="ca-RF-80">
       <h3><code class="id">RF-80</code> Ordenação</h3>
       <pre class="gherkin">Cenário: ordenar
   Quando a pessoa entra na ordenação
-  Então vê "Ordenar módulos", "Concluir" e só os módulos contratados</pre>
+  Então vê "Ordenar módulos", "Concluir" e só os módulos contratados
+Cenário: menu do card
+  Dado o card da Presença na normal
+  Quando a pessoa toca no menu do card
+  Então vê "Mover para cima", "Mover para baixo", "Mínima", "Reduzida", "Normal" marcada e "Expandida"</pre>
     </article>
     <article class="criterio" id="ca-RF-81">
       <h3><code class="id">RF-81</code> Conta</h3>
@@ -1032,9 +1057,9 @@ Cenário: instituição
   Então vê a inicial "E", "Escola Horizonte" e "Responsável · Ana Souza"</pre>
     </article>
     <article class="criterio" id="ca-RF-82">
-      <h3><code class="id">RF-82</code> Catálogo</h3>
+      <h3><code class="id">RF-82</code> A contratar</h3>
       <pre class="gherkin">Cenário: conta master
-  Quando a conta master abre o Catálogo
+  Quando a conta master abre a aba "A contratar" de Módulos
   Então vê "Módulos para contratar" e os cards com o preço inicial e "Ver detalhes"
   E o card do Quiz tem as Ondas do vão em forma de estrela, saindo da estrela padrinho</pre>
     </article>
@@ -1047,21 +1072,32 @@ Cenário: instituição
     <article class="criterio" id="ca-RF-84">
       <h3><code class="id">RF-84</code> Módulo aberto</h3>
       <pre class="gherkin">Cenário: falta configurar
-  Dado o módulo Presença sem turmas cadastradas
+  Dado um módulo ainda não configurado
   Quando a administração abre o módulo
   Então vê o aviso com "Configurar" acima do espaço do módulo
 
 Cenário: compact
   Dado o hub numa janela compact
-  Quando a administração abre o módulo Presença sem turmas
+  Quando a administração abre um módulo ainda não configurado
   Então a ação do aviso é um botão de ícone e o texto do aviso aparece inteiro</pre>
     </article>
     <article class="criterio" id="ca-RF-85">
       <h3><code class="id">RF-85</code> Rótulos da navegação</h3>
-      <pre class="gherkin">Cenário: trilho
+      <pre class="gherkin">Cenário: barra lateral
   Dado o hub numa janela medium
-  Então o trilho mostra só "Módulos" e "Catálogo"
-  E o topo, na largura toda, acima do trilho, mostra "Escola Horizonte" e a foto, que abrem a Conta</pre>
+  Então a barra lateral mostra "Módulos" aberto com "Contratados", "Da conta" e "A contratar", "Feed" e "Conta"
+  E o topo, na largura toda, acima da barra lateral, mostra "Escola Horizonte" e a foto, que abrem a Conta
+Cenário: barra encolhida
+  Quando a pessoa toca no botão de encolher, no alto da barra lateral
+  Então a barra mostra só os ícones de Módulos, Feed e Conta
+  E o mesmo botão abre a barra de novo
+Cenário: Feed
+  Quando a pessoa toca em "Feed"
+  Então vê no espaço do Feed as publicações dos módulos para ela
+
+Cenário: conta do time deboaz
+  Dado o administrador do deboaz no hub, numa janela expanded
+  Então a barra lateral mostra só "Módulos" e "Conta"</pre>
     </article>
     <article class="criterio" id="ca-RF-86">
       <h3><code class="id">RF-86</code> Foto</h3>
@@ -1078,7 +1114,8 @@ Cenário: enviar foto
   <section id="fora-de-escopo">
     <h2>Fora de escopo</h2>
     <ul class="fora">
-      <li>Telas internas de cada módulo e campos do cadastro: documentos dos módulos</li>
+      <li>Telas internas e conteúdo do card de cada módulo e campos do cadastro: documentos dos módulos</li>
+      <li>Conteúdo de cada publicação do Feed: documento do módulo que publica (<a class="ref" href="08_hub-ux.html#RN-221">Hub · UX base <code class="id">RN-221</code></a>)</li>
       <li>Telas do painel de administração do deboaz: módulos do time deboaz</li>
       <li>UI do quest: 13_quest_ui</li>
     </ul>
@@ -1087,20 +1124,20 @@ Cenário: enviar foto
     <h2>Diagramas</h2>
     <p>As vistas abrem no tema Branco e Preto, claro. O botão <strong>Paleta</strong>, na barra do canto, mostra as mesmas telas em qualquer tema de cor do design system, no modo claro ou escuro.</p>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-entrada_v05_20261024-0357.svg"><img src="../2_Diagramas/vista-hub-entrada_v05_20261024-0357.svg" alt="Vista da entrada do hub: contas acessadas, outra conta e criar conta no compact; entrada em duas colunas no medium e no expanded; tema de cor e modo pelo botão Paleta"></a>
-      <figcaption><strong>Hub · entrada · vista</strong><code>2_Diagramas/vista-hub-entrada_v05_20261024-0357.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-entrada_v06_20261031-2204.svg"><img src="../2_Diagramas/vista-hub-entrada_v06_20261031-2204.svg" alt="Vista da entrada no hub: primeiro acesso no aparelho com Entrar e Criar conta, contas acessadas, outra conta e criar conta, no compact, no medium e no expanded"></a>
+      <figcaption><strong>Hub · entrada · vista</strong><code>2_Diagramas/vista-hub-entrada_v06_20261031-2204.svg</code></figcaption>
     </figure>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-meus-modulos_v04_20261024-0357.svg"><img src="../2_Diagramas/vista-hub-meus-modulos_v04_20261024-0357.svg" alt="Vista de Meus módulos, da ordenação e da Conta, com a navegação por barra e trilho"></a>
-      <figcaption><strong>Hub · meus módulos · vista</strong><code>2_Diagramas/vista-hub-meus-modulos_v04_20261024-0357.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-meus-modulos_v12_20261101-0042.svg"><img src="../2_Diagramas/vista-hub-meus-modulos_v12_20261101-0042.svg" alt="Vista de Módulos com os cards em grade nos quatro tamanhos, A contratar, a ordenação com o menu do card, o Feed e a Conta, e a barra lateral aberta e encolhida"></a>
+      <figcaption><strong>Hub · módulos · vista</strong><code>2_Diagramas/vista-hub-meus-modulos_v12_20261101-0042.svg</code></figcaption>
     </figure>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-catalogo_v04_20261024-0357.svg"><img src="../2_Diagramas/vista-hub-catalogo_v04_20261024-0357.svg" alt="Vista do catálogo: módulos para contratar, detalhe com custo, código do time deboaz e lista com detalhe no expanded"></a>
-      <figcaption><strong>Hub · catálogo · vista</strong><code>2_Diagramas/vista-hub-catalogo_v04_20261024-0357.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-catalogo_v07_20261031-2212.svg"><img src="../2_Diagramas/vista-hub-catalogo_v07_20261031-2212.svg" alt="Vista da aba A contratar de Módulos: abas primárias no compact, detalhe com custo, código do time deboaz e, no expanded, lista e detalhe ao lado da barra lateral em acordeão"></a>
+      <figcaption><strong>Hub · módulos · a contratar · vista</strong><code>2_Diagramas/vista-hub-catalogo_v07_20261031-2212.svg</code></figcaption>
     </figure>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-modulo_v04_20261024-0357.svg"><img src="../2_Diagramas/vista-hub-modulo_v04_20261024-0357.svg" alt="Vista do módulo aberto pela administração e pela pessoa delegada"></a>
-      <figcaption><strong>Hub · módulo aberto · vista</strong><code>2_Diagramas/vista-hub-modulo_v04_20261024-0357.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-modulo_v06_20261031-2211.svg"><img src="../2_Diagramas/vista-hub-modulo_v06_20261031-2211.svg" alt="Vista do módulo aberto pela administração e pela pessoa delegada, só com a carcaça"></a>
+      <figcaption><strong>Hub · módulo aberto · vista</strong><code>2_Diagramas/vista-hub-modulo_v06_20261031-2211.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -1109,17 +1146,20 @@ Cenário: enviar foto
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v07</span></td><td>2026-10-24 03:59</td><td>Vistas com paletas (casca v06): uma linha de molduras e o botão <strong>Paleta</strong> para ver as telas em todos os temas do design system, claro ou escuro (padrão Branco e Preto, claro); vistas entrada v05, meus módulos, catálogo e módulo aberto v04; vista no tema Oceano removida; status → Aprovado</td></tr>
-      <tr><td>v06</td><td>2026-10-21 22:12</td><td><code class="id">RF-75</code> e <code class="id">RF-78</code> alterados: entrada com as boas-vindas com o logo (fundo Halo, logo do hub na abertura, brilhos passando pelos temas coloridos), sem o mascote sorteado; <code class="id">RN-126</code> removido; <code class="id">RN-138</code> e <code class="id">RNF-154</code> alterados; vista da entrada v04; <code class="id">RF-78</code>: a partir do medium, só o logo centralizado no Halo, sem painel de texto e sem barra do topo; status → Aprovado</td></tr>
-      <tr><td>v05</td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
-      <tr><td>v04</td><td>2026-10-20 01:47</td><td><code class="id">RF-85</code> alterado: trilho abaixo do topo, que ocupa a largura toda; vistas de meus módulos, catálogo, módulo aberto e tema Oceano v03; status → Em revisão; nome e foto no topo a partir da janela medium e trilho sem Conta (<code class="id">RF-85</code>, <code class="id">RN-124</code>); <code class="id">RN-138</code> incluído: fundo Estampa em todas as telas, fora das barras; vista da entrada v03; Meus módulos com as abas Contratados e Da conta e cards com métrica (<code class="id">RF-79</code>, <code class="id">RF-80</code>, <code class="id">RNF-153</code>); detalhe do catálogo com a vitrine, Como funciona e Quem usa (<code class="id">RF-83</code>); sem mascotes no lugar da foto no hub: foto ou inicial, instituição pelo nome e pela pessoa responsável (<code class="id">RF-75</code>, <code class="id">RF-81</code>, <code class="id">RF-86</code>, <code class="id">RN-125</code>, <code class="id">RNF-154</code>); cards de Meus módulos um por linha no compact e até dois depois, com as métricas nas cores da paleta (<code class="id">RF-79</code>)</td></tr>
-      <tr><td>v03</td><td>2026-10-19 15:06</td><td>Status → Aprovado</td></tr>
-      <tr><td>v02</td><td>2026-10-19 14:23</td><td>Mascote da entrada sorteado com o fundo na forma dele (<code class="id">RF-75</code>, <code class="id">RF-78</code>, <code class="id">RN-126</code>); foto ou mascote adotado (<code class="id">RF-81</code>, <code class="id">RF-86</code>, <code class="id">RN-125</code>); segmentado cheio (<code class="id">RF-77</code>); Ondas do vão nos cards do catálogo (<code class="id">RF-82</code>); aviso com botão de ícone no compact (<code class="id">RF-84</code>); Conta embaixo no trilho e topo só com logo e avisos até o medium (<code class="id">RF-85</code>, <code class="id">RN-124</code>); <code class="id">RNF-154</code>; vistas v02</td></tr>
-      <tr><td>v01</td><td>2026-10-19 11:22</td><td>Criação: <code class="id">RF-75</code> a <code class="id">RF-85</code>, <code class="id">RN-120</code> a <code class="id">RN-123</code>, <code class="id">RNF-151</code> a <code class="id">RNF-153</code> e vistas de entrada, meus módulos, catálogo, módulo aberto e tema Oceano</td></tr>
+      <tr><td><span class="boaz-versao">v21</span></td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
+      <tr><td>v20</td><td>2026-11-01 01:14</td><td>Feed com as publicações dos módulos e conta do time deboaz só com Módulos e Conta (<code class="id">RF-85</code>, 08 RN-221)</td></tr>
+      <tr><td>v19</td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
+      <tr><td>v18</td><td>2026-11-01 00:43</td><td>Vista de Módulos v12: item Atualização dos cards na Conta, com Na abertura e Ao vivo (<code class="id">RF-81</code>) (<a class="ref" href="15_modulos.html#RF-133">15 RF-133</a>)</td></tr>
+      <tr><td>v17</td><td>2026-10-31 23:30</td><td>Cards de Módulos com célula de 76dp ou mais, no mínimo 4 colunas e quantas couberem na janela, com o card do mesmo tamanho em qualquer janela, e rolagem com o topo e as abas escondidos (<code class="id">RF-79</code>); vista de Módulos v11</td></tr>
+      <tr><td>v16</td><td>2026-10-31 22:55</td><td>Card de módulo em quatro tamanhos de células quadradas (largura × altura): mínima 1x1, reduzida 2x2, normal 4x4 (o padrão) e expandida 4x8, numa grade de 4 colunas no compact e no medium e 8 a partir do expanded (<code class="id">RF-79</code>); Mínima no menu do card (<code class="id">RF-80</code>); vista de Módulos v10</td></tr>
+      <tr><td>v15</td><td>2026-10-31 22:17</td><td>Entrada no aparelho sem contas com Entrar e Criar conta (<code class="id">RF-75</code>, <code class="id">RF-78</code>); cards de Módulos em grade nos tamanhos reduzida, normal e expandida (<code class="id">RF-79</code>); ordenação na grade com o menu do card, mover e tamanho (<code class="id">RF-80</code>); botão de encolher a barra lateral (<code class="id">RF-85</code>); vistas entrada v06, módulos v09, a contratar v07 e módulo aberto v06</td></tr>
+      <tr><td>v14</td><td>2026-10-31 18:44</td><td>Abas primárias no compact no lugar do botão segmentado (<code class="id">RF-79</code>); barra lateral em acordeão com Módulos aberto, Feed e Conta (<code class="id">RF-85</code>, <code class="id">RN-124</code>, <code class="id">RN-138</code>); ordenação em lista, um por linha (<code class="id">RF-80</code>); vistas novas</td></tr>
+      <tr><td>v13</td><td>2026-10-31 16:41</td><td>Só a carcaça: Módulos com <q class="ui">Contratados</q> | <q class="ui">Da conta</q> | <q class="ui">A contratar</q> e cards com o ícone, o nome, as notificações e o espaço do conteúdo do módulo (<code class="id">RF-79</code>, <code class="id">RNF-153</code>, <code class="id">RN-210</code> novo); o Catálogo vira a aba A contratar (<code class="id">RF-82</code>); navegação com Módulos, Feed e Conta e Feed reservado (<code class="id">RF-85</code>); módulo aberto genérico (<code class="id">RF-84</code>); vistas de módulos v07, a contratar v05 e módulo aberto v05; status → Em revisão</td></tr>
+      <tr><td>v12</td><td>2026-10-31 15:53</td><td>Aprovado</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v07 · 2026-10-24 03:59</span>
+    <span>boaz · v21 · 2026-11-01 01:20</span>
     <span class="boaz-arquivo">1_Requisitos/12_hub-ui.html</span>
   </div>
 </footer>

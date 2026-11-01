@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1632 1188" width="1632" height="1188">
+  <title>Catálogo · classes</title>
+  <desc>Catálogo · diagrama de classes (requisito 15_catalogo). v01: criação — Módulo com tipo, custo e modelo de cobrança; Preço e PolíticaDeDesconto com vigência e histórico; FaixaDeDesconto progressiva; Contratação por conta (clientes do módulo) e Cobrança mensal com os valores do fechamento.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1632" height="1188"/>
+  <g id="marca-topo"><rect class="wm-band" x="0" y="0" width="1632" height="112"/><rect class="wm-accent" x="0" y="110" width="1632" height="2"/><text class="wm-eyebrow" x="40" y="40">BOAZ · UML · CLASSES</text><text class="title" x="40" y="72">Catálogo · classes</text><text class="subtitle" x="40" y="94">Módulo catalogado, preço com vigência, desconto por volume em faixas, contratação e cobrança mensal</text><text class="wm-meta-label" x="1344" y="44">VERSÃO</text><rect class="wm-badge" x="1344" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1368" y="71" text-anchor="middle">v01</text><line class="wm-sep" x1="1416" y1="32" x2="1416" y2="80"/><text class="wm-meta-label" x="1440" y="44">DATA</text><text class="wm-meta-value" x="1440" y="72">2026-10-29 · 04:43</text></g>
+  <g id="desenho" transform="translate(0,152)">
+<g id="tipo-modulo" filter="url(#sombra)"><rect class="node" x="40" y="0" width="120" height="122" rx="6"/></g><text class="uml-keyword" x="100.0" y="20" text-anchor="middle">«enumeration»</text><text class="label-strong" x="100.0" y="42" text-anchor="middle">TipoModulo</text><line class="divider" x1="40" y1="54" x2="160" y2="54"/><text class="mono" x="52" y="75">DA_CONTA</text><text class="mono" x="52" y="93">CONTRATAVEL</text><text class="mono" x="52" y="111">DO_TIME</text><g id="modelo-cobranca" filter="url(#sombra)"><rect class="node" x="40" y="154" width="152" height="104" rx="6"/></g><text class="uml-keyword" x="116.0" y="174" text-anchor="middle">«enumeration»</text><text class="label-strong" x="116.0" y="196" text-anchor="middle">ModeloCobranca</text><line class="divider" x1="40" y1="208" x2="192" y2="208"/><text class="mono" x="52" y="229">SEM_CUSTO</text><text class="mono" x="52" y="247">POR_USUARIO</text><g id="plano" filter="url(#sombra)"><rect class="node" x="40" y="290" width="120" height="104" rx="6"/></g><text class="uml-keyword" x="100.0" y="310" text-anchor="middle">«enumeration»</text><text class="label-strong" x="100.0" y="332" text-anchor="middle">Plano</text><line class="divider" x1="40" y1="344" x2="160" y2="344"/><text class="mono" x="52" y="365">MENSAL</text><text class="mono" x="52" y="383">ANUAL</text><g id="modulo" filter="url(#sombra)"><rect class="node-blue" x="288" y="0" width="400" height="244" rx="6"/></g><text class="label-strong" x="488.0" y="24" text-anchor="middle">Módulo</text><line class="divider" x1="288" y1="36" x2="688" y2="36"/><text class="mono" x="300" y="57">- id: Identificador</text><text class="mono" x="300" y="75">- nome: Texto</text><text class="mono" x="300" y="93">- tipo: TipoModulo</text><text class="mono" x="300" y="111">- temCusto: Booleano</text><text class="mono" x="300" y="129">- modeloCobranca: ModeloCobranca</text><text class="mono" x="300" y="147">- catalogadoEm: DataHora</text><text class="mono" x="300" y="165">- catalogadoPor: Usuário</text><line class="divider" x1="288" y1="176" x2="688" y2="176"/><text class="mono" x="300" y="197">+ precoVigente(data): Preço [0..1]</text><text class="mono" x="300" y="215">+ politicaVigente(data): PolíticaDeDesconto [0..1]</text><text class="mono" x="300" y="233">+ podeEntrarEmConta(): Booleano</text><g id="preco" filter="url(#sombra)"><rect class="node-blue" x="808" y="0" width="272" height="190" rx="6"/></g><text class="label-strong" x="944.0" y="24" text-anchor="middle">Preço</text><line class="divider" x1="808" y1="36" x2="1080" y2="36"/><text class="mono" x="820" y="57">- valorPorStaff: Dinheiro</text><text class="mono" x="820" y="75">- valorPorParticipante: Dinheiro</text><text class="mono" x="820" y="93">- valeDesde: Data</text><text class="mono" x="820" y="111">- valeAte: Data [0..1]</text><text class="mono" x="820" y="129">- definidoPor: Usuário</text><text class="mono" x="820" y="147">- definidoEm: DataHora</text><line class="divider" x1="808" y1="158" x2="1080" y2="158"/><text class="mono" x="820" y="179">+ valeEm(data): Booleano</text><g id="politica" filter="url(#sombra)"><rect class="node-blue" x="808" y="254" width="392" height="172" rx="6"/></g><text class="label-strong" x="1004.0" y="278" text-anchor="middle">PolíticaDeDesconto</text><line class="divider" x1="808" y1="290" x2="1200" y2="290"/><text class="mono" x="820" y="311">- ligado: Booleano</text><text class="mono" x="820" y="329">- percentualAnual: Percentual</text><text class="mono" x="820" y="347">- valeDesde: Data</text><text class="mono" x="820" y="365">- valeAte: Data [0..1]</text><text class="mono" x="820" y="383">- definidoPor: Usuário</text><line class="divider" x1="808" y1="394" x2="1200" y2="394"/><text class="mono" x="820" y="415">+ descontoPorVolume(subtotal, usuários): Dinheiro</text><g id="faixa" filter="url(#sombra)"><rect class="node-blue" x="1320" y="254" width="272" height="136" rx="6"/></g><text class="label-strong" x="1456.0" y="278" text-anchor="middle">FaixaDeDesconto</text><line class="divider" x1="1320" y1="290" x2="1592" y2="290"/><text class="mono" x="1332" y="311">- inicio: Inteiro</text><text class="mono" x="1332" y="329">- fim: Inteiro [0..1]</text><text class="mono" x="1332" y="347">- percentual: Percentual</text><line class="divider" x1="1320" y1="358" x2="1592" y2="358"/><text class="mono" x="1332" y="379">+ usuariosNaFaixa(total): Inteiro</text><g id="contratacao" filter="url(#sombra)"><rect class="node-blue" x="288" y="490" width="216" height="154" rx="6"/></g><text class="label-strong" x="396.0" y="514" text-anchor="middle">Contratação</text><line class="divider" x1="288" y1="526" x2="504" y2="526"/><text class="mono" x="300" y="547">- plano: Plano</text><text class="mono" x="300" y="565">- desde: Data</text><text class="mono" x="300" y="583">- ate: Data [0..1]</text><text class="mono" x="300" y="601">- automatica: Booleano</text><line class="divider" x1="288" y1="612" x2="504" y2="612"/><text class="mono" x="300" y="633">+ ativaEm(data): Booleano</text><g id="conta" filter="url(#sombra)"><rect class="node-external" x="40" y="740" width="192" height="140" rx="6"/></g><text class="uml-keyword" x="136.0" y="760" text-anchor="middle">«16_identidade-acesso»</text><text class="label-strong" x="136.0" y="782" text-anchor="middle">Conta</text><line class="divider" x1="40" y1="794" x2="232" y2="794"/><text class="mono" x="52" y="815">- sigla: Sigla</text><text class="mono" x="52" y="833">- nome: Texto</text><text class="mono" x="52" y="851">- tipo: TipoConta</text><text class="mono" x="52" y="869">- estado: EstadoConta</text><g id="cobranca" filter="url(#sombra)"><rect class="node-blue" x="808" y="490" width="304" height="262" rx="6"/></g><text class="label-strong" x="960.0" y="514" text-anchor="middle">Cobrança</text><line class="divider" x1="808" y1="526" x2="1112" y2="526"/><text class="mono" x="820" y="547">- competencia: MêsAno</text><text class="mono" x="820" y="565">- fechadaEm: DataHora</text><text class="mono" x="820" y="583">- staffAtivos: Inteiro</text><text class="mono" x="820" y="601">- participantesAtivos: Inteiro</text><text class="mono" x="820" y="619">- valorPorStaff: Dinheiro</text><text class="mono" x="820" y="637">- valorPorParticipante: Dinheiro</text><text class="mono" x="820" y="655">- subtotal: Dinheiro</text><text class="mono" x="820" y="673">- descontoPorVolume: Dinheiro</text><text class="mono" x="820" y="691">- descontoAnual: Dinheiro</text><text class="mono" x="820" y="709">- total: Dinheiro</text><line class="divider" x1="808" y1="720" x2="1112" y2="720"/><text class="mono" x="820" y="741">+ calcular(preço, política): Dinheiro</text><path class="node-note" d="M1160,514 H1393 L1405,526 V620 H1160 Z"/><text class="muted" x="1172" y="536" text-anchor="start">Valores copiados do preço e das</text><text class="muted" x="1172" y="554" text-anchor="start">faixas que valem no fechamento:</text><text class="muted" x="1172" y="572" text-anchor="start">fatura fechada não muda (RN-194).</text><text class="muted" x="1172" y="590" text-anchor="start">Usuários ativos no dia do</text><text class="muted" x="1172" y="608" text-anchor="start">fechamento (RN-195).</text><path class="edge edge-async" d="M1160,554 L1112,554"/><path class="edge" d="M688,40 L808,40" marker-start="url(#composicao)"/><text class="muted" x="708" y="32" text-anchor="start">1</text><text class="muted" x="800" y="32" text-anchor="end">0..*</text><text class="muted" x="748" y="58" text-anchor="middle">histórico</text><path class="edge" d="M688,204 L744,204 L744,294 L808,294" marker-start="url(#composicao)"/><text class="muted" x="708" y="196" text-anchor="start">1</text><text class="muted" x="800" y="286" text-anchor="end">0..*</text><path class="edge" d="M1200,294 L1320,294" marker-start="url(#composicao)"/><text class="muted" x="1220" y="286" text-anchor="start">1</text><text class="muted" x="1312" y="286" text-anchor="end">1..*</text><path class="edge" d="M368,244 L368,490"/><text class="muted" x="376" y="264" text-anchor="start">1</text><text class="muted" x="376" y="482" text-anchor="start">0..*</text><text class="muted" x="412" y="371" text-anchor="start">clientes (RF-124)</text><path class="edge" d="M136,740 L136,530 L288,530"/><text class="muted" x="144" y="732" text-anchor="start">1</text><text class="muted" x="280" y="522" text-anchor="end">0..*</text><path class="edge" d="M504,530 L808,530"/><text class="muted" x="516" y="522" text-anchor="start">1</text><text class="muted" x="800" y="522" text-anchor="end">0..*</text><text class="muted" x="800" y="548" text-anchor="end">fatura do mês</text>
+  </g>
+  <g id="marca-rodape" transform="translate(0,1072)"><rect class="wm-band" x="0" y="0" width="1632" height="116"/><line class="wm-sep" x1="0" y1="0.5" x2="1632" y2="0.5"/><text class="wm-eyebrow" x="40" y="30">LEGENDA</text><rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">classe do catálogo</text><rect class="node" x="223.20000000000002" y="47" width="14" height="14" rx="3"/><text class="label" x="245.20000000000002" y="58">enumeração</text><rect class="node-external" x="347.20000000000005" y="47" width="14" height="14" rx="3"/><text class="label" x="369.20000000000005" y="58">de outro requisito</text><rect class="node-note" x="530.4000000000001" y="47" width="14" height="14" rx="2"/><text class="label" x="552.4000000000001" y="58">nota</text><line class="edge" x1="610.0000000000001" y1="54" x2="654.0000000000001" y2="54"/><text class="label" x="666.0000000000001" y="58">associação</text><line class="edge" x1="784.0000000000001" y1="54" x2="812.0000000000001" y2="54" marker-start="url(#composicao)"/><text class="label" x="824.0000000000001" y="58">composição</text><line class="edge edge-async" x1="926.0000000000001" y1="54" x2="970.0000000000001" y2="54"/><text class="label" x="982.0000000000001" y="58">ligação da nota</text><line class="divider" x1="40" y1="76" x2="1592" y2="76"/><text class="footer" x="40" y="100">v01 · criação: entidades do catálogo de módulos (15_catalogo)</text><text class="wm-file" x="1592" y="100" text-anchor="end">catalogo-classes_v01_20261029-0443.svg</text></g>
+</svg>

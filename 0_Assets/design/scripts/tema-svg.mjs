@@ -42,6 +42,13 @@ const ICONES = {
   baixo: 'M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z',
   repetir: 'M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z',
   chat: 'M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z',
+  feed: 'M8 8H6v7c0 1.1.9 2 2 2h9v-2H8V8zm12-5h-8c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 8h-8V7h8v4zM4 12H2v7c0 1.1.9 2 2 2h9v-2H4v-7z',
+  carteira: 'M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z',
+  expandir: 'M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z',
+  recolher: 'M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z',
+  encolher: 'M3 18h13v-2H3v2zm0-5h10v-2H3v2zm0-7v2h13V6H3zm18 9.59L17.42 12 21 8.41 19.59 7l-5 5 5 5L21 15.59z',
+  pessoas: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z',
+  loja: 'M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z',
 };
 
 // Funções de desenho (componentes, compostos, marca) com os tokens resolvidos; usadas pelo
@@ -299,13 +306,22 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     });
     return { w, svg: s + rect(x + 0.5, y + 0.5, w - 1, h - 1, r, null, `stroke="${linha}" stroke-width="${num('segmented-button-outline-width')}"`) };
   }
+  // barra de busca: ícone de busca, texto de apoio (ou o que foi digitado) e, com texto, o botão de limpar
+  function busca(e, x, y, w, apoio, valor = '') {
+    const h = num('search-bar-height'), p = num('search-bar-padding'), g = num('search-bar-gap'), ti = num('search-bar-icon-size'), papel = tipoDe('search-bar-supporting-text');
+    let s = rect(x, y, w, h, canto('search-bar-shape', h), cor(e, 'search-bar-container-color'));
+    s += icone('buscar', x + p, y + (h - ti) / 2, ti, cor(e, 'search-bar-leading-icon-color'));
+    s += txt(x + p + ti + g, meio(y, h, papel), valor || apoio, papel, valor ? cor(e, 'search-bar-input-text-color') : cor(e, 'search-bar-supporting-text-color'));
+    if (valor) s += icone('close', x + w - p - ti, y + (h - ti) / 2, ti, cor(e, 'search-bar-trailing-icon-color'));
+    return s;
+  }
   function menu(e, x, y, w, itens) {
     const ih = num('menu-item-height'), p = num('menu-item-padding'), ti = num('menu-icon-size'), papel = tipoDe('menu-label');
     const h = itens.length * ih + 16;
     let s = rect(x, y, w, h, canto('menu-shape', h), cor(e, 'menu-container-color'), sombra(nivel('menu-elevation')));
     itens.forEach(([ic, t], i) => {
       const iy = y + 8 + i * ih;
-      s += icone(ic, x + p, iy + (ih - ti) / 2, ti, cor(e, 'menu-icon-color')) + txt(x + p + ti + p, meio(iy, ih, papel), t, papel, cor(e, 'menu-label-color'));
+      s += (ic ? icone(ic, x + p, iy + (ih - ti) / 2, ti, cor(e, 'menu-icon-color')) : '') + txt(x + p + ti + p, meio(iy, ih, papel), t, papel, cor(e, 'menu-label-color'));
     });
     return { h, svg: s };
   }
@@ -372,13 +388,91 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     });
     return s;
   }
-  function nav3(e, x, y, w, destinos, n, ativo = 0) {
+  // barra lateral em acordeão (hub e quest, medium e expanded): destinos com ícone; o que tem subníveis
+  // abre com a seta e mostra os subníveis recuados, sem ícone; o indicador marca o subnível (ou o destino) ativo
+  function acordeao(e, x, y, h, destinos) {
+    const w = num('navigation-drawer-side-width'), ih = num('navigation-drawer-item-height'), sh = num('navigation-drawer-subitem-height');
+    const si = num('navigation-drawer-subitem-inset'), ti = num('navigation-drawer-expand-icon-size');
+    const pl = tipoDe('navigation-drawer-label'), ps = tipoDe('navigation-drawer-subitem-label'), forma = (a) => canto('navigation-drawer-item-shape', a);
+    let s = rect(x, y, w, h, 0, cor(e, 'navigation-drawer-side-container-color')) + icone('encolher', x + 28, y + 16, 24, e['on-surface-variant']), cy = y + 56;
+    destinos.forEach(({ icone: ic, rotulo, ativo, aberto, filhos = [], selo: n }) => {
+      const marcado = ativo && !filhos.length, fg = marcado ? e['on-secondary-container'] : e['on-surface-variant'];
+      if (marcado) s += rect(x + 12, cy, w - 24, ih, forma(ih), cor(e, 'navigation-drawer-indicator-color'));
+      s += icone(ic, x + 28, cy + (ih - 24) / 2, 24, fg) + txt(x + 64, meio(cy, ih, pl), rotulo, pl, ativo ? (marcado ? fg : e['on-surface']) : fg);
+      if (n) s += selo(e, x + w - (filhos.length ? 64 : 36), cy + ih / 2, n);
+      if (filhos.length) s += icone(aberto ? 'recolher' : 'expandir', x + w - 24 - ti, cy + (ih - ti) / 2, ti, e['on-surface-variant']);
+      cy += ih;
+      if (aberto) filhos.forEach((f) => {
+        const at = ativo === f;
+        if (at) s += rect(x + si, cy, w - si - 12, sh, forma(sh), cor(e, 'navigation-drawer-indicator-color'));
+        s += txt(x + 64, meio(cy, sh, ps), f, ps, at ? e['on-secondary-container'] : e['on-surface-variant']);
+        cy += sh;
+      });
+    });
+    return s;
+  }
+  // barra lateral encolhida: botão de abrir no alto e os destinos como no trilho; o destino com subníveis
+  // marca o indicador quando um subnível está ativo, e os subníveis voltam ao abrir a barra
+  function acordeaoEncolhido(e, x, y, h, destinos) {
+    const w = num('navigation-drawer-side-collapsed-width'), iw = num('navigation-rail-indicator-width'), ih = num('navigation-rail-indicator-height'), papel = tipoDe('navigation-rail-label');
+    let s = rect(x, y, w, h, 0, cor(e, 'navigation-drawer-side-container-color')) + icone('menu', x + w / 2 - 12, y + 16, 24, e['on-surface-variant']);
+    destinos.forEach(({ icone: ic, rotulo, ativo, selo: n }, i) => {
+      const cy = y + 64 + i * 72, cx = x + w / 2, at = !!ativo;
+      if (at) s += rect(cx - iw / 2, cy, iw, ih, canto('navigation-rail-indicator-shape', ih), cor(e, 'navigation-rail-indicator-color'));
+      s += icone(ic, cx - 12, cy + 4, 24, at ? e['on-secondary-container'] : e['on-surface-variant']);
+      if (n) s += selo(e, cx + 12, cy + 6, n);
+      s += txt(cx, cy + ih + 4 + tipos[papel].size, rotulo, papel, at ? e['on-surface'] : e['on-surface-variant'], 'middle');
+    });
+    return s;
+  }
+  // card de módulo nos quatro tamanhos, em células quadradas (grade estilo Windows Phone; largura × altura em células de lado cel):
+  // mínima 1x1 = ícone e selo; reduzida 2x2 = ícone, nome e um número macro; normal 4x4 = número, tendência, série e números
+  // de apoio; expandida 4x8 = a normal com o gráfico das semanas e a lista do módulo. Ordenando: alça, botão de opções e o menu
+  const TAM = { minima: 'minimal', reduzida: 'reduced', normal: 'normal', expandida: 'expanded' };
+  function cardTamanho(e, x, y, cel, tamanho, ic, titulo, { n, metrica = {}, ordenando, aberto } = {}) {
+    const g = num('module-card-grid-gap'), k = TAM[tamanho], c = num(`module-card-${k}-columns`), r = num(`module-card-${k}-rows`);
+    const w = c * cel + (c - 1) * g, h = r * cel + (r - 1) * g, p = num('card-padding');
+    const fundo = rect(x, y, w, h, canto('card-shape', Math.min(w, h)), cor(e, 'card-filled-container-color'));
+    let s;
+    if (tamanho === 'minima') {
+      s = fundo + (ordenando ? caixaIcone(e, x + 8, y + 8, ic) : caixaIcone(e, x + (w - 40) / 2, y + (h - 40) / 2, ic));
+      if (n) s += selo(e, x + w - 14, y + 14, n);
+    } else if (tamanho === 'reduzida') {
+      s = fundo + caixaIcone(e, x + p, y + p, ic);
+      let t = titulo; while (largura(t, 'title-small') > w - 2 * p && t.length > 4) t = t.slice(0, -2).trimEnd() + '…';
+      s += txt(x + p, y + p + 64, t, 'title-small', e['on-surface']) + txt(x + p, y + h - p, metrica.valor, 'headline-small', e.primary);
+      if (n) s += selo(e, x + w - 20, y + 20, n);
+    } else {
+      s = cardModulo(e, x, y, w, h, ic, titulo, { n, metrica });
+      if (tamanho === 'expandida') {
+        const yy = y + cel * 4 + g * 3 - 64, lw = w - 2 * p, serie = metrica.semanas || metrica.serie || [];
+        s += `<rect x="${x + p}" y="${yy}" width="${lw}" height="1" fill="${e['outline-variant']}"/>` + txt(x + p, yy + 32, 'Últimas semanas', 'title-small', e['on-surface']);
+        s += graficoBarras(e, x + p, yy + 48, lw, 132, serie, { destaque: serie.length - 1, rotulos: serie.map((_, i) => `S${i + 1}`), mostrarValores: true, barraMax: 28 });
+        (metrica.lista || []).forEach(([a, b], i) => {
+          const ly = yy + 204 + i * 48;
+          s += `<rect x="${x + p}" y="${ly}" width="${lw}" height="1" fill="${e['outline-variant']}"/>` + txt(x + p, meio(ly, 48, 'body-medium'), a, 'body-medium', e['on-surface']) + txt(x + w - p, meio(ly, 48, 'title-small'), b, 'title-small', e.primary, 'end');
+        });
+      }
+    }
+    let m = '';
+    if (ordenando) {
+      s += rect(x + 0.5, y + 0.5, w - 1, h - 1, canto('card-shape', Math.min(w, h)), 'none', `stroke="${e.outline}" stroke-dasharray="4 3"`);
+      // a mínima arrasta pelo card inteiro e só mostra o botão de opções; as outras têm a alça no alto e o botão embaixo
+      if (tamanho === 'minima') s += rect(x + w - 34, y + h - 34, 30, 30, 15, e['secondary-container']) + icone('more', x + w - 31, y + h - 31, num('module-card-options-icon-size'), e['on-secondary-container']);
+      else s += rect(x + w - 44, y + 8, 36, 36, 18, cor(e, 'card-filled-container-color')) + icone('arrastar', x + w - 38, y + 14, 24, e['on-surface-variant'])
+        + rect(x + w - 48, y + h - 48, 40, 40, 20, e['secondary-container']) + icone('more', x + w - 40, y + h - 40, num('module-card-options-icon-size'), e['on-secondary-container']);
+      // o menu abre ao lado do card, alinhado pela base com o botão de opções
+      if (aberto) m = menu(e, x + w + 8, y + h - 304, 208, [['cima', 'Mover para cima'], ['baixo', 'Mover para baixo'], ...['minima', 'reduzida', 'normal', 'expandida'].map((t) => [tamanho === t ? 'check' : null, { minima: 'Mínima', reduzida: 'Reduzida', normal: 'Normal', expandida: 'Expandida' }[t]])]).svg;
+    }
+    return { w, h, svg: s + m };
+  }
+  function nav3(e, x, y, w, destinos, n, ativo = 0, comSelo = 1) {
     const h = num('navigation-bar-height'), iw = num('navigation-bar-indicator-width'), ih = num('navigation-bar-indicator-height'), papel = tipoDe('navigation-bar-label'), passo = w / destinos.length;
     return rect(x, y, w, h, 0, cor(e, 'navigation-bar-container-color')) + destinos.map(([ic, r], i) => {
       const cx = x + passo * i + passo / 2, at = i === ativo;
       return (at ? rect(cx - iw / 2, y + 12, iw, ih, canto('navigation-bar-indicator-shape', ih), cor(e, 'navigation-bar-indicator-color')) : '')
         + icone(ic, cx - 12, y + 12 + (ih - 24) / 2, 24, at ? cor(e, 'navigation-bar-active-icon-color') : cor(e, 'navigation-bar-icon-color'))
-        + (i === 1 && n ? selo(e, cx + 12, y + 16, n) : '')
+        + (i === comSelo && n ? selo(e, cx + 12, y + 16, n) : '')
         + txt(cx, y + 12 + ih + 4 + tipos[papel].size, r, papel, at ? cor(e, 'navigation-bar-active-label-color') : cor(e, 'navigation-bar-label-color'), 'middle');
     }).join('');
   }
@@ -626,11 +720,11 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
     return s;
   }
 
-  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas };
+  return { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, busca, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, acordeao, acordeaoEncolhido, cardTamanho, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas };
 }
 
 export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo }) {
-  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo });
+  const { nm, masc, L, M, GAP, PW, PAD, fundo, comp, num, cor, canto, tipoDe, nivel, quebrar, largura, rect, sombra, txt, mono, icone, meio, botao, fila, iconButton, fab, chip, card, campo, topAppBar, DESTINOS, navBar, navRail, drawer, lista, dialogo, snackbar, selo, abas, segmentado, busca, menu, controlesCarrossel, logoW, logoAlt, ESCALA_TOPO, logoNaBarra, logo, caixaIcone, avatar, topoCasca, nav3, cardModulo, cardCatalogo, cardAcesso, aviso, indicador, modoDe, FORMAS_TURMA, turma, menuLanding, interruptor, trilho3, acordeao, acordeaoEncolhido, cardTamanho, cardTarefa, quemAcessa, diaAgenda, graficoBarras, cardDesafio, vitrineTelas } = desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte, versao, data, status, semente, variante, extras, temas, mascote, mascotes, logos, desenharFundo });
 
   // ── componentes no quadro: título, descrição, altura do conteúdo, desenho ──
   const COMPONENTES = [
@@ -675,9 +769,18 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
       return s + b.svg + selo(e, x + 144 + b.w - 4, y + 6, '12');
     }],
     ['Abas', 'Abas primárias para vistas do mesmo assunto; indicador de 3dp em primary sob a aba ativa.', 48, (e, x, y) => abas(e, x + (PW - 2 * PAD - 360) / 2, y, 360, ['Configuração', 'Utilização'])],
+    ['Barra lateral em acordeão', 'Medium e expanded, abaixo do topo: aberta (280dp), o destino com subníveis abre pela seta; encolhida (80dp), só ícones e rótulos, para editar e ordenar módulos.', 392, (e, x, y) => {
+      const x1 = x + (PW - 2 * PAD - 280 - 2 * 80 - 2 * 32) / 2, H = [{ icone: 'modulo', rotulo: 'Módulos', ativo: 'Contratados', aberto: true, filhos: ['Contratados', 'Da conta', 'A contratar'] }, { icone: 'feed', rotulo: 'Feed' }, { icone: 'perfil', rotulo: 'Conta' }];
+      const Q = [{ icone: 'evento', rotulo: 'Tarefas' }, { icone: 'feed', rotulo: 'Feed' }, { icone: 'carteira', rotulo: 'Carteira', ativo: true, selo: '5' }, { icone: 'perfil', rotulo: 'Perfil' }];
+      return acordeao(e, x1, y, 392, H) + acordeaoEncolhido(e, x1 + 312, y, 392, [{ ...H[0], ativo: true }, H[1], H[2]]) + acordeaoEncolhido(e, x1 + 424, y, 392, Q);
+    }],
     ['Botão segmentado', 'De 2 a 5 opções curtas lado a lado; a selecionada ganha secondary-container e marcação. Cheio: ocupa o contêiner e divide por igual (formulários no compact).', 96, (e, x, y) =>
       fila([(cx, cy) => segmentado(e, cx, cy, ['Mensal', 'Anual'], 0), (cx, cy) => segmentado(e, cx, cy, ['Claro', 'Escuro', 'Sistema'], 2)], x, y, 24)
       + segmentado(e, x, y + 56, ['Escola', 'Empresa', 'Autônomo'], 0, 328).svg],
+    ['Barra de busca', 'Pesquisa numa lista, em surface-container-high e canto full; o ícone de busca vem na frente e, com texto, o botão de limpar.', 56, (e, x, y) => {
+      const w = (PW - 2 * PAD - 24) / 2;
+      return busca(e, x, y, w, 'Buscar por nome ou sigla') + busca(e, x + w + 24, y, w, '', 'maria');
+    }],
     ['Gráfico de barras', 'Valores lado a lado com o topo arredondado: destaque em primary, os outros em secondary-container; rótulos e valores opcionais. Sempre com o valor também em texto.', 120, (e, x, y) =>
       graficoBarras(e, x, y, 300, 120, [900, 1200, 1350, 1720, 1600, 1500], { destaque: 3, rotulos: ['1ª', '2ª', '3ª', '4ª', '5ª', '6ª'], mostrarValores: true, gap: 8 })
       + graficoBarras(e, x + 340, y + 40, 120, 40, [980, 1240], { destaque: 1 })],
@@ -711,15 +814,20 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
       return topoCasca(e, x1, y, 360, { conta: false }) + topoCasca(e, x1, y + 80, 360) + topoCasca(e, x1, y + 160, 360, { quest: true, nome: 'Lucas Andrade', letra: ['feliz', 'estrela'] })
         + menu(e, x1 + 360 - 240, y + 224, 240, [['voltar', 'Trocar perfil']]).svg;
     }],
-    ['Comum · Navegação da casca', 'Barra com três destinos no compact; a partir do medium, trilho (gaveta no large) abaixo do topo, sem Conta ou Perfil, que ficam no nome e na foto do topo.', 80, (e, x, y) =>
-      nav3(e, x, y, 336, [['modulo', 'Meus módulos'], ['add', 'Catálogo'], ['perfil', 'Conta']]) + nav3(e, x + 356, y, 336, [['evento', 'Tarefas'], ['salvos', 'Fixos'], ['perfil', 'Perfil']], '5')],
-    ['Comum · Card de módulo', 'Meus módulos (hub): painel do módulo com o número principal e a tendência, uma série ou o progresso e números de apoio nas cores da paleta, sem mascotes; Fixos (quest): nome, apoio, selo e estado. Até 2 por linha.', 420, (e, x, y) => {
-      const w = (PW - 2 * PAD - 16) / 2;
-      return cardModulo(e, x, y, w, 236, 'check', 'Presença', { n: '3', metrica: { valor: '94%', rotulo: 'presença na semana', tendencia: '+2 pts', serie: [88, 91, 90, 92, 94], extras: [['12', 'turmas', 'secondary'], ['3', 'sem chamada hoje', 'tertiary'], ['18', 'faltas seguidas', 'error']] } })
-        + cardModulo(e, x + w + 16, y, w, 236, 'perfil', 'Carteirinha', { metrica: { valor: '312 de 340', rotulo: 'carteirinhas prontas', progresso: 0.92, extras: [['21', 'esperando foto', 'tertiary'], ['7', 'sem autorização', 'error'], ['4', 'impressas hoje', 'secondary']] } })
-        + cardModulo(e, x, y + 252, w, 160, 'editar', 'Quiz', { n: '1', estado: 'Configurar', metrica: null })
-        + cardModulo(e, x + w + 16, y + 252, (w - 12) / 2, 128, 'salvos', 'Flashcards', { apoio: 'Estudo · quest' })
-        + cardModulo(e, x + w + 16 + (w - 12) / 2 + 12, y + 252, (w - 12) / 2, 128, 'chat', 'Chat da turma', { n: '5', apoio: '7º A · quest' });
+    ['Comum · Navegação da casca', 'Compact: barra com os destinos e, abaixo do topo, abas primárias com os subníveis do destino (Módulos: Contratados, Da conta e A contratar); medium e expanded: barra lateral em acordeão.', 136, (e, x, y) =>
+      abas(e, x, y, 336, ['Contratados', 'Da conta', 'A contratar']) + nav3(e, x, y + 56, 336, [['modulo', 'Módulos'], ['feed', 'Feed'], ['perfil', 'Conta']])
+        + nav3(e, x + 356, y + 56, 336, [['evento', 'Tarefas'], ['feed', 'Feed'], ['carteira', 'Carteira'], ['perfil', 'Perfil']], '5', 2, 2)],
+    ['Comum · Card de módulo', 'Módulos e Carteira, em células quadradas de 76dp ou mais (Windows Phone): mínima 1x1, reduzida 2x2, normal 4x4 (padrão) e expandida 4x8; janela larga = mais colunas.', 672, (e, x, y) => {
+      const g = num('module-card-grid-gap'), cel = num('module-card-cell-min-size'), W = 4 * cel + 3 * g, x1 = x + (PW - 2 * PAD - 2 * W - 36) / 2, x2 = x1 + W + 36;
+      const pres = { valor: '94%', rotulo: 'presença na semana', tendencia: '+2 pts', serie: [88, 91, 90, 92, 94], extras: [['12', 'turmas', 'secondary'], ['3', 'sem chamada hoje', 'tertiary'], ['18', 'faltas seguidas', 'error']],
+        semanas: [86, 88, 91, 90, 89, 92, 94], lista: [['7º A', '98%'], ['8º B', '91%'], ['9º C', '87%']] };
+      const cart = { valor: '312', rotulo: 'carteirinhas prontas', progresso: 0.92, extras: [['28', 'esperando a foto', 'tertiary'], ['4', 'vencendo', 'error']] };
+      const a = cardTamanho(e, x1, y, cel, 'expandida', 'check', 'Presença', { n: '3', metrica: pres });
+      const b = cardTamanho(e, x2, y, cel, 'normal', 'perfil', 'Carteirinha', { metrica: cart });
+      const yr = y + b.h + g, c = cardTamanho(e, x2, yr, cel, 'reduzida', 'chat', 'Mensagens', { n: '5', metrica: { valor: '5' } });
+      const xm = x2 + c.w + g, mins = [['salvos', '2'], ['evento'], ['carteira'], ['editar']].map(([ic, nn], i) => cardTamanho(e, xm + (i % 2) * (cel + g), yr + Math.floor(i / 2) * (cel + g), cel, 'minima', ic, '', { n: nn }).svg).join('');
+      const legenda = [['1x1', 'mínima'], ['2x2', 'reduzida'], ['4x4', 'normal · padrão'], ['4x8', 'expandida']].map(([t, r], i) => txt(x2, yr + c.h + 32 + i * 22, t, 'title-small', e['on-surface']) + txt(x2 + 40, yr + c.h + 32 + i * 22, r, 'body-small', e['on-surface-variant'])).join('');
+      return a.svg + b.svg + c.svg + mins + legenda;
     }],
     ['Comum · Vitrine de telas', 'Página do módulo (landing) e detalhe no catálogo (hub): as telas do módulo num computador e num celular, com o carrossel; até o módulo ficar pronto, cada tela é um espaço com o nome dela.', 340, (e, x, y) =>
       vitrineTelas(e, x + (PW - 2 * PAD - 460) / 2, y, 460, { telas: [['computador', 'Hub · chamada da turma'], ['celular', 'Quest · presença']] }).svg],
@@ -813,10 +921,12 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
       [['Módulos', 'Como funciona'], ['Hub', 'Quest'], ['Termos de uso', 'Privacidade']].forEach((col, i) => col.forEach((l, k) => { s += txt(x + 260 + i * 140, y + 40 + k * 28, l, 'body-medium', e['on-surface-variant']); }));
       return s;
     }],
-    ['Hub · Grade de módulos ordenando', 'Arrastar ou mover para cima e para baixo; os módulos da conta ficam fora da ordem.', 128, (e, x, y) => {
-      const w = (PW - 2 * PAD - 36) / 4;
-      const x1 = x + (PW - 2 * PAD - 2 * w - 12) / 2;
-      return cardModulo(e, x1, y, w, 128, '', 'Presença', { ordenando: true }) + cardModulo(e, x1 + w + 12, y, w, 128, '', 'Quiz', { ordenando: true });
+    ['Comum · Ordenando módulos', 'Hub (Módulos) e quest (Carteira): arrastar pela alça (a mínima, pelo card) ou o menu de opções do card, com mover e os quatro tamanhos; tudo guardado só no aparelho.', 504, (e, x, y) => {
+      const g = num('module-card-grid-gap'), cel = num('module-card-cell-min-size'), W = 4 * cel + 3 * g, x1 = x + (PW - 2 * PAD - W - 216) / 2;
+      const a = cardTamanho(e, x1, y, cel, 'reduzida', 'chat', 'Mensagens', { metrica: { valor: '5' }, ordenando: true });
+      const xm = x1 + a.w + g, mins = [['salvos'], ['evento'], ['carteira'], ['editar']].map(([ic], i) => cardTamanho(e, xm + (i % 2) * (cel + g), y + Math.floor(i / 2) * (cel + g), cel, 'minima', ic, '', { ordenando: true }).svg).join('');
+      const b = cardTamanho(e, x1, y + a.h + g, cel, 'normal', 'check', 'Presença', { metrica: { valor: '94%', rotulo: 'presença na semana', serie: [88, 91, 90, 92, 94] }, ordenando: true, aberto: true });
+      return a.svg + mins + b.svg;
     }],
     ['Hub · Simulador de custo', 'Detalhe do módulo no catálogo: pessoas e prazo recalculam o custo e os prazos de pagamento; só a conta master vê Incluir na conta.', 296, (e, x0, y) => {
       const w = 340, x = x0 + (PW - 2 * PAD - w) / 2;

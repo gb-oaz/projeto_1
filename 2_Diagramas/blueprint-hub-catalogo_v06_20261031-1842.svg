@@ -1,0 +1,377 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2168 1448" width="2168" height="1448">
+  <title>Hub · módulos · a contratar · blueprint de UX</title>
+  <desc>Blueprint de UX do catálogo de módulos no hub (requisito 08_hub-ux). v01: criação. v02: topo com logo, avisos e conta, sem o título da tela. v03: nome da instituição ou da pessoa ao lado da foto. v04: topo na largura toda, com o trilho abaixo; logo e avisos no compact; nome e foto a partir do medium; trilho sem Conta; detalhe com as telas do módulo, como funciona e quem usa. v05: o catálogo vai para dentro de Módulos, na aba A contratar do botão segmentado; barra com Módulos, Feed e Conta e trilho com Módulos e Feed. v06: abas primárias no compact, no lugar do botão segmentado; barra lateral em acordeão no medium e no expanded, com A contratar dentro de Módulos.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <!-- ── markers, filtro e gradiente da marca d'água: copie sempre ── -->
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1256" height="1152"/>
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="2168" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="2168" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · BLUEPRINT DE UX</text>
+    <text class="title" x="40" y="72">Hub · módulos · a contratar · blueprint de UX</text>
+    <text class="subtitle" x="40" y="94">Aba A contratar de Módulos: custo antes de incluir na conta e módulos do time deboaz por código</text>
+    <text class="wm-meta-label" x="1880" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1880" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1904" y="71" text-anchor="middle">v06</text>
+    <line class="wm-sep" x1="1952" y1="32" x2="1952" y2="80"/>
+    <text class="wm-meta-label" x="1976" y="44">DATA</text>
+    <text class="wm-meta-value" x="1976" y="72">2026-10-31 · 18:42</text>
+  </g>
+  <g id="compact-acontratar">
+  <rect class="panel" x="40" y="152" width="360" height="552" rx="24" filter="url(#sombra)"/>
+  <rect class="node-orange" x="56" y="168" width="328" height="80" rx="12"/>
+  <circle class="chip" cx="76" cy="183" r="9"/><text class="chip-text" x="76" y="187" text-anchor="middle">1</text>
+  <text class="boundary-label" x="92" y="187">TOPO</text>
+  <rect class="node-face" x="68" y="198" width="96" height="40" rx="8"/>
+  <text class="label" x="116" y="222.5" text-anchor="middle">logo do hub</text>
+  <rect class="node-face" x="300" y="198" width="72" height="40" rx="8"/>
+  <rect class="wm-badge" x="348" y="198" width="28" height="20" rx="10"/><text class="wm-badge-text" x="362" y="212" text-anchor="middle">2</text>
+  <text class="label" x="336" y="222.5" text-anchor="middle">avisos</text>
+  <rect class="boundary" x="56" y="256" width="328" height="80" rx="12"/>
+  <circle class="chip" cx="76" cy="271" r="9"/><text class="chip-text" x="76" y="275" text-anchor="middle">2</text>
+  <text class="boundary-label" x="92" y="275">ABAS PRIMÁRIAS · SUBNÍVEIS DE MÓDULOS</text>
+  <rect class="node-face" x="68" y="286" width="96" height="40" rx="8"/>
+  <text class="label" x="116" y="310.5" text-anchor="middle">Contratados</text>
+  <rect class="node-face" x="172" y="286" width="96" height="40" rx="8"/>
+  <text class="label" x="220" y="310.5" text-anchor="middle">Da conta</text>
+  <rect class="node-blue" x="276" y="286" width="96" height="40" rx="8"/>
+  <text class="label" x="324" y="310.5" text-anchor="middle">A contratar</text>
+  <rect class="boundary" x="56" y="344" width="328" height="248" rx="12"/>
+  <circle class="chip" cx="76" cy="359" r="9"/><text class="chip-text" x="76" y="363" text-anchor="middle">3</text>
+  <text class="boundary-label" x="92" y="363">MÓDULOS A CONTRATAR</text>
+  <rect class="node-purple edge-async" x="68" y="374" width="304" height="64" rx="8"/>
+  <text class="label" x="220" y="402.5" text-anchor="middle">módulo</text>
+  <text class="muted" x="220" y="418.5" text-anchor="middle">frase · a partir de R$</text>
+  <rect class="node-purple edge-async" x="68" y="446" width="304" height="64" rx="8"/>
+  <text class="label" x="220" y="474.5" text-anchor="middle">módulo</text>
+  <text class="muted" x="220" y="490.5" text-anchor="middle">frase · a partir de R$</text>
+  <rect class="node-purple edge-async" x="68" y="518" width="304" height="64" rx="8"/>
+  <text class="label" x="220" y="546.5" text-anchor="middle">módulo</text>
+  <text class="muted" x="220" y="562.5" text-anchor="middle">frase · a partir de R$</text>
+  <rect class="node-orange" x="56" y="600" width="328" height="88" rx="12"/>
+  <circle class="chip" cx="76" cy="615" r="9"/><text class="chip-text" x="76" y="619" text-anchor="middle">4</text>
+  <text class="boundary-label" x="92" y="619">BARRA DE NAVEGAÇÃO</text>
+  <rect class="node-blue" x="68" y="630" width="96" height="48" rx="8"/>
+  <text class="label" x="116" y="658.5" text-anchor="middle">Módulos</text>
+  <rect class="node-face" x="172" y="630" width="96" height="48" rx="8"/>
+  <text class="label" x="220" y="658.5" text-anchor="middle">Feed</text>
+  <rect class="node-face" x="276" y="630" width="96" height="48" rx="8"/>
+  <text class="label" x="324" y="658.5" text-anchor="middle">Conta</text>
+  <text class="mono" x="220" y="728" text-anchor="middle">compact · 360dp · módulos · a contratar</text>
+  </g>
+  <g id="compact-detalhe">
+  <rect class="panel" x="496" y="152" width="360" height="792" rx="24" filter="url(#sombra)"/>
+  <rect class="node-orange" x="512" y="168" width="328" height="80" rx="12"/>
+  <circle class="chip" cx="532" cy="183" r="9"/><text class="chip-text" x="532" y="187" text-anchor="middle">1</text>
+  <text class="boundary-label" x="548" y="187">TOPO</text>
+  <rect class="node-face" x="524" y="198" width="40" height="40" rx="8"/>
+  <text class="label" x="544" y="222.5" text-anchor="middle">←</text>
+  <rect class="node-face" x="572" y="198" width="256" height="40" rx="8"/>
+  <text class="label" x="700" y="222.5" text-anchor="middle">nome do módulo</text>
+  <rect class="boundary" x="512" y="256" width="328" height="144" rx="12"/>
+  <circle class="chip" cx="532" cy="271" r="9"/><text class="chip-text" x="532" y="275" text-anchor="middle">5</text>
+  <text class="boundary-label" x="548" y="275">TELAS DO MÓDULO</text>
+  <rect class="node-purple edge-async" x="524" y="286" width="304" height="104" rx="8"/>
+  <text class="label" x="676" y="334.5" text-anchor="middle">vitrine de telas</text>
+  <text class="muted" x="676" y="350.5" text-anchor="middle">hub e quest · carrossel</text>
+  <rect class="boundary" x="512" y="408" width="328" height="232" rx="12"/>
+  <circle class="chip" cx="532" cy="423" r="9"/><text class="chip-text" x="532" y="427" text-anchor="middle">6</text>
+  <text class="boundary-label" x="548" y="427">SOBRE O MÓDULO</text>
+  <rect class="node-purple edge-async" x="524" y="438" width="304" height="48" rx="8"/>
+  <text class="label" x="676" y="466.5" text-anchor="middle">descrição e para que serve</text>
+  <rect class="node-purple edge-async" x="524" y="494" width="304" height="64" rx="8"/>
+  <text class="label" x="676" y="522.5" text-anchor="middle">como funciona</text>
+  <text class="muted" x="676" y="538.5" text-anchor="middle">os passos do módulo</text>
+  <rect class="node-purple edge-async" x="524" y="566" width="304" height="64" rx="8"/>
+  <text class="label" x="676" y="594.5" text-anchor="middle">quem usa</text>
+  <text class="muted" x="676" y="610.5" text-anchor="middle">configura · usa · acompanha</text>
+  <rect class="boundary" x="512" y="648" width="328" height="184" rx="12"/>
+  <circle class="chip" cx="532" cy="663" r="9"/><text class="chip-text" x="532" y="667" text-anchor="middle">7</text>
+  <text class="boundary-label" x="548" y="667">CUSTO</text>
+  <rect class="node-face" x="524" y="678" width="304" height="40" rx="8"/>
+  <text class="label" x="676" y="702.5" text-anchor="middle">campo · pessoas que vão usar</text>
+  <rect class="node-face" x="524" y="726" width="148" height="40" rx="8"/>
+  <text class="label" x="598" y="750.5" text-anchor="middle">Mensal</text>
+  <rect class="node-face" x="680" y="726" width="148" height="40" rx="8"/>
+  <text class="label" x="754" y="750.5" text-anchor="middle">Anual</text>
+  <rect class="node-face" x="524" y="774" width="304" height="48" rx="8"/>
+  <text class="label" x="676" y="794.5" text-anchor="middle">custo calculado</text>
+  <text class="muted" x="676" y="810.5" text-anchor="middle">valor e prazos de pagamento</text>
+  <rect class="node-orange" x="512" y="840" width="328" height="88" rx="12"/>
+  <circle class="chip" cx="532" cy="855" r="9"/><text class="chip-text" x="532" y="859" text-anchor="middle">8</text>
+  <text class="boundary-label" x="548" y="859">AÇÃO</text>
+  <rect class="node-blue" x="524" y="870" width="304" height="48" rx="8"/>
+  <text class="label" x="676" y="898.5" text-anchor="middle">Incluir na conta</text>
+  <text class="mono" x="676" y="968" text-anchor="middle">compact · 360dp · detalhe do módulo</text>
+  </g>
+  <g id="compact-time">
+  <rect class="panel" x="952" y="152" width="360" height="584" rx="24" filter="url(#sombra)"/>
+  <rect class="node-orange" x="968" y="168" width="328" height="80" rx="12"/>
+  <circle class="chip" cx="988" cy="183" r="9"/><text class="chip-text" x="988" y="187" text-anchor="middle">1</text>
+  <text class="boundary-label" x="1004" y="187">TOPO</text>
+  <rect class="node-face" x="980" y="198" width="96" height="40" rx="8"/>
+  <text class="label" x="1028" y="222.5" text-anchor="middle">logo do hub</text>
+  <rect class="node-face" x="1212" y="198" width="72" height="40" rx="8"/>
+  <rect class="wm-badge" x="1260" y="198" width="28" height="20" rx="10"/><text class="wm-badge-text" x="1274" y="212" text-anchor="middle">2</text>
+  <text class="label" x="1248" y="222.5" text-anchor="middle">avisos</text>
+  <rect class="boundary" x="968" y="256" width="328" height="80" rx="12"/>
+  <circle class="chip" cx="988" cy="271" r="9"/><text class="chip-text" x="988" y="275" text-anchor="middle">2</text>
+  <text class="boundary-label" x="1004" y="275">ABAS PRIMÁRIAS · SUBNÍVEIS DE MÓDULOS</text>
+  <rect class="node-face" x="980" y="286" width="96" height="40" rx="8"/>
+  <text class="label" x="1028" y="310.5" text-anchor="middle">Contratados</text>
+  <rect class="node-face" x="1084" y="286" width="96" height="40" rx="8"/>
+  <text class="label" x="1132" y="310.5" text-anchor="middle">Da conta</text>
+  <rect class="node-blue" x="1188" y="286" width="96" height="40" rx="8"/>
+  <text class="label" x="1236" y="310.5" text-anchor="middle">A contratar</text>
+  <rect class="boundary" x="968" y="344" width="328" height="96" rx="12"/>
+  <circle class="chip" cx="988" cy="359" r="9"/><text class="chip-text" x="988" y="363" text-anchor="middle">3</text>
+  <text class="boundary-label" x="1004" y="363">MÓDULOS DO TIME DEBOAZ</text>
+  <rect class="node-purple edge-async" x="980" y="374" width="304" height="56" rx="8"/>
+  <text class="label" x="1132" y="398.5" text-anchor="middle">módulo do time</text>
+  <text class="muted" x="1132" y="414.5" text-anchor="middle">sem custo</text>
+  <rect class="boundary" x="968" y="448" width="328" height="176" rx="12"/>
+  <circle class="chip" cx="988" cy="463" r="9"/><text class="chip-text" x="988" y="467" text-anchor="middle">9</text>
+  <text class="boundary-label" x="1004" y="467">CÓDIGO DO MÓDULO · DIÁLOGO</text>
+  <rect class="node-face" x="980" y="478" width="304" height="40" rx="8"/>
+  <text class="label" x="1132" y="502.5" text-anchor="middle">Título · Adicionar módulo</text>
+  <rect class="node-face" x="980" y="526" width="304" height="40" rx="8"/>
+  <text class="label" x="1132" y="550.5" text-anchor="middle">campo · código</text>
+  <rect class="node-face" x="980" y="574" width="148" height="40" rx="8"/>
+  <text class="label" x="1054" y="598.5" text-anchor="middle">Cancelar</text>
+  <rect class="node-blue" x="1136" y="574" width="148" height="40" rx="8"/>
+  <text class="label" x="1210" y="598.5" text-anchor="middle">Adicionar</text>
+  <rect class="node-orange" x="968" y="632" width="328" height="88" rx="12"/>
+  <circle class="chip" cx="988" cy="647" r="9"/><text class="chip-text" x="988" y="651" text-anchor="middle">4</text>
+  <text class="boundary-label" x="1004" y="651">BARRA DE NAVEGAÇÃO</text>
+  <rect class="node-blue" x="980" y="662" width="96" height="48" rx="8"/>
+  <text class="label" x="1028" y="690.5" text-anchor="middle">Módulos</text>
+  <rect class="node-face" x="1084" y="662" width="96" height="48" rx="8"/>
+  <text class="label" x="1132" y="690.5" text-anchor="middle">Feed</text>
+  <rect class="node-face" x="1188" y="662" width="96" height="48" rx="8"/>
+  <text class="label" x="1236" y="690.5" text-anchor="middle">Conta</text>
+  <text class="mono" x="1132" y="760" text-anchor="middle">compact · 360dp · time deboaz</text>
+  </g>
+  <g id="expanded-acontratar">
+  <rect class="panel" x="1408" y="152" width="720" height="448" rx="24" filter="url(#sombra)"/>
+  <rect class="node-orange" x="1424" y="168" width="688" height="80" rx="12"/>
+  <circle class="chip" cx="1444" cy="183" r="9"/><text class="chip-text" x="1444" y="187" text-anchor="middle">1</text>
+  <text class="boundary-label" x="1460" y="187">TOPO</text>
+  <rect class="node-face" x="1436" y="198" width="96" height="40" rx="8"/>
+  <text class="label" x="1484" y="222.5" text-anchor="middle">logo do hub</text>
+  <rect class="node-face" x="1876" y="198" width="72" height="40" rx="8"/>
+  <rect class="wm-badge" x="1924" y="198" width="28" height="20" rx="10"/><text class="wm-badge-text" x="1938" y="212" text-anchor="middle">2</text>
+  <text class="label" x="1912" y="222.5" text-anchor="middle">avisos</text>
+  <rect class="node-face" x="1956" y="198" width="88" height="40" rx="8"/>
+  <text class="label" x="2000" y="214.5" text-anchor="middle">nome</text>
+  <text class="muted" x="2000" y="230.5" text-anchor="middle">instituição</text>
+  <rect class="node-face" x="2052" y="198" width="48" height="40" rx="8"/>
+  <text class="label" x="2076" y="222.5" text-anchor="middle">foto</text>
+  <rect class="node-orange" x="1424" y="256" width="168" height="320" rx="12"/>
+  <circle class="chip" cx="1444" cy="271" r="9"/><text class="chip-text" x="1444" y="275" text-anchor="middle">4</text>
+  <text class="boundary-label" x="1460" y="275">ACORDEÃO</text>
+  <rect class="node-face" x="1436" y="286" width="144" height="40" rx="8"/>
+  <text class="label" x="1508" y="310.5" text-anchor="middle">Módulos  ▴</text>
+  <rect class="node-face" x="1460" y="334" width="120" height="32" rx="8"/>
+  <text class="label" x="1520" y="354.5" text-anchor="middle">Contratados</text>
+  <rect class="node-face" x="1460" y="382" width="120" height="32" rx="8"/>
+  <text class="label" x="1520" y="402.5" text-anchor="middle">Da conta</text>
+  <rect class="node-blue" x="1460" y="430" width="120" height="32" rx="8"/>
+  <text class="label" x="1520" y="450.5" text-anchor="middle">A contratar</text>
+  <rect class="node-face" x="1436" y="478" width="144" height="40" rx="8"/>
+  <text class="label" x="1508" y="502.5" text-anchor="middle">Feed</text>
+  <rect class="node-face" x="1436" y="526" width="144" height="40" rx="8"/>
+  <text class="label" x="1508" y="550.5" text-anchor="middle">Conta</text>
+  <rect class="boundary" x="1608" y="256" width="200" height="224" rx="12"/>
+  <circle class="chip" cx="1628" cy="271" r="9"/><text class="chip-text" x="1628" y="275" text-anchor="middle">3</text>
+  <text class="boundary-label" x="1644" y="275">MÓDULOS A CONTRATAR</text>
+  <rect class="node-purple edge-async" x="1620" y="286" width="176" height="56" rx="8"/>
+  <text class="label" x="1708" y="310.5" text-anchor="middle">módulo</text>
+  <text class="muted" x="1708" y="326.5" text-anchor="middle">a partir de R$</text>
+  <rect class="node-purple edge-async" x="1620" y="350" width="176" height="56" rx="8"/>
+  <text class="label" x="1708" y="374.5" text-anchor="middle">módulo</text>
+  <text class="muted" x="1708" y="390.5" text-anchor="middle">a partir de R$</text>
+  <rect class="node-purple edge-async" x="1620" y="414" width="176" height="56" rx="8"/>
+  <text class="label" x="1708" y="438.5" text-anchor="middle">módulo</text>
+  <text class="muted" x="1708" y="454.5" text-anchor="middle">a partir de R$</text>
+  <rect class="boundary" x="1816" y="256" width="296" height="144" rx="12"/>
+  <circle class="chip" cx="1836" cy="271" r="9"/><text class="chip-text" x="1836" y="275" text-anchor="middle">6</text>
+  <text class="boundary-label" x="1852" y="275">SOBRE O MÓDULO</text>
+  <rect class="node-purple edge-async" x="1828" y="286" width="272" height="48" rx="8"/>
+  <text class="label" x="1964" y="314.5" text-anchor="middle">descrição e para que serve</text>
+  <rect class="node-purple edge-async" x="1828" y="342" width="272" height="48" rx="8"/>
+  <text class="label" x="1964" y="370.5" text-anchor="middle">como funciona</text>
+  <rect class="boundary" x="1816" y="408" width="296" height="176" rx="12"/>
+  <circle class="chip" cx="1836" cy="423" r="9"/><text class="chip-text" x="1836" y="427" text-anchor="middle">7</text>
+  <text class="boundary-label" x="1852" y="427">CUSTO</text>
+  <rect class="node-face" x="1828" y="438" width="85.3333" height="40" rx="8"/>
+  <text class="label" x="1870.67" y="462.5" text-anchor="middle">pessoas</text>
+  <rect class="node-face" x="1921.33" y="438" width="85.3333" height="40" rx="8"/>
+  <text class="label" x="1964" y="462.5" text-anchor="middle">Mensal</text>
+  <rect class="node-face" x="2014.67" y="438" width="85.3333" height="40" rx="8"/>
+  <text class="label" x="2057.33" y="462.5" text-anchor="middle">Anual</text>
+  <rect class="node-face" x="1828" y="486" width="272" height="40" rx="8"/>
+  <text class="label" x="1964" y="510.5" text-anchor="middle">custo calculado e prazos</text>
+  <rect class="node-blue" x="1828" y="534" width="272" height="40" rx="8"/>
+  <text class="label" x="1964" y="558.5" text-anchor="middle">Incluir na conta</text>
+  <text class="mono" x="1768" y="624" text-anchor="middle">expanded · 1280dp · desenhado na escala 0,56</text>
+  </g>
+  <g id="anotacoes">
+  <text class="section" x="40" y="1032">BLOCOS</text>
+  <circle class="chip" cx="49" cy="1059" r="9"/><text class="chip-text" x="49" y="1063" text-anchor="middle">1</text>
+  <text class="label-strong" x="68" y="1064">Topo</text>
+  <text class="muted" x="68" y="1082">logo do hub e avisos (nome e foto a partir</text>
+  <text class="muted" x="68" y="1100">do medium), na largura toda, acima da barra</text>
+  <text class="muted" x="68" y="1118">lateral; no detalhe, voltar e o nome do módulo</text>
+  <circle class="chip" cx="49" cy="1147" r="9"/><text class="chip-text" x="49" y="1151" text-anchor="middle">2</text>
+  <text class="label-strong" x="68" y="1152">Abas primárias</text>
+  <text class="muted" x="68" y="1170">os subníveis de Módulos no compact, com</text>
+  <text class="muted" x="68" y="1188">A contratar marcada</text>
+  <circle class="chip" cx="49" cy="1217" r="9"/><text class="chip-text" x="49" y="1221" text-anchor="middle">3</text>
+  <text class="label-strong" x="68" y="1222">Módulos a contratar</text>
+  <text class="muted" x="68" y="1240">só os não contratados, com preço inicial;</text>
+  <text class="muted" x="68" y="1258">no time deboaz, só os módulos do time</text>
+  <circle class="chip" cx="481" cy="1059" r="9"/><text class="chip-text" x="481" y="1063" text-anchor="middle">4</text>
+  <text class="label-strong" x="500" y="1064">Navegação</text>
+  <text class="muted" x="500" y="1082">barra lateral em acordeão no medium e no</text>
+  <text class="muted" x="500" y="1100">expanded, com A contratar marcado em Módulos</text>
+  <circle class="chip" cx="481" cy="1129" r="9"/><text class="chip-text" x="481" y="1133" text-anchor="middle">5</text>
+  <text class="label-strong" x="500" y="1134">Telas do módulo</text>
+  <text class="muted" x="500" y="1152">vitrine com as telas do módulo no hub e no</text>
+  <text class="muted" x="500" y="1170">quest: o cliente vê o que está contratando</text>
+  <circle class="chip" cx="481" cy="1199" r="9"/><text class="chip-text" x="481" y="1203" text-anchor="middle">6</text>
+  <text class="label-strong" x="500" y="1204">Sobre o módulo</text>
+  <text class="muted" x="500" y="1222">descrição, como funciona (os passos) e quem</text>
+  <text class="muted" x="500" y="1240">usa (configura, usa, acompanha)</text>
+  <circle class="chip" cx="913" cy="1059" r="9"/><text class="chip-text" x="913" y="1063" text-anchor="middle">7</text>
+  <text class="label-strong" x="932" y="1064">Custo</text>
+  <text class="muted" x="932" y="1082">pessoas e prazo mensal ou anual;</text>
+  <text class="muted" x="932" y="1100">custo e prazos de pagamento recalculados</text>
+  <circle class="chip" cx="913" cy="1129" r="9"/><text class="chip-text" x="913" y="1133" text-anchor="middle">8</text>
+  <text class="label-strong" x="932" y="1134">Ação</text>
+  <text class="muted" x="932" y="1152">Incluir na conta; só a conta master vê</text>
+  <text class="muted" x="932" y="1170">fixa na base no compact</text>
+  <circle class="chip" cx="913" cy="1199" r="9"/><text class="chip-text" x="913" y="1203" text-anchor="middle">9</text>
+  <text class="label-strong" x="932" y="1204">Código · time deboaz</text>
+  <text class="muted" x="932" y="1222">o módulo entra só com o código certo</text>
+  </g>
+  <g id="marca-rodape" transform="translate(0,1332)">
+    <rect class="wm-band" x="0" y="0" width="2168" height="116"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="2168" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-face" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">Bloco base</text>
+    <rect class="node-blue" x="160" y="47" width="14" height="14" rx="3"/><text class="label" x="182" y="58">Ação principal</text>
+    <rect class="node-purple edge-async" x="308" y="47" width="14" height="14" rx="3"/><text class="label" x="330" y="58">Espaço de módulo</text>
+    <rect class="node-orange" x="470" y="47" width="14" height="14" rx="3"/><text class="label" x="492" y="58">Fixo na tela</text>
+    <rect class="boundary" x="604" y="47" width="14" height="14" rx="3"/><text class="label" x="626" y="58">Seção</text>
+    <rect class="wm-badge" x="689" y="44" width="28" height="20" rx="10"/><text class="wm-badge-text" x="703" y="58" text-anchor="middle">3</text><text class="label" x="725" y="58">Notificação do módulo</text>
+    <line class="divider" x1="40" y1="76" x2="2128" y2="76"/>
+    <text class="footer" x="40" y="100">v06 · abas primárias no compact; barra lateral em acordeão no medium e no expanded</text>
+    <text class="wm-file" x="2128" y="100" text-anchor="end">blueprint-hub-catalogo_v06_20261031-1842.svg</text>
+  </g>
+</svg>
