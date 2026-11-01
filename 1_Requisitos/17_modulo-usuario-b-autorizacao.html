@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autorização · boaz · v04</title>
+<title>Módulo Usuários · Autorização · boaz · v08</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-b-autorizacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-b-autorizacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v04">
-<meta name="boaz:data" content="2026-11-01 12:35">
+<meta name="boaz:versao" content="v08">
+<meta name="boaz:data" content="2026-11-01 15:28">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-b-autorizacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v04</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 12:35</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v08</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 15:28</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -928,6 +928,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
     <h2>Contexto</h2>
     <p>A <a class="ref" href="17_modulo-usuario-a-autenticacao.html#contexto">autenticação</a> abre a sessão e entrega o token de acesso. Este documento define a parte de <strong>autorização</strong> desse token: o <strong>papel</strong> da pessoa e, para cada módulo que ela pode usar, as abas permitidas, Configuração e Utilização. A web e o mobile leem essas permissões para montar a casca — os destinos, os cards de Módulos e da Carteira, as abas do módulo aberto e os botões —, e o backend as confere em cada ação. Assim a casca nasce antes dos módulos: um módulo novo só precisa estar no <a class="ref" href="15_modulos.html#RN-202">registro de módulos</a> e nas permissões para aparecer para quem pode usá-lo.</p>
     <p class="historia"><span>Como</span> <strong>conta master</strong>, <span>quero</span> que cada pessoa veja só os módulos e as abas que liberei, <span>para</span> que a tela de cada um mostre só o que ele pode usar</p>
+    <p><strong>Conceder permissões.</strong> Uma permissão é um módulo do registro com as abas liberadas, dada a uma pessoa da mesma conta por quem está acima dela. O administrador do deboaz concede aos membros do time; a conta master, e o staff a quem ela deu Administrar usuários, concedem ao staff. Quem concede abre Permissões na pessoa, vê só o que pode conceder, marca as abas e salva tudo de uma vez; o servidor confere de novo, grava, sobe a versão das permissões da pessoa, e a casca dela muda na próxima ação, sem nova entrada. Toda tentativa termina num aviso de ação, para quem concede e para quem recebe.</p>
     <aside class="destaque importante"><p>Decisão do time do projeto em 2026-11-01: as permissões viajam no token de acesso, pelo ID do registro de módulos (<code>MOD-NN</code>), e a web e o mobile montam a casca sem outra consulta ao servidor; <code class="id">RNF-208</code> sai do 17 e passa a viver aqui.</p></aside>
   </section>
   <section id="requisitos-funcionais">
@@ -943,6 +944,10 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RF-149"><td><code class="id">RF-149</code></td><td>O sistema deve levar a Módulos, no hub, ou à Carteira, no quest, com o aviso <q class="ui">Você não tem acesso a este módulo.</q>, quem abre por endereço direto um módulo ou uma aba que não está no token</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-150"><td><code class="id">RF-150</code></td><td>O sistema deve dar ao participante, e ao responsável que entra com o código dele, a Utilização dos módulos da conta que têm o participante ou o responsável em Quem usa cada módulo, no quest</td><td><span class="prio prio-deve">Deve</span></td></tr>
         <tr id="RF-151"><td><code class="id">RF-151</code></td><td>O sistema deve dar ao acesso anônimo só a Utilização do módulo da sala, com o id da sala no token (<a class="ref" href="17_modulo-usuario-a-autenticacao.html#RF-136">Autenticação <code class="id">RF-136</code></a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-160"><td><code class="id">RF-160</code></td><td>O sistema deve mostrar em Permissões, para quem concede, as abas marcadas hoje para a pessoa e só os módulos e as abas que ele pode conceder (<a class="ref" href="#RN-252">RN-252</a>): ao staff, os módulos contratados e os da conta, com Administrar usuários; ao membro do time, SAC, Usuários e Catálogo</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-161"><td><code class="id">RF-161</code></td><td>O sistema deve salvar as permissões da pessoa de uma vez, com todas as abas marcadas, e recusar o salvamento inteiro, sem mudar nada, quando alguma aba passar do que quem concede tem naquele momento, com o aviso <q class="ui">Você não tem mais a &lt;módulo&gt; para conceder. Confira e salve.</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-162"><td><code class="id">RF-162</code></td><td>O sistema deve recusar o salvamento quando as permissões da pessoa mudaram depois que a tela abriu, com o aviso <q class="ui">As permissões da &lt;nome&gt; mudaram agora há pouco. Confira e salve.</q>, e mostrar as permissões atuais</td><td><span class="prio prio-deve">Deve</span></td></tr>
+        <tr id="RF-163"><td><code class="id">RF-163</code></td><td>O sistema deve mostrar a quem concede o aviso de ação concluído <q class="ui">Permissões da &lt;nome&gt; salvas.</q> e, a quem recebe, na próxima ação, o aviso de informação <q class="ui">Suas permissões mudaram: agora você usa &lt;módulo&gt;.</q> quando ganha um módulo (<a class="ref" href="06_design-system-telas.html#RN-248">Design system nas telas <code class="id">RN-248</code></a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
       </tbody>
     </table>
   </section>
@@ -961,6 +966,12 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RN-239"><td><code class="id">RN-239</code></td><td>Versão das permissões: cada mudança que afeta as permissões de uma pessoa sobe a versão nas sessões dela; o token com a versão anterior é recusado na próxima ação, e o aparelho renova para receber o novo (<a class="ref" href="17_modulo-usuario-a-autenticacao.html#RNF-216">Autenticação <code class="id">RNF-216</code></a>)</td></tr>
         <tr id="RN-240"><td><code class="id">RN-240</code></td><td>Responsável: pode o mesmo que o participante; o documento de cada módulo diz o que só um dos dois faz, como autorizar a foto do estudante menor de idade (<a class="ref" href="09_quest-ux.html#RN-102">Quest · UX base <code class="id">RN-102</code></a>)</td></tr>
         <tr id="RN-241"><td><code class="id">RN-241</code></td><td>Ninguém concede permissão que não tem (<a class="ref" href="17_modulo-usuario.html#RN-167">Usuários <code class="id">RN-167</code></a>): quem muda as permissões de outra pessoa é conferido pelas permissões atuais dele no servidor, e não pelo token</td></tr>
+        <tr id="RN-251"><td><code class="id">RN-251</code></td><td>Permissão: o par módulo (<code>MOD-NN</code>) e abas (C, U ou CU) dado a uma pessoa da mesma conta; <q class="ui">Administrar usuários</q> é C e U do módulo Usuários (<code>MOD-03</code>); a pessoa sem nenhuma aba num módulo não tem o módulo</td></tr>
+        <tr id="RN-252"><td><code class="id">RN-252</code></td><td>Quem concede a quem: o administrador do deboaz aos membros do time, entre SAC, Usuários e Catálogo; a conta master ao staff, entre os módulos contratados e os da conta; o staff com Administrar usuários ao staff abaixo dele (<a class="ref" href="17_modulo-usuario.html#RN-169">Usuários <code class="id">RN-169</code></a>), só dentro das abas que tem; ninguém muda as próprias permissões, as de um par ou as de um superior; participante, responsável e acesso anônimo não recebem permissões, e sim Quem usa cada módulo (<a class="ref" href="#RF-150">RF-150</a>)</td></tr>
+        <tr id="RN-253"><td><code class="id">RN-253</code></td><td>A permissão é da conta, e não de quem a concedeu: se quem concedeu perde uma aba, perde Administrar usuários ou é desativado, o que ele concedeu continua, e quem está acima ajusta</td></tr>
+        <tr id="RN-254"><td><code class="id">RN-254</code></td><td>Salvar substitui o conjunto inteiro da pessoa, tudo ou nada: aba desmarcada é retirada; retirar é o mesmo salvamento, e quem está dentro do módulo retirado vai a Módulos com o aviso de <a class="ref" href="#RF-149">RF-149</a></td></tr>
+        <tr id="RN-255"><td><code class="id">RN-255</code></td><td>Cada salvamento que muda algo sobe uma vez a versão das permissões da pessoa e vale para todas as sessões dela (<a class="ref" href="#RN-239">RN-239</a>); salvar sem mudança não sobe a versão</td></tr>
+        <tr id="RN-256"><td><code class="id">RN-256</code></td><td>Toda mudança de permissão fica registrada com quem mudou, a data e a hora, a versão e as abas antes e depois, e o registro não é apagado nem alterado; ele aparece só para quem administra as permissões da pessoa, isto é, quem pode mudá-las (<a class="ref" href="#RN-252">RN-252</a>), em <q class="ui">Registro de mudanças</q>, na tela Permissões; nem a própria pessoa nem o SAC o veem</td></tr>
       </tbody>
     </table>
     <p><strong>Permissões por papel</strong> (<a class="ref" href="#RN-233">RN-233</a>), com as abas <strong>C</strong> (Configuração) e <strong>U</strong> (Utilização) e os módulos pelo <a class="ref" href="15_modulos.html#RN-202">registro de módulos</a>:</p>
@@ -1015,6 +1026,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
         <tr id="RNF-219"><td><code class="id">RNF-219</code></td><td><span class="tag">Segurança</span></td><td>As permissões vão no token nas claims <code>papel</code>, <code>mods</code> — um mapa do ID do registro de módulos (<code>MOD-NN</code>) para as abas, <code>C</code>, <code>U</code> ou <code>CU</code> — e <code>pv</code>, a versão das permissões; o token inteiro, com a assinatura RS256 da chave de 2048 bits (342 caracteres), cabe em 4 KB</td></tr>
         <tr id="RNF-220"><td><code class="id">RNF-220</code></td><td><span class="tag">Segurança</span></td><td>Toda rota do backend declara o módulo e a aba, ou o papel, que exige; rota sem declaração é recusada (negar por padrão), e um teste automatizado falha quando existe rota sem declaração</td></tr>
         <tr id="RNF-221"><td><code class="id">RNF-221</code></td><td><span class="tag">Desempenho</span></td><td>A web e o mobile montam os destinos, os cards e as abas a partir do token, sem esperar outra resposta do servidor; só o conteúdo dos cards vem depois</td></tr>
+        <tr id="RNF-222"><td><code class="id">RNF-222</code></td><td><span class="tag">Consistência</span></td><td>O salvamento leva a versão das permissões que a tela leu; se ela mudou, nada é gravado e a resposta é 412; salvamento sem versão é recusado com 428</td></tr>
+        <tr id="RNF-223"><td><code class="id">RNF-223</code></td><td><span class="tag">Consistência</span></td><td>As permissões, o registro e a nova versão são gravados juntos, numa só operação, e a nova versão chega a todas as sessões da pessoa em até 1 s depois da resposta</td></tr>
+        <tr id="RNF-224"><td><code class="id">RNF-224</code></td><td><span class="tag">Segurança</span></td><td>O token com versão de permissões antiga é recusado com 401 <code>PERMISSOES_DESATUALIZADAS</code>; a web e o mobile renovam uma vez e montam a casca de novo com o token novo</td></tr>
       </tbody>
     </table>
   </section>
@@ -1090,15 +1104,68 @@ Cenário: staff sem a Sugestão marcada
   Então o token dela tem o papel "ANONIMO", só "MOD-05" com "U" e a sala 482107
   E a Carteira, Tarefas e o Perfil não abrem</pre>
     </article>
+    <article class="criterio" id="ca-RF-160">
+      <h3><code class="id">RF-160</code> O que pode conceder</h3>
+      <pre class="gherkin">Cenário: staff com Administrar usuários
+  Dado o João com Administrar usuários e só a Utilização do Quiz
+  Quando ele abre Permissões da Ana, staff abaixo dele
+  Então vê o Quiz só com a aba Utilização para marcar
+  E não vê a Presença nem a Agenda
+
+Cenário: membro do time
+  Quando o administrador do deboaz abre Permissões do Caio
+  Então vê SAC, Usuários e Catálogo, com Configuração e Utilização</pre>
+    </article>
+    <article class="criterio" id="ca-RF-161">
+      <h3><code class="id">RF-161</code> Salvar tudo ou nada</h3>
+      <pre class="gherkin">Cenário: quem concede perdeu a aba
+  Dado o João na tela Permissões da Ana, com a Utilização da Presença marcada para ela
+  E a conta master tirando a Presença do João antes de ele salvar
+  Quando o João toca em "Salvar"
+  Então vê "Você não tem mais a Presença para conceder. Confira e salve."
+  E nenhuma permissão da Ana muda</pre>
+    </article>
+    <article class="criterio" id="ca-RF-162">
+      <h3><code class="id">RF-162</code> Mudou enquanto editava</h3>
+      <pre class="gherkin">Cenário: duas pessoas na mesma tela
+  Dado a conta master e o João abrindo Permissões da Maria na versão 6
+  E a conta master salvando antes, na versão 7
+  Quando o João toca em "Salvar"
+  Então vê "As permissões da Maria mudaram agora há pouco. Confira e salve."
+  E a tela mostra as permissões da versão 7</pre>
+    </article>
+    <article class="criterio" id="ca-RF-163">
+      <h3><code class="id">RF-163</code> Avisos de quem concede e de quem recebe</h3>
+      <pre class="gherkin">Cenário: conta master libera a Presença
+  Quando a conta master marca a Utilização da Presença para a Maria e toca em "Salvar"
+  Então vê "Permissões da Maria salvas." com o selo de volta animado
+  E a Maria, na próxima ação, vê o card da Presença em Módulos
+  E o aviso "Suas permissões mudaram: agora você usa a Presença."</pre>
+    </article>
   </section>
   <section id="fora-de-escopo">
     <h2>Fora de escopo</h2>
     <ul class="fora">
       <li>Como a pessoa prova quem é e quanto tempo a sessão vale: <a class="ref" href="17_modulo-usuario-a-autenticacao.html#contexto">Módulo Usuários · Autenticação</a></li>
       <li>Limites dentro de um módulo, como turmas, conteúdos ou registros de cada pessoa: documento de cada módulo (<a class="ref" href="#RN-237">RN-237</a>)</li>
-      <li>Tela de permissões do staff e do membro do time: <a class="ref" href="17_modulo-usuario.html#RF-107">Usuários <code class="id">RF-107</code></a> e <a class="ref" href="17_modulo-usuario.html#RF-155">RF-155</a></li>
+      <li>Desenho da tela Permissões do staff e do membro do time: vistas de <a class="ref" href="17_modulo-usuario.html#RF-107">Usuários <code class="id">RF-107</code></a> e <a class="ref" href="17_modulo-usuario.html#RF-155">RF-155</a>; aqui ficam as regras de conceder</li>
       <li>Permissões mais finas que as abas, por ação (ver, criar, editar, apagar): cada módulo define o que as abas dele permitem (<a class="ref" href="#RN-237">RN-237</a>)</li>
     </ul>
+  </section>
+  <section id="diagramas">
+    <h2>Diagramas</h2>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/autorizacao-sequencia_v01_20261101-1325.svg"><img src="../2_Diagramas/autorizacao-sequencia_v01_20261101-1325.svg" alt="Sequência de conceder permissões: o administrador do deboaz concede o SAC ao membro do time e a conta master concede a Presença ao staff, com as concedíveis, o salvamento com a versão, as recusas, a nova versão nas sessões e a renovação que leva o módulo à casca, com as telas de exemplo de cada passo"></a>
+      <figcaption><strong>Autorização · conceder permissões · sequência</strong><code>2_Diagramas/autorizacao-sequencia_v01_20261101-1325.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/autorizacao-contrato-api_v01_20261101-1325.svg"><img src="../2_Diagramas/autorizacao-contrato-api_v01_20261101-1325.svg" alt="Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, com os códigos de erro"></a>
+      <figcaption><strong>Autorização · contrato de API</strong><code>2_Diagramas/autorizacao-contrato-api_v01_20261101-1325.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg"><img src="../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg" alt="Diagrama de classes da autorização: permissões do usuário com versão e pv, permissão por módulo e abas, mudança de permissão imutável, cálculo das permissões, autorização no token e exigência de cada rota, com papéis e abas"></a>
+      <figcaption><strong>Autorização · classes</strong><code>2_Diagramas/autorizacao-classes_v01_20261101-1502.svg</code></figcaption>
+    </figure>
   </section>
 </main>
 <footer class="boaz-marca-rodape">
@@ -1106,14 +1173,18 @@ Cenário: staff sem a Sugestão marcada
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v04</span></td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v08</span></td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
+      <tr><td>v07</td><td>2026-11-01 15:04</td><td>Diagrama autorizacao-classes v01: permissões com versão, registro de mudanças, cálculo, autorização no token e exigência das rotas</td></tr>
+      <tr><td>v06</td><td>2026-11-01 13:38</td><td>Registro de mudanças só para quem administra as permissões da pessoa, em Permissões (<code class="id">RN-256</code>); Em aberto resolvido</td></tr>
+      <tr><td>v05</td><td>2026-11-01 13:29</td><td>Conceder permissões: o que cada um pode conceder, salvar tudo ou nada com a versão, recusas e avisos de quem concede e de quem recebe (<code class="id">RF-160</code> a <code class="id">RF-163</code>, <code class="id">RN-251</code> a <code class="id">RN-256</code>, <code class="id">RNF-222</code> a <code class="id">RNF-224</code>); diagramas autorizacao-sequencia v01, com as telas do deboaz e da instituição, e autorizacao-contrato-api v01; registro das mudanças em aberto</td></tr>
+      <tr><td>v04</td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
       <tr><td>v03</td><td>2026-11-01 11:41</td><td>Sugestão só quando a conta master marca; membro do time com os módulos que o administrador do deboaz marca, como o staff (<code class="id">RF-145</code>, Usuários <code class="id">RF-155</code>); token de 4 KB com a assinatura RS256 (<code class="id">RNF-219</code>); permissões por ação fora de escopo; Em aberto resolvido</td></tr>
       <tr><td>v02</td><td>2026-11-01 03:38</td><td>Painel de administração retirado: o time deboaz alcança outras contas pela lista Contas do módulo Usuários (<code class="id">RN-235</code>); permissões do administrador e do membro do time atualizadas</td></tr>
       <tr><td>v01</td><td>2026-11-01 02:10</td><td>Criação: papéis, permissões por módulo e aba no token de acesso, casca montada pelo token, recusa no backend, escopo da conta e atualização das permissões sem nova entrada (<code class="id">RF-144</code> a <code class="id">RF-151</code>, <code class="id">RN-232</code> a <code class="id">RN-241</code>); <code class="id">RNF-208</code> vem do 17</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v04 · 2026-11-01 12:35</span>
+    <span>boaz · v08 · 2026-11-01 15:28</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-b-autorizacao.html</span>
   </div>
 </footer>

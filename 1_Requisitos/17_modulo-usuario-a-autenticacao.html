@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autenticação · boaz · v10</title>
+<title>Módulo Usuários · Autenticação · boaz · v12</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-a-autenticacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-a-autenticacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v10">
-<meta name="boaz:data" content="2026-11-01 13:15">
+<meta name="boaz:versao" content="v12">
+<meta name="boaz:data" content="2026-11-01 15:28">
 <meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,8 +917,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-a-autenticacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v10</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 13:15</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v12</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 15:28</dd></div>
     <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
@@ -1185,6 +1185,10 @@ Cenário: sair de todos
       <figcaption><strong>Autenticação · contrato de API</strong><code>2_Diagramas/autenticacao-contrato-api_v01_20261101-1143.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
+      <a href="../2_Diagramas/autenticacao-classes_v01_20261101-1501.svg"><img src="../2_Diagramas/autenticacao-classes_v01_20261101-1501.svg" alt="Diagrama de classes da autenticação: Sessão no Redis com frente, aparelho, quem entrou, versão das permissões e resumo da renovação, índice de sessões com o limite do hub, token de acesso JWT, token de renovação de uso único, chave de assinatura no Key Vault e tentativas de entrada com bloqueio progressivo"></a>
+      <figcaption><strong>Autenticação · classes</strong><code>2_Diagramas/autenticacao-classes_v01_20261101-1501.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
       <a href="../2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg"><img src="../2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg" alt="Vista dos aparelhos conectados no hub: linha Aparelhos conectados na Conta, lista com este aparelho marcado, sair de um aparelho e sair de todos com confirmação, no compact, no medium e no expanded"></a>
       <figcaption><strong>Hub · aparelhos conectados · vista</strong><code>2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg</code></figcaption>
     </figure>
@@ -1203,7 +1207,9 @@ Cenário: sair de todos
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v10</span></td><td>2026-11-01 13:15</td><td>Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v12</span></td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
+      <tr><td>v11</td><td>2026-11-01 15:04</td><td>Diagrama autenticacao-classes v01: sessão, índice de sessões, tokens, chave de assinatura e tentativas de entrada</td></tr>
+      <tr><td>v10</td><td>2026-11-01 13:15</td><td>Aprovado</td></tr>
       <tr><td>v09</td><td>2026-11-01 13:09</td><td>Aviso de ação em toda tentativa de entrar: nova <code class="id">RF-159</code>, entrada concluída com aviso flutuante, e <code class="id">RN-250</code>, o tom de cada resultado; vistas de entrada refeitas com os selos animados (vista-hub-entrar v01 e vista-quest-entrar v01 de 13:06)</td></tr>
       <tr><td>v08</td><td>2026-11-01 12:45</td><td>Vistas de entrada por tipo de usuário no compact, no medium e no expanded: vista-hub-entrar v01 (conta master, staff, educador autônomo e membro do time) e vista-quest-entrar v01 (participante, responsável e anônimo), com as recusas; nova <code class="id">RF-158</code>, aviso da entrada bloqueada</td></tr>
       <tr><td>v07</td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
@@ -1211,12 +1217,10 @@ Cenário: sair de todos
       <tr><td>v05</td><td>2026-11-01 11:46</td><td>Diagramas autenticacao-sequencia v01 (entrar, cada ação, renovar e sair) e autenticacao-contrato-api v01 (10 endereços /auth)</td></tr>
       <tr><td>v04</td><td>2026-11-01 11:41</td><td>Aparelhos conectados e sair de um ou de todos em Conta (<code class="id">RF-156</code>, <code class="id">RF-157</code>); até 5 sessões do hub por usuário (<code class="id">RN-247</code>); chave trocada a cada 90 dias ou na hora por vazamento (<code class="id">RNF-218</code>); biometria fora de escopo; Em aberto resolvido</td></tr>
       <tr><td>v03</td><td>2026-11-01 03:38</td><td><code class="id">RN-226</code>: o tempo da conta master e dos membros do time tem limites próprios (Usuários <code class="id">RN-243</code>)</td></tr>
-      <tr><td>v02</td><td>2026-11-01 03:14</td><td><code class="id">RN-226</code>: a conta master, o educador autônomo e os membros do time seguem os tempos que o time deboaz configura (Usuários <code class="id">RF-152</code>, <code class="id">RN-243</code>)</td></tr>
-      <tr><td>v01</td><td>2026-11-01 02:10</td><td>Criação: entrada no hub e no quest, sessão, token de acesso JWT e token de renovação, renovação, saída e fim antecipado (<code class="id">RF-134</code> a <code class="id">RF-143</code>, <code class="id">RN-224</code> a <code class="id">RN-231</code>); <code class="id">RNF-203</code>, <code class="id">RNF-204</code>, <code class="id">RNF-207</code> e <code class="id">RNF-209</code> vêm do 17</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v10 · 2026-11-01 13:15</span>
+    <span>boaz · v12 · 2026-11-01 15:28</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-a-autenticacao.html</span>
   </div>
 </footer>
