@@ -70,14 +70,15 @@ public static class CalculoDePermissoes
     /// <summary>
     /// O que quem concede pode dar ao alvo (RF-160, RN-167): o administrador e a
     /// conta master, todos os módulos que o alvo usa no hub, com as duas abas; o
-    /// staff, só os que ele mesmo tem, com as abas dele, sem Administrar usuários.
+    /// staff, só os que ele mesmo tem, com as abas dele, inclusive Administrar
+    /// usuários (RN-252).
     /// </summary>
     public static IReadOnlyDictionary<string, Abas> Concediveis(UsuarioAutorizado quem, IReadOnlyDictionary<string, Abas> modsDeQuem,
         UsuarioAutorizado alvo, ModulosDaConta modulos)
     {
         var doAlvo = modulos.Onde(m => alvo.Papel == Papel.MembroTime ? DoTimeNoHub(m) : m.Usa(Perfil.Staff, FrenteDeUso.Hub));
         return quem.Papel == Papel.Staff
-            ? doAlvo.Where(m => m.Id != Usuarios && modsDeQuem.ContainsKey(m.Id)).ToDictionary(m => m.Id, m => modsDeQuem[m.Id])
+            ? doAlvo.Where(m => modsDeQuem.ContainsKey(m.Id)).ToDictionary(m => m.Id, m => modsDeQuem[m.Id])
             : Todas(doAlvo, Abas.CU);
     }
 

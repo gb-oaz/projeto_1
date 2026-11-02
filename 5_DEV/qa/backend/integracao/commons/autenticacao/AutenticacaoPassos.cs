@@ -306,7 +306,12 @@ public sealed class AutenticacaoPassos(Mundo mundo)
         var errado = codigo[..^4] + (codigo[^4..] == "0000" ? "1111" : "0000");
         for (var i = 0; i < 5; i++)
         {
-            await mundo.Enviar("POST", "/auth/quest/entrar", new JsonObject { ["codigo"] = errado, ["aparelho"] = App }.ToJsonString());
+            await mundo.Enviar("POST", "/auth/quest/entrar", new JsonObject
+            {
+                ["codigo"] = errado,
+                ["aparelho"] = App,
+                ["quem"] = new JsonObject { ["tipo"] = "PARTICIPANTE" },
+            }.ToJsonString());
         }
     }
 

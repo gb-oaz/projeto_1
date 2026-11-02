@@ -336,7 +336,7 @@ Funcionalidade: Usuários
   Cenário: staff concede só o que tem
     Dado o João com "MOD-03" com "CU" e "MOD-05" com "U"
     Quando envia GET /usuarios/usr-ebfga-ana/permissoes
-    Então concediveis traz só "MOD-05" com "U"
+    Então concediveis traz só "MOD-03" com "CU" e "MOD-05" com "U"
 
   @RN-168
   Cenário: staff que administra usuários

@@ -187,7 +187,7 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     Task<PaginaDe<UsuarioCadastrado>> IUsuarios.Listar(FiltroDeUsuarios filtro, CancellationToken ct)
     {
         var achados = usuarios.Values
-            .Where(u => u.ContaId == filtro.ContaId && u.Tipo == filtro.Tipo && (filtro.Estado is null || u.Estado == filtro.Estado))
+            .Where(u => u.ContaId == filtro.ContaId && filtro.Tipos.Contains(u.Tipo) && (filtro.Estado is null || u.Estado == filtro.Estado))
             .Where(u => filtro.Busca is not { } busca || Contem(u.Nome, busca) || Contem(u.Login, busca) || u.Matricula == busca)
             .OrderBy(u => u.Nome, StringComparer.Ordinal).ToList();
         return Task.FromResult(Pagina(achados, filtro.Pagina));

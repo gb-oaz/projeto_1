@@ -27,7 +27,7 @@ public sealed record PedidoDeContaDto(string QuemPede, string ContaId);
 
 /// <summary>GET /usuarios?tipo=&amp;busca=&amp;estado=&amp;pagina= (RN-185).</summary>
 /// <param name="QuemPede">Id de quem pede.</param>
-/// <param name="Tipo">STAFF, PARTICIPANTE ou MEMBRO_TIME.</param>
+/// <param name="Tipo">STAFF, PARTICIPANTE ou MEMBRO_TIME; null busca em todos os que quem pede pode listar.</param>
 /// <param name="Busca">Nome, entrada, matrícula ou código.</param>
 /// <param name="Estado">PENDENTE, ATIVO ou DESATIVADO.</param>
 /// <param name="Pagina">A partir de 1.</param>
@@ -35,10 +35,11 @@ public sealed record ListaDeUsuariosDto(string QuemPede, string? Tipo, string? B
 {
     /// <summary>Confere e devolve o filtro sem a conta, que vem de quem pede.</summary>
     /// <exception cref="FalhaDeUsuarios">DADOS_INVALIDOS com o campo.</exception>
-    public (TipoUsuario Tipo, string? Busca, EstadoUsuario? Estado, int Pagina) Validar()
+    public (TipoUsuario? Tipo, string? Busca, EstadoUsuario? Estado, int Pagina) Validar()
     {
-        var tipo = Textos.TipoDe(Tipo) is TipoUsuario t and (TipoUsuario.Staff or TipoUsuario.Participante or TipoUsuario.MembroTime)
-            ? t : throw FalhaDeUsuarios.DadosInvalidos("tipo");
+        var tipo = Tipo is null ? (TipoUsuario?)null
+            : Textos.TipoDe(Tipo) is TipoUsuario t and (TipoUsuario.Staff or TipoUsuario.Participante or TipoUsuario.MembroTime)
+                ? t : throw FalhaDeUsuarios.DadosInvalidos("tipo");
         var estado = Estado is null ? (EstadoUsuario?)null : Textos.EstadoDe(Estado) ?? throw FalhaDeUsuarios.DadosInvalidos("estado");
         return (tipo, Validacao.Busca(Busca), estado, Validacao.Pagina(Pagina));
     }

@@ -5,6 +5,13 @@ namespace Boaz.Core.Commons.Tests.Usuario.Autenticacao.Domain;
 /// <summary>Os textos do contrato: valores das enumerações e códigos de erro.</summary>
 public class NomesEFalhasTests
 {
+    [Theory]
+    [InlineData(TipoQuemEntrou.Responsavel, "Mãe", "MAE")]
+    [InlineData(TipoQuemEntrou.Responsavel, " avó ", "AVO")]
+    [InlineData(TipoQuemEntrou.Participante, null, null)]
+    public void RN_186_rotulo_de_quem_entrou(TipoQuemEntrou tipo, string? parentesco, string? rotulo) =>
+        Assert.Equal(rotulo, new QuemEntrou(tipo, parentesco).Rotulo);
+
     [Fact]
     public void Valores_como_no_contrato()
     {

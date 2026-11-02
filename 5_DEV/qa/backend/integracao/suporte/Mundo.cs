@@ -255,14 +255,17 @@ public sealed partial class Mundo
         return rui;
     }
 
-    // abaixo do João: criada por ele, que precisa de Administrar usuários; versão 2 como no exemplo
+    // abaixo do João: criada por ele, que precisa de Administrar usuários; versão 2 como no exemplo.
+    // Se o cenário já deu ao João outras abas de Usuários ("só com U"), elas voltam depois.
     public async Task<Pessoa> Ana()
     {
         if (pessoas.TryGetValue("ana", out var ana)) return ana;
         var joao = await Joao();
+        var antes = (await Permissoes(joao))["mods"]!.AsObject().ToDictionary(m => m.Key, m => m.Value!.GetValue<string>());
         await Conceder(joao, new() { ["MOD-03"] = "CU" });
         ana = await Staff("ana", "Ana Costa", "20260089", joao);
         await Estado.DefinirVersao(ana.Id, 2);
+        if (antes.TryGetValue("MOD-03", out var abas) && abas != "CU") await Definir(joao, antes);
         return ana;
     }
 
@@ -290,7 +293,11 @@ public sealed partial class Mundo
         return (pessoas[nomeCurto], Texto(r, "codigoLiberacao"));
     }
 
-    public Task<(Pessoa Pessoa, string Codigo)> Gustavo() => Pendente("Gustavo Boaz de Moura Souza", "gustavo", "20260092");
+    // criado uma vez por cenário: o Dado e o Quando falam do mesmo Gustavo
+    public async Task<(Pessoa Pessoa, string Codigo)> Gustavo() =>
+        gustavo ??= await Pendente("Gustavo Boaz de Moura Souza", "gustavo", "20260092");
+
+    (Pessoa Pessoa, string Codigo)? gustavo;
 
     // membro do time criado pelo administrador, já com a senha confirmada
     public async Task<Pessoa> Membro(string nome, string nomeCurto)
@@ -495,8 +502,14 @@ public sealed partial class Mundo
     // POST /auth/quest/entrar com o código do Lucas, sem exigir 200 (a escola pode estar fora do ar)
     public async Task<Resposta> TentarQuest(string aparelho, JsonObject? quem = null, string? codigo = null)
     {
-        var corpo = new JsonObject { ["codigo"] = codigo ?? await CodigoDoLucas(), ["aparelho"] = aparelho };
-        if (quem is not null) corpo["quem"] = quem;
+        // quem entrou faz parte do pedido (código, aparelho e quem): sem o
+        // responsável no passo, entra o próprio participante
+        var corpo = new JsonObject
+        {
+            ["codigo"] = codigo ?? await CodigoDoLucas(),
+            ["aparelho"] = aparelho,
+            ["quem"] = quem ?? new JsonObject { ["tipo"] = "PARTICIPANTE" },
+        };
         var r = await Enviar("POST", "/auth/quest/entrar", corpo.ToJsonString());
         if (pessoas.TryGetValue("lucas", out var lucas)) Registrar(lucas, aparelho, r);
         return r;

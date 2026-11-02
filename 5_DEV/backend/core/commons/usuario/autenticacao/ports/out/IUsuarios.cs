@@ -17,6 +17,10 @@ public interface IUsuarios
     /// <summary>O usuário pelo id; null se não existir.</summary>
     Task<UsuarioDaEntrada?> Buscar(string id, CancellationToken ct = default);
 
-    /// <summary>Grava o último acesso do usuário, mostrado em Usuários.</summary>
-    Task RegistrarUltimoAcesso(string usuarioId, DateTimeOffset quando, CancellationToken ct = default);
+    /// <summary>Grava o último acesso do usuário e quem entrou, mostrados em Usuários (RN-186).</summary>
+    /// <param name="usuarioId">O usuário que entrou.</param>
+    /// <param name="quando">A hora da entrada.</param>
+    /// <param name="quem">O parentesco do responsável que entrou no quest ("MAE"); null quando foi o próprio usuário.</param>
+    /// <param name="ct">Cancelamento.</param>
+    Task RegistrarUltimoAcesso(string usuarioId, DateTimeOffset quando, string? quem, CancellationToken ct = default);
 }

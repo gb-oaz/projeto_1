@@ -17,11 +17,11 @@ public sealed record PaginaDe<T>(IReadOnlyList<T> Itens, int Pagina, int Total)
 /// código de acesso, sem diferenciar maiúsculas.
 /// </summary>
 /// <param name="ContaId">Só os da conta de quem pede.</param>
-/// <param name="Tipo">Staff, participante ou membro do time.</param>
+/// <param name="Tipos">Os tipos listados: o pedido, ou todos os que quem pede pode listar.</param>
 /// <param name="Busca">Termo buscado; null lista todos.</param>
 /// <param name="Estado">Só os do estado; null lista todos.</param>
 /// <param name="Pagina">Página, começando em 1.</param>
-public sealed record FiltroDeUsuarios(string ContaId, TipoUsuario Tipo, string? Busca, EstadoUsuario? Estado, int Pagina);
+public sealed record FiltroDeUsuarios(string ContaId, IReadOnlySet<TipoUsuario> Tipos, string? Busca, EstadoUsuario? Estado, int Pagina);
 
 /// <summary>
 /// Filtro da lista de contas do time (RN-185): a busca acha nome, sigla e o

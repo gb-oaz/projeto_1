@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.html (v14), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.html (v16), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Autorização
   1_Requisitos/17_modulo-usuario-b-autorizacao.html · Cenários de API
@@ -60,6 +60,11 @@ Funcionalidade: Autorização
         "versao": 2,
         "mods": {},
         "concediveis": [
+          {
+            "mod": "MOD-03",
+            "nome": "Usuários",
+            "abas": "CU"
+          },
           {
             "mod": "MOD-05",
             "nome": "Quiz",
@@ -284,8 +289,29 @@ Funcionalidade: Autorização
       | usr-ebfga-rui | o Rui, criado pela conta master como ele | 403 ACESSO_NEGADO |
 
   @RN-252
-  Cenário: staff não repassa Administrar usuários
+  Cenário: staff repassa Administrar usuários
     Dado o João com Administrar usuários e só a Utilização do Quiz
+    Quando o João envia PUT /usuarios/usr-ebfga-ana/permissoes com If-Match "2" e:
+      """
+      {
+        "mods": {
+          "MOD-03": "CU"
+        }
+      }
+      """
+    Então a resposta é 200 com:
+      """
+      {
+        "versao": 3,
+        "mods": {
+          "MOD-03": "CU"
+        }
+      }
+      """
+
+  @RN-252
+  Cenário: staff repassa Administrar usuários só com as abas que tem
+    Dado o João com "MOD-03" só com "U"
     Quando o João envia PUT /usuarios/usr-ebfga-ana/permissoes com If-Match "2" e:
       """
       {
@@ -298,7 +324,7 @@ Funcionalidade: Autorização
       """
       {
         "codigo": "PERMISSAO_ACIMA",
-        "mensagem": "Só a conta master concede o módulo Usuários.",
+        "mensagem": "Você não tem mais o módulo Usuários para conceder.",
         "mod": "MOD-03",
         "abas": "CU"
       }

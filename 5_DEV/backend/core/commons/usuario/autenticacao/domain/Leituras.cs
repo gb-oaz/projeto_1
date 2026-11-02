@@ -6,7 +6,19 @@ namespace Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 /// <summary>Quem entrou no quest: o participante ou um responsável com o parentesco (RN-228).</summary>
 /// <param name="Tipo">Participante ou responsável.</param>
 /// <param name="Parentesco">Como o responsável se apresenta ("Mãe"); só no responsável.</param>
-public sealed record QuemEntrou(TipoQuemEntrou Tipo, string? Parentesco = null);
+public sealed record QuemEntrou(TipoQuemEntrou Tipo, string? Parentesco = null)
+{
+    /// <summary>
+    /// Como o último acesso mostra quem entrou (RN-186): o parentesco do
+    /// responsável em maiúsculas e sem acento, como nos responsáveis do cadastro
+    /// ("Mãe" → "MAE"); null quando foi o próprio participante.
+    /// </summary>
+    public string? Rotulo => Tipo == TipoQuemEntrou.Responsavel && Parentesco is { } p
+        ? new string([.. p.Trim().Normalize(System.Text.NormalizationForm.FormD)
+            .Where(c => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark)])
+            .ToUpperInvariant()
+        : null;
+}
 
 /// <summary>O usuário que tenta entrar, lido da coleção usuarios.</summary>
 /// <param name="Id">Id do usuário (usr-ebfga-maria).</param>

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · boaz · v46</title>
+<title>Módulo Usuários · boaz · v47</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v46">
-<meta name="boaz:data" content="2026-11-02 15:08">
+<meta name="boaz:versao" content="v47">
+<meta name="boaz:data" content="2026-11-02 17:22">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,8 +918,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v46</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 15:08</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v47</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 17:22</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1146,7 +1146,7 @@ Cenário: só o administrador cria membros
 Cenário: staff concede só o que tem
   Dado o João com Administrar usuários e só a Utilização do Quiz
   Quando ele abre Permissões da Ana
-  Então só pode marcar a Utilização do Quiz</pre>
+  Então só pode marcar Administrar usuários e a Utilização do Quiz</pre>
     </article>
     <article class="criterio" id="RN-169">
       <h3><code class="id">RN-169</code> Ordem de superior</h3>
@@ -1697,7 +1697,7 @@ Cenário: salvar módulo não contratado
 Cenário: staff concede só o que tem
   Dado o João com "MOD-03" com "CU" e "MOD-05" com "U"
   Quando envia GET /usuarios/usr-ebfga-ana/permissoes
-  Então concediveis traz só "MOD-05" com "U"</pre>
+  Então concediveis traz só "MOD-03" com "CU" e "MOD-05" com "U"</pre>
     </article>
     <article class="criterio" id="RN-168">
       <h3><code class="id">RN-168</code> Administrar usuários</h3>
@@ -2304,8 +2304,8 @@ Cenário: geração de senha, acesso anônimo e auditoria
       <figcaption><strong>Usuários · sequência</strong><code>2_Diagramas/usuarios-sequencia_v01_20261101-2317.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/usuarios-contrato-api_v02_20261102-1507.svg"><img src="../2_Diagramas/usuarios-contrato-api_v02_20261102-1507.svg" alt="Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro"></a>
-      <figcaption><strong>Usuários · contrato de API</strong><code>2_Diagramas/usuarios-contrato-api_v02_20261102-1507.svg</code></figcaption>
+      <a href="../2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg"><img src="../2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg" alt="Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro"></a>
+      <figcaption><strong>Usuários · contrato de API</strong><code>2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -2314,7 +2314,8 @@ Cenário: geração de senha, acesso anônimo e auditoria
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v46</span></td><td>2026-11-02 15:08</td><td>Contrato de API de Usuários v02: regras do core (ids, sigla sugerida, documento, senha, tempos em horas, conta do time), mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam (RF-104 a RF-114, RF-152 a RF-154, RN-163 a RN-190, RN-242 a RN-246)</td></tr>
+      <tr><td><span class="boaz-versao">v47</span></td><td>2026-11-02 17:22</td><td>Contrato de API de Usuários v03: em <code class="id">RN-185</code>, GET /usuarios com tipo opcional (sem tipo, a busca percorre todos os tipos que quem pede pode listar) e o tipo em cada item da lista; a staff concede também Administrar usuários, só com as abas que tem (<code class="id">RN-167</code>, Autorização <code class="id">RN-252</code>)</td></tr>
+      <tr><td>v46</td><td>2026-11-02 15:08</td><td>Contrato de API de Usuários v02: regras do core (ids, sigla sugerida, documento, senha, tempos em horas, conta do time), mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam (RF-104 a RF-114, RF-152 a RF-154, RN-163 a RN-190, RN-242 a RN-246)</td></tr>
       <tr><td>v45</td><td>2026-11-02 14:01</td><td>Vista hub-usuarios v08: textos neutros nas recusas ao salvar as permissões (Autorização <code class="id">RF-161</code> e <code class="id">RF-162</code>)</td></tr>
       <tr><td>v44</td><td>2026-11-02 01:03</td><td><code>RN-245-api</code>: código antigo no quest responde <code>401 CODIGO_INVALIDO</code>, como no contrato da Autenticação</td></tr>
       <tr><td>v43</td><td>2026-11-02 00:11</td><td>Cenários separados em Cenários de tela e Cenários de API; os de API usam os endereços, pedidos e códigos do contrato (IDs nos dois: <code>&lt;ID&gt;-api</code>)</td></tr>
@@ -2323,11 +2324,10 @@ Cenário: geração de senha, acesso anônimo e auditoria
       <tr><td>v40</td><td>2026-11-01 18:18</td><td>Só Gherkin, telas e diagramas: contexto, RF, RN, RNF, ficha do módulo, exemplos de entidades e fora de escopo viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
       <tr><td>v39</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
       <tr><td>v38</td><td>2026-11-01 15:28</td><td>Sai a referência a identidade-acesso-sequencia v01, superada pelas sequências de autenticação e de autorização (17-a e 17-b)</td></tr>
-      <tr><td>v37</td><td>2026-11-01 15:04</td><td>Modelo revisto: identidade-acesso-classes v03 (membro do time, tempos de sessão, conferências do cadastro, comprovante e auditoria imutável) e identidade-acesso-documentos v03 (permissões com versão e pv, registrosPermissao e as chaves de autenticação no Redis)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v46 · 2026-11-02 15:08</span>
+    <span>boaz · v47 · 2026-11-02 17:22</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario.html</span>
   </div>
 </footer>

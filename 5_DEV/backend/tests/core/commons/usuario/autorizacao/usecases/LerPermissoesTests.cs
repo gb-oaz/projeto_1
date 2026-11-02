@@ -24,7 +24,7 @@ public class LerPermissoesTests
 
         Assert.Equal(("usr-ebfga-ana", 2), (lidas.Usuario, lidas.Versao));
         Assert.Empty(lidas.Mods);
-        Assert.Equal([new ConcedivelDto("MOD-05", "Quiz", "U")], lidas.Concediveis);
+        Assert.Equal([new ConcedivelDto("MOD-03", "Usuários", "CU"), new ConcedivelDto("MOD-05", "Quiz", "U")], lidas.Concediveis);
     }
 
     [Fact]

@@ -147,6 +147,9 @@ public sealed class AutenticacaoEmMemoria :
     /// <summary>O último acesso gravado de cada usuário.</summary>
     public Dictionary<string, DateTimeOffset> UltimosAcessos { get; } = [];
 
+    /// <summary>Quem entrou no último acesso de cada usuário (o parentesco do responsável).</summary>
+    public Dictionary<string, string?> QuemDosUltimosAcessos { get; } = [];
+
     /// <summary>Por que cada sessão apagada terminou.</summary>
     public Dictionary<string, MotivoFim> Encerradas { get; } = [];
 
@@ -170,9 +173,10 @@ public sealed class AutenticacaoEmMemoria :
 
     Task<UsuarioDaEntrada?> IUsuarios.Buscar(string id, CancellationToken ct) => Task.FromResult(usuarios.GetValueOrDefault(id));
 
-    Task IUsuarios.RegistrarUltimoAcesso(string usuarioId, DateTimeOffset quando, CancellationToken ct)
+    Task IUsuarios.RegistrarUltimoAcesso(string usuarioId, DateTimeOffset quando, string? quem, CancellationToken ct)
     {
         UltimosAcessos[usuarioId] = quando;
+        QuemDosUltimosAcessos[usuarioId] = quem;
         return Task.CompletedTask;
     }
 

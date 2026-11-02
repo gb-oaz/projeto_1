@@ -45,7 +45,7 @@ public class SalvarPermissoesTests
         var salvas = await mundo.Salvar("usr-ebfga-joao", "usr-ebfga-ana", "\"2\"", ("MOD-05", "U"));
         Assert.Equal((3, "U"), (salvas.Versao, salvas.Mods["MOD-05"]));
         await Falha("PERMISSAO_ACIMA", () => mundo.Salvar("usr-ebfga-joao", "usr-ebfga-ana", "\"3\"", ("MOD-05", "CU")));
-        await Falha("PERMISSAO_ACIMA", () => mundo.Salvar("usr-ebfga-joao", "usr-ebfga-ana", "\"3\"", ("MOD-05", "U"), ("MOD-03", "U")));
+        await Falha("PERMISSAO_ACIMA", () => mundo.Salvar("usr-ebfga-joao", "usr-ebfga-ana", "\"3\"", ("MOD-05", "U"), ("MOD-06", "U")));
     }
 
     [Fact]
@@ -118,13 +118,16 @@ public class SalvarPermissoesTests
     }
 
     [Fact]
-    public async Task RN_252_staff_nao_repassa_Administrar_usuarios()
+    public async Task RN_252_staff_repassa_Administrar_usuarios_com_as_abas_que_tem()
     {
-        await mundo.Conceder("usr-ebfga-joao", ("MOD-03", "CU"), ("MOD-05", "U"));
+        await mundo.Conceder("usr-ebfga-joao", ("MOD-03", "U"), ("MOD-05", "U"));
+
+        var salvas = await mundo.Salvar("usr-ebfga-joao", "usr-ebfga-ana", "\"2\"", ("MOD-03", "U"));
         var falha = await Falha("PERMISSAO_ACIMA",
-            () => mundo.Salvar("usr-ebfga-joao", "usr-ebfga-ana", "\"2\"", ("MOD-03", "CU")));
-        Assert.Equal(("Só a conta master concede o módulo Usuários.", "MOD-03", "CU"), (falha.Message, falha.Mod, falha.Abas));
-        Assert.Equal(3, (await mundo.Conceder("usr-ebfga-ana", ("MOD-03", "CU"))).Versao);
+            () => mundo.Salvar("usr-ebfga-joao", "usr-ebfga-ana", "\"3\"", ("MOD-03", "CU")));
+
+        Assert.Equal((3, "U"), (salvas.Versao, salvas.Mods["MOD-03"]));
+        Assert.Equal(("Você não tem mais o módulo Usuários para conceder.", "MOD-03", "CU"), (falha.Message, falha.Mod, falha.Abas));
     }
 
     [Fact]
@@ -134,8 +137,19 @@ public class SalvarPermissoesTests
         var falha = await Falha("MODULO_NAO_CONTRATADO",
             () => mundo.Salvar("usr-ebfga-master", "usr-ebfga-maria", "\"7\"", ("MOD-06", "U")));
         Assert.Equal(("MOD-06", "O módulo Presença não está contratado."), (falha.Mod, falha.Message));
+        mundo.Mock.Contratar("conta-ebfga", "MOD-07");
         Assert.Equal("Maria Souza não usa o módulo Carteirinha.", (await Falha("DADOS_INVALIDOS",
             () => mundo.Salvar("usr-ebfga-master", "usr-ebfga-maria", "\"7\"", ("MOD-07", "U")))).Message);
+    }
+
+    // RN-166: o que não está contratado responde que não está contratado, antes
+    // de olhar se a pessoa usaria o módulo (a Agenda, para um staff)
+    [Fact]
+    public async Task RN_166_nao_contratado_antes_de_quem_usa()
+    {
+        var falha = await Falha("MODULO_NAO_CONTRATADO",
+            () => mundo.Salvar("usr-ebfga-master", "usr-ebfga-maria", "\"7\"", ("MOD-12", "U")));
+        Assert.Equal(("MOD-12", "O módulo Agenda não está contratado."), (falha.Mod, falha.Message));
     }
 
     [Fact]

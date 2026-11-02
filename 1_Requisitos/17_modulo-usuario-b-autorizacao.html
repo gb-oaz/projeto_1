@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autorização · boaz · v15</title>
+<title>Módulo Usuários · Autorização · boaz · v16</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-b-autorizacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-b-autorizacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v15">
-<meta name="boaz:data" content="2026-11-02 14:02">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v16">
+<meta name="boaz:data" content="2026-11-02 17:24">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -918,9 +918,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-b-autorizacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v15</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 14:02</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v16</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 17:24</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
@@ -969,8 +969,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
       <pre class="gherkin">Cenário: staff com Administrar usuários
   Dado o João com Administrar usuários e só a Utilização do Quiz
   Quando ele abre Permissões da Ana, staff abaixo dele
-  Então vê o Quiz só com a aba Utilização para marcar
-  E não vê a Presença, a Agenda nem Usuários
+  Então vê Usuários com as duas abas e o Quiz só com a aba Utilização para marcar
+  E não vê a Presença nem a Agenda
 
 Cenário: membro do time
   Quando o administrador do deboaz abre Permissões do Caio
@@ -1134,6 +1134,11 @@ Cenário: staff sem a Sugestão marcada
       "versao": 2,
       "mods": {},
       "concediveis": [
+        {
+          "mod": "MOD-03",
+          "nome": "Usuários",
+          "abas": "CU"
+        },
         {
           "mod": "MOD-05",
           "nome": "Quiz",
@@ -1361,8 +1366,28 @@ Esquema do Cenário: abaixo é quem a pessoa criou, direta ou indiretamente
     | usr-ebfga-ana | a Ana, que ele criou                     | 200               |
     | usr-ebfga-rui | o Rui, criado pela conta master como ele | 403 ACESSO_NEGADO |
 
-Cenário: staff não repassa Administrar usuários
+Cenário: staff repassa Administrar usuários
   Dado o João com Administrar usuários e só a Utilização do Quiz
+  Quando o João envia PUT /usuarios/usr-ebfga-ana/permissoes com If-Match "2" e:
+    """
+    {
+      "mods": {
+        "MOD-03": "CU"
+      }
+    }
+    """
+  Então a resposta é 200 com:
+    """
+    {
+      "versao": 3,
+      "mods": {
+        "MOD-03": "CU"
+      }
+    }
+    """
+
+Cenário: staff repassa Administrar usuários só com as abas que tem
+  Dado o João com "MOD-03" só com "U"
   Quando o João envia PUT /usuarios/usr-ebfga-ana/permissoes com If-Match "2" e:
     """
     {
@@ -1375,7 +1400,7 @@ Cenário: staff não repassa Administrar usuários
     """
     {
       "codigo": "PERMISSAO_ACIMA",
-      "mensagem": "Só a conta master concede o módulo Usuários.",
+      "mensagem": "Você não tem mais o módulo Usuários para conceder.",
       "mod": "MOD-03",
       "abas": "CU"
     }
@@ -1546,8 +1571,8 @@ Cenário: responsável no quest
       <figcaption><strong>Autorização · conceder permissões · sequência</strong><code>2_Diagramas/autorizacao-sequencia_v02_20261102-1400.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/autorizacao-contrato-api_v04_20261102-1359.svg"><img src="../2_Diagramas/autorizacao-contrato-api_v04_20261102-1359.svg" alt="Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, com os códigos de erro"></a>
-      <figcaption><strong>Autorização · contrato de API</strong><code>2_Diagramas/autorizacao-contrato-api_v04_20261102-1359.svg</code></figcaption>
+      <a href="../2_Diagramas/autorizacao-contrato-api_v05_20261102-1724.svg"><img src="../2_Diagramas/autorizacao-contrato-api_v05_20261102-1724.svg" alt="Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, com os códigos de erro"></a>
+      <figcaption><strong>Autorização · contrato de API</strong><code>2_Diagramas/autorizacao-contrato-api_v05_20261102-1724.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
       <a href="../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg"><img src="../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg" alt="Diagrama de classes da autorização: permissões do usuário com versão e pv, permissão por módulo e abas, mudança de permissão imutável, cálculo das permissões, autorização no token e exigência de cada rota, com papéis e abas"></a>
@@ -1564,7 +1589,8 @@ Cenário: responsável no quest
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v15</span></td><td>2026-11-02 14:02</td><td>Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v16</span></td><td>2026-11-02 17:24</td><td>Staff com Administrar usuários repassa o MOD-03 ao staff abaixo, só com as abas que tem (<code class="id">RN-252</code>): sai o 403 "Só a conta master concede o módulo Usuários." e o MOD-03 entra nas concedíveis da staff (<code class="id">RF-160</code>); contrato de API v05</td></tr>
+      <tr><td>v15</td><td>2026-11-02 14:02</td><td>Aprovado</td></tr>
       <tr><td>v14</td><td>2026-11-02 14:01</td><td>Regras explícitas: abaixo é quem a pessoa criou, direta ou indiretamente, e staff nenhum repassa Administrar usuários (<code class="id">RN-252</code>); o que cada aba libera (<code class="id">RN-251</code>); módulos de cada papel por extenso (<code class="id">RN-233</code>); 422 DADOS_INVALIDOS para módulo que não existe ou que a pessoa não usa (<code class="id">RF-161</code>); contrato de API v04, com a mensagem de cada erro; sequência v02, com textos neutros</td></tr>
       <tr><td>v13</td><td>2026-11-02 13:32</td><td>Mensagens com texto neutro, sem gênero: "Você não tem mais o módulo Presença para conceder." (<code class="id">RF-161</code>) e "As permissões de Maria Souza mudaram agora há pouco." com o nome completo (<code class="id">RF-162</code>), nas telas e na API; contrato de API v03</td></tr>
       <tr><td>v12</td><td>2026-11-02 00:11</td><td>Cenários separados em Cenários de tela e Cenários de API; os de API usam os endereços, pedidos e códigos do contrato (IDs nos dois: <code>&lt;ID&gt;-api</code>)</td></tr>
@@ -1573,11 +1599,10 @@ Cenário: responsável no quest
       <tr><td>v09</td><td>2026-11-01 18:15</td><td>Só Gherkin e diagramas: contexto, RF, RN, RNF, permissões por papel e fora de escopo viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
       <tr><td>v08</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
       <tr><td>v07</td><td>2026-11-01 15:04</td><td>Diagrama autorizacao-classes v01: permissões com versão, registro de mudanças, cálculo, autorização no token e exigência das rotas</td></tr>
-      <tr><td>v06</td><td>2026-11-01 13:38</td><td>Registro de mudanças só para quem administra as permissões da pessoa, em Permissões (<code class="id">RN-256</code>); Em aberto resolvido</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v15 · 2026-11-02 14:02</span>
+    <span>boaz · v16 · 2026-11-02 17:24</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-b-autorizacao.html</span>
   </div>
 </footer>

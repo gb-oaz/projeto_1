@@ -828,11 +828,13 @@ public sealed partial class UsuariosPassos(Mundo mundo)
         Assert.DoesNotContain("MOD-06", concediveis.Keys);
     }
 
-    [Then(@"^concediveis traz só ""(MOD-\d+)"" com ""(\w+)""$")]
-    public void SoUmConcedivel(string mod, string abas)
+    // "concediveis traz só ""MOD-03"" com ""CU"" e ""MOD-05"" com ""U"""
+    [Then(@"^concediveis traz só (""MOD-.+)$")]
+    public void SoEstesConcediveis(string pares)
     {
         Respostas.Confere(mundo.Ultima, 200);
-        Assert.Equal(new Dictionary<string, string> { [mod] = abas }, Concediveis());
+        var esperados = Regex.Matches(pares, @"""(MOD-\d+)"" com ""(\w+)""").ToDictionary(m => m.Groups[1].Value, m => m.Groups[2].Value);
+        Assert.Equal(esperados, Concediveis());
     }
 
     [Given(@"^a conta master tendo salvado ""(MOD-\d+)"" com ""(\w+)"" para o João$")]

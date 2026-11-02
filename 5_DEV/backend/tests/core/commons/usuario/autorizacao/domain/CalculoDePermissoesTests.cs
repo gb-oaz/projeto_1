@@ -116,11 +116,11 @@ public class CalculoDePermissoesTests
     }
 
     [Fact]
-    public void RF_160_staff_concede_so_o_que_tem_sem_administrar_usuarios()
+    public void RF_160_staff_concede_so_o_que_tem_inclusive_administrar_usuarios()
     {
         var concediveis = CalculoDePermissoes.Concediveis(Pessoa("j", Papel.Staff), Mods(("MOD-03", "CU"), ("MOD-05", "U")),
             Pessoa("a", Papel.Staff), Escola("MOD-05", "MOD-06"));
-        Assert.Equal(Mods(("MOD-05", "U")), concediveis);
+        Assert.Equal(Mods(("MOD-03", "CU"), ("MOD-05", "U")), concediveis);
     }
 
     [Fact]

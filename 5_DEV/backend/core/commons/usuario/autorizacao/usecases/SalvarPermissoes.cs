@@ -51,13 +51,9 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
             if (depois == anterior) continue;
             var modulo = modulos.Registrado(mod);
             if (modulo is null) throw FalhaDeAutorizacao.ModuloInexistente(mod);
-            if (!CalculoDePermissoes.AlvoUsa(alvo, modulo)) throw FalhaDeAutorizacao.ModuloNaoUsado(mod, modulo.Nome, alvo.Nome);
             if (!modulos.Disponiveis.Contains(mod)) throw FalhaDeAutorizacao.ModuloNaoContratado(mod, modulo.Nome);
+            if (!CalculoDePermissoes.AlvoUsa(alvo, modulo)) throw FalhaDeAutorizacao.ModuloNaoUsado(mod, modulo.Nome, alvo.Nome);
             var mexe = (depois ?? anterior!.Value).Com(anterior ?? depois!.Value);
-            if (mod == CalculoDePermissoes.Usuarios && quem.Papel == Papel.Staff)
-            {
-                throw FalhaDeAutorizacao.SoAContaMasterConcede(mod, modulo.Nome, depois ?? anterior!.Value);
-            }
             if (!concediveis.TryGetValue(mod, out var pode) || !pode.Contem(mexe))
             {
                 throw FalhaDeAutorizacao.PermissaoAcima(mod, modulo.Nome, depois ?? anterior!.Value);

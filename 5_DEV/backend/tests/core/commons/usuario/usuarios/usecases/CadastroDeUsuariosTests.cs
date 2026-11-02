@@ -134,6 +134,27 @@ public class CadastroDeUsuariosTests
     public async Task RN_185_busca_nas_listas(string tipo, string termo, string nome) =>
         Assert.Equal(nome, Assert.Single((await mock.ListarUsuarios.Executar(new("usr-ebfga-master", tipo, termo))).Itens).Nome);
 
+    [Theory]
+    [InlineData("maria.ebfga", "Maria Souza")]
+    [InlineData("20260087", "Maria Souza")]
+    [InlineData("EBFGA-LUCAS-0412", "Lucas Andrade")]
+    public async Task RN_185_busca_sem_tipo_em_todos_os_tipos_que_pode_listar(string termo, string nome) =>
+        Assert.Equal(nome, Assert.Single((await mock.ListarUsuarios.Executar(new("usr-ebfga-master", null, termo))).Itens).Nome);
+
+    [Fact]
+    public async Task RN_185_sem_tipo_respeita_quem_pede()
+    {
+        var daMaster = await mock.ListarUsuarios.Executar(new("usr-ebfga-master", null));
+        var staff = await mock.ListarUsuarios.Executar(new("usr-ebfga-master", "STAFF"));
+        var participantes = await mock.ListarUsuarios.Executar(new("usr-ebfga-master", "PARTICIPANTE"));
+        Assert.Equal(staff.Total + participantes.Total, daMaster.Total);
+        Assert.Equal(daMaster.Itens.Select(u => u.Nome).Order(StringComparer.Ordinal), daMaster.Itens.Select(u => u.Nome));
+        Assert.Equal(2, (await mock.ListarUsuarios.Executar(new("usr-dboaz-caio", null))).Total);
+        Assert.Equal(["PARTICIPANTE", "STAFF"], daMaster.Itens.Select(u => u.Tipo).Distinct().Order());
+        Assert.All((await mock.ListarUsuarios.Executar(new("usr-preis-pedro", null))).Itens, u => Assert.Equal("PARTICIPANTE", u.Tipo));
+        await Falha("ACESSO_NEGADO", () => mock.ListarUsuarios.Executar(new("usr-ebfga-lucas", null)));
+    }
+
     [Fact]
     public async Task RN_185_ordem_filtro_e_pagina()
     {

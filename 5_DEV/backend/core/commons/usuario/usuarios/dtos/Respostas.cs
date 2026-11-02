@@ -20,12 +20,13 @@ public sealed record PaginaDto<T>(IReadOnlyList<T> Itens, int Pagina, int Total)
 /// <param name="Estado">PENDENTE, ATIVO ou DESATIVADO.</param>
 /// <param name="UltimoAcesso">Último acesso.</param>
 /// <param name="UltimoAcessoQuem">No participante, quem entrou.</param>
+/// <param name="Tipo">STAFF, PARTICIPANTE ou MEMBRO_TIME: a busca sem tipo mistura os tipos.</param>
 public sealed record UsuarioNaListaDto(
-    string Id, string Nome, string Login, string? Matricula, string Estado, DateTimeOffset? UltimoAcesso, string? UltimoAcessoQuem)
+    string Id, string Tipo, string Nome, string Login, string? Matricula, string Estado, DateTimeOffset? UltimoAcesso, string? UltimoAcessoQuem)
 {
     /// <summary>O item do usuário.</summary>
     public static UsuarioNaListaDto De(UsuarioCadastrado u) =>
-        new(u.Id, u.Nome, u.Login, u.Matricula, u.Estado.Texto(), u.UltimoAcesso, u.UltimoAcessoQuem);
+        new(u.Id, u.Tipo.Texto(), u.Nome, u.Login, u.Matricula, u.Estado.Texto(), u.UltimoAcesso, u.UltimoAcessoQuem);
 }
 
 /// <summary>GET /usuarios/{id}: sem senha, resumo nem código de liberação (RN-170, RN-181).</summary>

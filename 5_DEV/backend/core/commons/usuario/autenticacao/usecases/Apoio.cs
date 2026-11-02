@@ -65,7 +65,7 @@ sealed class AberturaDeSessao(IUsuarios usuarios, IContas contas, ISessoes sesso
         var (sessao, renovacao) = Sessao.Abrir(usuario.Id, conta.Id, conta.Sigla, frente, aparelho, quem, null,
             doUsuario.Pv, tempo, agora);
         var resposta = await emissor.Emitir(sessao, renovacao, usuario.Tipo.Texto(), doUsuario, agora, ct);
-        await usuarios.RegistrarUltimoAcesso(usuario.Id, agora, ct);
+        await usuarios.RegistrarUltimoAcesso(usuario.Id, agora, quem?.Rotulo, ct);
         return resposta;
     }
 }

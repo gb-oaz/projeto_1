@@ -21,6 +21,7 @@ public class EntrarNoQuestENaSalaTests
         var guardada = Assert.Single(c.Mock.Sessoes);
         Assert.Equal((Frente.Quest, TimeSpan.FromDays(30)), (guardada.Frente, guardada.TempoSemUso));
         Assert.Equal(claims.Quem, guardada.QuemEntrou);
+        Assert.Equal("MAE", c.Mock.QuemDosUltimosAcessos["usr-ebfga-lucas"]);
     }
 
     [Fact]
@@ -28,6 +29,7 @@ public class EntrarNoQuestENaSalaTests
     {
         var sessao = await c.LucasEntra("ebfga-lucas-0412");
         Assert.Equal(new QuemEntrou(TipoQuemEntrou.Participante), Claims(sessao).Quem);
+        Assert.Null(c.Mock.QuemDosUltimosAcessos["usr-ebfga-lucas"]);
     }
 
     [Theory]

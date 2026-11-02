@@ -57,10 +57,6 @@ public sealed class FalhaDeAutorizacao : Exception
     public static FalhaDeAutorizacao PermissaoAcima(string mod, string nome, Abas abas) =>
         new(GrupoDeFalha.Proibido, "PERMISSAO_ACIMA", $"Você não tem mais o módulo {nome} para conceder.") { Mod = mod, Abas = abas.ToString() };
 
-    /// <summary>A staff tentou repassar Administrar usuários, que só a conta master concede (RN-252).</summary>
-    public static FalhaDeAutorizacao SoAContaMasterConcede(string mod, string nome, Abas abas) =>
-        new(GrupoDeFalha.Proibido, "PERMISSAO_ACIMA", $"Só a conta master concede o módulo {nome}.") { Mod = mod, Abas = abas.ToString() };
-
     /// <summary>Outra pessoa salvou antes (RF-162, RNF-222).</summary>
     public static FalhaDeAutorizacao VersaoDesatualizada(int versao, string nome) =>
         new(GrupoDeFalha.VersaoDesatualizada, "VERSAO_DESATUALIZADA",

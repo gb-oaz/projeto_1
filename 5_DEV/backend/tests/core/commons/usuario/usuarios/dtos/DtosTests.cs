@@ -12,10 +12,10 @@ public class DtosTests
     [Fact]
     public void Lista_de_usuarios()
     {
-        Assert.Equal((TipoUsuario.Staff, "maria", EstadoUsuario.Ativo, 2), new ListaDeUsuariosDto("q", "STAFF", " maria ", "ATIVO", 2).Validar());
-        Assert.Equal((TipoUsuario.Participante, null as string, null as EstadoUsuario?, 1), new ListaDeUsuariosDto("q", "PARTICIPANTE", " ").Validar());
+        Assert.Equal((TipoUsuario.Staff as TipoUsuario?, "maria", EstadoUsuario.Ativo, 2), new ListaDeUsuariosDto("q", "STAFF", " maria ", "ATIVO", 2).Validar());
+        Assert.Equal((TipoUsuario.Participante as TipoUsuario?, null as string, null as EstadoUsuario?, 1), new ListaDeUsuariosDto("q", "PARTICIPANTE", " ").Validar());
         Assert.Equal("tipo", Campo(() => new ListaDeUsuariosDto("q", "MASTER").Validar()));
-        Assert.Equal("tipo", Campo(() => new ListaDeUsuariosDto("q", null).Validar()));
+        Assert.Equal((null as TipoUsuario?, "lucas", null as EstadoUsuario?, 1), new ListaDeUsuariosDto("q", null, "lucas").Validar());
         Assert.Equal("estado", Campo(() => new ListaDeUsuariosDto("q", "STAFF", Estado: "SUMIDO").Validar()));
         Assert.Equal("pagina", Campo(() => new ListaDeUsuariosDto("q", "STAFF", Pagina: 0).Validar()));
     }

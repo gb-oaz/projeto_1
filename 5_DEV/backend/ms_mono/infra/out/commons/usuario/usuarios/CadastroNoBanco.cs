@@ -1,0 +1,289 @@
+using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
+using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
+using Boaz.Core.Commons.Usuario.Usuarios.Domain;
+using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using IContas = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IContas;
+using IGeracoesDeSenha = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IGeracoesDeSenha;
+using IUsuarios = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IUsuarios;
+
+namespace Boaz.MsMono.Infra.Out.Commons.Usuario.Usuarios;
+
+// Listas de A a Z como se lê em português, sem diferenciar maiúsculas.
+static class Ordem
+{
+    public static readonly Collation Portugues = new("pt", strength: CollationStrength.Secondary);
+
+    public static readonly SortDefinition<BsonDocument> PorNome = Builders<BsonDocument>.Sort.Ascending("nome").Ascending("_id");
+
+    public static async Task<PaginaDe<T>> Pagina<T>(IMongoCollection<BsonDocument> colecao, FilterDefinition<BsonDocument> filtro,
+        int pagina, Func<BsonDocument, T> ler, CancellationToken ct)
+    {
+        var total = await colecao.CountDocumentsAsync(filtro, cancellationToken: ct);
+        var itens = await colecao.Find(filtro, new FindOptions { Collation = Portugues })
+            .Sort(PorNome).Skip((pagina - 1) * PaginaDe<T>.Tamanho).Limit(PaginaDe<T>.Tamanho).ToListAsync(ct);
+        return new PaginaDe<T>(itens.Select(ler).ToList(), pagina, (int)total);
+    }
+}
+
+// Os usuários do cadastro (usuarios). Grava só os campos do cadastro: o último
+// acesso é da Autenticação e as permissões, da Autorização.
+public sealed class UsuariosNoBanco(Armazenamento armazenamento, TimeDeboaz time) : IUsuarios
+{
+    IMongoCollection<BsonDocument> Usuarios => armazenamento.Colecao(Colecoes.Usuarios);
+
+    public async Task<UsuarioCadastrado?> Buscar(string id, CancellationToken ct = default)
+    {
+        var d = await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
+        if (d is null && await time.GarantirSeFor(usuarioId: id, ct: ct)) d = await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
+        return d is null ? null : Documentos.Usuario(d);
+    }
+
+    public async Task<UsuarioCadastrado?> BuscarPorEntrada(string entrada, CancellationToken ct = default) =>
+        await Usuarios.Find(Bson.Filtro.Eq("login", entrada)).FirstOrDefaultAsync(ct) is { } d ? Documentos.Usuario(d) : null;
+
+    public async Task<UsuarioCadastrado?> MasterDaConta(string contaId, CancellationToken ct = default) =>
+        await Usuarios.Find(Bson.Filtro.Eq("contaId", contaId) & Bson.Filtro.Eq("tipo", "MASTER")).FirstOrDefaultAsync(ct) is { } d
+            ? Documentos.Usuario(d)
+            : null;
+
+    public Task<bool> NomeCurtoEmUso(string contaId, string nomeCurto, string? exceto = null, CancellationToken ct = default) =>
+        Existe(Bson.Filtro.Eq("contaId", contaId) & Bson.Filtro.Eq("nomeCurto", nomeCurto), exceto, ct);
+
+    public Task<bool> MatriculaEmUso(string contaId, string matricula, string? exceto = null, CancellationToken ct = default) =>
+        Existe(Bson.Filtro.Eq("contaId", contaId) & Bson.Filtro.Eq("matricula", matricula), exceto, ct);
+
+    public Task<bool> LoginEmUso(string login, CancellationToken ct = default) => Existe(Bson.Filtro.Eq("login", login), null, ct);
+
+    public Task Inserir(UsuarioCadastrado usuario, CancellationToken ct = default)
+    {
+        var d = Documentos.DoCadastro(usuario);
+        d.InsertAt(0, new BsonElement("_id", usuario.Id));
+        return Usuarios.InsertOneAsync(d, cancellationToken: ct);
+    }
+
+    public Task Atualizar(UsuarioCadastrado usuario, CancellationToken ct = default)
+    {
+        var mudancas = Documentos.DoCadastro(usuario).Elements.Select(e => Bson.Mudar.Set(e.Name, e.Value));
+        return Usuarios.UpdateOneAsync(Bson.Filtro.Eq("_id", usuario.Id), Bson.Mudar.Combine(mudancas), cancellationToken: ct);
+    }
+
+    // a busca acha nome, entrada (ou código) e matrícula (RN-185)
+    public Task<PaginaDe<UsuarioCadastrado>> Listar(FiltroDeUsuarios filtro, CancellationToken ct = default)
+    {
+        var f = Bson.Filtro.Eq("contaId", filtro.ContaId) & Bson.Filtro.In("tipo", filtro.Tipos.Select(t => t.Texto()));
+        if (filtro.Estado is { } estado) f &= Bson.Filtro.Eq("estado", estado.Texto());
+        if (filtro.Busca is { } busca)
+        {
+            var contem = Bson.Contem(busca);
+            f &= Bson.Filtro.Regex("nome", contem) | Bson.Filtro.Regex("login", contem) | Bson.Filtro.Regex("matricula", contem);
+        }
+        return Ordem.Pagina(Usuarios, f, filtro.Pagina, Documentos.Usuario, ct);
+    }
+
+    async Task<bool> Existe(FilterDefinition<BsonDocument> filtro, string? exceto, CancellationToken ct)
+    {
+        if (exceto is not null) filtro &= Bson.Filtro.Ne("_id", exceto);
+        return await Usuarios.Find(filtro).Limit(1).AnyAsync(ct);
+    }
+}
+
+// As contas assinantes (contas), com o tempo de sessão de cada uma; o tempo do
+// time deboaz fica na conta do time (tempoDoTime).
+public sealed class ContasNoBanco(Armazenamento armazenamento, TimeDeboaz time) : IContas
+{
+    IMongoCollection<BsonDocument> Contas => armazenamento.Colecao(Colecoes.Contas);
+
+    public async Task<ContaAssinante?> Buscar(string id, CancellationToken ct = default)
+    {
+        var d = await Contas.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
+        if (d is null && await time.GarantirSeFor(contaId: id, ct: ct)) d = await Contas.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
+        return d is null ? null : Documentos.Conta(d);
+    }
+
+    // a sigla vale sem diferenciar maiúsculas (RN-179)
+    public Task<bool> SiglaEmUso(string sigla, CancellationToken ct = default) =>
+        Contas.Find(Bson.Filtro.Regex("sigla", new BsonRegularExpression($"^{System.Text.RegularExpressions.Regex.Escape(sigla)}$", "i"))).AnyAsync(ct);
+
+    public Task<bool> DominioEmUso(string dominio, CancellationToken ct = default) =>
+        Contas.Find(Bson.Filtro.Eq("dominio", dominio)).AnyAsync(ct);
+
+    // a conta, a conta master e a senha mostrada nascem juntas
+    public async Task Criar(ContaAssinante conta, UsuarioCadastrado master, GeracaoDeSenhaPedida geracao, TempoDaConta tempo,
+        CancellationToken ct = default)
+    {
+        var d = Documentos.DaConta(conta);
+        d["tempoSessao"] = Documentos.DoTempo(tempo);
+        d["conferencias"] = new BsonArray();
+        await Contas.InsertOneAsync(d, cancellationToken: ct);
+        var usuario = Documentos.DoCadastro(master);
+        usuario.InsertAt(0, new BsonElement("_id", master.Id));
+        await armazenamento.Colecao(Colecoes.Usuarios).InsertOneAsync(usuario, cancellationToken: ct);
+        await armazenamento.Colecao(Colecoes.GeracoesSenha).InsertOneAsync(Documentos.DaGeracao(geracao), cancellationToken: ct);
+    }
+
+    public Task Atualizar(ContaAssinante conta, CancellationToken ct = default) =>
+        Contas.UpdateOneAsync(Bson.Filtro.Eq("_id", conta.Id), Bson.Mudar.Set("estado", conta.Estado.Texto()), cancellationToken: ct);
+
+    // encerrada: fica marcada; os usuários não entram mais (RN-175). Apagar em
+    // cascata o conteúdo da conta fica para quando os módulos de conteúdo existirem.
+    public Task Encerrar(string contaId, DateTimeOffset quando, CancellationToken ct = default) =>
+        Contas.UpdateOneAsync(Bson.Filtro.Eq("_id", contaId), Bson.Mudar.Set("encerradaEm", Bson.Valor(quando)), cancellationToken: ct);
+
+    // a conta do time não aparece; a busca acha nome, sigla e CNPJ (RN-185)
+    public Task<PaginaDe<ContaAssinante>> Listar(FiltroDeContas filtro, CancellationToken ct = default)
+    {
+        var f = Bson.Filtro.Ne("_id", TimeDeboaz.ContaId);
+        if (filtro.Estado is { } estado) f &= Bson.Filtro.Eq("estado", estado.Texto());
+        if (filtro.Busca is { } busca)
+        {
+            var contem = Bson.Contem(busca);
+            var numeros = Documento.Numeros(busca);
+            var acha = Bson.Filtro.Regex("nome", contem) | Bson.Filtro.Regex("sigla", contem) | Bson.Filtro.Regex("documento", contem);
+            if (numeros.Length > 0) acha |= Bson.Filtro.Regex("documentoNumeros", Bson.Contem(numeros));
+            f &= acha;
+        }
+        return Ordem.Pagina(Contas, f, filtro.Pagina, Documentos.Conta, ct);
+    }
+
+    public async Task<TempoDaConta?> TempoDaConta(string contaId, CancellationToken ct = default) =>
+        await Contas.Find(Bson.Filtro.Eq("_id", contaId)).FirstOrDefaultAsync(ct) is { } d ? Documentos.TempoDaConta(d) : null;
+
+    public Task SalvarTempoDaConta(string contaId, TempoDaConta tempo, CancellationToken ct = default) =>
+        Contas.UpdateOneAsync(Bson.Filtro.Eq("_id", contaId), Bson.Mudar.Set("tempoSessao", Documentos.DoTempo(tempo)), cancellationToken: ct);
+
+    public async Task<TempoDoTime?> TempoDoTime(CancellationToken ct = default) =>
+        Documentos.TempoDoTime(await Contas.Find(Bson.Filtro.Eq("_id", TimeDeboaz.ContaId)).FirstOrDefaultAsync(ct));
+
+    public async Task SalvarTempoDoTime(TempoDoTime tempo, CancellationToken ct = default)
+    {
+        await time.Garantir(ct);
+        await Contas.UpdateOneAsync(Bson.Filtro.Eq("_id", TimeDeboaz.ContaId), Bson.Mudar.Set("tempoDoTime", Documentos.DoTempo(tempo)),
+            cancellationToken: ct);
+    }
+
+    // a conferência do SAC fica na conta (contas.conferencias, RN-172)
+    public Task RegistrarConferencia(string contaId, string quem, bool conferiu, DateTimeOffset quando, CancellationToken ct = default) =>
+        Contas.UpdateOneAsync(Bson.Filtro.Eq("_id", contaId), Bson.Mudar.Push("conferencias", new BsonDocument
+        {
+            ["quem"] = quem,
+            ["conferiu"] = conferiu,
+            ["quando"] = Bson.Valor(quando),
+        }), cancellationToken: ct);
+}
+
+// Gerações de senha (geracoesSenha): o código de liberação e o comprovante
+// guardados só como resumo.
+public sealed class GeracoesNoBanco(Armazenamento armazenamento) : IGeracoesDeSenha
+{
+    IMongoCollection<BsonDocument> Geracoes => armazenamento.Colecao(Colecoes.GeracoesSenha);
+
+    public Task Inserir(GeracaoDeSenhaPedida geracao, CancellationToken ct = default) =>
+        Geracoes.InsertOneAsync(Documentos.DaGeracao(geracao), cancellationToken: ct);
+
+    public async Task<GeracaoDeSenhaPedida?> UltimaDoUsuario(string usuarioId, CancellationToken ct = default) =>
+        await Geracoes.Find(Bson.Filtro.Eq("usuarioId", usuarioId)).Sort(Builders<BsonDocument>.Sort.Descending("pedidaEm"))
+            .FirstOrDefaultAsync(ct) is { } d
+            ? Documentos.Geracao(d)
+            : null;
+
+    public Task Atualizar(GeracaoDeSenhaPedida geracao, CancellationToken ct = default) =>
+        Geracoes.UpdateOneAsync(Bson.Filtro.Eq("_id", geracao.Id), Bson.Mudar
+            .Set("senhaMostradaEm", Bson.Valor(geracao.SenhaMostradaEm))
+            .Set("resumoComprovante", Bson.Valor(geracao.ResumoComprovante)), cancellationToken: ct);
+}
+
+// Auditoria (RN-178: 5 anos), pedidos de ajuda ao SAC e o último pagamento.
+public sealed class RegistrosNoBanco(Armazenamento armazenamento) : IAuditoria, IPedidosDeAjuda, IPagamentos
+{
+    public Task Registrar(RegistroDeAuditoria registro, CancellationToken ct = default) =>
+        armazenamento.Colecao(Colecoes.Auditoria).InsertOneAsync(new BsonDocument
+        {
+            ["_id"] = Guid.NewGuid().ToString("N"),
+            ["contaId"] = registro.ContaId,
+            ["quem"] = registro.Quem,
+            ["acao"] = registro.Acao.Texto(),
+            ["alvo"] = registro.Alvo,
+            ["quando"] = Bson.Valor(registro.Quando),
+            ["guardarAte"] = Bson.Valor(registro.GuardarAte),
+        }, cancellationToken: ct);
+
+    public async Task<IReadOnlyList<DateTimeOffset>> EnviosDoAparelho(string aparelho, DateTimeOffset desde, CancellationToken ct = default)
+    {
+        var lidos = await armazenamento.Colecao(Colecoes.PedidosAjuda)
+            .Find(Bson.Filtro.Eq("aparelho", aparelho) & Bson.Filtro.Gt("quando", Bson.Valor(desde))).ToListAsync(ct);
+        return lidos.Select(d => d.Data("quando")).OfType<DateTimeOffset>().ToList();
+    }
+
+    public Task Enviar(string aparelho, string instituicao, string contato, DateTimeOffset quando, CancellationToken ct = default) =>
+        armazenamento.Colecao(Colecoes.PedidosAjuda).InsertOneAsync(new BsonDocument
+        {
+            ["_id"] = Guid.NewGuid().ToString("N"),
+            ["aparelho"] = aparelho,
+            ["instituicao"] = instituicao,
+            ["contato"] = contato,
+            ["quando"] = Bson.Valor(quando),
+        }, cancellationToken: ct);
+
+    // a cobrança ainda não existe: nenhuma conta tem pagamento registrado
+    public Task<DateOnly?> UltimoPagamento(string contaId, CancellationToken ct = default) => Task.FromResult<DateOnly?>(null);
+}
+
+// Números do card Usuários (RN-189), contados no cadastro. Cada mês conta quem
+// está ativo hoje e já existia no fim daquele mês: o último é o número de hoje.
+public sealed class IndicadoresNoBanco(Armazenamento armazenamento) : IIndicadores
+{
+    public async Task<IReadOnlyList<int>> UsuariosAtivosPorMes(string contaId, IReadOnlySet<TipoUsuario> tipos, DateTimeOffset agora, int meses,
+        CancellationToken ct = default)
+    {
+        var filtro = Bson.Filtro.Eq("contaId", contaId) & Bson.Filtro.Eq("estado", "ATIVO") & Bson.Filtro.In("tipo", tipos.Select(t => t.Texto()));
+        return await PorMes(armazenamento.Colecao(Colecoes.Usuarios), filtro, "criadoEm", agora, meses, ct);
+    }
+
+    public async Task<int> UsuariosAtivos(string contaId, TipoUsuario tipo, CancellationToken ct = default) =>
+        (int)await armazenamento.Colecao(Colecoes.Usuarios).CountDocumentsAsync(
+            Bson.Filtro.Eq("contaId", contaId) & Bson.Filtro.Eq("estado", "ATIVO") & Bson.Filtro.Eq("tipo", tipo.Texto()), cancellationToken: ct);
+
+    public Task<IReadOnlyList<int>> ContasAtivasPorMes(DateTimeOffset agora, int meses, CancellationToken ct = default) =>
+        PorMes(armazenamento.Colecao(Colecoes.Contas), Bson.Filtro.Ne("_id", TimeDeboaz.ContaId) & Bson.Filtro.Eq("estado", "ATIVA"),
+            "criadaEm", agora, meses, ct);
+
+    // gerações abertas (código sem uso) que vencem entre de e ate (72 h depois do pedido)
+    public async Task<int> CodigosQueVencem(string contaId, DateTimeOffset de, DateTimeOffset ate, CancellationToken ct = default) =>
+        (int)await armazenamento.Colecao(Colecoes.GeracoesSenha).CountDocumentsAsync(
+            Bson.Filtro.Eq("contaId", contaId)
+            & Bson.Filtro.Ne("resumoCodigo", BsonNull.Value)
+            & Bson.Filtro.Eq("senhaMostradaEm", BsonNull.Value)
+            & Bson.Filtro.Gte("pedidaEm", Bson.Valor(de - CodigoDeLiberacao.Validade))
+            & Bson.Filtro.Lt("pedidaEm", Bson.Valor(ate - CodigoDeLiberacao.Validade)), cancellationToken: ct);
+
+    static async Task<IReadOnlyList<int>> PorMes(IMongoCollection<BsonDocument> colecao, FilterDefinition<BsonDocument> filtro, string criadoEm,
+        DateTimeOffset agora, int meses, CancellationToken ct)
+    {
+        var contagem = new List<int>();
+        var inicioDoMes = new DateTimeOffset(agora.Year, agora.Month, 1, 0, 0, 0, TimeSpan.Zero);
+        for (var i = meses - 1; i > 0; i--)
+        {
+            var fim = inicioDoMes.AddMonths(1 - i);
+            contagem.Add((int)await colecao.CountDocumentsAsync(filtro & Bson.Filtro.Lt(criadoEm, Bson.Valor(fim)), cancellationToken: ct));
+        }
+        contagem.Add((int)await colecao.CountDocumentsAsync(filtro, cancellationToken: ct));
+        return contagem;
+    }
+}
+
+// Encerrar sessões a pedido do cadastro (desativar, nova senha, conta fora do
+// ar): o caso de uso da Autenticação encerra as de cada usuário.
+public sealed class SessoesDosUsuarios(Armazenamento armazenamento, IEncerrarSessoesDoUsuario encerrar) : ISessoesDosUsuarios
+{
+    public Task EncerrarDoUsuario(string usuarioId, MotivoFim motivo, CancellationToken ct = default) =>
+        encerrar.Executar(usuarioId, motivo, ct);
+
+    public async Task EncerrarDaConta(string contaId, MotivoFim motivo, CancellationToken ct = default)
+    {
+        var ids = await armazenamento.Colecao(Colecoes.Usuarios).Find(Bson.Filtro.Eq("contaId", contaId))
+            .Project(Builders<BsonDocument>.Projection.Include("_id")).ToListAsync(ct);
+        foreach (var id in ids) await encerrar.Executar(id["_id"].AsString, motivo, ct);
+    }
+}

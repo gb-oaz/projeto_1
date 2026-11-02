@@ -1,3 +1,6 @@
+using Boaz.MsMono.Infra.In.Commons.Usuario.Autenticacao;
+using Boaz.MsMono.Infra.In.Commons.Usuario.Autorizacao;
+using Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
 using Microsoft.OpenApi;
 
 namespace Boaz.MsMono.Sistema;
@@ -26,7 +29,7 @@ public static class DocumentacaoApi
 
         | API | O que documenta |
         |---|---|
-        | `ms_mono · v1` | O backend único do deboaz: os contextos `landing_page`, `hub`, `quest` e `commons` num só serviço. Hoje traz os endpoints de sistema |
+        | `ms_mono · v1` | O backend único do deboaz: os contextos `landing_page`, `hub`, `quest` e `commons` num só serviço. Traz os endpoints de sistema e o módulo de usuário: Autenticação, Usuários e Autorização |
 
         ### O que vem por aí
 
@@ -40,15 +43,16 @@ public static class DocumentacaoApi
     private const string DescricaoMsMono = """
         O **ms_mono** é o backend único do deboaz: os contextos `landing_page`, `hub`, `quest` e `commons` rodam num só serviço.
 
-        Por enquanto só existem os **endpoints de sistema**, do próprio runtime, sem módulo:
+        Cada grupo do seletor é um módulo, com os endereços do contrato dele em `2_Diagramas/`. Com login, mande o token de acesso em `Authorization: Bearer <token>`: entre em `POST /auth/hub/entrar` e copie o `tokenAcesso`.
 
-        | Endpoint | Para quê |
-        |---|---|
-        | `GET /health` | Prontidão: responde 200 quando o backend está pronto para atender |
-        | `GET /` | Leva a este catálogo |
-        | `GET /doc/api` | Este catálogo (Swagger UI) |
-        | `GET /doc/api/catalogo.json` | O documento OpenAPI da capa do catálogo |
-        | `GET /doc/api/v1.json` | O documento OpenAPI desta API |
+        | Grupo | Contrato | Para quê |
+        |---|---|---|
+        | Sistema | — | Prontidão (`GET /health`) e esta documentação (`/doc/api`) |
+        | Autenticação | `autenticacao-contrato-api` | Entrar no hub, no quest e na sala, confirmar a senha, renovar o token, sair e os aparelhos conectados (`/auth/*`) |
+        | Usuários | `usuarios-contrato-api` | Contas, staff, participantes e membros do time, o card e o tempo de sessão (`/contas`, `/usuarios`, `/time`) |
+        | Autorização | `autorizacao-contrato-api` | Permissões por módulo e aba, com If-Match, e o registro de mudanças (`/usuarios/{id}/permissoes`) |
+
+        Toda resposta de erro traz `codigo` e `mensagem`, e o `campo`, o `tentarEm` ou os limites quando a falha tem.
         """;
 
     public static bool Habilitada(IConfiguration configuracao) => configuracao.GetValue<bool>("Swagger:Habilitado");
@@ -74,6 +78,9 @@ public static class DocumentacaoApi
             documento.Tags = new HashSet<OpenApiTag>
             {
                 new() { Name = TagSistema, Description = "Endpoints do próprio runtime, sem módulo: prontidão e documentação" },
+                new() { Name = AutenticacaoApi.Tag, Description = AutenticacaoApi.Descricao },
+                new() { Name = UsuariosApi.Tag, Description = UsuariosApi.Descricao },
+                new() { Name = AutorizacaoApi.Tag, Description = AutorizacaoApi.Descricao },
             };
             return Task.CompletedTask;
         }));
