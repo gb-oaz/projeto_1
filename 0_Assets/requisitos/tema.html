@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tema dos documentos de requisito · boaz · v07</title>
+<title>Tema dos documentos de requisito · boaz · v08</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="tema">
 <meta name="boaz:caminho" content="0_Assets/requisitos/tema.html">
 <meta name="boaz:tipo" content="Tema">
-<meta name="boaz:versao" content="v07">
-<meta name="boaz:data" content="2026-11-01 18:31">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v08">
+<meta name="boaz:data" content="2026-11-01 22:01">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -934,9 +934,9 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
   <p class="boaz-objetivo"><span>Objetivo</span>padronizar marca d'água, formato (cenários em Gherkin, telas e diagramas) e estilo de todo documento <code>.html</code> de <code>1_Requisitos/</code> e mostrar, renderizado, cada componente que um documento pode usar.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>tema</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v07</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 18:31</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v08</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 22:01</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 
@@ -1126,6 +1126,7 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
       <li>Palavras-chave: <code>Cenário</code>, <code>Esquema do Cenário</code> + <code>Exemplos</code>, <code>Dado</code>, <code>Quando</code>, <code>Então</code>, <code>E</code>, <code>Mas</code>; textos exibidos entre aspas</li>
       <li>Regra em forma de tabela (faixas, perfis, estados, tamanhos): <code>Esquema do Cenário</code> com <code>Exemplos</code>, colunas curtas</li>
       <li>Exemplo de dado (token, documento, comando): <em>doc string</em> entre <code>"""</code> dentro do passo</li>
+      <li>JSON sempre expandido: um campo por linha, objetos e listas abertos com 2 espaços, nunca vários campos na mesma linha</li>
       <li>Um cenário, um comportamento; até 3 cenários por ID</li>
       <li>Diga <strong>o quê</strong>: a tecnologia só aparece nos documentos transversais e nos RNF que a decidem</li>
       <li>Datas <code>AAAA-MM-DD</code>, horas <code>HH:MM</code>; número e unidade com espaço (<code>2 s</code>, <code>R$ 1.500,00</code>), decimal com vírgula</li>
@@ -1327,7 +1328,8 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v07</span></td><td>2026-11-01 18:31</td><td>Requisito só com Gherkin, telas e diagramas: funcionalidade = Cenários, Telas, Diagramas e Em aberto; transversal = Cenários, Diagramas e Em aberto; visão enxuta, em listas; cada regra (RF, RN, RNF) é um cenário com o ID como âncora; saem Contexto, tabelas de requisitos, prioridade, história e destaques; Gherkin quebra a linha em vez de cortar; casca v07</td></tr>
+      <tr><td><span class="boaz-versao">v08</span></td><td>2026-11-01 22:01</td><td>Escrita: JSON sempre expandido nas doc strings</td></tr>
+      <tr><td>v07</td><td>2026-11-01 18:31</td><td>Requisito só com Gherkin, telas e diagramas: funcionalidade = Cenários, Telas, Diagramas e Em aberto; transversal = Cenários, Diagramas e Em aberto; visão enxuta, em listas; cada regra (RF, RN, RNF) é um cenário com o ID como âncora; saem Contexto, tabelas de requisitos, prioridade, história e destaques; Gherkin quebra a linha em vez de cortar; casca v07</td></tr>
       <tr><td>v06</td><td>2026-10-24 03:59</td><td>Vista com paletas: <code>figure.diagrama[data-paletas]</code> e o botão <strong>Paleta</strong> na barra, que troca o tema de cor e o modo (claro ou escuro) das vistas de tela pelo fragmento <code>#paleta-&lt;id&gt;-&lt;modo&gt;</code> do <code>.svg</code>; casca v06</td></tr>
       <tr><td>v05</td><td>2026-10-17 18:14</td><td>Visão do produto ganha a seção opcional Identidade, com o componente de amostras da marca (<code>figure.marca</code>, fundos claro, médio e escuro) para logos, símbolo e ícones de <code>0_Assets/design/identidade/</code></td></tr>
       <tr><td>v04</td><td>2026-10-11 04:38</td><td>Impressão: diagrama com no máximo 75 mm de altura (era 85 mm), para caber no fim da página em vez de abrir uma nova</td></tr>
@@ -1337,7 +1339,7 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v07 · 2026-11-01 18:31</span>
+    <span>boaz · v08 · 2026-11-01 22:01</span>
     <span class="boaz-arquivo">0_Assets/requisitos/tema.html</span>
   </div>
 </footer>

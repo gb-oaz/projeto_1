@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · boaz · v40</title>
+<title>Módulo Usuários · boaz · v41</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v40">
-<meta name="boaz:data" content="2026-11-01 18:18">
+<meta name="boaz:versao" content="v41">
+<meta name="boaz:data" content="2026-11-01 22:01">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,8 +918,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v40</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 18:18</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v41</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 22:01</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1592,60 +1592,131 @@ Cenário: membro esqueceu a senha
   Dado a Escola Bento Freitas, a conta master, a Maria e o Lucas, com datas em UTC
   Então a conta é:
     """
-    { "_id": "conta-ebfga", "sigla": "EBFGA", "dominio": "objetivo_unidade1",
-      "nome": "Escola Bento Freitas", "tipo": "INSTITUICAO", "estado": "ATIVA",
-      "documento": "12.345.678/0001-90", "responsavel": "Gustavo Boaz de Moura Souza",
-      "telefone": "(51) 99999-0000", "criadaEm": "2026-03-12T13:05:00Z",
+    {
+      "_id": "conta-ebfga",
+      "sigla": "EBFGA",
+      "dominio": "objetivo_unidade1",
+      "nome": "Escola Bento Freitas",
+      "tipo": "INSTITUICAO",
+      "estado": "ATIVA",
+      "documento": "12.345.678/0001-90",
+      "responsavel": "Gustavo Boaz de Moura Souza",
+      "telefone": "(51) 99999-0000",
+      "criadaEm": "2026-03-12T13:05:00Z",
       "ultimoAcessoMaster": "2026-10-29T11:15:00Z",
-      "tempoSessao": { "staffNavegador": "PT8H", "staffApp": "P7D", "participante": "P30D" } }
+      "tempoSessao": {
+        "staffNavegador": "PT8H",
+        "staffApp": "P7D",
+        "participante": "P30D"
+      }
+    }
     """
   E a conta master é:
     """
-    { "_id": "usr-ebfga-master", "sigla": "EBFGA", "contaId": "conta-ebfga",
-      "tipo": "MASTER", "nome": "Escola Bento Freitas", "nomeCurto": "objetivo_unidade1",
-      "estado": "ATIVO", "login": "objetivo_unidade1@deboaz.com",
-      "resumoSenha": "(resumo irreversível)", "criadoEm": "2026-03-12T13:05:00Z",
-      "ultimoAcesso": "2026-10-29T11:15:00Z" }
+    {
+      "_id": "usr-ebfga-master",
+      "sigla": "EBFGA",
+      "contaId": "conta-ebfga",
+      "tipo": "MASTER",
+      "nome": "Escola Bento Freitas",
+      "nomeCurto": "objetivo_unidade1",
+      "estado": "ATIVO",
+      "login": "objetivo_unidade1@deboaz.com",
+      "resumoSenha": "(resumo irreversível)",
+      "criadoEm": "2026-03-12T13:05:00Z",
+      "ultimoAcesso": "2026-10-29T11:15:00Z"
+    }
     """
   E a staff é:
     """
-    { "_id": "usr-ebfga-maria", "sigla": "EBFGA", "contaId": "conta-ebfga",
-      "tipo": "STAFF", "nome": "Maria Souza", "nomeCurto": "maria", "estado": "ATIVO",
-      "login": "maria.ebfga@deboaz.com", "matricula": "20260087",
+    {
+      "_id": "usr-ebfga-maria",
+      "sigla": "EBFGA",
+      "contaId": "conta-ebfga",
+      "tipo": "STAFF",
+      "nome": "Maria Souza",
+      "nomeCurto": "maria",
+      "estado": "ATIVO",
+      "login": "maria.ebfga@deboaz.com",
+      "matricula": "20260087",
       "resumoSenha": "(resumo irreversível)",
-      "permissoes": [
-        { "moduloId": "mod-usuarios", "abaConfiguracao": true, "abaUtilizacao": true,
-          "suspensa": false },
-        { "moduloId": "mod-quiz", "abaConfiguracao": false, "abaUtilizacao": true,
-          "suspensa": false } ],
-      "criadoEm": "2026-03-14T10:20:00Z", "ultimoAcesso": "2026-10-29T09:42:00Z" }
+      "permissoes": {
+        "versao": 7,
+        "pv": 7,
+        "mods": {
+          "MOD-03": "CU",
+          "MOD-04": "U",
+          "MOD-05": "U"
+        },
+        "suspensos": []
+      },
+      "criadoEm": "2026-03-14T10:20:00Z",
+      "ultimoAcesso": "2026-10-29T09:42:00Z"
+    }
     """
   E o participante é:
     """
-    { "_id": "usr-ebfga-lucas", "sigla": "EBFGA", "contaId": "conta-ebfga",
-      "tipo": "PARTICIPANTE", "nome": "Lucas Andrade", "nomeCurto": "lucas",
-      "estado": "ATIVO", "login": "EBFGA-LUCAS-0412", "matricula": "48201755",
-      "responsaveis": [ { "nome": "Carla Andrade", "parentesco": "Mãe" },
-                        { "nome": "Paulo Andrade", "parentesco": "Pai" } ],
-      "criadoEm": "2026-03-20T15:00:00Z", "ultimoAcesso": "2026-10-28T22:10:00Z" }
+    {
+      "_id": "usr-ebfga-lucas",
+      "sigla": "EBFGA",
+      "contaId": "conta-ebfga",
+      "tipo": "PARTICIPANTE",
+      "nome": "Lucas Andrade",
+      "nomeCurto": "lucas",
+      "estado": "ATIVO",
+      "login": "EBFGA-LUCAS-0412",
+      "codigoGeradoEm": "2026-03-20T15:00:00Z",
+      "matricula": "48201755",
+      "responsaveis": [
+        {
+          "nome": "Carla Andrade",
+          "parentesco": "MAE"
+        },
+        {
+          "nome": "Paulo Andrade",
+          "parentesco": "PAI"
+        }
+      ],
+      "criadoEm": "2026-03-20T15:00:00Z",
+      "ultimoAcesso": "2026-10-28T22:10:00Z"
+    }
     """
 
 Cenário: geração de senha, acesso anônimo e auditoria
   Então a geração de senha da Maria é:
     """
-    { "_id": "ger-ebfga-maria-0001", "sigla": "EBFGA", "usuarioId": "usr-ebfga-maria",
-      "pedidaPor": "usr-ebfga-master", "resumoCodigo": "(resumo irreversível)",
-      "pedidaEm": "2026-10-27T13:00:00Z", "usadaEm": "2026-10-27T13:12:00Z" }
+    {
+      "_id": "ger-ebfga-maria-0001",
+      "sigla": "EBFGA",
+      "usuarioId": "usr-ebfga-maria",
+      "pedidaPor": "usr-ebfga-master",
+      "resumoCodigo": "(resumo irreversível)",
+      "resumoComprovante": "(resumo irreversível)",
+      "pedidaEm": "2026-10-27T13:00:00Z",
+      "senhaMostradaEm": "2026-10-27T13:12:00Z",
+      "confirmadaEm": "2026-10-27T13:13:00Z"
+    }
     """
   E o acesso anônimo da sala 482107 é:
     """
-    { "_id": "anon-ebfga-482107-13465", "sigla": "EBFGA", "sala": "482107",
-      "apelido": "PUPIL-EBFGA-13465" }
+    {
+      "_id": "anon-ebfga-482107-13465",
+      "sigla": "EBFGA",
+      "sala": "482107",
+      "apelido": "PUPIL-EBFGA-13465"
+    }
     """
   E o registro de auditoria é:
     """
-    { "_id": "aud-ebfga-000154", "contaId": "conta-ebfga", "quem": "usr-ebfga-maria",
-      "acao": "CRIAR_USUARIO", "alvo": "usr-ebfga-lucas", "quando": "2026-03-20T15:00:00Z" }
+    {
+      "_id": "aud-ebfga-000154",
+      "contaId": "conta-ebfga",
+      "quem": "usr-ebfga-maria",
+      "acao": "CRIAR_USUARIO",
+      "alvo": "usr-ebfga-lucas",
+      "quando": "2026-03-20T15:00:00Z",
+      "guardarAte": "2031-03-20T15:00:00Z"
+    }
     """</pre>
     </article>
     <article class="criterio" id="fora-de-escopo">
@@ -1692,6 +1763,16 @@ Cenário: geração de senha, acesso anônimo e auditoria
       <a href="../2_Diagramas/identidade-acesso-documentos_v03_20261101-1503.svg"><img src="../2_Diagramas/identidade-acesso-documentos_v03_20261101-1503.svg" alt="Modelo de documentos: contas com tempos de sessão e conferências, usuarios particionados pela sigla com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas"></a>
       <figcaption><strong>Usuários, autenticação e autorização · documentos</strong><code>2_Diagramas/identidade-acesso-documentos_v03_20261101-1503.svg</code></figcaption>
     </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/usuarios-contrato-api_v01_20261101-2206.svg"><img src="../2_Diagramas/usuarios-contrato-api_v01_20261101-2206.svg" alt="Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro"></a>
+      <figcaption><strong>Usuários · contrato de API</strong><code>2_Diagramas/usuarios-contrato-api_v01_20261101-2206.svg</code></figcaption>
+    </figure>
+  </section>
+  <section id="em-aberto">
+    <h2>Em aberto</h2>
+    <ul class="pendencias">
+      <li>Diagrama de sequência do módulo Usuários: <code>identidade-acesso-sequencia_v01</code> é de 2026-10-29 e não está neste documento <span class="tag dono">Desenvolvimento</span></li>
+    </ul>
   </section>
 </main>
 <footer class="boaz-marca-rodape">
@@ -1699,7 +1780,8 @@ Cenário: geração de senha, acesso anônimo e auditoria
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v40</span></td><td>2026-11-01 18:18</td><td>Só Gherkin, telas e diagramas: contexto, RF, RN, RNF, ficha do módulo, exemplos de entidades e fora de escopo viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
+      <tr><td><span class="boaz-versao">v41</span></td><td>2026-11-01 22:01</td><td>Contrato de API do módulo Usuários v01 com os 18 endereços; Em aberto só com o diagrama de sequência; JSON dos exemplos expandidos e alinhados ao modelo de documentos v03 (permissões em mods com versão e pv, geração de senha com comprovante)</td></tr>
+      <tr><td>v40</td><td>2026-11-01 18:18</td><td>Só Gherkin, telas e diagramas: contexto, RF, RN, RNF, ficha do módulo, exemplos de entidades e fora de escopo viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
       <tr><td>v39</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
       <tr><td>v38</td><td>2026-11-01 15:28</td><td>Sai a referência a identidade-acesso-sequencia v01, superada pelas sequências de autenticação e de autorização (17-a e 17-b)</td></tr>
       <tr><td>v37</td><td>2026-11-01 15:04</td><td>Modelo revisto: identidade-acesso-classes v03 (membro do time, tempos de sessão, conferências do cadastro, comprovante e auditoria imutável) e identidade-acesso-documentos v03 (permissões com versão e pv, registrosPermissao e as chaves de autenticação no Redis)</td></tr>
@@ -1708,11 +1790,10 @@ Cenário: geração de senha, acesso anônimo e auditoria
       <tr><td>v34</td><td>2026-11-01 12:20</td><td>vista-hub-time-deboaz v08: opções e permissões do membro do time (<code class="id">RF-155</code>, <code class="id">RN-246</code>) e limites do tempo de sessão na Configuração (<code class="id">RN-243</code>)</td></tr>
       <tr><td>v33</td><td>2026-11-01 11:41</td><td>Tempo de sessão dos membros do time (15 min a 12 h) e das contas master (15 min a 24 h), padrão 8 h, no navegador e no app (<code class="id">RN-243</code>), sai de Em aberto; permissões do membro do time por módulo, como o staff (<code class="id">RF-155</code>, <code class="id">RN-246</code>)</td></tr>
       <tr><td>v32</td><td>2026-11-01 03:52</td><td>Casos de uso identidade-acesso v04: editar staff e participante (<code class="id">RF-153</code>), gerar novo código de acesso (<code class="id">RF-154</code>) e tempo de sessão do time e das contas master (<code class="id">RF-152</code>)</td></tr>
-      <tr><td>v31</td><td>2026-11-01 03:50</td><td>Casos de uso identidade-acesso v03: o time deboaz cuida das contas no módulo Usuários, sem o painel de administração</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v40 · 2026-11-01 18:18</span>
+    <span>boaz · v41 · 2026-11-01 22:01</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario.html</span>
   </div>
 </footer>

@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autenticação · boaz · v13</title>
+<title>Módulo Usuários · Autenticação · boaz · v14</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-a-autenticacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-a-autenticacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v13">
-<meta name="boaz:data" content="2026-11-01 17:59">
+<meta name="boaz:versao" content="v14">
+<meta name="boaz:data" content="2026-11-01 22:01">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,8 +918,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-a-autenticacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v13</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 17:59</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v14</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 22:01</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1259,12 +1259,30 @@ Cenário: renovação copiada
   Quando a Maria entra no hub pelo navegador
   Então o token de acesso traz esta identidade, sem nome, documento, matrícula nem senha:
     """
-    {"alg": "RS256", "typ": "JWT", "kid": "deboaz-2026-11"}
     {
-      "iss": "deboaz", "aud": "hub", "sub": "usr-ebfga-maria", "sid": "3f9c2a71",
-      "conta": "conta-ebfga", "sigla": "EBFGA", "tipo": "STAFF", "aparelho": "NAVEGADOR",
-      "iat": 1793262120, "exp": 1793263020, "jti": "a81c0e5d",
-      "papel": "STAFF", "mods": { "MOD-03": "CU", "MOD-04": "U", "MOD-05": "U" }, "pv": 7
+      "alg": "RS256",
+      "typ": "JWT",
+      "kid": "deboaz-2026-11"
+    }
+    {
+      "iss": "deboaz",
+      "aud": "hub",
+      "sub": "usr-ebfga-maria",
+      "sid": "3f9c2a71",
+      "conta": "conta-ebfga",
+      "sigla": "EBFGA",
+      "tipo": "STAFF",
+      "aparelho": "NAVEGADOR",
+      "iat": 1793262120,
+      "exp": 1793263020,
+      "jti": "a81c0e5d",
+      "papel": "STAFF",
+      "mods": {
+        "MOD-03": "CU",
+        "MOD-04": "U",
+        "MOD-05": "U"
+      },
+      "pv": 7
     }
     """
   E papel, mods e pv são os da autorização
@@ -1296,10 +1314,16 @@ Cenário: quem entrou no quest
   Então a sessão fica no Redis na chave sessao:3f9c2a71, expirando em 8 h e refeita a cada ação:
     """
     {
-      "usuarioId": "usr-ebfga-maria", "contaId": "conta-ebfga", "sigla": "EBFGA",
-      "frente": "HUB", "aparelho": "NAVEGADOR", "quemEntrou": null, "versaoPermissoes": 7,
+      "usuarioId": "usr-ebfga-maria",
+      "contaId": "conta-ebfga",
+      "sigla": "EBFGA",
+      "frente": "HUB",
+      "aparelho": "NAVEGADOR",
+      "quemEntrou": null,
+      "versaoPermissoes": 7,
       "resumoRenovacao": "(resumo irreversível do token de renovação)",
-      "criadaEm": "2026-11-01T09:00:00Z", "ultimaAcao": "2026-11-01T09:42:00Z"
+      "criadaEm": "2026-11-01T09:00:00Z",
+      "ultimaAcao": "2026-11-01T09:42:00Z"
     }
     """
   E o índice sessoes:usr-ebfga-maria lista as sessões dela, para encerrar todas de uma vez
@@ -1359,8 +1383,8 @@ Cenário: sem aparelhos conectados no quest
       <figcaption><strong>Autenticação · sequência</strong><code>2_Diagramas/autenticacao-sequencia_v02_20261101-1214.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/autenticacao-contrato-api_v01_20261101-1143.svg"><img src="../2_Diagramas/autenticacao-contrato-api_v01_20261101-1143.svg" alt="Contrato de API da autenticação: entrar no hub, no quest e na sala, confirmar a senha anotada, renovar, sair, listar e encerrar sessões e chaves públicas do token, com pedido, respostas e códigos de erro"></a>
-      <figcaption><strong>Autenticação · contrato de API</strong><code>2_Diagramas/autenticacao-contrato-api_v01_20261101-1143.svg</code></figcaption>
+      <a href="../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg"><img src="../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg" alt="Contrato de API da autenticação: entrar no hub, no quest e na sala, confirmar a senha anotada, renovar, sair, listar e encerrar sessões e chaves públicas do token, com pedido, respostas e códigos de erro"></a>
+      <figcaption><strong>Autenticação · contrato de API</strong><code>2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
       <a href="../2_Diagramas/autenticacao-classes_v01_20261101-1501.svg"><img src="../2_Diagramas/autenticacao-classes_v01_20261101-1501.svg" alt="Diagrama de classes da autenticação: Sessão no Redis com frente, aparelho, quem entrou, versão das permissões e resumo da renovação, índice de sessões com o limite do hub, token de acesso JWT, token de renovação de uso único, chave de assinatura no Key Vault e tentativas de entrada com bloqueio progressivo"></a>
@@ -1373,7 +1397,8 @@ Cenário: sem aparelhos conectados no quest
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v13</span></td><td>2026-11-01 17:59</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão</td></tr>
+      <tr><td><span class="boaz-versao">v14</span></td><td>2026-11-01 22:01</td><td>JSON do token e da sessão expandidos (RNF-215, RNF-217); contrato de API v02, com JSON expandido</td></tr>
+      <tr><td>v13</td><td>2026-11-01 17:59</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão</td></tr>
       <tr><td>v12</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
       <tr><td>v11</td><td>2026-11-01 15:04</td><td>Diagrama autenticacao-classes v01: sessão, índice de sessões, tokens, chave de assinatura e tentativas de entrada</td></tr>
       <tr><td>v10</td><td>2026-11-01 13:15</td><td>Aprovado</td></tr>
@@ -1382,11 +1407,10 @@ Cenário: sem aparelhos conectados no quest
       <tr><td>v07</td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
       <tr><td>v06</td><td>2026-11-01 12:20</td><td>Sequência v02 com a entrada do participante no quest; vista-hub-aparelhos v01 (<code class="id">RF-156</code>, <code class="id">RF-157</code>); escolhas do contrato: token de renovação com o id da sessão (<code class="id">RNF-213</code>), comprovante do primeiro acesso (<code class="id">RF-143</code>), chave pública publicada (<code class="id">RNF-207</code>) e tentativas no Redis (<code class="id">RNF-217</code>)</td></tr>
       <tr><td>v05</td><td>2026-11-01 11:46</td><td>Diagramas autenticacao-sequencia v01 (entrar, cada ação, renovar e sair) e autenticacao-contrato-api v01 (10 endereços /auth)</td></tr>
-      <tr><td>v04</td><td>2026-11-01 11:41</td><td>Aparelhos conectados e sair de um ou de todos em Conta (<code class="id">RF-156</code>, <code class="id">RF-157</code>); até 5 sessões do hub por usuário (<code class="id">RN-247</code>); chave trocada a cada 90 dias ou na hora por vazamento (<code class="id">RNF-218</code>); biometria fora de escopo; Em aberto resolvido</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v13 · 2026-11-01 17:59</span>
+    <span>boaz · v14 · 2026-11-01 22:01</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-a-autenticacao.html</span>
   </div>
 </footer>
