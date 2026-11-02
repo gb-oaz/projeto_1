@@ -313,6 +313,12 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
     for d in 5_DEV/frontend/web/apps/*/; do [ -d "$d" ] && APPS_IMAGEM+=("$(basename "$d")"); done
   fi
   titulo "2 · aplicações"
+  # segredos do ambiente local, novos a cada execução: no lugar do Key Vault,
+  # a chave que assina o token (PKCS#8 em base64) e a senha do administrador
+  # do deboaz (17 RN-190, RNF-207); o qa do backend recebe os mesmos valores
+  CHAVE_PRIVADA=$(openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -outform DER 2>/dev/null | base64 | tr -d '\n')
+  ADMIN_ENTRADA=admin.dboaz@deboaz.com
+  ADMIN_SENHA="Ad#Ci$(od -An -N4 -tu4 /dev/urandom | tr -dc 0-9 | cut -c1-6)"
   {
     echo "# gerado por ci.sh — não edite"
     echo "services:"
@@ -329,6 +335,10 @@ $($QA_MOBILE && echo '    ports: ["127.0.0.1:18080:8080"]')
       ConnectionStrings__MongoDb: mongodb://mongodb:27017
       ConnectionStrings__Redis: redis:6379
       Swagger__Habilitado: "true"
+      Autenticacao__ChaveId: deboaz-local
+      Autenticacao__ChavePrivada: "$CHAVE_PRIVADA"
+      Administrador__Entrada: $ADMIN_ENTRADA
+      Administrador__Senha: "$ADMIN_SENHA"
     depends_on:
       mongodb: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -366,7 +376,11 @@ EOF
       for t in integracao carga; do
         [ $t = integracao ] && ! $QA_BACKEND && continue
         [ $t = carga ] && ! $QA_CARGA && continue
-        if $TEM_BACKEND; then suite "backend/$t" "qa · backend · $t" "API_URL=$API"
+        # a integração prepara o estado pelo banco e pelo cache, que estão em
+        # memória (tmpfs): por isso pode limpá-los antes de cada cenário
+        if $TEM_BACKEND; then suite "backend/$t" "qa · backend · $t" "API_URL=$API" \
+          "MONGO_URL=mongodb://mongodb:27017" "REDIS_URL=redis:6379" "QA_PODE_LIMPAR=sim" \
+          "ADMIN_ENTRADA=$ADMIN_ENTRADA" "ADMIN_SENHA=$ADMIN_SENHA" "CHAVE_PRIVADA=$CHAVE_PRIVADA"
         else aviso "sem 5_DEV/backend/Dockerfile: suíte backend/$t pulada"; registrar "qa · backend · $t" "qa" "pulado"; fi
       done
       # funcional da web: uma vez por app, contra o contêiner dele (RNF-192)
