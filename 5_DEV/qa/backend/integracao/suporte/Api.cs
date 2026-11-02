@@ -6,7 +6,15 @@ namespace Boaz.Qa.Integracao.Suporte;
 
 public sealed record Resposta(int Status, string Texto, IReadOnlyList<string> Cookies)
 {
-    public JsonNode? Corpo => Texto.Length == 0 ? null : JsonNode.Parse(Texto);
+    // o corpo em JSON; null se vazio ou se não for JSON (um 404 sem corpo, por exemplo)
+    public JsonNode? Corpo
+    {
+        get
+        {
+            try { return Texto.Length == 0 ? null : JsonNode.Parse(Texto); }
+            catch (System.Text.Json.JsonException) { return null; }
+        }
+    }
 
     public string? Cookie(string nome) =>
         Cookies.FirstOrDefault(c => c.StartsWith(nome + "=", StringComparison.Ordinal));

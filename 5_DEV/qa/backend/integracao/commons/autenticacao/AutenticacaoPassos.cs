@@ -33,7 +33,6 @@ public sealed class AutenticacaoPassos(Mundo mundo)
     const string SemSala = "abrir e fechar uma sala não está no contrato da Autenticação";
     const string SemTrocaDeChave = "trocar a chave de assinatura não tem endereço no contrato";
 
-    string? tokenGuardado;
     string acessoAnterior = "", renovacaoAnterior = "";
     readonly Dictionary<string, string> renovacoes = [];
 
@@ -128,31 +127,31 @@ public sealed class AutenticacaoPassos(Mundo mundo)
                 var partes = sessao.Acesso.Split('.');
                 var assinatura = Jwt.DeB64(partes[2]);
                 assinatura[0] ^= 0xFF;
-                tokenGuardado = $"{partes[0]}.{partes[1]}.{Convert.ToBase64String(assinatura).TrimEnd('=').Replace('+', '-').Replace('/', '_')}";
+                mundo.TokenGuardado = $"{partes[0]}.{partes[1]}.{Convert.ToBase64String(assinatura).TrimEnd('=').Replace('+', '-').Replace('/', '_')}";
                 break;
             case "vencido":
                 carga["iat"] = agora - 960;
                 carga["exp"] = agora - 60;
-                tokenGuardado = Jwt.Assinar(cabecalho, carga);
+                mundo.TokenGuardado = Jwt.Assinar(cabecalho, carga);
                 break;
             case "do quest":
                 carga["aud"] = "quest";
-                tokenGuardado = Jwt.Assinar(cabecalho, carga);
+                mundo.TokenGuardado = Jwt.Assinar(cabecalho, carga);
                 break;
             case "de uma sessão encerrada":
                 Exigir(await mundo.Enviar("POST", "/auth/sair", token: sessao.Acesso), 204, "POST /auth/sair");
-                tokenGuardado = sessao.Acesso;
+                mundo.TokenGuardado = sessao.Acesso;
                 break;
             default:
                 carga["pv"] = carga["pv"]!.GetValue<int>() - 1;
-                tokenGuardado = Jwt.Assinar(cabecalho, carga);
+                mundo.TokenGuardado = Jwt.Assinar(cabecalho, carga);
                 break;
         }
     }
 
     [Given(@"^um token de acesso de aud ""(hub|quest)""$")]
     public async Task TokenDaFrente(string aud) =>
-        tokenGuardado = aud == "hub"
+        mundo.TokenGuardado = aud == "hub"
             ? (await mundo.SessaoDe(await mundo.Maria(), Navegador)).Acesso
             : (await mundo.EntrarNoQuest(App)).Acesso;
 
@@ -160,12 +159,12 @@ public sealed class AutenticacaoPassos(Mundo mundo)
     public async Task UsadoNaFrente(string frente)
     {
         if (frente == "quest") throw new PendingStepException("o contrato ainda não tem endereço só do quest");
-        await mundo.Enviar("GET", "/auth/sessoes", token: tokenGuardado);
+        await mundo.Enviar("GET", "/auth/sessoes", token: mundo.TokenGuardado);
     }
 
     [When(@"^envia (?:um|qualquer) pedido com esse token$")]
     public Task PedidoComEsseToken() =>
-        mundo.Enviar("GET", "/auth/sessoes", token: tokenGuardado ?? mundo.Atual!.Acesso);
+        mundo.Enviar("GET", "/auth/sessoes", token: mundo.TokenGuardado ?? mundo.Atual!.Acesso);
 
     // ── entrar ──────────────────────────────────────────────────────────────
     [When(@"^(conta master, educador, staff|membro do time deboaz|participante ou responsável|pessoa sem código de acesso) envia POST (\S+) com (.+)$")]
@@ -178,7 +177,8 @@ public sealed class AutenticacaoPassos(Mundo mundo)
             case "participante ou responsável":
                 await mundo.Enviar("POST", endereco, new JsonObject
                 {
-                    ["codigo"] = await mundo.CodigoDoLucas(), ["aparelho"] = App,
+                    ["codigo"] = await mundo.CodigoDoLucas(),
+                    ["aparelho"] = App,
                     ["quem"] = new JsonObject { ["tipo"] = "PARTICIPANTE" },
                 }.ToJsonString());
                 break;
@@ -313,7 +313,7 @@ public sealed class AutenticacaoPassos(Mundo mundo)
         Respostas.TentarEm(mundo, unidade == "h" ? TimeSpan.FromHours(quanto) : TimeSpan.FromMinutes(quanto));
     }
 
-    [When(@"^a Carla envia POST /auth/quest/entrar com o código do Lucas(?: e o parentesco ""Mãe""|, como mãe)$")]
+    [When(@"^a Carla envia POST /auth/quest/entrar com o código do Lucas(?: e o parentesco ""Mãe""|, como mãe)?$")]
     public async Task CarlaEntra() =>
         mundo.Atual = await mundo.EntrarNoQuest(App, new JsonObject { ["tipo"] = "RESPONSAVEL", ["parentesco"] = "Mãe" });
 
@@ -487,6 +487,7 @@ public sealed class AutenticacaoPassos(Mundo mundo)
     public void ContinuaConectada() => Respostas.Confere(mundo.Ultima, 200);
 
     [When(@"^o Lucas abre Perfil no quest$")]
+    [Then(@"^não há a lista de aparelhos conectados nem ""Sair de todos os aparelhos""$")]
     public static void PerfilNoQuest() => throw new PendingStepException("é tela: fica no qa do frontend");
 
     // ── renovar ─────────────────────────────────────────────────────────────
@@ -732,7 +733,7 @@ public sealed class AutenticacaoPassos(Mundo mundo)
     [When(@"^a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes$")]
     public async Task MasterMudaPermissoes()
     {
-        tokenGuardado = (await mundo.SessaoDe(await mundo.Maria(), Navegador)).Acesso;
+        mundo.TokenGuardado = (await mundo.SessaoDe(await mundo.Maria(), Navegador)).Acesso;
         await MudarPermissoesDaMaria();
     }
 
@@ -762,12 +763,12 @@ public sealed class AutenticacaoPassos(Mundo mundo)
 
     [Then(@"^o token antigo recebe 401 PERMISSOES_DESATUALIZADAS$")]
     public async Task TokenDesatualizado() =>
-        Respostas.Confere(await mundo.Enviar("GET", "/auth/sessoes", token: tokenGuardado), 401, "PERMISSOES_DESATUALIZADAS");
+        Respostas.Confere(await mundo.Enviar("GET", "/auth/sessoes", token: mundo.TokenGuardado), 401, "PERMISSOES_DESATUALIZADAS");
 
     [Then(@"^POST /auth/renovar da Maria recebe 200 com um token de pv novo$")]
     public async Task PvNovo()
     {
-        var pvAntigo = Jwt.Carga(tokenGuardado!)["pv"]!.GetValue<int>();
+        var pvAntigo = Jwt.Carga(mundo.TokenGuardado!)["pv"]!.GetValue<int>();
         var sessao = await mundo.SessaoDe(await mundo.Maria(), Navegador);
         Respostas.Confere(await mundo.RenovarEGuardar(sessao), 200);
         Assert.True(Jwt.Carga(sessao.Acesso)["pv"]!.GetValue<int>() > pvAntigo, "o pv do token novo não subiu");

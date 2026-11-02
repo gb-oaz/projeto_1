@@ -1,11 +1,14 @@
+using MongoDB.Bson;
 using MongoDB.Driver;
 using StackExchange.Redis;
 
 namespace Boaz.Qa.Integracao.Suporte;
 
-// Preparo do estado que a API não cria (tempo sem uso, bloqueios seguidos),
-// pelas chaves do diagrama autenticacao-documentos. Nunca confere resultado:
-// o que só o banco mostra fica nos testes do backend.
+// Preparo do estado que a API não cria (tempo sem uso, bloqueios seguidos,
+// versão das permissões, módulo contratado), pelas chaves e coleções dos
+// diagramas autenticacao-documentos, autorizacao-documentos e
+// catalogo-documentos. Nunca confere resultado: o que só o banco mostra fica
+// nos testes do backend.
 public static class Estado
 {
     static readonly Lazy<ConnectionMultiplexer> redis = new(() =>
@@ -24,12 +27,69 @@ public static class Estado
             throw new InvalidOperationException(
                 "QA_PODE_LIMPAR=sim ausente: a suíte apaga o banco e o cache de MONGO_URL e REDIS_URL antes de cada cenário");
         }
-        foreach (var banco in await (await mongo.Value.ListDatabaseNamesAsync()).ToListAsync())
+        // o registro de módulos (15_modulos) fica: é dado do sistema, não do cenário
+        foreach (var nome in await (await mongo.Value.ListDatabaseNamesAsync()).ToListAsync())
         {
-            if (!BancosDoSistema.Contains(banco)) await mongo.Value.DropDatabaseAsync(banco);
+            if (BancosDoSistema.Contains(nome)) continue;
+            var banco = mongo.Value.GetDatabase(nome);
+            foreach (var colecao in await (await banco.ListCollectionNamesAsync()).ToListAsync())
+            {
+                if (colecao != "modulos") await banco.DropCollectionAsync(colecao);
+            }
         }
         foreach (var servidor in redis.Value.GetServers()) await servidor.FlushAllDatabasesAsync();
+        await SemearModulos();
     }
+
+    // os módulos que os cenários citam, se o backend ainda não os registrou
+    // (15_modulos): da conta, contratáveis e do time
+    static readonly (string Id, string Nome, string Tipo)[] Modulos =
+    [
+        ("MOD-02", "SAC", "DA_CONTA"), ("MOD-03", "Usuários", "DA_CONTA"), ("MOD-04", "Sugestão", "DA_CONTA"),
+        ("MOD-05", "Quiz", "CONTRATAVEL"), ("MOD-06", "Presença", "CONTRATAVEL"), ("MOD-07", "Carteirinha", "CONTRATAVEL"),
+        ("MOD-08", "Turmas", "DA_CONTA"), ("MOD-09", "Tarefas", "DA_CONTA"), ("MOD-12", "Agenda", "CONTRATAVEL"),
+        ("MOD-13", "Perfil", "DA_CONTA"), ("MOD-14", "Catálogo", "DO_TIME"),
+    ];
+
+    static async Task SemearModulos()
+    {
+        var modulos = Banco.GetCollection<BsonDocument>("modulos");
+        foreach (var (id, nome, tipo) in Modulos)
+        {
+            await modulos.UpdateOneAsync(Builders<BsonDocument>.Filter.Eq("_id", id),
+                Builders<BsonDocument>.Update.SetOnInsert("nome", nome).SetOnInsert("tipo", tipo),
+                new UpdateOptions { IsUpsert = true });
+        }
+    }
+
+    static IMongoDatabase Banco => mongo.Value.GetDatabase(Ambiente.MongoBanco);
+
+    // versão das permissões de um usuário, como nos exemplos (versão 6, versão 7)
+    public static Task DefinirVersao(string usuarioId, int versao) =>
+        Banco.GetCollection<BsonDocument>("usuarios").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", usuarioId),
+            Builders<BsonDocument>.Update.Set("permissoes.versao", versao).Set("permissoes.pv", versao));
+
+    // a conta contrata um módulo hoje (16_catalogo, coleção contratacoes)
+    public static Task Contratar(string contaId, string sigla, string moduloId) =>
+        Banco.GetCollection<BsonDocument>("contratacoes").InsertOneAsync(new BsonDocument
+        {
+            ["_id"] = Guid.NewGuid().ToString(),
+            ["contaId"] = contaId,
+            ["sigla"] = sigla,
+            ["moduloId"] = moduloId,
+            ["plano"] = "MENSAL",
+            ["desde"] = DateTime.UtcNow.AddMinutes(-1),
+            ["ate"] = BsonNull.Value,
+            ["automatica"] = false,
+        });
+
+    // a contratação em vigor termina agora
+    public static Task Descontratar(string contaId, string moduloId) =>
+        Banco.GetCollection<BsonDocument>("contratacoes").UpdateManyAsync(
+            Builders<BsonDocument>.Filter.Eq("contaId", contaId) & Builders<BsonDocument>.Filter.Eq("moduloId", moduloId)
+                & Builders<BsonDocument>.Filter.Eq("ate", BsonNull.Value),
+            Builders<BsonDocument>.Update.Set("ate", DateTime.UtcNow.AddSeconds(-1)));
 
     // a sessão passou do tempo sem uso: a chave expira (RN-226, RNF-217)
     public static Task ExpirarSessao(string sid) => redis.Value.GetDatabase().KeyDeleteAsync($"sessao:{sid}");

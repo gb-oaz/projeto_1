@@ -7,6 +7,8 @@ public static class Ambiente
     public static string ApiUrl => Ler("API_URL", "http://localhost:8080");
     public static string MongoUrl => Ler("MONGO_URL", "mongodb://localhost:27017");
     public static string RedisUrl => Ler("REDIS_URL", "localhost:6379");
+    // banco do backend no MongoDB, onde o preparo grava (versão das permissões, contratações)
+    public static string MongoBanco => Ler("MONGO_BANCO", "boaz");
 
     public static bool PodeLimpar => Ler("QA_PODE_LIMPAR", "") == "sim";
 

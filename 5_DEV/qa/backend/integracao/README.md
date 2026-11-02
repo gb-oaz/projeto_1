@@ -66,9 +66,12 @@ integracao/
 │   ├── Jwt.cs                      lê e assina tokens
 │   ├── Estado.cs                   limpa e prepara o banco e o cache
 │   └── Ganchos.cs                  antes de cada cenário: limpa tudo
-└── commons/autenticacao/           17_modulo-usuario-a-autenticacao.html
-    ├── autenticacao.feature
-    └── AutenticacaoPassos.cs
+├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.html
+│   ├── autenticacao.feature
+│   └── AutenticacaoPassos.cs
+└── commons/autorizacao/            17_modulo-usuario-b-autorizacao.html
+    ├── autorizacao.feature
+    └── AutorizacaoPassos.cs
 ```
 
 A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
@@ -88,10 +91,17 @@ python3 5_DEV/qa/backend/integracao/scripts/copiar-cenarios.py \
 Depois rode `dotnet build`: frase nova sem passo aparece como cenário pulado,
 com o texto `No matching step definition`.
 
-**Feature nova** (ex.: Autorização)
+Os outros requisitos, do mesmo jeito:
 
-1. Rode o script com o requisito e `commons/autorizacao/autorizacao.feature`.
-2. Crie `commons/autorizacao/AutorizacaoPassos.cs` com `[Binding]` e o
+| Requisito | `.feature` | Funcionalidade |
+|---|---|---|
+| `17_modulo-usuario-a-autenticacao.html` | `commons/autenticacao/autenticacao.feature` | `Autenticação` |
+| `17_modulo-usuario-b-autorizacao.html` | `commons/autorizacao/autorizacao.feature` | `Autorização` |
+
+**Feature nova** (ex.: Cadastro)
+
+1. Rode o script com o requisito e `<contexto>/<feature>/<feature>.feature`.
+2. Crie `<contexto>/<feature>/<Feature>Passos.cs` com `[Binding]` e o
    construtor recebendo o `Mundo`.
 3. Antes de criar um passo, procure se a frase já existe (`grep -rn "a resposta é" .`):
    passos de `suporte/` valem para todas as features.
@@ -102,9 +112,14 @@ requisito.
 
 **Passo que ainda não dá para testar**: `throw new PendingStepException("motivo")`.
 O cenário sai como pulado, com o motivo na saída. Hoje são três casos: o
-contrato ainda não tem o endereço (sala ao vivo, troca de chave, contratar
-módulo), é tela (fica no qa do frontend) ou só o banco mostra (fica nos testes
-do backend).
+contrato ainda não tem o endereço (sala ao vivo, troca de chave, os pedidos
+da Presença e do Quiz), é tela (fica no qa do frontend), só o banco mostra
+(fica nos testes do backend) ou é fora de escopo.
+
+**Conferir que toda frase tem passo**: o Reqnroll só acusa a frase sem passo
+quando o cenário chega nela. Com o backend ainda em 404, o cenário para no
+preparo; procure `No matching step definition` na saída de `dotnet test
+--logger "console;verbosity=normal"`.
 
 ## 4. Rodar
 
@@ -150,6 +165,7 @@ método. No TDD, enquanto o endpoint não existe, o vermelho esperado é o 404.
 |---|---|---|
 | `API_URL` | o backend | `http://localhost:8080` |
 | `MONGO_URL`, `REDIS_URL` | preparar o estado | `localhost` 27017 e 6379 |
+| `MONGO_BANCO` | o banco do backend dentro do Mongo (contratações, versão das permissões) | `boaz` |
 | `QA_PODE_LIMPAR=sim` | autoriza apagar o banco e o cache antes de cada cenário; sem ela, nada roda | — |
 | `ADMIN_ENTRADA`, `ADMIN_SENHA` | o administrador do deboaz (no lugar do Key Vault) | `admin.dboaz@deboaz.com`, vazia |
 | `CHAVE_PRIVADA` | a chave do token (PKCS#8 em base64), para montar os tokens recusados de RNF-216 | vazia |
@@ -168,6 +184,18 @@ esta suíte.
   navegador) e `EBFGA-LUCAS-0412` são trocados pelos valores reais na hora do
   pedido (`Mundo.Apelidos`); a pessoa é criada pela API na primeira vez que
   uma frase a cita.
+- **Quem é quem**: a conta master da EBFGA cria as staffs (Maria, João, Rui) e
+  dá as permissões pela API; a Ana é criada pelo João, por isso fica "abaixo"
+  dele (RN-252); o Caio é do time deboaz e recebe permissões do administrador.
+- **O que vem do banco, porque a API não cria**: o módulo contratado pela
+  escola (o catálogo ainda não tem o endereço de contratar e descontratar:
+  `Estado.Contratar`/`Descontratar`), a versão das permissões dos exemplos
+  ("na versão 6": `Estado.DefinirVersao`), o tempo sem uso da sessão e os
+  bloqueios seguidos.
+- **Token desatualizado**: quem pede com um token de versão antiga recebe
+  `401 PERMISSOES_DESATUALIZADAS`; no preparo, `Mundo.EnviarComo` renova e
+  tenta de novo uma vez, como o cliente faz.
 - **Comparação de JSON**: os campos do exemplo precisam estar na resposta com o
   mesmo valor; campo a mais é aceito; lista em qualquer ordem; data e hora do
-  exemplo só pedem uma data e hora; `"eyJ…"` só pede o começo.
+  exemplo só pedem uma data e hora; `"eyJ…"` só pede o começo. Os `mods` de um
+token são conferidos exatos (nenhum módulo a mais).

@@ -5,16 +5,17 @@ namespace Boaz.Qa.Integracao.Suporte;
 
 // Confere a resposta com o JSON do cenário: os campos do exemplo precisam
 // estar na resposta com o mesmo valor; listas em qualquer ordem; data e hora
-// do exemplo só pedem uma data e hora; "eyJ…" só pede o começo.
+// do exemplo só pedem uma data e hora; "eyJ…" só pede o começo. Com exato,
+// campo a mais também é diferença (os mods de um token, por exemplo).
 public static partial class Comparacao
 {
-    public static void Confere(JsonNode? esperado, JsonNode? atual, string caminho = "$")
+    public static void Confere(JsonNode? esperado, JsonNode? atual, string caminho = "$", bool exato = false)
     {
-        var erro = Diferenca(esperado, atual, caminho);
+        var erro = Diferenca(esperado, atual, caminho, exato);
         if (erro is not null) throw new Xunit.Sdk.XunitException($"{erro}\nresposta: {atual?.ToJsonString()}");
     }
 
-    static string? Diferenca(JsonNode? esperado, JsonNode? atual, string caminho)
+    static string? Diferenca(JsonNode? esperado, JsonNode? atual, string caminho, bool exato)
     {
         switch (esperado)
         {
@@ -25,8 +26,9 @@ public static partial class Comparacao
                 foreach (var (campo, valor) in objeto)
                 {
                     if (!a.ContainsKey(campo)) return $"{caminho}.{campo}: ausente";
-                    if (Diferenca(valor, a[campo], $"{caminho}.{campo}") is { } e) return e;
+                    if (Diferenca(valor, a[campo], $"{caminho}.{campo}", exato) is { } e) return e;
                 }
+                if (exato && a.FirstOrDefault(c => !objeto.ContainsKey(c.Key)) is { Key: not null } extra) return $"{caminho}.{extra.Key}: a mais";
                 return null;
             case JsonArray lista:
                 if (atual is not JsonArray l) return $"{caminho}: esperava uma lista, veio {atual?.ToJsonString()}";
@@ -34,7 +36,7 @@ public static partial class Comparacao
                 var livres = l.ToList();
                 for (var i = 0; i < lista.Count; i++)
                 {
-                    var par = livres.FirstOrDefault(x => Diferenca(lista[i], x, caminho) is null);
+                    var par = livres.FirstOrDefault(x => Diferenca(lista[i], x, caminho, exato) is null);
                     if (par is null && livres.Count > 0) return $"{caminho}[{i}]: nenhum item igual a {lista[i]!.ToJsonString()}";
                     livres.Remove(par);
                 }
