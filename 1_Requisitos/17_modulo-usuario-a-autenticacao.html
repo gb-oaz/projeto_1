@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autenticação · boaz · v14</title>
+<title>Módulo Usuários · Autenticação · boaz · v15</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-a-autenticacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-a-autenticacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v14">
-<meta name="boaz:data" content="2026-11-01 22:01">
+<meta name="boaz:versao" content="v15">
+<meta name="boaz:data" content="2026-11-01 23:41">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,8 +918,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-a-autenticacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v14</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 22:01</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v15</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 23:41</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1379,6 +1379,10 @@ Cenário: sem aparelhos conectados no quest
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
+      <a href="../2_Diagramas/autenticacao-casos-de-uso_v01_20261101-2337.svg"><img src="../2_Diagramas/autenticacao-casos-de-uso_v01_20261101-2337.svg" alt="Casos de uso da autenticação: a pessoa do hub entra, confirma a senha anotada, vê os aparelhos conectados e sai de um ou de todos; no hub e no quest renova, sai e vê o aviso de sessão terminada; as aplicações leem as chaves públicas; participante e responsável entram com o código de acesso e o visitante numa sala, com a conferência de tentativas incluída e o limite de 5 sessões estendendo a entrada no hub"></a>
+      <figcaption><strong>Autenticação · casos de uso</strong><code>2_Diagramas/autenticacao-casos-de-uso_v01_20261101-2337.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
       <a href="../2_Diagramas/autenticacao-sequencia_v02_20261101-1214.svg"><img src="../2_Diagramas/autenticacao-sequencia_v02_20261101-1214.svg" alt="Sequência da autenticação: entrada no hub com limite de 5 sessões, entrada do participante no quest com o código de acesso, recusas e bloqueio por tentativas, conferência de cada ação pela sessão e pela versão das permissões, renovação com troca do token e detecção de cópia, e sair de todos os aparelhos"></a>
       <figcaption><strong>Autenticação · sequência</strong><code>2_Diagramas/autenticacao-sequencia_v02_20261101-1214.svg</code></figcaption>
     </figure>
@@ -1390,6 +1394,10 @@ Cenário: sem aparelhos conectados no quest
       <a href="../2_Diagramas/autenticacao-classes_v01_20261101-1501.svg"><img src="../2_Diagramas/autenticacao-classes_v01_20261101-1501.svg" alt="Diagrama de classes da autenticação: Sessão no Redis com frente, aparelho, quem entrou, versão das permissões e resumo da renovação, índice de sessões com o limite do hub, token de acesso JWT, token de renovação de uso único, chave de assinatura no Key Vault e tentativas de entrada com bloqueio progressivo"></a>
       <figcaption><strong>Autenticação · classes</strong><code>2_Diagramas/autenticacao-classes_v01_20261101-1501.svg</code></figcaption>
     </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/autenticacao-documentos_v01_20261101-2340.svg"><img src="../2_Diagramas/autenticacao-documentos_v01_20261101-2340.svg" alt="Modelo de dados da autenticação: sessao, sessoes e tentativas no Redis; os campos de usuarios, contas e geracoesSenha que a entrada lê ou grava; a chave de assinatura no Key Vault e o token de acesso, que não é guardado"></a>
+      <figcaption><strong>Autenticação · documentos</strong><code>2_Diagramas/autenticacao-documentos_v01_20261101-2340.svg</code></figcaption>
+    </figure>
   </section>
 </main>
 <footer class="boaz-marca-rodape">
@@ -1397,7 +1405,8 @@ Cenário: sem aparelhos conectados no quest
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v14</span></td><td>2026-11-01 22:01</td><td>JSON do token e da sessão expandidos (RNF-215, RNF-217); contrato de API v02, com JSON expandido</td></tr>
+      <tr><td><span class="boaz-versao">v15</span></td><td>2026-11-01 23:41</td><td>Diagramas de casos de uso e de documentos da autenticação v01</td></tr>
+      <tr><td>v14</td><td>2026-11-01 22:01</td><td>JSON do token e da sessão expandidos (RNF-215, RNF-217); contrato de API v02, com JSON expandido</td></tr>
       <tr><td>v13</td><td>2026-11-01 17:59</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão</td></tr>
       <tr><td>v12</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
       <tr><td>v11</td><td>2026-11-01 15:04</td><td>Diagrama autenticacao-classes v01: sessão, índice de sessões, tokens, chave de assinatura e tentativas de entrada</td></tr>
@@ -1406,11 +1415,10 @@ Cenário: sem aparelhos conectados no quest
       <tr><td>v08</td><td>2026-11-01 12:45</td><td>Vistas de entrada por tipo de usuário no compact, no medium e no expanded: vista-hub-entrar v01 (conta master, staff, educador autônomo e membro do time) e vista-quest-entrar v01 (participante, responsável e anônimo), com as recusas; nova <code class="id">RF-158</code>, aviso da entrada bloqueada</td></tr>
       <tr><td>v07</td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
       <tr><td>v06</td><td>2026-11-01 12:20</td><td>Sequência v02 com a entrada do participante no quest; vista-hub-aparelhos v01 (<code class="id">RF-156</code>, <code class="id">RF-157</code>); escolhas do contrato: token de renovação com o id da sessão (<code class="id">RNF-213</code>), comprovante do primeiro acesso (<code class="id">RF-143</code>), chave pública publicada (<code class="id">RNF-207</code>) e tentativas no Redis (<code class="id">RNF-217</code>)</td></tr>
-      <tr><td>v05</td><td>2026-11-01 11:46</td><td>Diagramas autenticacao-sequencia v01 (entrar, cada ação, renovar e sair) e autenticacao-contrato-api v01 (10 endereços /auth)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v14 · 2026-11-01 22:01</span>
+    <span>boaz · v15 · 2026-11-01 23:41</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-a-autenticacao.html</span>
   </div>
 </footer>

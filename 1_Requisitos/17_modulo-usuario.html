@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · boaz · v41</title>
+<title>Módulo Usuários · boaz · v42</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v41">
-<meta name="boaz:data" content="2026-11-01 22:01">
+<meta name="boaz:versao" content="v42">
+<meta name="boaz:data" content="2026-11-01 23:18">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,8 +918,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v41</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 22:01</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v42</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 23:18</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1764,15 +1764,13 @@ Cenário: geração de senha, acesso anônimo e auditoria
       <figcaption><strong>Usuários, autenticação e autorização · documentos</strong><code>2_Diagramas/identidade-acesso-documentos_v03_20261101-1503.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
+      <a href="../2_Diagramas/usuarios-sequencia_v01_20261101-2317.svg"><img src="../2_Diagramas/usuarios-sequencia_v01_20261101-2317.svg" alt="Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo"></a>
+      <figcaption><strong>Usuários · sequência</strong><code>2_Diagramas/usuarios-sequencia_v01_20261101-2317.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
       <a href="../2_Diagramas/usuarios-contrato-api_v01_20261101-2206.svg"><img src="../2_Diagramas/usuarios-contrato-api_v01_20261101-2206.svg" alt="Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro"></a>
       <figcaption><strong>Usuários · contrato de API</strong><code>2_Diagramas/usuarios-contrato-api_v01_20261101-2206.svg</code></figcaption>
     </figure>
-  </section>
-  <section id="em-aberto">
-    <h2>Em aberto</h2>
-    <ul class="pendencias">
-      <li>Diagrama de sequência do módulo Usuários: <code>identidade-acesso-sequencia_v01</code> é de 2026-10-29 e não está neste documento <span class="tag dono">Desenvolvimento</span></li>
-    </ul>
   </section>
 </main>
 <footer class="boaz-marca-rodape">
@@ -1780,7 +1778,8 @@ Cenário: geração de senha, acesso anônimo e auditoria
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v41</span></td><td>2026-11-01 22:01</td><td>Contrato de API do módulo Usuários v01 com os 18 endereços; Em aberto só com o diagrama de sequência; JSON dos exemplos expandidos e alinhados ao modelo de documentos v03 (permissões em mods com versão e pv, geração de senha com comprovante)</td></tr>
+      <tr><td><span class="boaz-versao">v42</span></td><td>2026-11-01 23:18</td><td>Diagrama de sequência do módulo Usuários v01 (conta, staff, primeiro acesso, nova geração de senha, desativar e time deboaz); sai o Em aberto</td></tr>
+      <tr><td>v41</td><td>2026-11-01 22:01</td><td>Contrato de API do módulo Usuários v01 com os 18 endereços; Em aberto só com o diagrama de sequência; JSON dos exemplos expandidos e alinhados ao modelo de documentos v03 (permissões em mods com versão e pv, geração de senha com comprovante)</td></tr>
       <tr><td>v40</td><td>2026-11-01 18:18</td><td>Só Gherkin, telas e diagramas: contexto, RF, RN, RNF, ficha do módulo, exemplos de entidades e fora de escopo viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
       <tr><td>v39</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
       <tr><td>v38</td><td>2026-11-01 15:28</td><td>Sai a referência a identidade-acesso-sequencia v01, superada pelas sequências de autenticação e de autorização (17-a e 17-b)</td></tr>
@@ -1789,11 +1788,10 @@ Cenário: geração de senha, acesso anônimo e auditoria
       <tr><td>v35</td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
       <tr><td>v34</td><td>2026-11-01 12:20</td><td>vista-hub-time-deboaz v08: opções e permissões do membro do time (<code class="id">RF-155</code>, <code class="id">RN-246</code>) e limites do tempo de sessão na Configuração (<code class="id">RN-243</code>)</td></tr>
       <tr><td>v33</td><td>2026-11-01 11:41</td><td>Tempo de sessão dos membros do time (15 min a 12 h) e das contas master (15 min a 24 h), padrão 8 h, no navegador e no app (<code class="id">RN-243</code>), sai de Em aberto; permissões do membro do time por módulo, como o staff (<code class="id">RF-155</code>, <code class="id">RN-246</code>)</td></tr>
-      <tr><td>v32</td><td>2026-11-01 03:52</td><td>Casos de uso identidade-acesso v04: editar staff e participante (<code class="id">RF-153</code>), gerar novo código de acesso (<code class="id">RF-154</code>) e tempo de sessão do time e das contas master (<code class="id">RF-152</code>)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v41 · 2026-11-01 22:01</span>
+    <span>boaz · v42 · 2026-11-01 23:18</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario.html</span>
   </div>
 </footer>
