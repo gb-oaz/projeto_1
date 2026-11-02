@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulos · boaz · v20</title>
+<title>Módulos · boaz · v21</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="15_modulos">
 <meta name="boaz:caminho" content="1_Requisitos/15_modulos.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v20">
-<meta name="boaz:data" content="2026-11-01 03:57">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v21">
+<meta name="boaz:data" content="2026-11-01 18:20">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v06
+   boaz · tema dos documentos de requisito · v07
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
    Paleta: vistas com data-paletas trocam tema de cor e modo das telas.
@@ -417,7 +417,8 @@ caption { caption-side: top; padding: 0 0 8px; color: var(--muted); font-size: 1
 /* ── critérios de aceite (Gherkin) ───────────────────────── */
 .criterio { margin: 0 0 24px; break-inside: avoid; }
 .criterio h3 { margin-top: 24px; }
-pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); }
+.criterio { scroll-margin-top: 16px; }
+pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); white-space: pre-wrap; overflow-wrap: anywhere; }
 pre.gherkin::before {
   content: "GHERKIN";
   position: absolute;
@@ -720,7 +721,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v06 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v07 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
@@ -917,145 +918,28 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como um módulo do deboaz é construído, para que todo módulo siga o mesmo molde antes de entrar no catálogo.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>15_modulos</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v20</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 03:57</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v21</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 18:20</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
-  <section id="contexto">
-    <h2>Contexto</h2>
-    <p>Tudo o que a instituição, o educador autônomo e o time deboaz fazem no hub e no quest chega como um <a class="ref" href="99_glossario.html#modulo">módulo</a>: um card em <a class="ref" href="12_hub-ui.html">Módulos</a> no hub ou na Carteira do quest, telas liberadas pelas permissões do <a class="ref" href="17_modulo-usuario.html">Módulo Usuários</a> e um registro no <a class="ref" href="16_catalogo.html">Catálogo</a>, onde o administrador do deboaz decide se há custo e qual é o preço.</p>
-    <p>Este documento é a porta de entrada de todo módulo. Antes de existir um documento <code>NN_modulo-&lt;nome&gt;.html</code>, o módulo é registrado aqui com o nome, o tipo, a cobrança e, para cada perfil que vai usá-lo, onde aparece e para quê. O documento do módulo detalha depois as funcionalidades, os diagramas e as telas de cada perfil; o Catálogo administra o custo e o preço.</p>
-    <p>Todo card de módulo, em Módulos no hub e na Carteira do quest, tem quatro tamanhos, em células quadradas, como os blocos da tela inicial do Windows Phone (largura × altura em células): <strong>mínima</strong> 1x1, <strong>reduzida</strong> 2x2, <strong>normal</strong> 4x4 (o padrão) e <strong>expandida</strong> 4x8. A pessoa escolhe o tamanho de cada card ao ordenar, a escolha fica só no aparelho dela e o toque em qualquer tamanho abre o módulo.</p>
-    <p>Para cada tamanho funcionar, todo módulo entrega os mesmos dados, reunidos na <strong>Ficha do módulo</strong>: a mínima mostra só o ícone, então todo módulo precisa de um ícone; a reduzida mostra o nome e um dado macro, então todo módulo precisa de um nome curto e de um dado macro, e assim por diante. A ficha é o que o desenvolvimento pede de cada módulo antes das vistas e do código.</p>
-    <p class="historia"><span>Como</span> <strong>time deboaz</strong>, <span>quero</span> registrar cada módulo num molde único antes de especificá-lo, <span>para</span> saber sempre quem usa cada módulo, onde e para quê, e catalogar, liberar e cobrar todos do mesmo jeito</p>
-    <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-31: todo módulo é registrado neste documento antes de ter documento próprio; a definição dos tipos de módulo (da conta, contratável e do time) sai do Catálogo e passa a viver aqui (<code class="id">RN-203</code>, no lugar do antigo <code class="id">RN-198</code>); documento grande se divide em <code>NN_modulo-&lt;nome&gt;-a-&lt;assunto&gt;.html</code>, <code>NN_modulo-&lt;nome&gt;-b-&lt;assunto&gt;.html</code>.</p></aside>
-  </section>
-  <section id="requisitos-funcionais">
-    <h2>Requisitos funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
-      <tbody>
-        <tr id="RF-126"><td><code class="id">RF-126</code></td><td>O sistema deve mostrar um módulo a um usuário só quando o perfil dele está registrado para esse módulo em <strong>Quem usa cada módulo</strong> e só nas frentes registradas para esse perfil, além das permissões do <a class="ref" href="17_modulo-usuario.html#RF-107">Módulo Usuários <code class="id">RF-107</code></a></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-127"><td><code class="id">RF-127</code></td><td>O sistema deve guardar em cada módulo do <a class="ref" href="16_catalogo.html#RF-123">Catálogo <code class="id">RF-123</code></a> o ID do registro, o tipo, a cobrança e os perfis com a frente de cada um, iguais aos do <strong>Registro de módulos</strong>, e mostrá-los na aba Dados do módulo</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-132"><td><code class="id">RF-132</code></td><td>O sistema deve mostrar no Catálogo, na aba Dados do módulo, a <strong>Ficha do módulo</strong> com cada dado obrigatório preenchido ou marcado como <q class="ui">Falta</q>, e só deixar o módulo passar a <strong>Disponível</strong> com a ficha completa</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-128"><td><code class="id">RF-128</code></td><td>O sistema deve mostrar o card de cada módulo, em Módulos no hub e na Carteira do quest, num de quatro tamanhos, em células quadradas (largura × altura): <strong>mínima</strong> 1x1, com o ícone e o selo de notificações; <strong>reduzida</strong> 2x2, com o ícone, o nome e um dado macro; <strong>normal</strong> 4x4, com os números e o gráfico do módulo; e <strong>expandida</strong> 4x8, com o painel completo do módulo; e abrir o módulo com um toque no card, em qualquer tamanho</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-129"><td><code class="id">RF-129</code></td><td>O sistema deve deixar a pessoa, em Ordenar, mudar a ordem e o tamanho de cada card pelo menu do card, com <q class="ui">Mover para cima</q>, <q class="ui">Mover para baixo</q>, <q class="ui">Mínima</q>, <q class="ui">Reduzida</q>, <q class="ui">Normal</q> e <q class="ui">Expandida</q>, o tamanho atual marcado, e guardar a ordem e os tamanhos só no aparelho dela</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-133"><td><code class="id">RF-133</code></td><td>O sistema deve atualizar os números dos cards de módulo conforme a preferência da pessoa, escolhida na Conta, no hub, e no Perfil, no quest, em <q class="ui">Atualização dos cards</q>, no botão segmentado <q class="ui">Na abertura</q> | <q class="ui">Ao vivo</q>: na abertura, toda vez que ela abre Módulos, no hub, ou a Carteira, no quest; ao vivo, também enquanto a tela está aberta, assim que o dado muda</td><td><span class="prio prio-deve">Deve</span></td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="regras-de-negocio">
-    <h2>Regras de negócio</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Regra</th></tr></thead>
-      <tbody>
-        <tr id="RN-202"><td><code class="id">RN-202</code></td><td>Registro antes do documento: todo módulo é registrado aqui com um ID <code>MOD-NN</code>, que nunca é reaproveitado, o nome, o tipo, a cobrança e uma linha por perfil em Quem usa cada módulo, com a frente e o objetivo; módulo sem registro não tem documento próprio, vista nem lugar no Catálogo</td></tr>
-        <tr id="RN-203"><td><code class="id">RN-203</code></td><td>Tipos de módulo: <strong>da conta</strong> é requisito de toda conta de instituição e de educador autônomo, entra sozinho quando a conta é criada, não pode ser retirado nem aparece na vitrine, com ou sem custo; <strong>contratável</strong> aparece na vitrine do hub e entra numa conta quando a conta master o contrata; <strong>do time</strong> existe só na conta do time deboaz, sem custo, e nunca vira da conta nem contratável (<a class="ref" href="08_hub-ux.html#RN-79">Hub · UX base <code class="id">RN-79</code></a>, <a class="ref" href="08_hub-ux.html#RN-84">RN-84</a>)</td></tr>
-        <tr id="RN-204"><td><code class="id">RN-204</code></td><td>Cobrança: o módulo é <strong>sem custo</strong> ou <strong>com custo</strong>; com custo, o registro diz o modelo, <strong>por usuário</strong> (staff e participantes ativos, só no Usuários) ou <strong>por participante</strong> (participantes ativos, nos contratáveis e no Tarefas, módulo da conta: o staff já paga no Usuários); responsável e acesso anônimo nunca contam; modelo novo entra primeiro neste documento; preço, desconto e plano anual são do <a class="ref" href="16_catalogo.html#RN-199">Catálogo <code class="id">RN-199</code></a></td></tr>
-        <tr id="RN-205"><td><code class="id">RN-205</code></td><td>Perfis: só estes podem aparecer em Quem usa cada módulo, com o nome escrito igual: <a class="ref" href="99_glossario.html#administrador-do-deboaz">Administrador do deboaz</a>, Membro do <a class="ref" href="99_glossario.html#time-deboaz">time deboaz</a>, <a class="ref" href="99_glossario.html#conta-master">Conta master</a> da instituição, Educador autônomo, <a class="ref" href="99_glossario.html#staff">Staff</a>, <a class="ref" href="99_glossario.html#participante">Participante</a>, Responsável e <a class="ref" href="99_glossario.html#acesso-anonimo">Acesso anônimo</a>; perfil novo entra primeiro nesta regra</td></tr>
-        <tr id="RN-206"><td><code class="id">RN-206</code></td><td>Frentes: cada perfil usa o módulo no <a class="ref" href="99_glossario.html#hub">hub</a>, no <a class="ref" href="99_glossario.html#quest">quest</a> ou nos dois; o módulo contratável também tem a <a class="ref" href="99_glossario.html#pagina-do-modulo">página do módulo</a> na landing page</td></tr>
-        <tr id="RN-207"><td><code class="id">RN-207</code></td><td>Ciclo de vida, sempre nesta ordem: <strong>Registrado</strong> (linha neste documento) → <strong>Especificado</strong> (documento próprio) → <strong>Vistas aprovadas</strong> (uma por perfil, aprovada em pull request) → <strong>Catalogado</strong> (no Catálogo, com o custo) → <strong>Disponível</strong> (com preço valendo, se tiver custo) → <strong>Retirado</strong>; um módulo pode ir para Retirado de qualquer estado, inclusive quando é juntado a outro, e o registro dele fica, com o estado Retirado e o módulo que o recebeu</td></tr>
-        <tr id="RN-208"><td><code class="id">RN-208</code></td><td>Documento do módulo: arquivo <code>NN_modulo-&lt;nome&gt;.html</code>; quando passar de 12 requisitos funcionais ou de 4 páginas A4, divide-se em <code>NN_modulo-&lt;nome&gt;-a-&lt;assunto&gt;.html</code>, <code>NN_modulo-&lt;nome&gt;-b-&lt;assunto&gt;.html</code>, com o mesmo <code>NN</code>; cada linha de Quem usa cada módulo vira ao menos um requisito funcional, um ator no diagrama de casos de uso e uma vista <code>vista-&lt;aplicação&gt;-&lt;módulo&gt;-&lt;perfil&gt;</code>; todo documento de módulo traz a tabela <strong>Ficha do módulo</strong> em Regras de negócio (<a class="ref" href="#RN-217">RN-217</a>)</td></tr>
-        <tr id="RN-209"><td><code class="id">RN-209</code></td><td>Mudança de nome, tipo, cobrança, perfil, frente ou objetivo acontece primeiro neste registro, com versão nova, e depois no documento do módulo e no Catálogo</td></tr>
-        <tr id="RN-213"><td><code class="id">RN-213</code></td><td>Tamanho do card: todo card começa no tamanho <strong>normal</strong>; o documento de cada módulo define o que o card mostra em cada tamanho (o ícone da mínima, o dado macro da reduzida, os números e o gráfico da normal e o painel da expandida); enquanto o documento não existir, o card mostra só a carcaça: o ícone, o nome, o selo de notificações e o espaço do conteúdo</td></tr>
-        <tr id="RN-214"><td><code class="id">RN-214</code></td><td>Grade dos cards: células quadradas, com a altura igual à largura da coluna e lado mínimo de 76dp; a grade põe quantas colunas couberem na janela, no mínimo 4, e estica a célula até caber a próxima, então o card tem o mesmo tamanho em qualquer janela e as janelas largas mostram mais cards lado a lado; a mínima ocupa 1 coluna × 1 linha, a reduzida 2 × 2, a normal 4 × 4 e a expandida 4 × 8; cada card entra no primeiro lugar livre da grade, na ordem da pessoa; a ordem da pessoa vale em Contratados, no hub, e na Carteira, no quest</td></tr>
-        <tr id="RN-217"><td><code class="id">RN-217</code></td><td>Ficha do módulo: o documento de cada módulo traz os dados da tabela <strong>Ficha do módulo</strong>, e os dados do card, uma vez para cada perfil de Quem usa cada módulo que vê o card, porque cada perfil vê a gestão que lhe cabe; o módulo só passa de Registrado a Especificado com a ficha completa, e a Vistas aprovadas com os quatro tamanhos desenhados com os dados da ficha</td></tr>
-        <tr id="RN-218"><td><code class="id">RN-218</code></td><td>Limites da ficha, para tudo caber no card sem corte: nome com até 16 caracteres; dado macro com valor de até 6 caracteres e rótulo de até 20; série curta com até 5 pontos; até 3 números de apoio; série das semanas com 7 pontos; lista com até 3 linhas; o que passar do limite é encurtado no documento do módulo, nunca cortado na tela</td></tr>
-        <tr id="RN-219"><td><code class="id">RN-219</code></td><td>Ícone do módulo: cada módulo tem um ícone só dele, do conjunto de ícones do design system, o mesmo no hub, no quest, no Catálogo e na landing page; dois módulos não dividem ícone, e ícone que ainda não existe entra antes no design system</td></tr>
-        <tr id="RN-216"><td><code class="id">RN-216</code></td><td>Rolagem da grade: em Módulos e na Carteira, ao rolar para baixo, a barra do topo e as abas se escondem e voltam ao rolar para cima, e a barra de navegação fica; assim a expandida (4x8) cabe inteira na área visível</td></tr>
-        <tr id="RN-215"><td><code class="id">RN-215</code></td><td>Ordem e tamanho são uma preferência do aparelho: não vão para a conta nem para outros aparelhos; num aparelho novo, ou depois de limpar os dados do app, os cards voltam à ordem padrão e ao tamanho normal</td></tr>
-        <tr id="RN-220"><td><code class="id">RN-220</code></td><td>Atualização dos cards: o padrão é <strong>Na abertura</strong>; a escolha vale para todos os cards da pessoa e é guardada na conta dela, valendo em todos os aparelhos, ao contrário da ordem e do tamanho, que ficam no aparelho (<a class="ref" href="#RN-215">RN-215</a>); a troca de aba, a volta de um módulo aberto e o puxar para atualizar contam como abertura; em <strong>Ao vivo</strong>, o número muda no lugar, sem piscar o card nem mudar a rolagem, e o selo de notificações segue a mesma escolha; a escolha fica fora de Ordenar porque não muda a grade</td></tr>
-      </tbody>
-    </table>
-    <p><strong>Registro de módulos</strong> (<a class="ref" href="#RN-202">RN-202</a>), um por módulo, pelo ID. Tipo e cobrança <em>a definir</em> só valem no estado Registrado; módulo retirado fica na tabela e sai de Quem usa cada módulo.</p>
-    <table>
-      <thead><tr><th>ID</th><th>Módulo</th><th>Tipo</th><th>Cobrança</th><th>Documento</th><th>Estado</th></tr></thead>
-      <tbody>
-        <tr id="MOD-01"><td><code class="id">MOD-01</code></td><td>Contas</td><td>Da conta</td><td>Sem custo</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-02"><td><code class="id">MOD-02</code></td><td>SAC</td><td>Da conta</td><td>Sem custo</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-03"><td><code class="id">MOD-03</code></td><td>Usuários</td><td>Da conta</td><td>Com custo · por usuário</td><td><a class="ref" href="17_modulo-usuario.html">17_modulo-usuario</a>, <a class="ref" href="17_modulo-usuario-a-autenticacao.html">17_modulo-usuario-a-autenticacao</a> e <a class="ref" href="17_modulo-usuario-b-autorizacao.html">17_modulo-usuario-b-autorizacao</a></td><td>Especificado</td></tr>
-        <tr id="MOD-04"><td><code class="id">MOD-04</code></td><td>Sugestão</td><td>Da conta</td><td>Sem custo</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-05"><td><code class="id">MOD-05</code></td><td>Quiz</td><td>Contratável</td><td>Com custo · por participante</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-06"><td><code class="id">MOD-06</code></td><td>Presença</td><td>Contratável</td><td>Com custo · por participante</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-07"><td><code class="id">MOD-07</code></td><td>Carteirinha</td><td>Contratável</td><td>Com custo · por participante</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-08"><td><code class="id">MOD-08</code></td><td>Turmas</td><td>Da conta</td><td>Sem custo</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-09"><td><code class="id">MOD-09</code></td><td>Tarefas (com flashcards)</td><td>Da conta</td><td>Com custo · por participante</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-10"><td><code class="id">MOD-10</code></td><td>Flashcards</td><td>—</td><td>—</td><td>—</td><td>Retirado: juntado ao <a class="ref" href="#MOD-09">MOD-09</a></td></tr>
-        <tr id="MOD-11"><td><code class="id">MOD-11</code></td><td>Chat da turma</td><td>—</td><td>—</td><td>—</td><td>Retirado: juntado ao <a class="ref" href="#MOD-16">MOD-16</a></td></tr>
-        <tr id="MOD-12"><td><code class="id">MOD-12</code></td><td>Agenda</td><td>Contratável</td><td>Com custo · por participante</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-13"><td><code class="id">MOD-13</code></td><td>Perfil</td><td>Da conta</td><td>Sem custo</td><td>a criar</td><td>Registrado</td></tr>
-        <tr id="MOD-14"><td><code class="id">MOD-14</code></td><td>Catálogo</td><td>Do time</td><td>Sem custo</td><td><a class="ref" href="16_catalogo.html">16_catalogo</a></td><td>Especificado</td></tr>
-        <tr id="MOD-15"><td><code class="id">MOD-15</code></td><td>Painel de administração</td><td>—</td><td>—</td><td>—</td><td>Retirado: juntado ao <a class="ref" href="#MOD-03">MOD-03</a></td></tr>
-        <tr id="MOD-16"><td><code class="id">MOD-16</code></td><td>Mensagens</td><td>Contratável</td><td>Com custo · por participante</td><td>a criar</td><td>Registrado</td></tr>
-      </tbody>
-    </table>
-    <p><strong>Quem usa cada módulo</strong> (<a class="ref" href="#RN-205">RN-205</a>, <a class="ref" href="#RN-206">RN-206</a>), uma linha por perfil; perfis com o mesmo objetivo dividem a linha. Os objetivos saem do que os documentos já dizem e são confirmados no documento de cada módulo.</p>
-    <table>
-      <thead><tr><th>Módulo</th><th>Perfil</th><th>Frente</th><th>Objetivo</th></tr></thead>
-      <tbody>
-        <tr><td><code class="id">MOD-01</code> Contas</td><td>Conta master da instituição e educador autônomo</td><td>Hub</td><td>ver e pagar a cobrança mensal dos módulos da conta e dos contratados (<a class="ref" href="16_catalogo.html#RF-121">16 RF-121</a>)</td></tr>
-        <tr><td><code class="id">MOD-02</code> SAC</td><td>Conta master da instituição e educador autônomo</td><td>Hub</td><td>falar com o time deboaz; o SAC liga a escola ou a instituição ao deboaz, e a conversa com pais e alunos é do Mensagens (<a class="ref" href="08_hub-ux.html#RN-79">08 RN-79</a>)</td></tr>
-        <tr><td><code class="id">MOD-02</code> SAC</td><td>Membro do time deboaz</td><td>Hub</td><td>atender as contas, inclusive o pedido de nova senha da conta master (<a class="ref" href="17_modulo-usuario.html#RF-111">17 RF-111</a>)</td></tr>
-        <tr><td><code class="id">MOD-03</code> Usuários</td><td>Administrador do deboaz</td><td>Hub</td><td>criar os membros do time deboaz e pedir a nova geração de senha deles, e cuidar das contas de instituição e de educador autônomo: ver, suspender, desativar, reativar, encerrar e gerar o código da conta master (17 RF-113) (<a class="ref" href="17_modulo-usuario.html#RN-190">17 RN-190</a>)</td></tr>
-        <tr><td><code class="id">MOD-03</code> Usuários</td><td>Membro do time deboaz</td><td>Hub</td><td>cuidar das contas de instituição e de educador autônomo na lista Contas (17 <a class="ref" href="17_modulo-usuario.html#RF-113">RF-113</a>)</td></tr>
-        <tr><td><code class="id">MOD-03</code> Usuários</td><td>Conta master da instituição</td><td>Hub</td><td>criar o staff e os participantes e decidir as permissões (<a class="ref" href="17_modulo-usuario.html#RF-105">17 RF-105</a>)</td></tr>
-        <tr><td><code class="id">MOD-03</code> Usuários</td><td>Educador autônomo</td><td>Hub</td><td>criar os participantes</td></tr>
-        <tr><td><code class="id">MOD-03</code> Usuários</td><td>Staff</td><td>Hub</td><td>com a permissão Administrar usuários, criar e cuidar dos usuários abaixo dele (<a class="ref" href="17_modulo-usuario.html#RF-107">17 RF-107</a>)</td></tr>
-        <tr><td><code class="id">MOD-04</code> Sugestão</td><td>Staff</td><td>Hub</td><td>sugerir módulos à conta master (<a class="ref" href="08_hub-ux.html#RN-77">08 RN-77</a>, <a class="ref" href="08_hub-ux.html#RN-80">RN-80</a>)</td></tr>
-        <tr><td><code class="id">MOD-04</code> Sugestão</td><td>Conta master da instituição</td><td>Hub</td><td>receber as sugestões do staff</td></tr>
-        <tr><td><code class="id">MOD-05</code> Quiz</td><td>Staff e educador autônomo</td><td>Hub</td><td>criar o quiz, abrir a sala e passar o código (<a class="ref" href="11_landing-page-ui.html#RF-68">11 RF-68</a>)</td></tr>
-        <tr><td><code class="id">MOD-05</code> Quiz</td><td>Participante e acesso anônimo</td><td>Quest</td><td>entrar na sala e responder ao vivo</td></tr>
-        <tr><td><code class="id">MOD-06</code> Presença</td><td>Conta master da instituição</td><td>Hub</td><td>contratar e delegar os professores na aba Configuração (<a class="ref" href="08_hub-ux.html">08</a>)</td></tr>
-        <tr><td><code class="id">MOD-06</code> Presença</td><td>Staff</td><td>Hub</td><td>fazer a chamada na aba Utilização</td></tr>
-        <tr><td><code class="id">MOD-06</code> Presença</td><td>Participante e responsável</td><td>Quest</td><td>acompanhar a presença</td></tr>
-        <tr><td><code class="id">MOD-07</code> Carteirinha</td><td>Conta master da instituição</td><td>Hub</td><td>contratar e configurar a carteirinha</td></tr>
-        <tr><td><code class="id">MOD-07</code> Carteirinha</td><td>Participante</td><td>Quest</td><td>completar com a foto e mostrar a carteirinha, que fica na Carteira</td></tr>
-        <tr><td><code class="id">MOD-07</code> Carteirinha</td><td>Responsável</td><td>Quest</td><td>autorizar a foto do estudante menor de idade (<a class="ref" href="09_quest-ux.html#RN-102">09 RN-102</a>)</td></tr>
-        <tr><td><code class="id">MOD-08</code> Turmas</td><td>Conta master da instituição e staff</td><td>Hub</td><td>cadastrar as turmas; o staff, com a permissão de Configuração</td></tr>
-        <tr><td><code class="id">MOD-09</code> Tarefas</td><td>Staff e educador autônomo</td><td>Hub</td><td>criar tarefas com prazo e envios</td></tr>
-        <tr><td><code class="id">MOD-09</code> Tarefas</td><td>Participante</td><td>Quest</td><td>fazer as tarefas e ver os prazos na agenda, no espaço Tarefas do quest (<a class="ref" href="09_quest-ux.html#RF-36">09 RF-36</a>); as regras de agenda, card Agora e desafios saíram da casca (09 v15, 13 v08) e voltam no documento do módulo</td></tr>
-        <tr><td><code class="id">MOD-09</code> Tarefas</td><td>Staff e educador autônomo</td><td>Hub</td><td>criar tarefas de estudo com flashcards, fixas até a instituição revogar (<a class="ref" href="09_quest-ux.html#RN-98">09 RN-98</a>)</td></tr>
-        <tr><td><code class="id">MOD-09</code> Tarefas</td><td>Participante</td><td>Quest</td><td>estudar com os flashcards na Carteira</td></tr>
-        <tr><td><code class="id">MOD-12</code> Agenda</td><td>Conta master da instituição</td><td>Hub</td><td>publicar o cronograma escolar</td></tr>
-        <tr><td><code class="id">MOD-12</code> Agenda</td><td>Participante e responsável</td><td>Quest</td><td>ver os eventos e receber o aviso antes deles</td></tr>
-        <tr><td><code class="id">MOD-13</code> Perfil</td><td>Participante e responsável</td><td>Quest</td><td>acompanhar agenda, notas, pontuação e engajamento do ano (<a class="ref" href="09_quest-ux.html#RF-39">09 RF-39</a>)</td></tr>
-        <tr><td><code class="id">MOD-14</code> Catálogo</td><td>Administrador do deboaz</td><td>Hub</td><td>catalogar os módulos e definir preço, faixas e plano anual (<a class="ref" href="16_catalogo.html#RN-191">16 RN-191</a>)</td></tr>
-        <tr><td><code class="id">MOD-14</code> Catálogo</td><td>Membro do time deboaz</td><td>Hub</td><td>ver o catálogo e simular, sem salvar</td></tr>
-        <tr><td><code class="id">MOD-16</code> Mensagens</td><td>Participante e responsável</td><td>Quest</td><td>conversar entre si, também no chat da turma, e com a instituição</td></tr>
-        <tr><td><code class="id">MOD-16</code> Mensagens</td><td>Conta master da instituição e staff</td><td>Hub</td><td>conversar com os participantes e os responsáveis</td></tr>
-      </tbody>
-    </table>
-    <p><strong>Ficha do módulo</strong> (<a class="ref" href="#RN-217">RN-217</a>, <a class="ref" href="#RN-218">RN-218</a>, <a class="ref" href="#RN-219">RN-219</a>): o que todo módulo entrega para cumprir o <a class="ref" href="10_componentes-compostos-comuns.html#RF-43">card de módulo <code class="id">RF-43</code></a>, o Catálogo e o módulo aberto. Os dados do card são definidos para cada perfil que vê o card.</p>
-    <table>
-      <thead><tr><th>Grupo</th><th>Dado</th><th>Quem precisa</th><th>Onde aparece</th></tr></thead>
-      <tbody>
-        <tr><td>Identidade</td><td><strong>Ícone</strong>, só deste módulo, do design system (<a class="ref" href="#RN-219">RN-219</a>)</td><td>Todo módulo</td><td>os quatro tamanhos do card, único dado da mínima; card do Catálogo; aba Dados</td></tr>
-        <tr><td>Identidade</td><td><strong>Nome</strong>, com até 16 caracteres</td><td>Todo módulo</td><td>reduzida, normal e expandida; topo do módulo aberto; Catálogo</td></tr>
-        <tr><td>Identidade</td><td><strong>Frase</strong> sobre para que serve, em até duas linhas do card do Catálogo</td><td>Contratável</td><td>card do Catálogo e vitrine da landing page</td></tr>
-        <tr><td>Identidade</td><td><strong>Mascote padrinho</strong>: expressão e forma (<a class="ref" href="10_componentes-compostos-comuns.html#RN-119">10 RN-119</a>)</td><td>Contratável</td><td>card do Catálogo e destaque da landing page</td></tr>
-        <tr><td>Card · mínima 1x1</td><td><strong>Notificações</strong>: o que conta como não lida e quando deixa de contar</td><td>Todo módulo</td><td>selo, nos quatro tamanhos</td></tr>
-        <tr><td>Card · reduzida 2x2</td><td><strong>Dado macro</strong>: valor (até 6 caracteres) e rótulo (até 20), como <q class="ui">5</q> · <q class="ui">mensagens novas</q></td><td>Todo módulo, por perfil</td><td>reduzida</td></tr>
-        <tr><td>Card · normal 4x4</td><td><strong>Número principal</strong> e rótulo, como <q class="ui">94%</q> · <q class="ui">presença na semana</q></td><td>Todo módulo, por perfil</td><td>normal e expandida</td></tr>
-        <tr><td>Card · normal 4x4</td><td><strong>Tendência</strong> e o sentido de melhora (subir é bom ou cair é bom)</td><td>Quando o número muda com o tempo</td><td>normal e expandida</td></tr>
-        <tr><td>Card · normal 4x4</td><td><strong>Série curta</strong> (até 5 pontos) <em>ou</em> <strong>progresso</strong> (de 0 a 100%)</td><td>Todo módulo, por perfil</td><td>normal e expandida</td></tr>
-        <tr><td>Card · normal 4x4</td><td><strong>Números de apoio</strong>: até 3, cada um com valor, rótulo e o que a cor significa (destaque, atenção, sucesso ou erro)</td><td>Opcional</td><td>normal e expandida</td></tr>
-        <tr><td>Card · expandida 4x8</td><td><strong>Série das semanas</strong>: 7 pontos, um por semana</td><td>Todo módulo, por perfil</td><td>expandida</td></tr>
-        <tr><td>Card · expandida 4x8</td><td><strong>Lista do módulo</strong>: até 3 linhas de rótulo e valor, como <q class="ui">7º A</q> · <q class="ui">98%</q></td><td>Todo módulo, por perfil</td><td>expandida</td></tr>
-        <tr><td>Card · todos</td><td><strong>Estado sem dados</strong>: o texto e a ação enquanto falta configurar (<q class="ui">Configurar</q>, no hub) ou completar (<q class="ui">Completar</q>, no quest)</td><td>Todo módulo</td><td>normal e expandida com texto e ação; reduzida só com a ação; mínima só com o selo</td></tr>
-        <tr><td>Card · todos</td><td><strong>Rótulo falado</strong> de cada tamanho: o que o leitor de tela anuncia, sempre o nome e o dado daquele tamanho</td><td>Todo módulo</td><td>os quatro tamanhos</td></tr>
-        <tr><td>Feed</td><td><strong>Publicações no Feed</strong>: o que o módulo publica e para quem, toda a instituição ou uma turma ou equipe (<a class="ref" href="08_hub-ux.html#RN-221">08 RN-221</a>, <a class="ref" href="09_quest-ux.html#RN-222">09 RN-222</a>)</td><td>Módulo que publica no Feed</td><td>Feed do hub e do quest</td></tr>
-        <tr><td>Módulo aberto</td><td><strong>Abas</strong> Configuração e Utilização e quem vê cada uma</td><td>Módulo com tela no hub</td><td>topo do módulo aberto no hub</td></tr>
-        <tr><td>Módulo aberto</td><td><strong>Aviso para completar</strong>: texto e ação</td><td>Módulo que pede algo à pessoa</td><td>módulo aberto e card (estado Completar)</td></tr>
-        <tr><td>Catálogo</td><td><strong>Vitrine de telas</strong>: as telas no hub e no quest</td><td>Contratável</td><td>detalhe do módulo no Catálogo e página do módulo</td></tr>
-        <tr><td>Catálogo</td><td><strong>Como funciona</strong> (os passos) e <strong>Quem usa</strong> (Configura, Usa e Acompanha)</td><td>Contratável</td><td>detalhe do módulo no Catálogo e página do módulo</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="criterios-de-aceite">
-    <h2>Critérios de aceite</h2>
-    <article class="criterio" id="ca-RF-126">
+  <section id="cenarios">
+    <h2>Cenários</h2>
+    <article class="criterio" id="porta-de-entrada">
+      <h3>Porta de entrada de todo módulo</h3>
+      <pre class="gherkin">Cenário: registrar antes de especificar
+  Dado o time deboaz com a ideia do módulo Agenda
+  Quando registra a Agenda aqui, com nome, tipo, cobrança e quem usa
+  Então a Agenda ganha o ID "MOD-12"
+  E só depois ganha o documento "NN_modulo-agenda.html", as vistas e o lugar no Catálogo
+
+Cenário: documento grande se divide
+  Dado o documento do módulo Usuários com mais de 12 requisitos funcionais
+  Então ele se divide em "17_modulo-usuario-a-autenticacao.html"
+  E "17_modulo-usuario-b-autorizacao.html"</pre>
+    </article>
+    <article class="criterio" id="RF-126">
       <h3><code class="id">RF-126</code> Módulo só para os perfis registrados</h3>
       <pre class="gherkin">Cenário: perfil registrado
   Dado a Presença contratada pela Escola Bento Freitas
@@ -1074,20 +958,21 @@ Cenário: frente fora do registro
   Então vê a presença dele no quest
   E nenhuma tela da Presença pede entrada no hub para ele</pre>
     </article>
-    <article class="criterio" id="ca-RF-127">
+    <article class="criterio" id="RF-127">
       <h3><code class="id">RF-127</code> Registro no Catálogo</h3>
       <pre class="gherkin">Cenário: dados do registro
   Dado o módulo Usuários no Catálogo
   Quando o administrador do deboaz abre a aba Dados
   Então vê "MOD-03", "Da conta" e "Com custo · por usuário"
-  E os perfis Administrador do deboaz, Conta master da instituição, Educador autônomo e Staff, todos no hub
+  E os perfis Administrador do deboaz, Conta master da instituição e Educador autônomo
+  E o perfil Staff, todos no hub
 
 Cenário: registro diferente do Catálogo
   Dado a Presença registrada também para o responsável no quest
   Quando o Catálogo ainda não tem o responsável na Presença
   Então a aba Dados da Presença mostra o aviso "Diferente do registro MOD-06"</pre>
     </article>
-    <article class="criterio" id="ca-RF-132">
+    <article class="criterio" id="RF-132">
       <h3><code class="id">RF-132</code> Ficha do módulo</h3>
       <pre class="gherkin">Cenário: ficha incompleta
   Dado a Agenda catalogada sem o dado macro do participante
@@ -1105,7 +990,7 @@ Cenário: ícone repetido
   Quando a ficha de outro módulo traz o mesmo ícone
   Então a aba Dados mostra "Ícone já usado pela Presença (MOD-06)"</pre>
     </article>
-    <article class="criterio" id="ca-RF-128">
+    <article class="criterio" id="RF-128">
       <h3><code class="id">RF-128</code> Três tamanhos do card</h3>
       <pre class="gherkin">Cenário: tamanho padrão
   Dado a Escola Bento Freitas com a Presença recém-contratada
@@ -1118,7 +1003,8 @@ Cenário: abrir pela reduzida
   Então a Carteirinha abre, como abriria na normal ou na expandida
 
 Cenário: proporções
-  Dado a Escola Bento Freitas com o Quiz na mínima, o SAC na reduzida, a Presença na normal e a Carteirinha na expandida
+  Dado a Escola Bento Freitas com o Quiz na mínima e o SAC na reduzida
+  E a Presença na normal e a Carteirinha na expandida
   Quando a conta master abre Contratados no compact, com 4 colunas
   Então o Quiz ocupa 1 coluna e 1 linha, o SAC 2 × 2, a Presença a largura toda e a mesma altura
   E a Carteirinha a largura toda e o dobro da altura da Presença
@@ -1134,7 +1020,7 @@ Cenário: expandida inteira
   Então a barra do topo e as abas se escondem
   E a Carteirinha aparece inteira acima da barra de navegação</pre>
     </article>
-    <article class="criterio" id="ca-RF-129">
+    <article class="criterio" id="RF-129">
       <h3><code class="id">RF-129</code> Ordem e tamanho no aparelho</h3>
       <pre class="gherkin">Cenário: mudar o tamanho
   Dado a conta master em Ordenar
@@ -1147,7 +1033,7 @@ Cenário: outro aparelho
   Quando ele entra no quest pelo computador da escola
   Então a Carteirinha aparece no tamanho normal</pre>
     </article>
-    <article class="criterio" id="ca-RF-133">
+    <article class="criterio" id="RF-133">
       <h3><code class="id">RF-133</code> Atualização dos números</h3>
       <pre class="gherkin">Cenário: na abertura, o padrão
   Dado a conta master da Escola Bento Freitas com Módulos aberto e "Na abertura" marcado na Conta
@@ -1172,16 +1058,405 @@ Cenário: escolha no quest
   Quando ele marca "Ao vivo" em "Atualização dos cards"
   Então os cards da Carteira passam a se atualizar com a tela aberta</pre>
     </article>
-  </section>
-  <section id="fora-de-escopo">
-    <h2>Fora de escopo</h2>
-    <ul class="fora">
-      <li>Preço, desconto, plano anual e quem contratou: <a class="ref" href="16_catalogo.html">Catálogo</a></li>
-      <li>Permissões de cada usuário dentro de um módulo: <a class="ref" href="17_modulo-usuario.html">Módulo Usuários</a></li>
-      <li>Funcionalidades, diagramas e telas de cada módulo, e o que o card mostra em cada tamanho: documento próprio de cada um</li>
-      <li>Os valores da ficha de cada módulo (o ícone escolhido, os números e os rótulos): documento próprio de cada um</li>
-      <li>Desenho da grade e do menu do card: <a class="ref" href="10_componentes-compostos-comuns.html">Componentes compostos comuns</a> e as vistas do hub e do quest</li>
-    </ul>
+    <article class="criterio" id="RN-202">
+      <h3><code class="id">RN-202</code> Registro antes do documento</h3>
+      <pre class="gherkin">Cenário: ID nunca reaproveitado
+  Dado o "MOD-10" Flashcards retirado
+  Quando o time registra um módulo novo
+  Então ele recebe o próximo ID livre, e não "MOD-10"
+
+Cenário: módulo sem registro
+  Dado um módulo "Biblioteca" sem linha neste registro
+  Então ele não tem documento, vista nem lugar no Catálogo</pre>
+    </article>
+    <article class="criterio" id="RN-203">
+      <h3><code class="id">RN-203</code> Tipos de módulo</h3>
+      <pre class="gherkin">Esquema do Cenário: comportamento de cada tipo
+  Quando o módulo é &lt;tipo&gt;
+  Então &lt;como entra&gt;
+  E &lt;vitrine&gt;
+
+  Exemplos:
+    | tipo        | como entra                           | vitrine                   |
+    | da conta    | entra sozinho com a conta e não sai  | não aparece na vitrine    |
+    | contratável | entra quando a conta master contrata | aparece na vitrine do hub |
+    | do time     | só na conta do time, sem custo       | nunca vai à vitrine       |</pre>
+    </article>
+    <article class="criterio" id="RN-204">
+      <h3><code class="id">RN-204</code> Cobrança</h3>
+      <pre class="gherkin">Esquema do Cenário: modelo de cobrança
+  Quando o módulo &lt;módulo&gt; é &lt;cobrança&gt;
+  Então contam &lt;quem conta&gt;
+
+  Exemplos:
+    | módulo   | cobrança                     | quem conta                                      |
+    | Usuários | com custo · por usuário      | staff e participantes ativos                    |
+    | Quiz     | com custo · por participante | participantes ativos                            |
+    | Tarefas  | com custo · por participante | participantes ativos, staff já paga no Usuários |
+    | Perfil   | sem custo                    | ninguém                                         |
+
+Cenário: quem nunca conta
+  Então o responsável e o acesso anônimo nunca contam na cobrança
+  E preço, desconto e plano anual são do Catálogo</pre>
+    </article>
+    <article class="criterio" id="RN-205">
+      <h3><code class="id">RN-205</code> Perfis</h3>
+      <pre class="gherkin">Esquema do Cenário: perfil válido em Quem usa
+  Quando o registro cita o perfil "&lt;perfil&gt;"
+  Então o perfil é &lt;resultado&gt;
+
+  Exemplos:
+    | perfil                      | resultado                  |
+    | Administrador do deboaz     | aceito                     |
+    | Membro do time deboaz       | aceito                     |
+    | Conta master da instituição | aceito                     |
+    | Educador autônomo           | aceito                     |
+    | Staff                       | aceito                     |
+    | Participante                | aceito                     |
+    | Responsável                 | aceito                     |
+    | Acesso anônimo              | aceito                     |
+    | Professor                   | recusado: entra antes aqui |</pre>
+    </article>
+    <article class="criterio" id="RN-206">
+      <h3><code class="id">RN-206</code> Frentes</h3>
+      <pre class="gherkin">Cenário: frentes de um contratável
+  Dado a Presença, contratável
+  Então o staff a usa no hub, o participante no quest
+  E a Presença tem a página do módulo na landing page</pre>
+    </article>
+    <article class="criterio" id="RN-207">
+      <h3><code class="id">RN-207</code> Ciclo de vida</h3>
+      <pre class="gherkin">Cenário: ordem dos estados
+  Então o módulo passa por Registrado, Especificado, Vistas aprovadas, Catalogado e Disponível
+  E pode ir a Retirado de qualquer estado
+
+Cenário: módulo juntado a outro
+  Quando o Flashcards é juntado às Tarefas
+  Então o "MOD-10" fica no registro com o estado "Retirado: juntado ao MOD-09"</pre>
+    </article>
+    <article class="criterio" id="RN-208">
+      <h3><code class="id">RN-208</code> Documento do módulo</h3>
+      <pre class="gherkin">Cenário: o que cada linha de Quem usa gera
+  Dado a linha "Presença · Staff · Hub · fazer a chamada"
+  Então ela vira ao menos um requisito funcional
+  E um ator no diagrama de casos de uso
+  E a vista "vista-hub-presenca-staff"</pre>
+    </article>
+    <article class="criterio" id="RN-209">
+      <h3><code class="id">RN-209</code> Mudança começa aqui</h3>
+      <pre class="gherkin">Cenário: renomear um módulo
+  Quando o time decide renomear "Mensagens" para "Conversas"
+  Então muda primeiro este registro, com versão nova
+  E depois o documento do módulo e o Catálogo</pre>
+    </article>
+    <article class="criterio" id="RN-213">
+      <h3><code class="id">RN-213</code> Tamanho inicial do card</h3>
+      <pre class="gherkin">Cenário: começa no normal
+  Quando a escola contrata a Presença
+  Então o card da Presença começa no tamanho normal
+
+Cenário: módulo sem documento
+  Dado a Agenda só registrada
+  Então o card mostra só o ícone, o nome, o selo e o espaço do conteúdo</pre>
+    </article>
+    <article class="criterio" id="RN-214">
+      <h3><code class="id">RN-214</code> Grade dos cards</h3>
+      <pre class="gherkin">Esquema do Cenário: espaço de cada tamanho
+  Quando o card está na &lt;tamanho&gt;
+  Então ocupa &lt;colunas&gt; colunas e &lt;linhas&gt; linhas
+
+  Exemplos:
+    | tamanho   | colunas | linhas |
+    | mínima    | 1       | 1      |
+    | reduzida  | 2       | 2      |
+    | normal    | 4       | 4      |
+    | expandida | 4       | 8      |
+
+Cenário: janela larga
+  Dado células quadradas de lado mínimo 76dp e pelo menos 4 colunas
+  Quando a janela fica mais larga
+  Então a grade ganha colunas e o card mantém o tamanho
+  E cada card entra no primeiro lugar livre, na ordem da pessoa</pre>
+    </article>
+    <article class="criterio" id="RN-217">
+      <h3><code class="id">RN-217</code> Ficha do módulo</h3>
+      <pre class="gherkin">Cenário: ficha por perfil
+  Dado a Presença vista no card pela conta master e pelo staff
+  Então a ficha traz os dados do card uma vez para cada um
+
+Cenário: ficha libera o ciclo
+  Dado a Agenda com a ficha incompleta
+  Então a Agenda não passa de Registrado a Especificado
+  E só passa a Vistas aprovadas com os quatro tamanhos desenhados</pre>
+    </article>
+    <article class="criterio" id="RN-218">
+      <h3><code class="id">RN-218</code> Limites da ficha</h3>
+      <pre class="gherkin">Esquema do Cenário: limite de cada dado
+  Quando o documento traz &lt;dado&gt; com &lt;tamanho&gt;
+  Então &lt;resultado&gt;
+
+  Exemplos:
+    | dado                | tamanho       | resultado                       |
+    | o nome              | 17 caracteres | é encurtado no documento        |
+    | o valor do macro    | 7 caracteres  | é encurtado no documento        |
+    | o rótulo do macro   | 20 caracteres | cabe                            |
+    | a série curta       | 5 pontos      | cabe                            |
+    | os números de apoio | 4             | é encurtado para 3 no documento |
+    | a série das semanas | 7 pontos      | cabe                            |
+    | a lista             | 4 linhas      | é encurtada para 3 no documento |</pre>
+    </article>
+    <article class="criterio" id="RN-219">
+      <h3><code class="id">RN-219</code> Ícone do módulo</h3>
+      <pre class="gherkin">Cenário: ícone repetido
+  Dado o ícone "fact_check" da Presença
+  Quando a Agenda traz o mesmo ícone
+  Então o ícone é recusado
+
+Cenário: ícone novo
+  Quando um módulo precisa de um ícone que não existe
+  Então o ícone entra antes no design system</pre>
+    </article>
+    <article class="criterio" id="RN-216">
+      <h3><code class="id">RN-216</code> Rolagem da grade</h3>
+      <pre class="gherkin">Cenário: rolar para baixo
+  Dado Módulos aberto no compact
+  Quando a pessoa rola para baixo
+  Então a barra do topo e as abas se escondem e a barra de navegação fica
+  E quando rola para cima, elas voltam</pre>
+    </article>
+    <article class="criterio" id="RN-215">
+      <h3><code class="id">RN-215</code> Preferência do aparelho</h3>
+      <pre class="gherkin">Cenário: aparelho novo
+  Dado o Lucas com a Carteirinha na reduzida no celular
+  Quando ele limpa os dados do app
+  Então os cards voltam à ordem padrão e ao tamanho normal</pre>
+    </article>
+    <article class="criterio" id="RN-220">
+      <h3><code class="id">RN-220</code> Atualização dos cards</h3>
+      <pre class="gherkin">Cenário: padrão e alcance
+  Dado a conta master sem escolha feita
+  Então a atualização é "Na abertura", para todos os cards, em todos os aparelhos
+
+Esquema do Cenário: o que conta como abertura
+  Dado "Na abertura" marcado
+  Quando a conta master &lt;ação&gt;
+  Então os números dos cards se atualizam
+
+  Exemplos:
+    | ação                       |
+    | troca de aba em Módulos    |
+    | volta de um módulo aberto  |
+    | puxa a tela para atualizar |
+
+Cenário: ao vivo sem piscar
+  Dado "Ao vivo" marcado
+  Quando o número de um card muda
+  Então muda no lugar, sem piscar o card nem mudar a rolagem
+  E o selo de notificações segue a mesma escolha</pre>
+    </article>
+    <article class="criterio" id="MOD-01">
+      <h3><code class="id">MOD-01</code> Contas</h3>
+      <pre class="gherkin">Esquema do Cenário: registro do Contas
+  Dado o módulo "MOD-01" Contas, da conta, sem custo, sem documento, Registrado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil                      | frente | objetivo                                  |
+    | a conta master e o autônomo | hub    | ver e pagar a cobrança mensal dos módulos |</pre>
+    </article>
+    <article class="criterio" id="MOD-02">
+      <h3><code class="id">MOD-02</code> SAC</h3>
+      <pre class="gherkin">Esquema do Cenário: registro do SAC
+  Dado o módulo "MOD-02" SAC, da conta, sem custo, sem documento, Registrado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil                      | frente | objetivo                                        |
+    | a conta master e o autônomo | hub    | falar com o time deboaz                         |
+    | o membro do time            | hub    | atender as contas e o pedido de senha da master |</pre>
+    </article>
+    <article class="criterio" id="MOD-03">
+      <h3><code class="id">MOD-03</code> Usuários</h3>
+      <pre class="gherkin">Esquema do Cenário: registro do Usuários
+  Dado o módulo "MOD-03" Usuários, da conta, com custo por usuário, Especificado
+  E os documentos 17_modulo-usuario, 17_modulo-usuario-a e 17_modulo-usuario-b
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil           | frente | objetivo                                         |
+    | o administrador  | hub    | criar membros do time e cuidar das contas        |
+    | o membro do time | hub    | cuidar das contas na lista Contas                |
+    | a conta master   | hub    | criar staff e participantes e decidir permissões |
+    | o autônomo       | hub    | criar os participantes                           |
+    | o staff com Adm. | hub    | criar e cuidar dos usuários abaixo dele          |</pre>
+    </article>
+    <article class="criterio" id="MOD-04">
+      <h3><code class="id">MOD-04</code> Sugestão</h3>
+      <pre class="gherkin">Esquema do Cenário: registro da Sugestão
+  Dado o módulo "MOD-04" Sugestão, da conta, sem custo, sem documento, Registrado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil         | frente | objetivo                       |
+    | o staff        | hub    | sugerir módulos à conta master |
+    | a conta master | hub    | receber as sugestões do staff  |</pre>
+    </article>
+    <article class="criterio" id="MOD-05">
+      <h3><code class="id">MOD-05</code> Quiz</h3>
+      <pre class="gherkin">Esquema do Cenário: registro do Quiz
+  Dado o módulo "MOD-05" Quiz, contratável, com custo por participante, Registrado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil                     | frente | objetivo                                     |
+    | o staff e o autônomo       | hub    | criar o quiz, abrir a sala e passar o código |
+    | o participante e o anônimo | quest  | entrar na sala e responder ao vivo           |</pre>
+    </article>
+    <article class="criterio" id="MOD-06">
+      <h3><code class="id">MOD-06</code> Presença</h3>
+      <pre class="gherkin">Esquema do Cenário: registro da Presença
+  Dado o módulo "MOD-06" Presença, contratável, com custo por participante, Registrado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil                         | frente | objetivo                           |
+    | a conta master                 | hub    | contratar e delegar os professores |
+    | o staff                        | hub    | fazer a chamada na aba Utilização  |
+    | o participante e o responsável | quest  | acompanhar a presença              |</pre>
+    </article>
+    <article class="criterio" id="MOD-07">
+      <h3><code class="id">MOD-07</code> Carteirinha</h3>
+      <pre class="gherkin">Esquema do Cenário: registro da Carteirinha
+  Dado o módulo "MOD-07" Carteirinha, contratável, com custo por participante, Registrado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil         | frente | objetivo                                     |
+    | a conta master | hub    | contratar e configurar a carteirinha         |
+    | o participante | quest  | completar com a foto e mostrar, na Carteira  |
+    | o responsável  | quest  | autorizar a foto do estudante menor de idade |</pre>
+    </article>
+    <article class="criterio" id="MOD-08">
+      <h3><code class="id">MOD-08</code> Turmas</h3>
+      <pre class="gherkin">Esquema do Cenário: registro do Turmas
+  Dado o módulo "MOD-08" Turmas, da conta, sem custo, sem documento, Registrado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil                   | frente | objetivo                                      |
+    | a conta master e o staff | hub    | cadastrar as turmas, o staff com Configuração |</pre>
+    </article>
+    <article class="criterio" id="MOD-09">
+      <h3><code class="id">MOD-09</code> Tarefas</h3>
+      <pre class="gherkin">Esquema do Cenário: registro do Tarefas
+  Dado o módulo "MOD-09" Tarefas, com flashcards, da conta, com custo por participante
+  E o estado Registrado, sem documento
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil               | frente | objetivo                                           |
+    | o staff e o autônomo | hub    | criar tarefas com prazo e envios                   |
+    | o participante       | quest  | fazer as tarefas e ver os prazos no espaço Tarefas |
+    | o staff e o autônomo | hub    | criar tarefas de estudo com flashcards             |
+    | o participante       | quest  | estudar com os flashcards na Carteira              |
+
+Cenário: regras que voltam no documento do módulo
+  Então a agenda, o card Agora e os desafios saíram da casca e voltam no documento do Tarefas</pre>
+    </article>
+    <article class="criterio" id="MOD-10">
+      <h3><code class="id">MOD-10</code> Flashcards</h3>
+      <pre class="gherkin">Cenário: retirado
+  Então o "MOD-10" Flashcards está "Retirado: juntado ao MOD-09"</pre>
+    </article>
+    <article class="criterio" id="MOD-11">
+      <h3><code class="id">MOD-11</code> Chat da turma</h3>
+      <pre class="gherkin">Cenário: retirado
+  Então o "MOD-11" Chat da turma está "Retirado: juntado ao MOD-16"</pre>
+    </article>
+    <article class="criterio" id="MOD-12">
+      <h3><code class="id">MOD-12</code> Agenda</h3>
+      <pre class="gherkin">Esquema do Cenário: registro da Agenda
+  Dado o módulo "MOD-12" Agenda, contratável, com custo por participante, Registrado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil                         | frente | objetivo                                     |
+    | a conta master                 | hub    | publicar o cronograma escolar                |
+    | o participante e o responsável | quest  | ver os eventos e receber o aviso antes deles |</pre>
+    </article>
+    <article class="criterio" id="MOD-13">
+      <h3><code class="id">MOD-13</code> Perfil</h3>
+      <pre class="gherkin">Esquema do Cenário: registro do Perfil
+  Dado o módulo "MOD-13" Perfil, da conta, sem custo, sem documento, Registrado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil                         | frente | objetivo                                          |
+    | o participante e o responsável | quest  | acompanhar agenda, notas, pontuação e engajamento |</pre>
+    </article>
+    <article class="criterio" id="MOD-14">
+      <h3><code class="id">MOD-14</code> Catálogo</h3>
+      <pre class="gherkin">Esquema do Cenário: registro do Catálogo
+  Dado o módulo "MOD-14" Catálogo, do time, sem custo, documento 16_catalogo, Especificado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil           | frente | objetivo                                        |
+    | o administrador  | hub    | catalogar e definir preço, faixas e plano anual |
+    | o membro do time | hub    | ver o catálogo e simular, sem salvar            |</pre>
+    </article>
+    <article class="criterio" id="MOD-15">
+      <h3><code class="id">MOD-15</code> Painel de administração</h3>
+      <pre class="gherkin">Cenário: retirado
+  Então o "MOD-15" Painel de administração está "Retirado: juntado ao MOD-03"</pre>
+    </article>
+    <article class="criterio" id="MOD-16">
+      <h3><code class="id">MOD-16</code> Mensagens</h3>
+      <pre class="gherkin">Esquema do Cenário: registro do Mensagens
+  Dado o módulo "MOD-16" Mensagens, contratável, com custo por participante, Registrado
+  Então &lt;perfil&gt; o usa no &lt;frente&gt; para &lt;objetivo&gt;
+
+  Exemplos:
+    | perfil                         | frente | objetivo                                         |
+    | o participante e o responsável | quest  | conversar entre si, na turma e com a escola      |
+    | a conta master e o staff       | hub    | conversar com os participantes e os responsáveis |</pre>
+    </article>
+    <article class="criterio" id="ficha-do-modulo">
+      <h3>Ficha do módulo</h3>
+      <pre class="gherkin">Esquema do Cenário: o que todo módulo entrega
+  Quando o módulo é especificado
+  Então a ficha traz &lt;dado&gt; de &lt;quem precisa&gt;, usado em &lt;onde&gt;
+
+  Exemplos:
+    | dado                          | quem precisa           | onde                                |
+    | o ícone, só dele              | todo módulo            | os quatro tamanhos e o Catálogo     |
+    | o nome, até 16 caracteres     | todo módulo            | reduzida, normal, expandida e topo  |
+    | a frase, até duas linhas      | contratável            | Catálogo e vitrine da landing page  |
+    | o mascote padrinho            | contratável            | Catálogo e destaque da landing page |
+    | as notificações do selo       | todo módulo            | o selo, nos quatro tamanhos         |
+    | o dado macro, por perfil      | todo módulo            | reduzida                            |
+    | o número principal e rótulo   | todo módulo            | normal e expandida                  |
+    | a tendência e o sentido       | número que muda        | normal e expandida                  |
+    | a série curta ou progresso    | todo módulo            | normal e expandida                  |
+    | até 3 números de apoio        | opcional               | normal e expandida                  |
+    | a série das semanas, 7 pontos | todo módulo            | expandida                           |
+    | a lista, até 3 linhas         | todo módulo            | expandida                           |
+    | o estado sem dados            | todo módulo            | normal, expandida e reduzida        |
+    | o rótulo falado               | todo módulo            | os quatro tamanhos                  |
+    | as publicações no Feed        | módulo que publica     | Feed do hub e do quest              |
+    | as abas e quem vê cada uma    | módulo com tela no hub | topo do módulo aberto               |
+    | o aviso para completar        | módulo que pede algo   | módulo aberto e card                |
+    | a vitrine de telas            | contratável            | Catálogo e página do módulo         |
+    | como funciona e quem usa      | contratável            | Catálogo e página do módulo         |</pre>
+    </article>
+    <article class="criterio" id="fora-de-escopo">
+      <h3>Fora de escopo</h3>
+      <pre class="gherkin">Cenário: o que este documento não trata
+  Então preço, desconto, plano anual e quem contratou ficam no Catálogo
+  E as permissões dentro de um módulo ficam no Módulo Usuários
+  E funcionalidades, telas e valores da ficha ficam no documento de cada módulo
+  E o desenho da grade e do menu do card fica nos componentes comuns e nas vistas</pre>
+    </article>
   </section>
 </main>
 <footer class="boaz-marca-rodape">
@@ -1189,7 +1464,8 @@ Cenário: escolha no quest
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v20</span></td><td>2026-11-01 03:57</td><td>Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v21</span></td><td>2026-11-01 18:20</td><td>Só Gherkin: contexto, RF, RN, registro de módulos (um cenário por MOD-NN, mesmo ID como âncora), quem usa cada módulo, ficha do módulo e fora de escopo viram cenários; status → Em revisão</td></tr>
+      <tr><td>v20</td><td>2026-11-01 03:57</td><td>Aprovado</td></tr>
       <tr><td>v19</td><td>2026-11-01 03:38</td><td><code class="id">MOD-15</code> Painel de administração retirado: juntado ao <code class="id">MOD-03</code> Usuários, que no time deboaz cuida também das contas de instituição e de educador autônomo</td></tr>
       <tr><td>v18</td><td>2026-11-01 02:08</td><td>Registro do Usuários (<code class="id">MOD-03</code>) aponta também para 17-a (autenticação) e 17-b (autorização)</td></tr>
       <tr><td>v17</td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
@@ -1198,11 +1474,10 @@ Cenário: escolha no quest
       <tr><td>v14</td><td>2026-11-01 00:43</td><td>Atualização dos cards guardada na conta, valendo em todos os aparelhos (<code class="id">RN-220</code>); cenário de outro aparelho em <code class="id">RF-133</code></td></tr>
       <tr><td>v13</td><td>2026-11-01 00:37</td><td>Decisões da atualização dos cards: escolha em <q class="ui">Atualização dos cards</q> na Conta (hub) e no Perfil (quest), não em Ordenar; vale para todos os cards; padrão <q class="ui">Na abertura</q>; selo segue a escolha (<code class="id">RF-133</code>, <code class="id">RN-220</code>)</td></tr>
       <tr><td>v12</td><td>2026-11-01 00:29</td><td>Atualização dos números dos cards configurável pela pessoa em Ordenar, <q class="ui">Na abertura</q> (padrão) ou <q class="ui">Ao vivo</q> (<code class="id">RF-133</code>, <code class="id">RN-220</code>); pendência respondida e seção Em aberto retirada</td></tr>
-      <tr><td>v11</td><td>2026-10-31 23:46</td><td>Fichas de Usuários (<code class="id">MOD-03</code>) e Catálogo (<code class="id">MOD-14</code>) preenchidas nos documentos dos módulos e retiradas de Em aberto; <code class="id">RN-208</code>: a ficha é uma tabela em Regras de negócio</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v20 · 2026-11-01 03:57</span>
+    <span>boaz · v21 · 2026-11-01 18:20</span>
     <span class="boaz-arquivo">1_Requisitos/15_modulos.html</span>
   </div>
 </footer>

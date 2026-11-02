@@ -12,7 +12,7 @@ Você é a pessoa desenvolvedora do time. Uma tarefa sempre anda nesta ordem, e 
     tarefa_NN-…              1_Requisitos/     5_DEV/qa/ (+ unitários)     5_DEV/backend · 5_DEV/frontend      ci.sh               PR para a master
 ```
 
-O teste vem antes do código, e o requisito vem antes do teste: **nenhuma linha de 5_DEV/backend/ ou 5_DEV/frontend/ é escrita sem um cenário vermelho que ela faça passar**, e nenhum cenário existe sem o critério de aceite que ele cobre.
+O teste vem antes do código, e o requisito vem antes do teste: **nenhuma linha de 5_DEV/backend/ ou 5_DEV/frontend/ é escrita sem um cenário vermelho que ela faça passar**, e nenhum cenário de teste existe sem o cenário do requisito que ele cobre.
 
 ## Regras que esta skill aplica
 
@@ -42,8 +42,7 @@ A tarefa vive numa branch própria **dentro de um worktree próprio**, para que 
 ## 1 · Requisito → `1_Requisitos/`
 
 Use a skill **`requisito`** (dentro do worktree) para criar ou alterar o documento da funcionalidade. Para o TDD, ele precisa ter:
-- os requisitos (`RF-…`, `RN-…`, `RNF-…`) que a tarefa vai entregar, com IDs;
-- um **critério de aceite em Gherkin** (`<article class="criterio">` + `<pre class="gherkin">`) para cada requisito `Deve` — é dele que sai o cenário de teste;
+- um **cenário em Gherkin** (`<article class="criterio" id="RF-…">` + `<pre class="gherkin">`) para cada regra (`RF-…`, `RN-…`, `RNF-…`) que a tarefa vai entregar — é dele que sai o cenário de teste;
 - os limites mensuráveis (tempo, volume, taxa de erro) se houver teste de carga (RN-155);
 - nenhum item em **Em aberto** que mude o comportamento a testar. Se houver, pergunte antes de seguir; não invente a regra no teste nem no código.
 
@@ -71,7 +70,7 @@ Os testes ficam em `<suite>/<contexto>/<feature>/`, com os nomes do core (`hub/s
 ```bash
 grep -rlsE 'Reqnroll|SpecFlow|cucumber' <suite> --include='*.csproj' --include='package.json' --include='*.config.*' ; find <suite> -name '*.feature' | head
 ```
-- **Tem** → escreva `<suite>/<contexto>/<feature>/<feature>.feature`, em português (`# language: pt`), com `Funcionalidade:` apontando para o documento (`1_Requisitos/<NN>_<nome>.html`) e um `Cenário:` por critério de aceite, **copiado do `<pre class="gherkin">` do requisito** (desescape `&lt;` `&gt;` `&amp;`) e marcado com a tag do ID (`@RF-17`). Depois, os *step definitions* na mesma pasta, reaproveitando passos existentes antes de criar novos. Se o texto do requisito não der para automatizar como está, ajuste o requisito (nova versão) em vez de deixar o `.feature` divergir.
+- **Tem** → escreva `<suite>/<contexto>/<feature>/<feature>.feature`, em português (`# language: pt`), com `Funcionalidade:` apontando para o documento (`1_Requisitos/<NN>_<nome>.html`) e os `Cenário:`/`Esquema do Cenário:` de cada ID, **copiados do `<pre class="gherkin">` do requisito** (desescape `&lt;` `&gt;` `&amp;`) e marcado com a tag do ID (`@RF-17`). Depois, os *step definitions* na mesma pasta, reaproveitando passos existentes antes de criar novos. Se o texto do requisito não der para automatizar como está, ajuste o requisito (nova versão) em vez de deixar o `.feature` divergir.
 - **Não tem, mas a suíte está nascendo ou ainda não tem testes** → proponha adotar a ferramenta BDD da linguagem dela (C#/xUnit: Reqnroll com `Reqnroll.xUnit`; Cypress: `@badeball/cypress-cucumber-preprocessor`), na versão estável mais recente e fixada (RN-01, RNF-19). Trocar ou somar ferramenta de uma suíte não muda o CI se o contrato for mantido (RN-153). Pergunte uma vez antes de adotar.
 - **Não tem e a suíte já tem testes em outro formato** → siga o formato dela: um teste por cenário, nome com o ID (`RF_17_criar_conta_de_educador_autonomo`, ou `it('RF-17 · …')`), um `Trait`/tag com o ID e o corpo dividido em `// Dado`, `// Quando`, `// Então` com as frases do critério.
 

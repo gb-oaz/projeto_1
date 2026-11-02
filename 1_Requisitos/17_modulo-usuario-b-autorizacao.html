@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autorização · boaz · v08</title>
+<title>Módulo Usuários · Autorização · boaz · v09</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-b-autorizacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-b-autorizacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v08">
-<meta name="boaz:data" content="2026-11-01 15:28">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v09">
+<meta name="boaz:data" content="2026-11-01 18:15">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v06
+   boaz · tema dos documentos de requisito · v07
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
    Paleta: vistas com data-paletas trocam tema de cor e modo das telas.
@@ -417,7 +417,8 @@ caption { caption-side: top; padding: 0 0 8px; color: var(--muted); font-size: 1
 /* ── critérios de aceite (Gherkin) ───────────────────────── */
 .criterio { margin: 0 0 24px; break-inside: avoid; }
 .criterio h3 { margin-top: 24px; }
-pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); }
+.criterio { scroll-margin-top: 16px; }
+pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); white-space: pre-wrap; overflow-wrap: anywhere; }
 pre.gherkin::before {
   content: "GHERKIN";
   position: absolute;
@@ -720,7 +721,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v06 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v07 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
@@ -917,131 +918,32 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-b-autorizacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v08</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 15:28</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 18:15</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
-  <nav class="sumario"></nav>
-  <section id="contexto">
-    <h2>Contexto</h2>
-    <p>A <a class="ref" href="17_modulo-usuario-a-autenticacao.html#contexto">autenticação</a> abre a sessão e entrega o token de acesso. Este documento define a parte de <strong>autorização</strong> desse token: o <strong>papel</strong> da pessoa e, para cada módulo que ela pode usar, as abas permitidas, Configuração e Utilização. A web e o mobile leem essas permissões para montar a casca — os destinos, os cards de Módulos e da Carteira, as abas do módulo aberto e os botões —, e o backend as confere em cada ação. Assim a casca nasce antes dos módulos: um módulo novo só precisa estar no <a class="ref" href="15_modulos.html#RN-202">registro de módulos</a> e nas permissões para aparecer para quem pode usá-lo.</p>
-    <p class="historia"><span>Como</span> <strong>conta master</strong>, <span>quero</span> que cada pessoa veja só os módulos e as abas que liberei, <span>para</span> que a tela de cada um mostre só o que ele pode usar</p>
-    <p><strong>Conceder permissões.</strong> Uma permissão é um módulo do registro com as abas liberadas, dada a uma pessoa da mesma conta por quem está acima dela. O administrador do deboaz concede aos membros do time; a conta master, e o staff a quem ela deu Administrar usuários, concedem ao staff. Quem concede abre Permissões na pessoa, vê só o que pode conceder, marca as abas e salva tudo de uma vez; o servidor confere de novo, grava, sobe a versão das permissões da pessoa, e a casca dela muda na próxima ação, sem nova entrada. Toda tentativa termina num aviso de ação, para quem concede e para quem recebe.</p>
-    <aside class="destaque importante"><p>Decisão do time do projeto em 2026-11-01: as permissões viajam no token de acesso, pelo ID do registro de módulos (<code>MOD-NN</code>), e a web e o mobile montam a casca sem outra consulta ao servidor; <code class="id">RNF-208</code> sai do 17 e passa a viver aqui.</p></aside>
-  </section>
-  <section id="requisitos-funcionais">
-    <h2>Requisitos funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
-      <tbody>
-        <tr id="RF-144"><td><code class="id">RF-144</code></td><td>O sistema deve incluir no token de acesso o papel da pessoa e, para cada módulo que ela pode usar, as abas permitidas, Configuração e Utilização, calculadas na entrada e em cada renovação</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-145"><td><code class="id">RF-145</code></td><td>O sistema deve calcular as permissões pela contratação da conta (<a class="ref" href="16_catalogo.html#RF-124">Catálogo <code class="id">RF-124</code></a>), por Quem usa cada módulo (<a class="ref" href="15_modulos.html#RF-126">Módulos <code class="id">RF-126</code></a>), pelas permissões do staff (<a class="ref" href="17_modulo-usuario.html#RF-107">Usuários <code class="id">RF-107</code></a>) e do membro do time (<a class="ref" href="17_modulo-usuario.html#RF-155">Usuários <code class="id">RF-155</code></a>) e pelo papel (<a class="ref" href="#RN-233">RN-233</a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-146"><td><code class="id">RF-146</code></td><td>O sistema deve montar a casca da web e do mobile só com as permissões do token: os destinos da navegação, os cards de Módulos e da Carteira, as abas de cada módulo aberto e as ações que dependem do papel, sem mostrar o que não está no token</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-147"><td><code class="id">RF-147</code></td><td>O sistema deve recusar no backend, com acesso negado, toda ação de um módulo sem a aba exigida no token e toda ação que exija um papel que a pessoa não tem</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-148"><td><code class="id">RF-148</code></td><td>O sistema deve, depois de uma mudança de permissão, de contratação ou de descontratação, entregar um token com as permissões novas na próxima ação de cada sessão afetada e atualizar a casca sem pedir nova entrada</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-149"><td><code class="id">RF-149</code></td><td>O sistema deve levar a Módulos, no hub, ou à Carteira, no quest, com o aviso <q class="ui">Você não tem acesso a este módulo.</q>, quem abre por endereço direto um módulo ou uma aba que não está no token</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-150"><td><code class="id">RF-150</code></td><td>O sistema deve dar ao participante, e ao responsável que entra com o código dele, a Utilização dos módulos da conta que têm o participante ou o responsável em Quem usa cada módulo, no quest</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-151"><td><code class="id">RF-151</code></td><td>O sistema deve dar ao acesso anônimo só a Utilização do módulo da sala, com o id da sala no token (<a class="ref" href="17_modulo-usuario-a-autenticacao.html#RF-136">Autenticação <code class="id">RF-136</code></a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-160"><td><code class="id">RF-160</code></td><td>O sistema deve mostrar em Permissões, para quem concede, as abas marcadas hoje para a pessoa e só os módulos e as abas que ele pode conceder (<a class="ref" href="#RN-252">RN-252</a>): ao staff, os módulos contratados e os da conta, com Administrar usuários; ao membro do time, SAC, Usuários e Catálogo</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-161"><td><code class="id">RF-161</code></td><td>O sistema deve salvar as permissões da pessoa de uma vez, com todas as abas marcadas, e recusar o salvamento inteiro, sem mudar nada, quando alguma aba passar do que quem concede tem naquele momento, com o aviso <q class="ui">Você não tem mais a &lt;módulo&gt; para conceder. Confira e salve.</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-162"><td><code class="id">RF-162</code></td><td>O sistema deve recusar o salvamento quando as permissões da pessoa mudaram depois que a tela abriu, com o aviso <q class="ui">As permissões da &lt;nome&gt; mudaram agora há pouco. Confira e salve.</q>, e mostrar as permissões atuais</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-163"><td><code class="id">RF-163</code></td><td>O sistema deve mostrar a quem concede o aviso de ação concluído <q class="ui">Permissões da &lt;nome&gt; salvas.</q> e, a quem recebe, na próxima ação, o aviso de informação <q class="ui">Suas permissões mudaram: agora você usa &lt;módulo&gt;.</q> quando ganha um módulo (<a class="ref" href="06_design-system-telas.html#RN-248">Design system nas telas <code class="id">RN-248</code></a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="regras-de-negocio">
-    <h2>Regras de negócio</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Regra</th></tr></thead>
-      <tbody>
-        <tr id="RN-232"><td><code class="id">RN-232</code></td><td>Papéis: <code>ADMINISTRADOR</code> (administrador do deboaz), <code>MEMBRO_TIME</code> (membro do time deboaz), <code>MASTER</code> (conta master de instituição), <code>AUTONOMO</code> (educador autônomo), <code>STAFF</code>, <code>PARTICIPANTE</code> e <code>ANONIMO</code>; o responsável usa o papel do participante, com quem entrou marcado (<a class="ref" href="17_modulo-usuario-a-autenticacao.html#RN-228">Autenticação <code class="id">RN-228</code></a>); papel novo entra primeiro aqui e em <a class="ref" href="15_modulos.html#RN-205">Módulos <code class="id">RN-205</code></a></td></tr>
-        <tr id="RN-233"><td><code class="id">RN-233</code></td><td>O que cada papel recebe no token segue a tabela <strong>Permissões por papel</strong>, abaixo</td></tr>
-        <tr id="RN-234"><td><code class="id">RN-234</code></td><td>Os destinos fixos da casca — Módulos, Feed e Conta no hub; Tarefas, Feed, Carteira e Perfil no quest — não dependem de permissão, menos o Feed, que a conta do time deboaz não tem (<a class="ref" href="08_hub-ux.html#RN-221">Hub · UX base <code class="id">RN-221</code></a>); o que muda por pessoa são os cards, as abas e as ações</td></tr>
-        <tr id="RN-235"><td><code class="id">RN-235</code></td><td>Escopo da conta: toda leitura e escrita fica dentro da conta do token; um registro de outra conta é tratado como inexistente, e não como proibido; só os papéis do time deboaz alcançam outras contas, e só pela lista Contas do módulo Usuários e pelo SAC (<a class="ref" href="17_modulo-usuario.html#RN-187">Usuários <code class="id">RN-187</code></a>)</td></tr>
-        <tr id="RN-236"><td><code class="id">RN-236</code></td><td>A web e o mobile só escondem: leem o token para montar a casca, sem confiar nele para a segurança; quem garante cada permissão é o backend (<a class="ref" href="#RF-147">RF-147</a>)</td></tr>
-        <tr id="RN-237"><td><code class="id">RN-237</code></td><td>O que cada aba permite dentro de um módulo, e qualquer limite mais fino, como o professor ver só as turmas dele, é do documento do módulo (Ficha do módulo, Abas, <a class="ref" href="15_modulos.html#RN-217">Módulos <code class="id">RN-217</code></a>); a autorização conhece só o módulo, a aba e o papel</td></tr>
-        <tr id="RN-238"><td><code class="id">RN-238</code></td><td>Módulo descontratado ou retirado sai do token; as permissões do staff nele ficam suspensas e voltam com a recontratação (<a class="ref" href="17_modulo-usuario.html#RN-166">Usuários <code class="id">RN-166</code></a>)</td></tr>
-        <tr id="RN-239"><td><code class="id">RN-239</code></td><td>Versão das permissões: cada mudança que afeta as permissões de uma pessoa sobe a versão nas sessões dela; o token com a versão anterior é recusado na próxima ação, e o aparelho renova para receber o novo (<a class="ref" href="17_modulo-usuario-a-autenticacao.html#RNF-216">Autenticação <code class="id">RNF-216</code></a>)</td></tr>
-        <tr id="RN-240"><td><code class="id">RN-240</code></td><td>Responsável: pode o mesmo que o participante; o documento de cada módulo diz o que só um dos dois faz, como autorizar a foto do estudante menor de idade (<a class="ref" href="09_quest-ux.html#RN-102">Quest · UX base <code class="id">RN-102</code></a>)</td></tr>
-        <tr id="RN-241"><td><code class="id">RN-241</code></td><td>Ninguém concede permissão que não tem (<a class="ref" href="17_modulo-usuario.html#RN-167">Usuários <code class="id">RN-167</code></a>): quem muda as permissões de outra pessoa é conferido pelas permissões atuais dele no servidor, e não pelo token</td></tr>
-        <tr id="RN-251"><td><code class="id">RN-251</code></td><td>Permissão: o par módulo (<code>MOD-NN</code>) e abas (C, U ou CU) dado a uma pessoa da mesma conta; <q class="ui">Administrar usuários</q> é C e U do módulo Usuários (<code>MOD-03</code>); a pessoa sem nenhuma aba num módulo não tem o módulo</td></tr>
-        <tr id="RN-252"><td><code class="id">RN-252</code></td><td>Quem concede a quem: o administrador do deboaz aos membros do time, entre SAC, Usuários e Catálogo; a conta master ao staff, entre os módulos contratados e os da conta; o staff com Administrar usuários ao staff abaixo dele (<a class="ref" href="17_modulo-usuario.html#RN-169">Usuários <code class="id">RN-169</code></a>), só dentro das abas que tem; ninguém muda as próprias permissões, as de um par ou as de um superior; participante, responsável e acesso anônimo não recebem permissões, e sim Quem usa cada módulo (<a class="ref" href="#RF-150">RF-150</a>)</td></tr>
-        <tr id="RN-253"><td><code class="id">RN-253</code></td><td>A permissão é da conta, e não de quem a concedeu: se quem concedeu perde uma aba, perde Administrar usuários ou é desativado, o que ele concedeu continua, e quem está acima ajusta</td></tr>
-        <tr id="RN-254"><td><code class="id">RN-254</code></td><td>Salvar substitui o conjunto inteiro da pessoa, tudo ou nada: aba desmarcada é retirada; retirar é o mesmo salvamento, e quem está dentro do módulo retirado vai a Módulos com o aviso de <a class="ref" href="#RF-149">RF-149</a></td></tr>
-        <tr id="RN-255"><td><code class="id">RN-255</code></td><td>Cada salvamento que muda algo sobe uma vez a versão das permissões da pessoa e vale para todas as sessões dela (<a class="ref" href="#RN-239">RN-239</a>); salvar sem mudança não sobe a versão</td></tr>
-        <tr id="RN-256"><td><code class="id">RN-256</code></td><td>Toda mudança de permissão fica registrada com quem mudou, a data e a hora, a versão e as abas antes e depois, e o registro não é apagado nem alterado; ele aparece só para quem administra as permissões da pessoa, isto é, quem pode mudá-las (<a class="ref" href="#RN-252">RN-252</a>), em <q class="ui">Registro de mudanças</q>, na tela Permissões; nem a própria pessoa nem o SAC o veem</td></tr>
-      </tbody>
-    </table>
-    <p><strong>Permissões por papel</strong> (<a class="ref" href="#RN-233">RN-233</a>), com as abas <strong>C</strong> (Configuração) e <strong>U</strong> (Utilização) e os módulos pelo <a class="ref" href="15_modulos.html#RN-202">registro de módulos</a>:</p>
-    <table>
-      <thead><tr><th>Papel</th><th>Frente</th><th>Módulos no token</th><th>Abas</th><th>Ações do papel</th></tr></thead>
-      <tbody>
-        <tr><td>Administrador do deboaz</td><td>Hub</td><td>SAC, Usuários (membros e contas) e Catálogo</td><td>C e U</td><td>criar membros do time (<a class="ref" href="17_modulo-usuario.html#RN-190">Usuários <code class="id">RN-190</code></a>); salvar preços e faixas (<a class="ref" href="16_catalogo.html#RN-191">Catálogo <code class="id">RN-191</code></a>)</td></tr>
-        <tr><td>Membro do time deboaz</td><td>Hub</td><td>os módulos do time que o administrador do deboaz marcou para ele, entre SAC, Usuários e Catálogo (<a class="ref" href="17_modulo-usuario.html#RF-155">Usuários <code class="id">RF-155</code></a>), como o staff</td><td>as marcadas</td><td>— (não cria membros nem salva preços)</td></tr>
-        <tr><td>Conta master</td><td>Hub</td><td>todos os módulos da conta e os contratados</td><td>C e U</td><td>contratar, ver a cobrança e conceder permissões</td></tr>
-        <tr><td>Educador autônomo</td><td>Hub</td><td>todos os módulos da conta e os contratados, sem staff</td><td>C e U</td><td>contratar e ver a cobrança</td></tr>
-        <tr><td>Staff</td><td>Hub</td><td>os módulos que a conta master marcou (<a class="ref" href="17_modulo-usuario.html#RF-107">Usuários <code class="id">RF-107</code></a>), Usuários incluído quando recebe Administrar usuários</td><td>as marcadas</td><td>ver A contratar com os preços, sem contratar (<a class="ref" href="08_hub-ux.html#RF-23">Hub · UX base <code class="id">RF-23</code></a>)</td></tr>
-        <tr><td>Participante</td><td>Quest</td><td>Tarefas, Perfil e os módulos da conta com o participante em Quem usa</td><td>U</td><td>—</td></tr>
-        <tr><td>Responsável</td><td>Quest</td><td>os do participante, com o responsável em Quem usa</td><td>U, com os limites de cada módulo</td><td>—</td></tr>
-        <tr><td>Acesso anônimo</td><td>Quest</td><td>só o módulo da sala</td><td>U</td><td>—</td></tr>
-      </tbody>
-    </table>
-    <p><strong>Autorização no token de exemplo</strong> (<a class="ref" href="#RNF-219">RNF-219</a>): a staff Maria Souza com Usuários (C e U, por Administrar usuários) e a Sugestão e o Quiz (U), marcados pela conta master, e o Lucas Andrade no quest, com a mãe entrando; a identidade é a de <a class="ref" href="17_modulo-usuario-a-autenticacao.html#RNF-215">Autenticação <code class="id">RNF-215</code></a>.</p>
-<pre><code>{
-  "aud": "hub",
-  "sub": "usr-ebfga-maria",
-  "papel": "STAFF",
-  "mods": {
-    "MOD-03": "CU",
-    "MOD-04": "U",
-    "MOD-05": "U"
-  },
-  "pv": 7
-}</code></pre>
-<pre><code>{
-  "aud": "quest",
-  "sub": "usr-ebfga-lucas",
-  "quem": {
-    "tipo": "RESPONSAVEL",
-    "parentesco": "Mãe"
-  },
-  "papel": "PARTICIPANTE",
-  "mods": {
-    "MOD-06": "U",
-    "MOD-07": "U",
-    "MOD-09": "U",
-    "MOD-13": "U"
-  },
-  "pv": 3
-}</code></pre>
-  </section>
-  <section id="requisitos-nao-funcionais">
-    <h2>Requisitos não funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
-      <tbody>
-        <tr id="RNF-208"><td><code class="id">RNF-208</code></td><td><span class="tag">Segurança</span></td><td>O token traz os papéis do usuário (tipo de usuário, módulos e abas permitidas), e cada ação é autorizada ou recusada pelos papéis do token</td></tr>
-        <tr id="RNF-219"><td><code class="id">RNF-219</code></td><td><span class="tag">Segurança</span></td><td>As permissões vão no token nas claims <code>papel</code>, <code>mods</code> — um mapa do ID do registro de módulos (<code>MOD-NN</code>) para as abas, <code>C</code>, <code>U</code> ou <code>CU</code> — e <code>pv</code>, a versão das permissões; o token inteiro, com a assinatura RS256 da chave de 2048 bits (342 caracteres), cabe em 4 KB</td></tr>
-        <tr id="RNF-220"><td><code class="id">RNF-220</code></td><td><span class="tag">Segurança</span></td><td>Toda rota do backend declara o módulo e a aba, ou o papel, que exige; rota sem declaração é recusada (negar por padrão), e um teste automatizado falha quando existe rota sem declaração</td></tr>
-        <tr id="RNF-221"><td><code class="id">RNF-221</code></td><td><span class="tag">Desempenho</span></td><td>A web e o mobile montam os destinos, os cards e as abas a partir do token, sem esperar outra resposta do servidor; só o conteúdo dos cards vem depois</td></tr>
-        <tr id="RNF-222"><td><code class="id">RNF-222</code></td><td><span class="tag">Consistência</span></td><td>O salvamento leva a versão das permissões que a tela leu; se ela mudou, nada é gravado e a resposta é 412; salvamento sem versão é recusado com 428</td></tr>
-        <tr id="RNF-223"><td><code class="id">RNF-223</code></td><td><span class="tag">Consistência</span></td><td>As permissões, o registro e a nova versão são gravados juntos, numa só operação, e a nova versão chega a todas as sessões da pessoa em até 1 s depois da resposta</td></tr>
-        <tr id="RNF-224"><td><code class="id">RNF-224</code></td><td><span class="tag">Segurança</span></td><td>O token com versão de permissões antiga é recusado com 401 <code>PERMISSOES_DESATUALIZADAS</code>; a web e o mobile renovam uma vez e montam a casca de novo com o token novo</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="criterios-de-aceite">
-    <h2>Critérios de aceite</h2>
-    <article class="criterio" id="ca-RF-144">
+  <section id="cenarios">
+    <h2>Cenários</h2>
+    <article class="criterio" id="conceder-permissoes">
+      <h3>Conceder permissões</h3>
+      <pre class="gherkin">Cenário: a casca muda sem nova entrada
+  Dado a staff Maria Souza conectada no hub, sem a Presença
+  Quando a conta master abre Permissões da Maria, marca a Utilização da Presença e salva
+  Então a versão das permissões da Maria sobe
+  E na próxima ação o card da Presença aparece para ela, sem entrar de novo
+  E a conta master e a Maria veem cada uma o seu aviso de ação</pre>
+    </article>
+    <article class="criterio" id="RF-144">
       <h3><code class="id">RF-144</code> Permissões no token</h3>
       <pre class="gherkin">Cenário: staff com dois módulos
   Dado a Maria com Administrar usuários e a Utilização da Sugestão e do Quiz
   Quando ela entra no hub
-  Então o token dela tem o papel "STAFF" e os módulos "MOD-03" com "CU", "MOD-04" com "U" e "MOD-05" com "U"</pre>
+  Então o token dela tem o papel "STAFF"
+  E os módulos "MOD-03" com "CU", "MOD-04" com "U" e "MOD-05" com "U"</pre>
     </article>
-    <article class="criterio" id="ca-RF-145">
+    <article class="criterio" id="RF-145">
       <h3><code class="id">RF-145</code> Cálculo das permissões</h3>
       <pre class="gherkin">Cenário: módulo não contratado
   Dado a Maria com a Utilização da Presença marcada
@@ -1060,7 +962,7 @@ Cenário: staff sem a Sugestão marcada
   Quando ele entra no hub
   Então o token dele não tem "MOD-04"</pre>
     </article>
-    <article class="criterio" id="ca-RF-146">
+    <article class="criterio" id="RF-146">
       <h3><code class="id">RF-146</code> Casca pelo token</h3>
       <pre class="gherkin">Cenário: cards e abas do staff
   Dado o token da Maria com "MOD-05" só com "U"
@@ -1068,14 +970,14 @@ Cenário: staff sem a Sugestão marcada
   Então vê o card do Quiz e o módulo aberto só com a aba Utilização
   E não vê o card da Presença nem a aba Configuração do Quiz</pre>
     </article>
-    <article class="criterio" id="ca-RF-147">
+    <article class="criterio" id="RF-147">
       <h3><code class="id">RF-147</code> Recusa no backend</h3>
       <pre class="gherkin">Cenário: ação sem a aba
   Dado o token da Maria com "MOD-05" só com "U"
   Quando o aparelho pede para mudar a configuração do Quiz
   Então o backend responde acesso negado e nada muda</pre>
     </article>
-    <article class="criterio" id="ca-RF-148">
+    <article class="criterio" id="RF-148">
       <h3><code class="id">RF-148</code> Permissão nova sem sair</h3>
       <pre class="gherkin">Cenário: conta master libera a Presença
   Dado a Maria em Módulos, sem a Presença
@@ -1083,28 +985,29 @@ Cenário: staff sem a Sugestão marcada
   E a Maria faz a próxima ação no hub
   Então o card da Presença aparece para ela sem pedir nova entrada</pre>
     </article>
-    <article class="criterio" id="ca-RF-149">
+    <article class="criterio" id="RF-149">
       <h3><code class="id">RF-149</code> Endereço direto</h3>
       <pre class="gherkin">Cenário: módulo fora do token
   Dado o token da Maria sem "MOD-06"
   Quando ela abre o endereço da Presença
   Então vai para Módulos com o aviso "Você não tem acesso a este módulo."</pre>
     </article>
-    <article class="criterio" id="ca-RF-150">
+    <article class="criterio" id="RF-150">
       <h3><code class="id">RF-150</code> Participante e responsável</h3>
       <pre class="gherkin">Cenário: mãe no perfil do filho
   Dado a escola com a Presença e a Carteirinha contratadas
   Quando a Carla, mãe do Lucas, entra com o código dele
-  Então o token tem o papel "PARTICIPANTE", quem entrou "Mãe" e a Utilização de Tarefas, Perfil, Presença e Carteirinha</pre>
+  Então o token tem o papel "PARTICIPANTE" e quem entrou "Mãe"
+  E a Utilização de Tarefas, Perfil, Presença e Carteirinha</pre>
     </article>
-    <article class="criterio" id="ca-RF-151">
+    <article class="criterio" id="RF-151">
       <h3><code class="id">RF-151</code> Sala anônima</h3>
       <pre class="gherkin">Cenário: só a sala
   Dado uma pessoa sem código de acesso na sala 482107 do Quiz
   Então o token dela tem o papel "ANONIMO", só "MOD-05" com "U" e a sala 482107
   E a Carteira, Tarefas e o Perfil não abrem</pre>
     </article>
-    <article class="criterio" id="ca-RF-160">
+    <article class="criterio" id="RF-160">
       <h3><code class="id">RF-160</code> O que pode conceder</h3>
       <pre class="gherkin">Cenário: staff com Administrar usuários
   Dado o João com Administrar usuários e só a Utilização do Quiz
@@ -1116,7 +1019,7 @@ Cenário: membro do time
   Quando o administrador do deboaz abre Permissões do Caio
   Então vê SAC, Usuários e Catálogo, com Configuração e Utilização</pre>
     </article>
-    <article class="criterio" id="ca-RF-161">
+    <article class="criterio" id="RF-161">
       <h3><code class="id">RF-161</code> Salvar tudo ou nada</h3>
       <pre class="gherkin">Cenário: quem concede perdeu a aba
   Dado o João na tela Permissões da Ana, com a Utilização da Presença marcada para ela
@@ -1125,7 +1028,7 @@ Cenário: membro do time
   Então vê "Você não tem mais a Presença para conceder. Confira e salve."
   E nenhuma permissão da Ana muda</pre>
     </article>
-    <article class="criterio" id="ca-RF-162">
+    <article class="criterio" id="RF-162">
       <h3><code class="id">RF-162</code> Mudou enquanto editava</h3>
       <pre class="gherkin">Cenário: duas pessoas na mesma tela
   Dado a conta master e o João abrindo Permissões da Maria na versão 6
@@ -1134,7 +1037,7 @@ Cenário: membro do time
   Então vê "As permissões da Maria mudaram agora há pouco. Confira e salve."
   E a tela mostra as permissões da versão 7</pre>
     </article>
-    <article class="criterio" id="ca-RF-163">
+    <article class="criterio" id="RF-163">
       <h3><code class="id">RF-163</code> Avisos de quem concede e de quem recebe</h3>
       <pre class="gherkin">Cenário: conta master libera a Presença
   Quando a conta master marca a Utilização da Presença para a Maria e toca em "Salvar"
@@ -1142,15 +1045,282 @@ Cenário: membro do time
   E a Maria, na próxima ação, vê o card da Presença em Módulos
   E o aviso "Suas permissões mudaram: agora você usa a Presença."</pre>
     </article>
-  </section>
-  <section id="fora-de-escopo">
-    <h2>Fora de escopo</h2>
-    <ul class="fora">
-      <li>Como a pessoa prova quem é e quanto tempo a sessão vale: <a class="ref" href="17_modulo-usuario-a-autenticacao.html#contexto">Módulo Usuários · Autenticação</a></li>
-      <li>Limites dentro de um módulo, como turmas, conteúdos ou registros de cada pessoa: documento de cada módulo (<a class="ref" href="#RN-237">RN-237</a>)</li>
-      <li>Desenho da tela Permissões do staff e do membro do time: vistas de <a class="ref" href="17_modulo-usuario.html#RF-107">Usuários <code class="id">RF-107</code></a> e <a class="ref" href="17_modulo-usuario.html#RF-155">RF-155</a>; aqui ficam as regras de conceder</li>
-      <li>Permissões mais finas que as abas, por ação (ver, criar, editar, apagar): cada módulo define o que as abas dele permitem (<a class="ref" href="#RN-237">RN-237</a>)</li>
-    </ul>
+    <article class="criterio" id="RN-232">
+      <h3><code class="id">RN-232</code> Papéis</h3>
+      <pre class="gherkin">Esquema do Cenário: papel de cada pessoa
+  Quando &lt;quem&gt; entra
+  Então o token tem o papel "&lt;papel&gt;"
+
+  Exemplos:
+    | quem                            | papel         |
+    | o administrador do deboaz       | ADMINISTRADOR |
+    | o membro do time Caio Lima      | MEMBRO_TIME   |
+    | a conta master da EBFGA         | MASTER        |
+    | o educador autônomo Pedro Reis  | AUTONOMO      |
+    | a staff Maria Souza             | STAFF         |
+    | o participante Lucas Andrade    | PARTICIPANTE  |
+    | a Carla, mãe do Lucas           | PARTICIPANTE  |
+    | uma pessoa sem código de acesso | ANONIMO       |</pre>
+    </article>
+    <article class="criterio" id="RN-233">
+      <h3><code class="id">RN-233</code> Permissões por papel</h3>
+      <pre class="gherkin">Esquema do Cenário: módulos de cada papel
+  Quando &lt;quem&gt; entra no &lt;frente&gt;
+  Então o token tem &lt;módulos&gt; com as abas &lt;abas&gt;
+
+  Exemplos:
+    | quem           | frente | módulos                                | abas     |
+    | administrador  | hub    | SAC, Usuários e Catálogo               | C e U    |
+    | membro do time | hub    | os marcados entre SAC, Usuários e Cat. | marcadas |
+    | conta master   | hub    | os da conta e os contratados           | C e U    |
+    | autônomo       | hub    | os da conta e os contratados           | C e U    |
+    | staff          | hub    | os marcados pela conta master          | marcadas |
+    | participante   | quest  | Tarefas, Perfil e os de Quem usa       | U        |
+    | responsável    | quest  | os do participante, com Quem usa       | U        |
+    | anônimo        | quest  | só o módulo da sala                    | U        |
+
+Esquema do Cenário: ações de cada papel
+  Quando &lt;quem&gt; está no hub
+  Então pode &lt;ações&gt;
+
+  Exemplos:
+    | quem           | ações                                              |
+    | administrador  | criar membros do time e salvar preços e faixas     |
+    | membro do time | só o que foi marcado, sem criar membros nem preços |
+    | conta master   | contratar, ver a cobrança e conceder permissões    |
+    | autônomo       | contratar e ver a cobrança                         |
+    | staff          | ver A contratar com os preços, sem contratar       |</pre>
+    </article>
+    <article class="criterio" id="RN-234">
+      <h3><code class="id">RN-234</code> Destinos fixos</h3>
+      <pre class="gherkin">Esquema do Cenário: destinos que não dependem de permissão
+  Dado &lt;quem&gt; sem nenhum módulo marcado
+  Quando entra no &lt;frente&gt;
+  Então vê os destinos &lt;destinos&gt;
+
+  Exemplos:
+    | quem          | frente | destinos                         |
+    | a staff Maria | hub    | Módulos, Feed e Conta            |
+    | o membro Caio | hub    | Módulos e Conta, sem Feed        |
+    | o Lucas       | quest  | Tarefas, Feed, Carteira e Perfil |</pre>
+    </article>
+    <article class="criterio" id="RN-235">
+      <h3><code class="id">RN-235</code> Escopo da conta</h3>
+      <pre class="gherkin">Cenário: registro de outra conta
+  Dado a Maria, da escola "EBFGA"
+  Quando o aparelho pede um usuário da escola "COLSA"
+  Então a resposta é "não encontrado", e não "proibido"
+
+Cenário: time deboaz em outra conta
+  Quando o membro do time Caio abre a conta "EBFGA" pela lista Contas de Usuários
+  Então ele vê a conta</pre>
+    </article>
+    <article class="criterio" id="RN-236">
+      <h3><code class="id">RN-236</code> O backend garante</h3>
+      <pre class="gherkin">Cenário: aparelho adulterado
+  Dado a Maria com "MOD-05" só com "U"
+  E a casca adulterada mostrando a aba Configuração do Quiz
+  Quando ela salva a configuração do Quiz
+  Então o backend recusa com acesso negado</pre>
+    </article>
+    <article class="criterio" id="RN-237">
+      <h3><code class="id">RN-237</code> Limites dentro do módulo</h3>
+      <pre class="gherkin">Cenário: a autorização só conhece módulo, aba e papel
+  Dado o professor João com a Utilização da Presença
+  Quando ele abre a Presença
+  Então a autorização libera o módulo
+  E quais turmas ele vê é regra do documento da Presença</pre>
+    </article>
+    <article class="criterio" id="RN-238">
+      <h3><code class="id">RN-238</code> Módulo descontratado</h3>
+      <pre class="gherkin">Cenário: descontratação e recontratação
+  Dado a Maria com a Utilização da Presença
+  Quando a escola descontrata a Presença
+  Então "MOD-06" sai do token dela e a permissão fica suspensa
+  E quando a escola contrata a Presença de novo, "MOD-06" volta com "U"</pre>
+    </article>
+    <article class="criterio" id="RN-239">
+      <h3><code class="id">RN-239</code> Versão das permissões</h3>
+      <pre class="gherkin">Cenário: token com versão antiga
+  Dado a Maria com um token de versão de permissões 6
+  E a conta master mudando as permissões dela para a versão 7
+  Quando ela faz a próxima ação
+  Então o token de versão 6 é recusado e o aparelho renova para receber o de versão 7</pre>
+    </article>
+    <article class="criterio" id="RN-240">
+      <h3><code class="id">RN-240</code> Responsável</h3>
+      <pre class="gherkin">Cenário: só o responsável autoriza a foto
+  Dado a Carla entrando com o código do Lucas, de 12 anos
+  Quando ela autoriza a foto do Lucas
+  Então a autorização é aceita
+  E o Lucas, entrando sozinho, não vê essa ação</pre>
+    </article>
+    <article class="criterio" id="RN-241">
+      <h3><code class="id">RN-241</code> Ninguém concede o que não tem</h3>
+      <pre class="gherkin">Cenário: confere no servidor, não no token
+  Dado o João com um token que ainda tem a Presença
+  E a conta master tendo tirado a Presença dele há pouco
+  Quando ele concede a Presença à Ana
+  Então o servidor confere as permissões atuais do João e recusa</pre>
+    </article>
+    <article class="criterio" id="RN-251">
+      <h3><code class="id">RN-251</code> Permissão</h3>
+      <pre class="gherkin">Esquema do Cenário: abas de uma permissão
+  Quando a Maria recebe &lt;abas&gt; do Quiz
+  Então o token tem "MOD-05" com "&lt;valor&gt;"
+
+  Exemplos:
+    | abas                      | valor |
+    | Configuração              | C     |
+    | Utilização                | U     |
+    | Configuração e Utilização | CU    |
+
+Cenário: Administrar usuários
+  Quando a Maria recebe Administrar usuários
+  Então o token dela tem "MOD-03" com "CU"
+
+Cenário: nenhuma aba
+  Quando a conta master desmarca as duas abas do Quiz da Maria
+  Então a Maria não tem o Quiz</pre>
+    </article>
+    <article class="criterio" id="RN-252">
+      <h3><code class="id">RN-252</code> Quem concede a quem</h3>
+      <pre class="gherkin">Esquema do Cenário: concessões permitidas
+  Quando &lt;quem concede&gt; abre Permissões de &lt;quem recebe&gt;
+  Então &lt;resultado&gt;
+
+  Exemplos:
+    | quem concede     | quem recebe          | resultado                         |
+    | o administrador  | o membro Caio        | concede entre SAC, Usuários, Cat. |
+    | a conta master   | a staff Maria        | concede os módulos da escola      |
+    | o João, com Adm. | a Ana, abaixo dele   | concede só as abas que tem        |
+    | o João, com Adm. | ele mesmo            | não pode                          |
+    | o João, com Adm. | a Maria, par dele    | não pode                          |
+    | a staff Ana      | o João, acima dela   | não pode                          |
+    | a conta master   | o participante Lucas | não pode, ele usa Quem usa        |</pre>
+    </article>
+    <article class="criterio" id="RN-253">
+      <h3><code class="id">RN-253</code> A permissão é da conta</h3>
+      <pre class="gherkin">Cenário: quem concedeu é desativado
+  Dado a Ana com a Utilização do Quiz concedida pelo João
+  Quando a conta master desativa o João
+  Então a Ana continua com a Utilização do Quiz</pre>
+    </article>
+    <article class="criterio" id="RN-254">
+      <h3><code class="id">RN-254</code> Salvar substitui tudo</h3>
+      <pre class="gherkin">Cenário: desmarcar retira
+  Dado a Maria dentro da Presença
+  Quando a conta master desmarca a Presença dela e salva
+  Então a Presença sai das permissões da Maria
+  E a Maria vai para Módulos com o aviso "Você não tem acesso a este módulo."</pre>
+    </article>
+    <article class="criterio" id="RN-255">
+      <h3><code class="id">RN-255</code> Uma versão por salvamento</h3>
+      <pre class="gherkin">Cenário: salvar com mudança
+  Dado a Maria na versão de permissões 7, conectada no navegador e no app
+  Quando a conta master marca o Quiz e salva
+  Então a versão passa a 8 nas duas sessões
+
+Cenário: salvar sem mudança
+  Quando a conta master salva as permissões da Maria sem mudar nada
+  Então a versão continua 7</pre>
+    </article>
+    <article class="criterio" id="RN-256">
+      <h3><code class="id">RN-256</code> Registro de mudanças</h3>
+      <pre class="gherkin">Cenário: o que fica registrado
+  Quando a conta master marca a Presença da Maria em 2026-11-01 às 14:30
+  Então o registro guarda a conta master, a data, a hora, a versão 8 e as abas antes e depois
+  E esse registro não pode ser apagado nem alterado
+
+Esquema do Cenário: quem vê o registro
+  Quando &lt;quem&gt; abre Permissões da Maria
+  Então &lt;vê&gt; o Registro de mudanças
+
+  Exemplos:
+    | quem                    | vê     |
+    | a conta master          | vê     |
+    | o João, com Adm.        | vê     |
+    | a própria Maria         | não vê |
+    | o membro do time no SAC | não vê |</pre>
+    </article>
+    <article class="criterio" id="RNF-208">
+      <h3><code class="id">RNF-208</code> Autorizar pelo token</h3>
+      <pre class="gherkin">Cenário: ação autorizada pelo token
+  Dado o token da Maria com o papel "STAFF" e "MOD-05" com "U"
+  Quando ela responde a um quiz
+  Então a ação é autorizada pelos papéis do token</pre>
+    </article>
+    <article class="criterio" id="RNF-219">
+      <h3><code class="id">RNF-219</code> Permissões no token</h3>
+      <pre class="gherkin">Cenário: claims de autorização
+  Quando a Maria entra no hub
+  Então o token tem as claims papel, mods e pv:
+    """
+    { "aud": "hub", "sub": "usr-ebfga-maria", "papel": "STAFF",
+      "mods": { "MOD-03": "CU", "MOD-04": "U", "MOD-05": "U" }, "pv": 7 }
+    """
+  E o token inteiro, com a assinatura RS256 de 342 caracteres, cabe em 4 KB
+
+Cenário: responsável no quest
+  Quando a Carla entra com o código do Lucas
+  Então o token do quest é:
+    """
+    { "aud": "quest", "sub": "usr-ebfga-lucas", "papel": "PARTICIPANTE",
+      "quem": { "tipo": "RESPONSAVEL", "parentesco": "Mãe" },
+      "mods": { "MOD-06": "U", "MOD-07": "U", "MOD-09": "U", "MOD-13": "U" }, "pv": 3 }
+    """</pre>
+    </article>
+    <article class="criterio" id="RNF-220">
+      <h3><code class="id">RNF-220</code> Negar por padrão</h3>
+      <pre class="gherkin">Cenário: rota sem declaração
+  Dado uma rota nova do backend sem módulo, aba ou papel declarado
+  Quando alguém a chama
+  Então a rota recusa
+  E o teste automatizado de rotas falha no build</pre>
+    </article>
+    <article class="criterio" id="RNF-221">
+      <h3><code class="id">RNF-221</code> Casca sem esperar</h3>
+      <pre class="gherkin">Cenário: casca antes do conteúdo
+  Quando a Maria entra no hub
+  Então os destinos, os cards e as abas aparecem a partir do token
+  E só o conteúdo dos cards chega depois, do servidor</pre>
+    </article>
+    <article class="criterio" id="RNF-222">
+      <h3><code class="id">RNF-222</code> Salvar com versão</h3>
+      <pre class="gherkin">Esquema do Cenário: versão no salvamento
+  Dado as permissões da Maria na versão 7
+  Quando a conta master salva com &lt;versão&gt;
+  Então a resposta é &lt;resposta&gt;
+
+  Exemplos:
+    | versão     | resposta            |
+    | a versão 7 | gravado             |
+    | a versão 6 | 412, nada é gravado |
+    | sem versão | 428, nada é gravado |</pre>
+    </article>
+    <article class="criterio" id="RNF-223">
+      <h3><code class="id">RNF-223</code> Gravação única</h3>
+      <pre class="gherkin">Cenário: tudo junto
+  Quando a conta master salva as permissões da Maria
+  Então as permissões, o registro e a versão nova são gravados numa só operação
+  E a versão nova chega às sessões da Maria em até 1 s depois da resposta</pre>
+    </article>
+    <article class="criterio" id="RNF-224">
+      <h3><code class="id">RNF-224</code> Token desatualizado</h3>
+      <pre class="gherkin">Cenário: renova uma vez
+  Dado a Maria com um token de versão de permissões antiga
+  Quando o aparelho faz um pedido
+  Então a resposta é 401 "PERMISSOES_DESATUALIZADAS"
+  E o aparelho renova uma vez e monta a casca de novo com o token novo</pre>
+    </article>
+    <article class="criterio" id="fora-de-escopo">
+      <h3>Fora de escopo</h3>
+      <pre class="gherkin">Cenário: o que este documento não trata
+  Então como a pessoa prova quem é e quanto tempo a sessão vale fica em Autenticação
+  E limites dentro de um módulo, como turmas ou registros, ficam no documento do módulo
+  E o desenho da tela Permissões fica nas vistas de Usuários
+  E permissões por ação, como ver, criar, editar e apagar, ficam em cada módulo</pre>
+    </article>
   </section>
   <section id="diagramas">
     <h2>Diagramas</h2>
@@ -1173,7 +1343,8 @@ Cenário: membro do time
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v08</span></td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v09</span></td><td>2026-11-01 18:15</td><td>Só Gherkin e diagramas: contexto, RF, RN, RNF, permissões por papel e fora de escopo viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
+      <tr><td>v08</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
       <tr><td>v07</td><td>2026-11-01 15:04</td><td>Diagrama autorizacao-classes v01: permissões com versão, registro de mudanças, cálculo, autorização no token e exigência das rotas</td></tr>
       <tr><td>v06</td><td>2026-11-01 13:38</td><td>Registro de mudanças só para quem administra as permissões da pessoa, em Permissões (<code class="id">RN-256</code>); Em aberto resolvido</td></tr>
       <tr><td>v05</td><td>2026-11-01 13:29</td><td>Conceder permissões: o que cada um pode conceder, salvar tudo ou nada com a versão, recusas e avisos de quem concede e de quem recebe (<code class="id">RF-160</code> a <code class="id">RF-163</code>, <code class="id">RN-251</code> a <code class="id">RN-256</code>, <code class="id">RNF-222</code> a <code class="id">RNF-224</code>); diagramas autorizacao-sequencia v01, com as telas do deboaz e da instituição, e autorizacao-contrato-api v01; registro das mudanças em aberto</td></tr>
@@ -1184,7 +1355,7 @@ Cenário: membro do time
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v08 · 2026-11-01 15:28</span>
+    <span>boaz · v09 · 2026-11-01 18:15</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-b-autorizacao.html</span>
   </div>
 </footer>

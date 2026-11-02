@@ -5,7 +5,7 @@ description: Cria, altera, revisa ou exporta em PDF documentos de requisito do p
 
 # Documento de requisito → `1_Requisitos/`
 
-Você é analista de produto. A saída é **sempre um `.html` autocontido em `1_Requisitos/`**, curto e claro, no padrão de `0_Assets/requisitos/tema.html`.
+Você é analista de produto. A saída é **sempre um `.html` autocontido em `1_Requisitos/`**, no padrão de `0_Assets/requisitos/tema.html`, com **só cenários em Gherkin, telas e diagramas**: nada de parágrafos de contexto nem tabelas de requisitos, porque o time usa no dia a dia só o Gherkin, as telas e os diagramas. A ordem de trabalho é **requisito em Gherkin → telas (UX/UI, skill `diagrama-dev`, vistas) → diagramas**.
 
 ## Escopo
 
@@ -21,9 +21,11 @@ Resumo do que não pode faltar:
 - `<head>`: `charset`, `viewport`, `<title>Título · Projeto · vNN</title>`, o comentário `<!-- boaz:marca -->` e os 7 `<meta name="boaz:…">` (projeto = `PROJECT_NAME` de `.boaz`; data = `date '+%Y-%m-%d %H:%M'`), um por linha, na ordem do tema; depois a **casca** copiada sem alterar: `awk '/<!-- boaz:casca:inicio/,/<!-- boaz:casca:fim/' 0_Assets/requisitos/tema.html`.
 - `<body>`: `<header class="boaz-marca-topo">` (sobretítulo `Projeto · Tipo`, `<h1>`, objetivo de uma frase, carimbo com documento, versão, data `AAAA-MM-DD · HH:MM` e status) → `<main>` com um `<section id="…"><h2>` por seção do tipo, na ordem do tema (opcional vazia é removida) → `<footer class="boaz-marca-rodape">` (histórico `Versão | Data | Mudança`, mais nova no topo, até 10 linhas, e a linha `Projeto · vNN · data` + caminho).
 - Só componentes do catálogo, estilizados **só por classe**: nada de `style=""` (exceto o recorte de diagrama), `<style>`/`<script>` próprios, cores, fontes ou CDN fora da casca.
-- Requisitos em tabela, linha com `id` igual ao ID (`<tr id="RF-01">`), ID em `<code class="id">`, uma obrigação por frase, "O sistema deve …", prioridade em `<span class="prio prio-deve">`, critério de aceite em `<article class="criterio">` + `<pre class="gherkin">` para cada `Deve`.
+- Funcionalidade: `<main>` com `section#cenarios`, `section#telas` (figuras `vista-*`/`blueprint-*`), `section#diagramas` e `section#em-aberto`; transversal: cenários, diagramas e em aberto; visão: listas curtas; glossário: tabela de termos.
+- Cada regra é um `<article class="criterio" id="RF-01">` (o `id` é o próprio ID, para os links `doc.html#RF-01` continuarem valendo) com `<h3><code class="id">RF-01</code> Título</h3>` e um `<pre class="gherkin">` com um a três cenários concretos (pessoa, valor, texto exibido entre aspas). `RF` = o que a pessoa faz e o sistema responde; `RN` = a regra num caso que a prova; `RNF` = a medida ou o limite, com o número. Regra em tabela vira `Esquema do Cenário` + `Exemplos`; exemplo de dado vira doc string `"""`. Grupo sem ID (exemplo de ponta a ponta, `fora-de-escopo`) usa `id` em kebab-case e título sem `code.id`.
+- Linha de Gherkin com até 100 caracteres; passou, quebre em mais um `E`.
 - Texto escapado: `&` → `&amp;`, `<` → `&lt;`, `>` → `&gt;` (também dentro do Gherkin).
-- Curto: ≤ 12 requisitos funcionais, ≤ 4 páginas A4 impressas, uma funcionalidade por documento — passou, divida.
+- Curto: ≤ 12 IDs `RF`, uma funcionalidade por documento — passou, divida em `NN_nome-a-…` e `NN_nome-b-…`.
 - HTML indentado com 2 espaços, um bloco por linha: o diff do git precisa ser legível.
 
 ## Diagramas e outros documentos
@@ -46,7 +48,7 @@ Resumo do que não pode faltar:
 **Alteração** ("muda", "adiciona", "remove", "aprova" num documento existente)
 1. Abra o documento e aplique só o que foi pedido; não reescreva o resto, não troque a casca e não renomeie o arquivo. Documento `.md` antigo? Peça a migração pela skill `requisito-estilo` antes (ou faça-a seguindo aquela skill).
 2. Nova versão: `vNN` + 1 e data/hora atuais nos 5 lugares — `<title>`, `<meta boaz:versao/data>`, carimbo, linha nova no topo do histórico (o que mudou, citando os IDs) e linha do rodapé. Status muda no `<meta boaz:status>` e no carimbo (classe `status-…` junto). Mudança de status também é versão.
-3. Requisito removido sai da tabela (e dos critérios); o ID não é reutilizado. Pendência respondida sai de Em aberto e vira requisito/regra.
+3. Regra removida tem o cenário apagado; o ID não é reutilizado. Pendência respondida sai de Em aberto e vira cenário.
 4. Se o documento estava `Aprovado`, volte-o para `Em revisão`, a menos que o pedido diga outra coisa.
 5. Termo novo do domínio? Proponha incluí-lo em `99_glossario.html` (que também ganha versão).
 
@@ -59,8 +61,10 @@ Resumo do que não pode faltar:
 - Marca d'água: `grep -nE 'boaz:(versao|data|status)"|<title>|boaz-versao|boaz-data|<td>[0-9]{4}-|boaz-rodape-linha' -A1 <arquivo>` — mesma versão e data/hora em todos. No navegador, o botão PDF fica vermelho se divergirem.
 - Casca intacta: `diff <(awk '/<!-- boaz:casca:inicio/,/<!-- boaz:casca:fim/' 0_Assets/requisitos/tema.html) <(awk '/<!-- boaz:casca:inicio/,/<!-- boaz:casca:fim/' <arquivo>)` — vazio num documento novo; num existente, só pode diferir se ele usa um tema anterior (não atualize sem pedirem).
 - HTML válido: `xmllint --html --noout <arquivo>` se houver (avisos de tags HTML5 podem ser ignorados; erros de tag não fechada, não).
-- Seções na ordem do tema, nenhuma vazia, um `<h1>`, `<h3>` só em critérios e cartões.
-- IDs duplicados: `grep -rhoE --include='*.html' '<tr id="(RF|RNF|RN)-[0-9]+"' 1_Requisitos | sort | uniq -d` (deve sair vazio).
+- Seções na ordem do tema, nenhuma vazia, um `<h1>`, `<h3>` só em cenários e cartões; nenhum `<p>`, `<table>` ou `<ul>` dentro de `<main>` fora da visão e do glossário.
+- Linhas longas: `sed -n '/<pre class="gherkin">/,/<\/pre>/p' <arquivo> | LC_ALL=pt_BR.UTF-8 awk 'length > 100'` (deve sair vazio).
+\x27) if len(l)>100]" <arquivo>` (deve sair vazio).
+- IDs duplicados: `grep -rhoE --include='*.html' '<article class="criterio" id="(RF|RNF|RN)-[0-9]+"' 1_Requisitos | sort | uniq -d` (deve sair vazio).
 - Palavras vagas: `sed -n '/<body>/,$p' <arquivo> | grep -niE 'rápid|fácil|intuitiv|amigável|simples|adequad|eficiente|robust|flexível|etc\.|e/ou|entre outros|se possível|geralmente|normalmente|TBD|a definir'` — troque cada uma por critério verificável.
 - Tecnologia: `sed -n '/<body>/,$p' <arquivo> | grep -niE 'backend|frontend|banco de dados|\bAPI\b|endpoint|framework|servidor|\bSQL\b|cloud'` — reescreva como comportamento.
 - Diagramas e links referenciados existem (`ls`).

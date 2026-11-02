@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autenticação · boaz · v12</title>
+<title>Módulo Usuários · Autenticação · boaz · v13</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-a-autenticacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-a-autenticacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v12">
-<meta name="boaz:data" content="2026-11-01 15:28">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v13">
+<meta name="boaz:data" content="2026-11-01 17:59">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v06
+   boaz · tema dos documentos de requisito · v07
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
    Paleta: vistas com data-paletas trocam tema de cor e modo das telas.
@@ -417,7 +417,8 @@ caption { caption-side: top; padding: 0 0 8px; color: var(--muted); font-size: 1
 /* ── critérios de aceite (Gherkin) ───────────────────────── */
 .criterio { margin: 0 0 24px; break-inside: avoid; }
 .criterio h3 { margin-top: 24px; }
-pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); }
+.criterio { scroll-margin-top: 16px; }
+pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); white-space: pre-wrap; overflow-wrap: anywhere; }
 pre.gherkin::before {
   content: "GHERKIN";
   position: absolute;
@@ -720,7 +721,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v06 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v07 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
@@ -917,125 +918,28 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-a-autenticacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v12</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 15:28</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v13</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 17:59</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
-  <nav class="sumario"></nav>
-  <section id="contexto">
-    <h2>Contexto</h2>
-    <p>O <a class="ref" href="17_modulo-usuario.html#contexto">Módulo Usuários</a> define quem são os usuários e como cada um recebe a senha ou o código de acesso. Este documento cuida da <strong>autenticação</strong>: provar quem é a pessoa e abrir a <strong>sessão</strong> dela num aparelho. O que cada pessoa pode ver e fazer, a <strong>autorização</strong>, fica em <a class="ref" href="17_modulo-usuario-b-autorizacao.html#contexto">Módulo Usuários · Autorização</a>. As duas se juntam no <strong>token de acesso</strong>, um JWT que a web e o mobile recebem ao entrar: ele leva a identidade, definida aqui, e as permissões, definidas no 17-b, e é com ele que a casca do hub e do quest sabe quem está ali.</p>
-    <p class="historia"><span>Como</span> <strong>pessoa que usa o deboaz</strong>, <span>quero</span> entrar uma vez e continuar conectada enquanto uso, <span>para</span> não digitar a senha a cada tela, sem que outra pessoa consiga usar a minha sessão</p>
-    <aside class="destaque importante"><p>Decisão do time do projeto em 2026-11-01: a autenticação usa um token de acesso JWT de curta duração e um token de renovação guardado só como resumo na sessão, no servidor; o Módulo Usuários passa a ter três documentos, 17 (usuários e senhas), 17-a (autenticação) e 17-b (autorização) (<a class="ref" href="15_modulos.html#RN-208">Módulos <code class="id">RN-208</code></a>); <code class="id">RNF-203</code>, <code class="id">RNF-204</code>, <code class="id">RNF-207</code> e <code class="id">RNF-209</code> saem do 17 e passam a viver aqui.</p></aside>
-    <p><strong>Formas de entrar</strong></p>
-    <table>
-      <thead><tr><th>Frente</th><th>Quem</th><th>Com o quê</th><th>Sessão</th></tr></thead>
-      <tbody>
-        <tr><td>Hub</td><td>Conta master, educador autônomo, staff, administrador e membro do time deboaz</td><td>Entrada e senha (<a class="ref" href="17_modulo-usuario.html#RN-180">Usuários <code class="id">RN-180</code></a>)</td><td>Sessão do hub, com o tempo do staff no navegador ou no app</td></tr>
-        <tr><td>Quest</td><td>Participante e responsável</td><td>Código de acesso (<a class="ref" href="17_modulo-usuario.html#RN-184">Usuários <code class="id">RN-184</code></a>) e quem está entrando</td><td>Sessão do quest, com o tempo do participante</td></tr>
-        <tr><td>Quest · sala</td><td>Acesso anônimo</td><td>Código da sala (<a class="ref" href="17_modulo-usuario.html#RF-115">Usuários <code class="id">RF-115</code></a>)</td><td>Sessão só daquela sala, até ela fechar</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="requisitos-funcionais">
-    <h2>Requisitos funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
-      <tbody>
-        <tr id="RF-134"><td><code class="id">RF-134</code></td><td>O sistema deve abrir uma sessão do hub e entregar o token de acesso e o token de renovação a quem informa em Entrar a entrada e a senha certas de um usuário ativo de uma conta ativa</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-135"><td><code class="id">RF-135</code></td><td>O sistema deve abrir uma sessão do quest a quem informa o código de acesso de um participante ativo de uma conta ativa, registrando quem entrou: o participante ou o responsável, com o parentesco (<a class="ref" href="09_quest-ux.html#RN-94">Quest · UX base <code class="id">RN-94</code></a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-136"><td><code class="id">RF-136</code></td><td>O sistema deve abrir para o acesso anônimo (<a class="ref" href="17_modulo-usuario.html#RF-115">Usuários <code class="id">RF-115</code></a>) uma sessão que vale só para aquela sala e termina quando a sala fecha</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-137"><td><code class="id">RF-137</code></td><td>O sistema deve trocar o token de acesso vencido por um novo, sem pedir a senha nem o código, quando o aparelho apresenta o token de renovação de uma sessão ativa, entregando também um token de renovação novo</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-138"><td><code class="id">RF-138</code></td><td>O sistema deve encerrar a sessão do aparelho e invalidar os tokens dela quando a pessoa toca <q class="ui">Sair</q>, no hub, ou <q class="ui">Trocar perfil</q>, no quest</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-139"><td><code class="id">RF-139</code></td><td>O sistema deve recusar a entrada errada com <q class="ui">Entrada ou senha incorretas.</q>, no hub, ou <q class="ui">Código de acesso inválido.</q>, no quest, sem dizer qual dado está errado, e contar a tentativa (<a class="ref" href="#RNF-204">RNF-204</a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-140"><td><code class="id">RF-140</code></td><td>O sistema deve recusar a entrada certa de usuário desativado ou de conta suspensa, desativada ou encerrada (<a class="ref" href="17_modulo-usuario.html#RN-175">Usuários <code class="id">RN-175</code></a>) com <q class="ui">Acesso indisponível. Fale com quem administra a sua conta.</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-158"><td><code class="id">RF-158</code></td><td>O sistema deve mostrar, enquanto a entrada ou o código estiver bloqueado por tentativas erradas (<a class="ref" href="#RNF-204">RNF-204</a>), o aviso <q class="ui">Muitas tentativas erradas. Tente de novo às &lt;hora&gt;.</q>, com Entrar, no hub, ou Continuar, no quest, desligado até essa hora</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-159"><td><code class="id">RF-159</code></td><td>O sistema deve mostrar, logo depois de abrir a sessão, o aviso flutuante de ação concluída na primeira tela: <q class="ui">Você entrou. Que bom te ver de novo!</q> no hub, <q class="ui">Você entrou no perfil do &lt;nome&gt;.</q> no quest e <q class="ui">Você entrou na sala como &lt;apelido&gt;.</q> no acesso anônimo</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-141"><td><code class="id">RF-141</code></td><td>O sistema deve encerrar todas as sessões de um usuário, em todos os aparelhos, quando ele é desativado ou recebe uma nova geração de senha, e todas as sessões de uma conta quando ela é suspensa, desativada ou encerrada</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-142"><td><code class="id">RF-142</code></td><td>O sistema deve levar a pessoa à tela de entrada da frente, Entrar no hub ou o acesso no quest, com o aviso <q class="ui">Sua sessão terminou. Entre de novo.</q>, quando a sessão termina por tempo sem uso ou é encerrada</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-143"><td><code class="id">RF-143</code></td><td>O sistema deve abrir a sessão logo depois que a pessoa marca <q class="ui">Anotei a senha</q> no primeiro acesso ou depois de uma nova geração de senha (<a class="ref" href="17_modulo-usuario.html#RF-109">Usuários <code class="id">RF-109</code></a>), sem pedir a senha de novo, com um comprovante de uso único entregue junto com a senha gerada</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-156"><td><code class="id">RF-156</code></td><td>O sistema deve mostrar em Conta, no hub, os aparelhos conectados da própria pessoa, cada um com o tipo (navegador ou app) e a hora da última ação, com o aparelho em uso marcado como <q class="ui">Este aparelho</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-157"><td><code class="id">RF-157</code></td><td>O sistema deve encerrar, a pedido da própria pessoa em Conta, a sessão de um aparelho escolhido, com <q class="ui">Sair deste aparelho</q>, ou as de todos, com <q class="ui">Sair de todos os aparelhos</q>, levando a Entrar quem estava no aparelho encerrado</td><td><span class="prio prio-deve">Deve</span></td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="regras-de-negocio">
-    <h2>Regras de negócio</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Regra</th></tr></thead>
-      <tbody>
-        <tr id="RN-224"><td><code class="id">RN-224</code></td><td>Autenticação e autorização são separadas: a autenticação prova quem é a pessoa e abre a sessão; a autorização decide o que ela vê e faz (<a class="ref" href="17_modulo-usuario-b-autorizacao.html#RN-232">Autorização <code class="id">RN-232</code></a>); a sessão, no servidor, é a fonte da verdade, e os tokens só provam que o aparelho é dono dela</td></tr>
-        <tr id="RN-225"><td><code class="id">RN-225</code></td><td>Sessão: uma por entrada num aparelho, com o usuário, a conta, a frente (hub ou quest), o aparelho (navegador ou app), quem entrou, a versão das permissões e a hora da última ação; a mesma pessoa pode ter sessões em vários aparelhos ao mesmo tempo</td></tr>
-        <tr id="RN-226"><td><code class="id">RN-226</code></td><td>Tempo de sessão: a sessão termina depois do tempo sem uso da conta (<a class="ref" href="17_modulo-usuario.html#RN-183">Usuários <code class="id">RN-183</code></a>), o do staff no navegador, o do staff no app ou o do participante; a conta master e o educador autônomo seguem o tempo das contas master, e os membros do time deboaz, o tempo dos membros, que o time deboaz configura, com limites próprios (<a class="ref" href="17_modulo-usuario.html#RF-152">Usuários <code class="id">RF-152</code></a>, <a class="ref" href="17_modulo-usuario.html#RN-243">RN-243</a>); cada ação e cada renovação contam como uso</td></tr>
-        <tr id="RN-227"><td><code class="id">RN-227</code></td><td>Hub e quest têm sessões e tokens separados: o token de uma frente é recusado na outra; a landing page não abre sessão</td></tr>
-        <tr id="RN-228"><td><code class="id">RN-228</code></td><td>O responsável entra com o código do participante e recebe uma sessão do participante marcada com o parentesco (<a class="ref" href="17_modulo-usuario.html#RN-186">Usuários <code class="id">RN-186</code></a>); o que ele pode fazer é o do participante, menos o que o documento de cada módulo restringir (<a class="ref" href="17_modulo-usuario-b-autorizacao.html#RN-240">Autorização <code class="id">RN-240</code></a>)</td></tr>
-        <tr id="RN-229"><td><code class="id">RN-229</code></td><td>Tokens: o <strong>token de acesso</strong> vale 15 min (<a class="ref" href="#RNF-209">RNF-209</a>), não fica guardado no servidor e leva só o que identifica a sessão e autoriza (<a class="ref" href="#RNF-215">RNF-215</a>); o <strong>token de renovação</strong> é um valor aleatório de uso único, que vale enquanto a sessão estiver ativa</td></tr>
-        <tr id="RN-230"><td><code class="id">RN-230</code></td><td>Fim antecipado: desativar o usuário, uma nova geração de senha ou mudar o estado da conta encerram as sessões (<a class="ref" href="#RF-141">RF-141</a>); mudar permissões ou a contratação não encerra: só pede um token novo, que o aparelho busca sozinho com o token de renovação (<a class="ref" href="17_modulo-usuario-b-autorizacao.html#RF-148">Autorização <code class="id">RF-148</code></a>)</td></tr>
-        <tr id="RN-231"><td><code class="id">RN-231</code></td><td>A sessão do acesso anônimo vale só para a sala, não tem tempo sem uso e termina quando a sala fecha; ela não abre perfil, tarefa nem outra sala (<a class="ref" href="17_modulo-usuario.html#RN-177">Usuários <code class="id">RN-177</code></a>)</td></tr>
-        <tr id="RN-247"><td><code class="id">RN-247</code></td><td>Limite de sessões: cada usuário tem no máximo 5 sessões do hub ao mesmo tempo; ao abrir a sexta, termina a de última ação mais antiga, que vai para Entrar com o aviso de sessão terminada (<a class="ref" href="#RF-142">RF-142</a>); o quest não tem limite, porque a família divide o mesmo código</td></tr>
-        <tr id="RN-250"><td><code class="id">RN-250</code></td><td>Toda tentativa de entrar termina num aviso de ação (<a class="ref" href="06_design-system-telas.html#RN-248">Design system nas telas <code class="id">RN-248</code></a>): sessão aberta, concluído (<a class="ref" href="#RF-159">RF-159</a>); senha ou código incorreto, recusado (<a class="ref" href="#RF-139">RF-139</a>); conta ou usuário indisponível, indisponível (<a class="ref" href="#RF-140">RF-140</a>); entrada bloqueada, espera (<a class="ref" href="#RF-158">RF-158</a>); sessão terminada, indisponível, flutuante sobre a tela de entrada (<a class="ref" href="#RF-142">RF-142</a>); os selos ficam sempre animados (<a class="ref" href="06_design-system-telas.html#RN-249">RN-249</a>)</td></tr>
-      </tbody>
-    </table>
-    <p><strong>Token de acesso de exemplo</strong> (<a class="ref" href="#RNF-207">RNF-207</a>, <a class="ref" href="#RNF-215">RNF-215</a>): a staff Maria Souza, da Escola Bento Freitas (<code>EBFGA</code>), no navegador. O cabeçalho e a identidade estão aqui; as claims <code>papel</code>, <code>mods</code> e <code>pv</code> são da autorização (<a class="ref" href="17_modulo-usuario-b-autorizacao.html#RNF-219">Autorização <code class="id">RNF-219</code></a>). Horários em segundos desde 1970, em UTC.</p>
-<pre><code>{"alg": "RS256", "typ": "JWT", "kid": "deboaz-2026-11"}
-{
-  "iss": "deboaz",
-  "aud": "hub",
-  "sub": "usr-ebfga-maria",
-  "sid": "3f9c2a71",
-  "conta": "conta-ebfga",
-  "sigla": "EBFGA",
-  "tipo": "STAFF",
-  "aparelho": "NAVEGADOR",
-  "iat": 1793262120,
-  "exp": 1793263020,
-  "jti": "a81c0e5d",
-  "papel": "STAFF",
-  "mods": {
-    "MOD-03": "CU",
-    "MOD-04": "U",
-    "MOD-05": "U"
-  },
-  "pv": 7
-}</code></pre>
-    <p><strong>Sessão de exemplo</strong>, a mesma da Maria (<a class="ref" href="#RN-225">RN-225</a>, <a class="ref" href="#RNF-217">RNF-217</a>): expira em 8 h sem uso, o tempo do staff no navegador.</p>
-<pre><code>sessao:3f9c2a71   expira em 28800 s
-{
-  "usuarioId": "usr-ebfga-maria",
-  "contaId": "conta-ebfga",
-  "sigla": "EBFGA",
-  "frente": "HUB",
-  "aparelho": "NAVEGADOR",
-  "quemEntrou": null,
-  "versaoPermissoes": 7,
-  "resumoRenovacao": "(resumo irreversível do token de renovação)",
-  "criadaEm": "2026-11-01T09:00:00Z",
-  "ultimaAcao": "2026-11-01T09:42:00Z"
-}</code></pre>
-  </section>
-  <section id="requisitos-nao-funcionais">
-    <h2>Requisitos não funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
-      <tbody>
-        <tr id="RNF-207"><td><code class="id">RNF-207</code></td><td><span class="tag">Segurança</span></td><td>A credencial de acesso é um token JWT assinado com RS256 e chave RSA de 2048 bits; a chave privada fica no Key Vault do ambiente e nunca sai dele, e as aplicações validam o token com a chave pública, publicada com o <code>kid</code> no endereço de chaves da autenticação</td></tr>
-        <tr id="RNF-209"><td><code class="id">RNF-209</code></td><td><span class="tag">Segurança</span></td><td>O token de acesso vale no máximo 15 min e é renovado enquanto a sessão estiver dentro do tempo configurado (<a class="ref" href="17_modulo-usuario.html#RN-183">Usuários <code class="id">RN-183</code></a>)</td></tr>
-        <tr id="RNF-203"><td><code class="id">RNF-203</code></td><td><span class="tag">Segurança</span></td><td>Depois de desativar, suspender, pedir nova geração de senha, mudar permissão ou descontratar um módulo, a credencial de acesso emitida antes deixa de valer na próxima ação do usuário, em qualquer aparelho</td></tr>
-        <tr id="RNF-204"><td><code class="id">RNF-204</code></td><td><span class="tag">Segurança</span></td><td>5 tentativas erradas seguidas, de senha, de código de acesso ou de código de liberação, bloqueiam a entrada por 15 min; cada bloqueio seguido dobra o tempo, até 24 h, no hub e no quest</td></tr>
-        <tr id="RNF-213"><td><code class="id">RNF-213</code></td><td><span class="tag">Segurança</span></td><td>O token de renovação é o id da sessão seguido de 256 bits aleatórios, a sessão guarda só o resumo irreversível dele, e cada uso o troca por um novo; apresentar um token de renovação já trocado encerra a sessão, porque é sinal de cópia</td></tr>
-        <tr id="RNF-214"><td><code class="id">RNF-214</code></td><td><span class="tag">Segurança</span></td><td>Na web, o token de acesso fica só na memória da página e o token de renovação num cookie HttpOnly, Secure e SameSite=Strict, enviado só ao endereço de renovação; no app, o token de renovação fica no armazenamento seguro do sistema (Keychain no iOS, Keystore no Android) e o token de acesso só na memória</td></tr>
-        <tr id="RNF-215"><td><code class="id">RNF-215</code></td><td><span class="tag">Segurança</span></td><td>A identidade no token de acesso é: <code>iss</code> (deboaz), <code>aud</code> (hub ou quest), <code>sub</code> (id do usuário), <code>sid</code> (id da sessão), <code>conta</code>, <code>sigla</code>, <code>tipo</code> de usuário, <code>aparelho</code>, <code>quem</code> (no quest, o responsável e o parentesco), <code>iat</code>, <code>exp</code> e <code>jti</code>; o token nunca leva nome, documento, matrícula ou senha</td></tr>
-        <tr id="RNF-216"><td><code class="id">RNF-216</code></td><td><span class="tag">Segurança</span></td><td>Cada requisição confere a assinatura, a validade, a frente (<code>aud</code>) e se a sessão (<code>sid</code>) continua ativa com a mesma versão das permissões (<code>pv</code>); se algo falhar, a resposta é 401, e a web e o mobile tentam uma renovação antes de levar à tela de entrada</td></tr>
-        <tr id="RNF-217"><td><code class="id">RNF-217</code></td><td><span class="tag">Dados</span></td><td>A sessão fica no Redis, na chave <code>sessao:&lt;sid&gt;</code>, com expiração igual ao tempo sem uso, refeita a cada ação; o índice <code>sessoes:&lt;usuário&gt;</code> lista as sessões de cada usuário, para encerrar todas de uma vez; as tentativas erradas e os bloqueios de cada entrada e de cada código também ficam no Redis, com expiração igual ao tempo do bloqueio (<a class="ref" href="#RNF-204">RNF-204</a>)</td></tr>
-        <tr id="RNF-218"><td><code class="id">RNF-218</code></td><td><span class="tag">Segurança</span></td><td>O cabeçalho do token traz o <code>kid</code> da chave que assinou; a chave é trocada a cada 90 dias e na hora quando houver suspeita de vazamento; na troca de chave, a anterior continua aceita até o último token assinado com ela vencer, sem encerrar sessões, menos na troca por vazamento, em que a anterior é recusada na hora e as sessões renovam com a nova</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="criterios-de-aceite">
-    <h2>Critérios de aceite</h2>
-    <article class="criterio" id="ca-RF-134">
+  <section id="cenarios">
+    <h2>Cenários</h2>
+    <article class="criterio" id="formas-de-entrar">
+      <h3>Formas de entrar</h3>
+      <pre class="gherkin">Esquema do Cenário: cada frente com a sua entrada
+  Quando &lt;quem&gt; entra no &lt;frente&gt; com &lt;credencial&gt;
+  Então abre uma sessão &lt;sessão&gt;
+
+  Exemplos:
+    | quem                          | frente | credencial              | sessão                 |
+    | conta master, educador, staff | hub    | entrada e senha         | do navegador ou do app |
+    | membro do time deboaz         | hub    | entrada e senha         | do navegador ou do app |
+    | participante ou responsável   | quest  | código de acesso e quem | do participante        |
+    | pessoa sem código de acesso   | quest  | código da sala          | até a sala fechar      |</pre>
+    </article>
+    <article class="criterio" id="RF-134">
       <h3><code class="id">RF-134</code> Entrar no hub</h3>
       <pre class="gherkin">Cenário: staff entra
   Dado a staff Maria Souza, ativa, da escola de sigla "EBFGA", ativa
@@ -1043,7 +947,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   Então entra no hub com uma sessão do navegador
   E o aparelho recebe um token de acesso que vale 15 min e um token de renovação</pre>
     </article>
-    <article class="criterio" id="ca-RF-135">
+    <article class="criterio" id="RF-135">
       <h3><code class="id">RF-135</code> Entrar no quest</h3>
       <pre class="gherkin">Cenário: a mãe entra com o código do filho
   Dado o participante Lucas Andrade com o código "EBFGA-LUCAS-0412"
@@ -1051,7 +955,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   Então o perfil do Lucas abre no quest
   E a sessão registra que entrou a responsável, mãe</pre>
     </article>
-    <article class="criterio" id="ca-RF-136">
+    <article class="criterio" id="RF-136">
       <h3><code class="id">RF-136</code> Sala anônima</h3>
       <pre class="gherkin">Cenário: sala fecha
   Dado uma pessoa sem código de acesso na sala 482107, com o apelido "PUPIL-EBFGA-13465"
@@ -1059,7 +963,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   Então a sessão anônima termina
   E o token dela deixa de abrir a sala</pre>
     </article>
-    <article class="criterio" id="ca-RF-137">
+    <article class="criterio" id="RF-137">
       <h3><code class="id">RF-137</code> Renovação</h3>
       <pre class="gherkin">Cenário: token de acesso vence durante o uso
   Dado a Maria no hub há 20 min, com o token de acesso vencido
@@ -1072,7 +976,7 @@ Cenário: tempo sem uso passou
   Quando ela volta a usar o hub
   Então a renovação é recusada e ela vai para Entrar</pre>
     </article>
-    <article class="criterio" id="ca-RF-138">
+    <article class="criterio" id="RF-138">
       <h3><code class="id">RF-138</code> Sair</h3>
       <pre class="gherkin">Cenário: sair no computador da escola
   Dado a Maria conectada no navegador e no app
@@ -1080,7 +984,7 @@ Cenário: tempo sem uso passou
   Então a sessão do navegador termina e os tokens dela deixam de valer
   E o app continua conectado</pre>
     </article>
-    <article class="criterio" id="ca-RF-139">
+    <article class="criterio" id="RF-139">
       <h3><code class="id">RF-139</code> Entrada errada</h3>
       <pre class="gherkin">Cenário: senha errada
   Quando alguém informa "maria.ebfga@deboaz.com" e uma senha errada
@@ -1091,7 +995,7 @@ Cenário: entrada que não existe
   Quando alguém informa "zeca.ebfga@deboaz.com", que não existe, e uma senha
   Então vê a mesma mensagem "Entrada ou senha incorretas."</pre>
     </article>
-    <article class="criterio" id="ca-RF-140">
+    <article class="criterio" id="RF-140">
       <h3><code class="id">RF-140</code> Acesso indisponível</h3>
       <pre class="gherkin">Cenário: conta suspensa
   Dado a escola de sigla "EBFGA" suspensa pelo time deboaz
@@ -1099,7 +1003,7 @@ Cenário: entrada que não existe
   Então vê "Acesso indisponível. Fale com quem administra a sua conta."
   E nenhuma sessão é aberta</pre>
     </article>
-    <article class="criterio" id="ca-RF-158">
+    <article class="criterio" id="RF-158">
       <h3><code class="id">RF-158</code> Entrada bloqueada</h3>
       <pre class="gherkin">Cenário: quinta senha errada
   Dado 4 senhas erradas seguidas para "maria.ebfga@deboaz.com"
@@ -1107,11 +1011,12 @@ Cenário: entrada que não existe
   Então vê "Muitas tentativas erradas. Tente de novo às 09:15."
   E Entrar fica desligado até as 09:15</pre>
     </article>
-    <article class="criterio" id="ca-RF-159">
+    <article class="criterio" id="RF-159">
       <h3><code class="id">RF-159</code> Entrada concluída</h3>
       <pre class="gherkin">Cenário: hub
   Quando a Maria entra no hub com a senha certa
-  Então vê Módulos com o aviso flutuante "Você entrou. Que bom te ver de novo!" e o selo de volta animado
+  Então vê Módulos com o aviso flutuante "Você entrou. Que bom te ver de novo!"
+  E o selo de volta animado
 
 Cenário: quest
   Quando o Lucas entra com o código e escolhe o perfil dele
@@ -1121,7 +1026,7 @@ Cenário: anônimo
   Quando alguém entra na sala com o código da sala
   Então vê a sala com o aviso "Você entrou na sala como PUPIL-EBFGA-13465."</pre>
     </article>
-    <article class="criterio" id="ca-RF-141">
+    <article class="criterio" id="RF-141">
       <h3><code class="id">RF-141</code> Encerrar em todos os aparelhos</h3>
       <pre class="gherkin">Cenário: staff desativado
   Dado a Maria conectada no navegador e no app
@@ -1129,21 +1034,21 @@ Cenário: anônimo
   Então as duas sessões terminam
   E na próxima ação, em cada aparelho, ela vai para Entrar</pre>
     </article>
-    <article class="criterio" id="ca-RF-142">
+    <article class="criterio" id="RF-142">
       <h3><code class="id">RF-142</code> Sessão terminada</h3>
       <pre class="gherkin">Cenário: aviso ao voltar
   Dado o Lucas sem abrir o quest há 31 dias, com o tempo de 30 dias da escola
   Quando ele abre o quest
   Então vê o acesso com o aviso "Sua sessão terminou. Entre de novo."</pre>
     </article>
-    <article class="criterio" id="ca-RF-143">
+    <article class="criterio" id="RF-143">
       <h3><code class="id">RF-143</code> Primeiro acesso</h3>
       <pre class="gherkin">Cenário: senha anotada
   Dado a Maria vendo uma única vez a senha gerada no primeiro acesso
   Quando marca "Anotei a senha" e toca em "Continuar"
   Então entra no hub sem digitar a senha</pre>
     </article>
-    <article class="criterio" id="ca-RF-156">
+    <article class="criterio" id="RF-156">
       <h3><code class="id">RF-156</code> Aparelhos conectados</h3>
       <pre class="gherkin">Cenário: navegador e app
   Dado a Maria conectada no navegador da escola e no app do celular
@@ -1151,7 +1056,7 @@ Cenário: anônimo
   Então vê os dois aparelhos com a hora da última ação
   E o navegador marcado como "Este aparelho"</pre>
     </article>
-    <article class="criterio" id="ca-RF-157">
+    <article class="criterio" id="RF-157">
       <h3><code class="id">RF-157</code> Sair dos aparelhos</h3>
       <pre class="gherkin">Cenário: esqueceu o computador da escola aberto
   Dado a Maria conectada no navegador da escola e no app
@@ -1163,16 +1068,289 @@ Cenário: sair de todos
   Quando a Maria toca em "Sair de todos os aparelhos"
   Então as sessões do navegador e do app terminam e ela vai para Entrar</pre>
     </article>
+    <article class="criterio" id="RN-224">
+      <h3><code class="id">RN-224</code> Sessão no servidor</h3>
+      <pre class="gherkin">Cenário: a sessão vale mais que o token
+  Dado a Maria com um token de acesso emitido há 5 min
+  E a sessão dela encerrada no servidor
+  Quando o aparelho faz um pedido com esse token
+  Então o pedido é recusado</pre>
+    </article>
+    <article class="criterio" id="RN-225">
+      <h3><code class="id">RN-225</code> Uma sessão por aparelho</h3>
+      <pre class="gherkin">Cenário: navegador e app
+  Dado a Maria conectada no navegador
+  Quando ela entra também no app
+  Então ela fica com duas sessões, uma em cada aparelho
+  E cada sessão guarda a conta, a frente, o aparelho e quem entrou
+  E guarda também a versão das permissões e a hora da última ação</pre>
+    </article>
+    <article class="criterio" id="RN-226">
+      <h3><code class="id">RN-226</code> Tempo de sessão</h3>
+      <pre class="gherkin">Esquema do Cenário: tempo sem uso de cada pessoa
+  Dado &lt;quem&gt; conectado no &lt;aparelho&gt;
+  Quando fica sem usar por mais que o tempo &lt;tempo&gt;
+  Então a sessão termina
+
+  Exemplos:
+    | quem           | aparelho  | tempo                   |
+    | staff          | navegador | do staff no navegador   |
+    | staff          | app       | do staff no app         |
+    | participante   | app       | do participante         |
+    | conta master   | navegador | das contas master       |
+    | membro do time | navegador | dos membros do time     |
+
+Cenário: cada ação conta como uso
+  Dado a Maria no navegador, com o tempo de 8 h da escola
+  Quando ela age no hub a cada 7 h
+  Então a sessão continua aberta</pre>
+    </article>
+    <article class="criterio" id="RN-227">
+      <h3><code class="id">RN-227</code> Hub e quest separados</h3>
+      <pre class="gherkin">Cenário: token do hub no quest
+  Dado a Maria com um token de acesso do hub
+  Quando o aparelho usa esse token no quest
+  Então o quest recusa o token
+
+Cenário: landing page sem sessão
+  Quando alguém abre a landing page
+  Então nenhuma sessão é aberta</pre>
+    </article>
+    <article class="criterio" id="RN-228">
+      <h3><code class="id">RN-228</code> Responsável</h3>
+      <pre class="gherkin">Cenário: a mãe entra como o filho
+  Quando a Carla entra com o código do Lucas e escolhe "Mãe"
+  Então a sessão é do Lucas, marcada com o parentesco "Mãe"
+  E ela faz o que o Lucas faz, menos o que cada módulo restringir ao responsável</pre>
+    </article>
+    <article class="criterio" id="RN-229">
+      <h3><code class="id">RN-229</code> Tokens</h3>
+      <pre class="gherkin">Cenário: tokens da sessão
+  Quando a Maria entra no hub
+  Então recebe um token de acesso que vale 15 min e não fica guardado no servidor
+  E um token de renovação de uso único, que vale enquanto a sessão estiver ativa</pre>
+    </article>
+    <article class="criterio" id="RN-230">
+      <h3><code class="id">RN-230</code> O que encerra a sessão</h3>
+      <pre class="gherkin">Cenário: desativar encerra
+  Dado a Maria conectada no navegador
+  Quando a conta master desativa a Maria
+  Então a sessão termina
+
+Cenário: mudar permissão não encerra
+  Dado a Maria conectada no navegador
+  Quando a conta master muda as permissões dela
+  Então a sessão continua
+  E o aparelho busca sozinho um token novo com o token de renovação</pre>
+    </article>
+    <article class="criterio" id="RN-231">
+      <h3><code class="id">RN-231</code> Sessão anônima</h3>
+      <pre class="gherkin">Cenário: sala aberta sem tempo sem uso
+  Dado uma pessoa sem código de acesso na sala 482107
+  Quando ela fica 2 h sem agir, com a sala aberta
+  Então a sessão continua
+  E ela não abre perfil, tarefa nem outra sala</pre>
+    </article>
+    <article class="criterio" id="RN-247">
+      <h3><code class="id">RN-247</code> Limite de sessões</h3>
+      <pre class="gherkin">Cenário: sexta sessão do hub
+  Dado a Maria com 5 sessões do hub abertas
+  Quando ela entra num sexto aparelho
+  Então a sessão de última ação mais antiga termina
+  E aquele aparelho vai para Entrar com o aviso "Sua sessão terminou. Entre de novo."
+
+Cenário: quest sem limite
+  Dado o código do Lucas aberto em 6 aparelhos da família
+  Então as 6 sessões continuam abertas</pre>
+    </article>
+    <article class="criterio" id="RN-250">
+      <h3><code class="id">RN-250</code> Aviso de cada tentativa</h3>
+      <pre class="gherkin">Esquema do Cenário: tipo do aviso
+  Quando a tentativa de entrar termina em &lt;resultado&gt;
+  Então aparece o aviso de ação &lt;tipo&gt;, com o selo animado
+
+  Exemplos:
+    | resultado                       | tipo                                            |
+    | sessão aberta                   | concluído                                       |
+    | senha ou código incorreto       | recusado                                        |
+    | conta ou usuário indisponível   | indisponível                                    |
+    | entrada bloqueada               | espera                                          |
+    | sessão terminada                | indisponível, flutuante sobre a tela de entrada |</pre>
+    </article>
+    <article class="criterio" id="RNF-207">
+      <h3><code class="id">RNF-207</code> Token assinado</h3>
+      <pre class="gherkin">Cenário: assinatura RS256
+  Quando a Maria entra no hub
+  Então o token de acesso é um JWT assinado com RS256
+  E a chave RSA de 2048 bits que assina nunca sai do Key Vault
+  E as aplicações conferem o token com a chave pública publicada no endereço de chaves, pelo kid</pre>
+    </article>
+    <article class="criterio" id="RNF-209">
+      <h3><code class="id">RNF-209</code> Validade do token</h3>
+      <pre class="gherkin">Cenário: renovação dentro do tempo da sessão
+  Dado a Maria no hub, com o tempo de 8 h da escola
+  Quando o token de acesso dela passa de 15 min
+  Então o aparelho recebe um token novo pela renovação
+  E a renovação funciona enquanto ela não passar 8 h sem usar</pre>
+    </article>
+    <article class="criterio" id="RNF-203">
+      <h3><code class="id">RNF-203</code> Credencial antiga</h3>
+      <pre class="gherkin">Esquema do Cenário: mudança que invalida o token
+  Dado a Maria conectada no navegador e no app
+  Quando &lt;mudança&gt;
+  Então o token emitido antes deixa de valer na próxima ação dela, nos dois aparelhos
+
+  Exemplos:
+    | mudança                                           |
+    | a conta master desativa a Maria                   |
+    | o time deboaz suspende a escola                   |
+    | a conta master pede uma nova geração de senha     |
+    | a conta master muda as permissões dela            |
+    | a escola descontrata um módulo que ela usa        |</pre>
+    </article>
+    <article class="criterio" id="RNF-204">
+      <h3><code class="id">RNF-204</code> Bloqueio por tentativas</h3>
+      <pre class="gherkin">Esquema do Cenário: tempo do bloqueio
+  Dado &lt;bloqueios&gt; bloqueios seguidos para "maria.ebfga@deboaz.com"
+  Quando alguém erra a senha pela quinta vez seguida
+  Então a entrada fica bloqueada por &lt;tempo&gt;
+
+  Exemplos:
+    | bloqueios | tempo  |
+    | 0         | 15 min |
+    | 1         | 30 min |
+    | 2         | 1 h    |
+    | 7         | 24 h   |
+
+Cenário: código de acesso também bloqueia
+  Quando alguém erra 5 vezes seguidas o código "EBFGA-LUCAS-0412" no quest
+  Então o código fica bloqueado por 15 min</pre>
+    </article>
+    <article class="criterio" id="RNF-213">
+      <h3><code class="id">RNF-213</code> Token de renovação</h3>
+      <pre class="gherkin">Cenário: troca a cada uso
+  Dado a Maria com o token de renovação "3f9c2a71.A"
+  Quando o aparelho renova
+  Então recebe o token de renovação "3f9c2a71.B", o id da sessão seguido de 256 bits aleatórios
+  E "3f9c2a71.A" deixa de valer
+  E a sessão guarda só o resumo irreversível do token novo
+
+Cenário: renovação copiada
+  Dado o token de renovação "3f9c2a71.A" já trocado por "3f9c2a71.B"
+  Quando alguém apresenta "3f9c2a71.A"
+  Então a sessão 3f9c2a71 termina</pre>
+    </article>
+    <article class="criterio" id="RNF-214">
+      <h3><code class="id">RNF-214</code> Onde ficam os tokens</h3>
+      <pre class="gherkin">Esquema do Cenário: guarda no aparelho
+  Quando a Maria entra pelo &lt;aparelho&gt;
+  Então o token de acesso fica só na memória
+  E o token de renovação fica &lt;onde&gt;
+
+  Exemplos:
+    | aparelho       | onde                                                      |
+    | navegador      | cookie HttpOnly, Secure, SameSite=Strict, só na renovação |
+    | app no iOS     | Keychain                                                  |
+    | app no Android | Keystore                                                  |</pre>
+    </article>
+    <article class="criterio" id="RNF-215">
+      <h3><code class="id">RNF-215</code> Identidade no token</h3>
+      <pre class="gherkin">Cenário: token da Maria no navegador
+  Quando a Maria entra no hub pelo navegador
+  Então o token de acesso traz esta identidade, sem nome, documento, matrícula nem senha:
+    """
+    {"alg": "RS256", "typ": "JWT", "kid": "deboaz-2026-11"}
+    {
+      "iss": "deboaz", "aud": "hub", "sub": "usr-ebfga-maria", "sid": "3f9c2a71",
+      "conta": "conta-ebfga", "sigla": "EBFGA", "tipo": "STAFF", "aparelho": "NAVEGADOR",
+      "iat": 1793262120, "exp": 1793263020, "jti": "a81c0e5d",
+      "papel": "STAFF", "mods": { "MOD-03": "CU", "MOD-04": "U", "MOD-05": "U" }, "pv": 7
+    }
+    """
+  E papel, mods e pv são os da autorização
+
+Cenário: quem entrou no quest
+  Quando a Carla entra com o código do Lucas como mãe
+  Então o token traz em quem o responsável e o parentesco "Mãe"</pre>
+    </article>
+    <article class="criterio" id="RNF-216">
+      <h3><code class="id">RNF-216</code> Conferência em cada pedido</h3>
+      <pre class="gherkin">Esquema do Cenário: token recusado
+  Dado a Maria com um token &lt;problema&gt;
+  Quando o aparelho faz um pedido
+  Então a resposta é 401
+  E a web e o mobile tentam uma renovação antes de levar a Entrar
+
+  Exemplos:
+    | problema                            |
+    | com a assinatura errada             |
+    | vencido                             |
+    | do quest                            |
+    | de uma sessão encerrada             |
+    | com a versão de permissões antiga   |</pre>
+    </article>
+    <article class="criterio" id="RNF-217">
+      <h3><code class="id">RNF-217</code> Sessão no Redis</h3>
+      <pre class="gherkin">Cenário: sessão da Maria
+  Quando a Maria entra no hub pelo navegador, com o tempo de 8 h da escola
+  Então a sessão fica no Redis na chave sessao:3f9c2a71, expirando em 8 h e refeita a cada ação:
+    """
+    {
+      "usuarioId": "usr-ebfga-maria", "contaId": "conta-ebfga", "sigla": "EBFGA",
+      "frente": "HUB", "aparelho": "NAVEGADOR", "quemEntrou": null, "versaoPermissoes": 7,
+      "resumoRenovacao": "(resumo irreversível do token de renovação)",
+      "criadaEm": "2026-11-01T09:00:00Z", "ultimaAcao": "2026-11-01T09:42:00Z"
+    }
+    """
+  E o índice sessoes:usr-ebfga-maria lista as sessões dela, para encerrar todas de uma vez
+
+Cenário: tentativas erradas
+  Quando alguém erra a senha de "maria.ebfga@deboaz.com"
+  Então a tentativa e o bloqueio ficam no Redis, com expiração igual ao tempo do bloqueio</pre>
+    </article>
+    <article class="criterio" id="RNF-218">
+      <h3><code class="id">RNF-218</code> Troca da chave</h3>
+      <pre class="gherkin">Cenário: troca a cada 90 dias
+  Dado tokens assinados com a chave "deboaz-2026-11"
+  Quando a chave é trocada por "deboaz-2027-02" depois de 90 dias
+  Então os tokens novos levam o kid "deboaz-2027-02"
+  E os assinados com "deboaz-2026-11" continuam aceitos até vencer, sem encerrar sessões
+
+Cenário: troca por vazamento
+  Dado a suspeita de vazamento da chave "deboaz-2026-11"
+  Quando a chave é trocada na hora
+  Então os tokens assinados com "deboaz-2026-11" são recusados
+  E as sessões renovam com a chave nova</pre>
+    </article>
+    <article class="criterio" id="fora-de-escopo">
+      <h3>Fora de escopo</h3>
+      <pre class="gherkin">Cenário: sem provedor externo nem segundo fator
+  Quando a Maria entra no hub
+  Então entra só com a entrada e a senha, sem provedor externo nem segundo fator
+
+Cenário: sem biometria no app
+  Quando a Maria abre o app de novo, com a sessão ativa
+  Então continua conectada pelo token de renovação guardado no aparelho, sem biometria
+
+Cenário: sem aparelhos conectados no quest
+  Quando o Lucas abre Perfil no quest
+  Então não há a lista de aparelhos conectados nem "Sair de todos os aparelhos"</pre>
+    </article>
   </section>
-  <section id="fora-de-escopo">
-    <h2>Fora de escopo</h2>
-    <ul class="fora">
-      <li>Entrada por provedor externo e segundo fator de autenticação (<a class="ref" href="17_modulo-usuario.html#contexto">Usuários <code class="id">contexto</code></a>, decisão de 2026-10-29)</li>
-      <li>O que cada pessoa pode ver e fazer: <a class="ref" href="17_modulo-usuario-b-autorizacao.html#contexto">Módulo Usuários · Autorização</a></li>
-      <li>Geração de senha, código de liberação e código de acesso: <a class="ref" href="17_modulo-usuario.html#RN-181">Usuários <code class="id">RN-181</code></a></li>
-      <li>Entrada por biometria no app: o token de renovação já fica no armazenamento seguro do aparelho e a pessoa não digita a senha de novo (<a class="ref" href="#RNF-214">RNF-214</a>)</li>
-      <li>Aparelhos conectados e sair de todos no quest</li>
-    </ul>
+  <section id="telas">
+    <h2>Telas</h2>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg"><img src="../2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg" alt="Vista dos aparelhos conectados no hub: linha Aparelhos conectados na Conta, lista com este aparelho marcado, sair de um aparelho e sair de todos com confirmação, no compact, no medium e no expanded"></a>
+      <figcaption><strong>Hub · aparelhos conectados · vista</strong><code>2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/vista-hub-entrar_v01_20261101-1306.svg"><img src="../2_Diagramas/vista-hub-entrar_v01_20261101-1306.svg" alt="Vista de Entrar no hub pela conta master, pelo staff, pelo educador autônomo e pelo membro do time deboaz, cada um no compact, no medium e no expanded, com as recusas de entrada ou senha incorretas, acesso indisponível e entrada bloqueada e a sessão terminada"></a>
+      <figcaption><strong>Hub · entrar · vista</strong><code>2_Diagramas/vista-hub-entrar_v01_20261101-1306.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/vista-quest-entrar_v01_20261101-1306.svg"><img src="../2_Diagramas/vista-quest-entrar_v01_20261101-1306.svg" alt="Vista de entrar no quest: código de acesso, participante, responsável e acesso anônimo, cada um no compact, no medium e no expanded, com o código inválido, o código bloqueado e a sessão terminada"></a>
+      <figcaption><strong>Quest · entrar · vista</strong><code>2_Diagramas/vista-quest-entrar_v01_20261101-1306.svg</code></figcaption>
+    </figure>
   </section>
   <section id="diagramas">
     <h2>Diagramas</h2>
@@ -1188,18 +1366,6 @@ Cenário: sair de todos
       <a href="../2_Diagramas/autenticacao-classes_v01_20261101-1501.svg"><img src="../2_Diagramas/autenticacao-classes_v01_20261101-1501.svg" alt="Diagrama de classes da autenticação: Sessão no Redis com frente, aparelho, quem entrou, versão das permissões e resumo da renovação, índice de sessões com o limite do hub, token de acesso JWT, token de renovação de uso único, chave de assinatura no Key Vault e tentativas de entrada com bloqueio progressivo"></a>
       <figcaption><strong>Autenticação · classes</strong><code>2_Diagramas/autenticacao-classes_v01_20261101-1501.svg</code></figcaption>
     </figure>
-    <figure class="diagrama">
-      <a href="../2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg"><img src="../2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg" alt="Vista dos aparelhos conectados no hub: linha Aparelhos conectados na Conta, lista com este aparelho marcado, sair de um aparelho e sair de todos com confirmação, no compact, no medium e no expanded"></a>
-      <figcaption><strong>Hub · aparelhos conectados · vista</strong><code>2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg</code></figcaption>
-    </figure>
-    <figure class="diagrama">
-      <a href="../2_Diagramas/vista-hub-entrar_v01_20261101-1306.svg"><img src="../2_Diagramas/vista-hub-entrar_v01_20261101-1306.svg" alt="Vista de Entrar no hub pela conta master, pelo staff, pelo educador autônomo e pelo membro do time deboaz, cada um no compact, no medium e no expanded, com as recusas de entrada ou senha incorretas, acesso indisponível e entrada bloqueada e a sessão terminada"></a>
-      <figcaption><strong>Hub · entrar · vista</strong><code>2_Diagramas/vista-hub-entrar_v01_20261101-1306.svg</code></figcaption>
-    </figure>
-    <figure class="diagrama">
-      <a href="../2_Diagramas/vista-quest-entrar_v01_20261101-1306.svg"><img src="../2_Diagramas/vista-quest-entrar_v01_20261101-1306.svg" alt="Vista de entrar no quest: código de acesso, participante, responsável e acesso anônimo, cada um no compact, no medium e no expanded, com o código inválido, o código bloqueado e a sessão terminada"></a>
-      <figcaption><strong>Quest · entrar · vista</strong><code>2_Diagramas/vista-quest-entrar_v01_20261101-1306.svg</code></figcaption>
-    </figure>
   </section>
 </main>
 <footer class="boaz-marca-rodape">
@@ -1207,7 +1373,8 @@ Cenário: sair de todos
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v12</span></td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v13</span></td><td>2026-11-01 17:59</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão</td></tr>
+      <tr><td>v12</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
       <tr><td>v11</td><td>2026-11-01 15:04</td><td>Diagrama autenticacao-classes v01: sessão, índice de sessões, tokens, chave de assinatura e tentativas de entrada</td></tr>
       <tr><td>v10</td><td>2026-11-01 13:15</td><td>Aprovado</td></tr>
       <tr><td>v09</td><td>2026-11-01 13:09</td><td>Aviso de ação em toda tentativa de entrar: nova <code class="id">RF-159</code>, entrada concluída com aviso flutuante, e <code class="id">RN-250</code>, o tom de cada resultado; vistas de entrada refeitas com os selos animados (vista-hub-entrar v01 e vista-quest-entrar v01 de 13:06)</td></tr>
@@ -1216,11 +1383,10 @@ Cenário: sair de todos
       <tr><td>v06</td><td>2026-11-01 12:20</td><td>Sequência v02 com a entrada do participante no quest; vista-hub-aparelhos v01 (<code class="id">RF-156</code>, <code class="id">RF-157</code>); escolhas do contrato: token de renovação com o id da sessão (<code class="id">RNF-213</code>), comprovante do primeiro acesso (<code class="id">RF-143</code>), chave pública publicada (<code class="id">RNF-207</code>) e tentativas no Redis (<code class="id">RNF-217</code>)</td></tr>
       <tr><td>v05</td><td>2026-11-01 11:46</td><td>Diagramas autenticacao-sequencia v01 (entrar, cada ação, renovar e sair) e autenticacao-contrato-api v01 (10 endereços /auth)</td></tr>
       <tr><td>v04</td><td>2026-11-01 11:41</td><td>Aparelhos conectados e sair de um ou de todos em Conta (<code class="id">RF-156</code>, <code class="id">RF-157</code>); até 5 sessões do hub por usuário (<code class="id">RN-247</code>); chave trocada a cada 90 dias ou na hora por vazamento (<code class="id">RNF-218</code>); biometria fora de escopo; Em aberto resolvido</td></tr>
-      <tr><td>v03</td><td>2026-11-01 03:38</td><td><code class="id">RN-226</code>: o tempo da conta master e dos membros do time tem limites próprios (Usuários <code class="id">RN-243</code>)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v12 · 2026-11-01 15:28</span>
+    <span>boaz · v13 · 2026-11-01 17:59</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-a-autenticacao.html</span>
   </div>
 </footer>
