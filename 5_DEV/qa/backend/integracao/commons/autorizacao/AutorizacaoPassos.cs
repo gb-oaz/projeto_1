@@ -168,6 +168,8 @@ public sealed partial class AutorizacaoPassos(Mundo mundo)
 
     [When(@"^envia GET (\S+)$")]
     [When(@"^envia GET (\S+), de um usuário da escola ""COLSA""$")]
+    // RN-252: abaixo é quem a pessoa criou (a Ana pelo João; o Rui pela conta master)
+    [When(@"^envia GET (\S+), de (?:a Ana, que ele criou|o Rui, criado pela conta master como ele)$")]
     public async Task SujeitoPede(string caminho) => await mundo.EnviarComo(await mundo.SujeitoOu(caminho), "GET", await mundo.Traduzir(caminho));
 
     [When(@"^a Maria envia GET (\S+)$")]
@@ -373,6 +375,13 @@ public sealed partial class AutorizacaoPassos(Mundo mundo)
     [Then(@"^o desenho da tela Permissões .+$")]
     [Then(@"^permissões por ação, .+$")]
     public static void ForaDeEscopo() => throw new PendingStepException("fora de escopo: nada a testar");
+
+    // RN-251: o que criar ou usar quer dizer é regra de cada módulo; o valor das abas no token já é testado
+    [Then(@"^a Configuração, ""C"", libera .+$")]
+    [Then(@"^a Utilização, ""U"", libera .+$")]
+    [Then(@"^quem cria recebe ""C"", .+$")]
+    [Then(@"^o participante e o responsável só recebem ""U""$")]
+    public static void SentidoDasAbas() => throw new PendingStepException("o que cada aba libera é regra de cada módulo");
 
     // ── o token ─────────────────────────────────────────────────────────────
     [Then(@"^o token (?:de acesso )?tem o papel ""(\w+)""$")]

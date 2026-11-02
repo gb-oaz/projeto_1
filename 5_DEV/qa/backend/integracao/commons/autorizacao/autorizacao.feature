@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.html (v12), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.html (v14), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Autorização
   1_Requisitos/17_modulo-usuario-b-autorizacao.html · Cenários de API
@@ -90,12 +90,50 @@ Funcionalidade: Autorização
       """
       {
         "codigo": "PERMISSAO_ACIMA",
-        "mensagem": "Você não tem mais a Presença para conceder.",
+        "mensagem": "Você não tem mais o módulo Presença para conceder.",
         "mod": "MOD-06",
         "abas": "U"
       }
       """
     E GET /usuarios/usr-ebfga-ana/permissoes continua com a versão 2, sem mudança
+
+  @RF-161
+  Cenário: módulo que a pessoa não usa
+    Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes com:
+      """
+      {
+        "mods": {
+          "MOD-13": "U"
+        }
+      }
+      """
+    Então a resposta é 422 DADOS_INVALIDOS com:
+      """
+      {
+        "codigo": "DADOS_INVALIDOS",
+        "mensagem": "Maria Souza não usa o módulo Perfil.",
+        "campo": "mods.MOD-13"
+      }
+      """
+
+  @RF-161
+  Cenário: módulo que não existe
+    Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes com:
+      """
+      {
+        "mods": {
+          "MOD-99": "U"
+        }
+      }
+      """
+    Então a resposta é 422 DADOS_INVALIDOS com:
+      """
+      {
+        "codigo": "DADOS_INVALIDOS",
+        "mensagem": "O módulo MOD-99 não existe.",
+        "campo": "mods.MOD-99"
+      }
+      """
 
   @RF-162
   Cenário: duas pessoas salvando
@@ -106,7 +144,7 @@ Funcionalidade: Autorização
       """
       {
         "codigo": "VERSAO_DESATUALIZADA",
-        "mensagem": "As permissões da Maria mudaram agora há pouco. Confira e salve.",
+        "mensagem": "As permissões de Maria Souza mudaram agora há pouco. Confira e salve.",
         "versao": 7
       }
       """
@@ -133,15 +171,15 @@ Funcionalidade: Autorização
     Então o token tem em mods <módulos> com as abas <abas>
 
     Exemplos:
-      | quem           | frente | módulos                                | abas     |
-      | administrador  | hub    | SAC, Usuários e Catálogo               | C e U    |
-      | membro do time | hub    | os marcados entre SAC, Usuários e Cat. | marcadas |
-      | conta master   | hub    | os da conta e os contratados           | C e U    |
-      | autônomo       | hub    | os da conta e os contratados           | C e U    |
-      | staff          | hub    | os marcados pela conta master          | marcadas |
-      | participante   | quest  | Tarefas, Perfil e os de Quem usa       | U        |
-      | responsável    | quest  | os do participante, com Quem usa       | U        |
-      | anônimo        | quest  | só o módulo da sala                    | U        |
+      | quem           | frente | módulos                                                   | abas     |
+      | administrador  | hub    | SAC, Usuários e Catálogo                                  | C e U    |
+      | membro do time | hub    | os marcados entre SAC, Usuários e Catálogo                | marcadas |
+      | conta master   | hub    | todos os da conta e os contratados usados no hub          | C e U    |
+      | autônomo       | hub    | todos os da conta e os contratados usados no hub          | C e U    |
+      | staff          | hub    | os marcados pela conta master                             | marcadas |
+      | participante   | quest  | Tarefas, Perfil e os que participante ou responsável usam | U        |
+      | responsável    | quest  | os mesmos do participante                                 | U        |
+      | anônimo        | quest  | só o módulo da sala                                       | U        |
 
   @RN-235
   Cenário: registro de outra conta
@@ -212,6 +250,13 @@ Funcionalidade: Autorização
     Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes sem "MOD-05"
     Então GET /usuarios/usr-ebfga-maria/permissoes não traz "MOD-05"
 
+  @RN-251
+  Cenário: o que cada aba libera
+    Então a Configuração, "C", libera criar e configurar no módulo, como criar um Quiz
+    E a Utilização, "U", libera usar o que foi criado, como ver e participar de um Quiz
+    E quem cria recebe "C", como a conta master, o autônomo e a staff que dá aula
+    E o participante e o responsável só recebem "U"
+
   @RN-252
   Esquema do Cenário: concessões permitidas
     Quando <quem concede> envia PUT /usuarios/{id}/permissoes de <quem recebe>
@@ -226,6 +271,38 @@ Funcionalidade: Autorização
       | o João, com Adm. | a Maria, par dele    | 403 ACESSO_NEGADO               |
       | a staff Ana      | o João, acima dela   | 403 ACESSO_NEGADO               |
       | a conta master   | o participante Lucas | 403 ACESSO_NEGADO               |
+
+  @RN-252
+  Esquema do Cenário: abaixo é quem a pessoa criou, direta ou indiretamente
+    Dado o João com Administrar usuários e só a Utilização do Quiz
+    Quando envia GET /usuarios/<id>/permissoes, de <quem>
+    Então a resposta é <resposta>
+
+    Exemplos:
+      | id            | quem                                     | resposta          |
+      | usr-ebfga-ana | a Ana, que ele criou                     | 200               |
+      | usr-ebfga-rui | o Rui, criado pela conta master como ele | 403 ACESSO_NEGADO |
+
+  @RN-252
+  Cenário: staff não repassa Administrar usuários
+    Dado o João com Administrar usuários e só a Utilização do Quiz
+    Quando o João envia PUT /usuarios/usr-ebfga-ana/permissoes com If-Match "2" e:
+      """
+      {
+        "mods": {
+          "MOD-03": "CU"
+        }
+      }
+      """
+    Então a resposta é 403 PERMISSAO_ACIMA com:
+      """
+      {
+        "codigo": "PERMISSAO_ACIMA",
+        "mensagem": "Só a conta master concede o módulo Usuários.",
+        "mod": "MOD-03",
+        "abas": "CU"
+      }
+      """
 
   @RN-253
   Cenário: quem concedeu é desativado
