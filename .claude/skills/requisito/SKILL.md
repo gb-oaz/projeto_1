@@ -30,6 +30,7 @@ Resumo do que não pode faltar:
 
 ## Diagramas e outros documentos
 
+- Conjunto padrão de uma funcionalidade, sempre que couber (skill `diagrama-dev`, nesta ordem em Diagramas): **casos de uso** (quem faz o quê), **sequência** (os passos com os endereços e as recusas), **contrato de API** (cada endereço com uso, quem usa, login, pedido e respostas em JSON expandido), **classes** e **documentos** (coleções, embutidos, chaves no Redis e o que é só lido de outro requisito). Faltou algum? Diga na resposta e proponha desenhar.
 - Diagrama: `<figure class="diagrama">` apontando para o `.svg` **com a versão explícita**, por caminho relativo (`../2_Diagramas/<legenda>_vNN_<AAAAMMDD-HHMM>.svg`), com `alt` descritivo e o caminho na `<figcaption>`. Use a versão mais recente (`./boaz.sh diagramas`) e confira que o arquivo existe.
 - Outro documento: `<a class="ref" href="02_cadastro-usuario.html#RF-01">Cadastro de usuário <code class="id">RF-01</code></a>`; termo do glossário: `99_glossario.html#<termo>`.
 
