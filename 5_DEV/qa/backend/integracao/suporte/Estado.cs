@@ -91,6 +91,12 @@ public static class Estado
                 & Builders<BsonDocument>.Filter.Eq("ate", BsonNull.Value),
             Builders<BsonDocument>.Update.Set("ate", DateTime.UtcNow.AddSeconds(-1)));
 
+    // o código de liberação foi pedido há algum tempo (RN-182: vale 72 h)
+    public static Task PedidoHa(string usuarioId, TimeSpan tempo) =>
+        Banco.GetCollection<BsonDocument>("geracoesSenha").UpdateManyAsync(
+            Builders<BsonDocument>.Filter.Eq("usuarioId", usuarioId),
+            Builders<BsonDocument>.Update.Set("pedidaEm", DateTime.UtcNow - tempo));
+
     // a sessão passou do tempo sem uso: a chave expira (RN-226, RNF-217)
     public static Task ExpirarSessao(string sid) => redis.Value.GetDatabase().KeyDeleteAsync($"sessao:{sid}");
 

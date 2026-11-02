@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 
 namespace Boaz.Qa.Integracao.Suporte;
 
@@ -33,7 +34,16 @@ public sealed class Sessao
 //   Caio                             membro do time, criado pelo administrador
 //   Bruno                            staff da escola COLSA, outra conta
 //   Pedro                            educador autônomo
-public sealed class Mundo
+//   Paulo                            staff, professor (Usuários: desativar, nova geração de senha)
+//   Gustavo                          staff ainda pendente, com o código de liberação sem uso
+//   Ana Lima                         membro do time, atende o SAC (RN-172)
+//   Maria da EEJSA                   staff de outra escola, para o login em maiúsculas (RN-180)
+//
+// Quem um pedido do cenário cria (POST /contas, POST /usuarios com 201) fica
+// anotado: depois, "usr-ebfga-maria" é a Maria criada pelo cenário, e não uma
+// nova. Valores gerados (senha, código de liberação, comprovante) valem pelo
+// formato: o do exemplo é trocado pelo que veio, se o que veio tem a forma certa.
+public sealed partial class Mundo
 {
     public const string Navegador = "NAVEGADOR", App = "APP";
 
@@ -70,6 +80,7 @@ public sealed class Mundo
         Apelidos["usr-ebfga-lucas"] = async () => (await Lucas()).Id;
         Apelidos["usr-dboaz-caio"] = async () => (await Caio()).Id;
         Apelidos["usr-colsa-bruno"] = async () => (await Bruno()).Id;
+        Apelidos["usr-ebfga-paulo"] = async () => (await Paulo()).Id;
         Apelidos["EBFGA-LUCAS-0412"] = CodigoDoLucas;
         // sessões da Maria nos exemplos: 3f9c2a71 no navegador, 7d20b9e4 no app
         Apelidos["3f9c2a71"] = async () => (await SessaoDe(await Maria(), Navegador)).Sid;
@@ -92,6 +103,10 @@ public sealed class Mundo
     // valor do exemplo do requisito → valor real, gerado quando o texto o cita
     public Dictionary<string, Func<Task<string>>> Apelidos { get; } = [];
 
+    // campos do JSON do exemplo que a API não deixa reproduzir (histórico,
+    // pagamento): saem da comparação, e o passo que os põe aqui diz por quê
+    public HashSet<string> CamposSemConferir { get; } = [];
+
     readonly Dictionary<string, Pessoa> pessoas = [];
     readonly Dictionary<string, (string Id, Pessoa Master)> contas = [];
     Pessoa? admin;
@@ -103,8 +118,46 @@ public sealed class Mundo
         UltimoPedido = (metodo, caminho, corpo);
         HoraDoPedido = DateTimeOffset.UtcNow;
         Ultima = await api.Enviar(metodo, caminho, corpo, token, cookie, ifMatch);
+        Anotar(metodo, caminho, corpo, Ultima);
         return Ultima;
     }
+
+    void Anotar(string metodo, string caminho, string? corpo, Resposta r)
+    {
+        if (r.Status is < 200 or > 299 || r.Corpo is not JsonObject veio) return;
+        Gerado(veio, "senha", "Gu#Boaz507318", FormaDaSenha());
+        Gerado(veio, "codigoLiberacao", "482913", SeisNumeros());
+        Gerado(veio, "comprovante", "c7e1…", null);
+        if (metodo != "POST" || r.Status != 201 || corpo is null) return;
+        var pedido = JsonNode.Parse(corpo)!.AsObject();
+        if (caminho == "/contas" && pedido["sigla"]?.GetValue<string>() is { } sigla && !contas.ContainsKey(sigla.ToUpperInvariant()))
+        {
+            var master = new Pessoa { Nome = $"conta master da {sigla}", Entrada = Texto(r, "login"), Senha = veio["senha"]?.GetValue<string>() ?? "" };
+            contas[sigla.ToUpperInvariant()] = (Texto(r, "contaId"), master);
+        }
+        // só a EBFGA e o time: a Maria da EEJSA tem o mesmo nome curto da Maria dos exemplos
+        if (caminho == "/usuarios" && pedido["nomeCurto"]?.GetValue<string>() is { } nomeCurto && !pessoas.ContainsKey(nomeCurto)
+            && Texto(r, "login") is var login && (login.Contains(".ebfga@") || login.StartsWith("EBFGA-") || login.Contains(".dboaz@")))
+        {
+            pessoas[nomeCurto] = new Pessoa { Nome = pedido["nome"]?.GetValue<string>() ?? nomeCurto, Entrada = login, Id = Texto(r, "id") };
+            if (nomeCurto == "lucas") codigoLucas = login;
+        }
+    }
+
+    void Gerado(JsonObject veio, string campo, string exemplo, Regex? forma)
+    {
+        if (veio[campo]?.GetValue<string>() is { } valor && (forma is null || forma.IsMatch(valor)))
+        {
+            Apelidos[exemplo] = () => Task.FromResult(valor);
+        }
+    }
+
+    // duas letras do nome, um caractere especial, a palavra seguinte e 6 números (RN-171)
+    [GeneratedRegex(@"^[A-Z][a-z][^A-Za-z0-9][A-Z][a-z]+\d{6}$")]
+    private static partial Regex FormaDaSenha();
+
+    [GeneratedRegex(@"^\d{6}$")]
+    private static partial Regex SeisNumeros();
 
     public async Task<string> Traduzir(string texto)
     {
@@ -126,8 +179,15 @@ public sealed class Mundo
         {
             "EBFGA" => ContaNova("INSTITUICAO", "Escola Bento Freitas", "12.345.678/0001-90", "objetivo_unidade1", sigla),
             "COLSA" => ContaNova("INSTITUICAO", "Colégio Santo Antônio", "98.765.432/0001-10", "colegio_sa", sigla),
+            "EEJSA" => ContaNova("INSTITUICAO", "Escola Estadual José de Sá", "11.222.333/0001-81", "eejsa", sigla),
             _ => ContaNova("AUTONOMO", "Pedro Reis", "123.456.789-09", "pedro_reis", sigla),
         };
+        return await NovaConta(sigla, corpo);
+    }
+
+    // conta criada e confirmada; a primeira da sigla fica nos exemplos
+    public async Task<string> NovaConta(string sigla, string corpo)
+    {
         var r = Exigir(await api.Enviar("POST", "/contas", corpo), 201, $"POST /contas da {sigla}");
         var master = new Pessoa { Nome = $"conta master da {sigla}", Entrada = Texto(r, "login"), Senha = Texto(r, "senha") };
         contas[sigla] = (Texto(r, "contaId"), master);
@@ -135,7 +195,24 @@ public sealed class Mundo
         return contas[sigla].Id;
     }
 
-    static string ContaNova(string tipo, string nome, string documento, string dominio, string sigla) => new JsonObject
+    // CNPJ com os dígitos verificadores certos, um por número, para as contas em lote
+    public static string Cnpj(int numero)
+    {
+        var d = $"{numero:D8}0001".Select(c => c - '0').ToList();
+        foreach (var pesos in new[] { new[] { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 }, new[] { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 } })
+        {
+            var resto = d.Zip(pesos, (a, b) => a * b).Sum() % 11;
+            d.Add(resto < 2 ? 0 : 11 - resto);
+        }
+        var t = string.Concat(d);
+        return $"{t[..2]}.{t[2..5]}.{t[5..8]}/{t[8..12]}-{t[12..]}";
+    }
+
+    // 0 → "aaa", 1 → "aab"…: nomes curtos e siglas só com letras
+    public static string Letras(int numero, int tamanho = 3) =>
+        string.Concat(Enumerable.Range(0, tamanho).Select(i => (char)('a' + numero / (int)Math.Pow(26, tamanho - 1 - i) % 26)));
+
+    public static string ContaNova(string tipo, string nome, string documento, string dominio, string sigla) => new JsonObject
     {
         ["tipo"] = tipo,
         ["nome"] = nome,
@@ -189,23 +266,61 @@ public sealed class Mundo
         return ana;
     }
 
+    // o professor Paulo, criado pela conta master ou por um superior dele
+    public async Task<Pessoa> Paulo(Pessoa? criador = null) =>
+        pessoas.GetValueOrDefault("paulo") ?? await Staff("paulo", "Paulo Martins", "20260091", criador ?? await Master());
+
+    public async Task<Pessoa> MariaDaEejsa()
+    {
+        await ContaDe("EEJSA");
+        return pessoas.GetValueOrDefault("maria-eejsa")
+            ?? await Staff("maria-eejsa", "Maria Souza", "20260087", contas["EEJSA"].Master, nomeCurto: "maria");
+    }
+
+    // staff pendente: criado, com o código de liberação ainda sem uso (RF-109)
+    public async Task<(Pessoa Pessoa, string Codigo)> Pendente(string nome, string nomeCurto, string matricula)
+    {
+        var r = Exigir(await EnviarComo(await Master(), "POST", "/usuarios", new JsonObject
+        {
+            ["tipo"] = "STAFF",
+            ["nome"] = nome,
+            ["nomeCurto"] = nomeCurto,
+            ["matricula"] = matricula,
+        }.ToJsonString()), 201, $"POST /usuarios de {nome}");
+        return (pessoas[nomeCurto], Texto(r, "codigoLiberacao"));
+    }
+
+    public Task<(Pessoa Pessoa, string Codigo)> Gustavo() => Pendente("Gustavo Boaz de Moura Souza", "gustavo", "20260092");
+
+    // membro do time criado pelo administrador, já com a senha confirmada
+    public async Task<Pessoa> Membro(string nome, string nomeCurto)
+    {
+        if (pessoas.TryGetValue(nomeCurto, out var membro)) return membro;
+        var criado = Exigir(await api.Enviar("POST", "/usuarios", new JsonObject
+        {
+            ["tipo"] = "MEMBRO_TIME",
+            ["nome"] = nome,
+            ["nomeCurto"] = nomeCurto,
+        }.ToJsonString(), await TokenDe(Admin())), 201, $"POST /usuarios de {nome}");
+        return pessoas[nomeCurto] = await Ativar(nome, criado);
+    }
+
+    // os membros do time recebem permissões do administrador; os outros, da conta master
+    public bool DoTime(Pessoa pessoa) => pessoas.TryGetValue("caio", out var c) && c == pessoa
+        || pessoas.TryGetValue("analima", out var a) && a == pessoa;
+
+    // quem envia o pedido do cenário: o Sujeito do Dado, ou, sem ele, o time
+    // deboaz para as contas e o tempo do time e a conta master para o resto
+    public async Task<Pessoa> SujeitoOu(string caminho) =>
+        Sujeito ?? (caminho.StartsWith("/contas") || caminho.StartsWith("/time") ? Admin() : await Master());
+
     public async Task<Pessoa> Bruno()
     {
         await ContaDe("COLSA");
         return pessoas.GetValueOrDefault("bruno") ?? await Staff("bruno", "Bruno Dias", "20260100", contas["COLSA"].Master);
     }
 
-    public async Task<Pessoa> Caio()
-    {
-        if (pessoas.TryGetValue("caio", out var caio)) return caio;
-        var criado = Exigir(await api.Enviar("POST", "/usuarios", new JsonObject
-        {
-            ["tipo"] = "MEMBRO_TIME",
-            ["nome"] = "Caio Lima",
-            ["nomeCurto"] = "caio",
-        }.ToJsonString(), await TokenDe(Admin())), 201, "POST /usuarios do Caio");
-        return pessoas["caio"] = await Ativar("Caio Lima", criado);
-    }
+    public Task<Pessoa> Caio() => Membro("Caio Lima", "caio");
 
     public async Task<string> CodigoDoLucas() { await Lucas(); return codigoLucas; }
 
@@ -235,7 +350,7 @@ public sealed class Mundo
     }
 
     // staff criado por quem tem Administrar usuários, com a senha vista e ainda não confirmada
-    public async Task<(Pessoa Pessoa, string Comprovante)> StaffPendente(string nome, string nomeCurto, string matricula,
+    public async Task<(Pessoa Pessoa, string Comprovante)> StaffPendente(string nome, string nomeCurto, string? matricula,
         Pessoa? criador = null)
     {
         var criado = Exigir(await EnviarComo(criador ?? await Master(), "POST", "/usuarios", new JsonObject
@@ -266,9 +381,12 @@ public sealed class Mundo
         _ => null,
     };
 
-    async Task<Pessoa> Staff(string chave, string nome, string matricula, Pessoa criador)
+    // staff com a senha confirmada, fora dos exemplos (o card conta os ativos)
+    public Task<Pessoa> NovoStaff(string nomeCurto, string nome, Pessoa criador) => Staff(nomeCurto, nome, null, criador);
+
+    async Task<Pessoa> Staff(string chave, string nome, string? matricula, Pessoa criador, string? nomeCurto = null)
     {
-        var (pessoa, comprovante) = await StaffPendente(nome, chave, matricula, criador);
+        var (pessoa, comprovante) = await StaffPendente(nome, nomeCurto ?? chave, matricula, criador);
         await Confirmar(comprovante);
         return pessoas[chave] = pessoa;
     }
@@ -311,7 +429,7 @@ public sealed class Mundo
     // administrador para os membros do time)
     public async Task<JsonObject> Permissoes(Pessoa pessoa, Pessoa? por = null)
     {
-        por ??= pessoa == pessoas.GetValueOrDefault("caio") ? Admin() : await Master();
+        por ??= DoTime(pessoa) ? Admin() : await Master();
         var r = Exigir(await EnviarComo(por, "GET", $"/usuarios/{pessoa.Id}/permissoes"),
             200, $"GET /usuarios/{{id}}/permissoes de {pessoa.Nome}");
         return r.Corpo!.AsObject();
@@ -330,7 +448,7 @@ public sealed class Mundo
     public async Task<Resposta> Definir(Pessoa pessoa, Dictionary<string, string> mods, Pessoa? por = null, bool exigir = true)
     {
         foreach (var mod in mods.Keys.Where(Contrataveis.Contains)) await Contratar(mod);
-        por ??= pessoa == pessoas.GetValueOrDefault("caio") ? Admin() : await Master();
+        por ??= DoTime(pessoa) ? Admin() : await Master();
         var versao = (await Permissoes(pessoa, por))["versao"]!.GetValue<int>();
         var corpo = new JsonObject { ["mods"] = new JsonObject(mods.Select(m => KeyValuePair.Create(m.Key, (JsonNode?)m.Value))) };
         var r = await EnviarComo(por, "PUT", $"/usuarios/{pessoa.Id}/permissoes", corpo.ToJsonString(), versao.ToString());
@@ -370,11 +488,21 @@ public sealed class Mundo
 
     public async Task<Sessao> EntrarNoQuest(string aparelho, JsonObject? quem = null)
     {
-        var corpo = new JsonObject { ["codigo"] = await CodigoDoLucas(), ["aparelho"] = aparelho };
-        if (quem is not null) corpo["quem"] = quem;
-        var r = Exigir(await Enviar("POST", "/auth/quest/entrar", corpo.ToJsonString()), 200, "POST /auth/quest/entrar");
-        return Registrar(pessoas["lucas"], aparelho, r)!;
+        var r = Exigir(await TentarQuest(aparelho, quem), 200, "POST /auth/quest/entrar");
+        return Sessoes.Last(s => s.Acesso == Texto(r, "tokenAcesso"));
     }
+
+    // POST /auth/quest/entrar com o código do Lucas, sem exigir 200 (a escola pode estar fora do ar)
+    public async Task<Resposta> TentarQuest(string aparelho, JsonObject? quem = null, string? codigo = null)
+    {
+        var corpo = new JsonObject { ["codigo"] = codigo ?? await CodigoDoLucas(), ["aparelho"] = aparelho };
+        if (quem is not null) corpo["quem"] = quem;
+        var r = await Enviar("POST", "/auth/quest/entrar", corpo.ToJsonString());
+        if (pessoas.TryGetValue("lucas", out var lucas)) Registrar(lucas, aparelho, r);
+        return r;
+    }
+
+    public static JsonObject Carla() => new() { ["tipo"] = "RESPONSAVEL", ["parentesco"] = "Mãe" };
 
     // guarda a sessão aberta por uma resposta 200 de entrada ou confirmação
     public Sessao? Registrar(Pessoa pessoa, string aparelho, Resposta r)

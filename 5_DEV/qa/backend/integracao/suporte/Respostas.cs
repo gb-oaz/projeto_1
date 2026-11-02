@@ -25,7 +25,9 @@ public sealed class Respostas(Mundo mundo)
     public async Task StatusEJson(int status, string json)
     {
         Confere(mundo.Ultima, status);
-        Comparacao.Confere(JsonNode.Parse(await mundo.Traduzir(json)), mundo.Ultima.Corpo);
+        var esperado = JsonNode.Parse(await mundo.Traduzir(json));
+        if (esperado is JsonObject campos) foreach (var campo in mundo.CamposSemConferir) campos.Remove(campo);
+        Comparacao.Confere(esperado, mundo.Ultima.Corpo);
     }
 
     [Then(@"^a resposta é (\d{3}) ([A-Z_]+) com:$")]

@@ -29,7 +29,7 @@ public sealed partial class AutorizacaoPassos(Mundo mundo)
     // "a Maria com Administrar usuários e a Utilização da Sugestão e do Quiz"
     [Given(@"^(a Maria|o staff João Lima|o João|o membro do time Caio Lima) (?:só )?com (Administrar usuários.*|a Utilização.*)$")]
     // "a Maria com ""MOD-03"" só com ""C""", "a Ana com ""MOD-05"" com ""U"" concedida pelo João"
-    [Given(@"^(a Maria|o professor João|a Ana)(?:, da escola ""EBFGA"",)? com (""MOD-.+)$")]
+    [Given(@"^(a Maria|o professor João|o João|a Ana|o Paulo)(?:, da escola ""EBFGA"",)? com (""MOD-.+)$")]
     public async Task ComPermissoes(string quem, string permissoes)
     {
         var pessoa = await Pessoa(quem);
@@ -168,7 +168,7 @@ public sealed partial class AutorizacaoPassos(Mundo mundo)
 
     [When(@"^envia GET (\S+)$")]
     [When(@"^envia GET (\S+), de um usuário da escola ""COLSA""$")]
-    public async Task SujeitoPede(string caminho) => await mundo.EnviarComo(mundo.Sujeito!, "GET", await mundo.Traduzir(caminho));
+    public async Task SujeitoPede(string caminho) => await mundo.EnviarComo(await mundo.SujeitoOu(caminho), "GET", await mundo.Traduzir(caminho));
 
     [When(@"^a Maria envia GET (\S+)$")]
     public async Task MariaPede(string caminho) => await mundo.EnviarComo(await mundo.Maria(), "GET", await mundo.Traduzir(caminho));
@@ -219,8 +219,9 @@ public sealed partial class AutorizacaoPassos(Mundo mundo)
             "a conta master da EBFGA" => await mundo.Entrar(await mundo.Master(), Navegador),
             "o educador autônomo Pedro Reis" => await mundo.Entrar(await mundo.Pedro(), Navegador),
             "a staff Maria Souza" => await mundo.Entrar(await mundo.Maria(), Navegador),
-            "o participante Lucas Andrade" => await mundo.EntrarNoQuest(App, new JsonObject { ["tipo"] = "PARTICIPANTE" }),
-            "a Carla, mãe do Lucas" => await mundo.EntrarNoQuest(App, new JsonObject { ["tipo"] = "RESPONSAVEL", ["parentesco"] = "Mãe" }),
+            // sem exigir 200: em Usuários (RN-175) a mesma frase espera 403 com a escola fora do ar
+            "o participante Lucas Andrade" => mundo.Registrar(await mundo.Lucas(), App, await mundo.TentarQuest(App, new JsonObject { ["tipo"] = "PARTICIPANTE" })),
+            "a Carla, mãe do Lucas" => mundo.Registrar(await mundo.Lucas(), App, await mundo.TentarQuest(App, Carla())),
             _ => throw new PendingStepException(SemSala),
         };
     }
@@ -296,15 +297,21 @@ public sealed partial class AutorizacaoPassos(Mundo mundo)
     }
 
     // RNF-222: muda uma aba (Turmas) e salva com a versão da linha do Exemplo
-    [When(@"^a conta master envia PUT (/usuarios/\S+/permissoes) com (If-Match ""(\d+)""|sem If-Match)$")]
-    public async Task MasterSalvaComVersao(string caminho, string _, string versao)
+    // o Reqnroll não passa o grupo que não casou: um atributo para cada forma
+    [When(@"^a conta master envia PUT (/usuarios/\S+/permissoes) com If-Match ""(\d+)""$")]
+    public Task MasterSalvaComVersao(string caminho, string versao) => MasterSalvaVersao(caminho, versao);
+
+    [When(@"^a conta master envia PUT (/usuarios/\S+/permissoes) com sem If-Match$")]
+    public Task MasterSalvaSemVersao(string caminho) => MasterSalvaVersao(caminho, null);
+
+    async Task MasterSalvaVersao(string caminho, string? versao)
     {
         var mods = new JsonObject((await ModsDe(await mundo.Maria())).Select(m => KeyValuePair.Create(m.Key, (JsonNode?)m.Value)))
         {
             ["MOD-08"] = "C",
         };
         await mundo.EnviarComo(await mundo.Master(), "PUT", await mundo.Traduzir(caminho),
-            new JsonObject { ["mods"] = mods }.ToJsonString(), string.IsNullOrEmpty(versao) ? null : versao);
+            new JsonObject { ["mods"] = mods }.ToJsonString(), versao);
     }
 
     [When(@"^a conta master salva com o Quiz marcado$")]
@@ -536,11 +543,16 @@ public sealed partial class AutorizacaoPassos(Mundo mundo)
     }
 
     // RNF-222: "200, gravado" sobe a versão; "412 …, nada é gravado" a mantém
-    [Then(@"^a resposta é (\d{3})(?: ([A-Z_]+))?, (gravado|nada é gravado)$")]
-    public async Task GravadoOuNao(int status, string codigo, string gravado)
+    [Then(@"^a resposta é (\d{3}), gravado$")]
+    public Task Gravado(int status) => GravadoOuNao(status, null, "gravado");
+
+    [Then(@"^a resposta é (\d{3}) ([A-Z_]+), nada é gravado$")]
+    public Task NadaGravado(int status, string codigo) => GravadoOuNao(status, codigo, "nada é gravado");
+
+    async Task GravadoOuNao(int status, string? codigo, string gravado)
     {
         var versaoAntes = 7;
-        Respostas.Confere(mundo.Ultima, status, string.IsNullOrEmpty(codigo) ? null : codigo);
+        Respostas.Confere(mundo.Ultima, status, codigo);
         var versao = (await mundo.Permissoes(await mundo.Maria()))["versao"]!.GetValue<int>();
         Assert.Equal(gravado == "gravado" ? versaoAntes + 1 : versaoAntes, versao);
     }
@@ -615,6 +627,7 @@ public sealed partial class AutorizacaoPassos(Mundo mundo)
         "a Maria" => await mundo.Maria(),
         "a Ana" => await mundo.Ana(),
         "o membro do time Caio Lima" => await mundo.Caio(),
+        "o Paulo" => await mundo.Paulo(),
         _ => await mundo.Joao(),
     };
 

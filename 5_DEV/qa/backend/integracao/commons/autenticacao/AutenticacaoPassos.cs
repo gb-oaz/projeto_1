@@ -206,7 +206,11 @@ public sealed class AutenticacaoPassos(Mundo mundo)
             mundo.Atual = mundo.Sessoes.FirstOrDefault(s => s.Renovacao == renovacao);
             (acessoAnterior, renovacaoAnterior) = (mundo.Atual?.Acesso ?? "", renovacao);
         }
-        var r = await mundo.Enviar(metodo, await mundo.Traduzir(caminho), corpo.ToJsonString());
+        // fora de /auth/, o pedido vai com o token de quem o Dado citou (Usuários)
+        var alvo = await mundo.Traduzir(caminho);
+        var r = mundo.Sujeito is { } sujeito && !caminho.StartsWith("/auth/")
+            ? await mundo.EnviarComo(sujeito, metodo, alvo, corpo.ToJsonString())
+            : await mundo.Enviar(metodo, alvo, corpo.ToJsonString());
         if (pessoa is not null && caminho.StartsWith("/auth/") && caminho != "/auth/renovar")
         {
             var aparelho = corpo["aparelho"]?.GetValue<string>() ?? (CookieDeRenovacao(r) is null ? App : Navegador);
@@ -379,8 +383,14 @@ public sealed class AutenticacaoPassos(Mundo mundo)
         Assert.Equal((await mundo.Lucas()).Id, Carga()["sub"]?.GetValue<string>());
     }
 
-    [Then(@"^o token (?:tem o sub ""(usr-ebfga-lucas)"" e, em quem, o responsável|traz em quem o (?:tipo ""RESPONSAVEL""|responsável)) e o parentesco ""(.+)""$")]
-    public async Task QuemEntrou(string? sub, string parentesco)
+    // o Reqnroll não passa o grupo que não casou: um atributo para cada forma
+    [Then(@"^o token tem o sub ""(usr-ebfga-lucas)"" e, em quem, o responsável e o parentesco ""(.+)""$")]
+    public Task QuemEntrouComSub(string sub, string parentesco) => QuemEntrou(sub, parentesco);
+
+    [Then(@"^o token traz em quem o (?:tipo ""RESPONSAVEL""|responsável) e o parentesco ""(.+)""$")]
+    public Task QuemEntrouSemSub(string parentesco) => QuemEntrou(null, parentesco);
+
+    async Task QuemEntrou(string? sub, string parentesco)
     {
         var carga = Carga();
         if (!string.IsNullOrEmpty(sub)) Assert.Equal(await mundo.Traduzir(sub), carga["sub"]?.GetValue<string>());
@@ -723,7 +733,8 @@ public sealed class AutenticacaoPassos(Mundo mundo)
     }
 
     // ── o que muda a credencial (RN-230, RNF-203) ──────────────────────────
-    [When(@"^a conta master envia POST (/usuarios/\S+)$")]
+    // o reativar precisa de alguém desativado antes: passo próprio em UsuariosPassos
+    [When(@"^a conta master envia POST (/usuarios/\S+(?<!/reativar))$")]
     public async Task MasterEnvia(string caminho)
     {
         var alvo = await mundo.Traduzir(caminho);

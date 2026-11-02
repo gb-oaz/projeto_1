@@ -57,6 +57,7 @@ integracao/
 ├── xunit.runner.json               um cenário por vez (todos usam o mesmo banco)
 ├── Dockerfile                      a imagem que o CI roda (contrato das suítes)
 ├── scripts/copiar-cenarios.py      requisito → .feature
+├── scripts/conferir-passos.py      toda frase tem um passo, e só um, sem rodar os testes
 ├── suporte/                        comum a todas as features
 │   ├── Ambiente.cs                 variáveis de ambiente
 │   ├── Api.cs                      HttpClient, cookies e a resposta
@@ -69,9 +70,12 @@ integracao/
 ├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.html
 │   ├── autenticacao.feature
 │   └── AutenticacaoPassos.cs
-└── commons/autorizacao/            17_modulo-usuario-b-autorizacao.html
-    ├── autorizacao.feature
-    └── AutorizacaoPassos.cs
+├── commons/autorizacao/            17_modulo-usuario-b-autorizacao.html
+│   ├── autorizacao.feature
+│   └── AutorizacaoPassos.cs
+└── hub/usuarios/                   17_modulo-usuario.html (contas, staff, participantes, time)
+    ├── usuarios.feature
+    └── UsuariosPassos.cs
 ```
 
 A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
@@ -97,6 +101,10 @@ Os outros requisitos, do mesmo jeito:
 |---|---|---|
 | `17_modulo-usuario-a-autenticacao.html` | `commons/autenticacao/autenticacao.feature` | `Autenticação` |
 | `17_modulo-usuario-b-autorizacao.html` | `commons/autorizacao/autorizacao.feature` | `Autorização` |
+| `17_modulo-usuario.html` | `hub/usuarios/usuarios.feature` | `Usuários` |
+
+Dois cenários com o mesmo nome no requisito: o segundo ganha o ID no fim
+(`nome curto repetido · RF-153`), porque o Reqnroll não aceita nome repetido.
 
 **Feature nova** (ex.: Cadastro)
 
@@ -111,15 +119,24 @@ nova, skill `requisito`) e copie de novo. O `.feature` nunca diverge do
 requisito.
 
 **Passo que ainda não dá para testar**: `throw new PendingStepException("motivo")`.
-O cenário sai como pulado, com o motivo na saída. Hoje são três casos: o
+O cenário sai como pulado, com o motivo na saída. Os casos de hoje: o
 contrato ainda não tem o endereço (sala ao vivo, troca de chave, os pedidos
-da Presença e do Quiz), é tela (fica no qa do frontend), só o banco mostra
-(fica nos testes do backend) ou é fora de escopo.
+da Presença e do Quiz, a caixa do SAC, a auditoria), é tela (fica no qa do
+frontend), só o banco mostra (fica nos testes do backend), é segredo do Key
+Vault ou é fora de escopo.
 
-**Conferir que toda frase tem passo**: o Reqnroll só acusa a frase sem passo
-quando o cenário chega nela. Com o backend ainda em 404, o cenário para no
-preparo; procure `No matching step definition` na saída de `dotnet test
---logger "console;verbosity=normal"`.
+**Conferir que toda frase tem passo**: o Reqnroll só acusa a frase sem passo,
+a frase com dois passos ou o número errado de parâmetros quando o cenário
+chega nela. Com o backend ainda em 404, o cenário para no preparo e nada
+aparece. Rode, depois de mexer num `.feature` ou num `*Passos.cs`:
+
+```bash
+python3 scripts/conferir-passos.py     # sai com 1 se achar algum problema
+```
+
+**Grupo opcional não vira parâmetro**: com `(…)?` ou `(a|(b))`, o Reqnroll só
+passa os grupos que casaram, e o método com um parâmetro a mais quebra. Escreva
+um atributo para cada forma da frase, cada um no seu método.
 
 ## 4. Rodar
 
@@ -187,11 +204,19 @@ esta suíte.
 - **Quem é quem**: a conta master da EBFGA cria as staffs (Maria, João, Rui) e
   dá as permissões pela API; a Ana é criada pelo João, por isso fica "abaixo"
   dele (RN-252); o Caio é do time deboaz e recebe permissões do administrador.
+- **Quem o cenário cria fica anotado**: depois de `envia POST /usuarios com:`
+  criar a Maria, `usr-ebfga-maria` é ela, e não uma Maria nova. Valores gerados
+  (a senha, o código de liberação `482913`, o comprovante `c7e1…`) valem pelo
+  formato: o do exemplo é trocado pelo que veio, se o que veio tem a forma certa.
+- **Campos que a API não deixa reproduzir** saem da comparação, com o motivo
+  no passo (`Mundo.CamposSemConferir`): o histórico do card (`selo`, `noMes`,
+  `meses`) e o `ultimoPagamento` da conta, que vem da cobrança.
 - **O que vem do banco, porque a API não cria**: o módulo contratado pela
   escola (o catálogo ainda não tem o endereço de contratar e descontratar:
   `Estado.Contratar`/`Descontratar`), a versão das permissões dos exemplos
-  ("na versão 6": `Estado.DefinirVersao`), o tempo sem uso da sessão e os
-  bloqueios seguidos.
+  ("na versão 6": `Estado.DefinirVersao`), a hora do pedido do código de
+  liberação ("pedido há 73 h": `Estado.PedidoHa`), o tempo sem uso da sessão e
+  os bloqueios seguidos.
 - **Token desatualizado**: quem pede com um token de versão antiga recebe
   `401 PERMISSOES_DESATUALIZADAS`; no preparo, `Mundo.EnviarComo` renova e
   tenta de novo uma vez, como o cliente faz.
