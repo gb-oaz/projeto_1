@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Estrutura dos projetos · boaz · v12</title>
+<title>Estrutura dos projetos · boaz · v13</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="14_estrutura-projetos">
 <meta name="boaz:caminho" content="1_Requisitos/14_estrutura-projetos.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v12">
-<meta name="boaz:data" content="2026-11-01 18:25">
+<meta name="boaz:versao" content="v13">
+<meta name="boaz:data" content="2026-11-02 12:26">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -919,8 +919,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir uma organização de pastas e de dependências única para backend, web e mobile, que separa o domínio (core) dos adaptadores.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>14_estrutura-projetos</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v12</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 18:25</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v13</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 12:26</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1072,7 +1072,17 @@ Cenário: contexto novo
       <h3><code class="id">RNF-175</code> Estrutura do backend</h3>
       <pre class="gherkin">Cenário: pastas do backend
   Então 5_DEV/backend/ tem Boaz.slnx, core/&lt;contexto&gt;/&lt;feature&gt;/, ms_mono/ e tests/
-  E cada feature tem domain/, usecases/, ports/in/ e ports/out/</pre>
+  E cada feature tem domain/, dtos/, ports/in/, ports/out/ e usecases/
+  E usecases/ tem uma classe por caso de uso, com a interface dela em ports/in/
+  E dtos/ tem os dados que entram e saem dos casos de uso, com a validação dos campos
+
+Cenário: features de um módulo
+  Quando um módulo reúne mais de uma feature, como Usuários
+  Então elas ficam juntas em core/&lt;contexto&gt;/&lt;módulo&gt;/&lt;feature&gt;/
+  E Usuários fica em core/commons/usuario/, com usuario/, autenticacao/ e autorizacao/
+
+Cenário: bibliotecas do core
+  Então o core usa só as bibliotecas do próprio .NET, sem pacote de terceiros</pre>
     </article>
     <article class="criterio" id="RNF-176">
       <h3><code class="id">RNF-176</code> Projetos do core</h3>
@@ -1092,7 +1102,17 @@ Cenário: contexto novo
       <h3><code class="id">RNF-178</code> Testes do backend</h3>
       <pre class="gherkin">Cenário: projeto de teste
   Então tests/ espelha core/ e ms_mono/
-  E Boaz.Core.Hub tem o projeto xUnit Boaz.Core.Hub.Tests</pre>
+  E Boaz.Core.Hub tem o projeto xUnit Boaz.Core.Hub.Tests
+
+Cenário: testes de uma feature do core
+  Dado a feature core/commons/usuario/autenticacao/
+  Então os unitários testam domain/ e a validação de dtos/
+  E os de integração usam um mock que implementa os ports/out/ e chama os usecases/
+  E ficam em tests/core/commons/usuario/autenticacao/, com domain/, dtos/, mocks/ e usecases/
+
+Cenário: cobertura de cada projeto de teste
+  Então cada projeto de teste mede só os projetos que testa
+  E core/commons é medido por Boaz.Core.Commons.Tests, e não pelos testes do ms_mono</pre>
     </article>
     <article class="criterio" id="RNF-179">
       <h3><code class="id">RNF-179</code> Estrutura da web</h3>
@@ -1213,8 +1233,8 @@ Cenário: bibliotecas do core
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../2_Diagramas/estrutura-projetos_v05_20261025-0357.svg"><img src="../2_Diagramas/estrutura-projetos_v05_20261025-0357.svg" alt="Estrutura dos projetos: padrão de cada feature (infra/in, components, ports/in, usecases, domain, ports/out, infra/out) e as pastas do backend (core e ms_mono), da web (core e apps landing_page, hub, quest) e do mobile (core e apps hub, quest), as suítes do qa por alvo e tipo (backend/integracao, backend/carga, frontend/web/funcional com Cypress, frontend/mobile/funcional com Appium) com o contrato de cada uma, e as regras de dependência"></a>
-      <figcaption><strong>Estrutura dos projetos</strong><code>2_Diagramas/estrutura-projetos_v05_20261025-0357.svg</code></figcaption>
+      <a href="../2_Diagramas/estrutura-projetos_v06_20261102-1248.svg"><img src="../2_Diagramas/estrutura-projetos_v06_20261102-1248.svg" alt="Estrutura dos projetos: padrão de cada feature (infra/in, components, ports/in, usecases, domain, dtos, ports/out, infra/out), agrupada por módulo quando preciso e as pastas do backend (core e ms_mono), da web (core e apps landing_page, hub, quest) e do mobile (core e apps hub, quest), as suítes do qa por alvo e tipo (backend/integracao, backend/carga, frontend/web/funcional com Cypress, frontend/mobile/funcional com Appium) com o contrato de cada uma, e as regras de dependência"></a>
+      <figcaption><strong>Estrutura dos projetos</strong><code>2_Diagramas/estrutura-projetos_v06_20261102-1248.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -1224,7 +1244,8 @@ Cenário: bibliotecas do core
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v12</span></td><td>2026-11-01 18:25</td><td>Só Gherkin e diagramas: contexto, RN e RNF viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
+      <tr><td><span class="boaz-versao">v13</span></td><td>2026-11-02 12:26</td><td><code class="id">RNF-175</code> alterado: <code>dtos/</code>, um caso de uso por classe, features agrupadas por módulo (<code>core/commons/usuario/</code>) e só bibliotecas do .NET no core; <code class="id">RNF-178</code> alterado: unitários no domínio, integração com mock das portas e cobertura medida por projeto; diagrama <code>estrutura-projetos_v06</code></td></tr>
+      <tr><td>v12</td><td>2026-11-01 18:25</td><td>Só Gherkin e diagramas: contexto, RN e RNF viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
       <tr><td>v11</td><td>2026-10-27 00:49</td><td>Status → Aprovado</td></tr>
       <tr><td>v10</td><td>2026-10-26 23:53</td><td><code class="id">RNF-177</code> alterado: <code>ms_mono/sistema/</code> (endpoints de sistema e documentação da API) e <code>wwwroot/doc/api/design/</code> (cópia gerada do design system)</td></tr>
       <tr><td>v09</td><td>2026-10-25 03:57</td><td><code class="id">RNF-187</code> e <code class="id">RNF-198</code> alterados: as propriedades comuns do mobile ficam em <code>5_DEV/frontend/mobile/Directory.Build.props</code>; diagrama <code>estrutura-projetos_v05</code>; status: Aprovado</td></tr>
@@ -1233,11 +1254,10 @@ Cenário: bibliotecas do core
       <tr><td>v06</td><td>2026-10-24 22:47</td><td>Pendência respondida: o funcional do mobile usa Appium com testes em C# (<code class="id">RNF-196</code>, contrato <code>executar.sh</code> na máquina); <code class="id">RN-153</code> e <code class="id">RNF-191</code> alterados; Em aberto com o endereço do backend de teste no app; diagrama <code>estrutura-projetos_v04</code></td></tr>
       <tr><td>v05</td><td>2026-10-24 22:25</td><td>Estrutura do qa: <code class="id">RN-151</code> a <code class="id">RN-156</code> e <code class="id">RNF-190</code> a <code class="id">RNF-193</code> incluídos (suítes por alvo e tipo, contrato por imagem, carga sob demanda, testes de ponta a ponta da web fora do projeto); Em aberto com o qa funcional do mobile; diagrama <code>estrutura-projetos_v03</code>; status → Em revisão</td></tr>
       <tr><td>v04</td><td>2026-10-24 21:32</td><td>Status → Aprovado</td></tr>
-      <tr><td>v03</td><td>2026-10-24 21:28</td><td>Pendência respondida: o requisito 06 (<code class="id">RNF-108</code> a <code class="id">RNF-110</code>) passa a usar <code>core/commons/</code>; seção Em aberto removida</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v12 · 2026-11-01 18:25</span>
+    <span>boaz · v13 · 2026-11-02 12:26</span>
     <span class="boaz-arquivo">1_Requisitos/14_estrutura-projetos.html</span>
   </div>
 </footer>

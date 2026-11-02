@@ -2,6 +2,8 @@
   <!-- Testes de ms_mono/ (RNF-178): sobem o backend em memória -->
   <PropertyGroup>
     <IsPackable>false</IsPackable>
+    <!-- core/commons é medido pelo projeto de testes dele -->
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)/cobertura.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 
   <ItemGroup>

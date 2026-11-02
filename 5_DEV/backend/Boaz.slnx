@@ -16,6 +16,9 @@
     <Project Path="ms_mono/Boaz.MsMono.csproj" />
   </Folder>
   <Folder Name="/tests/" />
+  <Folder Name="/tests/core/commons/">
+    <Project Path="tests/core/commons/Boaz.Core.Commons.Tests.csproj" />
+  </Folder>
   <Folder Name="/tests/ms_mono/">
     <Project Path="tests/ms_mono/Boaz.MsMono.Tests.csproj" />
   </Folder>
