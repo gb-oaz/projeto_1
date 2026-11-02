@@ -54,7 +54,7 @@ Correção de bug (`fix_…`): se o comportamento esperado já está no requisit
 
 ## 2 · Cenários de teste → `5_DEV/qa/` (vermelho)
 
-**Escolha da suíte** pelo que o critério observa (RN-152, RNF-190):
+**Escolha da suíte** pelo que o critério observa (RN-152, RNF-190). Documento com contrato de API traz os cenários separados: os de `section#cenarios-api` (`id` do ID ou `<ID>-api`) vão para o qa do backend; os de `section#cenarios-tela`, para o funcional da web ou do mobile:
 
 | O critério observa… | Suíte |
 |---|---|

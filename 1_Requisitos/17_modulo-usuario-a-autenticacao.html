@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autenticação · boaz · v15</title>
+<title>Módulo Usuários · Autenticação · boaz · v16</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-a-autenticacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-a-autenticacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v15">
-<meta name="boaz:data" content="2026-11-01 23:41">
+<meta name="boaz:versao" content="v16">
+<meta name="boaz:data" content="2026-11-02 00:11">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,70 +918,46 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-a-autenticacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v15</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 23:41</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v16</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 00:11</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
-  <section id="cenarios">
-    <h2>Cenários</h2>
-    <article class="criterio" id="formas-de-entrar">
-      <h3>Formas de entrar</h3>
-      <pre class="gherkin">Esquema do Cenário: cada frente com a sua entrada
-  Quando &lt;quem&gt; entra no &lt;frente&gt; com &lt;credencial&gt;
-  Então abre uma sessão &lt;sessão&gt;
-
-  Exemplos:
-    | quem                          | frente | credencial              | sessão                 |
-    | conta master, educador, staff | hub    | entrada e senha         | do navegador ou do app |
-    | membro do time deboaz         | hub    | entrada e senha         | do navegador ou do app |
-    | participante ou responsável   | quest  | código de acesso e quem | do participante        |
-    | pessoa sem código de acesso   | quest  | código da sala          | até a sala fechar      |</pre>
-    </article>
+  <section id="cenarios-tela">
+    <h2>Cenários de tela</h2>
     <article class="criterio" id="RF-134">
       <h3><code class="id">RF-134</code> Entrar no hub</h3>
       <pre class="gherkin">Cenário: staff entra
   Dado a staff Maria Souza, ativa, da escola de sigla "EBFGA", ativa
   Quando informa "maria.ebfga@deboaz.com" e a senha dela em Entrar
-  Então entra no hub com uma sessão do navegador
-  E o aparelho recebe um token de acesso que vale 15 min e um token de renovação</pre>
+  Então entra no hub e vê Módulos</pre>
     </article>
     <article class="criterio" id="RF-135">
       <h3><code class="id">RF-135</code> Entrar no quest</h3>
       <pre class="gherkin">Cenário: a mãe entra com o código do filho
   Dado o participante Lucas Andrade com o código "EBFGA-LUCAS-0412"
   Quando a mãe, Carla Andrade, informa o código e escolhe que é ela quem está entrando
-  Então o perfil do Lucas abre no quest
-  E a sessão registra que entrou a responsável, mãe</pre>
-    </article>
-    <article class="criterio" id="RF-136">
-      <h3><code class="id">RF-136</code> Sala anônima</h3>
-      <pre class="gherkin">Cenário: sala fecha
-  Dado uma pessoa sem código de acesso na sala 482107, com o apelido "PUPIL-EBFGA-13465"
-  Quando o professor fecha a sala
-  Então a sessão anônima termina
-  E o token dela deixa de abrir a sala</pre>
+  Então o perfil do Lucas abre no quest</pre>
     </article>
     <article class="criterio" id="RF-137">
       <h3><code class="id">RF-137</code> Renovação</h3>
       <pre class="gherkin">Cenário: token de acesso vence durante o uso
-  Dado a Maria no hub há 20 min, com o token de acesso vencido
+  Dado a Maria no hub há 20 min
   Quando ela abre outro módulo
-  Então o aparelho troca o token de renovação por um token de acesso novo
-  E ela continua no hub sem digitar a senha
+  Então o módulo abre sem pedir a senha
 
 Cenário: tempo sem uso passou
   Dado a Maria sem usar o hub no navegador há 9 h, com o tempo de 8 h da escola
   Quando ela volta a usar o hub
-  Então a renovação é recusada e ela vai para Entrar</pre>
+  Então vai para Entrar com o aviso "Sua sessão terminou. Entre de novo."</pre>
     </article>
     <article class="criterio" id="RF-138">
       <h3><code class="id">RF-138</code> Sair</h3>
       <pre class="gherkin">Cenário: sair no computador da escola
   Dado a Maria conectada no navegador e no app
   Quando toca em "Sair" no navegador
-  Então a sessão do navegador termina e os tokens dela deixam de valer
+  Então o navegador volta para Entrar
   E o app continua conectado</pre>
     </article>
     <article class="criterio" id="RF-139">
@@ -989,7 +965,6 @@ Cenário: tempo sem uso passou
       <pre class="gherkin">Cenário: senha errada
   Quando alguém informa "maria.ebfga@deboaz.com" e uma senha errada
   Então vê "Entrada ou senha incorretas."
-  E o sistema conta uma tentativa errada para essa entrada
 
 Cenário: entrada que não existe
   Quando alguém informa "zeca.ebfga@deboaz.com", que não existe, e uma senha
@@ -1000,8 +975,7 @@ Cenário: entrada que não existe
       <pre class="gherkin">Cenário: conta suspensa
   Dado a escola de sigla "EBFGA" suspensa pelo time deboaz
   Quando a Maria informa a entrada e a senha certas
-  Então vê "Acesso indisponível. Fale com quem administra a sua conta."
-  E nenhuma sessão é aberta</pre>
+  Então vê "Acesso indisponível. Fale com quem administra a sua conta."</pre>
     </article>
     <article class="criterio" id="RF-158">
       <h3><code class="id">RF-158</code> Entrada bloqueada</h3>
@@ -1031,8 +1005,7 @@ Cenário: anônimo
       <pre class="gherkin">Cenário: staff desativado
   Dado a Maria conectada no navegador e no app
   Quando a conta master desativa a Maria
-  Então as duas sessões terminam
-  E na próxima ação, em cada aparelho, ela vai para Entrar</pre>
+  Então na próxima ação, em cada aparelho, ela vai para Entrar</pre>
     </article>
     <article class="criterio" id="RF-142">
       <h3><code class="id">RF-142</code> Sessão terminada</h3>
@@ -1061,107 +1034,26 @@ Cenário: anônimo
       <pre class="gherkin">Cenário: esqueceu o computador da escola aberto
   Dado a Maria conectada no navegador da escola e no app
   Quando, no app, escolhe o navegador em Conta e toca em "Sair deste aparelho"
-  Então a sessão do navegador termina e, na próxima ação nele, aparece Entrar
+  Então na próxima ação no navegador aparece Entrar
   E o app continua conectado
 
 Cenário: sair de todos
   Quando a Maria toca em "Sair de todos os aparelhos"
-  Então as sessões do navegador e do app terminam e ela vai para Entrar</pre>
-    </article>
-    <article class="criterio" id="RN-224">
-      <h3><code class="id">RN-224</code> Sessão no servidor</h3>
-      <pre class="gherkin">Cenário: a sessão vale mais que o token
-  Dado a Maria com um token de acesso emitido há 5 min
-  E a sessão dela encerrada no servidor
-  Quando o aparelho faz um pedido com esse token
-  Então o pedido é recusado</pre>
-    </article>
-    <article class="criterio" id="RN-225">
-      <h3><code class="id">RN-225</code> Uma sessão por aparelho</h3>
-      <pre class="gherkin">Cenário: navegador e app
-  Dado a Maria conectada no navegador
-  Quando ela entra também no app
-  Então ela fica com duas sessões, uma em cada aparelho
-  E cada sessão guarda a conta, a frente, o aparelho e quem entrou
-  E guarda também a versão das permissões e a hora da última ação</pre>
-    </article>
-    <article class="criterio" id="RN-226">
-      <h3><code class="id">RN-226</code> Tempo de sessão</h3>
-      <pre class="gherkin">Esquema do Cenário: tempo sem uso de cada pessoa
-  Dado &lt;quem&gt; conectado no &lt;aparelho&gt;
-  Quando fica sem usar por mais que o tempo &lt;tempo&gt;
-  Então a sessão termina
-
-  Exemplos:
-    | quem           | aparelho  | tempo                   |
-    | staff          | navegador | do staff no navegador   |
-    | staff          | app       | do staff no app         |
-    | participante   | app       | do participante         |
-    | conta master   | navegador | das contas master       |
-    | membro do time | navegador | dos membros do time     |
-
-Cenário: cada ação conta como uso
-  Dado a Maria no navegador, com o tempo de 8 h da escola
-  Quando ela age no hub a cada 7 h
-  Então a sessão continua aberta</pre>
+  Então o navegador e o app vão para Entrar</pre>
     </article>
     <article class="criterio" id="RN-227">
       <h3><code class="id">RN-227</code> Hub e quest separados</h3>
-      <pre class="gherkin">Cenário: token do hub no quest
-  Dado a Maria com um token de acesso do hub
-  Quando o aparelho usa esse token no quest
-  Então o quest recusa o token
-
-Cenário: landing page sem sessão
+      <pre class="gherkin">Cenário: landing page sem sessão
   Quando alguém abre a landing page
   Então nenhuma sessão é aberta</pre>
-    </article>
-    <article class="criterio" id="RN-228">
-      <h3><code class="id">RN-228</code> Responsável</h3>
-      <pre class="gherkin">Cenário: a mãe entra como o filho
-  Quando a Carla entra com o código do Lucas e escolhe "Mãe"
-  Então a sessão é do Lucas, marcada com o parentesco "Mãe"
-  E ela faz o que o Lucas faz, menos o que cada módulo restringir ao responsável</pre>
-    </article>
-    <article class="criterio" id="RN-229">
-      <h3><code class="id">RN-229</code> Tokens</h3>
-      <pre class="gherkin">Cenário: tokens da sessão
-  Quando a Maria entra no hub
-  Então recebe um token de acesso que vale 15 min e não fica guardado no servidor
-  E um token de renovação de uso único, que vale enquanto a sessão estiver ativa</pre>
-    </article>
-    <article class="criterio" id="RN-230">
-      <h3><code class="id">RN-230</code> O que encerra a sessão</h3>
-      <pre class="gherkin">Cenário: desativar encerra
-  Dado a Maria conectada no navegador
-  Quando a conta master desativa a Maria
-  Então a sessão termina
-
-Cenário: mudar permissão não encerra
-  Dado a Maria conectada no navegador
-  Quando a conta master muda as permissões dela
-  Então a sessão continua
-  E o aparelho busca sozinho um token novo com o token de renovação</pre>
-    </article>
-    <article class="criterio" id="RN-231">
-      <h3><code class="id">RN-231</code> Sessão anônima</h3>
-      <pre class="gherkin">Cenário: sala aberta sem tempo sem uso
-  Dado uma pessoa sem código de acesso na sala 482107
-  Quando ela fica 2 h sem agir, com a sala aberta
-  Então a sessão continua
-  E ela não abre perfil, tarefa nem outra sala</pre>
     </article>
     <article class="criterio" id="RN-247">
       <h3><code class="id">RN-247</code> Limite de sessões</h3>
       <pre class="gherkin">Cenário: sexta sessão do hub
   Dado a Maria com 5 sessões do hub abertas
   Quando ela entra num sexto aparelho
-  Então a sessão de última ação mais antiga termina
-  E aquele aparelho vai para Entrar com o aviso "Sua sessão terminou. Entre de novo."
-
-Cenário: quest sem limite
-  Dado o código do Lucas aberto em 6 aparelhos da família
-  Então as 6 sessões continuam abertas</pre>
+  Então o aparelho de última ação mais antiga vai para Entrar
+  E mostra o aviso "Sua sessão terminou. Entre de novo."</pre>
     </article>
     <article class="criterio" id="RN-250">
       <h3><code class="id">RN-250</code> Aviso de cada tentativa</h3>
@@ -1170,75 +1062,12 @@ Cenário: quest sem limite
   Então aparece o aviso de ação &lt;tipo&gt;, com o selo animado
 
   Exemplos:
-    | resultado                       | tipo                                            |
-    | sessão aberta                   | concluído                                       |
-    | senha ou código incorreto       | recusado                                        |
-    | conta ou usuário indisponível   | indisponível                                    |
-    | entrada bloqueada               | espera                                          |
-    | sessão terminada                | indisponível, flutuante sobre a tela de entrada |</pre>
-    </article>
-    <article class="criterio" id="RNF-207">
-      <h3><code class="id">RNF-207</code> Token assinado</h3>
-      <pre class="gherkin">Cenário: assinatura RS256
-  Quando a Maria entra no hub
-  Então o token de acesso é um JWT assinado com RS256
-  E a chave RSA de 2048 bits que assina nunca sai do Key Vault
-  E as aplicações conferem o token com a chave pública publicada no endereço de chaves, pelo kid</pre>
-    </article>
-    <article class="criterio" id="RNF-209">
-      <h3><code class="id">RNF-209</code> Validade do token</h3>
-      <pre class="gherkin">Cenário: renovação dentro do tempo da sessão
-  Dado a Maria no hub, com o tempo de 8 h da escola
-  Quando o token de acesso dela passa de 15 min
-  Então o aparelho recebe um token novo pela renovação
-  E a renovação funciona enquanto ela não passar 8 h sem usar</pre>
-    </article>
-    <article class="criterio" id="RNF-203">
-      <h3><code class="id">RNF-203</code> Credencial antiga</h3>
-      <pre class="gherkin">Esquema do Cenário: mudança que invalida o token
-  Dado a Maria conectada no navegador e no app
-  Quando &lt;mudança&gt;
-  Então o token emitido antes deixa de valer na próxima ação dela, nos dois aparelhos
-
-  Exemplos:
-    | mudança                                           |
-    | a conta master desativa a Maria                   |
-    | o time deboaz suspende a escola                   |
-    | a conta master pede uma nova geração de senha     |
-    | a conta master muda as permissões dela            |
-    | a escola descontrata um módulo que ela usa        |</pre>
-    </article>
-    <article class="criterio" id="RNF-204">
-      <h3><code class="id">RNF-204</code> Bloqueio por tentativas</h3>
-      <pre class="gherkin">Esquema do Cenário: tempo do bloqueio
-  Dado &lt;bloqueios&gt; bloqueios seguidos para "maria.ebfga@deboaz.com"
-  Quando alguém erra a senha pela quinta vez seguida
-  Então a entrada fica bloqueada por &lt;tempo&gt;
-
-  Exemplos:
-    | bloqueios | tempo  |
-    | 0         | 15 min |
-    | 1         | 30 min |
-    | 2         | 1 h    |
-    | 7         | 24 h   |
-
-Cenário: código de acesso também bloqueia
-  Quando alguém erra 5 vezes seguidas o código "EBFGA-LUCAS-0412" no quest
-  Então o código fica bloqueado por 15 min</pre>
-    </article>
-    <article class="criterio" id="RNF-213">
-      <h3><code class="id">RNF-213</code> Token de renovação</h3>
-      <pre class="gherkin">Cenário: troca a cada uso
-  Dado a Maria com o token de renovação "3f9c2a71.A"
-  Quando o aparelho renova
-  Então recebe o token de renovação "3f9c2a71.B", o id da sessão seguido de 256 bits aleatórios
-  E "3f9c2a71.A" deixa de valer
-  E a sessão guarda só o resumo irreversível do token novo
-
-Cenário: renovação copiada
-  Dado o token de renovação "3f9c2a71.A" já trocado por "3f9c2a71.B"
-  Quando alguém apresenta "3f9c2a71.A"
-  Então a sessão 3f9c2a71 termina</pre>
+    | resultado                     | tipo                                            |
+    | sessão aberta                 | concluído                                       |
+    | senha ou código incorreto     | recusado                                        |
+    | conta ou usuário indisponível | indisponível                                    |
+    | entrada bloqueada             | espera                                          |
+    | sessão terminada              | indisponível, flutuante sobre a tela de entrada |</pre>
     </article>
     <article class="criterio" id="RNF-214">
       <h3><code class="id">RNF-214</code> Onde ficam os tokens</h3>
@@ -1253,10 +1082,365 @@ Cenário: renovação copiada
     | app no iOS     | Keychain                                                  |
     | app no Android | Keystore                                                  |</pre>
     </article>
+    <article class="criterio" id="RNF-216">
+      <h3><code class="id">RNF-216</code> Conferência em cada pedido</h3>
+      <pre class="gherkin">Cenário: renova antes de levar a Entrar
+  Dado a Maria no hub com o token de acesso vencido
+  Quando um pedido do hub recebe 401
+  Então o hub tenta uma renovação antes de levar a Entrar
+  E se a renovação também for recusada, vai para Entrar com o aviso de sessão terminada</pre>
+    </article>
+  </section>
+  <section id="cenarios-api">
+    <h2>Cenários de API</h2>
+    <article class="criterio" id="formas-de-entrar">
+      <h3>Formas de entrar</h3>
+      <pre class="gherkin">Esquema do Cenário: um endereço de entrada por frente
+  Quando &lt;quem&gt; envia POST &lt;endereço&gt; com &lt;credencial&gt;
+  Então a resposta é 200 com tokenAcesso, tipo "Bearer" e expiraEm 900
+
+  Exemplos:
+    | quem                          | endereço           | credencial                |
+    | conta master, educador, staff | /auth/hub/entrar   | entrada, senha e aparelho |
+    | membro do time deboaz         | /auth/hub/entrar   | entrada, senha e aparelho |
+    | participante ou responsável   | /auth/quest/entrar | código, aparelho e quem   |
+    | pessoa sem código de acesso   | /auth/sala/entrar  | código da sala            |</pre>
+    </article>
+    <article class="criterio" id="RF-134-api">
+      <h3><code class="id">RF-134</code> Entrar no hub</h3>
+      <pre class="gherkin">Cenário: staff entra pelo navegador
+  Dado a staff "maria.ebfga@deboaz.com", ativa, da escola "EBFGA", ativa
+  Quando envia POST /auth/hub/entrar com:
+    """
+    {
+      "entrada": "maria.ebfga@deboaz.com",
+      "senha": "••••••••",
+      "aparelho": "NAVEGADOR"
+    }
+    """
+  Então a resposta é 200 com tokenAcesso, tipo "Bearer" e expiraEm 900
+  E vem o cookie deboaz_renovacao, HttpOnly, Secure e SameSite=Strict, só para /auth/renovar
+
+Cenário: staff entra pelo app
+  Quando envia o mesmo pedido com o aparelho "APP"
+  Então a resposta é 200 com o tokenRenovacao no corpo, sem cookie</pre>
+    </article>
+    <article class="criterio" id="RF-135-api">
+      <h3><code class="id">RF-135</code> Entrar no quest</h3>
+      <pre class="gherkin">Cenário: a mãe entra com o código do filho
+  Quando envia POST /auth/quest/entrar com:
+    """
+    {
+      "codigo": "EBFGA-LUCAS-0412",
+      "aparelho": "APP",
+      "quem": {
+        "tipo": "RESPONSAVEL",
+        "parentesco": "Mãe"
+      }
+    }
+    """
+  Então a resposta é 200 com o token de acesso do Lucas
+  E o token traz em quem o tipo "RESPONSAVEL" e o parentesco "Mãe"</pre>
+    </article>
+    <article class="criterio" id="RF-136">
+      <h3><code class="id">RF-136</code> Sala anônima</h3>
+      <pre class="gherkin">Cenário: entra e a sala fecha
+  Quando envia POST /auth/sala/entrar com a sala "482107", aberta
+  Então a resposta é 200 com um token de papel "ANONIMO", só com o módulo e o id da sala
+  E quando o professor fecha a sala, esse token recebe 401 em qualquer pedido
+
+Cenário: sala fechada
+  Quando envia POST /auth/sala/entrar com uma sala fechada ou inexistente
+  Então a resposta é 404 SALA_FECHADA</pre>
+    </article>
+    <article class="criterio" id="RF-137-api">
+      <h3><code class="id">RF-137</code> Renovação</h3>
+      <pre class="gherkin">Cenário: renovação no navegador
+  Dado a sessão 3f9c2a71 da Maria ativa e o cookie deboaz_renovacao dela
+  Quando envia POST /auth/renovar com o cookie
+  Então a resposta é 200 com um tokenAcesso novo e um cookie de renovação novo
+
+Cenário: renovação no app
+  Quando envia POST /auth/renovar com:
+    """
+    {
+      "tokenRenovacao": "3f9c2a71.Qm9h…"
+    }
+    """
+  Então a resposta é 200 com tokenAcesso e tokenRenovacao novos
+
+Cenário: tempo sem uso passou
+  Dado a sessão da Maria sem pedidos há 9 h, com o tempo de 8 h da escola
+  Quando envia POST /auth/renovar
+  Então a resposta é 401 SESSAO_TERMINADA com "Sua sessão terminou. Entre de novo."</pre>
+    </article>
+    <article class="criterio" id="RF-138-api">
+      <h3><code class="id">RF-138</code> Sair</h3>
+      <pre class="gherkin">Cenário: sair do navegador
+  Dado a Maria com sessões no navegador e no app
+  Quando envia POST /auth/sair com o token do navegador
+  Então a resposta é 204 e o cookie de renovação é apagado
+  E o token do navegador recebe 401 no próximo pedido, e o do app continua valendo</pre>
+    </article>
+    <article class="criterio" id="RF-139-api">
+      <h3><code class="id">RF-139</code> Entrada errada</h3>
+      <pre class="gherkin">Esquema do Cenário: mesma resposta para senha errada e entrada inexistente
+  Quando envia POST /auth/hub/entrar com a entrada &lt;entrada&gt; e &lt;senha&gt;
+  Então a resposta é 401 ENTRADA_INVALIDA com "Entrada ou senha incorretas."
+  E uma tentativa errada é contada para &lt;entrada&gt;
+
+  Exemplos:
+    | entrada                  | senha            |
+    | "maria.ebfga@deboaz.com" | uma senha errada |
+    | "zeca.ebfga@deboaz.com"  | qualquer senha   |</pre>
+    </article>
+    <article class="criterio" id="RF-140-api">
+      <h3><code class="id">RF-140</code> Acesso indisponível</h3>
+      <pre class="gherkin">Esquema do Cenário: conta ou usuário fora de uso
+  Dado &lt;situação&gt;
+  Quando a Maria envia POST /auth/hub/entrar com a entrada e a senha certas
+  Então a resposta é 403 ACESSO_INDISPONIVEL e nenhuma sessão é aberta
+
+  Exemplos:
+    | situação                  |
+    | a escola "EBFGA" suspensa |
+    | a Maria desativada        |</pre>
+    </article>
+    <article class="criterio" id="RF-158-api">
+      <h3><code class="id">RF-158</code> Entrada bloqueada</h3>
+      <pre class="gherkin">Cenário: quinta senha errada
+  Dado 4 senhas erradas seguidas para "maria.ebfga@deboaz.com"
+  Quando a quinta senha errada chega às 09:00
+  Então a resposta é 429 ENTRADA_BLOQUEADA com:
+    """
+    {
+      "tentarEm": "2026-11-01T09:15:00Z"
+    }
+    """
+  E até as 09:15 a senha certa também recebe 429</pre>
+    </article>
+    <article class="criterio" id="RF-141-api">
+      <h3><code class="id">RF-141</code> Encerrar em todos os aparelhos</h3>
+      <pre class="gherkin">Cenário: staff desativado
+  Dado a Maria com sessões no navegador e no app
+  Quando a conta master envia POST /usuarios/usr-ebfga-maria/desativar
+  Então os tokens das duas sessões recebem 401 no próximo pedido
+  E POST /auth/renovar de cada aparelho recebe 401 SESSAO_TERMINADA</pre>
+    </article>
+    <article class="criterio" id="RF-143-api">
+      <h3><code class="id">RF-143</code> Primeiro acesso</h3>
+      <pre class="gherkin">Cenário: comprovante da senha anotada
+  Dado o comprovante "c7e1…" recebido junto com a senha gerada
+  Quando envia POST /auth/hub/confirmar-senha com:
+    """
+    {
+      "comprovante": "c7e1…"
+    }
+    """
+  Então a resposta é 200 com o token de acesso e a renovação
+  E o mesmo comprovante, enviado de novo, recebe 401 COMPROVANTE_INVALIDO</pre>
+    </article>
+    <article class="criterio" id="RF-156-api">
+      <h3><code class="id">RF-156</code> Aparelhos conectados</h3>
+      <pre class="gherkin">Cenário: lista das sessões
+  Dado a Maria com sessões no navegador e no app
+  Quando envia GET /auth/sessoes com o token do navegador
+  Então a resposta é 200 com:
+    """
+    [
+      {
+        "sid": "3f9c2a71",
+        "aparelho": "NAVEGADOR",
+        "ultimaAcao": "2026-11-01T09:42:00Z",
+        "esteAparelho": true
+      },
+      {
+        "sid": "7d20b9e4",
+        "aparelho": "APP",
+        "ultimaAcao": "2026-11-01T08:10:00Z",
+        "esteAparelho": false
+      }
+    ]
+    """</pre>
+    </article>
+    <article class="criterio" id="RF-157-api">
+      <h3><code class="id">RF-157</code> Sair dos aparelhos</h3>
+      <pre class="gherkin">Cenário: sair de um aparelho
+  Quando a Maria envia DELETE /auth/sessoes/3f9c2a71 com o token do app
+  Então a resposta é 204
+  E o token do navegador recebe 401 no próximo pedido, e o do app continua valendo
+
+Cenário: sessão de outra pessoa
+  Quando a Maria envia DELETE /auth/sessoes/{sid} com o sid de uma sessão do João
+  Então a resposta é 404 SESSAO_NAO_ENCONTRADA
+
+Cenário: sair de todos
+  Quando a Maria envia DELETE /auth/sessoes
+  Então a resposta é 204
+  E os tokens e as renovações de todas as sessões dela recebem 401</pre>
+    </article>
+    <article class="criterio" id="RN-224">
+      <h3><code class="id">RN-224</code> Sessão no servidor</h3>
+      <pre class="gherkin">Cenário: a sessão vale mais que o token
+  Dado um token de acesso da Maria emitido há 5 min
+  E a sessão desse token encerrada no servidor
+  Quando envia qualquer pedido com esse token
+  Então a resposta é 401</pre>
+    </article>
+    <article class="criterio" id="RN-225">
+      <h3><code class="id">RN-225</code> Uma sessão por aparelho</h3>
+      <pre class="gherkin">Cenário: navegador e app
+  Dado a Maria com uma sessão no navegador
+  Quando envia POST /auth/hub/entrar com o aparelho "APP"
+  Então GET /auth/sessoes lista duas sessões, uma por aparelho
+  E cada sessão guarda a conta, a frente, o aparelho, quem entrou, o pv e a última ação</pre>
+    </article>
+    <article class="criterio" id="RN-226">
+      <h3><code class="id">RN-226</code> Tempo de sessão</h3>
+      <pre class="gherkin">Esquema do Cenário: tempo sem uso de cada pessoa
+  Dado &lt;quem&gt; com uma sessão no &lt;aparelho&gt;
+  Quando passa sem pedidos mais que o tempo &lt;tempo&gt;
+  Então o próximo pedido recebe 401 e POST /auth/renovar recebe 401 SESSAO_TERMINADA
+
+  Exemplos:
+    | quem           | aparelho  | tempo                 |
+    | staff          | navegador | do staff no navegador |
+    | staff          | app       | do staff no app       |
+    | participante   | app       | do participante       |
+    | conta master   | navegador | das contas master     |
+    | membro do time | navegador | dos membros do time   |
+
+Cenário: cada pedido conta como uso
+  Dado a Maria no navegador, com o tempo de 8 h da escola
+  Quando ela faz um pedido a cada 7 h
+  Então a sessão continua e POST /auth/renovar recebe 200</pre>
+    </article>
+    <article class="criterio" id="RN-227-api">
+      <h3><code class="id">RN-227</code> Hub e quest separados</h3>
+      <pre class="gherkin">Esquema do Cenário: token da outra frente
+  Dado um token de acesso de aud "&lt;aud&gt;"
+  Quando é usado num endereço do &lt;frente&gt;
+  Então a resposta é 401
+
+  Exemplos:
+    | aud   | frente |
+    | hub   | quest  |
+    | quest | hub    |</pre>
+    </article>
+    <article class="criterio" id="RN-228">
+      <h3><code class="id">RN-228</code> Responsável</h3>
+      <pre class="gherkin">Cenário: a mãe entra como o filho
+  Quando a Carla envia POST /auth/quest/entrar com o código do Lucas e o parentesco "Mãe"
+  Então o token tem o sub "usr-ebfga-lucas" e, em quem, o responsável e o parentesco "Mãe"
+  E ela faz pela API o que o Lucas faz, menos o que cada módulo restringir ao responsável</pre>
+    </article>
+    <article class="criterio" id="RN-229">
+      <h3><code class="id">RN-229</code> Tokens</h3>
+      <pre class="gherkin">Cenário: tokens da sessão
+  Quando a Maria envia POST /auth/hub/entrar
+  Então recebe um token de acesso com expiraEm 900, que não fica guardado no servidor
+  E um token de renovação de uso único, que vale enquanto a sessão estiver ativa</pre>
+    </article>
+    <article class="criterio" id="RN-230">
+      <h3><code class="id">RN-230</code> O que encerra a sessão</h3>
+      <pre class="gherkin">Cenário: desativar encerra
+  Dado a Maria com uma sessão no navegador
+  Quando a conta master envia POST /usuarios/usr-ebfga-maria/desativar
+  Então POST /auth/renovar da Maria recebe 401 SESSAO_TERMINADA
+
+Cenário: mudar permissão não encerra
+  Dado a Maria com uma sessão no navegador
+  Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes
+  Então o token antigo recebe 401 PERMISSOES_DESATUALIZADAS
+  E POST /auth/renovar da Maria recebe 200 com um token de pv novo</pre>
+    </article>
+    <article class="criterio" id="RN-231">
+      <h3><code class="id">RN-231</code> Sessão anônima</h3>
+      <pre class="gherkin">Cenário: sala aberta sem tempo sem uso
+  Dado um token de papel "ANONIMO" da sala 482107
+  Quando passa 2 h sem pedidos, com a sala aberta
+  Então os pedidos à sala continuam com 200
+  E os pedidos a perfil, tarefa ou outra sala recebem 403</pre>
+    </article>
+    <article class="criterio" id="RN-247-api">
+      <h3><code class="id">RN-247</code> Limite de sessões</h3>
+      <pre class="gherkin">Cenário: sexta sessão do hub
+  Dado a Maria com 5 sessões do hub abertas
+  Quando envia POST /auth/hub/entrar de um sexto aparelho
+  Então a resposta é 200 e a sessão de última ação mais antiga termina
+  E POST /auth/renovar daquela sessão recebe 401 SESSAO_TERMINADA
+
+Cenário: quest sem limite
+  Dado o código do Lucas usado em POST /auth/quest/entrar de 6 aparelhos
+  Então as 6 sessões continuam e cada POST /auth/renovar recebe 200</pre>
+    </article>
+    <article class="criterio" id="RNF-207">
+      <h3><code class="id">RNF-207</code> Token assinado</h3>
+      <pre class="gherkin">Cenário: assinatura RS256
+  Quando a Maria envia POST /auth/hub/entrar
+  Então o token de acesso é um JWT assinado com RS256, com o kid no cabeçalho
+  E a chave RSA de 2048 bits que assina nunca sai do Key Vault
+  E GET /auth/chaves devolve a chave pública desse kid, sem autenticação</pre>
+    </article>
+    <article class="criterio" id="RNF-209">
+      <h3><code class="id">RNF-209</code> Validade do token</h3>
+      <pre class="gherkin">Cenário: renovação dentro do tempo da sessão
+  Dado a Maria no hub, com o tempo de 8 h da escola
+  Quando o token de acesso dela passa de 15 min
+  Então POST /auth/renovar devolve um token novo
+  E a renovação funciona enquanto ela não passar 8 h sem pedidos</pre>
+    </article>
+    <article class="criterio" id="RNF-203">
+      <h3><code class="id">RNF-203</code> Credencial antiga</h3>
+      <pre class="gherkin">Esquema do Cenário: mudança que invalida o token
+  Dado a Maria com sessões no navegador e no app
+  Quando &lt;mudança&gt;
+  Então o token emitido antes recebe 401 no próximo pedido, nos dois aparelhos
+
+  Exemplos:
+    | mudança                                       |
+    | a conta master desativa a Maria               |
+    | o time deboaz suspende a escola               |
+    | a conta master pede uma nova geração de senha |
+    | a conta master muda as permissões dela        |
+    | a escola descontrata um módulo que ela usa    |</pre>
+    </article>
+    <article class="criterio" id="RNF-204">
+      <h3><code class="id">RNF-204</code> Bloqueio por tentativas</h3>
+      <pre class="gherkin">Esquema do Cenário: tempo do bloqueio
+  Dado &lt;bloqueios&gt; bloqueios seguidos para "maria.ebfga@deboaz.com"
+  Quando a quinta senha errada seguida chega a POST /auth/hub/entrar
+  Então a resposta é 429 ENTRADA_BLOQUEADA, com tentarEm daqui a &lt;tempo&gt;
+
+  Exemplos:
+    | bloqueios | tempo  |
+    | 0         | 15 min |
+    | 1         | 30 min |
+    | 2         | 1 h    |
+    | 7         | 24 h   |
+
+Cenário: código de acesso também bloqueia
+  Quando o código "EBFGA-LUCAS-0412" chega errado 5 vezes seguidas a POST /auth/quest/entrar
+  Então a resposta é 429 ENTRADA_BLOQUEADA, com tentarEm daqui a 15 min</pre>
+    </article>
+    <article class="criterio" id="RNF-213">
+      <h3><code class="id">RNF-213</code> Token de renovação</h3>
+      <pre class="gherkin">Cenário: troca a cada uso
+  Dado a Maria com o token de renovação "3f9c2a71.A"
+  Quando envia POST /auth/renovar com "3f9c2a71.A"
+  Então recebe "3f9c2a71.B", o id da sessão seguido de 256 bits aleatórios
+  E "3f9c2a71.A" deixa de valer
+  E a sessão guarda só o resumo irreversível do token novo
+
+Cenário: renovação copiada
+  Dado o token de renovação "3f9c2a71.A" já trocado por "3f9c2a71.B"
+  Quando alguém envia POST /auth/renovar com "3f9c2a71.A"
+  Então a resposta é 401 SESSAO_TERMINADA e a sessão 3f9c2a71 termina</pre>
+    </article>
     <article class="criterio" id="RNF-215">
       <h3><code class="id">RNF-215</code> Identidade no token</h3>
       <pre class="gherkin">Cenário: token da Maria no navegador
-  Quando a Maria entra no hub pelo navegador
+  Quando a Maria envia POST /auth/hub/entrar com o aparelho "NAVEGADOR"
   Então o token de acesso traz esta identidade, sem nome, documento, matrícula nem senha:
     """
     {
@@ -1288,30 +1472,29 @@ Cenário: renovação copiada
   E papel, mods e pv são os da autorização
 
 Cenário: quem entrou no quest
-  Quando a Carla entra com o código do Lucas como mãe
+  Quando a Carla envia POST /auth/quest/entrar com o código do Lucas, como mãe
   Então o token traz em quem o responsável e o parentesco "Mãe"</pre>
     </article>
-    <article class="criterio" id="RNF-216">
+    <article class="criterio" id="RNF-216-api">
       <h3><code class="id">RNF-216</code> Conferência em cada pedido</h3>
       <pre class="gherkin">Esquema do Cenário: token recusado
   Dado a Maria com um token &lt;problema&gt;
-  Quando o aparelho faz um pedido
+  Quando envia um pedido com esse token
   Então a resposta é 401
-  E a web e o mobile tentam uma renovação antes de levar a Entrar
 
   Exemplos:
-    | problema                            |
-    | com a assinatura errada             |
-    | vencido                             |
-    | do quest                            |
-    | de uma sessão encerrada             |
-    | com a versão de permissões antiga   |</pre>
+    | problema                          |
+    | com a assinatura errada           |
+    | vencido                           |
+    | do quest                          |
+    | de uma sessão encerrada           |
+    | com a versão de permissões antiga |</pre>
     </article>
     <article class="criterio" id="RNF-217">
       <h3><code class="id">RNF-217</code> Sessão no Redis</h3>
       <pre class="gherkin">Cenário: sessão da Maria
   Quando a Maria entra no hub pelo navegador, com o tempo de 8 h da escola
-  Então a sessão fica no Redis na chave sessao:3f9c2a71, expirando em 8 h e refeita a cada ação:
+  Então a sessão fica no Redis na chave sessao:3f9c2a71, expirando em 8 h e refeita a cada pedido:
     """
     {
       "usuarioId": "usr-ebfga-maria",
@@ -1337,14 +1520,14 @@ Cenário: tentativas erradas
       <pre class="gherkin">Cenário: troca a cada 90 dias
   Dado tokens assinados com a chave "deboaz-2026-11"
   Quando a chave é trocada por "deboaz-2027-02" depois de 90 dias
-  Então os tokens novos levam o kid "deboaz-2027-02"
+  Então os tokens novos levam o kid "deboaz-2027-02" e GET /auth/chaves traz as duas
   E os assinados com "deboaz-2026-11" continuam aceitos até vencer, sem encerrar sessões
 
 Cenário: troca por vazamento
   Dado a suspeita de vazamento da chave "deboaz-2026-11"
   Quando a chave é trocada na hora
-  Então os tokens assinados com "deboaz-2026-11" são recusados
-  E as sessões renovam com a chave nova</pre>
+  Então os tokens assinados com "deboaz-2026-11" recebem 401
+  E POST /auth/renovar devolve tokens assinados com a chave nova</pre>
     </article>
     <article class="criterio" id="fora-de-escopo">
       <h3>Fora de escopo</h3>
@@ -1405,7 +1588,8 @@ Cenário: sem aparelhos conectados no quest
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v15</span></td><td>2026-11-01 23:41</td><td>Diagramas de casos de uso e de documentos da autenticação v01</td></tr>
+      <tr><td><span class="boaz-versao">v16</span></td><td>2026-11-02 00:11</td><td>Cenários separados em Cenários de tela e Cenários de API; os de API usam os endereços, pedidos e códigos do contrato (IDs nos dois: <code>&lt;ID&gt;-api</code>)</td></tr>
+      <tr><td>v15</td><td>2026-11-01 23:41</td><td>Diagramas de casos de uso e de documentos da autenticação v01</td></tr>
       <tr><td>v14</td><td>2026-11-01 22:01</td><td>JSON do token e da sessão expandidos (RNF-215, RNF-217); contrato de API v02, com JSON expandido</td></tr>
       <tr><td>v13</td><td>2026-11-01 17:59</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão</td></tr>
       <tr><td>v12</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
@@ -1414,11 +1598,10 @@ Cenário: sem aparelhos conectados no quest
       <tr><td>v09</td><td>2026-11-01 13:09</td><td>Aviso de ação em toda tentativa de entrar: nova <code class="id">RF-159</code>, entrada concluída com aviso flutuante, e <code class="id">RN-250</code>, o tom de cada resultado; vistas de entrada refeitas com os selos animados (vista-hub-entrar v01 e vista-quest-entrar v01 de 13:06)</td></tr>
       <tr><td>v08</td><td>2026-11-01 12:45</td><td>Vistas de entrada por tipo de usuário no compact, no medium e no expanded: vista-hub-entrar v01 (conta master, staff, educador autônomo e membro do time) e vista-quest-entrar v01 (participante, responsável e anônimo), com as recusas; nova <code class="id">RF-158</code>, aviso da entrada bloqueada</td></tr>
       <tr><td>v07</td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
-      <tr><td>v06</td><td>2026-11-01 12:20</td><td>Sequência v02 com a entrada do participante no quest; vista-hub-aparelhos v01 (<code class="id">RF-156</code>, <code class="id">RF-157</code>); escolhas do contrato: token de renovação com o id da sessão (<code class="id">RNF-213</code>), comprovante do primeiro acesso (<code class="id">RF-143</code>), chave pública publicada (<code class="id">RNF-207</code>) e tentativas no Redis (<code class="id">RNF-217</code>)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v15 · 2026-11-01 23:41</span>
+    <span>boaz · v16 · 2026-11-02 00:11</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-a-autenticacao.html</span>
   </div>
 </footer>

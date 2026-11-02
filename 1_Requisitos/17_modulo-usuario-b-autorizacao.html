@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autorização · boaz · v11</title>
+<title>Módulo Usuários · Autorização · boaz · v12</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-b-autorizacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-b-autorizacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v11">
-<meta name="boaz:data" content="2026-11-01 23:41">
+<meta name="boaz:versao" content="v12">
+<meta name="boaz:data" content="2026-11-02 00:11">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,49 +918,21 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-b-autorizacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v11</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 23:41</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v12</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 00:11</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
-  <section id="cenarios">
-    <h2>Cenários</h2>
+  <section id="cenarios-tela">
+    <h2>Cenários de tela</h2>
     <article class="criterio" id="conceder-permissoes">
       <h3>Conceder permissões</h3>
       <pre class="gherkin">Cenário: a casca muda sem nova entrada
   Dado a staff Maria Souza conectada no hub, sem a Presença
   Quando a conta master abre Permissões da Maria, marca a Utilização da Presença e salva
-  Então a versão das permissões da Maria sobe
-  E na próxima ação o card da Presença aparece para ela, sem entrar de novo
+  Então na próxima ação o card da Presença aparece para a Maria, sem entrar de novo
   E a conta master e a Maria veem cada uma o seu aviso de ação</pre>
-    </article>
-    <article class="criterio" id="RF-144">
-      <h3><code class="id">RF-144</code> Permissões no token</h3>
-      <pre class="gherkin">Cenário: staff com dois módulos
-  Dado a Maria com Administrar usuários e a Utilização da Sugestão e do Quiz
-  Quando ela entra no hub
-  Então o token dela tem o papel "STAFF"
-  E os módulos "MOD-03" com "CU", "MOD-04" com "U" e "MOD-05" com "U"</pre>
-    </article>
-    <article class="criterio" id="RF-145">
-      <h3><code class="id">RF-145</code> Cálculo das permissões</h3>
-      <pre class="gherkin">Cenário: módulo não contratado
-  Dado a Maria com a Utilização da Presença marcada
-  E a escola sem a Presença contratada
-  Quando ela entra no hub
-  Então o token dela não tem "MOD-06"
-
-Cenário: membro do time sem o Catálogo
-  Dado o membro do time Caio Lima com a Utilização do SAC e de Usuários marcadas
-  Quando ele entra no hub
-  Então o token dele tem o papel "MEMBRO_TIME", "MOD-02" e "MOD-03" com "U"
-  E não tem "MOD-14"
-
-Cenário: staff sem a Sugestão marcada
-  Dado o staff João Lima só com a Utilização do Quiz
-  Quando ele entra no hub
-  Então o token dele não tem "MOD-04"</pre>
     </article>
     <article class="criterio" id="RF-146">
       <h3><code class="id">RF-146</code> Casca pelo token</h3>
@@ -969,13 +941,6 @@ Cenário: staff sem a Sugestão marcada
   Quando ela abre Módulos e toca no card do Quiz
   Então vê o card do Quiz e o módulo aberto só com a aba Utilização
   E não vê o card da Presença nem a aba Configuração do Quiz</pre>
-    </article>
-    <article class="criterio" id="RF-147">
-      <h3><code class="id">RF-147</code> Recusa no backend</h3>
-      <pre class="gherkin">Cenário: ação sem a aba
-  Dado o token da Maria com "MOD-05" só com "U"
-  Quando o aparelho pede para mudar a configuração do Quiz
-  Então o backend responde acesso negado e nada muda</pre>
     </article>
     <article class="criterio" id="RF-148">
       <h3><code class="id">RF-148</code> Permissão nova sem sair</h3>
@@ -992,19 +957,11 @@ Cenário: staff sem a Sugestão marcada
   Quando ela abre o endereço da Presença
   Então vai para Módulos com o aviso "Você não tem acesso a este módulo."</pre>
     </article>
-    <article class="criterio" id="RF-150">
-      <h3><code class="id">RF-150</code> Participante e responsável</h3>
-      <pre class="gherkin">Cenário: mãe no perfil do filho
-  Dado a escola com a Presença e a Carteirinha contratadas
-  Quando a Carla, mãe do Lucas, entra com o código dele
-  Então o token tem o papel "PARTICIPANTE" e quem entrou "Mãe"
-  E a Utilização de Tarefas, Perfil, Presença e Carteirinha</pre>
-    </article>
     <article class="criterio" id="RF-151">
       <h3><code class="id">RF-151</code> Sala anônima</h3>
       <pre class="gherkin">Cenário: só a sala
   Dado uma pessoa sem código de acesso na sala 482107 do Quiz
-  Então o token dela tem o papel "ANONIMO", só "MOD-05" com "U" e a sala 482107
+  Então vê só a sala
   E a Carteira, Tarefas e o Perfil não abrem</pre>
     </article>
     <article class="criterio" id="RF-160">
@@ -1045,41 +1002,9 @@ Cenário: membro do time
   E a Maria, na próxima ação, vê o card da Presença em Módulos
   E o aviso "Suas permissões mudaram: agora você usa a Presença."</pre>
     </article>
-    <article class="criterio" id="RN-232">
-      <h3><code class="id">RN-232</code> Papéis</h3>
-      <pre class="gherkin">Esquema do Cenário: papel de cada pessoa
-  Quando &lt;quem&gt; entra
-  Então o token tem o papel "&lt;papel&gt;"
-
-  Exemplos:
-    | quem                            | papel         |
-    | o administrador do deboaz       | ADMINISTRADOR |
-    | o membro do time Caio Lima      | MEMBRO_TIME   |
-    | a conta master da EBFGA         | MASTER        |
-    | o educador autônomo Pedro Reis  | AUTONOMO      |
-    | a staff Maria Souza             | STAFF         |
-    | o participante Lucas Andrade    | PARTICIPANTE  |
-    | a Carla, mãe do Lucas           | PARTICIPANTE  |
-    | uma pessoa sem código de acesso | ANONIMO       |</pre>
-    </article>
     <article class="criterio" id="RN-233">
       <h3><code class="id">RN-233</code> Permissões por papel</h3>
-      <pre class="gherkin">Esquema do Cenário: módulos de cada papel
-  Quando &lt;quem&gt; entra no &lt;frente&gt;
-  Então o token tem &lt;módulos&gt; com as abas &lt;abas&gt;
-
-  Exemplos:
-    | quem           | frente | módulos                                | abas     |
-    | administrador  | hub    | SAC, Usuários e Catálogo               | C e U    |
-    | membro do time | hub    | os marcados entre SAC, Usuários e Cat. | marcadas |
-    | conta master   | hub    | os da conta e os contratados           | C e U    |
-    | autônomo       | hub    | os da conta e os contratados           | C e U    |
-    | staff          | hub    | os marcados pela conta master          | marcadas |
-    | participante   | quest  | Tarefas, Perfil e os de Quem usa       | U        |
-    | responsável    | quest  | os do participante, com Quem usa       | U        |
-    | anônimo        | quest  | só o módulo da sala                    | U        |
-
-Esquema do Cenário: ações de cada papel
+      <pre class="gherkin">Esquema do Cenário: ações de cada papel
   Quando &lt;quem&gt; está no hub
   Então pode &lt;ações&gt;
 
@@ -1104,49 +1029,6 @@ Esquema do Cenário: ações de cada papel
     | o membro Caio | hub    | Módulos e Conta, sem Feed        |
     | o Lucas       | quest  | Tarefas, Feed, Carteira e Perfil |</pre>
     </article>
-    <article class="criterio" id="RN-235">
-      <h3><code class="id">RN-235</code> Escopo da conta</h3>
-      <pre class="gherkin">Cenário: registro de outra conta
-  Dado a Maria, da escola "EBFGA"
-  Quando o aparelho pede um usuário da escola "COLSA"
-  Então a resposta é "não encontrado", e não "proibido"
-
-Cenário: time deboaz em outra conta
-  Quando o membro do time Caio abre a conta "EBFGA" pela lista Contas de Usuários
-  Então ele vê a conta</pre>
-    </article>
-    <article class="criterio" id="RN-236">
-      <h3><code class="id">RN-236</code> O backend garante</h3>
-      <pre class="gherkin">Cenário: aparelho adulterado
-  Dado a Maria com "MOD-05" só com "U"
-  E a casca adulterada mostrando a aba Configuração do Quiz
-  Quando ela salva a configuração do Quiz
-  Então o backend recusa com acesso negado</pre>
-    </article>
-    <article class="criterio" id="RN-237">
-      <h3><code class="id">RN-237</code> Limites dentro do módulo</h3>
-      <pre class="gherkin">Cenário: a autorização só conhece módulo, aba e papel
-  Dado o professor João com a Utilização da Presença
-  Quando ele abre a Presença
-  Então a autorização libera o módulo
-  E quais turmas ele vê é regra do documento da Presença</pre>
-    </article>
-    <article class="criterio" id="RN-238">
-      <h3><code class="id">RN-238</code> Módulo descontratado</h3>
-      <pre class="gherkin">Cenário: descontratação e recontratação
-  Dado a Maria com a Utilização da Presença
-  Quando a escola descontrata a Presença
-  Então "MOD-06" sai do token dela e a permissão fica suspensa
-  E quando a escola contrata a Presença de novo, "MOD-06" volta com "U"</pre>
-    </article>
-    <article class="criterio" id="RN-239">
-      <h3><code class="id">RN-239</code> Versão das permissões</h3>
-      <pre class="gherkin">Cenário: token com versão antiga
-  Dado a Maria com um token de versão de permissões 6
-  E a conta master mudando as permissões dela para a versão 7
-  Quando ela faz a próxima ação
-  Então o token de versão 6 é recusado e o aparelho renova para receber o de versão 7</pre>
-    </article>
     <article class="criterio" id="RN-240">
       <h3><code class="id">RN-240</code> Responsável</h3>
       <pre class="gherkin">Cenário: só o responsável autoriza a foto
@@ -1155,84 +1037,16 @@ Cenário: time deboaz em outra conta
   Então a autorização é aceita
   E o Lucas, entrando sozinho, não vê essa ação</pre>
     </article>
-    <article class="criterio" id="RN-241">
-      <h3><code class="id">RN-241</code> Ninguém concede o que não tem</h3>
-      <pre class="gherkin">Cenário: confere no servidor, não no token
-  Dado o João com um token que ainda tem a Presença
-  E a conta master tendo tirado a Presença dele há pouco
-  Quando ele concede a Presença à Ana
-  Então o servidor confere as permissões atuais do João e recusa</pre>
-    </article>
-    <article class="criterio" id="RN-251">
-      <h3><code class="id">RN-251</code> Permissão</h3>
-      <pre class="gherkin">Esquema do Cenário: abas de uma permissão
-  Quando a Maria recebe &lt;abas&gt; do Quiz
-  Então o token tem "MOD-05" com "&lt;valor&gt;"
-
-  Exemplos:
-    | abas                      | valor |
-    | Configuração              | C     |
-    | Utilização                | U     |
-    | Configuração e Utilização | CU    |
-
-Cenário: Administrar usuários
-  Quando a Maria recebe Administrar usuários
-  Então o token dela tem "MOD-03" com "CU"
-
-Cenário: nenhuma aba
-  Quando a conta master desmarca as duas abas do Quiz da Maria
-  Então a Maria não tem o Quiz</pre>
-    </article>
-    <article class="criterio" id="RN-252">
-      <h3><code class="id">RN-252</code> Quem concede a quem</h3>
-      <pre class="gherkin">Esquema do Cenário: concessões permitidas
-  Quando &lt;quem concede&gt; abre Permissões de &lt;quem recebe&gt;
-  Então &lt;resultado&gt;
-
-  Exemplos:
-    | quem concede     | quem recebe          | resultado                         |
-    | o administrador  | o membro Caio        | concede entre SAC, Usuários, Cat. |
-    | a conta master   | a staff Maria        | concede os módulos da escola      |
-    | o João, com Adm. | a Ana, abaixo dele   | concede só as abas que tem        |
-    | o João, com Adm. | ele mesmo            | não pode                          |
-    | o João, com Adm. | a Maria, par dele    | não pode                          |
-    | a staff Ana      | o João, acima dela   | não pode                          |
-    | a conta master   | o participante Lucas | não pode, ele usa Quem usa        |</pre>
-    </article>
-    <article class="criterio" id="RN-253">
-      <h3><code class="id">RN-253</code> A permissão é da conta</h3>
-      <pre class="gherkin">Cenário: quem concedeu é desativado
-  Dado a Ana com a Utilização do Quiz concedida pelo João
-  Quando a conta master desativa o João
-  Então a Ana continua com a Utilização do Quiz</pre>
-    </article>
     <article class="criterio" id="RN-254">
       <h3><code class="id">RN-254</code> Salvar substitui tudo</h3>
       <pre class="gherkin">Cenário: desmarcar retira
   Dado a Maria dentro da Presença
   Quando a conta master desmarca a Presença dela e salva
-  Então a Presença sai das permissões da Maria
-  E a Maria vai para Módulos com o aviso "Você não tem acesso a este módulo."</pre>
-    </article>
-    <article class="criterio" id="RN-255">
-      <h3><code class="id">RN-255</code> Uma versão por salvamento</h3>
-      <pre class="gherkin">Cenário: salvar com mudança
-  Dado a Maria na versão de permissões 7, conectada no navegador e no app
-  Quando a conta master marca o Quiz e salva
-  Então a versão passa a 8 nas duas sessões
-
-Cenário: salvar sem mudança
-  Quando a conta master salva as permissões da Maria sem mudar nada
-  Então a versão continua 7</pre>
+  Então a Maria vai para Módulos com o aviso "Você não tem acesso a este módulo."</pre>
     </article>
     <article class="criterio" id="RN-256">
       <h3><code class="id">RN-256</code> Registro de mudanças</h3>
-      <pre class="gherkin">Cenário: o que fica registrado
-  Quando a conta master marca a Presença da Maria em 2026-11-01 às 14:30
-  Então o registro guarda a conta master, a data, a hora, a versão 8 e as abas antes e depois
-  E esse registro não pode ser apagado nem alterado
-
-Esquema do Cenário: quem vê o registro
+      <pre class="gherkin">Esquema do Cenário: quem vê o registro
   Quando &lt;quem&gt; abre Permissões da Maria
   Então &lt;vê&gt; o Registro de mudanças
 
@@ -1243,17 +1057,329 @@ Esquema do Cenário: quem vê o registro
     | a própria Maria         | não vê |
     | o membro do time no SAC | não vê |</pre>
     </article>
+    <article class="criterio" id="RNF-221">
+      <h3><code class="id">RNF-221</code> Casca sem esperar</h3>
+      <pre class="gherkin">Cenário: casca antes do conteúdo
+  Quando a Maria entra no hub
+  Então os destinos, os cards e as abas aparecem a partir do token
+  E só o conteúdo dos cards chega depois, do servidor</pre>
+    </article>
+    <article class="criterio" id="RNF-224">
+      <h3><code class="id">RNF-224</code> Token desatualizado</h3>
+      <pre class="gherkin">Cenário: renova uma vez
+  Dado a Maria no hub com um token de versão de permissões antiga
+  Quando um pedido do hub recebe 401 "PERMISSOES_DESATUALIZADAS"
+  Então o hub renova uma vez e monta a casca de novo com o token novo</pre>
+    </article>
+  </section>
+  <section id="cenarios-api">
+    <h2>Cenários de API</h2>
+    <article class="criterio" id="RF-144">
+      <h3><code class="id">RF-144</code> Permissões no token</h3>
+      <pre class="gherkin">Cenário: staff com dois módulos
+  Dado a Maria com Administrar usuários e a Utilização da Sugestão e do Quiz
+  Quando envia POST /auth/hub/entrar com a entrada e a senha dela
+  Então o token de acesso tem o papel "STAFF"
+  E os mods "MOD-03" com "CU", "MOD-04" com "U" e "MOD-05" com "U"</pre>
+    </article>
+    <article class="criterio" id="RF-145">
+      <h3><code class="id">RF-145</code> Cálculo das permissões</h3>
+      <pre class="gherkin">Cenário: módulo não contratado
+  Dado a Maria com a Utilização da Presença marcada
+  E a escola sem a Presença contratada
+  Quando envia POST /auth/hub/entrar
+  Então o token dela não tem "MOD-06"
+
+Cenário: membro do time sem o Catálogo
+  Dado o membro do time Caio Lima com a Utilização do SAC e de Usuários marcadas
+  Quando envia POST /auth/hub/entrar
+  Então o token tem o papel "MEMBRO_TIME", "MOD-02" e "MOD-03" com "U", e não tem "MOD-14"
+
+Cenário: staff sem a Sugestão marcada
+  Dado o staff João Lima só com a Utilização do Quiz
+  Quando envia POST /auth/hub/entrar
+  Então o token dele não tem "MOD-04"</pre>
+    </article>
+    <article class="criterio" id="RF-147">
+      <h3><code class="id">RF-147</code> Recusa no servidor</h3>
+      <pre class="gherkin">Cenário: ação sem a aba
+  Dado o token da Maria sem "MOD-03"
+  Quando envia POST /usuarios para criar um staff
+  Então a resposta é 403 ACESSO_NEGADO e nenhum usuário é criado</pre>
+    </article>
+    <article class="criterio" id="RF-150">
+      <h3><code class="id">RF-150</code> Participante e responsável</h3>
+      <pre class="gherkin">Cenário: mãe no perfil do filho
+  Dado a escola com a Presença e a Carteirinha contratadas
+  Quando a Carla, mãe do Lucas, envia POST /auth/quest/entrar com o código dele
+  Então o token tem o papel "PARTICIPANTE" e, em quem, o parentesco "Mãe"
+  E os mods de Tarefas, Perfil, Presença e Carteirinha, todos com "U"</pre>
+    </article>
+    <article class="criterio" id="RF-151-api">
+      <h3><code class="id">RF-151</code> Sala anônima</h3>
+      <pre class="gherkin">Cenário: só a sala
+  Quando envia POST /auth/sala/entrar com a sala 482107 do Quiz
+  Então o token tem o papel "ANONIMO", só "MOD-05" com "U" e a sala 482107
+  E os pedidos à Carteira, a Tarefas e ao Perfil recebem 403 ACESSO_NEGADO</pre>
+    </article>
+    <article class="criterio" id="RF-160-api">
+      <h3><code class="id">RF-160</code> O que pode conceder</h3>
+      <pre class="gherkin">Cenário: staff com Administrar usuários
+  Dado o João com Administrar usuários e só a Utilização do Quiz
+  Quando envia GET /usuarios/usr-ebfga-ana/permissoes
+  Então a resposta é 200 com:
+    """
+    {
+      "usuario": "usr-ebfga-ana",
+      "versao": 2,
+      "mods": {},
+      "concediveis": [
+        {
+          "mod": "MOD-05",
+          "nome": "Quiz",
+          "abas": "U"
+        }
+      ]
+    }
+    """
+
+Cenário: pessoa que não está abaixo
+  Quando o João envia GET /usuarios/usr-ebfga-rui/permissoes, de um par dele
+  Então a resposta é 403 ACESSO_NEGADO</pre>
+    </article>
+    <article class="criterio" id="RF-161-api">
+      <h3><code class="id">RF-161</code> Salvar tudo ou nada</h3>
+      <pre class="gherkin">Cenário: quem concede perdeu a aba
+  Dado a conta master tendo tirado a Presença do João
+  Quando o João envia PUT /usuarios/usr-ebfga-ana/permissoes com If-Match "2" e:
+    """
+    {
+      "mods": {
+        "MOD-05": "U",
+        "MOD-06": "U"
+      }
+    }
+    """
+  Então a resposta é 403 PERMISSAO_ACIMA com:
+    """
+    {
+      "codigo": "PERMISSAO_ACIMA",
+      "mensagem": "Você não tem mais a Presença para conceder.",
+      "mod": "MOD-06",
+      "abas": "U"
+    }
+    """
+  E GET /usuarios/usr-ebfga-ana/permissoes continua com a versão 2, sem mudança</pre>
+    </article>
+    <article class="criterio" id="RF-162-api">
+      <h3><code class="id">RF-162</code> Mudou enquanto editava</h3>
+      <pre class="gherkin">Cenário: duas pessoas salvando
+  Dado as permissões da Maria lidas na versão 6 pela conta master e pelo João
+  E a conta master tendo salvado antes, passando à versão 7
+  Quando o João envia PUT /usuarios/usr-ebfga-maria/permissoes com If-Match "6"
+  Então a resposta é 412 VERSAO_DESATUALIZADA com:
+    """
+    {
+      "codigo": "VERSAO_DESATUALIZADA",
+      "mensagem": "As permissões da Maria mudaram agora há pouco. Confira e salve.",
+      "versao": 7
+    }
+    """</pre>
+    </article>
+    <article class="criterio" id="RN-232">
+      <h3><code class="id">RN-232</code> Papéis</h3>
+      <pre class="gherkin">Esquema do Cenário: papel de cada pessoa
+  Quando &lt;quem&gt; envia POST &lt;endereço&gt;
+  Então o token tem o papel "&lt;papel&gt;"
+
+  Exemplos:
+    | quem                            | endereço           | papel         |
+    | o administrador do deboaz       | /auth/hub/entrar   | ADMINISTRADOR |
+    | o membro do time Caio Lima      | /auth/hub/entrar   | MEMBRO_TIME   |
+    | a conta master da EBFGA         | /auth/hub/entrar   | MASTER        |
+    | o educador autônomo Pedro Reis  | /auth/hub/entrar   | AUTONOMO      |
+    | a staff Maria Souza             | /auth/hub/entrar   | STAFF         |
+    | o participante Lucas Andrade    | /auth/quest/entrar | PARTICIPANTE  |
+    | a Carla, mãe do Lucas           | /auth/quest/entrar | PARTICIPANTE  |
+    | uma pessoa sem código de acesso | /auth/sala/entrar  | ANONIMO       |</pre>
+    </article>
+    <article class="criterio" id="RN-233-api">
+      <h3><code class="id">RN-233</code> Permissões por papel</h3>
+      <pre class="gherkin">Esquema do Cenário: módulos de cada papel
+  Quando &lt;quem&gt; entra no &lt;frente&gt;
+  Então o token tem em mods &lt;módulos&gt; com as abas &lt;abas&gt;
+
+  Exemplos:
+    | quem           | frente | módulos                                | abas     |
+    | administrador  | hub    | SAC, Usuários e Catálogo               | C e U    |
+    | membro do time | hub    | os marcados entre SAC, Usuários e Cat. | marcadas |
+    | conta master   | hub    | os da conta e os contratados           | C e U    |
+    | autônomo       | hub    | os da conta e os contratados           | C e U    |
+    | staff          | hub    | os marcados pela conta master          | marcadas |
+    | participante   | quest  | Tarefas, Perfil e os de Quem usa       | U        |
+    | responsável    | quest  | os do participante, com Quem usa       | U        |
+    | anônimo        | quest  | só o módulo da sala                    | U        |</pre>
+    </article>
+    <article class="criterio" id="RN-235">
+      <h3><code class="id">RN-235</code> Escopo da conta</h3>
+      <pre class="gherkin">Cenário: registro de outra conta
+  Dado a Maria, da escola "EBFGA", com "MOD-03" com "U"
+  Quando envia GET /usuarios/usr-colsa-bruno, de um usuário da escola "COLSA"
+  Então a resposta é 404 USUARIO_INEXISTENTE, e não 403
+
+Cenário: time deboaz em outra conta
+  Quando o membro do time Caio, com "MOD-03" com "U", envia GET /contas/conta-ebfga
+  Então a resposta é 200 com o cadastro da conta</pre>
+    </article>
+    <article class="criterio" id="RN-236">
+      <h3><code class="id">RN-236</code> O servidor garante</h3>
+      <pre class="gherkin">Cenário: casca adulterada
+  Dado a Maria com "MOD-03" só com "C"
+  E a casca adulterada mostrando a aba Utilização de Usuários
+  Quando envia GET /usuarios?tipo=STAFF
+  Então a resposta é 403 ACESSO_NEGADO</pre>
+    </article>
+    <article class="criterio" id="RN-237">
+      <h3><code class="id">RN-237</code> Limites dentro do módulo</h3>
+      <pre class="gherkin">Cenário: a autorização só conhece módulo, aba e papel
+  Dado o professor João com "MOD-06" com "U"
+  Quando envia um pedido da Presença
+  Então a autorização libera o módulo
+  E quais turmas ele vê é regra do documento da Presença</pre>
+    </article>
+    <article class="criterio" id="RN-238">
+      <h3><code class="id">RN-238</code> Módulo descontratado</h3>
+      <pre class="gherkin">Cenário: descontratação e recontratação
+  Dado a Maria com "MOD-06" com "U"
+  Quando a escola descontrata a Presença
+  Então GET /usuarios/usr-ebfga-maria/permissoes não traz "MOD-06" em mods
+  E o próximo token da Maria vem sem "MOD-06"
+  E quando a escola contrata a Presença de novo, "MOD-06" volta com "U"</pre>
+    </article>
+    <article class="criterio" id="RN-239">
+      <h3><code class="id">RN-239</code> Versão das permissões</h3>
+      <pre class="gherkin">Cenário: token com versão antiga
+  Dado a Maria com um token de pv 6
+  E a conta master tendo salvado as permissões dela, passando à versão 7
+  Quando ela envia um pedido com o token de pv 6
+  Então a resposta é 401 PERMISSOES_DESATUALIZADAS
+  E POST /auth/renovar devolve um token de pv 7</pre>
+    </article>
+    <article class="criterio" id="RN-241">
+      <h3><code class="id">RN-241</code> Ninguém concede o que não tem</h3>
+      <pre class="gherkin">Cenário: confere no servidor, não no token
+  Dado o João com um token que ainda tem "MOD-06"
+  E a conta master tendo tirado a Presença dele há pouco
+  Quando envia PUT /usuarios/usr-ebfga-ana/permissoes com "MOD-06" com "U"
+  Então a resposta é 403 PERMISSAO_ACIMA, conferida com as permissões atuais do João</pre>
+    </article>
+    <article class="criterio" id="RN-251">
+      <h3><code class="id">RN-251</code> Permissão</h3>
+      <pre class="gherkin">Esquema do Cenário: abas de uma permissão
+  Quando a conta master salva para a Maria &lt;abas&gt; do Quiz
+  Então o token novo da Maria tem "MOD-05" com "&lt;valor&gt;"
+
+  Exemplos:
+    | abas                      | valor |
+    | Configuração              | C     |
+    | Utilização                | U     |
+    | Configuração e Utilização | CU    |
+
+Cenário: Administrar usuários
+  Quando a conta master salva Administrar usuários para a Maria
+  Então o token novo da Maria tem "MOD-03" com "CU"
+
+Cenário: nenhuma aba
+  Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes sem "MOD-05"
+  Então GET /usuarios/usr-ebfga-maria/permissoes não traz "MOD-05"</pre>
+    </article>
+    <article class="criterio" id="RN-252">
+      <h3><code class="id">RN-252</code> Quem concede a quem</h3>
+      <pre class="gherkin">Esquema do Cenário: concessões permitidas
+  Quando &lt;quem concede&gt; envia PUT /usuarios/{id}/permissoes de &lt;quem recebe&gt;
+  Então a resposta é &lt;resposta&gt;
+
+  Exemplos:
+    | quem concede     | quem recebe          | resposta                        |
+    | o administrador  | o membro Caio        | 200                             |
+    | a conta master   | a staff Maria        | 200                             |
+    | o João, com Adm. | a Ana, abaixo dele   | 200, só com as abas que ele tem |
+    | o João, com Adm. | ele mesmo            | 403 ACESSO_NEGADO               |
+    | o João, com Adm. | a Maria, par dele    | 403 ACESSO_NEGADO               |
+    | a staff Ana      | o João, acima dela   | 403 ACESSO_NEGADO               |
+    | a conta master   | o participante Lucas | 403 ACESSO_NEGADO               |</pre>
+    </article>
+    <article class="criterio" id="RN-253">
+      <h3><code class="id">RN-253</code> A permissão é da conta</h3>
+      <pre class="gherkin">Cenário: quem concedeu é desativado
+  Dado a Ana com "MOD-05" com "U" concedida pelo João
+  Quando a conta master envia POST /usuarios/usr-ebfga-joao/desativar
+  Então GET /usuarios/usr-ebfga-ana/permissoes continua com "MOD-05" com "U"</pre>
+    </article>
+    <article class="criterio" id="RN-254-api">
+      <h3><code class="id">RN-254</code> Salvar substitui tudo</h3>
+      <pre class="gherkin">Cenário: desmarcar retira
+  Dado a Maria com "MOD-03" com "CU" e "MOD-06" com "U"
+  Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes com:
+    """
+    {
+      "mods": {
+        "MOD-03": "CU"
+      }
+    }
+    """
+  Então a resposta é 200 e "MOD-06" sai das permissões da Maria</pre>
+    </article>
+    <article class="criterio" id="RN-255">
+      <h3><code class="id">RN-255</code> Uma versão por salvamento</h3>
+      <pre class="gherkin">Cenário: salvar com mudança
+  Dado a Maria na versão de permissões 7, com sessões no navegador e no app
+  Quando a conta master salva com o Quiz marcado
+  Então a resposta é 200 com a versão 8
+  E POST /auth/renovar das duas sessões devolve tokens de pv 8
+
+Cenário: salvar sem mudança
+  Quando a conta master salva as permissões da Maria sem mudar nada
+  Então a resposta é 200 com a versão 7</pre>
+    </article>
+    <article class="criterio" id="RN-256-api">
+      <h3><code class="id">RN-256</code> Registro de mudanças</h3>
+      <pre class="gherkin">Cenário: o que fica registrado
+  Dado a conta master tendo marcado a Presença da Maria em 2026-11-01 às 13:20 UTC
+  Quando envia GET /usuarios/usr-ebfga-maria/permissoes/historico
+  Então a resposta é 200 com:
+    """
+    [
+      {
+        "em": "2026-11-01T13:20:00Z",
+        "por": "usr-ebfga-master",
+        "versao": 8,
+        "antes": {
+          "MOD-06": null
+        },
+        "depois": {
+          "MOD-06": "U"
+        }
+      }
+    ]
+    """
+  E nenhum endereço apaga ou altera esse registro
+
+Cenário: a própria pessoa não vê
+  Quando a Maria envia GET /usuarios/usr-ebfga-maria/permissoes/historico
+  Então a resposta é 403 ACESSO_NEGADO</pre>
+    </article>
     <article class="criterio" id="RNF-208">
       <h3><code class="id">RNF-208</code> Autorizar pelo token</h3>
       <pre class="gherkin">Cenário: ação autorizada pelo token
   Dado o token da Maria com o papel "STAFF" e "MOD-05" com "U"
-  Quando ela responde a um quiz
-  Então a ação é autorizada pelos papéis do token</pre>
+  Quando envia um pedido do Quiz
+  Então o pedido é autorizado pelo papel e pelos mods do token, sem ler as permissões</pre>
     </article>
     <article class="criterio" id="RNF-219">
       <h3><code class="id">RNF-219</code> Permissões no token</h3>
       <pre class="gherkin">Cenário: claims de autorização
-  Quando a Maria entra no hub
+  Quando a Maria envia POST /auth/hub/entrar
   Então o token tem as claims papel, mods e pv:
     """
     {
@@ -1271,7 +1397,7 @@ Esquema do Cenário: quem vê o registro
   E o token inteiro, com a assinatura RS256 de 342 caracteres, cabe em 4 KB
 
 Cenário: responsável no quest
-  Quando a Carla entra com o código do Lucas
+  Quando a Carla envia POST /auth/quest/entrar com o código do Lucas
   Então o token do quest é:
     """
     {
@@ -1295,45 +1421,38 @@ Cenário: responsável no quest
     <article class="criterio" id="RNF-220">
       <h3><code class="id">RNF-220</code> Negar por padrão</h3>
       <pre class="gherkin">Cenário: rota sem declaração
-  Dado uma rota nova do backend sem módulo, aba ou papel declarado
-  Quando alguém a chama
-  Então a rota recusa
+  Dado uma rota nova sem módulo, aba ou papel declarado
+  Quando alguém a chama com um token válido
+  Então a resposta é 403 ACESSO_NEGADO
   E o teste automatizado de rotas falha no build</pre>
-    </article>
-    <article class="criterio" id="RNF-221">
-      <h3><code class="id">RNF-221</code> Casca sem esperar</h3>
-      <pre class="gherkin">Cenário: casca antes do conteúdo
-  Quando a Maria entra no hub
-  Então os destinos, os cards e as abas aparecem a partir do token
-  E só o conteúdo dos cards chega depois, do servidor</pre>
     </article>
     <article class="criterio" id="RNF-222">
       <h3><code class="id">RNF-222</code> Salvar com versão</h3>
       <pre class="gherkin">Esquema do Cenário: versão no salvamento
   Dado as permissões da Maria na versão 7
-  Quando a conta master salva com &lt;versão&gt;
+  Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes com &lt;versão&gt;
   Então a resposta é &lt;resposta&gt;
 
   Exemplos:
-    | versão     | resposta            |
-    | a versão 7 | gravado             |
-    | a versão 6 | 412, nada é gravado |
-    | sem versão | 428, nada é gravado |</pre>
+    | versão       | resposta                                 |
+    | If-Match "7" | 200, gravado                             |
+    | If-Match "6" | 412 VERSAO_DESATUALIZADA, nada é gravado |
+    | sem If-Match | 428 VERSAO_AUSENTE, nada é gravado       |</pre>
     </article>
     <article class="criterio" id="RNF-223">
       <h3><code class="id">RNF-223</code> Gravação única</h3>
       <pre class="gherkin">Cenário: tudo junto
-  Quando a conta master salva as permissões da Maria
+  Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes
   Então as permissões, o registro e a versão nova são gravados numa só operação
   E a versão nova chega às sessões da Maria em até 1 s depois da resposta</pre>
     </article>
-    <article class="criterio" id="RNF-224">
+    <article class="criterio" id="RNF-224-api">
       <h3><code class="id">RNF-224</code> Token desatualizado</h3>
-      <pre class="gherkin">Cenário: renova uma vez
+      <pre class="gherkin">Cenário: código da recusa
   Dado a Maria com um token de versão de permissões antiga
-  Quando o aparelho faz um pedido
-  Então a resposta é 401 "PERMISSOES_DESATUALIZADAS"
-  E o aparelho renova uma vez e monta a casca de novo com o token novo</pre>
+  Quando envia qualquer pedido com esse token
+  Então a resposta é 401 PERMISSOES_DESATUALIZADAS
+  E POST /auth/renovar devolve o token novo, sem encerrar a sessão</pre>
     </article>
     <article class="criterio" id="fora-de-escopo">
       <h3>Fora de escopo</h3>
@@ -1373,7 +1492,8 @@ Cenário: responsável no quest
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v11</span></td><td>2026-11-01 23:41</td><td>Diagramas de casos de uso e de documentos da autorização v01</td></tr>
+      <tr><td><span class="boaz-versao">v12</span></td><td>2026-11-02 00:11</td><td>Cenários separados em Cenários de tela e Cenários de API; os de API usam os endereços, pedidos e códigos do contrato (IDs nos dois: <code>&lt;ID&gt;-api</code>)</td></tr>
+      <tr><td>v11</td><td>2026-11-01 23:41</td><td>Diagramas de casos de uso e de documentos da autorização v01</td></tr>
       <tr><td>v10</td><td>2026-11-01 22:01</td><td>JSON dos tokens expandidos (RNF-219); contrato de API v02, com JSON expandido</td></tr>
       <tr><td>v09</td><td>2026-11-01 18:15</td><td>Só Gherkin e diagramas: contexto, RF, RN, RNF, permissões por papel e fora de escopo viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
       <tr><td>v08</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
@@ -1382,11 +1502,10 @@ Cenário: responsável no quest
       <tr><td>v05</td><td>2026-11-01 13:29</td><td>Conceder permissões: o que cada um pode conceder, salvar tudo ou nada com a versão, recusas e avisos de quem concede e de quem recebe (<code class="id">RF-160</code> a <code class="id">RF-163</code>, <code class="id">RN-251</code> a <code class="id">RN-256</code>, <code class="id">RNF-222</code> a <code class="id">RNF-224</code>); diagramas autorizacao-sequencia v01, com as telas do deboaz e da instituição, e autorizacao-contrato-api v01; registro das mudanças em aberto</td></tr>
       <tr><td>v04</td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
       <tr><td>v03</td><td>2026-11-01 11:41</td><td>Sugestão só quando a conta master marca; membro do time com os módulos que o administrador do deboaz marca, como o staff (<code class="id">RF-145</code>, Usuários <code class="id">RF-155</code>); token de 4 KB com a assinatura RS256 (<code class="id">RNF-219</code>); permissões por ação fora de escopo; Em aberto resolvido</td></tr>
-      <tr><td>v02</td><td>2026-11-01 03:38</td><td>Painel de administração retirado: o time deboaz alcança outras contas pela lista Contas do módulo Usuários (<code class="id">RN-235</code>); permissões do administrador e do membro do time atualizadas</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v11 · 2026-11-01 23:41</span>
+    <span>boaz · v12 · 2026-11-02 00:11</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-b-autorizacao.html</span>
   </div>
 </footer>
