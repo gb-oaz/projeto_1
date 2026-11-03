@@ -8,6 +8,7 @@ public static class Saude
     {
         rotas.MapGet("/health", () => Results.Ok())
             .WithTags(DocumentacaoApi.TagSistema)
+            .WithGroupName(DocumentacaoApi.DocumentoSistema)
             .WithSummary("Prontidão do backend")
             .WithDescription(
                 "Responde 200, sem corpo, quando o ms_mono está no ar e pronto para atender. " +

@@ -15,12 +15,17 @@ Um único serviço, `ms_mono`, com a estrutura hexagonal de
 │       └── <feature>/            domain/ · usecases/ · ports/in/ · ports/out/
 ├── ms_mono/                      Boaz.MsMono: ASP.NET Core, imagem backend-mono
 │   ├── Program.cs                ponto de composição (liga portas e adaptadores)
+│   ├── appsettings.json          padrões de configuração (sem segredos)
 │   ├── sistema/                  endpoints do runtime: /health e a documentação em /doc/api
-│   ├── wwwroot/doc/api/          swagger.css e design/ (cópia gerada do design system, não edite)
+│   │   ├── guias/                guia de uso de cada API do Swagger (Markdown)
+│   │   └── exemplos/             exemplos de cada endpoint (gerados dos contratos, não edite)
+│   ├── wwwroot/doc/api/          swagger.css, design/ e diagramas/ (cópias geradas, não edite)
 │   └── infra/
 │       ├── in/<contexto>/<feature>/    endpoints HTTP (chamam ports/in)
 │       └── out/<contexto>/<feature>/   MongoDB e Redis (implementam ports/out)
 ├── tests/                        espelha core/ e ms_mono/, um xUnit por projeto
+├── scripts/diagramas-da-doc.sh   copia de 2_Diagramas/ os diagramas que os guias mostram
+├── scripts/exemplos-da-doc.py    gera os exemplos de cada endpoint a partir dos contratos
 └── Dockerfile                    imagem backend-mono, porta 8080, /health
 ```
 
@@ -33,11 +38,137 @@ dotnet test
 dotnet run --project ms_mono   # http://localhost:8080/health
 ```
 
+## Rodar local
+
+Precisa de:
+
+- **.NET 10 SDK** (`dotnet --version`);
+- **Docker**, para o MongoDB 8.0 e o Redis 8.0 (as mesmas versões do CI);
+- a **senha do administrador** do deboaz, que você escolhe: ela não fica no
+  `appsettings.json` (é segredo) e vale só para o seu banco local.
+
+```bash
+# 1. MongoDB e Redis nas portas padrão do appsettings.json (uma vez; --rm apaga ao parar)
+docker run -d --rm --name boaz-mongo -p 127.0.0.1:27017:27017 mongo:8.0
+docker run -d --rm --name boaz-redis -p 127.0.0.1:6379:6379 redis:8.0
+
+# 2. backend, na pasta 5_DEV/backend, com a senha do administrador
+Administrador__Senha='<escolha uma senha>' dotnet run --project ms_mono
+```
+
+- `http://localhost:8080/health` responde 200 quando o backend está no ar;
+  `http://localhost:8080/doc/api` abre a documentação (o `dotnet run` usa
+  `appsettings.Development.json`, que liga o Swagger).
+- Entrada do administrador: `admin.dboaz@deboaz.com`, com a senha escolhida, em
+  `POST /auth/hub/entrar` (no Swagger, API **Autenticação**):
+
+  ```bash
+  curl -X POST http://localhost:8080/auth/hub/entrar \
+    -H 'Content-Type: application/json' \
+    -d '{
+      "entrada": "admin.dboaz@deboaz.com",
+      "senha": "<a senha escolhida>",
+      "aparelho": "APP"
+    }'
+  ```
+
+  Com `"aparelho": "APP"` a resposta traz o `tokenAcesso` e o `tokenRenovacao`
+  no corpo; cole o `tokenAcesso` em **Authorize** no Swagger.
+- MongoDB e Redis em outro lugar (os contêineres do qa, por exemplo): troque as
+  portas por variável, nunca no `appsettings.json`:
+  `ConnectionStrings__MongoDb='mongodb://localhost:37017' ConnectionStrings__Redis='localhost:16379'`.
+- Sem `Autenticacao__ChavePrivada`, cada partida gera uma chave nova e os tokens
+  emitidos antes deixam de valer; para mantê-los, gere uma chave RSA em PKCS#8
+  base64 e passe-a nessa variável (tabela em **Configuração**).
+
+### O primeiro usuário
+
+Ninguém se cadastra como administrador: o time deboaz nasce da configuração.
+
+1. **Na partida**, o backend grava no banco o registro de módulos e garante a
+   conta do time (`conta-dboaz`, seção `Time`) e o administrador
+   (`usr-dboaz-<Administrador__NomeCurto>`, entrada `Administrador__Entrada`),
+   já `ATIVO` e com o resumo (PBKDF2) de `Administrador__Senha`
+   (`infra/out/commons/usuario/TimeDeboaz.cs`). Se o banco estiver fora do ar, isso
+   acontece no primeiro uso.
+2. **Só cria o que falta**: se o administrador já existe, nada muda, nem a
+   senha. A senha da variável vale só no nascimento dele; um backend que subiu
+   sem ela deixa o administrador **sem senha**, e toda entrada dá
+   `401 ENTRADA_INVALIDA`. O mesmo vale se o banco for esvaziado: o primeiro
+   pedido que procura o time o recria com a configuração do processo que estiver
+   rodando. Para corrigir no banco local, apague o administrador
+   (`db.usuarios.deleteOne({ _id: "usr-dboaz-admin" })` no `mongosh`) e suba o
+   backend de novo com a senha.
+3. **Depois dele**, tudo nasce pela API:
+   - o administrador cria os membros do time em `POST /usuarios` e dá as
+     permissões deles em `PUT /usuarios/{id}/permissoes`;
+   - uma escola ou um educador cria a própria conta em `POST /contas`, que é
+     público: a resposta traz a entrada da conta master, a senha gerada (mostrada
+     uma vez) e o `comprovante`, que confirma a senha em
+     `POST /auth/hub/confirmar-senha`;
+   - a conta master cria o staff e os participantes em `POST /usuarios`; o staff
+     gera a própria senha com o código de liberação em
+     `POST /usuarios/gerar-senha`, e o participante entra no quest com o código
+     de acesso.
+
 A documentação da API (Swagger UI com a identidade deboaz) fica em
 `http://localhost:8080/doc/api`: abre na capa do catálogo, e o seletor do
-topo, à direita, abre cada API (`ms_mono · v1`); a raiz `/` leva a ela (302).
+topo, à direita, abre cada API — **Sistema**, **Autenticação**, **Usuários** e
+**Autorização**, uma por módulo (`/doc/api/<modulo>.json`). Cada uma começa
+pelo guia de uso de `ms_mono/sistema/guias/<modulo>.md` (fluxo passo a passo,
+erros e os diagramas do módulo, na largura toda) e tem o botão **Authorize**
+para o token; a raiz `/` leva ao catálogo (302). Os exemplos ficam dentro de
+cada endpoint: o pedido em **Request body** e cada resposta, com os erros e as
+mensagens exatas, em **Responses** (seletor **Examples**). O endereço da página
+abre o endpoint (`#/<Tag>/<operação>`), para compartilhar.
 Ela existe quando `Swagger:Habilitado` é `true`: no `dotnet run`
 (appsettings.Development.json), no CI local e em homologação. Em produção fica
 desligada (a raiz responde 404) e o WAF bloqueia `/doc/api`. O banner (animado
 e parado), o logo, o favicon e as cores de `wwwroot/doc/api/design/` vêm de
 `pnpm run gerar` em `0_Assets/design/`.
+
+Os diagramas dos guias são cópias da versão mais recente de `2_Diagramas/`, em
+`ms_mono/wwwroot/doc/api/diagramas/<legenda>.svg`, porque a imagem do backend
+só enxerga `5_DEV/backend/`. Depois de uma versão nova de um deles, rode
+`./5_DEV/backend/scripts/diagramas-da-doc.sh`; o teste
+`DiagramasDaDocumentacaoTests` falha enquanto a cópia estiver atrás.
+
+Os exemplos de `ms_mono/sistema/exemplos/<modulo>.json` saem do contrato de API
+mais recente de cada módulo (o PEDIDO e as RESPOSTAS de cada caixa), com as
+mensagens das falhas do core. Depois de uma versão nova de um contrato, rode
+`./5_DEV/backend/scripts/exemplos-da-doc.py`; o teste
+`Todo_endpoint_traz_os_exemplos_do_contrato` falha se um endpoint ficar sem
+exemplo ou sobrar um. Módulo
+novo: `WithGroupName(<modulo>)` no grupo de endpoints, uma linha em
+`DocumentacaoApi.Apis`, o guia em `sistema/guias/`, as legendas no script dos diagramas e o módulo em
+`MODULOS` do script dos exemplos.
+
+## Configuração
+
+Tudo que muda de um ambiente para outro vem da configuração, nunca do código:
+`ms_mono/appsettings.json` traz os padrões e cada parâmetro pode ser trocado por
+variável de ambiente, com `__` no lugar de `:`. Faltando um parâmetro
+obrigatório, o backend não sobe e diz qual variável definir
+(`ms_mono/infra/out/commons/Configuracoes.cs`).
+
+| Variável | Padrão (appsettings.json) | Para quê |
+|---|---|---|
+| `ConnectionStrings__MongoDb` | `mongodb://localhost:27017` | Servidor do MongoDB (`ConnectionStrings__Mongo` também vale, nome usado no Azure) |
+| `ConnectionStrings__Redis` | `localhost:6379` | Servidor do Redis |
+| `Mongo__Banco` | `boaz` | Banco dentro do MongoDB |
+| `Time__Nome` | `Time deboaz` | Nome da conta do time deboaz |
+| `Time__Documento` | vazio | CNPJ da conta do time |
+| `Time__Responsavel` | vazio | Responsável pela conta do time |
+| `Time__Telefone` | vazio | Telefone do responsável |
+| `Administrador__Nome` | `Administrador do deboaz` | Nome do administrador |
+| `Administrador__NomeCurto` | `admin` | Forma o id `usr-dboaz-<nome curto>` |
+| `Administrador__Entrada` | `admin.dboaz@deboaz.com` | Entrada do administrador no hub |
+| `Administrador__Senha` | — **segredo** | Senha da primeira entrada do administrador; sem ela, ele nasce sem senha e não entra |
+| `Autenticacao__ChaveId` | `deboaz-local` | O `kid` da chave que assina o token |
+| `Autenticacao__ChavePrivada` | — **segredo** | Chave RSA em PKCS#8 base64; sem ela, uma chave nova a cada partida e os tokens caem quando o backend reinicia |
+| `Swagger__Habilitado` | `false` (`true` em Development) | Liga `/doc/api` |
+
+Os dados do time e do administrador são gravados só quando eles nascem no banco:
+mudar a variável depois não altera o que já existe. A sigla `DBOAZ`, o id
+`conta-dboaz` e o domínio `deboaz.com` das entradas são regras do produto
+(requisito 17, RN-179 e RN-180) e ficam no core.

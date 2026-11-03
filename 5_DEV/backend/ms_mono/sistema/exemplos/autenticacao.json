@@ -1,0 +1,305 @@
+{
+  "POST auth/hub/entrar": {
+    "pedido": {
+      "entrada": "maria.ebfga@deboaz.com",
+      "senha": "••••••••",
+      "aparelho": "NAVEGADOR"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "tokenAcesso": "eyJ…",
+            "tipo": "Bearer",
+            "expiraEm": 900
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "ENTRADA_INVALIDA",
+          "corpo": {
+            "codigo": "ENTRADA_INVALIDA",
+            "mensagem": "Entrada ou senha incorretas."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_INDISPONIVEL",
+          "corpo": {
+            "codigo": "ACESSO_INDISPONIVEL",
+            "mensagem": "Acesso indisponível. Fale com quem administra a sua conta."
+          }
+        }
+      ],
+      "429": [
+        {
+          "nome": "ENTRADA_BLOQUEADA",
+          "corpo": {
+            "codigo": "ENTRADA_BLOQUEADA",
+            "mensagem": "Muitas tentativas erradas. Tente de novo mais tarde.",
+            "tentarEm": "2026-11-01T09:15:00Z"
+          }
+        }
+      ]
+    }
+  },
+  "POST auth/quest/entrar": {
+    "pedido": {
+      "codigo": "EBFGA-LUCAS-0412",
+      "aparelho": "APP",
+      "quem": {
+        "tipo": "RESPONSAVEL",
+        "parentesco": "Mãe"
+      }
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "tokenAcesso": "eyJ…",
+            "tipo": "Bearer",
+            "expiraEm": 900
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "CODIGO_INVALIDO",
+          "corpo": {
+            "codigo": "CODIGO_INVALIDO",
+            "mensagem": "Código de acesso inválido."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_INDISPONIVEL",
+          "corpo": {
+            "codigo": "ACESSO_INDISPONIVEL",
+            "mensagem": "Acesso indisponível. Fale com quem administra a sua conta."
+          }
+        }
+      ],
+      "429": [
+        {
+          "nome": "ENTRADA_BLOQUEADA",
+          "corpo": {
+            "codigo": "ENTRADA_BLOQUEADA",
+            "mensagem": "Muitas tentativas erradas. Tente de novo mais tarde.",
+            "tentarEm": "2026-11-01T09:15:00Z"
+          }
+        }
+      ]
+    }
+  },
+  "POST auth/hub/confirmar-senha": {
+    "pedido": {
+      "comprovante": "c7e1…"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "tokenAcesso": "eyJ…",
+            "tipo": "Bearer",
+            "expiraEm": 900
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "COMPROVANTE_INVALIDO",
+          "corpo": {
+            "codigo": "COMPROVANTE_INVALIDO",
+            "mensagem": "Comprovante inválido. Gere a senha de novo."
+          }
+        }
+      ]
+    }
+  },
+  "POST auth/sala/entrar": {
+    "pedido": {
+      "sala": "482107"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "tokenAcesso": "eyJ…",
+            "tipo": "Bearer",
+            "expiraEm": 900
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "SALA_FECHADA",
+          "corpo": {
+            "codigo": "SALA_FECHADA",
+            "mensagem": "Essa sala não está aberta."
+          }
+        }
+      ]
+    }
+  },
+  "POST auth/renovar": {
+    "pedido": {
+      "tokenRenovacao": "3f9c2a71.Qm9h…"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "tokenAcesso": "eyJ…",
+            "tipo": "Bearer",
+            "expiraEm": 900
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        }
+      ]
+    }
+  },
+  "POST auth/sair": {
+    "pedido": null,
+    "respostas": {
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ]
+    }
+  },
+  "GET auth/sessoes": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": [
+            {
+              "sid": "3f9c2a71",
+              "aparelho": "NAVEGADOR",
+              "ultimaAcao": "2026-11-01T09:42:00Z",
+              "esteAparelho": true
+            }
+          ]
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ]
+    }
+  },
+  "DELETE auth/sessoes/{sid}": {
+    "pedido": null,
+    "respostas": {
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "SESSAO_NAO_ENCONTRADA",
+          "corpo": {
+            "codigo": "SESSAO_NAO_ENCONTRADA",
+            "mensagem": "Sessão não encontrada."
+          }
+        }
+      ]
+    }
+  },
+  "DELETE auth/sessoes": {
+    "pedido": null,
+    "respostas": {
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ]
+    }
+  },
+  "GET auth/chaves": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "keys": [
+              {
+                "kid": "deboaz-2026-11",
+                "kty": "RSA",
+                "alg": "RS256",
+                "use": "sig",
+                "n": "…",
+                "e": "AQAB"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

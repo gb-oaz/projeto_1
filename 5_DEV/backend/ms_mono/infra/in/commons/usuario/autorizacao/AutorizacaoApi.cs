@@ -14,13 +14,16 @@ public sealed record PermissoesCorpo(IReadOnlyDictionary<string, string?>? Mods)
 public static class AutorizacaoApi
 {
     public const string Tag = "Autorização";
+
+    // A API deste módulo no seletor do Swagger (/doc/api/autorizacao.json).
+    public const string Documento = "autorizacao";
     public const string Descricao =
         "Permissões por módulo e aba (17_modulo-usuario-b-autorizacao): ler, salvar o conjunto inteiro com a versão lida " +
         "no If-Match e o registro de mudanças. Exige MOD-03 · U e ser superior da pessoa";
 
     public static IEndpointRouteBuilder MapAutorizacao(this IEndpointRouteBuilder rotas)
     {
-        var api = rotas.MapGroup("/usuarios/{id}/permissoes").WithTags(Tag);
+        var api = rotas.MapGroup("/usuarios/{id}/permissoes").WithTags(Tag).WithGroupName(Documento);
         var uso = ExigeUsuarios(Abas.U);
 
         api.MapGet("", (string id, HttpContext http, ILerPermissoes ler, CancellationToken ct) =>

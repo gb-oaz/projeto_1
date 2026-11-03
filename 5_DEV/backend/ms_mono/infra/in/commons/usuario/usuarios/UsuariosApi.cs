@@ -28,13 +28,16 @@ public sealed record TempoDoTimeCorpo(string? MembrosNavegador, string? MembrosA
 public static class UsuariosApi
 {
     public const string Tag = "Usuários";
+
+    // A API deste módulo no seletor do Swagger (/doc/api/usuarios.json).
+    public const string Documento = "usuarios";
     public const string Descricao =
         "Contas assinantes, staff, participantes e membros do time (17_modulo-usuario): cadastro, senha, código de acesso, " +
         "estado, card e tempo de sessão. Com login, exige o módulo Usuários (MOD-03) na aba Utilização, e na Configuração para o tempo de sessão";
 
     public static IEndpointRouteBuilder MapUsuarios(this IEndpointRouteBuilder rotas)
     {
-        var api = rotas.MapGroup("").WithTags(Tag);
+        var api = rotas.MapGroup("").WithTags(Tag).WithGroupName(Documento);
         var uso = ExigeUsuarios(Abas.U);
         var configuracao = ExigeUsuarios(Abas.C);
 

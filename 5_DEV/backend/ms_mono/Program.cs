@@ -23,6 +23,7 @@ using Autorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 var builder = WebApplication.CreateBuilder(args);
 var servicos = builder.Services;
 
+servicos.AddConfiguracoes();
 servicos.AddDocumentacaoApi();
 servicos.AddJsonDasApis();
 servicos.AddSingleton(TimeProvider.System);

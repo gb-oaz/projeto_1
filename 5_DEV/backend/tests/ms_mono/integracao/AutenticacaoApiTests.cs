@@ -1,4 +1,6 @@
 using System.Net;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Boaz.MsMono.Tests.Integracao;
 
@@ -161,6 +163,10 @@ public class AutenticacaoApiTests(Backend backend) : IClassFixture<Backend>
         using var api = backend.Cliente();
 
         Assert.Equal(HttpStatusCode.OK, (await api.Enviar("GET", "/time/tempo-sessao", token: admin.Token)).Status);
+        // o time e o administrador nascem com os parâmetros da configuração
+        var conta = await backend.Banco.GetCollection<BsonDocument>("contas").Find(Builders<BsonDocument>.Filter.Eq("_id", "conta-dboaz")).FirstAsync();
+        var usuario = await backend.Banco.GetCollection<BsonDocument>("usuarios").Find(Builders<BsonDocument>.Filter.Eq("_id", admin.Id)).FirstAsync();
+        Assert.Equal((Backend.NomeDoTime, "Administrador do deboaz", "admin"), (conta["nome"].AsString, usuario["nome"].AsString, usuario["nomeCurto"].AsString));
     }
 
     static string Sid(string token) =>

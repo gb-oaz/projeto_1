@@ -17,13 +17,15 @@ public sealed class Backend : WebApplicationFactory<Program>, IAsyncLifetime
 {
     public const string AdminEntrada = "admin.dboaz@deboaz.com";
     public const string AdminSenha = "Ad#Teste271828";
+    public const string NomeDoTime = "Time deboaz dos testes";
 
     public string NomeDoBanco { get; } = $"boaz_testes_{Guid.NewGuid():N}";
 
     protected override void ConfigureWebHost(IWebHostBuilder builder) => builder
         .UseSetting("Mongo:Banco", NomeDoBanco)
         .UseSetting("Administrador:Entrada", AdminEntrada)
-        .UseSetting("Administrador:Senha", AdminSenha);
+        .UseSetting("Administrador:Senha", AdminSenha)
+        .UseSetting("Time:Nome", NomeDoTime);
 
     // O banco do teste, para preparar o que a API não cria (uma contratação).
     public IMongoDatabase Banco => new MongoClient(

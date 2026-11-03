@@ -1,25 +1,24 @@
 using System.Security.Cryptography;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.Out;
+using Microsoft.Extensions.Options;
 
 namespace Boaz.MsMono.Infra.Out.Commons.Usuario.Autenticacao;
 
-// Assinatura RS256 do token de acesso (RNF-207) com a chave privada da
-// configuração: Autenticacao:ChaveId (o kid) e Autenticacao:ChavePrivada (PKCS#8
-// em base64; no Azure vem do Key Vault). Sem chave configurada, uma chave nova
-// é gerada a cada partida: serve à máquina de quem desenvolve, e os tokens
+// Assinatura RS256 do token de acesso (RNF-207) com a chave da configuração
+// (seção Autenticacao, em Configuracoes.cs): ChaveId é o kid e ChavePrivada a
+// chave em PKCS#8 base64 (no Azure, do Key Vault). Sem chave privada, uma chave
+// nova é gerada a cada partida: serve à máquina de quem desenvolve, e os tokens
 // deixam de valer quando o backend reinicia.
 public sealed class AssinadorRsa : IAssinador, IDisposable
 {
-    public const string KidLocal = "deboaz-local";
-
     readonly string kid;
     readonly RSA rsa = RSA.Create(2048);
 
-    public AssinadorRsa(IConfiguration configuracao)
+    public AssinadorRsa(IOptions<OpcoesDaAutenticacao> opcoes)
     {
-        kid = configuracao["Autenticacao:ChaveId"] is { Length: > 0 } k ? k : KidLocal;
-        if (configuracao["Autenticacao:ChavePrivada"] is { Length: > 0 } chave)
+        kid = opcoes.Value.ChaveId;
+        if (opcoes.Value.ChavePrivada is { Length: > 0 } chave)
         {
             rsa.ImportPkcs8PrivateKey(Convert.FromBase64String(chave), out _);
         }

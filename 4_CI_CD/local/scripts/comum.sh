@@ -6,9 +6,11 @@ set -euo pipefail
 # Copia de /fonte (repositório, só leitura) para /trabalho só o que o build
 # precisa, sem os artefatos da máquina (node_modules, bin, obj, dist…), para
 # que nada do sistema da pessoa entre no contêiner e nada volte para ela (RNF-164).
+# 2_Diagramas entra porque os testes do backend conferem as cópias dos diagramas
+# da documentação da API com a versão mais recente (no GitHub o checkout é inteiro).
 copiar() {
   local itens=() i
-  for i in global.json .nvmrc 5_DEV; do [ -e "/fonte/$i" ] && itens+=("$i"); done
+  for i in global.json .nvmrc 2_Diagramas 5_DEV; do [ -e "/fonte/$i" ] && itens+=("$i"); done
   mkdir -p /trabalho
   tar -C /fonte \
     --exclude=node_modules --exclude=bin --exclude=obj --exclude=dist \

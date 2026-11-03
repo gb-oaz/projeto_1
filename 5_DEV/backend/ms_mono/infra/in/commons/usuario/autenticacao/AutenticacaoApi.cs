@@ -16,6 +16,9 @@ public sealed record SessaoAbertaNoAppCorpo(string TokenAcesso, string Tipo, int
 public static class AutenticacaoApi
 {
     public const string Tag = "Autenticação";
+
+    // A API deste módulo no seletor do Swagger (/doc/api/autenticacao.json).
+    public const string Documento = "autenticacao";
     public const string Descricao =
         "Entrada no hub, no quest e na sala, confirmação da senha, renovação do token e aparelhos conectados " +
         "(17_modulo-usuario-a-autenticacao). O token de acesso vale 15 min; a renovação vai no cookie na web e no corpo no app";
@@ -25,7 +28,7 @@ public static class AutenticacaoApi
 
     public static IEndpointRouteBuilder MapAutenticacao(this IEndpointRouteBuilder rotas)
     {
-        var api = rotas.MapGroup("/auth").WithTags(Tag);
+        var api = rotas.MapGroup("/auth").WithTags(Tag).WithGroupName(Documento);
 
         api.MapPost("/hub/entrar", async (EntradaNoHubDto? corpo, HttpContext http, IEntrarNoHub entrar, CancellationToken ct) =>
                 Aberta(http, await entrar.Executar(corpo ?? new(null, null, null), ct)))
@@ -78,12 +81,14 @@ public static class AutenticacaoApi
                 http.Response.Cookies.Delete(Cookie, OpcoesDoCookie());
                 return Results.NoContent();
             })
+            .ComLogin()
             .WithSummary("Encerrar a sessão deste aparelho")
             .WithDescription("Com o token de acesso (RF-138). O cookie de renovação é apagado.")
             .Produces(StatusCodes.Status204NoContent)
             .Produces<Erro>(StatusCodes.Status401Unauthorized);
 
         api.MapGet("/sessoes", (HttpContext http, IListarSessoes listar, CancellationToken ct) => listar.Executar(DoHub(http), ct))
+            .ComLogin()
             .WithSummary("Listar os aparelhos conectados")
             .WithDescription("Com o token de acesso (RF-156): as sessões da própria pessoa, a mais recente primeiro.")
             .Produces<IReadOnlyList<SessaoListadaDto>>()
@@ -94,6 +99,7 @@ public static class AutenticacaoApi
                 await encerrar.Executar(DoHub(http), sid, ct);
                 return Results.NoContent();
             })
+            .ComLogin()
             .WithSummary("Sair de um aparelho escolhido na lista")
             .WithDescription("Com o token de acesso (RF-157): só as próprias sessões; a de outra pessoa responde 404.")
             .Produces(StatusCodes.Status204NoContent)
@@ -105,6 +111,7 @@ public static class AutenticacaoApi
                 await encerrar.Executar(DoHub(http), ct);
                 return Results.NoContent();
             })
+            .ComLogin()
             .WithSummary("Sair de todos os aparelhos de uma vez, inclusive este")
             .WithDescription("Com o token de acesso (RF-157).")
             .Produces(StatusCodes.Status204NoContent)

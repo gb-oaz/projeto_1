@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using StackExchange.Redis;
@@ -6,21 +7,21 @@ namespace Boaz.MsMono.Infra.Out.Commons;
 
 // Banco (MongoDB) e cache (Redis) do backend, compartilhados pelos adaptadores
 // de saída. Os endereços vêm de ConnectionStrings:MongoDb (ou :Mongo, nome
-// usado no Azure) e ConnectionStrings:Redis; o banco, de Mongo:Banco (padrão
-// "boaz", o mesmo do qa). Nada conecta na partida: o primeiro uso conecta, para
+// usado no Azure) e ConnectionStrings:Redis; o banco, de Mongo:Banco
+// (Configuracoes.cs). Nada conecta na partida: o primeiro uso conecta, para
 // /health e /doc/api responderem mesmo sem banco.
 public sealed class Armazenamento
 {
-    public const string BancoPadrao = "boaz";
-
     readonly Lazy<IMongoDatabase> banco;
     readonly Lazy<ConnectionMultiplexer> cache;
 
-    public Armazenamento(IConfiguration configuracao)
+    public Armazenamento(IConfiguration configuracao, IOptions<OpcoesDoMongo> opcoes)
     {
-        var mongo = configuracao.GetConnectionString("MongoDb") ?? configuracao.GetConnectionString("Mongo") ?? "mongodb://localhost:27017";
-        var redis = configuracao.GetConnectionString("Redis") ?? "localhost:6379";
-        var nome = configuracao["Mongo:Banco"] is { Length: > 0 } n ? n : BancoPadrao;
+        var mongo = configuracao.GetConnectionString("MongoDb") ?? configuracao.GetConnectionString("Mongo")
+            ?? throw new InvalidOperationException("Defina ConnectionStrings__MongoDb (appsettings.json ou variável de ambiente).");
+        var redis = configuracao.GetConnectionString("Redis")
+            ?? throw new InvalidOperationException("Defina ConnectionStrings__Redis (appsettings.json ou variável de ambiente).");
+        var nome = opcoes.Value.Banco;
         banco = new(() => new MongoClient(mongo).GetDatabase(nome));
         cache = new(() =>
         {

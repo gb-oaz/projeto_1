@@ -1,0 +1,218 @@
+{
+  "GET usuarios/{id}/permissoes": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "usuario": "usr-ebfga-maria",
+            "versao": 6,
+            "mods": {
+              "MOD-03": "CU",
+              "MOD-08": "C"
+            },
+            "concediveis": [
+              {
+                "mod": "MOD-06",
+                "nome": "Presença",
+                "abas": "CU"
+              },
+              {
+                "mod": "MOD-05",
+                "nome": "Quiz",
+                "abas": "CU"
+              }
+            ]
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "USUARIO_INEXISTENTE",
+          "corpo": {
+            "codigo": "USUARIO_INEXISTENTE",
+            "mensagem": "Usuário não encontrado."
+          }
+        }
+      ]
+    }
+  },
+  "PUT usuarios/{id}/permissoes": {
+    "pedido": {
+      "mods": {
+        "MOD-03": "CU",
+        "MOD-06": "U",
+        "MOD-08": "C"
+      }
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "versao": 7,
+            "mods": {
+              "MOD-03": "CU",
+              "MOD-06": "U",
+              "MOD-08": "C"
+            }
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "PERMISSAO_ACIMA",
+          "corpo": {
+            "codigo": "PERMISSAO_ACIMA",
+            "mensagem": "Você não tem mais o módulo Presença para conceder.",
+            "mod": "MOD-06",
+            "abas": "U"
+          }
+        },
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "USUARIO_INEXISTENTE",
+          "corpo": {
+            "codigo": "USUARIO_INEXISTENTE",
+            "mensagem": "Usuário não encontrado."
+          }
+        }
+      ],
+      "412": [
+        {
+          "nome": "VERSAO_DESATUALIZADA",
+          "corpo": {
+            "codigo": "VERSAO_DESATUALIZADA",
+            "mensagem": "As permissões de Ana Lima mudaram agora há pouco. Confira e salve.",
+            "versao": 7
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "MODULO_NAO_CONTRATADO",
+          "corpo": {
+            "codigo": "MODULO_NAO_CONTRATADO",
+            "mensagem": "O módulo Relatórios não está contratado.",
+            "mod": "MOD-12"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O módulo MOD-13 não existe.",
+            "campo": "mods.MOD-13"
+          }
+        }
+      ],
+      "428": [
+        {
+          "nome": "VERSAO_AUSENTE",
+          "corpo": {
+            "codigo": "VERSAO_AUSENTE",
+            "mensagem": "Envie a versão lida das permissões no If-Match."
+          }
+        }
+      ]
+    }
+  },
+  "GET usuarios/{id}/permissoes/historico": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": [
+            {
+              "em": "2026-11-01T13:20:00Z",
+              "por": "usr-ebfga-master",
+              "versao": 7,
+              "antes": {
+                "MOD-06": null
+              },
+              "depois": {
+                "MOD-06": "U"
+              }
+            }
+          ]
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "USUARIO_INEXISTENTE",
+          "corpo": {
+            "codigo": "USUARIO_INEXISTENTE",
+            "mensagem": "Usuário não encontrado."
+          }
+        }
+      ]
+    }
+  }
+}

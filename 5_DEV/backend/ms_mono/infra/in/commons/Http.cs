@@ -27,6 +27,16 @@ public sealed record Erro(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Abas = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? Versao = null);
 
+// A marca que ComLogin() deixa no endpoint.
+public sealed class MarcaDeLogin
+{
+    public static readonly MarcaDeLogin Instancia = new();
+
+    MarcaDeLogin()
+    {
+    }
+}
+
 public static class Http
 {
     // Data e hora sempre em UTC, sem frações: 2026-11-01T09:15:00Z.
@@ -142,8 +152,13 @@ public static class Http
             http.Items[typeof(AcessoConferido)] = acesso;
             return await proximo(contexto);
         })
+        .ComLogin()
         .Produces<Erro>(StatusCodes.Status401Unauthorized)
         .Produces<Erro>(StatusCodes.Status403Forbidden);
+
+    // Marca a rota como "com login": a documentação põe o cadeado do Bearer nela
+    // (DocumentacaoApi). Quem confere o token é o filtro ou o caso de uso.
+    public static RouteHandlerBuilder ComLogin(this RouteHandlerBuilder rota) => rota.WithMetadata(MarcaDeLogin.Instancia);
 
     // Exige o módulo Usuários (MOD-03) na aba pedida.
     public static ExigenciaDaRota ExigeUsuarios(Abas aba) => new(CalculoDePermissoes.Usuarios, aba);

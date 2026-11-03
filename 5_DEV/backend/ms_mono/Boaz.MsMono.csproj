@@ -29,6 +29,12 @@
   </Target>
 
   <ItemGroup>
+    <!-- Guias de uso de cada API do Swagger (sistema/DocumentacaoApi.cs) -->
+    <EmbeddedResource Include="sistema/guias/*.md" LogicalName="guias/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="sistema/exemplos/*.json" LogicalName="exemplos/%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../core/commons/Boaz.Core.Commons.csproj" />
     <ProjectReference Include="../core/landing_page/Boaz.Core.LandingPage.csproj" />
     <ProjectReference Include="../core/hub/Boaz.Core.Hub.csproj" />
