@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hub · UI · boaz · v24</title>
+<title>Hub · UI · boaz · v26</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="12_hub-ui">
 <meta name="boaz:caminho" content="1_Requisitos/12_hub-ui.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v24">
-<meta name="boaz:data" content="2026-11-01 18:21">
+<meta name="boaz:versao" content="v26">
+<meta name="boaz:data" content="2026-11-03 14:39">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,8 +918,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>12_hub-ui</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v24</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 18:21</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v26</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 14:39</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1011,15 +1011,15 @@ Cenário: instituição
       <h3><code class="id">RF-82</code> A contratar</h3>
       <pre class="gherkin">Cenário: conta master
   Quando a conta master abre a aba "A contratar" de Módulos
-  Então vê "Módulos para contratar" e os cards com o preço inicial e "Ver detalhes"
-  E o card do Quiz tem as Ondas do vão em forma de estrela, saindo da estrela padrinho</pre>
+  Então vê "Módulos para contratar" e o espaço dos cards da vitrine
+  E o conteúdo de cada card vem do Catálogo (16_modulo-catalogo RF-164)</pre>
     </article>
     <article class="criterio" id="RF-83">
       <h3><code class="id">RF-83</code> Detalhe do módulo</h3>
-      <pre class="gherkin">Cenário: conhecer o Quiz
-  Quando a conta master toca em "Ver detalhes" no Quiz
-  Então vê as telas do Quiz no hub e no quest, a descrição, "Como funciona" e "Quem usa"
-  E o simulador de custo e "Incluir na conta"</pre>
+      <pre class="gherkin">Cenário: abrir o detalhe
+  Quando a conta master toca em "Ver detalhes" num card de A contratar
+  Então vê a barra do topo com o nome do módulo e a navegação da casca
+  E o espaço da vitrine do módulo, com o conteúdo do Catálogo (16_modulo-catalogo RF-165 a RF-167)</pre>
     </article>
     <article class="criterio" id="RF-84">
       <h3><code class="id">RF-84</code> Módulo aberto</h3>
@@ -1179,22 +1179,90 @@ Cenário: inicial decorativa
   </section>
   <section id="telas">
     <h2>Telas</h2>
+    <h3>Web</h3>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-entrada_v06_20261031-2204.svg"><img src="../2_Diagramas/vista-hub-entrada_v06_20261031-2204.svg" alt="Vista da entrada no hub: primeiro acesso no aparelho com Entrar e Criar conta, contas acessadas, outra conta e criar conta, no compact, no medium e no expanded"></a>
-      <figcaption><strong>Hub · entrada · vista</strong><code>2_Diagramas/vista-hub-entrada_v06_20261031-2204.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-entrada-web_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-entrada-web_v01_20261103-1435.svg" alt="Web: entrada no medium e no expanded, primeira vez e com as contas acessadas, só com o logo sobre o fundo Halo"></a>
+      <figcaption><strong>Hub · entrada · web · vista</strong><code>2_Diagramas/vista-hub-entrada-web_v01_20261103-1435.svg</code></figcaption>
     </figure>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-meus-modulos_v12_20261101-0042.svg"><img src="../2_Diagramas/vista-hub-meus-modulos_v12_20261101-0042.svg" alt="Vista de Módulos com os cards em grade nos quatro tamanhos, A contratar, a ordenação com o menu do card, o Feed e a Conta, e a barra lateral aberta e encolhida"></a>
-      <figcaption><strong>Hub · módulos · vista</strong><code>2_Diagramas/vista-hub-meus-modulos_v12_20261101-0042.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-meus-modulos-web_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-meus-modulos-web_v01_20261103-1435.svg" alt="Web: Módulos no medium e no expanded, com a barra lateral aberta e encolhida"></a>
+      <figcaption><strong>Hub · módulos · web · vista</strong><code>2_Diagramas/vista-hub-meus-modulos-web_v01_20261103-1435.svg</code></figcaption>
     </figure>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-catalogo_v07_20261031-2212.svg"><img src="../2_Diagramas/vista-hub-catalogo_v07_20261031-2212.svg" alt="Vista da aba A contratar de Módulos: abas primárias no compact, detalhe com custo, código do time deboaz e, no expanded, lista e detalhe ao lado da barra lateral em acordeão"></a>
-      <figcaption><strong>Hub · módulos · a contratar · vista</strong><code>2_Diagramas/vista-hub-catalogo_v07_20261031-2212.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-catalogo-web_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-catalogo-web_v01_20261103-1435.svg" alt="Web: A contratar e o detalhe do módulo no medium e no expanded, só com a carcaça; o conteúdo da vitrine é do Catálogo (16)"></a>
+      <figcaption><strong>Hub · módulos · a contratar · web · vista</strong><code>2_Diagramas/vista-hub-catalogo-web_v01_20261103-1435.svg</code></figcaption>
     </figure>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-modulo_v06_20261031-2211.svg"><img src="../2_Diagramas/vista-hub-modulo_v06_20261031-2211.svg" alt="Vista do módulo aberto pela administração e pela pessoa delegada, só com a carcaça"></a>
-      <figcaption><strong>Hub · módulo aberto · vista</strong><code>2_Diagramas/vista-hub-modulo_v06_20261031-2211.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-modulo-web_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-modulo-web_v01_20261103-1435.svg" alt="Web: módulo aberto no medium e no expanded, só com a carcaça"></a>
+      <figcaption><strong>Hub · módulo aberto · web · vista</strong><code>2_Diagramas/vista-hub-modulo-web_v01_20261103-1435.svg</code></figcaption>
     </figure>
+    <h3>PWA</h3>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-entrada-pwa_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-entrada-pwa_v01_20261103-1435.svg" alt="PWA: primeiro acesso com Entrar e Criar conta, contas acessadas, outra conta e criar conta no compact"></a>
+      <figcaption><strong>Hub · entrada · pwa · vista</strong><code>2_Diagramas/vista-hub-entrada-pwa_v01_20261103-1435.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-meus-modulos-pwa_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-meus-modulos-pwa_v01_20261103-1435.svg" alt="PWA: Módulos com os cards em grade nos quatro tamanhos, rolagem, Da conta, A contratar, a ordenação com o menu do card, o Feed, a Conta e a Foto no compact"></a>
+      <figcaption><strong>Hub · módulos · pwa · vista</strong><code>2_Diagramas/vista-hub-meus-modulos-pwa_v01_20261103-1435.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-catalogo-pwa_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-catalogo-pwa_v01_20261103-1435.svg" alt="PWA: A contratar, detalhe do módulo e código do time deboaz no compact, só com a carcaça; o conteúdo da vitrine é do Catálogo (16)"></a>
+      <figcaption><strong>Hub · módulos · a contratar · pwa · vista</strong><code>2_Diagramas/vista-hub-catalogo-pwa_v01_20261103-1435.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-modulo-pwa_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-modulo-pwa_v01_20261103-1435.svg" alt="PWA: módulo aberto pela administração e pela pessoa delegada no compact, só com a carcaça"></a>
+      <figcaption><strong>Hub · módulo aberto · pwa · vista</strong><code>2_Diagramas/vista-hub-modulo-pwa_v01_20261103-1435.svg</code></figcaption>
+    </figure>
+    <h3>Mobile</h3>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-entrada-mobile_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-entrada-mobile_v01_20261103-1435.svg" alt="Mobile: primeiro acesso com Entrar e Criar conta, contas acessadas, outra conta e criar conta no compact"></a>
+      <figcaption><strong>Hub · entrada · mobile · vista</strong><code>2_Diagramas/vista-hub-entrada-mobile_v01_20261103-1435.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-meus-modulos-mobile_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-meus-modulos-mobile_v01_20261103-1435.svg" alt="Mobile: Módulos com os cards em grade nos quatro tamanhos, rolagem, Da conta, A contratar, a ordenação com o menu do card, o Feed, a Conta e a Foto no compact"></a>
+      <figcaption><strong>Hub · módulos · mobile · vista</strong><code>2_Diagramas/vista-hub-meus-modulos-mobile_v01_20261103-1435.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-catalogo-mobile_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-catalogo-mobile_v01_20261103-1435.svg" alt="Mobile: A contratar, detalhe do módulo e código do time deboaz no compact, só com a carcaça; o conteúdo da vitrine é do Catálogo (16)"></a>
+      <figcaption><strong>Hub · módulos · a contratar · mobile · vista</strong><code>2_Diagramas/vista-hub-catalogo-mobile_v01_20261103-1435.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-modulo-mobile_v01_20261103-1435.svg"><img src="../2_Diagramas/vista-hub-modulo-mobile_v01_20261103-1435.svg" alt="Mobile: módulo aberto pela administração e pela pessoa delegada no compact, só com a carcaça"></a>
+      <figcaption><strong>Hub · módulo aberto · mobile · vista</strong><code>2_Diagramas/vista-hub-modulo-mobile_v01_20261103-1435.svg</code></figcaption>
+    </figure>
+  </section>
+  <section id="diagramas">
+    <h2>Diagramas</h2>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/hub-casos-de-uso_v01_20261103-1437.svg"><img src="../2_Diagramas/hub-casos-de-uso_v01_20261103-1437.svg" alt="Casos de uso da carcaça do hub: a pessoa do hub escolhe a conta do aparelho, entra, cria conta, sai, vê Módulos, ordena, abre o módulo, vê o Feed e a Conta, envia a foto e escolhe o tema; a conta master vê A contratar e o detalhe; entrar, criar conta e sair vêm do 17, a vitrine do 16 e o conteúdo de cada módulo, do documento dele"></a>
+      <figcaption><strong>Hub · casos de uso</strong><code>2_Diagramas/hub-casos-de-uso_v01_20261103-1437.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/hub-sequencia_v01_20261103-1438.svg"><img src="../2_Diagramas/hub-sequencia_v01_20261103-1438.svg" alt="Sequência da carcaça do hub com as telas: entrar pela conta do aparelho, por outra conta ou criando a conta (referência ao 17), navegar por Contratados e Feed, ordenar só no aparelho, ver A contratar e o detalhe (referência ao 16), ver a Conta, enviar a foto e escolher o tema; os passos sem contrato ficam marcados como em aberto"></a>
+      <figcaption><strong>Hub · carcaça · sequência com as telas</strong><code>2_Diagramas/hub-sequencia_v01_20261103-1438.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg"><img src="../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg" alt="Sequência da autenticação do 17-a, com a entrada no hub por e-mail e senha"></a>
+      <figcaption><strong>Entrada no hub · sequência (17_modulo-usuario-a)</strong><code>2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg"><img src="../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg" alt="Contrato de API da autenticação do 17-a, com a entrada no hub e o sair"></a>
+      <figcaption><strong>Entrada no hub · contrato de API (17_modulo-usuario-a)</strong><code>2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg"><img src="../2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg" alt="Contrato de API dos usuários do 17, com a criação da conta master"></a>
+      <figcaption><strong>Criar conta · contrato de API (17_modulo-usuario)</strong><code>2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg</code></figcaption>
+    </figure>
+  </section>
+  <section id="em-aberto">
+    <h2>Em aberto</h2>
+    <ul class="pendencias">
+      <li>Em qual contrato o hub recebe os cards de Contratados e Da conta, com as notificações e o "Configurar" (<code class="id">RF-79</code>)? <span class="tag dono">Produto</span></li>
+      <li>Em qual contrato o hub recebe as publicações do Feed (<code class="id">RF-85</code>, <a class="ref" href="08_hub-ux.html#RN-221">08 <code class="id">RN-221</code></a>)? <span class="tag dono">Produto</span></li>
+      <li>Quais dados da conta o hub recebe para o topo, a Conta e o card de acesso (nome, responsável, foto ou inicial), e em qual contrato (<code class="id">RF-81</code>, <code class="id">RN-124</code>)? <span class="tag dono">Produto</span></li>
+      <li>Como o hub envia e guarda a foto da instituição ou da pessoa (<code class="id">RF-86</code>, <code class="id">RN-125</code>)? <span class="tag dono">Produto</span></li>
+      <li>A Atualização dos cards (Na abertura ou Ao vivo) fica guardada no aparelho ou na conta (<code class="id">RF-81</code>)? <span class="tag dono">Produto</span></li>
+    </ul>
   </section>
 </main>
 <footer class="boaz-marca-rodape">
@@ -1202,7 +1270,9 @@ Cenário: inicial decorativa
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v24</span></td><td>2026-11-01 18:21</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão</td></tr>
+      <tr><td><span class="boaz-versao">v26</span></td><td>2026-11-03 14:39</td><td>Telas separadas em Web, PWA e Mobile (vistas entrada, módulos, a contratar e módulo aberto v01); Diagramas: casos de uso e sequência com as telas da carcaça do hub, com a entrada e o sair do <a class="ref" href="17_modulo-usuario-a-autenticacao.html#RF-134">17-a RF-134</a>, a criação da conta do <a class="ref" href="17_modulo-usuario.html#RF-104">17 RF-104</a> e a vitrine do 16 como referência; Em aberto: os contratos ainda não definidos dos cards de Módulos, do Feed, da conta, da foto e da Atualização dos cards</td></tr>
+      <tr><td>v25</td><td>2026-11-03 13:54</td><td>A contratar e detalhe do módulo só com a carcaça (<code class="id">RF-82</code>, <code class="id">RF-83</code>, vista-hub-catalogo v09 e vista-hub-meus-modulos v13, sem desenhar outros módulos, nem no código do time): cards, carrossel, descrição, como funciona, quem usa, calculadora e Incluir na conta passam para o Catálogo (<a class="ref" href="16_modulo-catalogo.html#RF-164">16_modulo-catalogo <code class="id">RF-164</code> a <code class="id">RF-168</code></a>)</td></tr>
+      <tr><td>v24</td><td>2026-11-01 18:21</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão</td></tr>
       <tr><td>v23</td><td>2026-11-01 03:57</td><td>Aprovado</td></tr>
       <tr><td>v22</td><td>2026-11-01 03:48</td><td>Painel de administração do deboaz retirado (Módulos <code class="id">MOD-15</code>): as mensagens chegam ao SAC e o time deboaz cuida das contas no módulo Usuários</td></tr>
       <tr><td>v21</td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
@@ -1210,12 +1280,10 @@ Cenário: inicial decorativa
       <tr><td>v19</td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
       <tr><td>v18</td><td>2026-11-01 00:43</td><td>Vista de Módulos v12: item Atualização dos cards na Conta, com Na abertura e Ao vivo (<code class="id">RF-81</code>) (<a class="ref" href="15_modulos.html#RF-133">15 RF-133</a>)</td></tr>
       <tr><td>v17</td><td>2026-10-31 23:30</td><td>Cards de Módulos com célula de 76dp ou mais, no mínimo 4 colunas e quantas couberem na janela, com o card do mesmo tamanho em qualquer janela, e rolagem com o topo e as abas escondidos (<code class="id">RF-79</code>); vista de Módulos v11</td></tr>
-      <tr><td>v16</td><td>2026-10-31 22:55</td><td>Card de módulo em quatro tamanhos de células quadradas (largura × altura): mínima 1x1, reduzida 2x2, normal 4x4 (o padrão) e expandida 4x8, numa grade de 4 colunas no compact e no medium e 8 a partir do expanded (<code class="id">RF-79</code>); Mínima no menu do card (<code class="id">RF-80</code>); vista de Módulos v10</td></tr>
-      <tr><td>v15</td><td>2026-10-31 22:17</td><td>Entrada no aparelho sem contas com Entrar e Criar conta (<code class="id">RF-75</code>, <code class="id">RF-78</code>); cards de Módulos em grade nos tamanhos reduzida, normal e expandida (<code class="id">RF-79</code>); ordenação na grade com o menu do card, mover e tamanho (<code class="id">RF-80</code>); botão de encolher a barra lateral (<code class="id">RF-85</code>); vistas entrada v06, módulos v09, a contratar v07 e módulo aberto v06</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v24 · 2026-11-01 18:21</span>
+    <span>boaz · v26 · 2026-11-03 14:39</span>
     <span class="boaz-arquivo">1_Requisitos/12_hub-ui.html</span>
   </div>
 </footer>

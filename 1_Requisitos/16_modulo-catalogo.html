@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catálogo · boaz · v22</title>
+<title>Catálogo · boaz · v23</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="16_modulo-catalogo">
 <meta name="boaz:caminho" content="1_Requisitos/16_modulo-catalogo.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v22">
-<meta name="boaz:data" content="2026-11-03 12:33">
+<meta name="boaz:versao" content="v23">
+<meta name="boaz:data" content="2026-11-03 13:52">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -915,11 +915,11 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
 <header class="boaz-marca-topo">
   <p class="boaz-eyebrow">boaz · Funcionalidade</p>
   <h1>Catálogo</h1>
-  <p class="boaz-objetivo"><span>Objetivo</span>catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante.</p>
+  <p class="boaz-objetivo"><span>Objetivo</span>catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante, e a vitrine de cada módulo contratável, que a instituição e o educador autônomo veem em A contratar, simulam e incluem na conta.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>16_modulo-catalogo</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v22</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 12:33</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v23</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 13:52</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1061,6 +1061,85 @@ Cenário: buscar um autônomo
   Quando a fatura do mês fecha
   Então o total é R$ 2.224,41 menos 15%, ou seja, R$ 1.890,75</pre>
     </article>
+    <article class="criterio" id="RF-164">
+      <h3><code class="id">RF-164</code> Vitrine em A contratar</h3>
+      <pre class="gherkin">Cenário: cards da vitrine
+  Dado a conta master da EBFGA sem um módulo contratável com preço valendo
+  Quando abre a aba A contratar de Módulos
+  Então vê o card do módulo com o nome, a frase da vitrine, "R$ 4,90 por participante/mês" e "Ver detalhes"
+  E o nome, a frase e o preço do card vêm do Catálogo
+
+Cenário: vitrine incompleta
+  Dado um módulo contratável com preço valendo e a vitrine sem descrição
+  Quando a conta master abre A contratar
+  Então o módulo não aparece</pre>
+    </article>
+    <article class="criterio" id="RF-165">
+      <h3><code class="id">RF-165</code> Detalhe do módulo</h3>
+      <pre class="gherkin">Cenário: conhecer o módulo
+  Dado a conta master em A contratar
+  Quando toca em "Ver detalhes" no card de um módulo
+  Então vê o carrossel com as imagens do módulo, a posição "1 de 4" e as setas
+  E a descrição, "Como funciona" em passos numerados e "Quem usa" com cada papel e o que ele faz
+  E a calculadora de preço e "Incluir na conta"
+
+Cenário: staff consulta
+  Dado a staff Maria em A contratar
+  Quando abre o detalhe do mesmo módulo
+  Então vê a vitrine e a calculadora, sem "Incluir na conta" (08_hub-ux RN-77)</pre>
+    </article>
+    <article class="criterio" id="RF-166">
+      <h3><code class="id">RF-166</code> Calculadora de preço</h3>
+      <pre class="gherkin">Cenário: plano mensal
+  Dado um módulo cobrado por participante, a R$ 4,90, com as faixas de exemplo
+  Quando a conta master informa 30 participantes e escolhe "Mensal"
+  Então vê R$ 147,00 por mês
+
+Cenário: plano anual
+  Dado a mesma calculadora com 30 participantes e o plano anual com 15%
+  Quando escolhe "Anual"
+  Então vê R$ 1.764,00 em 12 meses e R$ 1.499,40 no plano anual
+  E nada é salvo
+
+Cenário: cobrado por staff e participante
+  Dado um módulo cobrado por usuário
+  Quando o detalhe abre
+  Então a calculadora pede staff e participantes, como a simulação do Catálogo (RF-120)</pre>
+    </article>
+    <article class="criterio" id="RF-167">
+      <h3><code class="id">RF-167</code> Incluir na conta</h3>
+      <pre class="gherkin">Cenário: contratar no plano mensal
+  Dado a conta master da EBFGA no detalhe de um módulo, com 30 participantes e "Mensal"
+  Quando toca em "Incluir na conta"
+  Então vê o diálogo com o nome do módulo, o plano e o custo estimado de R$ 147,00 por mês
+  E ao tocar em "Incluir" o módulo entra em Contratados com o aviso "Configurar" (08_hub-ux RF-25)
+  E sai de A contratar
+  E entra na fatura do mês, com a contagem do fechamento (RN-195)
+
+Cenário: contratar no plano anual
+  Dado "Anual" escolhido na calculadora
+  Quando a conta master inclui o módulo
+  Então a contratação fica no plano anual por 12 meses (RN-201)
+
+Cenário: desistir
+  Dado o diálogo de incluir aberto
+  Quando a conta master toca em "Cancelar"
+  Então nada muda e o detalhe continua aberto</pre>
+    </article>
+    <article class="criterio" id="RF-168">
+      <h3><code class="id">RF-168</code> Vitrine no Catálogo</h3>
+      <pre class="gherkin">Cenário: editar a vitrine
+  Dado o administrador do deboaz na aba Vitrine de um módulo contratável
+  Quando informa a frase, a descrição, 3 passos, 3 papéis em "Quem usa" e 4 imagens
+  E toca em "Salvar vitrine"
+  Então A contratar mostra a vitrine nova
+  E a aba mostra quem salvou e quando
+
+Cenário: membro do time sem permissão
+  Dado um membro do time deboaz que não é o administrador
+  Quando abre a aba Vitrine
+  Então vê a vitrine sem poder salvar</pre>
+    </article>
     <article class="criterio" id="RN-191">
       <h3><code class="id">RN-191</code> Só o administrador muda preços</h3>
       <pre class="gherkin">Esquema do Cenário: quem salva
@@ -1188,6 +1267,30 @@ Cenário: módulo deixa de ter custo
   Quando a fatura do mês fecha com 40 staff e 312 participantes
   Então o total é R$ 2.224,41 menos 15%, R$ 1.890,75
   E a contagem segue o fechamento de cada mês dos 12 assumidos</pre>
+    </article>
+    <article class="criterio" id="RN-258">
+      <h3><code class="id">RN-258</code> Vitrine completa</h3>
+      <pre class="gherkin">Esquema do Cenário: o que leva o módulo a A contratar
+  Dado um módulo contratável &lt;situação&gt;
+  Então &lt;resultado&gt;
+
+  Exemplos:
+    | situação                                                        | resultado                    |
+    | com preço valendo, frase, descrição, imagem, passo e papel      | aparece em A contratar       |
+    | com preço valendo e sem imagem                                  | não aparece em A contratar   |
+    | com a vitrine completa e sem preço (RN-199)                     | não aparece em A contratar   |
+    | da conta ou do time                                             | nunca aparece em A contratar |
+
+Cenário: limites da vitrine
+  Então a vitrine tem de 1 a 5 imagens, de 1 a 5 passos e de 1 a 4 papéis em "Quem usa"</pre>
+    </article>
+    <article class="criterio" id="RN-259">
+      <h3><code class="id">RN-259</code> Uma contratação por módulo</h3>
+      <pre class="gherkin">Cenário: módulo já contratado
+  Dado a EBFGA com um módulo contratado
+  Quando a conta master abre A contratar
+  Então esse módulo não aparece
+  E a conta tem uma só contratação ativa de cada módulo</pre>
     </article>
     <article class="criterio" id="ficha-mod-14">
       <h3>Ficha do módulo Catálogo</h3>
@@ -1573,6 +1676,160 @@ Cenário: simulação no plano anual
   Quando envia POST /catalogo/modulos/MOD-03/simulacao com 40 staff e 312 participantes
   Então a resposta traz total12Meses 26692.92 e totalPlanoAnual 22688.98</pre>
     </article>
+    <article class="criterio" id="RF-164-api">
+      <h3><code class="id">RF-164</code> Vitrine em A contratar</h3>
+      <pre class="gherkin">Cenário: módulos para contratar
+  Dado o Quiz (MOD-05) com 4.90 por participante e a vitrine completa
+  Quando a conta master da EBFGA envia GET /catalogo/vitrine
+  Então a resposta é 200 com os módulos que a EBFGA ainda não contratou, de A a Z, entre eles:
+    """
+    {
+      "moduloId": "MOD-05",
+      "nome": "Quiz",
+      "frase": "Frase curta da vitrine.",
+      "modeloCobranca": "POR_PARTICIPANTE",
+      "valorPorParticipante": 4.90,
+      "valorPorStaff": null
+    }
+    """
+
+Cenário: conta do time
+  Quando um membro do time deboaz envia GET /catalogo/vitrine
+  Então a resposta é 200 com a lista vazia</pre>
+    </article>
+    <article class="criterio" id="RF-165-api">
+      <h3><code class="id">RF-165</code> Detalhe do módulo</h3>
+      <pre class="gherkin">Cenário: detalhe para a conta
+  Quando a conta master da EBFGA envia GET /catalogo/vitrine/MOD-05
+  Então a resposta é 200 com:
+    """
+    {
+      "moduloId": "MOD-05",
+      "nome": "Quiz",
+      "frase": "Frase curta da vitrine.",
+      "descricao": "Descrição do módulo na vitrine.",
+      "imagens": [
+        {
+          "id": "img-MOD-05-1",
+          "url": "/catalogo/vitrine/MOD-05/imagens/img-MOD-05-1",
+          "legenda": "Primeira imagem"
+        }
+      ],
+      "passos": [
+        "Primeiro passo",
+        "Segundo passo",
+        "Terceiro passo"
+      ],
+      "quemUsa": [
+        {
+          "papel": "Configura",
+          "texto": "Quem prepara o módulo"
+        }
+      ],
+      "modeloCobranca": "POR_PARTICIPANTE",
+      "valorPorParticipante": 4.90,
+      "valorPorStaff": null,
+      "podeIncluir": true
+    }
+    """
+
+Cenário: staff consulta
+  Quando a staff Maria envia GET /catalogo/vitrine/MOD-05
+  Então a resposta é 200 com podeIncluir false
+
+Cenário: módulo fora da vitrine
+  Quando a conta master envia GET /catalogo/vitrine/MOD-06
+  Então a resposta é 404 FORA_DA_VITRINE com a mensagem "Este módulo não está disponível para contratar."</pre>
+    </article>
+    <article class="criterio" id="RF-166-api">
+      <h3><code class="id">RF-166</code> Calculadora de preço</h3>
+      <pre class="gherkin">Cenário: plano anual
+  Dado o plano anual com 15%
+  Quando a conta master da EBFGA envia POST /catalogo/vitrine/MOD-05/simulacao com:
+    """
+    {
+      "staff": 0,
+      "participantes": 30
+    }
+    """
+  Então a resposta é 200 com totalMes 147.00, total12Meses 1764.00 e totalPlanoAnual 1499.40
+  E nada é gravado
+
+Cenário: quantidade inválida
+  Quando envia POST /catalogo/vitrine/MOD-05/simulacao com participantes -1
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "participantes"</pre>
+    </article>
+    <article class="criterio" id="RF-167-api">
+      <h3><code class="id">RF-167</code> Incluir na conta</h3>
+      <pre class="gherkin">Cenário: contratar
+  Dado hoje 2026-11-03
+  Quando a conta master da EBFGA envia POST /catalogo/vitrine/MOD-05/contratacao com:
+    """
+    {
+      "plano": "MENSAL"
+    }
+    """
+  Então a resposta é 201 com:
+    """
+    {
+      "id": "ctr-ebfga-MOD-05",
+      "contaId": "conta-ebfga",
+      "moduloId": "MOD-05",
+      "plano": "MENSAL",
+      "desde": "2026-11-03",
+      "ate": null
+    }
+    """
+  E o MOD-05 sai de GET /catalogo/vitrine da EBFGA
+
+Esquema do Cenário: recusas
+  Quando &lt;quem&gt; envia POST /catalogo/vitrine/MOD-05/contratacao
+  Então a resposta é &lt;resposta&gt;
+
+  Exemplos:
+    | quem                                       | resposta                                                         |
+    | a staff Maria                              | 403 ACESSO_NEGADO                                                |
+    | a conta master, com o MOD-05 já contratado | 409 JA_CONTRATADO com a mensagem "Este módulo já está na conta." |
+    | a conta master, com o plano "SEMANAL"      | 422 DADOS_INVALIDOS com o campo "plano"                          |</pre>
+    </article>
+    <article class="criterio" id="RF-168-api">
+      <h3><code class="id">RF-168</code> Vitrine no Catálogo</h3>
+      <pre class="gherkin">Cenário: salvar a vitrine
+  Quando o administrador envia PUT /catalogo/modulos/MOD-05/vitrine com:
+    """
+    {
+      "frase": "Frase curta da vitrine.",
+      "descricao": "Descrição do módulo na vitrine.",
+      "imagens": [
+        "img-MOD-05-1"
+      ],
+      "passos": [
+        "Primeiro passo",
+        "Segundo passo",
+        "Terceiro passo"
+      ],
+      "quemUsa": [
+        {
+          "papel": "Configura",
+          "texto": "Quem prepara o módulo"
+        }
+      ]
+    }
+    """
+  Então a resposta é 200 com a vitrine, completa true, salvaEm e salvaPor
+
+Cenário: enviar uma imagem
+  Quando o administrador envia POST /catalogo/modulos/MOD-05/vitrine/imagens com uma imagem PNG, JPEG ou WebP
+  Então a resposta é 201 com o id e a url da imagem
+
+Cenário: ver a vitrine no time
+  Quando um membro do time envia GET /catalogo/modulos/MOD-05/vitrine
+  Então a resposta é 200 com a vitrine e completa true
+
+Cenário: membro sem permissão
+  Quando o membro do time Caio, com MOD-14 U, envia PUT /catalogo/modulos/MOD-05/vitrine
+  Então a resposta é 403 ACESSO_NEGADO</pre>
+    </article>
     <article class="criterio" id="RN-191-api">
       <h3><code class="id">RN-191</code> Só o administrador salva</h3>
       <pre class="gherkin">Esquema do Cenário: quem salva
@@ -1676,6 +1933,23 @@ Cenário: desconto para hoje
     | a staff Maria, da EBFGA                 |
     | o membro do time Caio, sem o MOD-14     |</pre>
     </article>
+    <article class="criterio" id="RN-258-api">
+      <h3><code class="id">RN-258</code> Vitrine completa</h3>
+      <pre class="gherkin">Esquema do Cenário: limites da vitrine
+  Quando o administrador envia PUT /catalogo/modulos/MOD-05/vitrine com &lt;pedido&gt;
+  Então a resposta é 422 DADOS_INVALIDOS com o campo &lt;campo&gt;
+
+  Exemplos:
+    | pedido       | campo     |
+    | 6 imagens    | "imagens" |
+    | 6 passos     | "passos"  |
+    | 5 papéis     | "quemUsa" |
+
+Cenário: vitrine salva incompleta
+  Quando o administrador salva a vitrine do MOD-05 sem imagens
+  Então a resposta é 200 com completa false
+  E o MOD-05 sai de GET /catalogo/vitrine</pre>
+    </article>
     <article class="criterio" id="RNF-210-api">
       <h3><code class="id">RNF-210</code> Mesmo valor em todo lugar</h3>
       <pre class="gherkin">Esquema do Cenário: simulação igual ao fechamento
@@ -1744,6 +2018,43 @@ Cenário: desconto para hoje
     }
     """
 
+Cenário: vitrine dentro do documento do módulo
+  Dado um módulo contratável com a vitrine salva pelo administrador
+  E as imagens guardadas à parte, só com o id e a ordem aqui
+  Então o trecho do documento em modulos é:
+    """
+    {
+      "_id": "MOD-05",
+      "nome": "Quiz",
+      "tipo": "CONTRATAVEL",
+      "vitrine": {
+        "frase": "Frase curta da vitrine.",
+        "descricao": "Descrição do módulo na vitrine.",
+        "imagens": [
+          {
+            "id": "img-MOD-05-1",
+            "legenda": "Primeira imagem",
+            "ordem": 1
+          }
+        ],
+        "passos": [
+          "Primeiro passo",
+          "Segundo passo",
+          "Terceiro passo"
+        ],
+        "quemUsa": [
+          {
+            "papel": "Configura",
+            "texto": "Quem prepara o módulo"
+          }
+        ],
+        "completa": true,
+        "salvaEm": "2026-11-02T14:20:00Z",
+        "salvaPor": "usr-dboaz-admin"
+      }
+    }
+    """
+
 Cenário: documento em contratacoes
   Dado uma por conta e módulo
   E o módulo da conta entra sozinho quando a conta é criada
@@ -1761,6 +2072,25 @@ Cenário: documento em contratacoes
       "desde": "2026-03-12T00:00:00Z",
       "ate": null,
       "automatica": true
+    }
+    """
+
+Cenário: contratação incluída pela conta
+  Dado a conta master da EBFGA incluiu o Quiz no plano mensal
+  Então o exemplo é:
+    """
+    {
+      "_id": "ctr-ebfga-MOD-05",
+      "contaId": "conta-ebfga",
+      "sigla": "EBFGA",
+      "nomeConta": "Escola Bento Freitas",
+      "tipoConta": "INSTITUICAO",
+      "moduloId": "MOD-05",
+      "nomeModulo": "Quiz",
+      "plano": "MENSAL",
+      "desde": "2026-11-03T00:00:00Z",
+      "ate": null,
+      "automatica": false
     }
     """
 
@@ -1800,7 +2130,8 @@ Cenário: documento em cobrancas
   E impostos, nota fiscal e formas de pagamento ficam de fora
   E reajuste automático por índice fica de fora
   E os valores definitivos são configuração do administrador; os daqui são exemplo
-  E a fatura que a conta vê e paga é do módulo Contas (MOD-01): o Catálogo grava a cobrança fechada e o Contas a mostra</pre>
+  E a fatura que a conta vê e paga é do módulo Contas (MOD-01): o Catálogo grava a cobrança fechada e o Contas a mostra
+  E descontratar um módulo e trocar o plano de uma contratação ficam de fora</pre>
     </article>
   </section>
   <section id="telas">
@@ -1810,39 +2141,62 @@ Cenário: documento em cobrancas
       <a href="../2_Diagramas/vista-hub-catalogo-deboaz-web_v01_20261103-1149.svg"><img src="../2_Diagramas/vista-hub-catalogo-deboaz-web_v01_20261103-1149.svg" alt="Web: vista do catálogo do time deboaz: card do Catálogo nos tamanhos mínima, reduzida, normal e expandida no compact, no medium e no expanded, só com o Catálogo; módulos por tipo, dados e clientes do módulo Usuários, preço por staff e por participante, faixas de desconto e simulação"></a>
       <figcaption><strong>Hub · catálogo · web · vista</strong><code>2_Diagramas/vista-hub-catalogo-deboaz-web_v01_20261103-1149.svg</code></figcaption>
     </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-vitrine-modulo-web_v01_20261103-1329.svg"><img src="../2_Diagramas/vista-hub-vitrine-modulo-web_v01_20261103-1329.svg" alt="Web: vitrine do módulo no medium (A contratar com os cards da vitrine) e no expanded (lista e detalhe lado a lado), com conteúdo genérico do Catálogo"></a>
+      <figcaption><strong>Hub · vitrine do módulo · web · vista</strong><code>2_Diagramas/vista-hub-vitrine-modulo-web_v01_20261103-1329.svg</code></figcaption>
+    </figure>
     <h3>PWA</h3>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-catalogo-deboaz-pwa_v02_20261103-1232.svg"><img src="../2_Diagramas/vista-hub-catalogo-deboaz-pwa_v02_20261103-1232.svg" alt="PWA: vista do catálogo do time deboaz: card do Catálogo nos tamanhos mínima, reduzida, normal e expandida no compact, no medium e no expanded, só com o Catálogo; módulos por tipo, dados e clientes do módulo Usuários, preço por staff e por participante, faixas de desconto e simulação"></a>
-      <figcaption><strong>Hub · catálogo · pwa · vista</strong><code>2_Diagramas/vista-hub-catalogo-deboaz-pwa_v02_20261103-1232.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-catalogo-deboaz-pwa_v03_20261103-1339.svg"><img src="../2_Diagramas/vista-hub-catalogo-deboaz-pwa_v03_20261103-1339.svg" alt="PWA: vista do catálogo do time deboaz: card do Catálogo nos tamanhos mínima, reduzida, normal e expandida no compact, no medium e no expanded, só com o Catálogo; módulos por tipo, dados e clientes do módulo Usuários, preço por staff e por participante, faixas de desconto, vitrine e simulação"></a>
+      <figcaption><strong>Hub · catálogo · pwa · vista</strong><code>2_Diagramas/vista-hub-catalogo-deboaz-pwa_v03_20261103-1339.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-vitrine-modulo-pwa_v01_20261103-1329.svg"><img src="../2_Diagramas/vista-hub-vitrine-modulo-pwa_v01_20261103-1329.svg" alt="PWA: A contratar com os cards da vitrine, detalhe do módulo com carrossel, descrição, como funciona, quem usa e a calculadora, e o diálogo Incluir na conta"></a>
+      <figcaption><strong>Hub · vitrine do módulo · pwa · vista</strong><code>2_Diagramas/vista-hub-vitrine-modulo-pwa_v01_20261103-1329.svg</code></figcaption>
     </figure>
     <h3>Mobile</h3>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-catalogo-deboaz-mobile_v02_20261103-1232.svg"><img src="../2_Diagramas/vista-hub-catalogo-deboaz-mobile_v02_20261103-1232.svg" alt="Mobile: vista do catálogo do time deboaz: card do Catálogo nos tamanhos mínima, reduzida, normal e expandida no compact, no medium e no expanded, só com o Catálogo; módulos por tipo, dados e clientes do módulo Usuários, preço por staff e por participante, faixas de desconto e simulação"></a>
-      <figcaption><strong>Hub · catálogo · mobile · vista</strong><code>2_Diagramas/vista-hub-catalogo-deboaz-mobile_v02_20261103-1232.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-catalogo-deboaz-mobile_v03_20261103-1339.svg"><img src="../2_Diagramas/vista-hub-catalogo-deboaz-mobile_v03_20261103-1339.svg" alt="Mobile: vista do catálogo do time deboaz: card do Catálogo nos tamanhos mínima, reduzida, normal e expandida no compact, no medium e no expanded, só com o Catálogo; módulos por tipo, dados e clientes do módulo Usuários, preço por staff e por participante, faixas de desconto, vitrine e simulação"></a>
+      <figcaption><strong>Hub · catálogo · mobile · vista</strong><code>2_Diagramas/vista-hub-catalogo-deboaz-mobile_v03_20261103-1339.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-vitrine-modulo-mobile_v01_20261103-1329.svg"><img src="../2_Diagramas/vista-hub-vitrine-modulo-mobile_v01_20261103-1329.svg" alt="Mobile: A contratar com os cards da vitrine, detalhe do módulo com carrossel, descrição, como funciona, quem usa e a calculadora, e o diálogo Incluir na conta"></a>
+      <figcaption><strong>Hub · vitrine do módulo · mobile · vista</strong><code>2_Diagramas/vista-hub-vitrine-modulo-mobile_v01_20261103-1329.svg</code></figcaption>
     </figure>
   </section>
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-casos-de-uso_v02_20261103-1232.svg"><img src="../2_Diagramas/catalogo-casos-de-uso_v02_20261103-1232.svg" alt="Casos de uso do catálogo: o membro do time deboaz vê o card, lista e busca módulos, vê quem contratou, o histórico e simula; o administrador também cataloga, agenda o preço, configura as faixas e o percentual do plano anual, tudo registrado no histórico; o fechamento do mês fecha a cobrança com o mesmo cálculo da simulação"></a>
-      <figcaption><strong>Catálogo · casos de uso</strong><code>2_Diagramas/catalogo-casos-de-uso_v02_20261103-1232.svg</code></figcaption>
+      <a href="../2_Diagramas/catalogo-casos-de-uso_v03_20261103-1344.svg"><img src="../2_Diagramas/catalogo-casos-de-uso_v03_20261103-1344.svg" alt="Casos de uso do catálogo: o membro do time deboaz vê o card, lista e busca módulos, vê quem contratou, o histórico e simula; o administrador também cataloga, agenda o preço, edita a vitrine, configura as faixas e o percentual do plano anual, tudo registrado no histórico; o fechamento do mês fecha a cobrança com o mesmo cálculo da simulação"></a>
+      <figcaption><strong>Catálogo · casos de uso</strong><code>2_Diagramas/catalogo-casos-de-uso_v03_20261103-1344.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
       <a href="../2_Diagramas/catalogo-sequencia_v04_20261103-1232.svg"><img src="../2_Diagramas/catalogo-sequencia_v04_20261103-1232.svg" alt="Sequência do catálogo: o administrador agenda o preço do módulo Usuários com papel e data conferidos e auditoria gravada; um membro simula 40 staff e 312 participantes sem salvar; o fechamento do mês conta os ativos de cada contratação, calcula igual à simulação, aplica o plano anual e grava a cobrança fechada; com as telas do hub de cada fase e o endpoint que cada uma chama"></a>
       <figcaption><strong>Catálogo · sequência com as telas</strong><code>2_Diagramas/catalogo-sequencia_v04_20261103-1232.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-contrato-api_v02_20261103-1232.svg"><img src="../2_Diagramas/catalogo-contrato-api_v02_20261103-1232.svg" alt="Contrato de API do catálogo: resumo, lista e dados do módulo, catalogar, clientes, preços, desconto e simulação, com o formato de erro e as mensagens exatas"></a>
-      <figcaption><strong>Catálogo · contrato de API</strong><code>2_Diagramas/catalogo-contrato-api_v02_20261103-1232.svg</code></figcaption>
+      <a href="../2_Diagramas/catalogo-vitrine-sequencia_v01_20261103-1349.svg"><img src="../2_Diagramas/catalogo-vitrine-sequencia_v01_20261103-1349.svg" alt="Sequência da vitrine com as telas: o administrador envia as imagens e salva a vitrine; a conta master abre A contratar, vê o detalhe, simula 30 participantes no plano mensal sem salvar e inclui o módulo, que vai para Contratados; staff ou módulo já na conta recebe 403 ou 409"></a>
+      <figcaption><strong>Catálogo · vitrine · sequência com as telas</strong><code>2_Diagramas/catalogo-vitrine-sequencia_v01_20261103-1349.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-classes_v04_20261103-1232.svg"><img src="../2_Diagramas/catalogo-classes_v04_20261103-1232.svg" alt="Diagrama de classes do catálogo: Módulo com tipo, custo e modelo de cobrança, Preço e PolíticaDeDesconto com vigência, FaixaDeDesconto, Contratação por conta e Cobrança mensal"></a>
-      <figcaption><strong>Catálogo · classes</strong><code>2_Diagramas/catalogo-classes_v04_20261103-1232.svg</code></figcaption>
+      <a href="../2_Diagramas/catalogo-contrato-api_v03_20261103-1349.svg"><img src="../2_Diagramas/catalogo-contrato-api_v03_20261103-1349.svg" alt="Contrato de API do catálogo: resumo, lista e dados do módulo, catalogar, clientes, preços, desconto e simulação, e a vitrine (A contratar, detalhe, calculadora, incluir na conta e aba Vitrine), com o formato de erro e as mensagens exatas"></a>
+      <figcaption><strong>Catálogo · contrato de API</strong><code>2_Diagramas/catalogo-contrato-api_v03_20261103-1349.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-documentos_v04_20261103-1232.svg"><img src="../2_Diagramas/catalogo-documentos_v04_20261103-1232.svg" alt="Modelo de documentos do catálogo: modulos com precos e politicas com faixas embutidos, contratacoes e cobrancas particionadas por contaId, com referências a contas e usuarios"></a>
-      <figcaption><strong>Catálogo · modelo de documentos</strong><code>2_Diagramas/catalogo-documentos_v04_20261103-1232.svg</code></figcaption>
+      <a href="../2_Diagramas/catalogo-classes_v05_20261103-1351.svg"><img src="../2_Diagramas/catalogo-classes_v05_20261103-1351.svg" alt="Diagrama de classes do catálogo: Módulo com tipo, custo e modelo de cobrança, Preço e PolíticaDeDesconto com vigência, FaixaDeDesconto, Contratação por conta, uma ativa por módulo, Cobrança mensal e a Vitrine do módulo contratável"></a>
+      <figcaption><strong>Catálogo · classes</strong><code>2_Diagramas/catalogo-classes_v05_20261103-1351.svg</code></figcaption>
     </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/catalogo-documentos_v05_20261103-1351.svg"><img src="../2_Diagramas/catalogo-documentos_v05_20261103-1351.svg" alt="Modelo de documentos do catálogo: modulos com precos, politicas com faixas e a vitrine embutidos, contratacoes e cobrancas particionadas por contaId, com referências a contas e usuarios"></a>
+      <figcaption><strong>Catálogo · modelo de documentos</strong><code>2_Diagramas/catalogo-documentos_v05_20261103-1351.svg</code></figcaption>
+    </figure>
+  </section>
+  <section id="em-aberto">
+    <h2>Em aberto</h2>
+    <ul class="pendencias">
+      <li>Quantos caracteres a frase e a descrição da vitrine podem ter? <span class="tag dono">Produto</span></li>
+      <li>Qual o tamanho máximo e a proporção de cada imagem da vitrine? <span class="tag dono">Produto</span></li>
+    </ul>
   </section>
 </main>
 <footer class="boaz-marca-rodape">
@@ -1850,7 +2204,8 @@ Cenário: documento em cobrancas
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v22</span></td><td>2026-11-03 12:33</td><td>Lista do catálogo só com o espaço de cada módulo, sem nomes de outros módulos (<code class="id">RF-117</code>, vistas pwa e mobile v02); <code class="id">RF-121</code> sai para o módulo Contas (fora de escopo); nova <code class="id">RN-257</code>: mudar o custo vale para todas as contratações; diagramas com a referência 16_modulo-catalogo (casos de uso v02, sequência v04, contrato v02, classes v04, documentos v04)</td></tr>
+      <tr><td><span class="boaz-versao">v23</span></td><td>2026-11-03 13:52</td><td>Vitrine do módulo trazida de 12_hub-ui (<code class="id">RF-164</code> a <code class="id">RF-168</code>, <code class="id">RN-258</code>, <code class="id">RN-259</code>, com as âncoras -api): A contratar, detalhe com carrossel, descrição, como funciona, quem usa e calculadora, Incluir na conta e a aba Vitrine do time; telas vista-hub-vitrine-modulo v01 (web, pwa, mobile) e vista-hub-catalogo-deboaz v03 (pwa, mobile); casos de uso v03, sequência da vitrine v01, contrato v03, classes v05, documentos v05; exemplos da vitrine e da contratação incluída; Em aberto: limites de texto e de imagem</td></tr>
+      <tr><td>v22</td><td>2026-11-03 12:33</td><td>Lista do catálogo só com o espaço de cada módulo, sem nomes de outros módulos (<code class="id">RF-117</code>, vistas pwa e mobile v02); <code class="id">RF-121</code> sai para o módulo Contas (fora de escopo); nova <code class="id">RN-257</code>: mudar o custo vale para todas as contratações; diagramas com a referência 16_modulo-catalogo (casos de uso v02, sequência v04, contrato v02, classes v04, documentos v04)</td></tr>
       <tr><td>v21</td><td>2026-11-03 11:49</td><td>Estrutura do módulo (06 <code class="id">RNF-103</code> v17): Telas em Web, PWA e Mobile, uma vista por plataforma, separadas da vista hub-catalogo-deboaz v04</td></tr>
       <tr><td>v20</td><td>2026-11-03 11:02</td><td>Telas: card do Catálogo nos quatro tamanhos no compact, no medium e no expanded, sem outros módulos e sem o Painel de administração (vista-hub-catalogo-deboaz v04, catalogo-sequencia v03); ficha do módulo com a receita do resumo (R$ 200.996,76, R$ 201k) e os 5 meses do contrato no lugar das 7 semanas</td></tr>
       <tr><td>v19</td><td>2026-11-03 10:48</td><td>Documento renomeado para 16_modulo-catalogo; cenários divididos em Cenários de tela e Cenários de API, com os endereços e códigos do contrato catalogo-contrato-api v01 (<code class="id">RF-116</code> a <code class="id">RF-120</code>, <code class="id">RF-122</code> a <code class="id">RF-125</code>, <code class="id">RN-191</code> a <code class="id">RN-194</code>, <code class="id">RN-196</code>, <code class="id">RN-199</code>, <code class="id">RN-200</code>, <code class="id">RNF-210</code> a <code class="id">RNF-212</code>, âncoras -api); exemplos de entidades com o id do registro (MOD-03) e o administrador usr-dboaz-admin; catalogo-sequencia v02, com as telas</td></tr>
@@ -1859,11 +2214,10 @@ Cenário: documento em cobrancas
       <tr><td>v16</td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
       <tr><td>v15</td><td>2026-11-01 01:14</td><td>Exemplo do card com 7 módulos da conta e 5 contratáveis, depois de Tarefas virar da conta (ca-RF-116)</td></tr>
       <tr><td>v14</td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
-      <tr><td>v13</td><td>2026-10-31 23:46</td><td>Ficha do módulo <code class="id">MOD-14</code> em Regras de negócio: ícone <code>loja</code>, dados de cada tamanho do card para o administrador e o membro do time deboaz, a partir de <code class="id">RF-116</code></td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v22 · 2026-11-03 12:33</span>
+    <span>boaz · v23 · 2026-11-03 13:52</span>
     <span class="boaz-arquivo">1_Requisitos/16_modulo-catalogo.html</span>
   </div>
 </footer>
