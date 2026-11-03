@@ -1,0 +1,1159 @@
+{
+  "POST contas": {
+    "pedido": {
+      "tipo": "INSTITUICAO",
+      "nome": "Escola Bento Freitas",
+      "documento": "12.345.678/0001-90",
+      "responsavel": "Gustavo Boaz de Moura Souza",
+      "telefone": "(51) 99999-0000",
+      "dominio": "objetivo_unidade1",
+      "sigla": "EBFGA"
+    },
+    "respostas": {
+      "201": [
+        {
+          "nome": "201",
+          "corpo": {
+            "contaId": "conta-ebfga",
+            "login": "objetivo_unidade1@deboaz.com",
+            "senha": "(gerada pela RN-171, mostrada uma vez)",
+            "comprovante": "c7e1…"
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "SIGLA_EM_USO",
+          "corpo": {
+            "codigo": "SIGLA_EM_USO",
+            "mensagem": "Essa sigla já é usada por outra conta."
+          }
+        },
+        {
+          "nome": "DOMINIO_EM_USO",
+          "corpo": {
+            "codigo": "DOMINIO_EM_USO",
+            "mensagem": "Esse domínio já é usado por outra conta."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "SIGLA_INVALIDA",
+          "corpo": {
+            "codigo": "SIGLA_INVALIDA",
+            "mensagem": "A sigla precisa de 5 letras."
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"tipo\" está faltando ou é inválido.",
+            "campo": "tipo"
+          }
+        }
+      ]
+    }
+  },
+  "GET contas/sigla-sugerida": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "sigla": "EBFGA",
+            "livre": true
+          }
+        }
+      ]
+    }
+  },
+  "POST usuarios/gerar-senha": {
+    "pedido": {
+      "entrada": "gustavo.ebfga@deboaz.com",
+      "codigoLiberacao": "482913"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "senha": "Gu#Boaz507318",
+            "comprovante": "c7e1…"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "CODIGO_INVALIDO",
+          "corpo": {
+            "codigo": "CODIGO_INVALIDO",
+            "mensagem": "Entrada ou código de liberação incorretos."
+          }
+        }
+      ],
+      "410": [
+        {
+          "nome": "CODIGO_VENCIDO",
+          "corpo": {
+            "codigo": "CODIGO_VENCIDO",
+            "mensagem": "O código de liberação venceu. Peça uma nova geração de senha."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"entrada\" está faltando ou é inválido.",
+            "campo": "entrada"
+          }
+        }
+      ],
+      "429": [
+        {
+          "nome": "ENTRADA_BLOQUEADA",
+          "corpo": {
+            "codigo": "ENTRADA_BLOQUEADA",
+            "mensagem": "Muitas tentativas erradas. Tente de novo mais tarde.",
+            "tentarEm": "2026-11-01T09:15:00Z"
+          }
+        }
+      ]
+    }
+  },
+  "POST contas/esqueci-senha-master": {
+    "pedido": {
+      "instituicao": "Escola Bento Freitas",
+      "contato": "(51) 99999-0000"
+    },
+    "respostas": {
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"instituicao\" está faltando ou é inválido.",
+            "campo": "instituicao"
+          }
+        }
+      ],
+      "429": [
+        {
+          "nome": "LIMITE_ATENDIMENTO",
+          "corpo": {
+            "codigo": "LIMITE_ATENDIMENTO",
+            "mensagem": "Você já enviou 3 pedidos em 24 h. Tente de novo mais tarde.",
+            "tentarEm": "2026-11-02T08:10:00Z"
+          }
+        }
+      ]
+    }
+  },
+  "GET usuarios": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "itens": [
+              {
+                "id": "usr-ebfga-maria",
+                "tipo": "STAFF",
+                "nome": "Maria Souza",
+                "login": "maria.ebfga@deboaz.com",
+                "matricula": "20260087",
+                "estado": "ATIVO",
+                "ultimoAcesso": "2026-10-29T09:42:00Z",
+                "ultimoAcessoQuem": null
+              }
+            ],
+            "pagina": 1,
+            "total": 37
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"tipo\" está faltando ou é inválido.",
+            "campo": "tipo"
+          }
+        }
+      ]
+    }
+  },
+  "GET usuarios/{id}": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "id": "usr-ebfga-lucas",
+            "tipo": "PARTICIPANTE",
+            "nome": "Lucas Andrade",
+            "nomeCurto": "lucas",
+            "login": "EBFGA-LUCAS-0412",
+            "matricula": "48201755",
+            "estado": "ATIVO",
+            "responsaveis": [
+              {
+                "nome": "Carla Andrade",
+                "parentesco": "MAE"
+              },
+              {
+                "nome": "Paulo Andrade",
+                "parentesco": "PAI"
+              }
+            ],
+            "ultimoAcesso": "2026-11-01T07:55:00Z",
+            "ultimoAcessoQuem": "MAE"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "USUARIO_INEXISTENTE",
+          "corpo": {
+            "codigo": "USUARIO_INEXISTENTE",
+            "mensagem": "Usuário não encontrado."
+          }
+        }
+      ]
+    }
+  },
+  "POST usuarios": {
+    "pedido": {
+      "tipo": "STAFF",
+      "nome": "Maria Souza",
+      "nomeCurto": "maria",
+      "matricula": "20260087"
+    },
+    "respostas": {
+      "201": [
+        {
+          "nome": "201",
+          "corpo": {
+            "id": "usr-ebfga-maria",
+            "login": "maria.ebfga@deboaz.com",
+            "estado": "PENDENTE",
+            "codigoLiberacao": "482913",
+            "venceEm": "2026-11-04T22:06:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "NOME_CURTO_EM_USO",
+          "corpo": {
+            "codigo": "NOME_CURTO_EM_USO",
+            "mensagem": "Esse nome curto já existe na escola."
+          }
+        },
+        {
+          "nome": "MATRICULA_EM_USO",
+          "corpo": {
+            "codigo": "MATRICULA_EM_USO",
+            "mensagem": "Essa matrícula já existe na escola."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"tipo\" está faltando ou é inválido.",
+            "campo": "tipo"
+          }
+        }
+      ]
+    }
+  },
+  "PATCH usuarios/{id}": {
+    "pedido": {
+      "nomeCurto": "mariasouza"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "id": "usr-ebfga-maria",
+            "login": "mariasouza.ebfga@deboaz.com"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "USUARIO_INEXISTENTE",
+          "corpo": {
+            "codigo": "USUARIO_INEXISTENTE",
+            "mensagem": "Usuário não encontrado."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "NOME_CURTO_EM_USO",
+          "corpo": {
+            "codigo": "NOME_CURTO_EM_USO",
+            "mensagem": "Esse nome curto já existe na escola."
+          }
+        },
+        {
+          "nome": "MATRICULA_EM_USO",
+          "corpo": {
+            "codigo": "MATRICULA_EM_USO",
+            "mensagem": "Essa matrícula já existe na escola."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"responsaveis\" está faltando ou é inválido.",
+            "campo": "responsaveis"
+          }
+        }
+      ]
+    }
+  },
+  "POST usuarios/{id}/nova-geracao-senha": {
+    "pedido": null,
+    "respostas": {
+      "201": [
+        {
+          "nome": "201",
+          "corpo": {
+            "codigoLiberacao": "482913",
+            "venceEm": "2026-11-04T22:06:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "USUARIO_INEXISTENTE",
+          "corpo": {
+            "codigo": "USUARIO_INEXISTENTE",
+            "mensagem": "Usuário não encontrado."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "SEM_SENHA",
+          "corpo": {
+            "codigo": "SEM_SENHA",
+            "mensagem": "O participante entra pelo código de acesso, sem senha."
+          }
+        }
+      ]
+    }
+  },
+  "POST usuarios/{id}/novo-codigo-acesso": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "login": "EBFGA-LUCAS-7731",
+            "codigoGeradoEm": "2026-11-01T22:06:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "USUARIO_INEXISTENTE",
+          "corpo": {
+            "codigo": "USUARIO_INEXISTENTE",
+            "mensagem": "Usuário não encontrado."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "SO_PARTICIPANTE",
+          "corpo": {
+            "codigo": "SO_PARTICIPANTE",
+            "mensagem": "Só o participante tem código de acesso."
+          }
+        }
+      ]
+    }
+  },
+  "POST usuarios/{id}/reativar": {
+    "pedido": null,
+    "respostas": {
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "USUARIO_INEXISTENTE",
+          "corpo": {
+            "codigo": "USUARIO_INEXISTENTE",
+            "mensagem": "Usuário não encontrado."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "ESTADO_IGUAL",
+          "corpo": {
+            "codigo": "ESTADO_IGUAL",
+            "mensagem": "O usuário já está ativo."
+          }
+        }
+      ]
+    }
+  },
+  "POST usuarios/{id}/desativar": {
+    "pedido": null,
+    "respostas": {
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "USUARIO_INEXISTENTE",
+          "corpo": {
+            "codigo": "USUARIO_INEXISTENTE",
+            "mensagem": "Usuário não encontrado."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "ESTADO_IGUAL",
+          "corpo": {
+            "codigo": "ESTADO_IGUAL",
+            "mensagem": "O usuário já está desativado."
+          }
+        }
+      ]
+    }
+  },
+  "PUT contas/{id}/tempo-sessao": {
+    "pedido": {
+      "staffNavegador": "PT8H",
+      "staffApp": "P7D",
+      "participante": "P30D"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "staffNavegador": "PT8H",
+            "staffApp": "P7D",
+            "participante": "P30D"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CONTA_INEXISTENTE",
+          "corpo": {
+            "codigo": "CONTA_INEXISTENTE",
+            "mensagem": "Conta não encontrada."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "FORA_DOS_LIMITES",
+          "corpo": {
+            "codigo": "FORA_DOS_LIMITES",
+            "mensagem": "O tempo precisa ficar entre 15 min e 12 h.",
+            "campo": "staffNavegador",
+            "minimo": "PT15M",
+            "maximo": "PT12H"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"staffNavegador\" está faltando ou é inválido.",
+            "campo": "staffNavegador"
+          }
+        }
+      ]
+    }
+  },
+  "GET contas/{id}/tempo-sessao": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "staffNavegador": "PT8H",
+            "staffApp": "P7D",
+            "participante": "P30D"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CONTA_INEXISTENTE",
+          "corpo": {
+            "codigo": "CONTA_INEXISTENTE",
+            "mensagem": "Conta não encontrada."
+          }
+        }
+      ]
+    }
+  },
+  "GET usuarios/card": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "selo": 2,
+            "dado": 335,
+            "rotulo": "usuários ativos",
+            "noMes": 12,
+            "meses": [
+              301,
+              310,
+              318,
+              323,
+              335
+            ],
+            "staff": 37,
+            "participantes": 298
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ]
+    }
+  },
+  "GET contas": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "itens": [
+              {
+                "id": "conta-ebfga",
+                "sigla": "EBFGA",
+                "nome": "Escola Bento Freitas",
+                "tipo": "INSTITUICAO",
+                "estado": "ATIVA",
+                "ultimoAcessoMaster": "2026-11-01T08:15:00Z"
+              }
+            ],
+            "pagina": 1,
+            "total": 112
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"estado\" está faltando ou é inválido.",
+            "campo": "estado"
+          }
+        }
+      ]
+    }
+  },
+  "GET contas/{id}": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "id": "conta-ebfga",
+            "tipo": "INSTITUICAO",
+            "nome": "Escola Bento Freitas",
+            "documento": "12.345.678/0001-90",
+            "sigla": "EBFGA",
+            "loginMaster": "objetivo_unidade1@deboaz.com",
+            "responsavel": "Gustavo Boaz de Moura Souza",
+            "telefone": "(51) 99999-0000",
+            "estado": "ATIVA",
+            "criadaEm": "2026-03-12T13:05:00Z",
+            "ultimoPagamento": "2026-10-05",
+            "ultimoAcessoMaster": "2026-11-01T08:15:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CONTA_INEXISTENTE",
+          "corpo": {
+            "codigo": "CONTA_INEXISTENTE",
+            "mensagem": "Conta não encontrada."
+          }
+        }
+      ]
+    }
+  },
+  "POST contas/{id}/estado": {
+    "pedido": {
+      "estado": "DESATIVADA"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "id": "conta-ebfga",
+            "estado": "DESATIVADA"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CONTA_INEXISTENTE",
+          "corpo": {
+            "codigo": "CONTA_INEXISTENTE",
+            "mensagem": "Conta não encontrada."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "TRANSICAO_INVALIDA",
+          "corpo": {
+            "codigo": "TRANSICAO_INVALIDA",
+            "mensagem": "Conta encerrada não volta."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"estado\" está faltando ou é inválido.",
+            "campo": "estado"
+          }
+        }
+      ]
+    }
+  },
+  "POST contas/{id}/codigo-master": {
+    "pedido": {
+      "documento": "12.345.678/0001-90",
+      "responsavel": "Gustavo Boaz de Moura Souza",
+      "telefone": "(51) 99999-0000",
+      "ultimoPagamento": null
+    },
+    "respostas": {
+      "201": [
+        {
+          "nome": "201",
+          "corpo": {
+            "codigoLiberacao": "482913",
+            "contato": "(51) 99999-0000",
+            "venceEm": "2026-11-04T22:06:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CONTA_INEXISTENTE",
+          "corpo": {
+            "codigo": "CONTA_INEXISTENTE",
+            "mensagem": "Conta não encontrada."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "CONFERENCIA_INCOMPLETA",
+          "corpo": {
+            "codigo": "CONFERENCIA_INCOMPLETA",
+            "mensagem": "Os dados conferidos não batem com o cadastro."
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"documento\" está faltando ou é inválido.",
+            "campo": "documento"
+          }
+        }
+      ]
+    }
+  },
+  "PUT time/tempo-sessao": {
+    "pedido": {
+      "membrosNavegador": "PT8H",
+      "membrosApp": "PT8H",
+      "mastersNavegador": "PT4H",
+      "mastersApp": "PT8H"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "membrosNavegador": "PT8H",
+            "membrosApp": "PT8H",
+            "mastersNavegador": "PT4H",
+            "mastersApp": "PT8H"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "FORA_DOS_LIMITES",
+          "corpo": {
+            "codigo": "FORA_DOS_LIMITES",
+            "mensagem": "O tempo precisa ficar entre 15 min e 24 h.",
+            "campo": "mastersNavegador",
+            "minimo": "PT15M",
+            "maximo": "PT24H"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"membrosNavegador\" está faltando ou é inválido.",
+            "campo": "membrosNavegador"
+          }
+        }
+      ]
+    }
+  },
+  "GET time/tempo-sessao": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "membrosNavegador": "PT8H",
+            "membrosApp": "PT8H",
+            "mastersNavegador": "PT4H",
+            "mastersApp": "PT8H"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ]
+    }
+  }
+}

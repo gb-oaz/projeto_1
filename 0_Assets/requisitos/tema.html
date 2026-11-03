@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tema dos documentos de requisito · boaz · v06</title>
+<title>Tema dos documentos de requisito · boaz · v09</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="tema">
 <meta name="boaz:caminho" content="0_Assets/requisitos/tema.html">
 <meta name="boaz:tipo" content="Tema">
-<meta name="boaz:versao" content="v06">
-<meta name="boaz:data" content="2026-10-24 03:59">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v09">
+<meta name="boaz:data" content="2026-11-02 00:11">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v06
+   boaz · tema dos documentos de requisito · v07
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
    Paleta: vistas com data-paletas trocam tema de cor e modo das telas.
@@ -417,7 +417,8 @@ caption { caption-side: top; padding: 0 0 8px; color: var(--muted); font-size: 1
 /* ── critérios de aceite (Gherkin) ───────────────────────── */
 .criterio { margin: 0 0 24px; break-inside: avoid; }
 .criterio h3 { margin-top: 24px; }
-pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); }
+.criterio { scroll-margin-top: 16px; }
+pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); white-space: pre-wrap; overflow-wrap: anywhere; }
 pre.gherkin::before {
   content: "GHERKIN";
   position: absolute;
@@ -720,7 +721,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v06 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v07 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
@@ -930,12 +931,12 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
 <header class="boaz-marca-topo">
   <p class="boaz-eyebrow">boaz · Tema</p>
   <h1>Tema dos documentos de requisito</h1>
-  <p class="boaz-objetivo"><span>Objetivo</span>padronizar marca d'água, tipografia, formato e estilo de todo documento <code>.html</code> de <code>1_Requisitos/</code> e mostrar, renderizado, cada componente que um documento pode usar.</p>
+  <p class="boaz-objetivo"><span>Objetivo</span>padronizar marca d'água, formato (cenários em Gherkin, telas e diagramas) e estilo de todo documento <code>.html</code> de <code>1_Requisitos/</code> e mostrar, renderizado, cada componente que um documento pode usar.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>tema</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v06</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-24 · 03:59</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 00:11</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 
@@ -952,7 +953,7 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
         <tr><td><a href="#casca">Casca</a></td><td>o bloco de estilo e script que todo documento embute; temas e PDF</td></tr>
         <tr><td><a href="#visual">Visual</a></td><td>cores e tipografia</td></tr>
         <tr><td><a href="#formato">Formato</a></td><td>nome do arquivo, esqueleto e tamanho</td></tr>
-        <tr><td><a href="#escrita">Escrita</a></td><td>como redigir um requisito claro</td></tr>
+        <tr><td><a href="#escrita">Escrita</a></td><td>como escrever um cenário em Gherkin</td></tr>
         <tr><td><a href="#catalogo">Catálogo de componentes</a></td><td>cada componente disponível, renderizado, com o HTML</td></tr>
         <tr><td><a href="#tipos">Tipos de documento</a></td><td>quais seções cada tipo usa</td></tr>
         <tr><td><a href="#versionamento">Versionamento e PDF</a></td><td>versão, data, histórico, IDs e exportação</td></tr>
@@ -1044,7 +1045,7 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
     <h2>Visual</h2>
     <p>Mesma paleta dos diagramas. Cor tem papel fixo; nunca escreva cor, <code>style=""</code> ou fonte no documento — use as classes do catálogo.</p>
     <div class="paleta">
-      <div style="--c: var(--accent)"><b>Acento</b><br><code>--accent</code> links, IDs, <span class="prio prio-deve">Deve</span></div>
+      <div style="--c: var(--accent)"><b>Acento</b><br><code>--accent</code> links, IDs, passos do Gherkin</div>
       <div style="--c: var(--accent-2)"><b>Acento 2</b><br><code>--accent-2</code> histórias, Importante</div>
       <div style="--c: var(--green)"><b>Verde</b><br><code>--green</code> Aprovado, escopo</div>
       <div style="--c: var(--yellow)"><b>Amarelo</b><br><code>--yellow</code> Rascunho, Em aberto</div>
@@ -1067,7 +1068,7 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
       <li><code>NN</code>: dois dígitos, ordem de leitura (<code>00</code> visão, <code>01</code>–<code>89</code> funcionalidades, <code>90</code>–<code>98</code> transversais, <code>99</code> glossário)</li>
       <li><code>nome</code>: kebab-case, sem acentos; não muda entre versões (links e âncoras continuam válidos)</li>
     </ul>
-    <p><strong>Esqueleto</strong> (funcionalidade; os outros tipos estão em <a href="#tipos">Tipos de documento</a>):</p>
+    <p><strong>Esqueleto</strong> (funcionalidade; os outros tipos estão em <a href="#tipos">Tipos de documento</a>). O documento traz só o que o time usa no dia a dia: <strong>cenários em Gherkin</strong>, as <strong>telas</strong> desenhadas (vistas e blueprints) e os <strong>diagramas</strong>. Nada de parágrafos de contexto nem tabelas de requisitos:</p>
 <pre><code>&lt;!doctype html&gt;
 &lt;html lang="pt-BR"&gt;
 &lt;head&gt;
@@ -1083,14 +1084,11 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
 &lt;body&gt;
 &lt;header class="boaz-marca-topo"&gt;…&lt;/header&gt;
 &lt;main&gt;
-  &lt;section id="contexto"&gt;&lt;h2&gt;Contexto&lt;/h2&gt;…&lt;/section&gt;
-  &lt;section id="requisitos-funcionais"&gt;&lt;h2&gt;Requisitos funcionais&lt;/h2&gt;…&lt;/section&gt;
-  &lt;section id="regras-de-negocio"&gt;&lt;h2&gt;Regras de negócio&lt;/h2&gt;…&lt;/section&gt;
-  &lt;section id="requisitos-nao-funcionais"&gt;&lt;h2&gt;Requisitos não funcionais&lt;/h2&gt;…&lt;/section&gt;
-  &lt;section id="criterios-de-aceite"&gt;&lt;h2&gt;Critérios de aceite&lt;/h2&gt;…&lt;/section&gt;
-  &lt;section id="fora-de-escopo"&gt;&lt;h2&gt;Fora de escopo&lt;/h2&gt;…&lt;/section&gt;
-  &lt;section id="em-aberto"&gt;&lt;h2&gt;Em aberto&lt;/h2&gt;…&lt;/section&gt;
+  &lt;section id="cenarios-tela"&gt;&lt;h2&gt;Cenários de tela&lt;/h2&gt;…&lt;/section&gt;
+  &lt;section id="cenarios-api"&gt;&lt;h2&gt;Cenários de API&lt;/h2&gt;…&lt;/section&gt;   ← quando há contrato de API
+  &lt;section id="telas"&gt;&lt;h2&gt;Telas&lt;/h2&gt;…&lt;/section&gt;
   &lt;section id="diagramas"&gt;&lt;h2&gt;Diagramas&lt;/h2&gt;…&lt;/section&gt;
+  &lt;section id="em-aberto"&gt;&lt;h2&gt;Em aberto&lt;/h2&gt;…&lt;/section&gt;
 &lt;/main&gt;
 &lt;footer class="boaz-marca-rodape"&gt;…&lt;/footer&gt;
 &lt;/body&gt;
@@ -1105,44 +1103,46 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
     <table>
       <thead><tr><th>Limite</th><th>Valor</th><th>Passou?</th></tr></thead>
       <tbody>
-        <tr><td>Documento impresso</td><td>≤ 4 páginas A4</td><td>divida em dois documentos</td></tr>
-        <tr><td>Contexto / Problema</td><td>≤ 2 parágrafos curtos</td><td>o detalhe vai para os requisitos</td></tr>
-        <tr><td>Requisitos funcionais</td><td>≤ 12 por documento</td><td>divida a funcionalidade</td></tr>
-        <tr><td>Cenários por requisito</td><td>≤ 2</td><td>o resto é regra de negócio</td></tr>
         <tr><td>Assunto</td><td>1 funcionalidade por documento</td><td>crie outro documento</td></tr>
+        <tr><td>Requisitos funcionais</td><td>≤ 12 IDs <code>RF</code> por documento</td><td>divida em <code>NN_nome-a-…</code> e <code>NN_nome-b-…</code></td></tr>
+        <tr><td>Cenários por ID</td><td>≤ 3, um caso concreto cada</td><td>use Esquema do Cenário com Exemplos</td></tr>
+        <tr><td>Linha de Gherkin</td><td>≤ 100 caracteres</td><td>quebre em mais um <code>E</code></td></tr>
+        <tr><td>Texto fora de Gherkin</td><td>nenhum, exceto na visão e no glossário</td><td>vire cenário, tela ou diagrama</td></tr>
       </tbody>
     </table>
   </section>
 
   <section id="escrita">
     <h2>Escrita</h2>
+    <p>Todo requisito é um <strong>cenário em Gherkin</strong>, em português, com uma pessoa e um dado concretos (a Maria, a escola <code>EBFGA</code>, o código <code>EBFGA-LUCAS-0412</code>). O que antes era tabela, contexto ou parágrafo vira cenário; o que é desenho vira tela ou diagrama.</p>
     <table>
-      <thead><tr><th>Bloco</th><th>Forma</th><th>Exemplo</th></tr></thead>
+      <thead><tr><th>ID</th><th>O que o cenário mostra</th><th>Exemplo</th></tr></thead>
       <tbody>
-        <tr><td>Requisito funcional</td><td><code>O sistema deve &lt;verbo&gt; &lt;objeto&gt; [quando &lt;condição&gt;].</code></td><td>O sistema deve bloquear o login após 5 tentativas erradas seguidas.</td></tr>
-        <tr><td>Regra de negócio</td><td>política do negócio, vale mesmo sem sistema</td><td>Um pedido só pode ser cancelado antes do envio.</td></tr>
-        <tr><td>Requisito não funcional</td><td>métrica + limite + condição</td><td>95 % das buscas respondem em ≤ 2 s com 1.000 usuários simultâneos.</td></tr>
+        <tr><td><code class="id">RF</code></td><td>o que a pessoa faz e o que o sistema responde</td><td><code>Quando a Maria informa a entrada e a senha · Então entra no hub</code></td></tr>
+        <tr><td><code class="id">RN</code></td><td>a regra do negócio, num caso que a prova</td><td><code>Dado a sigla "EBFGA" já usada · Quando outra escola informa "ebfga" · Então é recusada</code></td></tr>
+        <tr><td><code class="id">RNF</code></td><td>a medida ou o limite técnico, com o número</td><td><code>Quando a fatura muda · Então o total aparece em até 1 s</code></td></tr>
       </tbody>
     </table>
     <ul>
-      <li>Uma obrigação por frase: "e" unindo duas ações são dois requisitos</li>
-      <li>Sempre "deve"; a força vem da prioridade, nunca de "pode" ou "deveria" no texto</li>
-      <li>Diga <strong>o quê</strong>, não <strong>como</strong>: nada de backend, frontend, banco, API, framework, provedor ou tela específica</li>
-      <li>Voz ativa, tempo presente, um nome por coisa (o do glossário)</li>
-      <li>Datas <code>AAAA-MM-DD</code>, horas <code>HH:MM</code> (24 h); número e unidade com espaço (<code>2 s</code>, <code>10 MB</code>, <code>R$ 1.500,00</code>), decimal com vírgula; limites com símbolo (<code>≤ 2 s</code>, <code>≥ 99,5 %</code>)</li>
-      <li>Sem emojis; imagens só como diagrama ou, na seção Identidade da visão do produto, como amostra da marca</li>
-      <li>Dúvida não vira requisito: vai para Em aberto</li>
+      <li>Palavras-chave: <code>Cenário</code>, <code>Esquema do Cenário</code> + <code>Exemplos</code>, <code>Dado</code>, <code>Quando</code>, <code>Então</code>, <code>E</code>, <code>Mas</code>; textos exibidos entre aspas</li>
+      <li>Regra em forma de tabela (faixas, perfis, estados, tamanhos): <code>Esquema do Cenário</code> com <code>Exemplos</code>, colunas curtas</li>
+      <li>Exemplo de dado (token, documento, comando): <em>doc string</em> entre <code>"""</code> dentro do passo</li>
+      <li>JSON sempre expandido: um campo por linha, objetos e listas abertos com 2 espaços, nunca vários campos na mesma linha</li>
+      <li>Um cenário, um comportamento; até 3 cenários por ID</li>
+      <li>Diga <strong>o quê</strong>: a tecnologia só aparece nos documentos transversais e nos RNF que a decidem</li>
+      <li>Datas <code>AAAA-MM-DD</code>, horas <code>HH:MM</code>; número e unidade com espaço (<code>2 s</code>, <code>R$ 1.500,00</code>), decimal com vírgula</li>
+      <li>Dúvida não vira cenário: vai para Em aberto</li>
+      <li>Funcionalidade com contrato de API: os cenários se dividem em <strong>Cenários de tela</strong> (<code>section#cenarios-tela</code>: o que a pessoa vê, toca e lê, sem endereço) e <strong>Cenários de API</strong> (<code>section#cenarios-api</code>: método e endereço do contrato, pedido em JSON, status e código de erro, como <code>Quando envia POST /auth/hub/entrar … Então a resposta é 401 ENTRADA_INVALIDA</code>); sem contrato, a seção é uma só, <code>section#cenarios</code></li>
+      <li>Regra que vale nas duas seções tem um cenário em cada: o de tela fica com o <code>id</code> do ID (<code>RF-139</code>, os links continuam valendo) e o de API ganha <code>-api</code> (<code>RF-139-api</code>); regra só de uma seção fica com o <code>id</code> do ID. Os de API são a base do qa do backend; os de tela, do qa da web e do mobile</li>
     </ul>
-    <p>Palavras vagas são proibidas; troque por um critério verificável:</p>
+    <p>Palavras vagas são proibidas; troque por um valor no cenário:</p>
     <table>
       <thead><tr><th>Evite</th><th>Troque por</th></tr></thead>
       <tbody>
-        <tr><td>rápido, eficiente, performático</td><td>tempo com limite: <code>≤ 2 s</code></td></tr>
-        <tr><td>fácil, intuitivo, amigável, simples</td><td>tarefa + medida: concluir o cadastro em ≤ 3 passos</td></tr>
-        <tr><td>seguro, robusto, confiável</td><td>ameaça + controle, ou disponibilidade: <code>≥ 99,5 %</code> ao mês</td></tr>
-        <tr><td>adequado, flexível, moderno</td><td>o critério que torna "adequado" verdadeiro</td></tr>
-        <tr><td>etc., entre outros, e/ou</td><td>a lista completa, ou "e" / "ou"</td></tr>
-        <tr><td>geralmente, normalmente, se possível</td><td>a condição exata, ou mova para Em aberto</td></tr>
+        <tr><td>rápido, eficiente, performático</td><td>tempo com limite: <code>em até 2 s</code></td></tr>
+        <tr><td>fácil, intuitivo, amigável, simples</td><td>tarefa + medida: <code>em até 3 toques</code></td></tr>
+        <tr><td>seguro, robusto, confiável</td><td>ameaça + controle: <code>a 6ª tentativa é bloqueada</code></td></tr>
+        <tr><td>etc., entre outros, e/ou</td><td>a lista completa nos Exemplos</td></tr>
         <tr><td>TBD, a definir</td><td>uma pendência em Em aberto</td></tr>
       </tbody>
     </table>
@@ -1157,7 +1157,7 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
         <tr><td>Título</td><td><code>&lt;h1&gt;</code></td><td>só na marca de topo; primeira letra maiúscula (e nomes próprios), sem ID nem ponto final</td></tr>
         <tr><td>Objetivo</td><td><code>.boaz-objetivo</code></td><td>uma frase, na marca de topo</td></tr>
         <tr><td>Seção</td><td><code>&lt;section id&gt;&lt;h2&gt;</code></td><td>só os nomes do esqueleto do tipo, na ordem dele</td></tr>
-        <tr><td>Subseção</td><td><code>&lt;h3&gt;</code></td><td>em Critérios de aceite (uma por requisito) e nos cartões; nunca <code>&lt;h4&gt;</code></td></tr>
+        <tr><td>Subseção</td><td><code>&lt;h3&gt;</code></td><td>no título de cada cenário e nos cartões; nunca <code>&lt;h4&gt;</code></td></tr>
         <tr><td>Identificador</td><td><code>&lt;code class="id"&gt;</code></td><td>IDs (<code class="id">RF-01</code>); valores literais, campos e arquivos em <code>&lt;code&gt;</code></td></tr>
         <tr><td>Termo definido</td><td><code>&lt;strong&gt;</code></td><td>primeira ocorrência de um termo do glossário; no máximo um por frase</td></tr>
         <tr><td>Texto exibido</td><td><code>&lt;q class="ui"&gt;</code></td><td>mensagem ou rótulo, exatamente como aparece</td></tr>
@@ -1166,79 +1166,25 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
       </tbody>
     </table>
 
-    <h3>Requisitos funcionais</h3>
-    <p>Cada linha tem <code>id</code> igual ao ID: outro documento aponta para <code>02_cadastro-usuario.html#RF-02</code> e a linha acende.</p>
+    <h3>Cenário</h3>
+    <p>Um <code>&lt;article class="criterio"&gt;</code> por ID, com <code>id</code> igual ao ID: outro documento aponta para <code>17_modulo-usuario.html#RN-179</code> e o cenário acende. Grupo sem ID (como <code>fora-de-escopo</code> ou um exemplo de ponta a ponta) usa um <code>id</code> em kebab-case e o título sem o <code>code.id</code>. Escreva o texto puro: o script colore as palavras-chave e a linha longa quebra.</p>
     <div class="boaz-exemplo">
-      <table>
-        <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
-        <tbody>
-          <tr id="RF-01"><td><code class="id">RF-01</code></td><td>O sistema deve criar a conta com nome, e-mail e senha</td><td><span class="prio prio-deve">Deve</span></td></tr>
-          <tr id="RF-02"><td><code class="id">RF-02</code></td><td>O sistema deve enviar um código de confirmação ao e-mail informado</td><td><span class="prio prio-deve">Deve</span></td></tr>
-          <tr id="RF-03"><td><code class="id">RF-03</code></td><td>O sistema deve lembrar o e-mail do último acesso no mesmo aparelho</td><td><span class="prio prio-deveria">Deveria</span></td></tr>
-          <tr id="RF-04"><td><code class="id">RF-04</code></td><td>O sistema deve permitir entrar com uma conta Google</td><td><span class="prio prio-poderia">Poderia</span></td></tr>
-        </tbody>
-      </table>
-    </div>
+      <article class="criterio" id="RN-02">
+        <h3><code class="id">RN-02</code> Validade do código</h3>
+        <pre class="gherkin">Esquema do Cenário: código informado depois de um tempo
+  Dado o código enviado a "ana@exemplo.com" há &lt;tempo&gt;
+  Quando a Ana informa o código
+  Então &lt;resultado&gt;
 
-    <h3>Prioridade (MoSCoW)</h3>
-    <div class="boaz-exemplo">
-      <table>
-        <thead><tr><th>Valor</th><th>Significado</th></tr></thead>
-        <tbody>
-          <tr><td><span class="prio prio-deve">Deve</span></td><td>sem ele a entrega não vale; exige critério de aceite</td></tr>
-          <tr><td><span class="prio prio-deveria">Deveria</span></td><td>importante, mas a entrega sai sem ele</td></tr>
-          <tr><td><span class="prio prio-poderia">Poderia</span></td><td>desejável, entra se sobrar tempo</td></tr>
-          <tr><td><span class="prio prio-nao-agora">Não agora</span></td><td>combinado que fica para depois; prefira Fora de escopo</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Regras de negócio</h3>
-    <div class="boaz-exemplo">
-      <table>
-        <thead><tr><th>ID</th><th>Regra</th></tr></thead>
-        <tbody>
-          <tr id="RN-01"><td><code class="id">RN-01</code></td><td>Um e-mail pertence a uma única conta</td></tr>
-          <tr id="RN-02"><td><code class="id">RN-02</code></td><td>O código de confirmação vale por 15 min</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Requisitos não funcionais</h3>
-    <div class="boaz-exemplo">
-      <table>
-        <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
-        <tbody>
-          <tr id="RNF-01"><td><code class="id">RNF-01</code></td><td><span class="tag">Desempenho</span></td><td>A confirmação do código responde em ≤ 1 s para 95 % das tentativas</td></tr>
-          <tr id="RNF-02"><td><code class="id">RNF-02</code></td><td><span class="tag">Privacidade</span></td><td>A senha nunca é exibida nem enviada por e-mail</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p>Categorias: Desempenho, Disponibilidade, Segurança, Privacidade, Acessibilidade, Usabilidade, Compatibilidade, Conformidade.</p>
-
-    <h3>Critérios de aceite</h3>
-    <p>Um <code>&lt;article class="criterio"&gt;</code> por requisito <span class="prio prio-deve">Deve</span>, com no máximo 2 cenários em Gherkin. Escreva o texto puro: o script colore as palavras-chave.</p>
-    <div class="boaz-exemplo">
-      <article class="criterio" id="ca-RF-02">
-        <h3><code class="id">RF-02</code> Código de confirmação</h3>
-        <pre class="gherkin">Cenário: código correto
-  Dado uma conta criada com "ana@exemplo.com"
-  Quando a pessoa informa o código recebido em até 15 min
-  Então a conta fica confirmada
-
-Cenário: código expirado
-  Dado um código enviado há mais de 15 min
-  Quando a pessoa o informa
-  Então o sistema exibe "Código expirado"
-  E oferece reenviar o código</pre>
+  Exemplos:
+    | tempo  | resultado                       |
+    | 14 min | a conta fica confirmada         |
+    | 16 min | aparece "Código expirado"       |</pre>
       </article>
     </div>
 
-    <h3>Contexto e história de usuário</h3>
-    <div class="boaz-exemplo">
-      <p>Hoje a compra exige preencher os dados a cada pedido. Clientes recorrentes abandonam o carrinho.</p>
-      <p class="historia"><span>Como</span> <strong>cliente</strong>, <span>quero</span> ter uma conta, <span>para</span> comprar sem redigitar meus dados</p>
-    </div>
+    <h3>Telas</h3>
+    <p>As vistas (<code>vista-*</code>) e as blueprints (<code>blueprint-*</code>) de <code>2_Diagramas/</code>, com o mesmo componente dos diagramas (abaixo), na seção <strong>Telas</strong>. O passo a passo de cada tela fica na anotação da própria vista, não em texto no documento.</p>
 
     <h3>Personas</h3>
     <p>Visão do produto. <code>data-inicial</code> é a letra do avatar.</p>
@@ -1276,7 +1222,7 @@ Cenário: código expirado
       </div>
     </div>
 
-    <h3>Escopo e fora de escopo</h3>
+    <h3>Escopo e fora de escopo (visão)</h3>
     <div class="boaz-exemplo">
       <ul class="escopo">
         <li>Conta de cliente com confirmação de e-mail</li>
@@ -1295,14 +1241,6 @@ Cenário: código expirado
         <li>Clientes de outros países precisam de cadastro? <span class="tag dono">Produto</span></li>
         <li>Quantos reenvios de código por hora? <span class="tag dono">Segurança</span></li>
       </ul>
-    </div>
-
-    <h3>Destaques</h3>
-    <p>No máximo 2 por documento.</p>
-    <div class="boaz-exemplo">
-      <aside class="destaque nota"><p>Contexto que ajuda a entender, mas não é requisito.</p></aside>
-      <aside class="destaque importante"><p>Decisão tomada que restringe o produto, com quem decidiu.</p></aside>
-      <aside class="destaque aviso"><p>Risco conhecido ou dependência externa.</p></aside>
     </div>
 
     <h3>Diagramas</h3>
@@ -1363,13 +1301,13 @@ Cenário: código expirado
     <table>
       <thead><tr><th>Tipo</th><th>Arquivo</th><th>Seções, na ordem (<strong>obrigatórias</strong> em negrito)</th></tr></thead>
       <tbody>
-        <tr><td>Visão do produto</td><td><code>00_visao-produto.html</code></td><td><strong>Problema</strong>, <strong>Objetivos e métricas</strong>, <strong>Personas</strong>, <strong>Escopo</strong>, Identidade, Fora de escopo, Em aberto, Diagramas</td></tr>
-        <tr><td>Funcionalidade</td><td><code>01</code>–<code>89</code></td><td><strong>Contexto</strong>, <strong>Requisitos funcionais</strong>, Regras de negócio, Requisitos não funcionais, <strong>Critérios de aceite</strong>, Fora de escopo, Em aberto, Diagramas</td></tr>
-        <tr><td>Transversal</td><td><code>90</code>–<code>98</code></td><td><strong>Contexto</strong>, Regras de negócio, <strong>Requisitos não funcionais</strong>, Em aberto, Diagramas</td></tr>
+        <tr><td>Visão do produto</td><td><code>00_visao-produto.html</code></td><td><strong>Problema</strong> (lista), <strong>Objetivos e métricas</strong>, <strong>Personas</strong>, <strong>Escopo</strong>, Identidade, Fora de escopo</td></tr>
+        <tr><td>Funcionalidade</td><td><code>01</code>–<code>89</code></td><td><strong>Cenários</strong> (de tela e de API, quando há contrato), Telas, Diagramas, Em aberto</td></tr>
+        <tr><td>Transversal</td><td><code>90</code>–<code>98</code> e as regras do projeto</td><td><strong>Cenários</strong>, Diagramas, Em aberto</td></tr>
         <tr><td>Glossário</td><td><code>99_glossario.html</code></td><td><strong>Termos</strong></td></tr>
       </tbody>
     </table>
-    <p>Todos começam com a marca de topo e terminam com a de rodapé. Identidade, na visão, traz o nome, as amostras da marca e as regras de uso (tabela de regras de negócio). Escopo, na visão, é uma lista curta das capacidades do produto, não dos arquivos (<code>./boaz.sh requisitos</code> lista os arquivos).</p>
+    <p>Todos começam com a marca de topo e terminam com a de rodapé. O que antes era Contexto, Fora de escopo ou um exemplo vira o primeiro ou o último cenário da seção Cenários (<code>id</code> em kebab-case). A ordem de trabalho é <strong>requisito em Gherkin → telas (UX/UI) → diagramas</strong>.</p>
   </section>
 
   <section id="versionamento">
@@ -1378,7 +1316,7 @@ Cenário: código expirado
       <li>Um arquivo por documento, editado no lugar; o git guarda o conteúdo antigo (diferente dos diagramas, que geram um arquivo por versão)</li>
       <li>Toda alteração, inclusive de status, é uma versão nova: <code>vNN</code> + 1 e data/hora atuais nos <code>&lt;meta&gt;</code>, no <code>&lt;title&gt;</code>, no carimbo, numa linha nova no topo do histórico e na linha do rodapé</li>
       <li>IDs são únicos no projeto inteiro, não por documento: o próximo é o maior existente + 1</li>
-      <li>IDs nunca são reaproveitados nem renumerados; requisito removido sai da tabela e o histórico registra (<code class="id">RF-07</code> removido)</li>
+      <li>IDs nunca são reaproveitados nem renumerados; o cenário removido sai do documento e o histórico registra (<code class="id">RF-07</code> removido)</li>
       <li>Ao trocar a versão de um diagrama referenciado, o documento também ganha versão</li>
       <li>A casca não muda numa versão comum: o documento adota um tema novo só quando pedirem (skill <code>/requisito-estilo</code>), e isso também é versão</li>
     </ul>
@@ -1393,7 +1331,10 @@ Cenário: código expirado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v06</span></td><td>2026-10-24 03:59</td><td>Vista com paletas: <code>figure.diagrama[data-paletas]</code> e o botão <strong>Paleta</strong> na barra, que troca o tema de cor e o modo (claro ou escuro) das vistas de tela pelo fragmento <code>#paleta-&lt;id&gt;-&lt;modo&gt;</code> do <code>.svg</code>; casca v06</td></tr>
+      <tr><td><span class="boaz-versao">v09</span></td><td>2026-11-02 00:11</td><td>Escrita e esqueleto: cenários de tela e de API em seções separadas (<code>cenarios-tela</code>, <code>cenarios-api</code>, sufixo <code>-api</code>)</td></tr>
+      <tr><td>v08</td><td>2026-11-01 22:01</td><td>Escrita: JSON sempre expandido nas doc strings</td></tr>
+      <tr><td>v07</td><td>2026-11-01 18:31</td><td>Requisito só com Gherkin, telas e diagramas: funcionalidade = Cenários, Telas, Diagramas e Em aberto; transversal = Cenários, Diagramas e Em aberto; visão enxuta, em listas; cada regra (RF, RN, RNF) é um cenário com o ID como âncora; saem Contexto, tabelas de requisitos, prioridade, história e destaques; Gherkin quebra a linha em vez de cortar; casca v07</td></tr>
+      <tr><td>v06</td><td>2026-10-24 03:59</td><td>Vista com paletas: <code>figure.diagrama[data-paletas]</code> e o botão <strong>Paleta</strong> na barra, que troca o tema de cor e o modo (claro ou escuro) das vistas de tela pelo fragmento <code>#paleta-&lt;id&gt;-&lt;modo&gt;</code> do <code>.svg</code>; casca v06</td></tr>
       <tr><td>v05</td><td>2026-10-17 18:14</td><td>Visão do produto ganha a seção opcional Identidade, com o componente de amostras da marca (<code>figure.marca</code>, fundos claro, médio e escuro) para logos, símbolo e ícones de <code>0_Assets/design/identidade/</code></td></tr>
       <tr><td>v04</td><td>2026-10-11 04:38</td><td>Impressão: diagrama com no máximo 75 mm de altura (era 85 mm), para caber no fim da página em vez de abrir uma nova</td></tr>
       <tr><td>v03</td><td>2026-10-11 03:21</td><td>Impressão: o histórico do rodapé pode quebrar entre páginas (sem página quase vazia só para ele) e a legenda e o cabeçalho de uma tabela não ficam separados das linhas; diagrama com no máximo 85 mm de altura</td></tr>
@@ -1402,7 +1343,7 @@ Cenário: código expirado
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v06 · 2026-10-24 03:59</span>
+    <span>boaz · v09 · 2026-11-02 00:11</span>
     <span class="boaz-arquivo">0_Assets/requisitos/tema.html</span>
   </div>
 </footer>

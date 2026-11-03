@@ -221,6 +221,23 @@
         "label": { "$value": "{md.sys.typescale.body-medium}" }
       },
 
+      "action-notice": {
+        "$descricao": "Aviso de ação: resultado de toda ação confirmada, bom ou ruim, com o selo de status animado (medidor e rosto do mascote), o texto e a cor do tom; na tela (acima do formulário) ou flutuante (acima da navegação, depois de trocar de tela).",
+        "min-height": { "$value": 56 },
+        "shape": { "$value": "{md.sys.shape.corner.medium}" },
+        "badge-size": { "$value": 32 },
+        "label": { "$value": "{md.sys.typescale.body-medium}" },
+        "floating-elevation": { "$value": "{md.sys.elevation.level3}" },
+        "concluded-container-color": { "$value": "{md.sys.color.sucesso-container}" },
+        "concluded-label-color": { "$value": "{md.sys.color.on-sucesso-container}" },
+        "info-container-color": { "$value": "{md.sys.color.secondary-container}" },
+        "info-label-color": { "$value": "{md.sys.color.on-secondary-container}" },
+        "refused-container-color": { "$value": "{md.sys.color.error-container}" },
+        "refused-label-color": { "$value": "{md.sys.color.on-error-container}" },
+        "waiting-container-color": { "$value": "{md.sys.color.aviso-container}" },
+        "waiting-label-color": { "$value": "{md.sys.color.on-aviso-container}" }
+      },
+
       "badge": {
         "$descricao": "Selo de notificação: ponto de 6dp ou número em 16dp, no canto de um ícone, destino de navegação ou card.",
         "small-size": { "$value": 6 },

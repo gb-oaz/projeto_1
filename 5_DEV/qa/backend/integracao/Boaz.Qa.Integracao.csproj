@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    qa · backend · integração (14_estrutura-projetos RNF-190, RNF-191): os
+    cenários de API dos requisitos rodam contra o backend no ar, em API_URL.
+    Caixa-preta: não referencia nada de 5_DEV/backend/ (RN-151). O banco e o
+    cache são usados só para preparar o estado de um cenário, nunca para
+    conferir o resultado.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="Reqnroll.xUnit" Version="3.3.4" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <!-- JUnit XML em /resultados: contrato das suítes em contêiner (RNF-191) -->
+    <PackageReference Include="JunitXml.TestLogger" Version="8.1.0" />
+    <!-- preparar o estado: tempo sem uso e bloqueios que a API não cria -->
+    <PackageReference Include="MongoDB.Driver" Version="3.13.0" />
+    <PackageReference Include="StackExchange.Redis" Version="3.4.29" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="reqnroll.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

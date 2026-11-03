@@ -3,24 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Landing page · UX base · boaz · v07</title>
+<title>Landing page · UX base · boaz · v10</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="07_landing-page-ux">
 <meta name="boaz:caminho" content="1_Requisitos/07_landing-page-ux.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v07">
-<meta name="boaz:data" content="2026-10-21 22:12">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v10">
+<meta name="boaz:data" content="2026-11-01 18:24">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v05
+   boaz · tema dos documentos de requisito · v07
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
+   Paleta: vistas com data-paletas trocam tema de cor e modo das telas.
    ════════════════════════════════════════════════════════════ */
 
 /* ── tokens: claro ───────────────────────────────────────── */
@@ -416,7 +417,8 @@ caption { caption-side: top; padding: 0 0 8px; color: var(--muted); font-size: 1
 /* ── critérios de aceite (Gherkin) ───────────────────────── */
 .criterio { margin: 0 0 24px; break-inside: avoid; }
 .criterio h3 { margin-top: 24px; }
-pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); }
+.criterio { scroll-margin-top: 16px; }
+pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); white-space: pre-wrap; overflow-wrap: anywhere; }
 pre.gherkin::before {
   content: "GHERKIN";
   position: absolute;
@@ -636,6 +638,33 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 .boaz-barra .boaz-pdf:hover { color: #fff; filter: brightness(1.08); }
 .boaz-barra[data-alerta] .boaz-pdf { background: var(--red); }
 
+/* ── paleta das vistas: tema de cor e modo das telas (figure.diagrama[data-paletas]) ── */
+.boaz-barra .boaz-paleta[aria-expanded="true"] { background: var(--surface-2); color: var(--text-strong); }
+.boaz-paletas {
+  position: absolute;
+  top: calc(100% + 8px); right: 0;
+  width: min(320px, calc(100vw - 24px));
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--page);
+  box-shadow: var(--shadow);
+}
+.boaz-paletas[hidden] { display: none; }
+.boaz-paletas .boaz-eyebrow { margin: 4px 4px 8px; }
+.boaz-paletas .boaz-seg { margin-bottom: 12px; }
+.boaz-paletas .boaz-seg button { flex: 1; justify-content: center; }
+.boaz-paletas ul { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.boaz-paletas li button { width: 100%; height: 34px; justify-content: flex-start; gap: 10px; color: var(--text); font-weight: 500; }
+.boaz-paletas li button:hover { background: var(--surface); }
+.boaz-paletas li button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 650; }
+.boaz-amostras { display: inline-flex; flex: none; }
+.boaz-amostras i { width: 14px; height: 14px; margin-left: -4px; border: 1.5px solid var(--page); border-radius: 50%; }
+.boaz-amostras i:first-child { margin-left: 0; }
+figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weight: 600; }
+
 /* ── telas estreitas ─────────────────────────────────────── */
 @media screen and (max-width: 760px) {
   body { margin: 0; border-radius: 0; box-shadow: none; font-size: 15px; }
@@ -692,14 +721,14 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v05 — tema (claro/sistema/escuro), PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v07 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
   function guardado() { try { return localStorage.getItem(CHAVE) || "system"; } catch (e) { return "system"; } }
   function aplicar(t) {
     if (t === "light" || t === "dark") h.setAttribute("data-theme", t); else h.removeAttribute("data-theme");
-    var bs = d.querySelectorAll(".boaz-seg button");
+    var bs = d.querySelectorAll(".boaz-barra > .boaz-seg button");
     for (var i = 0; i < bs.length; i++) bs[i].setAttribute("aria-pressed", String(bs[i].getAttribute("data-tema") === t));
   }
   aplicar(guardado());
@@ -737,7 +766,8 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
     light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/><\/svg>',
     system: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/><\/svg>',
     dark: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/><\/svg>',
-    pdf: '<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/><\/svg>'
+    pdf: '<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/><\/svg>',
+    paleta: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16a5 5 0 0 0 5-5c0-4-4-7.2-9-7.2z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="15.5" cy="7.5" r="1"/><\/svg>'
   };
   function norm(s) { return (s || "").replace(/[^0-9a-z]/gi, "").toLowerCase(); }
 
@@ -765,6 +795,67 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
       aplicar(t);
     });
     aplicar(guardado());
+
+    // Paleta das vistas: figure.diagrama[data-paletas="id|Nome|#cor|#cor|#cor,…"] aponta para um .svg que traz
+    // todos os temas nos dois modos; a escolha vira o fragmento #paleta-<id>-<claro|escuro> do <img> e do link
+    var vistas = d.querySelectorAll("figure.diagrama[data-paletas]");
+    if (vistas.length) {
+      var lista = vistas[0].getAttribute("data-paletas").split(",").map(function (p) { return p.split("|"); });
+      var escolha = { tema: lista[0][0], modo: "claro" };
+      var pb = d.createElement("button");
+      pb.type = "button"; pb.className = "boaz-paleta"; pb.title = "Tema de cor e modo das vistas";
+      pb.setAttribute("aria-expanded", "false"); pb.setAttribute("aria-haspopup", "true");
+      pb.innerHTML = ICONES.paleta + '<span class="rotulo">Paleta<\/span>';
+      var painel = d.createElement("div");
+      painel.className = "boaz-paletas"; painel.hidden = true;
+      painel.setAttribute("role", "dialog"); painel.setAttribute("aria-label", "Paleta das vistas");
+      var htm = '<p class="boaz-eyebrow">Modo das telas<\/p><div class="boaz-seg" role="group" aria-label="Modo das telas">' +
+        '<button type="button" data-modo="claro">' + ICONES.light + 'Claro<\/button><button type="button" data-modo="escuro">' + ICONES.dark + 'Escuro<\/button><\/div>' +
+        '<p class="boaz-eyebrow">Tema de cor · ' + lista.length + '<\/p><ul>';
+      for (var p = 0; p < lista.length; p++) {
+        htm += '<li><button type="button" data-paleta="' + lista[p][0] + '"><span class="boaz-amostras"><i><\/i><i><\/i><i><\/i><\/span>' + lista[p][1] + "<\/button><\/li>";
+      }
+      painel.innerHTML = htm + "<\/ul>";
+      var bolas = painel.querySelectorAll(".boaz-amostras");
+      for (var p2 = 0; p2 < bolas.length; p2++) {
+        var is = bolas[p2].children;
+        for (var c = 0; c < 3; c++) is[c].style.background = lista[p2][c + 2];
+      }
+      barra.insertBefore(pb, barra.querySelector(".boaz-pdf"));
+      barra.appendChild(painel);
+      for (var f = 0; f < vistas.length; f++) {
+        var leg = vistas[f].querySelector("figcaption strong");
+        if (leg) { var at = d.createElement("span"); at.className = "boaz-paleta-atual"; leg.appendChild(d.createTextNode(" · ")); leg.appendChild(at); }
+      }
+      var mostrar = function () {
+        var frag = "#paleta-" + escolha.tema + "-" + escolha.modo, nome = "";
+        for (var i = 0; i < lista.length; i++) if (lista[i][0] === escolha.tema) nome = lista[i][1];
+        for (var j = 0; j < vistas.length; j++) {
+          var img = vistas[j].querySelector("img"), a = vistas[j].querySelector("a"), sp = vistas[j].querySelector(".boaz-paleta-atual");
+          if (img) img.src = img.getAttribute("src").split("#")[0] + frag;
+          if (a) a.href = a.getAttribute("href").split("#")[0] + frag;
+          if (sp) sp.textContent = nome + ", " + escolha.modo;
+        }
+        var bs = painel.querySelectorAll("button");
+        for (var k = 0; k < bs.length; k++) {
+          var b = bs[k], on = b.getAttribute("data-modo") ? b.getAttribute("data-modo") === escolha.modo : b.getAttribute("data-paleta") === escolha.tema;
+          b.setAttribute("aria-pressed", String(on));
+        }
+      };
+      var abrir = function (sim) { painel.hidden = !sim; pb.setAttribute("aria-expanded", String(sim)); };
+      pb.addEventListener("click", function (e) { e.stopPropagation(); abrir(painel.hidden); });
+      painel.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var b = e.target.closest("button");
+        if (!b) return;
+        if (b.getAttribute("data-modo")) escolha.modo = b.getAttribute("data-modo");
+        if (b.getAttribute("data-paleta")) escolha.tema = b.getAttribute("data-paleta");
+        mostrar();
+      });
+      d.addEventListener("click", function () { abrir(false); });
+      d.addEventListener("keydown", function (e) { if (e.key === "Escape" && !painel.hidden) { abrir(false); pb.focus(); } });
+      mostrar();
+    }
 
     // Tabelas largas rolam na horizontal dentro do documento, sem cortar conteúdo
     var ts = d.querySelectorAll("table");
@@ -827,103 +918,47 @@ dl.glossario > :nth-last-child(-n + 2) { border-bottom: 0; }
   <p class="boaz-objetivo"><span>Objetivo</span>definir como os blocos da landing page se distribuem no celular e na web e como o visitante se move entre eles, deixando espaços fixos para cada módulo se apresentar.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>07_landing-page-ux</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v07</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-10-21 · 22:12</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v10</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 18:24</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
-  <nav class="sumario"></nav>
-  <section id="contexto">
-    <h2>Contexto</h2>
-    <p>Este é o primeiro de três documentos de UX base: landing page (07), hub (08) e quest (09). Ele não trata de nenhum módulo em particular: define a distribuição dos blocos e a experiência do <a class="ref" href="00_visao-produto.html#personas">Visitante</a>, primeiro no celular (janela compact) e depois na web (medium e expanded, ver <a class="ref" href="99_glossario.html#classe-de-janela">classe de janela</a>). Cada <a class="ref" href="99_glossario.html#modulo">módulo</a> entra por espaços reservados, desenhados em roxo tracejado nas blueprints: o documento do módulo diz o que aparece no card, na página do módulo, no destaque e nos depoimentos, sem mudar a estrutura daqui.</p>
-    <p class="historia"><span>Como</span> <strong>visitante</strong>, <span>quero</span> entender o que o deboaz oferece, ver quem já usa e chegar ao hub ou ao quest, <span>para</span> decidir se começo a usar</p>
-    <aside class="destaque nota"><p>Sequência das telas: UX base (07 a 09) → componentes compostos (10) → UI (11 a 13), em que as vistas de <a class="ref" href="06_design-system-telas.html#RN-27">Design system nas telas <code class="id">RN-27</code></a> juntam os componentes compostos e o design system sobre esta distribuição. A blueprint não é vista: mostra só blocos e ações, sem cores, textos finais nem componentes do design system.</p></aside>
-    <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-18: a landing page não tem formulário de contato. Quem quer usar o deboaz cria a conta; dentro dela, um módulo de suporte e um módulo de mensagens levam conversas e reclamações da escola, da empresa ou do educador autônomo ao painel de administração do deboaz, acessado pelo hub, com histórico guardado para auditoria. Esses módulos têm documentos próprios.</p></aside>
-  </section>
-  <section id="requisitos-funcionais">
-    <h2>Requisitos funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
-      <tbody>
-        <tr id="RF-01"><td><code class="id">RF-01</code></td><td>O sistema deve apresentar a landing page numa única página de rolagem vertical, com os blocos nesta ordem: topo, apresentação, para quem, destaque, como funciona (do módulo em destaque), módulos, números, depoimentos, rodapé</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-02"><td><code class="id">RF-02</code></td><td>O sistema deve manter o topo fixo no alto da tela durante toda a rolagem, com o logo levando ao início da página</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-03"><td><code class="id">RF-03</code></td><td>O sistema deve oferecer, nas janelas compact e medium, um menu com os links das seções Módulos, Para quem, Como funciona e Depoimentos, o seletor de tema e as ações <q class="ui">Começar grátis</q>, <q class="ui">Entrar numa sala</q> e <q class="ui">Entrar</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-04"><td><code class="id">RF-04</code></td><td>O sistema deve mostrar, a partir da janela expanded, os links das seções, o seletor de tema e as três ações no próprio topo, sem menu</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-05"><td><code class="id">RF-05</code></td><td>O sistema deve mostrar na apresentação o título, a frase de valor, o logo na animação de abertura e as ações <q class="ui">Começar grátis</q> e <q class="ui">Entrar numa sala</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-06"><td><code class="id">RF-06</code></td><td>O sistema deve levar <q class="ui">Começar grátis</q> ao cadastro no hub, <q class="ui">Entrar</q> ao acesso ao hub e <q class="ui">Entrar numa sala</q> à entrada pelo <a class="ref" href="99_glossario.html#codigo-da-sala">código da sala</a> no quest</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-07"><td><code class="id">RF-07</code></td><td>O sistema deve mostrar, na janela compact, uma barra de ação fixa na base da tela enquanto a apresentação estiver fora de vista e o rodapé não estiver visível</td><td><span class="prio prio-deveria">Deveria</span></td></tr>
-        <tr id="RF-08"><td><code class="id">RF-08</code></td><td>O sistema deve mostrar no bloco Módulos, num carrossel, um card por módulo publicado, com ícone, nome, frase curta, o número de instituições e educadores autônomos que usam o módulo e a ação <q class="ui">Saiba mais</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-09"><td><code class="id">RF-09</code></td><td>O sistema deve abrir a página do módulo ao tocar em <q class="ui">Saiba mais</q>, com os blocos topo, navegação, apresentação do módulo com a vitrine das telas dele no hub e no quest e os números do módulo, benefícios, onde aparece, depoimentos do módulo, outros módulos e rodapé</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-13"><td><code class="id">RF-13</code></td><td>O sistema deve mostrar no bloco Números o total de escolas, o de empresas e o de educadores autônomos que usam o deboaz</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-14"><td><code class="id">RF-14</code></td><td>O sistema deve mostrar no bloco Depoimentos, num carrossel, os depoimentos autorizados, cada um com a imagem da instituição, o nome da instituição ou do educador autônomo e o texto</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-15"><td><code class="id">RF-15</code></td><td>O sistema deve oferecer um seletor de tema com todos os <a class="ref" href="99_glossario.html#tema-de-cor">temas de cor</a> do design system e os modos claro, escuro e sistema, guardando a escolha no aparelho</td><td><span class="prio prio-deve">Deve</span></td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="regras-de-negocio">
-    <h2>Regras de negócio</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Regra</th></tr></thead>
-      <tbody>
-        <tr id="RN-60"><td><code class="id">RN-60</code></td><td>Um módulo só aparece na landing page depois de publicado no <a class="ref" href="99_glossario.html#catalogo-de-modulos">catálogo de módulos</a></td></tr>
-        <tr id="RN-61"><td><code class="id">RN-61</code></td><td>Todo módulo publicado tem um card no bloco Módulos e uma página do módulo; a seção de destaque é opcional</td></tr>
-        <tr id="RN-62"><td><code class="id">RN-62</code></td><td>O documento de cada módulo define o conteúdo do card, da página do módulo (com as telas da vitrine), do destaque e dos passos de Como funciona, sem mudar a ordem nem a estrutura dos blocos desta UX base</td></tr>
-        <tr id="RN-63"><td><code class="id">RN-63</code></td><td>O bloco Destaques de módulos mostra um destaque por vez, na ordem de <code class="id">RN-66</code>, e só aparece quando ao menos um módulo publicado tem destaque</td></tr>
-        <tr id="RN-64"><td><code class="id">RN-64</code></td><td>Todo o conteúdo da landing page é visível sem conta e sem login</td></tr>
-        <tr id="RN-65"><td><code class="id">RN-65</code></td><td>Mudar a ordem ou a estrutura dos blocos exige uma nova versão deste documento e da blueprint antes de chegar à UI (11_landing_page_ui)</td></tr>
-        <tr id="RN-66"><td><code class="id">RN-66</code></td><td>Os módulos aparecem do mais contratado ao menos contratado; sem contratação ou em empate, do criado mais recentemente ao mais antigo</td></tr>
-        <tr id="RN-67"><td><code class="id">RN-67</code></td><td>O carrossel do bloco Módulos mostra todos os módulos publicados; nenhum fica de fora</td></tr>
-        <tr id="RN-68"><td><code class="id">RN-68</code></td><td>Os números da landing page e da página do módulo mostram só totais, nunca o nome de um cliente</td></tr>
-        <tr id="RN-69"><td><code class="id">RN-69</code></td><td>Um depoimento é escrito no hub e só aparece na landing page depois que o autor autoriza a publicação</td></tr>
-        <tr id="RN-70"><td><code class="id">RN-70</code></td><td>O bloco Depoimentos e os depoimentos do módulo só aparecem quando há ao menos um depoimento autorizado</td></tr>
-        <tr id="RN-71"><td><code class="id">RN-71</code></td><td>O preço de um módulo só aparece na contratação, dentro da conta, e nunca na landing page</td></tr>
-        <tr id="RN-72"><td><code class="id">RN-72</code></td><td>A landing page não recebe mensagens: suporte, conversa e reclamação acontecem dentro da conta</td></tr>
-        <tr id="RN-73"><td><code class="id">RN-73</code></td><td>Os termos de uso e a política de privacidade ficam em páginas próprias da landing page, com o mesmo topo e rodapé, e são redigidos pelo Jurídico</td></tr>
-        <tr id="RN-74"><td><code class="id">RN-74</code></td><td>O bloco Como funciona apresenta os passos do módulo em destaque, com o nome dele, e muda junto quando o destaque muda; sem módulo em destaque, mostra os passos gerais: criar no hub, abrir a sala e passar o código, jogar pelo quest</td></tr>
-        <tr id="RN-75"><td><code class="id">RN-75</code></td><td>Sem escolha guardada no aparelho, a página usa o tema de cor padrão no modo do sistema</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="requisitos-nao-funcionais">
-    <h2>Requisitos não funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
-      <tbody>
-        <tr id="RNF-120"><td><code class="id">RNF-120</code></td><td><span class="tag">Usabilidade</span></td><td>Numa tela de 360 × 640dp, a ação <q class="ui">Começar grátis</q> aparece sem rolar</td></tr>
-        <tr id="RNF-121"><td><code class="id">RNF-121</code></td><td><span class="tag">Usabilidade</span></td><td>Qualquer bloco é alcançado em ≤ 2 toques a partir de qualquer ponto da página</td></tr>
-        <tr id="RNF-123"><td><code class="id">RNF-123</code></td><td><span class="tag">Compatibilidade</span></td><td>O carrossel do bloco Módulos mostra 1 card por vez no compact, 2 no medium e 3 a partir do expanded</td></tr>
-        <tr id="RNF-124"><td><code class="id">RNF-124</code></td><td><span class="tag">Compatibilidade</span></td><td>Nas janelas large e extra-large, a página mantém a distribuição da expanded, centralizada na largura máxima de conteúdo do design system</td></tr>
-        <tr id="RNF-125"><td><code class="id">RNF-125</code></td><td><span class="tag">Compatibilidade</span></td><td>Nenhuma largura a partir de 360dp gera rolagem horizontal</td></tr>
-        <tr id="RNF-126"><td><code class="id">RNF-126</code></td><td><span class="tag">Acessibilidade</span></td><td>A ordem de leitura e de foco pelo teclado segue a ordem dos blocos de <code class="id">RF-01</code></td></tr>
-        <tr id="RNF-127"><td><code class="id">RNF-127</code></td><td><span class="tag">Acessibilidade</span></td><td>Com a preferência de movimento reduzido ativa, a ida a uma seção pelo menu e a troca de item dos carrosséis acontecem sem animação</td></tr>
-        <tr id="RNF-128"><td><code class="id">RNF-128</code></td><td><span class="tag">Acessibilidade</span></td><td>Os carrosséis só avançam por ação do visitante e mostram a posição atual, como <q class="ui">2 de 7</q></td></tr>
-        <tr id="RNF-129"><td><code class="id">RNF-129</code></td><td><span class="tag">Acessibilidade</span></td><td>Os carrosséis são operáveis pelo gesto de deslizar e pelos botões anterior e próximo, também pelo teclado</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="criterios-de-aceite">
-    <h2>Critérios de aceite</h2>
-    <article class="criterio" id="ca-RF-01">
+  <section id="cenarios">
+    <h2>Cenários</h2>
+    <article class="criterio" id="sequencia-das-telas">
+      <h3>Sequência das telas</h3>
+      <pre class="gherkin">Cenário: da blueprint à vista
+  Dado a blueprint, só com blocos e ações, sem cores, textos finais nem componentes
+  Então os compostos (10) e as UIs (11 a 13) montam as vistas sobre esta distribuição
+  E cada módulo entra pelos espaços reservados em roxo tracejado
+
+Cenário: sem formulário de contato
+  Quando o visitante procura falar com o deboaz
+  Então a landing page não tem formulário de contato (decisão de 2026-10-18)
+  E quem quer usar cria a conta e fala com o SAC de dentro dela</pre>
+    </article>
+    <article class="criterio" id="RF-01">
       <h3><code class="id">RF-01</code> Ordem dos blocos</h3>
       <pre class="gherkin">Cenário: página completa
   Dado ao menos um módulo com destaque e um depoimento autorizado
   Quando o visitante rola a landing page do início ao fim
-  Então vê topo, apresentação, para quem, destaque, como funciona, módulos, números, depoimentos e rodapé, nessa ordem
+  Então vê topo, apresentação, para quem, destaque, como funciona e módulos
+  E depois números, depoimentos e rodapé, nessa ordem
 
 Cenário: o destaque muda
   Dado o Quiz em destaque e Como funciona com os passos do Quiz
   Quando o destaque passa para a Presença
   Então Como funciona passa a mostrar os passos da Presença</pre>
     </article>
-    <article class="criterio" id="ca-RF-02">
+    <article class="criterio" id="RF-02">
       <h3><code class="id">RF-02</code> Topo fixo</h3>
       <pre class="gherkin">Cenário: voltar ao início pelo logo
   Dado o visitante no bloco Depoimentos
   Quando toca no logo do topo
   Então a página volta à apresentação</pre>
     </article>
-    <article class="criterio" id="ca-RF-03">
+    <article class="criterio" id="RF-03">
       <h3><code class="id">RF-03</code> Menu no compact e no medium</h3>
       <pre class="gherkin">Cenário: ir a uma seção pelo menu
   Dado a landing page aberta numa janela compact
@@ -931,35 +966,37 @@ Cenário: o destaque muda
   Então o menu fecha
   E a página mostra o bloco Módulos</pre>
     </article>
-    <article class="criterio" id="ca-RF-04">
+    <article class="criterio" id="RF-04">
       <h3><code class="id">RF-04</code> Topo no expanded</h3>
       <pre class="gherkin">Cenário: topo completo
   Dado a landing page aberta numa janela expanded
-  Então o topo mostra os quatro links das seções, o seletor de tema e as ações "Entrar numa sala", "Entrar" e "Começar grátis"
+  Então o topo mostra os quatro links das seções e o seletor de tema
+  E as ações "Entrar numa sala", "Entrar" e "Começar grátis"
   E não há botão de menu</pre>
     </article>
-    <article class="criterio" id="ca-RF-05">
+    <article class="criterio" id="RF-05">
       <h3><code class="id">RF-05</code> Apresentação</h3>
       <pre class="gherkin">Cenário: primeira tela no celular
   Dado a landing page aberta numa tela de 360 × 640dp
   Então o visitante vê o logo, o título, a frase de valor e a ação "Começar grátis" sem rolar</pre>
     </article>
-    <article class="criterio" id="ca-RF-06">
+    <article class="criterio" id="RF-06">
       <h3><code class="id">RF-06</code> Destinos das ações</h3>
       <pre class="gherkin">Cenário: entrar numa sala
   Dado o visitante na landing page
   Quando toca em "Entrar numa sala"
   Então abre a entrada pelo código da sala no quest</pre>
     </article>
-    <article class="criterio" id="ca-RF-08">
+    <article class="criterio" id="RF-08">
       <h3><code class="id">RF-08</code> Carrossel de módulos</h3>
       <pre class="gherkin">Cenário: ordem por contratação
-  Dado os módulos A com 30 contratações, B com 12 e C sem contratação, criado depois de D, também sem contratação
+  Dado os módulos A com 30 contratações, B com 12 e C sem contratação
+  E C criado depois de D, também sem contratação
   Quando o visitante percorre o carrossel no compact
   Então vê um card por vez, na ordem A, B, C e D
   E cada card mostra quantas instituições e educadores autônomos usam o módulo, sem preço</pre>
     </article>
-    <article class="criterio" id="ca-RF-09">
+    <article class="criterio" id="RF-09">
       <h3><code class="id">RF-09</code> Página do módulo</h3>
       <pre class="gherkin">Cenário: abrir a página do módulo
   Dado o visitante no bloco Módulos
@@ -967,7 +1004,7 @@ Cenário: o destaque muda
   Então abre a página daquele módulo com a vitrine das telas dele e os números dele
   E o carrossel Outros módulos não mostra o módulo atual</pre>
     </article>
-    <article class="criterio" id="ca-RF-13">
+    <article class="criterio" id="RF-13">
       <h3><code class="id">RF-13</code> Números</h3>
       <pre class="gherkin">Cenário: totais sem nomes
   Dado 40 escolas, 5 empresas e 120 educadores autônomos usando o deboaz
@@ -975,14 +1012,14 @@ Cenário: o destaque muda
   Então vê os totais 40, 5 e 120
   E nenhum nome de cliente aparece</pre>
     </article>
-    <article class="criterio" id="ca-RF-14">
+    <article class="criterio" id="RF-14">
       <h3><code class="id">RF-14</code> Depoimentos</h3>
       <pre class="gherkin">Cenário: só depoimentos autorizados
   Dado dois depoimentos escritos no hub, um autorizado e outro não
   Quando o visitante chega ao bloco Depoimentos
   Então vê só o autorizado, com a imagem da instituição, o nome e o texto</pre>
     </article>
-    <article class="criterio" id="ca-RF-15">
+    <article class="criterio" id="RF-15">
       <h3><code class="id">RF-15</code> Seletor de tema</h3>
       <pre class="gherkin">Cenário: escolha guardada
   Dado o visitante escolhe um tema de cor colorido no modo escuro
@@ -994,22 +1031,219 @@ Cenário: primeira visita
   Quando o visitante abre a landing page
   Então a página usa o tema de cor padrão no modo do sistema</pre>
     </article>
+    <article class="criterio" id="RF-07">
+      <h3><code class="id">RF-07</code> Barra de ação fixa</h3>
+      <pre class="gherkin">Esquema do Cenário: barra fixa no compact
+  Dado o visitante no compact
+  Quando &lt;posição&gt;
+  Então a barra de ação fixa &lt;resultado&gt;
+
+  Exemplos:
+    | posição                      | resultado   |
+    | a apresentação está à vista  | não aparece |
+    | a apresentação saiu de vista | aparece     |
+    | o rodapé está visível        | não aparece |</pre>
+    </article>
+    <article class="criterio" id="RN-60">
+      <h3><code class="id">RN-60</code> Só módulo publicado</h3>
+      <pre class="gherkin">Cenário: módulo não publicado
+  Dado a Agenda ainda não publicada no catálogo
+  Então a Agenda não aparece na landing page</pre>
+    </article>
+    <article class="criterio" id="RN-61">
+      <h3><code class="id">RN-61</code> Card e página</h3>
+      <pre class="gherkin">Cenário: módulo publicado
+  Dado o Quiz publicado, sem destaque
+  Então o Quiz tem um card no bloco Módulos e uma página do módulo
+  E não aparece em Destaque</pre>
+    </article>
+    <article class="criterio" id="RN-62">
+      <h3><code class="id">RN-62</code> O módulo define o conteúdo</h3>
+      <pre class="gherkin">Cenário: conteúdo do Quiz
+  Então o card, a página, o destaque e os passos do Quiz vêm do documento do Quiz
+  E a ordem e a estrutura dos blocos não mudam</pre>
+    </article>
+    <article class="criterio" id="RN-63">
+      <h3><code class="id">RN-63</code> Destaque</h3>
+      <pre class="gherkin">Cenário: um destaque por vez
+  Dado o Quiz e a Presença com destaque
+  Então o bloco mostra um por vez, na ordem do mais contratado
+
+Cenário: sem destaque
+  Dado nenhum módulo publicado com destaque
+  Então o bloco Destaque não aparece</pre>
+    </article>
+    <article class="criterio" id="RN-64">
+      <h3><code class="id">RN-64</code> Sem login</h3>
+      <pre class="gherkin">Cenário: visitante sem conta
+  Quando o visitante abre a landing page sem conta
+  Então vê todo o conteúdo</pre>
+    </article>
+    <article class="criterio" id="RN-65">
+      <h3><code class="id">RN-65</code> Mudança exige versão</h3>
+      <pre class="gherkin">Cenário: bloco novo
+  Quando o time muda a ordem dos blocos
+  Então este documento e a blueprint ganham versão nova antes da UI (11)</pre>
+    </article>
+    <article class="criterio" id="RN-66">
+      <h3><code class="id">RN-66</code> Ordem dos módulos</h3>
+      <pre class="gherkin">Esquema do Cenário: ordem no carrossel
+  Dado &lt;módulos&gt;
+  Então a ordem é &lt;ordem&gt;
+
+  Exemplos:
+    | módulos                                              | ordem             |
+    | Quiz em 90 contas e Presença em 40                   | Quiz, Presença    |
+    | Agenda e Mensagens sem contratação, Agenda mais nova | Agenda, Mensagens |</pre>
+    </article>
+    <article class="criterio" id="RN-67">
+      <h3><code class="id">RN-67</code> Todos no carrossel</h3>
+      <pre class="gherkin">Cenário: 7 publicados
+  Dado 7 módulos publicados
+  Então o carrossel do bloco Módulos mostra os 7</pre>
+    </article>
+    <article class="criterio" id="RN-68">
+      <h3><code class="id">RN-68</code> Só totais</h3>
+      <pre class="gherkin">Cenário: números sem nome
+  Então o bloco Números mostra "128 escolas", e nunca o nome de um cliente</pre>
+    </article>
+    <article class="criterio" id="RN-69">
+      <h3><code class="id">RN-69</code> Depoimento autorizado</h3>
+      <pre class="gherkin">Cenário: depoimento sem autorização
+  Dado um depoimento escrito no hub pela EBFGA, ainda sem autorização
+  Então ele não aparece na landing page
+  E aparece depois que a EBFGA autoriza</pre>
+    </article>
+    <article class="criterio" id="RN-70">
+      <h3><code class="id">RN-70</code> Bloco Depoimentos</h3>
+      <pre class="gherkin">Cenário: nenhum autorizado
+  Dado nenhum depoimento autorizado
+  Então o bloco Depoimentos e os depoimentos do módulo não aparecem</pre>
+    </article>
+    <article class="criterio" id="RN-71">
+      <h3><code class="id">RN-71</code> Sem preço</h3>
+      <pre class="gherkin">Cenário: preço só na conta
+  Quando o visitante abre a página do Quiz
+  Então não vê preço
+  E o preço só aparece na contratação, dentro da conta</pre>
+    </article>
+    <article class="criterio" id="RN-72">
+      <h3><code class="id">RN-72</code> Sem mensagens</h3>
+      <pre class="gherkin">Cenário: reclamação
+  Quando o visitante procura enviar uma reclamação
+  Então a landing page não recebe mensagens
+  E suporte, conversa e reclamação acontecem dentro da conta</pre>
+    </article>
+    <article class="criterio" id="RN-73">
+      <h3><code class="id">RN-73</code> Termos e privacidade</h3>
+      <pre class="gherkin">Cenário: página de termos
+  Quando o visitante abre Termos de uso
+  Então a página tem o mesmo topo e rodapé
+  E o texto é do Jurídico</pre>
+    </article>
+    <article class="criterio" id="RN-74">
+      <h3><code class="id">RN-74</code> Como funciona</h3>
+      <pre class="gherkin">Esquema do Cenário: passos do bloco
+  Dado &lt;destaque&gt;
+  Então Como funciona mostra &lt;passos&gt;
+
+  Exemplos:
+    | destaque                  | passos                                                         |
+    | o Quiz em destaque        | os passos do Quiz, com o nome dele                             |
+    | nenhum módulo em destaque | criar no hub, abrir a sala e passar o código, jogar pelo quest |</pre>
+    </article>
+    <article class="criterio" id="RN-75">
+      <h3><code class="id">RN-75</code> Tema padrão</h3>
+      <pre class="gherkin">Cenário: primeira visita
+  Dado o aparelho sem tema escolhido e no modo escuro
+  Quando o visitante abre a landing page
+  Então a página usa o tema de cor padrão no modo escuro</pre>
+    </article>
+    <article class="criterio" id="RNF-120">
+      <h3><code class="id">RNF-120</code> Começar grátis sem rolar</h3>
+      <pre class="gherkin">Cenário: tela pequena
+  Quando a landing page abre numa tela de 360 × 640dp
+  Então Começar grátis aparece sem rolar</pre>
+    </article>
+    <article class="criterio" id="RNF-121">
+      <h3><code class="id">RNF-121</code> Dois toques</h3>
+      <pre class="gherkin">Cenário: ir aos Depoimentos
+  Dado o visitante no rodapé
+  Quando ele abre o menu e toca Depoimentos
+  Então chega ao bloco em 2 toques</pre>
+    </article>
+    <article class="criterio" id="RNF-123">
+      <h3><code class="id">RNF-123</code> Cards por janela</h3>
+      <pre class="gherkin">Esquema do Cenário: carrossel de módulos
+  Quando o carrossel abre na janela &lt;janela&gt;
+  Então mostra &lt;cards&gt; por vez
+
+  Exemplos:
+    | janela   | cards |
+    | compact  | 1     |
+    | medium   | 2     |
+    | expanded | 3     |</pre>
+    </article>
+    <article class="criterio" id="RNF-124">
+      <h3><code class="id">RNF-124</code> Janelas largas</h3>
+      <pre class="gherkin">Cenário: large
+  Quando a página abre numa janela large
+  Então mantém a distribuição da expanded, centralizada na largura máxima de conteúdo</pre>
+    </article>
+    <article class="criterio" id="RNF-125">
+      <h3><code class="id">RNF-125</code> Sem rolagem horizontal</h3>
+      <pre class="gherkin">Cenário: 360dp
+  Quando a página abre com 360dp de largura
+  Então não há rolagem horizontal</pre>
+    </article>
+    <article class="criterio" id="RNF-126">
+      <h3><code class="id">RNF-126</code> Ordem de leitura</h3>
+      <pre class="gherkin">Cenário: foco pelo teclado
+  Quando o visitante navega com Tab
+  Então o foco segue topo, apresentação, para quem, destaque e como funciona
+  E depois módulos, números, depoimentos e rodapé</pre>
+    </article>
+    <article class="criterio" id="RNF-127">
+      <h3><code class="id">RNF-127</code> Movimento reduzido</h3>
+      <pre class="gherkin">Cenário: sem animação
+  Dado o aparelho com movimento reduzido
+  Quando o visitante vai a uma seção pelo menu ou troca o item de um carrossel
+  Então a mudança acontece sem animação</pre>
+    </article>
+    <article class="criterio" id="RNF-128">
+      <h3><code class="id">RNF-128</code> Carrossel por ação</h3>
+      <pre class="gherkin">Cenário: posição visível
+  Dado o carrossel no segundo de 7 módulos
+  Então mostra "2 de 7"
+  E só avança quando o visitante age</pre>
+    </article>
+    <article class="criterio" id="RNF-129">
+      <h3><code class="id">RNF-129</code> Operar o carrossel</h3>
+      <pre class="gherkin">Esquema do Cenário: formas de avançar
+  Quando o visitante &lt;ação&gt;
+  Então o carrossel vai para o próximo item
+
+  Exemplos:
+    | ação                           |
+    | desliza o dedo para a esquerda |
+    | toca em próximo                |
+    | aperta Enter no botão próximo  |</pre>
+    </article>
+    <article class="criterio" id="fora-de-escopo">
+      <h3>Fora de escopo</h3>
+      <pre class="gherkin">Cenário: o que este documento não trata
+  Então card, página e destaque de cada módulo ficam no documento do módulo
+  E SAC, mensagens e a administração das contas ficam nos módulos da conta
+  E as regras do depoimento ficam no documento do módulo depoimento
+  E o preço de cada módulo aparece só na contratação, no hub
+  E o texto dos termos e da privacidade é do Jurídico
+  E textos finais, cores e componentes ficam nos compostos (10) e na UI (11)
+  E as telas do hub e do quest ficam em 08_hub-ux e 09_quest-ux
+  E outros idiomas além do português do Brasil ficam de fora</pre>
+    </article>
   </section>
-  <section id="fora-de-escopo">
-    <h2>Fora de escopo</h2>
-    <ul class="fora">
-      <li>Conteúdo de cada módulo: card, página e destaque ficam no documento do módulo</li>
-      <li>Suporte, mensagens e painel de administração do deboaz: módulos próprios dentro da conta</li>
-      <li>Regras do depoimento (imagem, nome e texto de até 150 caracteres): documento do módulo depoimento</li>
-      <li>Preço de cada módulo: aparece só na contratação, no hub</li>
-      <li>Texto dos termos de uso e da política de privacidade: Jurídico</li>
-      <li>Textos finais, cores, tipografia e componentes: componentes compostos (10) e UI da landing page (11)</li>
-      <li>Telas internas do hub e do quest: 08_hub_ux e 09_quest_ux</li>
-      <li>Outros idiomas além do português do Brasil</li>
-    </ul>
-  </section>
-  <section id="diagramas">
-    <h2>Diagramas</h2>
+  <section id="telas">
+    <h2>Telas</h2>
     <figure class="diagrama">
       <a href="../2_Diagramas/blueprint-landing-page_v05_20261021-2138.svg"><img src="../2_Diagramas/blueprint-landing-page_v05_20261021-2138.svg" alt="Blueprint da landing page: página inteira e menu aberto no compact, página no expanded, com 11 blocos numerados, carrosséis e os espaços reservados aos módulos"></a>
       <figcaption><strong>Landing page · blueprint de UX</strong><code>2_Diagramas/blueprint-landing-page_v05_20261021-2138.svg</code></figcaption>
@@ -1025,7 +1259,10 @@ Cenário: primeira visita
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v07</span></td><td>2026-10-21 22:12</td><td><code class="id">RF-05</code> alterado: o logo na abertura no lugar do mascote de boas-vindas; blueprint v05; status → Aprovado</td></tr>
+      <tr><td><span class="boaz-versao">v10</span></td><td>2026-11-01 18:24</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); blueprints em Telas; status → Em revisão</td></tr>
+      <tr><td>v09</td><td>2026-11-01 03:57</td><td>Aprovado</td></tr>
+      <tr><td>v08</td><td>2026-11-01 03:48</td><td>Painel de administração do deboaz retirado (Módulos <code class="id">MOD-15</code>): as mensagens chegam ao SAC e o time deboaz cuida das contas no módulo Usuários</td></tr>
+      <tr><td>v07</td><td>2026-10-21 22:12</td><td><code class="id">RF-05</code> alterado: o logo na abertura no lugar do mascote de boas-vindas; blueprint v05; status → Aprovado</td></tr>
       <tr><td>v06</td><td>2026-10-20 01:57</td><td>Status → Aprovado</td></tr>
       <tr><td>v05</td><td>2026-10-20 01:27</td><td>Destaque antes de Como funciona, que mostra os passos do módulo em destaque, e dos Módulos (<code class="id">RF-01</code>, <code class="id">RN-62</code>, <code class="id">RN-74</code>); página do módulo com a vitrine das telas dele (<code class="id">RF-09</code>); blueprints da página e da página do módulo v04; status → Em revisão</td></tr>
       <tr><td>v04</td><td>2026-10-18 22:27</td><td>Status → Aprovado</td></tr>
@@ -1035,7 +1272,7 @@ Cenário: primeira visita
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v07 · 2026-10-21 22:12</span>
+    <span>boaz · v10 · 2026-11-01 18:24</span>
     <span class="boaz-arquivo">1_Requisitos/07_landing-page-ux.html</span>
   </div>
 </footer>

@@ -1,0 +1,226 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 2520" width="1392" height="2520">
+  <title>Autenticação · sequência</title>
+  <desc>Sequência do requisito 17-a (Módulo Usuários · Autenticação) e 17-b (Autorização): entrada no hub com o token de acesso JWT RS256 e o token de renovação, limite de 5 sessões, recusas e bloqueio por tentativas, conferência de cada ação pela sessão e pela versão das permissões, renovação com troca do token e detecção de cópia, e sair de todos os aparelhos. v01: criação.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+    <symbol id="uml-ator" viewBox="0 0 24 40"><circle class="ink-ring" cx="12" cy="6" r="5"/><path class="ico" d="M12,11 V26 M3,16 H21 M12,26 L4,37 M12,26 L20,37"/></symbol>
+    <symbol id="ic-web" viewBox="0 0 24 24"><rect class="ico" x="2" y="4" width="20" height="16" rx="2"/><path class="ico" d="M2,9 H22"/><circle class="ico-fill" cx="5" cy="6.5" r="0.9"/><circle class="ico-fill" cx="7.8" cy="6.5" r="0.9"/></symbol>
+    <symbol id="ic-servico" viewBox="0 0 24 24"><rect class="ico" x="3" y="4" width="18" height="7" rx="1.5"/><rect class="ico" x="3" y="13" width="18" height="7" rx="1.5"/><circle class="ico-fill" cx="6.5" cy="7.5" r="0.9"/><circle class="ico-fill" cx="6.5" cy="16.5" r="0.9"/><path class="ico" d="M10,7.5 H17 M10,16.5 H17"/></symbol>
+    <symbol id="ic-banco-nosql" viewBox="0 0 24 24"><rect class="ico" x="7" y="2" width="14" height="16" rx="1.5"/><path class="ico" d="M4,6 V20.5 C4,21.3 4.7,22 5.5,22 H16 M10,7 H18 M10,10.5 H18 M10,14 H15"/></symbol>
+    <symbol id="ic-cache" viewBox="0 0 24 24"><rect class="ico" x="5" y="5" width="14" height="14" rx="2"/><path class="ico" d="M9,2 V5 M15,2 V5 M9,19 V22 M15,19 V22 M2,9 H5 M2,15 H5 M19,9 H22 M19,15 H22"/><path class="ico-fill" d="M13,7.5 L9.5,12.6 H12 L11,16.5 L14.5,11.4 H12 Z"/></symbol>
+    <symbol id="ic-segredos" viewBox="0 0 24 24"><rect class="ico" x="5" y="10.5" width="14" height="11" rx="2"/><path class="ico" d="M8,10.5 V7.5 C8,5 9.8,3 12,3 C14.2,3 16,5 16,7.5 V10.5 M12,16.6 V18.5"/><circle class="ico" cx="12" cy="15.2" r="1.4"/></symbol>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1392" height="2520"/>
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="1392" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="1392" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · SEQUÊNCIA</text>
+    <text class="title" x="40" y="72">Autenticação · entrar, renovar e sair</text>
+    <text class="subtitle" x="40" y="94">Token de acesso de 15 min, renovação de uso único, sessão no Redis conferida a cada ação</text>
+    <text class="wm-meta-label" x="1104" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v01</text>
+    <line class="wm-sep" x1="1176" y1="32" x2="1176" y2="80"/>
+    <text class="wm-meta-label" x="1200" y="44">DATA</text>
+    <text class="wm-meta-value" x="1200" y="72">2026-11-01 · 11:43</text>
+  </g>
+  <g id="fases">
+    <line class="divider" x1="40" y1="282" x2="1352" y2="282"/><text class="boundary-label" x="40" y="302">ENTRADA · RF-134 · RF-139 · RF-140 · RN-247 · RNF-204</text>
+    <line class="divider" x1="40" y1="1046" x2="1352" y2="1046"/><text class="boundary-label" x="40" y="1066">CADA AÇÃO · RF-147 · RNF-216 · RNF-220</text>
+    <line class="divider" x1="40" y1="1358" x2="1352" y2="1358"/><text class="boundary-label" x="40" y="1378">RENOVAÇÃO · RF-137 · RF-148 · RNF-213 · RNF-214</text>
+    <line class="divider" x1="40" y1="2050" x2="1352" y2="2050"/><text class="boundary-label" x="40" y="2070">SAIR · RF-138 · RF-156 · RF-157</text>
+  </g>
+  <g id="linhas-de-vida">
+    <line class="lifeline" x1="104" y1="216" x2="104" y2="2312"/>
+    <line class="lifeline" x1="304" y1="208" x2="304" y2="2312"/>
+    <line class="lifeline" x1="560" y1="208" x2="560" y2="2312"/>
+    <line class="lifeline" x1="824" y1="208" x2="824" y2="2312"/>
+    <line class="lifeline" x1="1048" y1="208" x2="1048" y2="2312"/>
+    <line class="lifeline" x1="1272" y1="208" x2="1272" y2="2312"/>
+  </g>
+  <g id="fragmentos">
+    <rect class="boundary" x="216" y="488" width="1136" height="476" rx="6"/>
+    <path class="frame-tag" d="M216,488 H264 V502 L256,510 H216 Z"/><text class="frame-op" x="226" y="504">alt</text>
+    <text class="muted" x="276" y="504">[senha certa, usuário e conta ativos]</text>
+    <line class="divider" x1="216" y1="772" x2="1352" y2="772" stroke-dasharray="6 4"/><text class="muted" x="228" y="790">[senha errada ou entrada inexistente]</text>
+    <line class="divider" x1="216" y1="888" x2="1352" y2="888" stroke-dasharray="6 4"/><text class="muted" x="228" y="906">[usuário desativado ou conta suspensa]</text>
+    <rect class="boundary" x="216" y="1532" width="1136" height="436" rx="6"/>
+    <path class="frame-tag" d="M216,1532 H264 V1546 L256,1554 H216 Z"/><text class="frame-op" x="226" y="1548">alt</text>
+    <text class="muted" x="276" y="1548">[resumo igual e sessão ativa]</text>
+    <line class="divider" x1="216" y1="1776" x2="1352" y2="1776" stroke-dasharray="6 4"/><text class="muted" x="228" y="1794">[renovação já trocada: sinal de cópia]</text>
+    <line class="divider" x1="216" y1="1892" x2="1352" y2="1892" stroke-dasharray="6 4"/><text class="muted" x="228" y="1910">[sessão vencida pelo tempo sem uso]</text>
+  </g>
+  <g id="mensagens">
+    <line class="edge" x1="104" y1="336" x2="304" y2="336" marker-end="url(#seta)"/><rect class="edge-label-bg" x="139" y="315" width="131" height="16" rx="3"/><text class="muted" x="204" y="328" text-anchor="middle">1: entrada + senha</text>
+    <line class="edge" x1="304" y1="376" x2="554" y2="376" marker-end="url(#seta)"/><rect class="edge-label-bg" x="344" y="355" width="170" height="16" rx="3"/><text class="muted" x="429" y="368" text-anchor="middle">2: POST /auth/hub/entrar</text>
+    <line class="edge" x1="566" y1="416" x2="1048" y2="416" marker-end="url(#seta)"/><rect class="edge-label-bg" x="689" y="395" width="236" height="16" rx="3"/><text class="muted" x="807" y="408" text-anchor="middle">3: entrada bloqueada? (tentativas)</text>
+    <line class="edge" x1="566" y1="456" x2="824" y2="456" marker-end="url(#seta)"/><rect class="edge-label-bg" x="567" y="435" width="256" height="16" rx="3"/><text class="muted" x="695" y="448" text-anchor="middle">4: lê usuário, conta, resumo da senha</text>
+    <path class="edge" d="M566,528 H598 V548 H568" marker-end="url(#seta)"/><text class="muted" x="610" y="542">5: calcula papel, mods e pv (RF-145)</text>
+    <line class="edge" x1="566" y1="584" x2="1048" y2="584" marker-end="url(#seta)"/><rect class="edge-label-bg" x="662" y="563" width="289" height="16" rx="3"/><text class="muted" x="807" y="576" text-anchor="middle">6: 5 sessões no hub? encerra a mais antiga</text>
+    <line class="edge" x1="566" y1="624" x2="1048" y2="624" marker-end="url(#seta)"/><rect class="edge-label-bg" x="659" y="603" width="296" height="16" rx="3"/><text class="muted" x="807" y="616" text-anchor="middle">7: grava sessao:&lt;sid&gt; + resumo da renovação</text>
+    <line class="edge" x1="566" y1="664" x2="1272" y2="664" marker-end="url(#seta)"/><rect class="edge-label-bg" x="814" y="643" width="210" height="16" rx="3"/><text class="muted" x="919" y="656" text-anchor="middle">8: assina o token (RS256, kid)</text>
+    <line class="edge edge-async" x1="1272" y1="704" x2="566" y2="704" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="870" y="683" width="98" height="16" rx="3"/><text class="muted" x="919" y="696" text-anchor="middle">9: assinatura</text>
+    <line class="edge edge-async" x1="554" y1="744" x2="304" y2="744" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="308" y="723" width="243" height="16" rx="3"/><text class="muted" x="429" y="736" text-anchor="middle">10: 200 acesso (15 min) + renovação</text>
+    <line class="edge" x1="566" y1="820" x2="1048" y2="820" marker-end="url(#seta)"/><rect class="edge-label-bg" x="666" y="799" width="283" height="16" rx="3"/><text class="muted" x="807" y="812" text-anchor="middle">11: conta tentativa (5 → bloqueio 15 min)</text>
+    <line class="edge edge-async" x1="554" y1="860" x2="304" y2="860" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="344" y="839" width="170" height="16" rx="3"/><text class="muted" x="429" y="852" text-anchor="middle">12: 401 ENTRADA_INVALIDA</text>
+    <line class="edge edge-async" x1="554" y1="936" x2="304" y2="936" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="334" y="915" width="190" height="16" rx="3"/><text class="muted" x="429" y="928" text-anchor="middle">13: 403 ACESSO_INDISPONIVEL</text>
+    <line class="edge edge-async" x1="304" y1="996" x2="104" y2="996" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="125" y="975" width="157" height="16" rx="3"/><text class="muted" x="204" y="988" text-anchor="middle">14: Módulos pelo token</text>
+    <line class="edge" x1="104" y1="1100" x2="304" y2="1100" marker-end="url(#seta)"/><rect class="edge-label-bg" x="148" y="1079" width="111" height="16" rx="3"/><text class="muted" x="204" y="1092" text-anchor="middle">15: abre o Quiz</text>
+    <line class="edge" x1="304" y1="1140" x2="554" y2="1140" marker-end="url(#seta)"/><rect class="edge-label-bg" x="340" y="1119" width="177" height="16" rx="3"/><text class="muted" x="429" y="1132" text-anchor="middle">16: pedido + Bearer token</text>
+    <path class="edge" d="M566,1172 H598 V1192 H568" marker-end="url(#seta)"/><text class="muted" x="610" y="1186">17: assinatura, kid, exp, aud, mods</text>
+    <line class="edge" x1="566" y1="1228" x2="1048" y2="1228" marker-end="url(#seta)"/><rect class="edge-label-bg" x="689" y="1207" width="236" height="16" rx="3"/><text class="muted" x="807" y="1220" text-anchor="middle">18: sessao:&lt;sid&gt; ativa e pv igual?</text>
+    <line class="edge edge-async" x1="1048" y1="1268" x2="566" y2="1268" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="686" y="1247" width="243" height="16" rx="3"/><text class="muted" x="807" y="1260" text-anchor="middle">19: ativa, pv 7 (refaz a expiração)</text>
+    <line class="edge edge-async" x1="554" y1="1308" x2="304" y2="1308" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="327" y="1287" width="203" height="16" rx="3"/><text class="muted" x="429" y="1300" text-anchor="middle">20: 200 · 401 · 403 sem a aba</text>
+    <path class="edge" d="M304,1404 H336 V1424 H306" marker-end="url(#seta)"/><text class="muted" x="348" y="1418">21: recebeu 401 ou o token vence</text>
+    <line class="edge" x1="304" y1="1460" x2="554" y2="1460" marker-end="url(#seta)"/><rect class="edge-label-bg" x="350" y="1439" width="157" height="16" rx="3"/><text class="muted" x="429" y="1452" text-anchor="middle">22: POST /auth/renovar</text>
+    <line class="edge" x1="566" y1="1500" x2="1048" y2="1500" marker-end="url(#seta)"/><rect class="edge-label-bg" x="679" y="1479" width="256" height="16" rx="3"/><text class="muted" x="807" y="1492" text-anchor="middle">23: lê sessao:&lt;sid&gt;, compara o resumo</text>
+    <path class="edge" d="M566,1572 H598 V1592 H568" marker-end="url(#seta)"/><text class="muted" x="610" y="1586">24: recalcula as permissões e o pv</text>
+    <line class="edge" x1="566" y1="1628" x2="1048" y2="1628" marker-end="url(#seta)"/><rect class="edge-label-bg" x="679" y="1607" width="256" height="16" rx="3"/><text class="muted" x="807" y="1620" text-anchor="middle">25: troca o resumo, refaz a expiração</text>
+    <line class="edge" x1="566" y1="1668" x2="1272" y2="1668" marker-end="url(#seta)"/><rect class="edge-label-bg" x="837" y="1647" width="164" height="16" rx="3"/><text class="muted" x="919" y="1660" text-anchor="middle">26: assina o token novo</text>
+    <line class="edge edge-async" x1="1272" y1="1708" x2="566" y2="1708" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="867" y="1687" width="104" height="16" rx="3"/><text class="muted" x="919" y="1700" text-anchor="middle">27: assinatura</text>
+    <line class="edge edge-async" x1="554" y1="1748" x2="304" y2="1748" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="357" y="1727" width="144" height="16" rx="3"/><text class="muted" x="429" y="1740" text-anchor="middle">28: 200 tokens novos</text>
+    <line class="edge" x1="566" y1="1824" x2="1048" y2="1824" marker-end="url(#seta)"/><rect class="edge-label-bg" x="735" y="1803" width="144" height="16" rx="3"/><text class="muted" x="807" y="1816" text-anchor="middle">29: encerra a sessão</text>
+    <line class="edge edge-async" x1="554" y1="1864" x2="304" y2="1864" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="344" y="1843" width="170" height="16" rx="3"/><text class="muted" x="429" y="1856" text-anchor="middle">30: 401 SESSAO_TERMINADA</text>
+    <line class="edge edge-async" x1="554" y1="1940" x2="304" y2="1940" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="344" y="1919" width="170" height="16" rx="3"/><text class="muted" x="429" y="1932" text-anchor="middle">31: 401 SESSAO_TERMINADA</text>
+    <line class="edge edge-async" x1="304" y1="2000" x2="104" y2="2000" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="116" y="1979" width="177" height="16" rx="3"/><text class="muted" x="204" y="1992" text-anchor="middle">32: segue ou vai a Entrar</text>
+    <line class="edge" x1="104" y1="2104" x2="304" y2="2104" marker-end="url(#seta)"/><rect class="edge-label-bg" x="142" y="2083" width="124" height="16" rx="3"/><text class="muted" x="204" y="2096" text-anchor="middle">33: Sair de todos</text>
+    <line class="edge" x1="304" y1="2144" x2="554" y2="2144" marker-end="url(#seta)"/><rect class="edge-label-bg" x="344" y="2123" width="170" height="16" rx="3"/><text class="muted" x="429" y="2136" text-anchor="middle">34: DELETE /auth/sessoes</text>
+    <line class="edge" x1="566" y1="2184" x2="1048" y2="2184" marker-end="url(#seta)"/><rect class="edge-label-bg" x="646" y="2163" width="322" height="16" rx="3"/><text class="muted" x="807" y="2176" text-anchor="middle">35: apaga sessoes:&lt;usuário&gt; e cada sessao:&lt;sid&gt;</text>
+    <line class="edge edge-async" x1="554" y1="2224" x2="304" y2="2224" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="400" y="2203" width="58" height="16" rx="3"/><text class="muted" x="429" y="2216" text-anchor="middle">36: 204</text>
+    <line class="edge edge-async" x1="304" y1="2264" x2="104" y2="2264" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="145" y="2243" width="118" height="16" rx="3"/><text class="muted" x="204" y="2256" text-anchor="middle">37: vai a Entrar</text>
+  </g>
+  <g id="ativacoes">
+    <rect class="activation" x="554" y="368" width="12" height="596"/>
+    <rect class="activation" x="554" y="1132" width="12" height="184"/>
+    <rect class="activation" x="554" y="1452" width="12" height="516"/>
+    <rect class="activation" x="554" y="2136" width="12" height="96"/>
+  </g>
+  <g id="participantes">
+    <g id="p-pessoa"><use href="#uml-ator" x="92" y="152" width="24" height="40"/><text class="label-strong" x="104" y="210" text-anchor="middle">Staff (Maria)</text></g>
+    <g id="p-hub" filter="url(#sombra)"><rect class="node-blue" x="220" y="152" width="168" height="56" rx="10"/><use href="#ic-web" x="234" y="168" width="24" height="24"/><text class="label-strong" x="266" y="176">Hub</text><text class="mono" x="266" y="194">[web e app]</text></g>
+    <g id="p-api" filter="url(#sombra)"><rect class="node-blue" x="476" y="152" width="168" height="56" rx="10"/><use href="#ic-servico" x="490" y="168" width="24" height="24"/><text class="label-strong" x="522" y="176">ms_mono</text><text class="mono" x="522" y="194">[backend]</text></g>
+    <g id="p-mongo" filter="url(#sombra)"><rect class="node-green" x="740" y="152" width="168" height="56" rx="10"/><use href="#ic-banco-nosql" x="754" y="168" width="24" height="24"/><text class="label-strong" x="786" y="176">MongoDB</text><text class="mono" x="786" y="194">[usuários]</text></g>
+    <g id="p-redis" filter="url(#sombra)"><rect class="node-green" x="964" y="152" width="168" height="56" rx="10"/><use href="#ic-cache" x="978" y="168" width="24" height="24"/><text class="label-strong" x="1010" y="176">Redis</text><text class="mono" x="1010" y="194">[sessões]</text></g>
+    <g id="p-kv" filter="url(#sombra)"><rect class="node-external" x="1188" y="152" width="168" height="56" rx="10"/><use href="#ic-segredos" x="1202" y="168" width="24" height="24"/><text class="label-strong" x="1234" y="176">Key Vault</text><text class="mono" x="1234" y="194">[chave RSA]</text></g>
+  </g>
+  <g id="marca-rodape" transform="translate(0,2352)">
+    <rect class="wm-band" x="0" y="0" width="1392" height="168"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="1392" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">projeto (hub e ms_mono)</text>
+    <rect class="node-green" x="255" y="47" width="14" height="14" rx="3"/><text class="label" x="277" y="58">dados</text>
+    <rect class="node-external" x="341" y="47" width="14" height="14" rx="3"/><text class="label" x="363" y="58">serviço da Azure</text>
+    <line class="edge" x1="40" y1="84" x2="68" y2="84" marker-end="url(#seta)"/><text class="label" x="80" y="88">chamada</text>
+    <line class="edge edge-async" x1="158" y1="84" x2="186" y2="84" marker-end="url(#seta-aberta)"/><text class="label" x="198" y="88">resposta</text>
+    <rect class="activation" x="283" y="76" width="12" height="16"/><text class="label" x="305" y="88">ativação do ms_mono</text>
+    <path class="frame-tag" d="M469,76 H503 V86 L497,92 H469 Z"/><text class="frame-op" x="475" y="88">alt</text><text class="label" x="513" y="88">fragmento com guardas</text>
+    <line class="lifeline" x1="692" y1="84" x2="720" y2="84"/><text class="label" x="732" y="88">linha de vida</text>
+    <line class="divider" x1="40" y1="128" x2="1352" y2="128"/>
+    <text class="footer" x="40" y="152">v01 · criação: entrada, cada ação, renovação com detecção de cópia e sair de todos os aparelhos</text>
+    <text class="wm-file" x="1352" y="152" text-anchor="end">autenticacao-sequencia_v01_20261101-1143.svg</text>
+  </g>
+</svg>

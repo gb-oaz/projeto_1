@@ -2,6 +2,8 @@
   <!--
     core/commons: o que os contextos compartilham (RN-146). Sem pacotes de
     ASP.NET Core, MongoDB ou Redis (RN-147, RNF-176).
-    Features em <feature>/ com domain/, usecases/, ports/in/ e ports/out/.
+    Features em <modulo>/<feature>/ (usuario/autenticacao/) com domain/, dtos/,
+    ports/in/, ports/out/ e usecases/: um caso de uso por classe.
+    Só bibliotecas do próprio .NET.
   -->
 </Project>

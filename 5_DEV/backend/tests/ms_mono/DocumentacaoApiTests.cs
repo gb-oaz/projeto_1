@@ -14,7 +14,11 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     [Theory]
     [InlineData("/doc/api/index.html", "text/html")]
     [InlineData("/doc/api/catalogo.json", "application/json")]
-    [InlineData("/doc/api/v1.json", "application/json")]
+    [InlineData("/doc/api/sistema.json", "application/json")]
+    [InlineData("/doc/api/autenticacao.json", "application/json")]
+    [InlineData("/doc/api/usuarios.json", "application/json")]
+    [InlineData("/doc/api/autorizacao.json", "application/json")]
+    [InlineData("/doc/api/diagramas/usuarios-contrato-api.svg", "image/svg+xml")]
     [InlineData("/doc/api/swagger.css", "text/css")]
     [InlineData("/doc/api/design/banner.svg", "image/svg+xml")]
     [InlineData("/doc/api/design/banner-parado.svg", "image/svg+xml")]
@@ -36,7 +40,7 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
         var documento = await cliente.GetStringAsync("/doc/api/catalogo.json");
 
         Assert.Contains("deboaz · catálogo de APIs", documento);
-        Assert.Contains("ms_mono · v1", documento);
+        Assert.Contains("Autenticação", documento);
         Assert.DoesNotContain("\"/health\"", documento);
     }
 
@@ -47,27 +51,115 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
 
         var configuracao = await cliente.GetStringAsync("/doc/api/index.js");
 
-        var capa = configuracao.IndexOf("/doc/api/catalogo.json", StringComparison.Ordinal);
-        Assert.InRange(capa, 0, configuracao.IndexOf("/doc/api/v1.json", StringComparison.Ordinal));
+        var ordem = new[] { "catalogo", "sistema", "autenticacao", "usuarios", "autorizacao" }
+            .Select(d => configuracao.IndexOf($"/doc/api/{d}.json", StringComparison.Ordinal)).ToList();
+        Assert.DoesNotContain(-1, ordem);
+        Assert.Equal(ordem.Order(), ordem);
     }
 
     [Fact]
-    public async Task MsMono_documenta_os_endpoints_de_sistema()
+    public async Task Sistema_documenta_so_o_health()
     {
         using var cliente = Cliente(true);
 
-        var documento = await cliente.GetStringAsync("/doc/api/v1.json");
+        var documento = await cliente.GetStringAsync("/doc/api/sistema.json");
 
         Assert.Contains("\"/health\"", documento);
         Assert.Contains("\"Sistema\"", documento);
-        Assert.Contains("deboaz · API ms_mono", documento);
+        Assert.Contains("deboaz · Sistema", documento);
         Assert.DoesNotContain("\"servers\"", documento);
+        Assert.DoesNotContain("\"/auth/", documento);
+    }
+
+    // cada módulo é uma API própria: só os endereços dele, com o guia e os diagramas
+    [Theory]
+    [InlineData("autenticacao", "/auth/hub/entrar", "/usuarios/{id}/permissoes", "autenticacao-sequencia.svg")]
+    [InlineData("usuarios", "/contas", "/auth/hub/entrar", "usuarios-contrato-api.svg")]
+    [InlineData("autorizacao", "/usuarios/{id}/permissoes", "/contas", "autorizacao-casos-de-uso.svg")]
+    public async Task Cada_modulo_e_uma_api_com_guia_e_diagramas(string api, string tem, string naoTem, string diagrama)
+    {
+        using var cliente = Cliente(true);
+
+        var documento = System.Text.Json.Nodes.JsonNode.Parse(await cliente.GetStringAsync($"/doc/api/{api}.json"))!;
+        var caminhos = documento["paths"]!.AsObject().Select(p => p.Key).ToList();
+        var guia = documento["info"]!["description"]!.GetValue<string>();
+
+        Assert.Contains(tem, caminhos);
+        Assert.DoesNotContain(naoTem, caminhos);
+        Assert.Contains("## Como usar", guia);
+        Assert.Contains($"/doc/api/diagramas/{diagrama}", guia);
+        Assert.Equal(HttpStatusCode.OK, (await cliente.GetAsync($"/doc/api/diagramas/{diagrama}")).StatusCode);
+    }
+
+    // Authorize: o cadeado do Bearer só nos endereços com login
+    [Theory]
+    [InlineData("autenticacao", "/auth/sessoes", "get", true)]
+    [InlineData("autenticacao", "/auth/hub/entrar", "post", false)]
+    [InlineData("usuarios", "/usuarios", "get", true)]
+    [InlineData("usuarios", "/contas", "post", false)]
+    [InlineData("autorizacao", "/usuarios/{id}/permissoes", "put", true)]
+    public async Task Cadeado_so_nos_enderecos_com_login(string api, string caminho, string metodo, bool comLogin)
+    {
+        using var cliente = Cliente(true);
+
+        var documento = System.Text.Json.Nodes.JsonNode.Parse(await cliente.GetStringAsync($"/doc/api/{api}.json"))!;
+
+        Assert.Equal("bearer", documento["components"]!["securitySchemes"]!["Bearer"]!["scheme"]!.GetValue<string>());
+        Assert.Equal(comLogin, documento["paths"]![caminho]![metodo]!["security"] is not null);
+    }
+
+    // os exemplos do contrato (sistema/exemplos/, de scripts/exemplos-da-doc.py)
+    // ficam dentro de cada endpoint: todo endpoint tem o seu, e nenhum sobra
+    [Theory]
+    [InlineData("autenticacao")]
+    [InlineData("usuarios")]
+    [InlineData("autorizacao")]
+    public async Task Todo_endpoint_traz_os_exemplos_do_contrato(string api)
+    {
+        using var cliente = Cliente(true);
+
+        var documento = System.Text.Json.Nodes.JsonNode.Parse(await cliente.GetStringAsync($"/doc/api/{api}.json"))!;
+        var operacoes = documento["paths"]!.AsObject()
+            .SelectMany(p => p.Value!.AsObject().Select(m => $"{m.Key.ToUpperInvariant()} {p.Key.TrimStart('/')}"))
+            .Order().ToList();
+        var doContrato = Sistema.ExemplosDaApi.Do(api);
+        var exemplos = doContrato.Keys.Order().ToList();
+
+        Assert.True(operacoes.SequenceEqual(exemplos),
+            "Endpoints e exemplos divergem; rode scripts/exemplos-da-doc.py depois de mudar o contrato. " +
+            $"Sem exemplo: {string.Join(", ", operacoes.Except(exemplos))}. Sobrando: {string.Join(", ", exemplos.Except(operacoes))}.");
+        // e chegam ao endpoint: todo endpoint com pedido ou resposta com corpo no contrato mostra os exemplos
+        foreach (var (chave, exemplo) in doContrato)
+        {
+            var temCorpo = exemplo["pedido"] is not null
+                || exemplo["respostas"]!.AsObject().Any(r => r.Value!.AsArray().Count > 0);
+            if (!temCorpo) continue;
+            var (metodo, caminho) = (chave.Split(' ')[0].ToLowerInvariant(), "/" + chave.Split(' ')[1]);
+            var operacao = documento["paths"]![caminho]![metodo]!.ToJsonString();
+            Assert.True(operacao.Contains("\"example\"") || operacao.Contains("\"examples\""), $"{chave} sem os exemplos no endpoint.");
+        }
+    }
+
+    [Fact]
+    public async Task Exemplos_de_pedido_e_de_erro_aparecem_no_endpoint()
+    {
+        using var cliente = Cliente(true);
+
+        var documento = System.Text.Json.Nodes.JsonNode.Parse(await cliente.GetStringAsync("/doc/api/autenticacao.json"))!;
+        var entrar = documento["paths"]!["/auth/hub/entrar"]!["post"]!;
+
+        Assert.Equal("NAVEGADOR", entrar["requestBody"]!["content"]!["application/json"]!["example"]!["aparelho"]!.GetValue<string>());
+        Assert.Equal("Bearer", entrar["responses"]!["200"]!["content"]!["application/json"]!["examples"]!["200"]!["value"]!["tipo"]!.GetValue<string>());
+        var bloqueada = entrar["responses"]!["429"]!["content"]!["application/json"]!["examples"]!["ENTRADA_BLOQUEADA"]!["value"]!;
+        Assert.Equal("ENTRADA_BLOQUEADA", bloqueada["codigo"]!.GetValue<string>());
+        Assert.NotNull(bloqueada["tentarEm"]);
     }
 
     [Theory]
     [InlineData("/doc/api/index.html")]
-    [InlineData("/doc/api/v1.json")]
+    [InlineData("/doc/api/usuarios.json")]
     [InlineData("/doc/api/design/banner.svg")]
+    [InlineData("/doc/api/diagramas/usuarios-contrato-api.svg")]
     public async Task Desabilitada_nao_publica_nada(string caminho)
     {
         using var cliente = Cliente(false);

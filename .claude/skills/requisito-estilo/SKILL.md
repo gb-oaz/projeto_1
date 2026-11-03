@@ -45,11 +45,10 @@ Só com pedido ou confirmação. Para cada documento:
    | tabela de cabeçalho `<!-- boaz:marca -->` | `<meta boaz:*>` + `<header class="boaz-marca-topo">` |
    | `# Título` + `> Objetivo:` | `<h1>` + `.boaz-objetivo` |
    | `## Seção` | `<section id="kebab"><h2>` |
-   | tabelas RF / RN / RNF | `<table>` com `<tr id="ID">`, `code.id`, `.prio-*`, `.tag` |
-   | `### \`RF-02\` …` + ` ```gherkin ` | `<article class="criterio" id="ca-RF-02">` + `<pre class="gherkin">` |
-   | `- Como **x**, quero …, para …` | `<p class="historia">` |
+   | tabelas RF / RN / RNF | um `<article class="criterio" id="ID">` por linha, com o cenário em Gherkin que prova a regra |
+   | `### \`RF-02\` …` + ` ```gherkin ` | `<article class="criterio" id="RF-02">` + `<pre class="gherkin">` |
+   | contexto, história, notas | cenário sem ID no começo de Cenários, ou sai |
    | `- [ ] pergunta — dono` | `<ul class="pendencias">` com `<span class="tag dono">` |
-   | `> [!NOTE]` / `[!IMPORTANT]` / `[!WARNING]` | `<aside class="destaque nota|importante|aviso">` |
    | `![t](../2_Diagramas/x.svg)` | `<figure class="diagrama">` |
    | `[t](02_x.md)` | `<a class="ref" href="02_x.html">` |
    | `<!-- boaz:historico -->` + `<sub>` | `<footer class="boaz-marca-rodape">` |

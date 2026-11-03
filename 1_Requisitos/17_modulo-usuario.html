@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · boaz · v22</title>
+<title>Módulo Usuários · boaz · v47</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v22">
-<meta name="boaz:data" content="2026-11-01 01:00">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v47">
+<meta name="boaz:data" content="2026-11-02 17:22">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v06
+   boaz · tema dos documentos de requisito · v07
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
    Paleta: vistas com data-paletas trocam tema de cor e modo das telas.
@@ -417,7 +417,8 @@ caption { caption-side: top; padding: 0 0 8px; color: var(--muted); font-size: 1
 /* ── critérios de aceite (Gherkin) ───────────────────────── */
 .criterio { margin: 0 0 24px; break-inside: avoid; }
 .criterio h3 { margin-top: 24px; }
-pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); }
+.criterio { scroll-margin-top: 16px; }
+pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); white-space: pre-wrap; overflow-wrap: anywhere; }
 pre.gherkin::before {
   content: "GHERKIN";
   position: absolute;
@@ -720,7 +721,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v06 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v07 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
@@ -917,121 +918,40 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v22</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 01:00</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v47</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 17:22</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
-  <nav class="sumario"></nav>
-  <section id="contexto">
-    <h2>Contexto</h2>
-    <p>A <a class="ref" href="07_landing-page-ux.html#RF-06">landing page</a> leva ao cadastro no hub, o <a class="ref" href="08_hub-ux.html#RF-16">hub</a> tem as telas Entrar e Criar conta e o <a class="ref" href="09_quest-ux.html#RN-91">quest</a> abre o perfil pelo código de acesso. Faltava dizer quem cria cada usuário, que permissões ele recebe, como recupera o acesso e quanto tempo fica conectado. Este documento define isso para as três frentes: a instituição e o educador autônomo se cadastram sozinhos; os demais usuários nascem no <strong>módulo Usuários</strong>, onde também se decidem as permissões; e o time deboaz administra as contas pelo <a class="ref" href="99_glossario.html#painel-de-administracao-do-deboaz">painel de administração do deboaz</a>.</p>
-    <p class="historia"><span>Como</span> <strong>instituição</strong>, <span>quero</span> criar as contas de quem trabalha e estuda comigo e decidir o que cada uma pode fazer, <span>para</span> controlar o acesso sem depender de ninguém de fora</p>
-    <aside class="destaque importante"><p>Decisão do time do projeto em 2026-10-29: o deboaz não usa provedor externo de login nem envia e-mail ou mensagem com senha; toda senha é gerada pelo sistema e mostrada só ao próprio usuário; quem esquece pede a um usuário superior uma nova geração de senha, e a conta master, ao time deboaz. Também não há segundo fator de autenticação. Nenhuma conta é apagada: ela é desativada ou encerrada. O atendimento sem login fica na tela Entrar do hub, e a landing page continua sem receber mensagens (<a class="ref" href="07_landing-page-ux.html#RN-72">Landing page · UX base <code class="id">RN-72</code></a>).</p></aside>
-  </section>
-  <section id="requisitos-funcionais">
-    <h2>Requisitos funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
-      <tbody>
-        <tr id="RF-104"><td><code class="id">RF-104</code></td><td>O sistema deve tornar <a class="ref" href="99_glossario.html#conta-master">conta master</a> quem cria em Criar conta a conta de uma instituição ou de um educador autônomo, com um domínio de entrada e uma <strong>sigla</strong> únicos no sistema</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-105"><td><code class="id">RF-105</code></td><td>O sistema deve incluir o módulo Usuários entre os módulos da conta da instituição, com staff, participantes e permissões, e do educador autônomo, só com participantes</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-106"><td><code class="id">RF-106</code></td><td>O sistema deve permitir que a conta master de uma instituição, e não a de um educador autônomo, crie no módulo Usuários um usuário <strong>staff</strong> com nome, nome curto e número de matrícula; o nome curto forma a entrada <code>&lt;nome curto&gt;.&lt;sigla&gt;@deboaz.com</code></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-107"><td><code class="id">RF-107</code></td><td>O sistema deve definir as permissões de cada staff por módulo contratado, marcando a aba Configuração, a aba Utilização ou as duas</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-108"><td><code class="id">RF-108</code></td><td>O sistema deve criar no módulo Usuários um participante com nome, nome curto, número de matrícula (na conta de instituição) e um ou mais responsáveis, cada um com o parentesco, gerando o código de acesso dele</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-109"><td><code class="id">RF-109</code></td><td>O sistema deve gerar e mostrar uma única vez a senha do usuário, para ele anotar, no primeiro acesso e no primeiro acesso depois de cada nova geração de senha</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-110"><td><code class="id">RF-110</code></td><td>O sistema deve permitir que um usuário superior peça uma <strong>nova geração de senha</strong> para quem está abaixo dele, que vale no próximo acesso desse usuário</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-111"><td><code class="id">RF-111</code></td><td>O sistema deve levar, sem login, a mensagem enviada pela ação <q class="ui">Esqueci a senha da conta master</q> da tela Entrar ao <strong>SAC</strong>, módulo da conta que toda conta tem para falar com o time deboaz e que o time usa para atender (<a class="ref" href="15_modulos.html#RN-203">Módulos <code class="id">RN-203</code></a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-112"><td><code class="id">RF-112</code></td><td>O sistema deve permitir que a conta master e o staff com o módulo Usuários desativem e reativem staff e participantes abaixo deles</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-113"><td><code class="id">RF-113</code></td><td>O sistema deve permitir que o time deboaz veja, suspenda, reative, desative e encerre contas de instituição e de educador autônomo no painel de administração do deboaz</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-114"><td><code class="id">RF-114</code></td><td>O sistema deve deixar a instituição configurar o tempo de sessão do staff e o dos participantes, e o educador autônomo, o dos participantes dele</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-115"><td><code class="id">RF-115</code></td><td>O sistema deve dar um <strong>acesso anônimo</strong>, válido só para aquela sala e com um apelido gerado pelo sistema, a quem entra sem código de acesso numa sala que aceita participante anônimo</td><td><span class="prio prio-deve">Deve</span></td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="regras-de-negocio">
-    <h2>Regras de negócio</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Regra</th></tr></thead>
-      <tbody>
-        <tr id="RN-163"><td><code class="id">RN-163</code></td><td>Os tipos de usuário são instituição e educador autônomo (contas master), staff, participante e time deboaz; o responsável não é usuário e entra com o código de acesso do participante (<a class="ref" href="09_quest-ux.html#RN-94">Quest · UX base <code class="id">RN-94</code></a>), e o acesso anônimo não é usuário</td></tr>
-        <tr id="RN-164"><td><code class="id">RN-164</code></td><td>Só a instituição e o educador autônomo se cadastram sozinhos; staff e participantes nascem no módulo Usuários, e os membros do time deboaz nascem no módulo Usuários da conta do time deboaz, criados só pela conta master do time</td></tr>
-        <tr id="RN-165"><td><code class="id">RN-165</code></td><td>O educador autônomo cria só participantes: a conta dele não tem staff nem permissões</td></tr>
-        <tr id="RN-166"><td><code class="id">RN-166</code></td><td>O staff só recebe permissão em módulo que a instituição contratou; o módulo descontratado suspende as permissões dele, que voltam se o módulo for recontratado</td></tr>
-        <tr id="RN-167"><td><code class="id">RN-167</code></td><td>Ninguém concede permissão que não tem; a conta master tem todas as permissões da própria conta</td></tr>
-        <tr id="RN-168"><td><code class="id">RN-168</code></td><td>A conta master pode conceder o próprio módulo Usuários a um staff, que passa a criar staff e participantes e a conceder permissões dentro das que tem</td></tr>
-        <tr id="RN-169"><td><code class="id">RN-169</code></td><td>A ordem de superior é: time deboaz (o administrador do deboaz, conta master do time, acima dos membros, <a class="ref" href="#RN-190">RN-190</a>), conta master, staff com o módulo Usuários, demais staff e participantes; um usuário pede nova geração de senha, desativa e reativa só quem está abaixo dele, nunca um par</td></tr>
-        <tr id="RN-170"><td><code class="id">RN-170</code></td><td>Nenhuma pessoa escolhe nem vê a senha de outra: toda senha é gerada pelo sistema e mostrada só ao próprio usuário, exceto a do administrador do deboaz (<a class="ref" href="#RN-190">RN-190</a>), e o deboaz não envia senha nem código de acesso por e-mail ou mensagem</td></tr>
-        <tr id="RN-171"><td><code class="id">RN-171</code></td><td>A senha gerada tem as 2 primeiras letras do primeiro nome, 1 caractere especial, o segundo nome e 6 números, com caractere especial e números aleatórios (Gustavo Boaz de Moura Souza → <code>Gu#Boaz507318</code>); o segundo nome ignora de, da, do, dos, das e e, e quem tem um nome só usa o restante dele (Xuxa → <code>Xu@Xa182482</code>)</td></tr>
-        <tr id="RN-172"><td><code class="id">RN-172</code></td><td>O time deboaz pede a nova geração de senha da conta master só depois de conferir, pelo SAC, o CNPJ ou o CPF da conta e mais 2 destes 3 dados do cadastro: o nome de quem fez o cadastro, o telefone e a data da última contratação ou pagamento; o código de liberação vai ao contato do cadastro conferido</td></tr>
-        <tr id="RN-173"><td><code class="id">RN-173</code></td><td>Uma conta de instituição ou de educador autônomo está ativa, suspensa (decisão temporária do time deboaz), desativada (falta de pagamento, volta com a regularização) ou encerrada (a pedido do cliente)</td></tr>
-        <tr id="RN-174"><td><code class="id">RN-174</code></td><td>Nenhuma conta ou usuário é apagado; na conta encerrada, os dados do cliente são apagados em cascata (<a class="ref" href="00_visao-produto.html#escopo">Visão do produto</a>) e fica só o registro mínimo para histórico, auditoria e cobrança, anonimizado depois de 5 anos</td></tr>
-        <tr id="RN-175"><td><code class="id">RN-175</code></td><td>Conta suspensa, desativada ou encerrada bloqueia a entrada de todo staff e participante dela; usuário desativado não entra até ser reativado</td></tr>
-        <tr id="RN-176"><td><code class="id">RN-176</code></td><td>O tempo de sessão vale para a entrada no hub e no quest; não se aplica à duração de salas, quizzes ou aulas ao vivo, definida pelos módulos</td></tr>
-        <tr id="RN-177"><td><code class="id">RN-177</code></td><td>O acesso anônimo termina quando a sala fecha e não abre perfil, tarefa nem outra sala; o apelido é <code>PUPIL-&lt;sigla&gt;-&lt;5 números aleatórios&gt;</code>, com a sigla da conta dona da sala e o número único na sala (<code>PUPIL-EBFGA-13465</code>)</td></tr>
-        <tr id="RN-178"><td><code class="id">RN-178</code></td><td>Criar usuário, pedir nova geração de senha, mudar permissão e mudar o estado de uma conta ou de um usuário ficam na auditoria por 5 anos, com quem fez, o quê e quando</td></tr>
-        <tr id="RN-179"><td><code class="id">RN-179</code></td><td>A sigla tem 5 letras, é sugerida pelas iniciais do nome (Escola Bento Freitas Gonçalves Araújo → <code>EBFGA</code>), é comparada sem diferença entre maiúsculas e minúsculas (<code>EBFGA</code> e <code>ebfga</code> são a mesma), é recusada se já existir no sistema e não muda depois da criação da conta, porque forma as entradas do staff; a sigla <code>DBOAZ</code> é reservada à conta do time deboaz</td></tr>
-        <tr id="RN-180"><td><code class="id">RN-180</code></td><td>A conta master entra com <code>&lt;domínio&gt;@deboaz.com</code> (<code>objetivo_unidade1@deboaz.com</code>) o staff com <code>&lt;nome curto&gt;.&lt;sigla&gt;@deboaz.com</code> (<code>maria.eejsa@deboaz.com</code>) e o membro do time deboaz com <code>&lt;nome curto&gt;.dboaz@deboaz.com</code> (<code>gustavo.dboaz@deboaz.com</code>), na mesma tela Entrar; o nome curto não se repete na instituição, a entrada não diferencia maiúsculas de minúsculas, e esses endereços só identificam a entrada, sem caixa de e-mail</td></tr>
-        <tr id="RN-181"><td><code class="id">RN-181</code></td><td>Toda geração de senha, a do primeiro acesso e cada nova geração, vem com um <strong>código de liberação</strong> de 6 números, que quem a pediu vê uma única vez e entrega pessoalmente; a senha só aparece para quem informa a entrada e esse código</td></tr>
-        <tr id="RN-182"><td><code class="id">RN-182</code></td><td>A geração de senha e o código de liberação valem por 72 h; vencidos, o superior pede outra geração</td></tr>
-        <tr id="RN-183"><td><code class="id">RN-183</code></td><td>O tempo de sessão sem uso fica entre os limites abaixo, com o valor padrão até a instituição mudar: staff no navegador de 15 min a 12 h (padrão 8 h), staff no app de 1 a 30 dias (padrão 7 dias) e participante de 1 a 90 dias (padrão 30 dias)</td></tr>
-        <tr id="RN-184"><td><code class="id">RN-184</code></td><td>O código de acesso do participante é <code>&lt;SIGLA&gt;-&lt;NOME CURTO&gt;-&lt;4 números aleatórios&gt;</code> (<code>EBFGA-LUCAS-0412</code>), único no sistema; aparece sempre em maiúsculas e é aceito sem diferença entre maiúsculas e minúsculas; o participante não tem senha, e ele e os responsáveis entram com esse mesmo código (<a class="ref" href="09_quest-ux.html#RN-94">Quest · UX base RN-94</a>)</td></tr>
-        <tr id="RN-185"><td><code class="id">RN-185</code></td><td>As listas de staff, participantes, contas e membros do time ficam em ordem alfabética, com busca por nome e por entrada, código de acesso, matrícula, sigla ou CNPJ/CPF, e filtro pelo estado; o SAC busca do mesmo jeito e mostra primeiro a mensagem mais antiga</td></tr>
-        <tr id="RN-186"><td><code class="id">RN-186</code></td><td>Cada staff, participante e conta mostra a data e a hora do último acesso (da conta, o da conta master); no participante, também quem entrou: ele ou o responsável, com o parentesco</td></tr>
-        <tr id="RN-187"><td><code class="id">RN-187</code></td><td>Ver a conta, no painel do time deboaz, mostra só os dados do cadastro (tipo, nome, CNPJ ou CPF, sigla, entrada da conta master, responsável e telefone) e as datas de criação, do último contrato ou pagamento e do último acesso da conta master; nada dos usuários, turmas ou conteúdos da conta</td></tr>
-        <tr id="RN-188"><td><code class="id">RN-188</code></td><td>Na conta de instituição (escola ou empresa), cada staff e participante tem um número de matrícula, único na instituição: quem cadastra informa o número que a instituição já usa ou toca Gerar automaticamente, e o sistema cria um de 8 números aleatórios; a matrícula identifica a pessoa na instituição e não substitui a entrada nem o código de acesso</td></tr>
-        <tr id="RN-189"><td><code class="id">RN-189</code></td><td>Na tela inicial do hub, aba Da conta, o card do módulo Usuários mostra à conta master e ao staff com o módulo Usuários o total de usuários, com staff e participantes num gráfico, os novos no mês, o staff ativo, com senha pendente e desativado, e os participantes ativos, sem acesso há 30 dias e desativados; o selo conta os códigos de liberação que vencem hoje; no educador autônomo, só os números dos participantes; o que aparece em cada tamanho do card está na Ficha do módulo</td></tr>
-        <tr id="RN-190"><td><code class="id">RN-190</code></td><td>A conta master do time deboaz é a do <strong>administrador do deboaz</strong>: a entrada e a senha dela ficam num segredo do Key Vault (<a class="ref" href="05_cd-implantacao.html#RN-24">CD e implantação RN-24</a>) e só são definidas e trocadas ali, fora das telas, e o sistema guarda da senha só o resumo irreversível (<a class="ref" href="#RNF-201">RNF-201</a>); o administrador cria os membros do time e, quando um deles esquece a senha, pede a nova geração de senha e entrega o código de liberação para o primeiro acesso</td></tr>
-      </tbody>
-    </table>
-    <p><strong>Ficha do módulo</strong> <code class="id">MOD-03</code> (<a class="ref" href="15_modulos.html#RN-217">Módulos RN-217</a>, <a class="ref" href="15_modulos.html#RN-218">RN-218</a>): os dados do card em cada tamanho, por perfil que vê o card, a partir de <a class="ref" href="#RN-189">RN-189</a>. Usuário ativo é o que conta na cobrança (<a class="ref" href="16_catalogo.html#RN-195">Catálogo RN-195</a>); o Membro do time deboaz não usa este módulo.</p>
-    <table>
-      <thead><tr><th>Dado</th><th>Conta master e staff com Usuários</th><th>Educador autônomo</th><th>Administrador do deboaz</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Ícone</strong> · identidade</td><td colspan="3">pessoas (Material group), do design system v43</td></tr>
-        <tr><td><strong>Nome</strong> · identidade</td><td colspan="3"><q class="ui">Usuários</q></td></tr>
-        <tr><td><strong>Frase</strong> e <strong>Mascote padrinho</strong> · identidade</td><td colspan="3">Não se aplica: módulo da conta, fora da vitrine (<a class="ref" href="15_modulos.html#RN-203">15 RN-203</a>)</td></tr>
-        <tr><td><strong>Notificações</strong> · mínima 1x1</td><td>códigos de liberação que vencem hoje (<a class="ref" href="#RN-182">RN-182</a>); deixa de contar no primeiro acesso ou no vencimento</td><td>sem selo: participante não tem senha</td><td>códigos de liberação de membros que vencem hoje</td></tr>
-        <tr><td><strong>Dado macro</strong> · reduzida 2x2</td><td><q class="ui">248</q> · <q class="ui">usuários ativos</q></td><td><q class="ui">32</q> · <q class="ui">participantes ativos</q></td><td><q class="ui">5</q> · <q class="ui">membros ativos</q></td></tr>
-        <tr><td><strong>Número principal</strong> · normal 4x4</td><td><q class="ui">248</q> · <q class="ui">usuários ativos</q>, staff e participantes</td><td><q class="ui">32</q> · <q class="ui">participantes ativos</q></td><td><q class="ui">5</q> · <q class="ui">membros ativos</q></td></tr>
-        <tr><td><strong>Tendência</strong> · normal 4x4</td><td colspan="3"><q class="ui">+12 no mês</q>: novos no mês; subir é bom</td></tr>
-        <tr><td><strong>Série curta</strong> · normal 4x4</td><td>usuários ativos nos últimos 5 meses, em barras divididas em staff e participantes</td><td>participantes ativos nos últimos 5 meses</td><td>membros ativos nos últimos 5 meses</td></tr>
-        <tr><td><strong>Números de apoio</strong> · normal 4x4</td><td><q class="ui">staff ativo</q> (destaque), <q class="ui">participantes ativos</q> (destaque) e <q class="ui">senha pendente</q> (atenção)</td><td><q class="ui">sem acesso há 30 dias</q> (atenção) e <q class="ui">desativados</q></td><td><q class="ui">senha pendente</q> (atenção) e <q class="ui">desativados</q></td></tr>
-        <tr><td><strong>Série das semanas</strong> · expandida 4x8</td><td>usuários ativos no fim de cada uma das 7 últimas semanas</td><td>participantes ativos no fim de cada uma das 7 últimas semanas</td><td>membros ativos no fim de cada uma das 7 últimas semanas</td></tr>
-        <tr><td><strong>Lista do módulo</strong> · expandida 4x8</td><td><q class="ui">Sem acesso há 30 dias</q> (participantes), <q class="ui">Staff desativado</q> e <q class="ui">Participantes desativados</q>, cada um com o número</td><td>os 3 participantes há mais tempo sem acesso, com o nome curto e os dias (<q class="ui">LUCAS</q> · <q class="ui">42 dias</q>, <a class="ref" href="#RN-186">RN-186</a>)</td><td>os 3 membros com senha pendente, com o nome curto e as horas até o código vencer</td></tr>
-        <tr><td><strong>Estado sem dados</strong> · todos os tamanhos</td><td><q class="ui">Cadastre o staff e os participantes</q> e <q class="ui">Configurar</q></td><td><q class="ui">Cadastre os seus participantes</q> e <q class="ui">Configurar</q></td><td><q class="ui">Cadastre os membros do time</q> e <q class="ui">Configurar</q></td></tr>
-        <tr><td><strong>Rótulo falado</strong> · todos os tamanhos</td><td colspan="3">sempre <q class="ui">Usuários</q> e o dado do tamanho: mínima <q class="ui">Usuários, 2 códigos de liberação vencem hoje</q>; reduzida <q class="ui">Usuários, 248 usuários ativos</q>; normal e expandida com a tendência e os números de apoio, na ordem da tela</td></tr>
-        <tr><td><strong>Abas</strong> · módulo aberto</td><td>Configuração: tempo de sessão (<a class="ref" href="#RF-114">RF-114</a>); Utilização: staff, participantes, permissões, senhas e desativação; a conta master vê as duas, o staff com o módulo Usuários, as que recebeu (<a class="ref" href="#RF-107">RF-107</a>)</td><td>as duas, só com participantes</td><td>as duas, com os membros do time</td></tr>
-        <tr><td><strong>Aviso para completar</strong> · módulo aberto</td><td colspan="3">Não se aplica: o módulo não pede nada à pessoa</td></tr>
-        <tr><td><strong>Vitrine</strong>, <strong>Como funciona</strong> e <strong>Quem usa</strong> · Catálogo</td><td colspan="3">Não se aplica: módulo da conta, fora da vitrine (<a class="ref" href="15_modulos.html#RN-203">15 RN-203</a>)</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="requisitos-nao-funcionais">
-    <h2>Requisitos não funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
-      <tbody>
-        <tr id="RNF-201"><td><code class="id">RNF-201</code></td><td><span class="tag">Segurança</span></td><td>A senha é guardada só de forma irreversível: ninguém, nem o time deboaz, consegue ler a senha de um usuário</td></tr>
-        <tr id="RNF-202"><td><code class="id">RNF-202</code></td><td><span class="tag">Segurança</span></td><td>Toda senha tem ao menos 8 caracteres, com letra maiúscula, letra minúscula, caractere especial e número</td></tr>
-        <tr id="RNF-203"><td><code class="id">RNF-203</code></td><td><span class="tag">Segurança</span></td><td>Depois de desativar, suspender, pedir nova geração de senha, mudar permissão ou descontratar um módulo, a credencial de acesso emitida antes deixa de valer na próxima ação do usuário, em qualquer aparelho</td></tr>
-        <tr id="RNF-204"><td><code class="id">RNF-204</code></td><td><span class="tag">Segurança</span></td><td>5 tentativas erradas seguidas, de senha, de código de acesso ou de código de liberação, bloqueiam a entrada por 15 min; cada bloqueio seguido dobra o tempo, até 24 h, no hub e no quest</td></tr>
-        <tr id="RNF-205"><td><code class="id">RNF-205</code></td><td><span class="tag">Segurança</span></td><td>O atendimento sem login aceita até 3 envios por aparelho a cada 24 h</td></tr>
-        <tr id="RNF-206"><td><code class="id">RNF-206</code></td><td><span class="tag">Conformidade</span></td><td>Um registro da auditoria não pode ser alterado nem apagado, nem pelo time deboaz</td></tr>
-        <tr id="RNF-207"><td><code class="id">RNF-207</code></td><td><span class="tag">Segurança</span></td><td>A credencial de acesso é um token JWT assinado com RS256 e chave RSA de 2048 bits; a chave privada fica no Key Vault do ambiente e nunca sai dele, e as aplicações validam o token com a chave pública</td></tr>
-        <tr id="RNF-208"><td><code class="id">RNF-208</code></td><td><span class="tag">Segurança</span></td><td>O token traz os papéis do usuário (tipo de usuário, módulos e abas permitidas), e cada ação é autorizada ou recusada pelos papéis do token</td></tr>
-        <tr id="RNF-209"><td><code class="id">RNF-209</code></td><td><span class="tag">Segurança</span></td><td>O token de acesso vale no máximo 15 min e é renovado enquanto a sessão estiver dentro do tempo configurado (<code class="id">RN-183</code>)</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="criterios-de-aceite">
-    <h2>Critérios de aceite</h2>
-    <article class="criterio" id="ca-RF-104">
+  <section id="cenarios-tela">
+    <h2>Cenários de tela</h2>
+    <article class="criterio" id="quem-cria-cada-usuario">
+      <h3>Quem cria cada usuário</h3>
+      <pre class="gherkin">Esquema do Cenário: origem de cada usuário
+  Quando &lt;quem&gt; passa a existir
+  Então foi criado por &lt;origem&gt;
+
+  Exemplos:
+    | quem                           | origem                                         |
+    | a conta master da escola EBFGA | ela mesma, em Criar conta                      |
+    | o educador autônomo Pedro Reis | ele mesmo, em Criar conta                      |
+    | a staff Maria Souza            | a conta master, no módulo Usuários             |
+    | o participante Lucas Andrade   | a conta master ou um staff, no módulo Usuários |
+    | o membro do time Caio Reis     | o administrador do deboaz, no Usuários do time |
+
+Cenário: sem login externo, sem e-mail e sem segundo fator
+  Quando qualquer pessoa entra no hub
+  Então entra só com a entrada e a senha gerada pelo sistema
+  E o deboaz não oferece login Google ou Microsoft, nem segundo fator
+  E nenhuma senha ou código é enviado por e-mail ou mensagem</pre>
+    </article>
+    <article class="criterio" id="RF-104">
       <h3><code class="id">RF-104</code> Conta master</h3>
       <pre class="gherkin">Cenário: escola cria a conta
   Dado a pessoa na tela Criar conta
-  Quando escolhe "Instituição", informa o domínio "objetivo_unidade1" e a sigla "EBFGA" e toca em "Criar conta"
+  Quando escolhe "Instituição", informa o domínio "objetivo_unidade1" e a sigla "EBFGA"
+  E toca em "Criar conta"
   Então vê a senha gerada uma única vez, para anotar
   E passa a entrar como conta master com "objetivo_unidade1@deboaz.com"
 
@@ -1040,14 +960,14 @@ Cenário: sigla já usada
   Quando outra instituição tenta criar a conta com a sigla "EBFGA"
   Então o sistema recusa a sigla e pede outra</pre>
     </article>
-    <article class="criterio" id="ca-RF-105">
+    <article class="criterio" id="RF-105">
       <h3><code class="id">RF-105</code> Módulo Usuários</h3>
       <pre class="gherkin">Cenário: educador autônomo
   Dado a conta master de um educador autônomo
   Quando abre o módulo Usuários
   Então vê só os participantes, sem staff nem permissões</pre>
     </article>
-    <article class="criterio" id="ca-RF-106">
+    <article class="criterio" id="RF-106">
       <h3><code class="id">RF-106</code> Criar staff</h3>
       <pre class="gherkin">Cenário: secretária cadastrada pela escola
   Dado a conta master da instituição de sigla "EEJSA" no módulo Usuários
@@ -1060,7 +980,7 @@ Cenário: educador autônomo não cria staff
   Quando procura a ação de criar staff
   Então o sistema não oferece a ação</pre>
     </article>
-    <article class="criterio" id="ca-RF-107">
+    <article class="criterio" id="RF-107">
       <h3><code class="id">RF-107</code> Permissões do staff</h3>
       <pre class="gherkin">Cenário: professor com a Presença
   Dado a instituição com o módulo Presença contratado
@@ -1072,18 +992,20 @@ Cenário: módulo não contratado
   Quando a conta master define as permissões de um staff
   Então a Carteirinha não aparece entre os módulos que ela pode marcar</pre>
     </article>
-    <article class="criterio" id="ca-RF-108">
+    <article class="criterio" id="RF-108">
       <h3><code class="id">RF-108</code> Criar participante</h3>
       <pre class="gherkin">Cenário: aluno novo com dois responsáveis
   Dado o staff com o módulo Usuários da escola de sigla "EBFGA"
-  Quando cria o participante "Lucas Andrade", nome curto "lucas", com a mãe "Carla Andrade" e o pai "Paulo Andrade"
+  Quando cria o participante "Lucas Andrade", nome curto "lucas"
+  E com a mãe "Carla Andrade" e o pai "Paulo Andrade"
   Então o Lucas aparece entre os participantes com um código como "EBFGA-LUCAS-0412", sem senha
   E esse código abre o perfil dele no quest, para ele e para os dois responsáveis</pre>
     </article>
-    <article class="criterio" id="ca-RF-109">
+    <article class="criterio" id="RF-109">
       <h3><code class="id">RF-109</code> Senha gerada no acesso</h3>
       <pre class="gherkin">Cenário: primeiro acesso do staff
-  Dado o staff "Gustavo Boaz de Moura Souza", recém-criado, com o código de liberação entregue pela secretaria
+  Dado o staff "Gustavo Boaz de Moura Souza", recém-criado
+  E o código de liberação entregue pela secretaria
   Quando entra pela primeira vez com a entrada dele e o código
   Então vê uma única vez uma senha como "Gu#Boaz507318", para anotar
   E nenhum superior consegue ver essa senha
@@ -1094,7 +1016,7 @@ Cenário: sem o código de liberação
   Então o sistema não mostra a senha
   E conta uma tentativa errada</pre>
     </article>
-    <article class="criterio" id="ca-RF-110">
+    <article class="criterio" id="RF-110">
       <h3><code class="id">RF-110</code> Senha esquecida</h3>
       <pre class="gherkin">Cenário: professor esqueceu a senha
   Dado o staff "Paulo", que esqueceu a senha
@@ -1107,7 +1029,7 @@ Cenário: par não pede a geração
   Quando um procura a nova geração de senha do outro
   Então o sistema não oferece a ação</pre>
     </article>
-    <article class="criterio" id="ca-RF-111">
+    <article class="criterio" id="RF-111">
       <h3><code class="id">RF-111</code> Atendimento sem login</h3>
       <pre class="gherkin">Cenário: conta master esqueceu a senha
   Dado a pessoa na tela Entrar do hub, sem login
@@ -1115,7 +1037,7 @@ Cenário: par não pede a geração
   Então a mensagem aparece no SAC do time deboaz
   E a pessoa vê que o time deboaz vai conferir os dados do cadastro</pre>
     </article>
-    <article class="criterio" id="ca-RF-112">
+    <article class="criterio" id="RF-112">
       <h3><code class="id">RF-112</code> Desativar e reativar</h3>
       <pre class="gherkin">Cenário: professor que saiu da escola
   Dado o staff "Paulo" com o hub aberto no celular
@@ -1123,20 +1045,20 @@ Cenário: par não pede a geração
   Então a próxima ação do Paulo no celular leva à tela Entrar
   E o Paulo continua na lista do staff, como desativado</pre>
     </article>
-    <article class="criterio" id="ca-RF-113">
-      <h3><code class="id">RF-113</code> Painel do time deboaz</h3>
+    <article class="criterio" id="RF-113">
+      <h3><code class="id">RF-113</code> Contas no módulo Usuários do time deboaz</h3>
       <pre class="gherkin">Cenário: falta de pagamento
   Dado uma escola ativa com o pagamento em atraso
-  Quando o time deboaz desativa a conta no painel
+  Quando o time deboaz desativa a conta na lista Contas do módulo Usuários
   Então o staff e os participantes da escola não entram mais
-  E a conta continua no painel, como desativada, com os dados guardados
+  E a conta continua na lista Contas, como desativada, com os dados guardados
 
 Cenário: pagamento regularizado
   Dado a mesma escola desativada
   Quando o time deboaz reativa a conta
   Então o staff e os participantes voltam a entrar com as mesmas permissões</pre>
     </article>
-    <article class="criterio" id="ca-RF-114">
+    <article class="criterio" id="RF-114">
       <h3><code class="id">RF-114</code> Tempo de sessão</h3>
       <pre class="gherkin">Cenário: sessão do staff termina
   Dado a instituição com um tempo de sessão do staff configurado
@@ -1144,7 +1066,52 @@ Cenário: pagamento regularizado
   Então a próxima ação dele leva à tela Entrar
   E uma sala ao vivo aberta por ele não é encerrada por isso</pre>
     </article>
-    <article class="criterio" id="ca-RF-115">
+    <article class="criterio" id="RF-152">
+      <h3><code class="id">RF-152</code> Tempo de sessão das contas master e do time</h3>
+      <pre class="gherkin">Cenário: time deboaz muda o tempo da conta master no navegador
+  Dado o time deboaz na aba Configuração do módulo Usuários
+  Quando informa 4 h para as contas master no navegador e salva
+  Então a conta master de uma escola que fica 4 h sem usar o hub volta à tela Entrar
+  E o tempo dos membros do time continua o mesmo
+
+Cenário: valor fora dos limites
+  Quando o time deboaz informa para os membros no navegador um tempo fora dos limites
+  Então o campo mostra o erro com os limites e nada é salvo</pre>
+    </article>
+    <article class="criterio" id="RF-153">
+      <h3><code class="id">RF-153</code> Editar staff e participante</h3>
+      <pre class="gherkin">Cenário: nome curto do staff
+  Dado a staff Maria Souza com a entrada maria.ebfga@deboaz.com e o hub aberto no navegador
+  Quando a conta master muda o nome curto dela para "mariasouza" e salva
+  Então a sessão aberta da Maria termina
+  E ela entra com mariasouza.ebfga@deboaz.com e a mesma senha
+
+Cenário: responsável novo
+  Dado o participante Lucas Andrade com a mãe como responsável
+  Quando a conta master adiciona Paulo Andrade como pai e salva
+  Então o participante selecionado mostra os dois responsáveis, com o mesmo código de acesso
+
+Cenário: nome curto repetido
+  Quando a conta master muda o nome curto de um staff para um que já existe na escola
+  Então o campo mostra o erro e nada é salvo</pre>
+    </article>
+    <article class="criterio" id="RF-154">
+      <h3><code class="id">RF-154</code> Novo código de acesso</h3>
+      <pre class="gherkin">Cenário: família perdeu o código
+  Dado o participante Lucas Andrade com o código EBFGA-LUCAS-0412 aberto no celular da mãe
+  Quando a conta master toca Gerar novo código de acesso e confirma
+  Então o código EBFGA-LUCAS-0412 deixa de valer e a sessão do celular da mãe termina
+  E o participante selecionado mostra o código novo, EBFGA-LUCAS-&lt;4 números&gt;</pre>
+    </article>
+    <article class="criterio" id="RF-155">
+      <h3><code class="id">RF-155</code> Permissões do membro do time</h3>
+      <pre class="gherkin">Cenário: membro só com o SAC
+  Dado o membro do time Caio Lima, sem módulos
+  Quando o administrador do deboaz marca para ele a Utilização do SAC e salva
+  Então, na próxima ação, o Caio vê só o card do SAC em Módulos
+  E não vê os cards de Usuários nem do Catálogo</pre>
+    </article>
+    <article class="criterio" id="RF-115">
       <h3><code class="id">RF-115</code> Acesso anônimo</h3>
       <pre class="gherkin">Cenário: visitante de evento aberto
   Dado uma sala da instituição de sigla "EBFGA" que aceita participante anônimo
@@ -1152,197 +1119,1193 @@ Cenário: pagamento regularizado
   Então participa da sala com um apelido como "PUPIL-EBFGA-13465"
   E não consegue abrir perfil, tarefa ou outra sala com esse acesso</pre>
     </article>
+    <article class="criterio" id="RN-164">
+      <h3><code class="id">RN-164</code> Quem se cadastra sozinho</h3>
+      <pre class="gherkin">Cenário: staff não se cadastra
+  Quando a Maria abre Criar conta
+  Então só pode criar a conta de uma instituição ou de um educador autônomo
+  E a conta dela de staff só nasce pela conta master, no módulo Usuários
+
+Cenário: só o administrador cria membros
+  Dado o membro do time Caio com a Utilização de Usuários
+  Quando ele procura Novo membro
+  Então a ação não aparece</pre>
+    </article>
+    <article class="criterio" id="RN-165">
+      <h3><code class="id">RN-165</code> Autônomo sem staff</h3>
+      <pre class="gherkin">Cenário: autônomo só com participantes
+  Quando o educador autônomo Pedro abre o módulo Usuários
+  Então vê só Participantes, sem Staff nem Permissões</pre>
+    </article>
+    <article class="criterio" id="RN-167">
+      <h3><code class="id">RN-167</code> Ninguém concede o que não tem</h3>
+      <pre class="gherkin">Cenário: conta master tem tudo
+  Quando a conta master abre Permissões da Maria
+  Então pode marcar qualquer aba de qualquer módulo da escola
+
+Cenário: staff concede só o que tem
+  Dado o João com Administrar usuários e só a Utilização do Quiz
+  Quando ele abre Permissões da Ana
+  Então só pode marcar Administrar usuários e a Utilização do Quiz</pre>
+    </article>
+    <article class="criterio" id="RN-169">
+      <h3><code class="id">RN-169</code> Ordem de superior</h3>
+      <pre class="gherkin">Esquema do Cenário: quem age sobre quem
+  Quando &lt;quem&gt; procura nova geração de senha, desativar ou reativar &lt;alvo&gt;
+  Então a ação &lt;resultado&gt;
+
+  Exemplos:
+    | quem                      | alvo                      | resultado   |
+    | o administrador           | o membro Caio             | aparece     |
+    | o time deboaz             | a conta master da EBFGA   | aparece     |
+    | a conta master            | o João, com Adm. usuários | aparece     |
+    | o João, com Adm. usuários | a staff Ana               | aparece     |
+    | o João, com Adm. usuários | o Lucas                   | aparece     |
+    | o João, com Adm. usuários | o Rui, também com Adm.    | não aparece |
+    | a staff Ana               | o João                    | não aparece |</pre>
+    </article>
+    <article class="criterio" id="RN-172">
+      <h3><code class="id">RN-172</code> Senha da conta master</h3>
+      <pre class="gherkin">Cenário: conferência pelo SAC
+  Dado a conta master da EBFGA pedindo ajuda pelo SAC
+  Quando a Ana Lima, do time deboaz, confere o CNPJ 12.345.678/0001-90
+  E confere 2 de 3: o nome de quem cadastrou, o telefone e a data do último pagamento
+  Então pode pedir a nova geração de senha da conta master
+  E o código de liberação vai ao contato conferido (51) 99999-0000
+
+Cenário: conferência incompleta
+  Quando só o CNPJ e o telefone conferem e a data do pagamento não confere
+  Então Gerar código da master continua inativo</pre>
+    </article>
+    <article class="criterio" id="RN-176">
+      <h3><code class="id">RN-176</code> Sessão não encerra a sala</h3>
+      <pre class="gherkin">Cenário: sala ao vivo continua
+  Dado a Maria com uma sala ao vivo aberta
+  Quando a sessão dela termina pelo tempo sem uso
+  Então a sala continua aberta pelo tempo do módulo</pre>
+    </article>
+    <article class="criterio" id="RN-177">
+      <h3><code class="id">RN-177</code> Acesso anônimo</h3>
+      <pre class="gherkin">Cenário: apelido na sala
+  Quando uma pessoa entra sem código na sala 482107 da EBFGA
+  Então recebe um apelido como "PUPIL-EBFGA-13465", único na sala
+  E não abre perfil, tarefa nem outra sala
+
+Cenário: sala fecha
+  Quando o professor fecha a sala 482107
+  Então o acesso "PUPIL-EBFGA-13465" termina</pre>
+    </article>
+    <article class="criterio" id="RN-179">
+      <h3><code class="id">RN-179</code> Sigla</h3>
+      <pre class="gherkin">Cenário: sigla sugerida
+  Quando a escola informa o nome "Escola Bento Freitas Gonçalves Araújo"
+  Então a sigla sugerida é "EBFGA"
+
+Esquema do Cenário: sigla recusada
+  Dado a sigla "EBFGA" já usada
+  Quando outra conta informa a sigla "&lt;sigla&gt;"
+  Então &lt;resultado&gt;
+
+  Exemplos:
+    | sigla | resultado                       |
+    | ebfga | é recusada, já existe           |
+    | DBOAZ | é recusada, reservada ao time   |
+    | EBF   | é recusada, precisa de 5 letras |
+    | COLSA | é aceita                        |
+
+Cenário: sigla não muda
+  Quando a conta master da EBFGA procura mudar a sigla
+  Então a sigla não pode ser editada</pre>
+    </article>
+    <article class="criterio" id="RN-242">
+      <h3><code class="id">RN-242</code> Mesmo formulário para todos</h3>
+      <pre class="gherkin">Esquema do Cenário: documento de cada conta
+  Quando &lt;quem&gt; cria a conta
+  Então informa nome, &lt;documento&gt;, responsável, telefone, domínio e sigla
+
+  Exemplos:
+    | quem                | documento               |
+    | a escola            | CNPJ 12.345.678/0001-90 |
+    | a empresa           | CNPJ                    |
+    | o educador autônomo | CPF 123.456.789-09      |</pre>
+    </article>
+    <article class="criterio" id="RN-180">
+      <h3><code class="id">RN-180</code> Entradas</h3>
+      <pre class="gherkin">Esquema do Cenário: formato da entrada
+  Quando &lt;quem&gt; entra na tela Entrar
+  Então usa a entrada "&lt;entrada&gt;"
+
+  Exemplos:
+    | quem                     | entrada                      |
+    | a conta master da EBFGA  | objetivo_unidade1@deboaz.com |
+    | a staff Maria, da EEJSA  | maria.eejsa@deboaz.com       |
+    | o membro do time Gustavo | gustavo.dboaz@deboaz.com     |
+
+Cenário: maiúsculas e minúsculas
+  Quando a Maria digita "Maria.EEJSA@deboaz.com"
+  Então entra como "maria.eejsa@deboaz.com"
+
+Cenário: sem caixa de e-mail
+  Quando alguém manda um e-mail para "maria.eejsa@deboaz.com"
+  Então nenhuma caixa recebe, porque o endereço só identifica a entrada</pre>
+    </article>
+    <article class="criterio" id="RN-243">
+      <h3><code class="id">RN-243</code> Tempo de sessão do time e das contas master</h3>
+      <pre class="gherkin">Esquema do Cenário: limites e padrão
+  Quando o time deboaz configura o tempo de &lt;quem&gt;, no navegador ou no app
+  Então aceita de &lt;mínimo&gt; a &lt;máximo&gt;, com padrão &lt;padrão&gt;
+
+  Exemplos:
+    | quem                      | mínimo | máximo | padrão |
+    | membros do time           | 15 min | 12 h   | 8 h    |
+    | contas master e autônomos | 15 min | 24 h   | 8 h    |
+
+Cenário: escola não muda a própria conta master
+  Quando a conta master da EBFGA abre a Configuração de Usuários
+  Então não vê o tempo de sessão da conta master</pre>
+    </article>
+    <article class="criterio" id="RN-246">
+      <h3><code class="id">RN-246</code> Membro novo sem módulos</h3>
+      <pre class="gherkin">Cenário: começa sem nada
+  Quando o administrador cria o membro Caio Reis
+  Então o Caio entra e vê Módulos vazio
+  E quando o administrador marca o SAC, o card aparece na próxima ação, sem nova entrada</pre>
+    </article>
+    <article class="criterio" id="RN-185">
+      <h3><code class="id">RN-185</code> Listas e busca</h3>
+      <pre class="gherkin">Esquema do Cenário: busca nas listas
+  Quando &lt;quem&gt; busca "&lt;termo&gt;" em &lt;lista&gt;
+  Então encontra &lt;resultado&gt;
+
+  Exemplos:
+    | quem           | lista         | termo              | resultado               |
+    | a conta master | Staff         | maria.ebfga        | a Maria                 |
+    | a conta master | Staff         | 20260087           | a Maria, pela matrícula |
+    | a conta master | Participantes | EBFGA-LUCAS-0412   | o Lucas                 |
+    | o time deboaz  | Contas        | EBFGA              | a Escola Bento Freitas  |
+    | o time deboaz  | Contas        | 12.345.678/0001-90 | a Escola Bento Freitas  |
+
+Cenário: ordem e filtro
+  Quando a conta master abre Staff com o filtro Desativados
+  Então vê só o staff desativado, de A a Z
+
+Cenário: ordem do SAC
+  Quando o membro do time abre o SAC
+  Então vê primeiro a mensagem mais antiga</pre>
+    </article>
+    <article class="criterio" id="RN-186">
+      <h3><code class="id">RN-186</code> Último acesso</h3>
+      <pre class="gherkin">Cenário: participante com quem entrou
+  Dado a Carla, mãe do Lucas, entrou hoje às 07:55
+  Quando a conta master vê o Lucas
+  Então vê "hoje, 07:55, a mãe"
+
+Cenário: último acesso da conta
+  Quando o time deboaz vê a EBFGA
+  Então vê o último acesso da conta master, hoje, 08:15</pre>
+    </article>
+    <article class="criterio" id="RN-187">
+      <h3><code class="id">RN-187</code> Ver a conta</h3>
+      <pre class="gherkin">Cenário: só o cadastro
+  Quando o time deboaz toca Ver a conta da EBFGA
+  Então vê tipo, nome, CNPJ, sigla, entrada da conta master, responsável e telefone
+  E as datas de criação, 12/03/2026, do último pagamento, 05/10/2026, e do último acesso
+  E não vê usuários, turmas nem conteúdos da escola</pre>
+    </article>
+    <article class="criterio" id="RN-188">
+      <h3><code class="id">RN-188</code> Matrícula</h3>
+      <pre class="gherkin">Cenário: matrícula que a escola já usa
+  Quando a conta master cria a Maria com a matrícula "20260087"
+  Então a matrícula da Maria é "20260087"
+
+Cenário: gerar automaticamente
+  Quando a conta master toca Gerar automaticamente no Lucas
+  Então o sistema cria uma matrícula de 8 números, como "48201755", única na escola
+
+Cenário: autônomo sem matrícula
+  Quando o educador autônomo cria um participante
+  Então o formulário não pede matrícula</pre>
+    </article>
+    <article class="criterio" id="RN-189">
+      <h3><code class="id">RN-189</code> Card do módulo Usuários</h3>
+      <pre class="gherkin">Esquema do Cenário: dados do card por tamanho
+  Dado a conta master da EBFGA na aba Da conta
+  Quando o card Usuários está &lt;tamanho&gt;
+  Então mostra &lt;dados&gt;
+
+  Exemplos:
+    | tamanho       | dados                                                      |
+    | mínima 1x1    | o ícone e o selo "2", códigos de liberação que vencem hoje |
+    | reduzida 2x2  | 335 · usuários ativos                                      |
+    | normal 4x4    | 335, +12 no mês, 5 meses em barras, 37 staff, 298 part.    |
+    | expandida 4x8 | 7 semanas e a lista Sem acesso há 30 dias e Desativados    |
+
+Esquema do Cenário: card para cada perfil
+  Quando &lt;quem&gt; vê o card Usuários na reduzida
+  Então vê "&lt;dado&gt;"
+
+  Exemplos:
+    | quem                      | dado                      |
+    | a conta master da EBFGA   | 335 · usuários ativos     |
+    | o educador autônomo Pedro | 32 · participantes ativos |
+    | o administrador do deboaz | 112 · contas ativas       |
+
+Cenário: sem dados
+  Dado a EBFGA recém-criada, sem usuários
+  Então o card mostra "Cadastre o staff e os participantes" e Configurar
+
+Cenário: rótulo falado
+  Quando o leitor de tela lê o card na mínima
+  Então diz "Usuários, 2 códigos de liberação vencem hoje"
+
+Cenário: abas do módulo aberto
+  Quando a conta master abre Usuários
+  Então vê Configuração, com o tempo de sessão
+  E Utilização, com staff, participantes e permissões</pre>
+    </article>
   </section>
-  <section id="fora-de-escopo">
-    <h2>Fora de escopo</h2>
-    <ul class="fora">
-      <li>Entrada por provedor externo de login, como conta Google ou Microsoft (decisão de 2026-10-29)</li>
-      <li>Segundo fator de autenticação, inclusive para o time deboaz (decisão de 2026-10-29)</li>
-      <li>Senha escolhida pela pessoa e envio de senha, código ou aviso por e-mail ou mensagem</li>
-      <li>Recuperação de senha por perguntas de segurança</li>
-      <li>Turma e ano do participante: ficam no módulo de gestão de turmas</li>
-      <li>Formato do código da sala: fica no módulo de aula ao vivo; as vistas usam 6 números só como exemplo</li>
-      <li>Usuário em várias unidades da mesma instituição (fase de escala, <a class="ref" href="00_visao-produto.html#fora-de-escopo">Visão do produto</a>)</li>
-    </ul>
+  <section id="cenarios-api">
+    <h2>Cenários de API</h2>
+    <article class="criterio" id="RF-104-api">
+      <h3><code class="id">RF-104</code> Conta master</h3>
+      <pre class="gherkin">Cenário: escola cria a conta
+  Quando envia POST /contas, sem login, com:
+    """
+    {
+      "tipo": "INSTITUICAO",
+      "nome": "Escola Bento Freitas",
+      "documento": "12.345.678/0001-90",
+      "responsavel": "Gustavo Boaz de Moura Souza",
+      "telefone": "(51) 99999-0000",
+      "dominio": "objetivo_unidade1",
+      "sigla": "EBFGA"
+    }
+    """
+  Então a resposta é 201 com:
+    """
+    {
+      "contaId": "conta-ebfga",
+      "login": "objetivo_unidade1@deboaz.com",
+      "senha": "Gu#Boaz507318",
+      "comprovante": "c7e1…"
+    }
+    """
+  E POST /auth/hub/confirmar-senha com o comprovante abre a sessão da conta master
+
+Cenário: sigla já usada
+  Dado uma conta com a sigla "EBFGA"
+  Quando envia POST /contas com a sigla "EBFGA"
+  Então a resposta é 409 SIGLA_EM_USO e nenhuma conta é criada
+
+Cenário: domínio já usado
+  Quando envia POST /contas com o domínio "objetivo_unidade1", já usado
+  Então a resposta é 409 DOMINIO_EM_USO</pre>
+    </article>
+    <article class="criterio" id="RF-106-api">
+      <h3><code class="id">RF-106</code> Criar staff</h3>
+      <pre class="gherkin">Cenário: secretária cadastrada pela escola
+  Dado o token da conta master da EBFGA, com "MOD-03" com "CU"
+  Quando envia POST /usuarios com:
+    """
+    {
+      "tipo": "STAFF",
+      "nome": "Maria Souza",
+      "nomeCurto": "maria",
+      "matricula": "20260087"
+    }
+    """
+  Então a resposta é 201 com:
+    """
+    {
+      "id": "usr-ebfga-maria",
+      "login": "maria.ebfga@deboaz.com",
+      "estado": "PENDENTE",
+      "codigoLiberacao": "482913",
+      "venceEm": "2026-11-04T22:06:00Z"
+    }
+    """
+
+Cenário: educador autônomo não cria staff
+  Dado o token do educador autônomo Pedro
+  Quando envia POST /usuarios com o tipo "STAFF"
+  Então a resposta é 403 ACESSO_NEGADO
+
+Cenário: nome curto repetido
+  Quando a conta master envia POST /usuarios com o nome curto "maria", já usado na EBFGA
+  Então a resposta é 409 NOME_CURTO_EM_USO</pre>
+    </article>
+    <article class="criterio" id="RF-108-api">
+      <h3><code class="id">RF-108</code> Criar participante</h3>
+      <pre class="gherkin">Cenário: aluno novo com dois responsáveis
+  Dado o token do staff João, com "MOD-03" com "U"
+  Quando envia POST /usuarios com:
+    """
+    {
+      "tipo": "PARTICIPANTE",
+      "nome": "Lucas Andrade",
+      "nomeCurto": "lucas",
+      "matricula": null,
+      "responsaveis": [
+        {
+          "nome": "Carla Andrade",
+          "parentesco": "MAE"
+        },
+        {
+          "nome": "Paulo Andrade",
+          "parentesco": "PAI"
+        }
+      ]
+    }
+    """
+  Então a resposta é 201 com o login "EBFGA-LUCAS-" seguido de 4 números, sem senha
+  E POST /auth/quest/entrar com esse código abre o perfil do Lucas</pre>
+    </article>
+    <article class="criterio" id="RF-109-api">
+      <h3><code class="id">RF-109</code> Senha gerada no acesso</h3>
+      <pre class="gherkin">Cenário: primeiro acesso do staff
+  Dado o staff "gustavo.ebfga@deboaz.com" pendente, com o código de liberação "482913"
+  Quando envia POST /usuarios/gerar-senha, sem login, com:
+    """
+    {
+      "entrada": "gustavo.ebfga@deboaz.com",
+      "codigoLiberacao": "482913"
+    }
+    """
+  Então a resposta é 200 com:
+    """
+    {
+      "senha": "Gu#Boaz507318",
+      "comprovante": "c7e1…"
+    }
+    """
+  E o mesmo pedido, enviado de novo, recebe 401 CODIGO_INVALIDO
+
+Cenário: código errado
+  Quando envia POST /usuarios/gerar-senha com o código "111111"
+  Então a resposta é 401 CODIGO_INVALIDO, sem a senha, e conta uma tentativa errada
+
+Cenário: quinto código errado
+  Dado 4 códigos errados seguidos para "gustavo.ebfga@deboaz.com"
+  Quando o quinto chega a POST /usuarios/gerar-senha
+  Então a resposta é 429 ENTRADA_BLOQUEADA com tentarEm</pre>
+    </article>
+    <article class="criterio" id="RF-110-api">
+      <h3><code class="id">RF-110</code> Senha esquecida</h3>
+      <pre class="gherkin">Cenário: professor esqueceu a senha
+  Dado o token do staff João, com "MOD-03" com "U", superior do Paulo
+  Quando envia POST /usuarios/usr-ebfga-paulo/nova-geracao-senha
+  Então a resposta é 201 com codigoLiberacao e venceEm
+  E POST /auth/hub/entrar com a senha antiga do Paulo recebe 401 ENTRADA_INVALIDA
+  E os tokens das sessões abertas do Paulo recebem 401
+
+Cenário: par não pede a geração
+  Quando o João envia POST /usuarios/usr-ebfga-rui/nova-geracao-senha, de um par dele
+  Então a resposta é 403 ACESSO_NEGADO
+
+Cenário: participante não tem senha
+  Quando a conta master envia POST /usuarios/usr-ebfga-lucas/nova-geracao-senha
+  Então a resposta é 422 SEM_SENHA</pre>
+    </article>
+    <article class="criterio" id="RF-111-api">
+      <h3><code class="id">RF-111</code> Atendimento sem login</h3>
+      <pre class="gherkin">Cenário: conta master esqueceu a senha
+  Quando envia POST /contas/esqueci-senha-master, sem login, com:
+    """
+    {
+      "instituicao": "Escola Bento Freitas",
+      "contato": "(51) 99999-0000"
+    }
+    """
+  Então a resposta é 202 e a mensagem entra no SAC do time deboaz</pre>
+    </article>
+    <article class="criterio" id="RF-112-api">
+      <h3><code class="id">RF-112</code> Desativar e reativar</h3>
+      <pre class="gherkin">Cenário: professor que saiu da escola
+  Dado o Paulo com uma sessão no app
+  Quando a conta master envia POST /usuarios/usr-ebfga-paulo/desativar
+  Então a resposta é 204
+  E o token do app do Paulo recebe 401 no próximo pedido
+  E GET /usuarios?tipo=STAFF&amp;estado=DESATIVADO traz o Paulo
+
+Cenário: reativar
+  Quando a conta master envia POST /usuarios/usr-ebfga-paulo/reativar
+  Então a resposta é 204 e o Paulo volta a ATIVO com as mesmas permissões
+
+Cenário: já desativado
+  Quando a conta master envia POST /usuarios/usr-ebfga-paulo/desativar de novo
+  Então a resposta é 409 ESTADO_IGUAL</pre>
+    </article>
+    <article class="criterio" id="RF-113-api">
+      <h3><code class="id">RF-113</code> Contas no módulo Usuários do time deboaz</h3>
+      <pre class="gherkin">Cenário: falta de pagamento
+  Dado o token do membro do time Caio, com "MOD-03" com "U"
+  Quando envia POST /contas/conta-ebfga/estado com:
+    """
+    {
+      "estado": "DESATIVADA"
+    }
+    """
+  Então a resposta é 200 com o estado "DESATIVADA"
+  E POST /auth/hub/entrar da Maria e POST /auth/quest/entrar do Lucas recebem 403
+  E GET /contas?estado=DESATIVADA traz a EBFGA
+
+Cenário: pagamento regularizado
+  Quando o Caio envia POST /contas/conta-ebfga/estado com o estado "ATIVA"
+  Então a resposta é 200 e a Maria e o Lucas voltam a entrar com as mesmas permissões</pre>
+    </article>
+    <article class="criterio" id="RF-114-api">
+      <h3><code class="id">RF-114</code> Tempo de sessão</h3>
+      <pre class="gherkin">Cenário: ler e salvar o tempo da escola
+  Dado o token da conta master da EBFGA, com "MOD-03" com "CU"
+  Quando envia PUT /contas/conta-ebfga/tempo-sessao com:
+    """
+    {
+      "staffNavegador": "PT4H",
+      "staffApp": "P7D",
+      "participante": "P30D"
+    }
+    """
+  Então a resposta é 200 com o mesmo corpo
+  E GET /contas/conta-ebfga/tempo-sessao devolve "PT4H" no staff do navegador
+
+Cenário: sem a aba Configuração
+  Quando a Maria, com "MOD-03" só com "U", envia GET /contas/conta-ebfga/tempo-sessao
+  Então a resposta é 403 ACESSO_NEGADO</pre>
+    </article>
+    <article class="criterio" id="RF-152-api">
+      <h3><code class="id">RF-152</code> Tempo de sessão das contas master e do time</h3>
+      <pre class="gherkin">Cenário: time deboaz muda o tempo da conta master no navegador
+  Dado o token do administrador do deboaz, com "MOD-03" com "CU"
+  Quando envia PUT /time/tempo-sessao com:
+    """
+    {
+      "membrosNavegador": "PT8H",
+      "membrosApp": "PT8H",
+      "mastersNavegador": "PT4H",
+      "mastersApp": "PT8H"
+    }
+    """
+  Então a resposta é 200 com o mesmo corpo
+
+Cenário: valor fora dos limites
+  Quando envia PUT /time/tempo-sessao com "mastersNavegador" igual a "PT30H"
+  Então a resposta é 422 FORA_DOS_LIMITES com:
+    """
+    {
+      "campo": "mastersNavegador",
+      "minimo": "PT15M",
+      "maximo": "PT24H"
+    }
+    """
+  E GET /time/tempo-sessao continua com "PT4H"</pre>
+    </article>
+    <article class="criterio" id="RF-153-api">
+      <h3><code class="id">RF-153</code> Editar staff e participante</h3>
+      <pre class="gherkin">Cenário: nome curto do staff
+  Dado a Maria com uma sessão no navegador
+  Quando a conta master envia PATCH /usuarios/usr-ebfga-maria com:
+    """
+    {
+      "nomeCurto": "mariasouza"
+    }
+    """
+  Então a resposta é 200 com o login "mariasouza.ebfga@deboaz.com"
+  E o token do navegador da Maria recebe 401 no próximo pedido
+  E POST /auth/hub/entrar com o login novo e a mesma senha recebe 200
+
+Cenário: responsável novo
+  Quando a conta master envia PATCH /usuarios/usr-ebfga-lucas com a mãe e o pai em responsaveis
+  Então GET /usuarios/usr-ebfga-lucas traz os dois responsáveis e o mesmo login
+
+Cenário: nome curto repetido
+  Quando a conta master envia PATCH /usuarios/usr-ebfga-ana com o nome curto "maria"
+  Então a resposta é 409 NOME_CURTO_EM_USO e nada muda</pre>
+    </article>
+    <article class="criterio" id="RF-154-api">
+      <h3><code class="id">RF-154</code> Novo código de acesso</h3>
+      <pre class="gherkin">Cenário: família perdeu o código
+  Dado a Carla com uma sessão do quest pelo código "EBFGA-LUCAS-0412"
+  Quando a conta master envia POST /usuarios/usr-ebfga-lucas/novo-codigo-acesso
+  Então a resposta é 200 com o login "EBFGA-LUCAS-" seguido de 4 números novos
+  E o token da Carla recebe 401 e POST /auth/quest/entrar com o código antigo recebe 401
+
+Cenário: só participante
+  Quando a conta master envia POST /usuarios/usr-ebfga-maria/novo-codigo-acesso
+  Então a resposta é 422 SO_PARTICIPANTE</pre>
+    </article>
+    <article class="criterio" id="RF-155-api">
+      <h3><code class="id">RF-155</code> Permissões do membro do time</h3>
+      <pre class="gherkin">Cenário: membro só com o SAC
+  Dado o membro do time Caio Lima, sem módulos
+  Quando o administrador envia PUT /usuarios/usr-dboaz-caio/permissoes com "MOD-02" com "U"
+  Então a resposta é 200
+  E POST /auth/renovar do Caio devolve um token só com "MOD-02" com "U"</pre>
+    </article>
+    <article class="criterio" id="RN-163">
+      <h3><code class="id">RN-163</code> Tipos de usuário</h3>
+      <pre class="gherkin">Esquema do Cenário: quem é usuário
+  Quando &lt;quem&gt; entra
+  Então &lt;é usuário&gt;
+
+  Exemplos:
+    | quem                            | é usuário                                     |
+    | a conta master da EBFGA         | GET /usuarios/{id} traz o tipo "MASTER"       |
+    | o educador autônomo Pedro       | GET /usuarios/{id} traz o tipo "MASTER"       |
+    | a staff Maria                   | GET /usuarios/{id} traz o tipo "STAFF"        |
+    | o Lucas                         | GET /usuarios/{id} traz o tipo "PARTICIPANTE" |
+    | o membro do time Caio           | GET /usuarios/{id} traz o tipo "MEMBRO_TIME"  |
+    | a Carla, mãe do Lucas           | não é usuário: fica nos responsaveis do Lucas |
+    | uma pessoa sem código numa sala | não é usuário: acesso anônimo                 |</pre>
+    </article>
+    <article class="criterio" id="RN-164-api">
+      <h3><code class="id">RN-164</code> Quem se cadastra sozinho</h3>
+      <pre class="gherkin">Cenário: staff não se cadastra
+  Quando envia POST /contas com o tipo "STAFF"
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "tipo"
+
+Cenário: só o administrador cria membros
+  Dado o token do membro do time Caio, com "MOD-03" com "U"
+  Quando envia POST /usuarios com o tipo "MEMBRO_TIME"
+  Então a resposta é 403 ACESSO_NEGADO</pre>
+    </article>
+    <article class="criterio" id="RN-165-api">
+      <h3><code class="id">RN-165</code> Autônomo sem staff</h3>
+      <pre class="gherkin">Cenário: autônomo só com participantes
+  Dado o token do educador autônomo Pedro
+  Quando envia GET /usuarios?tipo=STAFF
+  Então a resposta é 403 ACESSO_NEGADO
+  E GET /usuarios?tipo=PARTICIPANTE recebe 200</pre>
+    </article>
+    <article class="criterio" id="RN-166">
+      <h3><code class="id">RN-166</code> Permissão só em módulo contratado</h3>
+      <pre class="gherkin">Cenário: descontratou e recontratou
+  Dado o Paulo com "MOD-06" com "U"
+  Quando a escola descontrata a Presença
+  Então GET /usuarios/usr-ebfga-paulo/permissoes não traz "MOD-06" em mods
+  E quando a escola recontrata a Presença, "MOD-06" volta com "U"
+
+Cenário: salvar módulo não contratado
+  Quando a conta master envia PUT /usuarios/usr-ebfga-paulo/permissoes com "MOD-12"
+  Então a resposta é 422 MODULO_NAO_CONTRATADO</pre>
+    </article>
+    <article class="criterio" id="RN-167-api">
+      <h3><code class="id">RN-167</code> Ninguém concede o que não tem</h3>
+      <pre class="gherkin">Cenário: conta master tem tudo
+  Quando a conta master envia GET /usuarios/usr-ebfga-maria/permissoes
+  Então concediveis traz todos os módulos contratados pela escola, com "CU"
+
+Cenário: staff concede só o que tem
+  Dado o João com "MOD-03" com "CU" e "MOD-05" com "U"
+  Quando envia GET /usuarios/usr-ebfga-ana/permissoes
+  Então concediveis traz só "MOD-03" com "CU" e "MOD-05" com "U"</pre>
+    </article>
+    <article class="criterio" id="RN-168">
+      <h3><code class="id">RN-168</code> Administrar usuários</h3>
+      <pre class="gherkin">Cenário: staff que administra usuários
+  Dado a conta master tendo salvado "MOD-03" com "CU" para o João
+  Quando o João envia POST /usuarios para criar a staff Ana
+  Então a resposta é 201
+  E PUT /usuarios/usr-ebfga-ana/permissoes do João aceita só as abas que ele tem</pre>
+    </article>
+    <article class="criterio" id="RN-169-api">
+      <h3><code class="id">RN-169</code> Ordem de superior</h3>
+      <pre class="gherkin">Esquema do Cenário: quem age sobre quem
+  Quando &lt;quem&gt; envia POST /usuarios/{id}/desativar de &lt;alvo&gt;
+  Então a resposta é &lt;resposta&gt;
+
+  Exemplos:
+    | quem                      | alvo                      | resposta          |
+    | o administrador           | o membro Caio             | 204               |
+    | a conta master            | o João, com Adm. usuários | 204               |
+    | o João, com Adm. usuários | a staff Ana               | 204               |
+    | o João, com Adm. usuários | o Lucas                   | 204               |
+    | o João, com Adm. usuários | o Rui, também com Adm.    | 403 ACESSO_NEGADO |
+    | a staff Ana               | o João                    | 403 ACESSO_NEGADO |
+
+Cenário: time deboaz e a conta master
+  Quando o membro do time Caio envia POST /contas/conta-ebfga/codigo-master
+  Então a nova geração da conta master da EBFGA segue a RN-172</pre>
+    </article>
+    <article class="criterio" id="RN-170">
+      <h3><code class="id">RN-170</code> Ninguém vê a senha de outro</h3>
+      <pre class="gherkin">Cenário: senha só para o próprio usuário
+  Quando a conta master envia POST /usuarios para criar a Maria
+  Então a resposta traz o código de liberação e nenhum campo de senha
+  E GET /usuarios/usr-ebfga-maria não traz senha nem resumo da senha
+  E a senha só sai em POST /usuarios/gerar-senha, para quem tem o código
+
+Cenário: exceção do administrador
+  Então a senha do administrador do deboaz fica no Key Vault, fora de qualquer endereço</pre>
+    </article>
+    <article class="criterio" id="RN-171">
+      <h3><code class="id">RN-171</code> Formato da senha</h3>
+      <pre class="gherkin">Esquema do Cenário: senha gerada
+  Quando POST /usuarios/gerar-senha gera a senha de "&lt;nome&gt;"
+  Então a senha tem o formato de "&lt;exemplo&gt;"
+
+  Exemplos:
+    | nome                        | exemplo        |
+    | Gustavo Boaz de Moura Souza | Gu#Boaz507318  |
+    | Maria da Silva              | Ma!Silva204871 |
+    | Xuxa                        | Xu@Xa182482    |
+
+Cenário: o que muda a cada geração
+  Quando duas gerações de senha saem para o Gustavo Boaz de Moura Souza
+  Então as duas começam com "Gu" e têm "Boaz"
+  E o caractere especial e os 6 números são sorteados de novo</pre>
+    </article>
+    <article class="criterio" id="RN-172-api">
+      <h3><code class="id">RN-172</code> Senha da conta master</h3>
+      <pre class="gherkin">Cenário: conferência pelo SAC
+  Dado o token da Ana Lima, do time deboaz, com "MOD-03" com "U"
+  Quando envia POST /contas/conta-ebfga/codigo-master com:
+    """
+    {
+      "documento": "12.345.678/0001-90",
+      "responsavel": "Gustavo Boaz de Moura Souza",
+      "telefone": "(51) 99999-0000",
+      "ultimoPagamento": null
+    }
+    """
+  Então a resposta é 201 com:
+    """
+    {
+      "codigoLiberacao": "482913",
+      "contato": "(51) 99999-0000",
+      "venceEm": "2026-11-04T22:06:00Z"
+    }
+    """
+
+Cenário: conferência incompleta
+  Quando envia o CNPJ e o telefone certos e a data do último pagamento errada
+  Então a resposta é 422 CONFERENCIA_INCOMPLETA e nenhum código é gerado</pre>
+    </article>
+    <article class="criterio" id="RN-173">
+      <h3><code class="id">RN-173</code> Estados da conta</h3>
+      <pre class="gherkin">Esquema do Cenário: estado da conta
+  Quando o time deboaz envia POST /contas/conta-ebfga/estado com "&lt;estado&gt;"
+  Então a resposta é 200 e o estado significa &lt;motivo&gt;
+
+  Exemplos:
+    | estado     | motivo                                        |
+    | ATIVA      | uso normal                                    |
+    | SUSPENSA   | decisão temporária do time deboaz             |
+    | DESATIVADA | falta de pagamento, volta com a regularização |
+    | ENCERRADA  | pedido do cliente                             |
+
+Cenário: conta encerrada não volta
+  Dado a conta da EBFGA encerrada
+  Quando o time deboaz envia POST /contas/conta-ebfga/estado com "ATIVA"
+  Então a resposta é 409 TRANSICAO_INVALIDA</pre>
+    </article>
+    <article class="criterio" id="RN-174">
+      <h3><code class="id">RN-174</code> Nada é apagado</h3>
+      <pre class="gherkin">Cenário: conta encerrada
+  Quando o time deboaz envia POST /contas/conta-ebfga/estado com "ENCERRADA"
+  Então os dados da escola são apagados em cascata
+  E fica só o registro mínimo para histórico, auditoria e cobrança
+  E esse registro é anonimizado depois de 5 anos
+
+Cenário: usuário desativado continua na lista
+  Quando a conta master envia POST /usuarios/usr-ebfga-paulo/desativar
+  Então GET /usuarios/usr-ebfga-paulo continua com 200 e o estado "DESATIVADO"</pre>
+    </article>
+    <article class="criterio" id="RN-175">
+      <h3><code class="id">RN-175</code> Conta bloqueada</h3>
+      <pre class="gherkin">Esquema do Cenário: quem não entra
+  Dado &lt;situação&gt;
+  Quando &lt;quem&gt; envia POST &lt;endereço&gt;
+  Então a resposta é 403 ACESSO_INDISPONIVEL
+
+  Exemplos:
+    | situação           | quem                  | endereço           |
+    | a EBFGA suspensa   | a staff Maria         | /auth/hub/entrar   |
+    | a EBFGA desativada | o Lucas               | /auth/quest/entrar |
+    | a EBFGA encerrada  | a Carla, mãe do Lucas | /auth/quest/entrar |
+    | o Paulo desativado | o Paulo               | /auth/hub/entrar   |</pre>
+    </article>
+    <article class="criterio" id="RN-178">
+      <h3><code class="id">RN-178</code> Auditoria</h3>
+      <pre class="gherkin">Esquema do Cenário: ação auditada
+  Quando a Maria envia &lt;pedido&gt;
+  Então a auditoria guarda a Maria, a ação, o alvo e a hora, até 5 anos depois
+
+  Exemplos:
+    | pedido                                          |
+    | POST /usuarios do participante Lucas            |
+    | POST /usuarios/usr-ebfga-ana/nova-geracao-senha |
+    | PUT /usuarios/usr-ebfga-joao/permissoes         |
+    | POST /usuarios/usr-ebfga-paulo/desativar        |</pre>
+    </article>
+    <article class="criterio" id="RN-179-api">
+      <h3><code class="id">RN-179</code> Sigla</h3>
+      <pre class="gherkin">Cenário: sigla sugerida
+  Quando envia GET /contas/sigla-sugerida?nome=Escola Bento Freitas Gonçalves Araújo
+  Então a resposta é 200 com:
+    """
+    {
+      "sigla": "EBFGA",
+      "livre": true
+    }
+    """
+
+Esquema do Cenário: sigla recusada
+  Dado a sigla "EBFGA" já usada
+  Quando envia POST /contas com a sigla "&lt;sigla&gt;"
+  Então a resposta é &lt;resposta&gt;
+
+  Exemplos:
+    | sigla | resposta                                |
+    | ebfga | 409 SIGLA_EM_USO                        |
+    | DBOAZ | 422 SIGLA_INVALIDA, reservada ao time   |
+    | EBF   | 422 SIGLA_INVALIDA, precisa de 5 letras |
+    | COLSA | 201                                     |</pre>
+    </article>
+    <article class="criterio" id="RN-242-api">
+      <h3><code class="id">RN-242</code> Mesmo formulário para todos</h3>
+      <pre class="gherkin">Esquema do Cenário: documento de cada conta
+  Quando envia POST /contas com o tipo "&lt;tipo&gt;" e o documento &lt;documento&gt;
+  Então a resposta é &lt;resposta&gt;
+
+  Exemplos:
+    | tipo        | documento               | resposta                               |
+    | INSTITUICAO | CNPJ 12.345.678/0001-90 | 201                                    |
+    | AUTONOMO    | CPF 123.456.789-09      | 201                                    |
+    | AUTONOMO    | CNPJ 12.345.678/0001-90 | 422 DADOS_INVALIDOS, campo "documento" |</pre>
+    </article>
+    <article class="criterio" id="RN-180-api">
+      <h3><code class="id">RN-180</code> Entradas</h3>
+      <pre class="gherkin">Cenário: maiúsculas e minúsculas
+  Quando envia POST /auth/hub/entrar com a entrada "Maria.EEJSA@deboaz.com"
+  Então a resposta é 200 e o token é de "maria.eejsa@deboaz.com"
+
+Esquema do Cenário: login de cada usuário
+  Quando &lt;quem&gt; é criado
+  Então o login é "&lt;login&gt;"
+
+  Exemplos:
+    | quem                     | login                        |
+    | a conta master da EBFGA  | objetivo_unidade1@deboaz.com |
+    | a staff Maria, da EEJSA  | maria.eejsa@deboaz.com       |
+    | o membro do time Gustavo | gustavo.dboaz@deboaz.com     |</pre>
+    </article>
+    <article class="criterio" id="RN-181">
+      <h3><code class="id">RN-181</code> Código de liberação</h3>
+      <pre class="gherkin">Cenário: primeiro acesso da Maria
+  Quando a conta master envia POST /usuarios para criar a Maria
+  Então a resposta 201 traz o código de liberação "482913" uma única vez
+  E GET /usuarios/usr-ebfga-maria não traz o código
+  E POST /usuarios/gerar-senha só devolve a senha com "maria.ebfga@deboaz.com" e "482913"</pre>
+    </article>
+    <article class="criterio" id="RN-182">
+      <h3><code class="id">RN-182</code> Validade de 72 h</h3>
+      <pre class="gherkin">Esquema do Cenário: código vencido
+  Dado o código de liberação da Maria pedido há &lt;tempo&gt;
+  Quando ela envia POST /usuarios/gerar-senha com o código
+  Então a resposta é &lt;resposta&gt;
+
+  Exemplos:
+    | tempo | resposta           |
+    | 71 h  | 200 com a senha    |
+    | 73 h  | 410 CODIGO_VENCIDO |</pre>
+    </article>
+    <article class="criterio" id="RN-183">
+      <h3><code class="id">RN-183</code> Tempo de sessão da instituição</h3>
+      <pre class="gherkin">Esquema do Cenário: limites e padrão
+  Quando a conta master envia PUT /contas/conta-ebfga/tempo-sessao com &lt;campo&gt;
+  Então aceita de &lt;mínimo&gt; a &lt;máximo&gt;, com padrão &lt;padrão&gt;
+  E fora disso a resposta é 422 FORA_DOS_LIMITES
+
+  Exemplos:
+    | campo          | mínimo | máximo | padrão |
+    | staffNavegador | PT15M  | PT12H  | PT8H   |
+    | staffApp       | P1D    | P30D   | P7D    |
+    | participante   | P1D    | P90D   | P30D   |</pre>
+    </article>
+    <article class="criterio" id="RN-243-api">
+      <h3><code class="id">RN-243</code> Tempo de sessão do time e das contas master</h3>
+      <pre class="gherkin">Esquema do Cenário: limites e padrão
+  Quando o time deboaz envia PUT /time/tempo-sessao com &lt;campos&gt;
+  Então aceita de &lt;mínimo&gt; a &lt;máximo&gt;, com padrão &lt;padrão&gt;
+
+  Exemplos:
+    | campos                        | mínimo | máximo | padrão |
+    | membrosNavegador e membrosApp | PT15M  | PT12H  | PT8H   |
+    | mastersNavegador e mastersApp | PT15M  | PT24H  | PT8H   |
+
+Cenário: escola não muda a própria conta master
+  Quando a conta master da EBFGA envia PUT /time/tempo-sessao
+  Então a resposta é 403 ACESSO_NEGADO</pre>
+    </article>
+    <article class="criterio" id="RN-244">
+      <h3><code class="id">RN-244</code> Editar nome curto e matrícula</h3>
+      <pre class="gherkin">Cenário: nome curto do participante
+  Quando a conta master envia PATCH /usuarios/usr-ebfga-lucas com o nome curto "lucasa"
+  Então a resposta é 200 com um login novo, como "EBFGA-LUCASA-7731"
+  E o código "EBFGA-LUCAS-0412" deixa de valer
+
+Cenário: matrícula repetida
+  Quando a conta master envia PATCH /usuarios/usr-ebfga-ana com a matrícula "20260087", da Maria
+  Então a resposta é 409 MATRICULA_EM_USO e nada muda</pre>
+    </article>
+    <article class="criterio" id="RN-245">
+      <h3><code class="id">RN-245</code> Código de acesso novo</h3>
+      <pre class="gherkin">Cenário: o anterior deixa de valer
+  Dado o Lucas no tablet e a Carla no celular com "EBFGA-LUCAS-0412"
+  Quando a conta master envia POST /usuarios/usr-ebfga-lucas/novo-codigo-acesso
+  Então os tokens do tablet e do celular recebem 401 no próximo pedido
+  E POST /auth/quest/entrar com "EBFGA-LUCAS-0412" recebe 401 CODIGO_INVALIDO</pre>
+    </article>
+    <article class="criterio" id="RN-246-api">
+      <h3><code class="id">RN-246</code> Membro novo sem módulos</h3>
+      <pre class="gherkin">Cenário: começa sem nada
+  Quando o administrador envia POST /usuarios com o tipo "MEMBRO_TIME" para o Caio Reis
+  Então a resposta é 201
+  E GET /usuarios/usr-dboaz-caio/permissoes traz mods vazio</pre>
+    </article>
+    <article class="criterio" id="RN-184">
+      <h3><code class="id">RN-184</code> Código de acesso</h3>
+      <pre class="gherkin">Cenário: formato do código
+  Quando a EBFGA envia POST /usuarios do participante de nome curto "lucas"
+  Então o login é "EBFGA-LUCAS-" seguido de 4 números, como "EBFGA-LUCAS-0412"
+  E o login é único no sistema e vem em maiúsculas
+
+Cenário: minúsculas aceitas
+  Quando a Carla envia POST /auth/quest/entrar com o código "ebfga-lucas-0412"
+  Então a resposta é 200 com o token do Lucas, sem senha</pre>
+    </article>
+    <article class="criterio" id="RN-185-api">
+      <h3><code class="id">RN-185</code> Listas e busca</h3>
+      <pre class="gherkin">Esquema do Cenário: busca nas listas
+  Quando &lt;quem&gt; envia GET &lt;endereço&gt;?busca=&lt;termo&gt;
+  Então itens traz &lt;resultado&gt;
+
+  Exemplos:
+    | quem           | endereço  | termo              | resultado               |
+    | a conta master | /usuarios | maria.ebfga        | a Maria                 |
+    | a conta master | /usuarios | 20260087           | a Maria, pela matrícula |
+    | a conta master | /usuarios | EBFGA-LUCAS-0412   | o Lucas                 |
+    | o time deboaz  | /contas   | EBFGA              | a Escola Bento Freitas  |
+    | o time deboaz  | /contas   | 12.345.678/0001-90 | a Escola Bento Freitas  |
+
+Cenário: ordem, filtro e página
+  Quando a conta master envia GET /usuarios?tipo=STAFF&amp;estado=DESATIVADO&amp;pagina=1
+  Então itens traz só o staff desativado, de A a Z, até 50 por página, com o total</pre>
+    </article>
+    <article class="criterio" id="RN-186-api">
+      <h3><code class="id">RN-186</code> Último acesso</h3>
+      <pre class="gherkin">Cenário: participante com quem entrou
+  Dado a Carla, mãe do Lucas, entrou em 2026-11-01 às 07:55 UTC
+  Quando a conta master envia GET /usuarios/usr-ebfga-lucas
+  Então ultimoAcesso é "2026-11-01T07:55:00Z" e ultimoAcessoQuem é "MAE"
+
+Cenário: último acesso da conta
+  Quando o time deboaz envia GET /contas?busca=EBFGA
+  Então o item da EBFGA traz ultimoAcessoMaster</pre>
+    </article>
+    <article class="criterio" id="RN-187-api">
+      <h3><code class="id">RN-187</code> Ver a conta</h3>
+      <pre class="gherkin">Cenário: só o cadastro
+  Quando o time deboaz envia GET /contas/conta-ebfga
+  Então a resposta é 200 com:
+    """
+    {
+      "id": "conta-ebfga",
+      "tipo": "INSTITUICAO",
+      "nome": "Escola Bento Freitas",
+      "documento": "12.345.678/0001-90",
+      "sigla": "EBFGA",
+      "loginMaster": "objetivo_unidade1@deboaz.com",
+      "responsavel": "Gustavo Boaz de Moura Souza",
+      "telefone": "(51) 99999-0000",
+      "estado": "ATIVA",
+      "criadaEm": "2026-03-12T13:05:00Z",
+      "ultimoPagamento": "2026-10-05",
+      "ultimoAcessoMaster": "2026-11-01T08:15:00Z"
+    }
+    """
+  E a resposta não traz usuários, turmas nem conteúdos da escola
+
+Cenário: conta que não existe
+  Quando envia GET /contas/conta-zzzzz
+  Então a resposta é 404 CONTA_INEXISTENTE</pre>
+    </article>
+    <article class="criterio" id="RN-188-api">
+      <h3><code class="id">RN-188</code> Matrícula</h3>
+      <pre class="gherkin">Cenário: gerar automaticamente
+  Quando a conta master envia POST /usuarios do Lucas com a matrícula null
+  Então GET /usuarios/{id} do Lucas traz uma matrícula de 8 números, única na escola
+
+Cenário: matrícula que a escola já usa
+  Quando a conta master envia POST /usuarios da Maria com a matrícula "20260087"
+  Então GET /usuarios/usr-ebfga-maria traz a matrícula "20260087"</pre>
+    </article>
+    <article class="criterio" id="RN-189-api">
+      <h3><code class="id">RN-189</code> Card do módulo Usuários</h3>
+      <pre class="gherkin">Cenário: dados do card
+  Dado a conta master da EBFGA, com 37 staff e 298 participantes ativos
+  Quando envia GET /usuarios/card
+  Então a resposta é 200 com:
+    """
+    {
+      "selo": 2,
+      "dado": 335,
+      "rotulo": "usuários ativos",
+      "noMes": 12,
+      "meses": [
+        301,
+        310,
+        318,
+        323,
+        335
+      ],
+      "staff": 37,
+      "participantes": 298
+    }
+    """
+
+Esquema do Cenário: dado de cada perfil
+  Quando &lt;quem&gt; envia GET /usuarios/card
+  Então dado e rotulo são &lt;dado&gt;
+
+  Exemplos:
+    | quem                      | dado                        |
+    | a conta master da EBFGA   | 335 e "usuários ativos"     |
+    | o educador autônomo Pedro | 32 e "participantes ativos" |
+    | o administrador do deboaz | 112 e "contas ativas"       |</pre>
+    </article>
+    <article class="criterio" id="RN-190">
+      <h3><code class="id">RN-190</code> Administrador do deboaz</h3>
+      <pre class="gherkin">Cenário: senha fora das telas
+  Então a entrada e a senha do administrador do deboaz ficam num segredo do Key Vault
+  E só são definidas e trocadas ali, sem endereço que as mude
+  E o sistema guarda só o resumo irreversível da senha
+
+Cenário: membro esqueceu a senha
+  Quando o administrador envia POST /usuarios/usr-dboaz-caio/nova-geracao-senha
+  Então a resposta é 201 com o código de liberação para entregar ao Caio</pre>
+    </article>
+    <article class="criterio" id="RNF-201">
+      <h3><code class="id">RNF-201</code> Senha irreversível</h3>
+      <pre class="gherkin">Cenário: ninguém lê a senha
+  Dado a senha da Maria guardada
+  Quando o time deboaz envia qualquer pedido sobre a Maria
+  Então nenhuma resposta traz a senha
+  E no banco existe só o resumo irreversível, de onde a senha não pode ser lida</pre>
+    </article>
+    <article class="criterio" id="RNF-202">
+      <h3><code class="id">RNF-202</code> Força da senha</h3>
+      <pre class="gherkin">Esquema do Cenário: senha válida
+  Quando o servidor confere a senha "&lt;senha&gt;"
+  Então ela é &lt;resultado&gt;
+
+  Exemplos:
+    | senha         | resultado               |
+    | Gu#Boaz507318 | aceita                  |
+    | Gu#B5         | recusada, menos de 8    |
+    | gu#boaz507318 | recusada, sem maiúscula |
+    | GuBoaz507318  | recusada, sem especial  |
+    | Gu#Boazxyzwq  | recusada, sem número    |</pre>
+    </article>
+    <article class="criterio" id="RNF-205">
+      <h3><code class="id">RNF-205</code> Limite do atendimento sem login</h3>
+      <pre class="gherkin">Cenário: quarto envio no dia
+  Dado 3 pedidos POST /contas/esqueci-senha-master do mesmo aparelho nas últimas 24 h
+  Quando chega o quarto
+  Então a resposta é 429 LIMITE_ATENDIMENTO com tentarEm, 24 h depois do primeiro</pre>
+    </article>
+    <article class="criterio" id="RNF-206">
+      <h3><code class="id">RNF-206</code> Auditoria imutável</h3>
+      <pre class="gherkin">Cenário: registro não muda
+  Dado o registro "aud-ebfga-000154" da criação do Lucas
+  Quando o time deboaz procura alterar ou apagar o registro
+  Então nenhum endereço da API faz isso
+  E o banco recusa a alteração e a remoção</pre>
+    </article>
+    <article class="criterio" id="exemplo-entidades">
+      <h3>Exemplo de cada entidade</h3>
+      <pre class="gherkin">Cenário: escola EBFGA cadastrada
+  Dado a Escola Bento Freitas, a conta master, a Maria e o Lucas, com datas em UTC
+  Então a conta é:
+    """
+    {
+      "_id": "conta-ebfga",
+      "sigla": "EBFGA",
+      "dominio": "objetivo_unidade1",
+      "nome": "Escola Bento Freitas",
+      "tipo": "INSTITUICAO",
+      "estado": "ATIVA",
+      "documento": "12.345.678/0001-90",
+      "responsavel": "Gustavo Boaz de Moura Souza",
+      "telefone": "(51) 99999-0000",
+      "criadaEm": "2026-03-12T13:05:00Z",
+      "ultimoAcessoMaster": "2026-10-29T11:15:00Z",
+      "tempoSessao": {
+        "staffNavegador": "PT8H",
+        "staffApp": "P7D",
+        "participante": "P30D"
+      }
+    }
+    """
+  E a conta master é:
+    """
+    {
+      "_id": "usr-ebfga-master",
+      "sigla": "EBFGA",
+      "contaId": "conta-ebfga",
+      "tipo": "MASTER",
+      "nome": "Escola Bento Freitas",
+      "nomeCurto": "objetivo_unidade1",
+      "estado": "ATIVO",
+      "login": "objetivo_unidade1@deboaz.com",
+      "resumoSenha": "(resumo irreversível)",
+      "criadoEm": "2026-03-12T13:05:00Z",
+      "ultimoAcesso": "2026-10-29T11:15:00Z"
+    }
+    """
+  E a staff é:
+    """
+    {
+      "_id": "usr-ebfga-maria",
+      "sigla": "EBFGA",
+      "contaId": "conta-ebfga",
+      "tipo": "STAFF",
+      "nome": "Maria Souza",
+      "nomeCurto": "maria",
+      "estado": "ATIVO",
+      "login": "maria.ebfga@deboaz.com",
+      "matricula": "20260087",
+      "resumoSenha": "(resumo irreversível)",
+      "permissoes": {
+        "versao": 7,
+        "pv": 7,
+        "mods": {
+          "MOD-03": "CU",
+          "MOD-04": "U",
+          "MOD-05": "U"
+        },
+        "suspensos": []
+      },
+      "criadoEm": "2026-03-14T10:20:00Z",
+      "ultimoAcesso": "2026-10-29T09:42:00Z"
+    }
+    """
+  E o participante é:
+    """
+    {
+      "_id": "usr-ebfga-lucas",
+      "sigla": "EBFGA",
+      "contaId": "conta-ebfga",
+      "tipo": "PARTICIPANTE",
+      "nome": "Lucas Andrade",
+      "nomeCurto": "lucas",
+      "estado": "ATIVO",
+      "login": "EBFGA-LUCAS-0412",
+      "codigoGeradoEm": "2026-03-20T15:00:00Z",
+      "matricula": "48201755",
+      "responsaveis": [
+        {
+          "nome": "Carla Andrade",
+          "parentesco": "MAE"
+        },
+        {
+          "nome": "Paulo Andrade",
+          "parentesco": "PAI"
+        }
+      ],
+      "criadoEm": "2026-03-20T15:00:00Z",
+      "ultimoAcesso": "2026-10-28T22:10:00Z"
+    }
+    """
+
+Cenário: geração de senha, acesso anônimo e auditoria
+  Então a geração de senha da Maria é:
+    """
+    {
+      "_id": "ger-ebfga-maria-0001",
+      "sigla": "EBFGA",
+      "usuarioId": "usr-ebfga-maria",
+      "pedidaPor": "usr-ebfga-master",
+      "resumoCodigo": "(resumo irreversível)",
+      "resumoComprovante": "(resumo irreversível)",
+      "pedidaEm": "2026-10-27T13:00:00Z",
+      "senhaMostradaEm": "2026-10-27T13:12:00Z",
+      "confirmadaEm": "2026-10-27T13:13:00Z"
+    }
+    """
+  E o acesso anônimo da sala 482107 é:
+    """
+    {
+      "_id": "anon-ebfga-482107-13465",
+      "sigla": "EBFGA",
+      "sala": "482107",
+      "apelido": "PUPIL-EBFGA-13465"
+    }
+    """
+  E o registro de auditoria é:
+    """
+    {
+      "_id": "aud-ebfga-000154",
+      "contaId": "conta-ebfga",
+      "quem": "usr-ebfga-maria",
+      "acao": "CRIAR_USUARIO",
+      "alvo": "usr-ebfga-lucas",
+      "quando": "2026-03-20T15:00:00Z",
+      "guardarAte": "2031-03-20T15:00:00Z"
+    }
+    """</pre>
+    </article>
+    <article class="criterio" id="fora-de-escopo">
+      <h3>Fora de escopo</h3>
+      <pre class="gherkin">Cenário: o que este documento não trata
+  Então login por Google ou Microsoft e segundo fator ficam de fora (decisão de 2026-10-29)
+  E senha escolhida pela pessoa e envio de senha ou código por e-mail ficam de fora
+  E recuperação por perguntas de segurança fica de fora
+  E turma e ano do participante ficam no módulo de turmas
+  E o formato do código da sala fica no módulo de aula ao vivo
+  E usuário em várias unidades da mesma instituição fica para a fase de escala</pre>
+    </article>
+  </section>
+  <section id="telas">
+    <h2>Telas</h2>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-acesso_v03_20261101-0236.svg"><img src="../2_Diagramas/vista-hub-acesso_v03_20261101-0236.svg" alt="Vista do acesso ao hub: criar conta com domínio e sigla, igual para escola, empresa e autônomo, que só troca o CNPJ pelo CPF, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha"></a>
+      <figcaption><strong>Hub · acesso · vista</strong><code>2_Diagramas/vista-hub-acesso_v03_20261101-0236.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-usuarios_v08_20261102-1400.svg"><img src="../2_Diagramas/vista-hub-usuarios_v08_20261102-1400.svg" alt="Vista do módulo Usuários: card do módulo nos quatro tamanhos no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe"></a>
+      <figcaption><strong>Hub · usuários · vista</strong><code>2_Diagramas/vista-hub-usuarios_v08_20261102-1400.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-time-deboaz_v09_20261101-1338.svg"><img src="../2_Diagramas/vista-hub-time-deboaz_v09_20261101-1338.svg" alt="Vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card nos quatro tamanhos com as contas assinantes e os membros do time, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe"></a>
+      <figcaption><strong>Hub · time deboaz · usuários · vista</strong><code>2_Diagramas/vista-hub-time-deboaz_v09_20261101-1338.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-quest-sala-anonima_v02_20261029-0255.svg"><img src="../2_Diagramas/vista-quest-sala-anonima_v02_20261029-0255.svg" alt="Vista do quest: código da sala, escolha entre anônimo e código de acesso, e sala anônima com o apelido gerado PUPIL-EBFGA-13465"></a>
+      <figcaption><strong>Quest · sala anônima · vista</strong><code>2_Diagramas/vista-quest-sala-anonima_v02_20261029-0255.svg</code></figcaption>
+    </figure>
   </section>
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../2_Diagramas/identidade-acesso_v02_20261029-0103.svg"><img src="../2_Diagramas/identidade-acesso_v02_20261029-0103.svg" alt="Casos de uso de identidade e acesso: conta master, staff, participantes, permissões, senhas, SAC, painel do time deboaz e entradas no quest"></a>
-      <figcaption><strong>Identidade e acesso · casos de uso</strong><code>2_Diagramas/identidade-acesso_v02_20261029-0103.svg</code></figcaption>
+      <a href="../2_Diagramas/identidade-acesso_v04_20261101-0351.svg"><img src="../2_Diagramas/identidade-acesso_v04_20261101-0351.svg" alt="Casos de uso de identidade e acesso: conta master, staff, participantes, permissões, senhas, edição de staff e participante, novo código de acesso, SAC, contas e tempo de sessão cuidados pelo time deboaz no módulo Usuários e entradas no quest"></a>
+      <figcaption><strong>Identidade e acesso · casos de uso</strong><code>2_Diagramas/identidade-acesso_v04_20261101-0351.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/identidade-acesso-sequencia_v01_20261029-0117.svg"><img src="../2_Diagramas/identidade-acesso-sequencia_v01_20261029-0117.svg" alt="Sequência do cadastro do staff ao uso do token: código de liberação, senha gerada pelo sistema, token assinado no Key Vault e revogação conferida a cada ação"></a>
-      <figcaption><strong>Identidade e acesso · sequência</strong><code>2_Diagramas/identidade-acesso-sequencia_v01_20261029-0117.svg</code></figcaption>
-    </figure>
-    <h3>Entidades de identidade e acesso</h3>
-    <figure class="diagrama">
-      <a href="../2_Diagramas/identidade-acesso-classes_v02_20261031-1244.svg"><img src="../2_Diagramas/identidade-acesso-classes_v02_20261031-1244.svg" alt="Diagrama de classes de identidade e acesso: Conta, Usuário abstrato com ContaMaster, Staff e Participante, Permissão por módulo, Responsável, GeraçãoDeSenha, Sessão, RegistroDeAuditoria e AcessoAnônimo"></a>
-      <figcaption><strong>Identidade e acesso · classes</strong><code>2_Diagramas/identidade-acesso-classes_v02_20261031-1244.svg</code></figcaption>
+      <a href="../2_Diagramas/identidade-acesso-classes_v03_20261101-1500.svg"><img src="../2_Diagramas/identidade-acesso-classes_v03_20261101-1500.svg" alt="Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável e AcessoAnônimo; sessão e permissões nos diagramas de autenticação e de autorização"></a>
+      <figcaption><strong>Usuários · classes</strong><code>2_Diagramas/identidade-acesso-classes_v03_20261101-1500.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/identidade-acesso-documentos_v02_20261031-1244.svg"><img src="../2_Diagramas/identidade-acesso-documentos_v02_20261031-1244.svg" alt="Modelo de documentos de identidade e acesso: contas, usuarios particionados pela sigla com permissões e responsáveis embutidos, geracoesSenha, acessosAnonimos, auditoria e sessão no Redis"></a>
-      <figcaption><strong>Identidade e acesso · modelo de documentos</strong><code>2_Diagramas/identidade-acesso-documentos_v02_20261031-1244.svg</code></figcaption>
+      <a href="../2_Diagramas/identidade-acesso-documentos_v03_20261101-1503.svg"><img src="../2_Diagramas/identidade-acesso-documentos_v03_20261101-1503.svg" alt="Modelo de documentos: contas com tempos de sessão e conferências, usuarios particionados pela sigla com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas"></a>
+      <figcaption><strong>Usuários, autenticação e autorização · documentos</strong><code>2_Diagramas/identidade-acesso-documentos_v03_20261101-1503.svg</code></figcaption>
     </figure>
-    <h3>Exemplo de cada entidade de identidade e acesso</h3>
-    <p>Dados fictícios, os mesmos das vistas: a Escola Bento Freitas (<code>EBFGA</code>), a conta master dela, a staff Maria Souza e o participante Lucas Andrade. Os ids são legíveis só no exemplo, datas em UTC; senha e código de liberação nunca ficam guardados como texto, só o resumo irreversível (<a class="ref" href="#RNF-201">RNF-201</a>).</p>
-    <p><strong>contas</strong> · uma por instituição ou educador autônomo, com a sigla e o domínio únicos (<a class="ref" href="#RF-104">RF-104</a>, <a class="ref" href="#RN-179">RN-179</a>, <a class="ref" href="#RN-183">RN-183</a>)</p>
-<pre><code>{
-  "_id": "conta-ebfga",
-  "sigla": "EBFGA",
-  "dominio": "objetivo_unidade1",
-  "nome": "Escola Bento Freitas",
-  "tipo": "INSTITUICAO",
-  "estado": "ATIVA",
-  "documento": "12.345.678/0001-90",
-  "responsavel": "Gustavo Boaz de Moura Souza",
-  "telefone": "(51) 99999-0000",
-  "criadaEm": "2026-03-12T13:05:00Z",
-  "ultimoAcessoMaster": "2026-10-29T11:15:00Z",
-  "tempoSessao": {
-    "staffNavegador": "PT8H",
-    "staffApp": "P7D",
-    "participante": "P30D"
-  }
-}</code></pre>
-    <p><strong>usuarios</strong> · conta master: entra com o domínio da conta e tem todas as permissões dela (<a class="ref" href="#RF-104">RF-104</a>, <a class="ref" href="#RN-167">RN-167</a>, <a class="ref" href="#RN-180">RN-180</a>)</p>
-<pre><code>{
-  "_id": "usr-ebfga-master",
-  "sigla": "EBFGA",
-  "contaId": "conta-ebfga",
-  "tipo": "MASTER",
-  "nome": "Escola Bento Freitas",
-  "nomeCurto": "objetivo_unidade1",
-  "estado": "ATIVO",
-  "login": "objetivo_unidade1@deboaz.com",
-  "resumoSenha": "(resumo irreversível da senha)",
-  "criadoEm": "2026-03-12T13:05:00Z",
-  "ultimoAcesso": "2026-10-29T11:15:00Z"
-}</code></pre>
-    <p><strong>usuarios</strong> · staff: entrada com o nome curto e a sigla, matrícula informada e permissões por módulo (<a class="ref" href="#RF-106">RF-106</a>, <a class="ref" href="#RF-107">RF-107</a>, <a class="ref" href="#RN-188">RN-188</a>)</p>
-<pre><code>{
-  "_id": "usr-ebfga-maria",
-  "sigla": "EBFGA",
-  "contaId": "conta-ebfga",
-  "tipo": "STAFF",
-  "nome": "Maria Souza",
-  "nomeCurto": "maria",
-  "estado": "ATIVO",
-  "login": "maria.ebfga@deboaz.com",
-  "matricula": "20260087",
-  "resumoSenha": "(resumo irreversível da senha)",
-  "permissoes": [
-    { "moduloId": "mod-usuarios", "abaConfiguracao": true,  "abaUtilizacao": true, "suspensa": false },
-    { "moduloId": "mod-quiz",     "abaConfiguracao": false, "abaUtilizacao": true, "suspensa": false }
-  ],
-  "criadoEm": "2026-03-14T10:20:00Z",
-  "ultimoAcesso": "2026-10-29T09:42:00Z"
-}</code></pre>
-    <p><strong>usuarios</strong> · participante: sem senha, entra com o código de acesso, que vale também para os responsáveis (<a class="ref" href="#RF-108">RF-108</a>, <a class="ref" href="#RN-184">RN-184</a>, <a class="ref" href="#RN-186">RN-186</a>)</p>
-<pre><code>{
-  "_id": "usr-ebfga-lucas",
-  "sigla": "EBFGA",
-  "contaId": "conta-ebfga",
-  "tipo": "PARTICIPANTE",
-  "nome": "Lucas Andrade",
-  "nomeCurto": "lucas",
-  "estado": "ATIVO",
-  "login": "EBFGA-LUCAS-0412",
-  "matricula": "48201755",
-  "responsaveis": [
-    { "nome": "Carla Andrade", "parentesco": "Mãe" },
-    { "nome": "Paulo Andrade", "parentesco": "Pai" }
-  ],
-  "criadoEm": "2026-03-20T15:00:00Z",
-  "ultimoAcesso": "2026-10-28T22:10:00Z"
-}</code></pre>
-    <p><strong>geracoesSenha</strong> · cada geração de senha, com o código de liberação que vale 72 h (<a class="ref" href="#RF-110">RF-110</a>, <a class="ref" href="#RN-181">RN-181</a>, <a class="ref" href="#RN-182">RN-182</a>)</p>
-<pre><code>{
-  "_id": "ger-ebfga-maria-0001",
-  "sigla": "EBFGA",
-  "usuarioId": "usr-ebfga-maria",
-  "pedidaPor": "usr-ebfga-master",
-  "resumoCodigo": "(resumo irreversível do código de liberação)",
-  "pedidaEm": "2026-10-27T13:00:00Z",
-  "usadaEm": "2026-10-27T13:12:00Z"
-}</code></pre>
-    <p><strong>acessosAnonimos</strong> · um por pessoa sem código de acesso numa sala que aceita anônimo; some quando a sala fecha (<a class="ref" href="#RF-115">RF-115</a>, <a class="ref" href="#RN-177">RN-177</a>)</p>
-<pre><code>{
-  "_id": "anon-ebfga-482107-13465",
-  "sigla": "EBFGA",
-  "sala": "482107",
-  "apelido": "PUPIL-EBFGA-13465"
-}</code></pre>
-    <p><strong>auditoria</strong> · um registro por ação de criar usuário, gerar senha, mudar permissão ou estado; nunca muda (<a class="ref" href="#RN-178">RN-178</a>, <a class="ref" href="#RNF-206">RNF-206</a>)</p>
-<pre><code>{
-  "_id": "aud-ebfga-000154",
-  "contaId": "conta-ebfga",
-  "quem": "usr-ebfga-maria",
-  "acao": "CRIAR_USUARIO",
-  "alvo": "usr-ebfga-lucas",
-  "quando": "2026-03-20T15:00:00Z"
-}</code></pre>
-    <p><strong>sessão no Redis</strong> · chave <code>sessao:&lt;id&gt;</code>, que expira pelo tempo de sessão da conta, aqui 8 h do staff no navegador (<a class="ref" href="#RF-114">RF-114</a>, <a class="ref" href="#RN-183">RN-183</a>)</p>
-<pre><code>sessao:3f9c2a71   expira em 28800 s
-{
-  "usuarioId": "usr-ebfga-maria",
-  "sigla": "EBFGA",
-  "aparelho": "NAVEGADOR",
-  "quemEntrou": null,
-  "ultimaAcao": "2026-10-29T09:42:00Z"
-}</code></pre>
-    <h3>Telas do hub: conta nova e entrada</h3>
-    <p>Exemplo de ponta a ponta com a Escola Bento Freitas Gonçalves e a staff Maria Souza. As vistas estão em compact; o botão <strong>Paleta</strong> troca o tema de cor e o modo.</p>
-    <ol>
-      <li><strong>Criar conta</strong>: a escola informa o CNPJ <code>12.345.678/0001-90</code>, o responsável Gustavo Boaz de Moura Souza, o telefone, o domínio <code>objetivo_unidade1</code> e a sigla <code>EBFGA</code>, que o sistema confere (<a class="ref" href="#RF-104">RF-104</a>, <a class="ref" href="#RN-179">RN-179</a>).</li>
-      <li><strong>Sua senha</strong>: o sistema mostra uma única vez a entrada <code>objetivo_unidade1@deboaz.com</code> e a senha <code>Gu#Boaz507318</code>; Continuar só fica ativo depois de marcar Anotei a senha (<a class="ref" href="#RF-109">RF-109</a>, <a class="ref" href="#RN-171">RN-171</a>).</li>
-      <li><strong>Entrar</strong>: a Maria, criada no módulo Usuários, informa <code>maria.ebfga@deboaz.com</code> e toca Recebi um código de liberação (<a class="ref" href="#RN-180">RN-180</a>).</li>
-      <li><strong>Código de liberação</strong>: ela informa o código <code>482913</code>, recebido pessoalmente, e toca Gerar minha senha; a senha aparece uma única vez, como no passo 2 (<a class="ref" href="#RN-181">RN-181</a>, <a class="ref" href="#RN-182">RN-182</a>, <a class="ref" href="#RNF-204">RNF-204</a>).</li>
-      <li><strong>Esqueci a senha</strong>: o staff pede uma nova geração de senha a quem cuida dos usuários (<a class="ref" href="#RF-110">RF-110</a>); a conta master envia o CNPJ e o telefone ao SAC, até 3 vezes por aparelho a cada 24 h (<a class="ref" href="#RF-111">RF-111</a>, <a class="ref" href="#RN-172">RN-172</a>, <a class="ref" href="#RNF-205">RNF-205</a>).</li>
-    </ol>
-    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-acesso_v02_20261029-0255.svg"><img src="../2_Diagramas/vista-hub-acesso_v02_20261029-0255.svg" alt="Vista do acesso ao hub: criar conta com domínio e sigla, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha"></a>
-      <figcaption><strong>Hub · acesso · vista</strong><code>2_Diagramas/vista-hub-acesso_v02_20261029-0255.svg</code></figcaption>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/usuarios-sequencia_v01_20261101-2317.svg"><img src="../2_Diagramas/usuarios-sequencia_v01_20261101-2317.svg" alt="Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo"></a>
+      <figcaption><strong>Usuários · sequência</strong><code>2_Diagramas/usuarios-sequencia_v01_20261101-2317.svg</code></figcaption>
     </figure>
-    <h3>Telas do módulo Usuários</h3>
-    <ol>
-      <li><strong>Módulos</strong>: na tela inicial do hub, aba Da conta, o card Usuários da escola mostra 352 usuários (40 staff e 312 participantes) e 12 novos no mês, 37 staff ativos, 2 com senha pendente e 1 desativado, e 298 participantes ativos, 27 sem acesso há 30 dias e 14 desativados; o selo avisa 2 códigos de liberação que vencem hoje (<a class="ref" href="#RN-189">RN-189</a>).</li>
-      <li><strong>Staff</strong>: a conta master busca por nome, entrada ou matrícula, filtra pelos botões segmentados Ativos, Pendentes e Desativados e vê o staff de A a Z, com a entrada, a matrícula e o último acesso (Ana Prado, hoje, 08:42); toca Novo staff (<a class="ref" href="#RF-105">RF-105</a>, <a class="ref" href="#RF-112">RF-112</a>, <a class="ref" href="#RN-185">RN-185</a>, <a class="ref" href="#RN-186">RN-186</a>).</li>
-      <li><strong>Novo staff</strong>: informa Maria Souza, o nome curto <code>maria</code> e a matrícula que a escola já usa, <code>20260087</code> (ou toca Gerar automaticamente); o apoio mostra a entrada <code>maria.ebfga@deboaz.com</code>, e ninguém digita senha (<a class="ref" href="#RN-188">RN-188</a>, <a class="ref" href="#RF-106">RF-106</a>, <a class="ref" href="#RN-170">RN-170</a>).</li>
-      <li><strong>Código de liberação</strong>: o diálogo mostra <code>482 913</code> uma única vez, para entregar pessoalmente à Maria em até 72 h (<a class="ref" href="#RN-181">RN-181</a>, <a class="ref" href="#RN-182">RN-182</a>).</li>
-      <li><strong>Permissões</strong>: nos botões segmentados de cada módulo contratado, marca Utilização em Presença e Configuração em Turmas; pode conceder Administrar usuários, pedir nova geração de senha ou desativar a Maria (<a class="ref" href="#RF-107">RF-107</a>, <a class="ref" href="#RF-110">RF-110</a>, <a class="ref" href="#RN-166">RN-166</a>, <a class="ref" href="#RN-168">RN-168</a>).</li>
-      <li><strong>Participantes</strong>: a mesma busca, por nome, código ou matrícula, e o filtro Ativos ou Desativados (sem pendente, porque o participante não tem senha); cada um mostra o código de acesso em maiúsculas, como <code>EBFGA-LUCAS-0412</code>, a matrícula e o último acesso com quem entrou: hoje, 07:55, a mãe (<a class="ref" href="#RN-184">RN-184</a>, <a class="ref" href="#RN-186">RN-186</a>).</li>
-      <li><strong>Novo participante</strong>: informa Lucas Andrade e o nome curto <code>lucas</code>, toca Gerar automaticamente para a matrícula (<code>48201755</code>) e informa os responsáveis Carla Andrade (mãe) e Paulo Andrade (pai), com Adicionar responsável para mais um; o código <code>EBFGA-LUCAS-&lt;4 números&gt;</code> vale para todos, sem senha (<a class="ref" href="#RN-188">RN-188</a>, <a class="ref" href="#RF-108">RF-108</a>, <a class="ref" href="#RN-184">RN-184</a>).</li>
-      <li><strong>Tempo de sessão</strong>: staff no navegador 8 h, staff no app 7 dias e participantes 30 dias, dentro dos limites (<a class="ref" href="#RF-114">RF-114</a>, <a class="ref" href="#RN-183">RN-183</a>).</li>
-    </ol>
-    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-usuarios_v05_20261029-0330.svg"><img src="../2_Diagramas/vista-hub-usuarios_v05_20261029-0330.svg" alt="Vista do módulo Usuários: card do módulo em Módulos, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão"></a>
-      <figcaption><strong>Hub · usuários · vista</strong><code>2_Diagramas/vista-hub-usuarios_v05_20261029-0330.svg</code></figcaption>
-    </figure>
-    <h3>Telas do hub: acesso do time deboaz</h3>
-    <ol>
-      <li><strong>Entrar</strong>: o membro do time entra na mesma tela das contas com <code>gustavo.dboaz@deboaz.com</code> e a senha gerada pelo sistema, sem segundo fator (<a class="ref" href="#RN-179">RN-179</a>, <a class="ref" href="#RN-180">RN-180</a>).</li>
-      <li><strong>Módulos</strong>: a conta do time (<code>DBOAZ</code>, sem custos) mostra o card de cada módulo com os dados dele (<a class="ref" href="08_hub-ux.html#RN-84">Hub · UX base RN-84</a>): o painel de administração com 128 contas (96 instituições e 32 autônomos), 112 ativas, 4 suspensas e 12 desativadas, 105 pagamentos em dia, 7 em atraso e 9 contas novas no mês; o SAC com 42 atendimentos no mês, 39 atendidos e 3 não atendidos; Usuários com os membros do time por estado; e, rolando a tela, o <a class="ref" href="16_catalogo.html#RF-116">Catálogo</a>, que só esta conta tem.</li>
-      <li><strong>Contas</strong>: a busca por nome, sigla ou CNPJ e os botões segmentados Ativas, Suspensas e Desativadas filtram as contas, de A a Z, com a sigla, o pagamento em dia ou em atraso e o último acesso (<a class="ref" href="#RN-185">RN-185</a>, <a class="ref" href="#RN-186">RN-186</a>); o menu de cada conta vê, suspende, desativa, gera o código da master e encerra, e numa conta desativada, reativa (<a class="ref" href="#RF-113">RF-113</a>, <a class="ref" href="#RN-173">RN-173</a>, <a class="ref" href="#RN-174">RN-174</a>).</li>
-      <li><strong>Dados da conta</strong>: Ver a conta abre só o cadastro da Escola Bento Freitas (tipo, CNPJ, entrada da conta master, responsável e telefone) e as datas: criada em 12/03/2026, último pagamento em 05/10/2026 e último acesso da conta master hoje, 08:15 (<a class="ref" href="#RN-187">RN-187</a>).</li>
-      <li><strong>SAC</strong>: a mesma busca e os botões segmentados Novas, Conferindo e Respondidas separam, da mais antiga para a mais nova, as mensagens da ação Esqueci a senha da conta master, que chegam sem login com a conta e o CNPJ ou CPF (<a class="ref" href="#RF-111">RF-111</a>).</li>
-      <li><strong>Conferir cadastro</strong>: o CNPJ <code>12.345.678/0001-90</code> confere, e mais 2 de 3 dados: nome de quem cadastrou e telefone conferem, a data do último pagamento não veio; Pedir nova geração de senha fica ativo (<a class="ref" href="#RN-172">RN-172</a>, <a class="ref" href="#RN-178">RN-178</a>).</li>
-      <li><strong>Código da master</strong>: o diálogo mostra <code>715 204</code> uma única vez, para entregar ao contato conferido <code>(51) 99999-0000</code>; com ele, a conta master recebe a senha na tela Código de liberação (<a class="ref" href="#RN-181">RN-181</a>, <a class="ref" href="#RN-182">RN-182</a>).</li>
-      <li><strong>Usuários do time</strong>: só o administrador do deboaz, conta master do time, cria membros (<code>ana.dboaz@deboaz.com</code>); quando um membro esquece a senha, o administrador pede a nova geração de senha e entrega o código de liberação para o primeiro acesso. A entrada e a senha do próprio administrador ficam no Key Vault, fora das telas (<a class="ref" href="#RN-164">RN-164</a>, <a class="ref" href="#RN-169">RN-169</a>, <a class="ref" href="#RN-190">RN-190</a>).</li>
-    </ol>
-    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-time-deboaz_v06_20261031-1527.svg"><img src="../2_Diagramas/vista-hub-time-deboaz_v06_20261031-1527.svg" alt="Vista do acesso do time deboaz: entrar com a entrada .dboaz, cards dos módulos do time com dados e gráficos, inclusive o Catálogo, contas com busca, dados da conta, SAC com busca, conferência do cadastro, código da conta master e membros do time"></a>
-      <figcaption><strong>Hub · time deboaz · vista</strong><code>2_Diagramas/vista-hub-time-deboaz_v06_20261031-1527.svg</code></figcaption>
-    </figure>
-    <h3>Telas do quest: sala anônima</h3>
-    <ol>
-      <li><strong>Entrar numa sala</strong>: na tela de acesso do quest, a pessoa toca Entrar numa sala e digita o código que quem apresenta mostra na tela, como <code>482 107</code>; o formato do código é do módulo da sala (<a class="ref" href="09_quest-ux.html#RN-100">Quest · UX base RN-100</a>).</li>
-      <li><strong>Como entrar</strong>: a sala aceita anônimo, então ela escolhe Entrar como anônimo ou Usar meu código de acesso, que leva o resultado para o perfil (<a class="ref" href="09_quest-ux.html#RN-101">Quest · UX base RN-101</a>).</li>
-      <li><strong>Sala como anônimo</strong>: recebe o apelido <code>PUPIL-EBFGA-13465</code>, que some quando a sala fecha (<a class="ref" href="#RF-115">RF-115</a>, <a class="ref" href="#RN-177">RN-177</a>).</li>
-    </ol>
-    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-quest-sala-anonima_v02_20261029-0255.svg"><img src="../2_Diagramas/vista-quest-sala-anonima_v02_20261029-0255.svg" alt="Vista do quest: código da sala, escolha entre anônimo e código de acesso, e sala anônima com o apelido gerado PUPIL-EBFGA-13465"></a>
-      <figcaption><strong>Quest · sala anônima · vista</strong><code>2_Diagramas/vista-quest-sala-anonima_v02_20261029-0255.svg</code></figcaption>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg"><img src="../2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg" alt="Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro"></a>
+      <figcaption><strong>Usuários · contrato de API</strong><code>2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -1351,20 +2314,20 @@ Cenário: pagamento regularizado
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v22</span></td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
-      <tr><td>v21</td><td>2026-10-31 23:46</td><td>Ficha do módulo <code class="id">MOD-03</code> em Regras de negócio: ícone <code>pessoas</code>, dados de cada tamanho do card para a conta master e o staff com Usuários, o educador autônomo e o administrador do deboaz; <code class="id">RN-189</code> aponta para a ficha</td></tr>
-      <tr><td>v20</td><td>2026-10-31 16:46</td><td>Meus módulos vira Módulos no critério de <code class="id">RF-107</code> e nos exemplos</td></tr>
-      <tr><td>v19</td><td>2026-10-31 15:53</td><td>Aprovado</td></tr>
-      <tr><td>v18</td><td>2026-10-31 15:29</td><td>Vista do time deboaz v06: card do Catálogo pelo registro de módulos (15_modulos)</td></tr>
-      <tr><td>v17</td><td>2026-10-31 13:23</td><td>Link de <code class="id">RF-111</code> para os tipos de módulo em <a class="ref" href="15_modulos.html#RN-203">Módulos RN-203</a></td></tr>
-      <tr><td>v16</td><td>2026-10-31 12:45</td><td>Renumerado de 16_identidade-acesso para 17_modulo-usuario e título Módulo Usuários; links para 16_catalogo; diagramas identidade-acesso-classes v02 e identidade-acesso-documentos v02</td></tr>
-      <tr><td>v15</td><td>2026-10-29 05:05</td><td>Exemplo completo, com dados fictícios, de cada entidade: contas, usuarios (conta master, staff e participante), geracoesSenha, acessosAnonimos, auditoria e sessão</td></tr>
-      <tr><td>v14</td><td>2026-10-29 05:00</td><td>Diagrama entidade-relacionamento trocado pelo modelo de documentos (identidade-acesso-documentos v01), para o MongoDB e o Cosmos DB for MongoDB</td></tr>
-      <tr><td>v13</td><td>2026-10-29 04:49</td><td>Diagramas de classes e de entidade-relacionamento (identidade-acesso-classes v01, identidade-acesso-er v01)</td></tr>
+      <tr><td><span class="boaz-versao">v47</span></td><td>2026-11-02 17:22</td><td>Contrato de API de Usuários v03: em <code class="id">RN-185</code>, GET /usuarios com tipo opcional (sem tipo, a busca percorre todos os tipos que quem pede pode listar) e o tipo em cada item da lista; a staff concede também Administrar usuários, só com as abas que tem (<code class="id">RN-167</code>, Autorização <code class="id">RN-252</code>)</td></tr>
+      <tr><td>v46</td><td>2026-11-02 15:08</td><td>Contrato de API de Usuários v02: regras do core (ids, sigla sugerida, documento, senha, tempos em horas, conta do time), mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam (RF-104 a RF-114, RF-152 a RF-154, RN-163 a RN-190, RN-242 a RN-246)</td></tr>
+      <tr><td>v45</td><td>2026-11-02 14:01</td><td>Vista hub-usuarios v08: textos neutros nas recusas ao salvar as permissões (Autorização <code class="id">RF-161</code> e <code class="id">RF-162</code>)</td></tr>
+      <tr><td>v44</td><td>2026-11-02 01:03</td><td><code>RN-245-api</code>: código antigo no quest responde <code>401 CODIGO_INVALIDO</code>, como no contrato da Autenticação</td></tr>
+      <tr><td>v43</td><td>2026-11-02 00:11</td><td>Cenários separados em Cenários de tela e Cenários de API; os de API usam os endereços, pedidos e códigos do contrato (IDs nos dois: <code>&lt;ID&gt;-api</code>)</td></tr>
+      <tr><td>v42</td><td>2026-11-01 23:18</td><td>Diagrama de sequência do módulo Usuários v01 (conta, staff, primeiro acesso, nova geração de senha, desativar e time deboaz); sai o Em aberto</td></tr>
+      <tr><td>v41</td><td>2026-11-01 22:01</td><td>Contrato de API do módulo Usuários v01 com os 18 endereços; Em aberto só com o diagrama de sequência; JSON dos exemplos expandidos e alinhados ao modelo de documentos v03 (permissões em mods com versão e pv, geração de senha com comprovante)</td></tr>
+      <tr><td>v40</td><td>2026-11-01 18:18</td><td>Só Gherkin, telas e diagramas: contexto, RF, RN, RNF, ficha do módulo, exemplos de entidades e fora de escopo viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
+      <tr><td>v39</td><td>2026-11-01 15:28</td><td>Aprovado</td></tr>
+      <tr><td>v38</td><td>2026-11-01 15:28</td><td>Sai a referência a identidade-acesso-sequencia v01, superada pelas sequências de autenticação e de autorização (17-a e 17-b)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v22 · 2026-11-01 01:00</span>
+    <span>boaz · v47 · 2026-11-02 17:22</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario.html</span>
   </div>
 </footer>

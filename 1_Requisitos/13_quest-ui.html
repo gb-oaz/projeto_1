@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quest · UI · boaz · v16</title>
+<title>Quest · UI · boaz · v17</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="13_quest-ui">
 <meta name="boaz:caminho" content="1_Requisitos/13_quest-ui.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v16">
-<meta name="boaz:data" content="2026-11-01 01:20">
-<meta name="boaz:status" content="Aprovado">
+<meta name="boaz:versao" content="v17">
+<meta name="boaz:data" content="2026-11-01 18:20">
+<meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..800;1,14..32,400..800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
 <style id="boaz-tema">
 /* ════════════════════════════════════════════════════════════
-   boaz · tema dos documentos de requisito · v06
+   boaz · tema dos documentos de requisito · v07
    Paleta do tema.svg (dark) com a variante light equivalente.
    Temas: claro · sistema · escuro (botões no canto) · impressão sempre clara.
    Paleta: vistas com data-paletas trocam tema de cor e modo das telas.
@@ -417,7 +417,8 @@ caption { caption-side: top; padding: 0 0 8px; color: var(--muted); font-size: 1
 /* ── critérios de aceite (Gherkin) ───────────────────────── */
 .criterio { margin: 0 0 24px; break-inside: avoid; }
 .criterio h3 { margin-top: 24px; }
-pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); }
+.criterio { scroll-margin-top: 16px; }
+pre.gherkin { position: relative; padding-top: 30px; background: var(--surface); white-space: pre-wrap; overflow-wrap: anywhere; }
 pre.gherkin::before {
   content: "GHERKIN";
   position: absolute;
@@ -720,7 +721,7 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
 }
 </style>
 <script id="boaz-tema-js">
-/* boaz · tema dos documentos de requisito · v06 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
+/* boaz · tema dos documentos de requisito · v07 — tema (claro/sistema/escuro), paleta das vistas, PDF, marca d'água, tabelas roláveis, Gherkin, sumário */
 (function () {
   var d = document, h = d.documentElement, CHAVE = "boaz-tema";
   function meta(n) { var m = d.querySelector('meta[name="boaz:' + n + '"]'); return m ? m.content.trim() : ""; }
@@ -917,79 +918,30 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como as telas do quest ficam no celular e na web — acesso, tarefas, feed, carteira, perfil e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>13_quest-ui</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v16</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 01:20</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v17</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 18:20</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
-  <nav class="sumario"></nav>
-  <section id="contexto">
-    <h2>Contexto</h2>
-    <p>Último passo antes do código do quest. A estrutura das telas vem de <a class="ref" href="09_quest-ux.html">Quest · UX base</a>, e os blocos são os de <a class="ref" href="10_componentes-compostos-quest.html">Componentes compostos · quest</a> e <a class="ref" href="10_componentes-compostos-comuns.html">comuns</a>. As <a class="ref" href="99_glossario.html#vista">vistas</a> mostram cada tela em compact (com os estados de cada uma), medium e expanded, em todos os temas de cor do design system, no modo claro ou escuro escolhido pelo botão Paleta (abrem em Branco e Preto, claro), com o composto, a identidade e o mascote de cada bloco (<a class="ref" href="06_design-system-telas.html#RNF-103">Design system nas telas <code class="id">RNF-103</code></a>). O topo, a foto ou mascote e a entrada seguem o mesmo desenho do <a class="ref" href="12_hub-ui.html">Hub · UI</a>.</p>
-    <p class="historia"><span>Como</span> <strong>estudante ou responsável</strong>, <span>quero</span> entrar com um toque no meu perfil e ver primeiro a tarefa que vence antes, <span>para</span> não perder prazos nem procurar onde cada coisa fica</p>
-    <aside class="destaque nota"><p>As pessoas, a instituição, as tarefas, os módulos e os números das vistas são exemplos para mostrar o desenho. No quest, eles vêm do código de acesso e dos módulos que a instituição liberou, nas regras da UX base.</p></aside>
-  </section>
-  <section id="requisitos-funcionais">
-    <h2>Requisitos funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Requisito</th><th>Prioridade</th></tr></thead>
-      <tbody>
-        <tr id="RF-87"><td><code class="id">RF-87</code></td><td>O sistema deve mostrar no acesso as <a class="ref" href="10_componentes-compostos-comuns.html#RF-48">boas-vindas com o logo</a>: o logo inteiro do quest, de hastes curtas, na animação de abertura sobre o fundo Halo, o título <q class="ui">Que bom te ver!</q>, o apoio <q class="ui">Escolha o perfil para entrar</q>, os cards dos perfis acessados (foto ou mascote adotado, nome, instituição, turma e ano), as ações <q class="ui">Inserir outro código</q> e <q class="ui">Entrar numa sala</q> e o aviso <q class="ui">Os códigos de acesso são entregues pela sua instituição.</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-88"><td><code class="id">RF-88</code></td><td>O sistema deve mostrar em Código de acesso o campo <q class="ui">Código de acesso</q>, com o apoio <q class="ui">Entregue pela sua instituição</q>, a ação <q class="ui">Continuar</q> e o aviso <q class="ui">Esqueceu o código? Peça à sua instituição.</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-89"><td><code class="id">RF-89</code></td><td>O sistema deve mostrar em Quem está acessando a foto ou o mascote, o nome, a instituição, a turma e o ano do perfil, as opções <q class="ui">Sou o estudante</q> e <q class="ui">Sou responsável</q>, o parentesco (<q class="ui">Mãe</q>, <q class="ui">Pai</q> e <q class="ui">Outro</q>), num botão segmentado cheio, e a ação <q class="ui">Entrar</q>, todos na largura das opções</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-90"><td><code class="id">RF-90</code></td><td>O sistema deve mostrar o acesso, a partir da janela medium, em duas colunas, sem barra do topo: o logo centralizado sobre o fundo Halo, sem painel de texto, e os perfis acessados ao lado</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-91"><td><code class="id">RF-91</code></td><td>O sistema deve mostrar em Tarefas o espaço reservado <q class="ui">Módulo Tarefas</q>, com o apoio <q class="ui">telas definidas no documento do módulo</q>; a agenda, os cards de tarefa, o card Agora e os desafios ficam no documento do módulo Tarefas (<a class="ref" href="15_modulos.html#MOD-09">registro de módulos <code class="id">MOD-09</code></a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-93"><td><code class="id">RF-93</code></td><td>O sistema deve mostrar na Carteira os cards de módulo numa grade de células quadradas — células de 76dp ou mais, no mínimo 4 colunas e quantas couberem na janela —, cada um num tamanho (largura × altura): <strong>mínima</strong> 1x1, só com o ícone e o selo; <strong>reduzida</strong> 2x2, com o espaço <q class="ui">dado macro</q>; <strong>normal</strong> 4x4, o padrão, com o espaço <q class="ui">números e gráfico do módulo</q>; e <strong>expandida</strong> 4x8, com o espaço <q class="ui">painel completo do módulo</q>; todos só com a carcaça: o ícone, o nome, o selo de notificações e o estado <q class="ui">Completar</q> quando o módulo pede algo</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-131"><td><code class="id">RF-131</code></td><td>O sistema deve mostrar em Ordenar a Carteira o topo <q class="ui">Ordenar a Carteira</q> com <q class="ui">Concluir</q>, o apoio <q class="ui">Arraste ou use o menu do card para mudar a ordem e o tamanho</q> e os cards na mesma grade, cada um com a alça de arrastar no alto (a mínima arrasta pelo card inteiro) e o botão do menu embaixo, à direita; o menu traz <q class="ui">Mover para cima</q>, <q class="ui">Mover para baixo</q>, <q class="ui">Mínima</q>, <q class="ui">Reduzida</q>, <q class="ui">Normal</q> e <q class="ui">Expandida</q>, com o tamanho atual marcado; no expanded, a barra lateral aparece encolhida</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-94"><td><code class="id">RF-94</code></td><td>O sistema deve mostrar em Perfil a foto ou o mascote, o nome, a instituição, a turma e o ano, o espaço reservado <q class="ui">Painel do perfil</q>, definido no documento do módulo Perfil, e os itens <q class="ui">Foto ou mascote</q>, <q class="ui">Tema</q> (com o nome do tema ativo), <q class="ui">Atualização dos cards</q> (<a class="ref" href="15_modulos.html#RF-133">15 RF-133</a>) e <q class="ui">Trocar perfil</q>, que volta ao acesso</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-95"><td><code class="id">RF-95</code></td><td>O sistema deve mostrar em Foto ou mascote a foto ou o mascote atual, o apoio <q class="ui">Sem foto, o mascote aparece no lugar dela</q>, a ação <q class="ui">Enviar foto</q>, a grade <q class="ui">Adote um mascote</q> com mascotes felizes em formas variadas e a ação <q class="ui">Usar este mascote</q></td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-96"><td><code class="id">RF-96</code></td><td>O sistema deve mostrar no módulo aberto o topo com voltar, o nome e os avisos do módulo e, quando o módulo pede algo, o aviso para completar com a ação dele, como <q class="ui">Enviar foto</q>; no compact, a ação é um botão de ícone e o texto do aviso fica inteiro à vista</td><td><span class="prio prio-deve">Deve</span></td></tr>
-        <tr id="RF-97"><td><code class="id">RF-97</code></td><td>O sistema deve mostrar na barra inferior <q class="ui">Tarefas</q>, <q class="ui">Feed</q>, <q class="ui">Carteira</q> e <q class="ui">Perfil</q>, e na barra lateral em acordeão, abaixo do topo, que ocupa a largura toda, os mesmos quatro destinos e, no alto, o botão de encolher, que deixa a barra só com os ícones (80dp) e a abre de novo, com o selo de notificações na Carteira (o Perfil abre também pelo nome e pela foto do topo); em Feed, as publicações dos módulos para o participante, que a vista mostra como o espaço reservado <q class="ui">Conteúdo do feed</q> (<a class="ref" href="09_quest-ux.html#RN-222">Quest · UX base <code class="id">RN-222</code></a>)</td><td><span class="prio prio-deve">Deve</span></td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="regras-de-negocio">
-    <h2>Regras de negócio</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Regra</th></tr></thead>
-      <tbody>
-        <tr id="RN-127"><td><code class="id">RN-127</code></td><td>Na janela compact, o topo da casca do quest mostra só o logo e os avisos, e o Perfil (com Trocar perfil) abre pelo destino da barra; a partir da janela medium, o nome e a foto do perfil aparecem no topo e também abrem o Perfil, que segue como destino da barra lateral, como no hub (<a class="ref" href="12_hub-ui.html#RN-124">Hub · UI <code class="id">RN-124</code></a>)</td></tr>
-        <tr id="RN-128"><td><code class="id">RN-128</code></td><td>Todo perfil sem foto recebe um mascote feliz sorteado, que aparece no lugar da foto (no card do perfil, no topo e em Perfil) até a pessoa enviar uma foto ou adotar outro mascote em Foto ou mascote; a foto de perfil do estudante menor de idade segue a autorização dos responsáveis (<a class="ref" href="09_quest-ux.html#RN-102">Quest · UX base <code class="id">RN-102</code></a>), e a foto da carteirinha continua pedida pelo módulo dela</td></tr>
-        <tr id="RN-139"><td><code class="id">RN-139</code></td><td>Todas as telas do quest usam o fundo Estampa abaixo da barra do topo, por trás dos cards; a barra do topo, a barra inferior e a barra lateral ficam limpas, e os fundos próprios (Halo no acesso) ficam por cima (<a class="ref" href="90_identidade-visual.html#RN-56">Identidade visual <code class="id">RN-56</code></a>)</td></tr>
-        <tr id="RN-130"><td><code class="id">RN-130</code></td><td>As pessoas, a instituição, as tarefas, os módulos e os números das vistas são exemplos; num tema de cor, o quest segue a regra da landing page e do hub (<a class="ref" href="11_landing-page-ui.html#RN-118">Landing page · UI <code class="id">RN-118</code></a>)</td></tr>
-        <tr id="RN-211"><td><code class="id">RN-211</code></td><td>As vistas do quest mostram só a carcaça: Tarefas, Feed, os cards da Carteira e o painel do perfil são espaços reservados, e as telas de cada módulo, com a visão de cada perfil, ficam no documento do módulo</td></tr>
-        <tr id="RN-131"><td><code class="id">RN-131</code></td><td>Mudar um texto, uma tela ou um bloco do quest exige uma nova versão deste documento e das vistas, e o código das telas só começa depois que as vistas forem aprovadas na revisão do pull request</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="requisitos-nao-funcionais">
-    <h2>Requisitos não funcionais</h2>
-    <table>
-      <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th></tr></thead>
-      <tbody>
-        <tr id="RNF-156"><td><code class="id">RNF-156</code></td><td><span class="tag">Compatibilidade</span></td><td>O acesso tem uma coluna no compact e duas (boas-vindas e perfis) a partir do medium; a grade da Carteira, de células quadradas, tem células de 76dp ou mais e quantas colunas couberem na janela, no mínimo 4 (<a class="ref" href="15_modulos.html#RN-214">registro de módulos <code class="id">RN-214</code></a>)</td></tr>
-        <tr id="RNF-157"><td><code class="id">RNF-157</code></td><td><span class="tag">Acessibilidade</span></td><td>No acesso compact, o fundo Halo atrás do logo some antes do título, e nenhum texto fica sobre o desenho; o mascote adotado como foto é decorativo, e o leitor de tela anuncia o nome do perfil</td></tr>
-      </tbody>
-    </table>
-  </section>
-  <section id="criterios-de-aceite">
-    <h2>Critérios de aceite</h2>
-    <article class="criterio" id="ca-RF-87">
+  <section id="cenarios">
+    <h2>Cenários</h2>
+    <article class="criterio" id="RF-87">
       <h3><code class="id">RF-87</code> Acesso</h3>
       <pre class="gherkin">Cenário: dois perfis e um código do ano passado
   Dado o perfil de Lucas deste ano, o de Beatriz e o de Lucas do ano passado neste aparelho
   Quando a pessoa abre o quest
-  Então vê o logo do quest se montando sobre o fundo Halo, "Que bom te ver!", os três cards, "Inserir outro código" e "Entrar numa sala"
+  Então vê o logo do quest se montando sobre o fundo Halo e "Que bom te ver!"
+  E os três cards, "Inserir outro código" e "Entrar numa sala"
   E nenhum mascote aparece nas boas-vindas</pre>
     </article>
-    <article class="criterio" id="ca-RF-88">
+    <article class="criterio" id="RF-88">
       <h3><code class="id">RF-88</code> Código de acesso</h3>
       <pre class="gherkin">Cenário: inserir outro código
   Quando a pessoa toca em "Inserir outro código"
   Então vê o campo "Código de acesso", "Continuar" e "Esqueceu o código? Peça à sua instituição."</pre>
     </article>
-    <article class="criterio" id="ca-RF-89">
+    <article class="criterio" id="RF-89">
       <h3><code class="id">RF-89</code> Quem está acessando</h3>
       <pre class="gherkin">Cenário: responsável
   Dado um código de acesso válido
@@ -997,21 +949,21 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   Então vê o perfil de Lucas, "Sou o estudante", "Sou responsável", o parentesco e "Entrar"
   E "Mãe", "Pai" e "Outro" ficam num botão segmentado na largura das opções</pre>
     </article>
-    <article class="criterio" id="ca-RF-90">
+    <article class="criterio" id="RF-90">
       <h3><code class="id">RF-90</code> Acesso na web</h3>
       <pre class="gherkin">Cenário: janela expanded
   Dado o quest aberto numa janela expanded
   Então o acesso mostra só o logo, centralizado sobre o fundo Halo, e os perfis ao lado
   E não mostra a barra do topo nem o painel "Que bom te ver!"</pre>
     </article>
-    <article class="criterio" id="ca-RF-91">
+    <article class="criterio" id="RF-91">
       <h3><code class="id">RF-91</code> Tarefas</h3>
       <pre class="gherkin">Cenário: espaço do módulo Tarefas
   Quando o estudante abre Tarefas
   Então vê o espaço reservado "Módulo Tarefas" com "telas definidas no documento do módulo"
   E Tarefas fica marcada na barra</pre>
     </article>
-    <article class="criterio" id="ca-RF-93">
+    <article class="criterio" id="RF-93">
       <h3><code class="id">RF-93</code> Carteira</h3>
       <pre class="gherkin">Cenário: módulo pede algo
   Dado um módulo da Carteira esperando a foto do estudante
@@ -1021,31 +973,33 @@ Cenário: tamanhos
   Dado um card na normal, um na reduzida, quatro na mínima e um na expandida
   Quando o estudante abre a Carteira no compact
   Então a normal mostra "números e gráfico do módulo" num quadrado na linha toda
-  E a reduzida mostra "dado macro" num quadrado na metade da linha, com as quatro mínimas ao lado, só com o ícone
+  E a reduzida mostra "dado macro" num quadrado na metade da linha
+  E as quatro mínimas ficam ao lado, só com o ícone
   E a expandida mostra "painel completo do módulo" na linha toda, com o dobro da altura da normal
 Cenário: rolagem
   Quando o estudante rola a Carteira até a expandida
   Então o topo se esconde e a expandida aparece inteira acima da barra inferior</pre>
     </article>
-    <article class="criterio" id="ca-RF-131">
+    <article class="criterio" id="RF-131">
       <h3><code class="id">RF-131</code> Ordenar a Carteira</h3>
       <pre class="gherkin">Cenário: menu do card
   Dado o estudante em Ordenar a Carteira
   Quando toca no menu de um card na normal
-  Então vê "Mover para cima", "Mover para baixo", "Mínima", "Reduzida", "Normal" marcada e "Expandida"
+  Então vê "Mover para cima", "Mover para baixo" e "Mínima"
+  E "Reduzida", "Normal" marcada e "Expandida"
 Cenário: expanded
   Dado o quest numa janela expanded
   Quando o estudante abre Ordenar a Carteira
   Então a barra lateral aparece só com os ícones e a grade usa a largura liberada</pre>
     </article>
-    <article class="criterio" id="ca-RF-94">
+    <article class="criterio" id="RF-94">
       <h3><code class="id">RF-94</code> Perfil</h3>
       <pre class="gherkin">Cenário: trocar perfil no celular
   Dado um responsável no perfil de Lucas numa janela compact
   Quando abre Perfil e toca em "Trocar perfil"
   Então volta ao acesso com os perfis do aparelho</pre>
     </article>
-    <article class="criterio" id="ca-RF-95">
+    <article class="criterio" id="RF-95">
       <h3><code class="id">RF-95</code> Foto ou mascote</h3>
       <pre class="gherkin">Cenário: perfil sem foto
   Dado um perfil que entrou pela primeira vez, sem foto
@@ -1056,20 +1010,22 @@ Cenário: adotar outro mascote
   Quando o estudante abre "Foto ou mascote", escolhe a estrela e toca em "Usar este mascote"
   Então a estrela aparece no lugar da foto no topo, em Perfil e no card do acesso</pre>
     </article>
-    <article class="criterio" id="ca-RF-96">
+    <article class="criterio" id="RF-96">
       <h3><code class="id">RF-96</code> Módulo aberto</h3>
       <pre class="gherkin">Cenário: compact
   Dado o quest numa janela compact
   Dado um módulo que pede uma foto
   Quando o estudante abre o módulo
-  Então vê o aviso "Envie a foto que o módulo pede para continuar." com um botão de ícone, e o texto inteiro</pre>
+  Então vê o aviso "Envie a foto que o módulo pede para continuar." com um botão de ícone
+  E o texto aparece inteiro</pre>
     </article>
-    <article class="criterio" id="ca-RF-97">
+    <article class="criterio" id="RF-97">
       <h3><code class="id">RF-97</code> Navegação</h3>
       <pre class="gherkin">Cenário: barra lateral
   Dado o quest numa janela medium com cinco notificações novas num módulo da Carteira
   Então a barra lateral mostra "Tarefas", "Feed", "Carteira" e "Perfil", com o selo 5 na Carteira
-  E o topo, na largura toda, acima da barra lateral, mostra "Lucas Andrade" e a foto ou o mascote, que abrem o Perfil
+  E o topo, na largura toda, acima da barra lateral, mostra "Lucas Andrade" e a foto ou o mascote
+  E o nome e a foto abrem o Perfil
 Cenário: barra encolhida
   Quando o estudante toca no botão de encolher, no alto da barra lateral
   Então a barra mostra só os ícones dos quatro destinos, com o selo 5 na Carteira
@@ -1077,19 +1033,96 @@ Cenário: Feed
   Quando o estudante toca em "Feed"
   Então vê no espaço do Feed as publicações dos módulos para a turma dele e para toda a instituição</pre>
     </article>
+    <article class="criterio" id="RN-127">
+      <h3><code class="id">RN-127</code> Topo do quest</h3>
+      <pre class="gherkin">Esquema do Cenário: topo por janela
+  Dado o Lucas no quest na janela &lt;janela&gt;
+  Então o topo mostra &lt;topo&gt;
+  E o Perfil abre &lt;como&gt;
+
+  Exemplos:
+    | janela  | topo                               | como                                      |
+    | compact | só o logo e os avisos              | pelo destino da barra                     |
+    | medium  | o logo, os avisos, o nome e a foto | pelo nome, pela foto e pela barra lateral |</pre>
+    </article>
+    <article class="criterio" id="RN-128">
+      <h3><code class="id">RN-128</code> Mascote no lugar da foto</h3>
+      <pre class="gherkin">Cenário: perfil sem foto
+  Dado o Lucas sem foto
+  Então um mascote feliz sorteado aparece no card do perfil, no topo e em Perfil
+  E continua até ele enviar uma foto ou adotar outro mascote
+
+Cenário: estudante menor de idade
+  Dado o Lucas, de 12 anos, sem a autorização dos responsáveis
+  Quando ele procura enviar a foto de perfil
+  Então a foto segue a autorização dos responsáveis
+  E a foto da carteirinha continua pedida pelo módulo dela</pre>
+    </article>
+    <article class="criterio" id="RN-139">
+      <h3><code class="id">RN-139</code> Fundo Estampa</h3>
+      <pre class="gherkin">Cenário: fundo das telas
+  Quando o Lucas abre qualquer tela do quest
+  Então o fundo Estampa fica abaixo da barra do topo, atrás dos cards
+  E as barras ficam limpas e o Halo do acesso fica por cima</pre>
+    </article>
+    <article class="criterio" id="RN-130">
+      <h3><code class="id">RN-130</code> Dados de exemplo</h3>
+      <pre class="gherkin">Cenário: vistas com exemplo
+  Quando alguém abre as vistas do quest
+  Então pessoas, instituição, tarefas, módulos e números são exemplos
+  E num tema de cor o quest segue a regra da landing page e do hub</pre>
+    </article>
+    <article class="criterio" id="RN-211">
+      <h3><code class="id">RN-211</code> Só a carcaça</h3>
+      <pre class="gherkin">Cenário: espaços reservados
+  Quando alguém abre a vista da casca do quest
+  Então Tarefas, Feed, os cards da Carteira e o painel do perfil são espaços reservados
+  E as telas de cada módulo ficam no documento do módulo</pre>
+    </article>
+    <article class="criterio" id="RN-131">
+      <h3><code class="id">RN-131</code> Mudança exige versão</h3>
+      <pre class="gherkin">Cenário: texto novo no acesso
+  Quando o time muda o título "Que bom te ver!"
+  Então este documento e a vista ganham versão nova
+  E o código só muda depois da vista aprovada no pull request</pre>
+    </article>
+    <article class="criterio" id="RNF-156">
+      <h3><code class="id">RNF-156</code> Colunas</h3>
+      <pre class="gherkin">Esquema do Cenário: colunas do acesso
+  Quando o acesso abre na janela &lt;janela&gt;
+  Então mostra &lt;colunas&gt;
+
+  Exemplos:
+    | janela  | colunas                    |
+    | compact | uma coluna                 |
+    | medium  | duas: boas-vindas e perfis |
+
+Cenário: grade da Carteira
+  Então a Carteira tem células quadradas de 76dp ou mais e pelo menos 4 colunas</pre>
+    </article>
+    <article class="criterio" id="RNF-157">
+      <h3><code class="id">RNF-157</code> Acessibilidade do acesso</h3>
+      <pre class="gherkin">Cenário: Halo no compact
+  Quando o acesso abre no compact
+  Então o Halo atrás do logo some antes do título
+  E nenhum texto fica sobre o desenho
+
+Cenário: mascote decorativo
+  Dado o Lucas com mascote no lugar da foto
+  Quando o leitor de tela passa pelo card do perfil
+  Então anuncia "Lucas Andrade" e ignora o mascote</pre>
+    </article>
+    <article class="criterio" id="fora-de-escopo">
+      <h3>Fora de escopo</h3>
+      <pre class="gherkin">Cenário: o que este documento não trata
+  Então a sala do quiz fica no documento do módulo da sala
+  E as telas e o conteúdo de cada módulo ficam nos documentos dos módulos
+  E o conteúdo de cada publicação do Feed fica no módulo que publica
+  E a geração e a entrega dos códigos de acesso ficam no Módulo Usuários</pre>
+    </article>
   </section>
-  <section id="fora-de-escopo">
-    <h2>Fora de escopo</h2>
-    <ul class="fora">
-      <li>Sala do quiz (espera, perguntas, ranking e resultado): documento do módulo da sala</li>
-      <li>Telas internas e conteúdo do card de cada módulo (tarefas com a agenda, o card Agora e os desafios, flashcards, mensagens, carteirinha, painel do perfil): documentos dos módulos; as regras de tarefas que saíram desta UI na v08 voltam no documento do módulo Tarefas</li>
-      <li>Conteúdo de cada publicação do Feed: documento do módulo que publica (<a class="ref" href="09_quest-ux.html#RN-222">Quest · UX base <code class="id">RN-222</code></a>)</li>
-      <li>Geração, formato e entrega dos códigos de acesso: módulo de cadastro, no hub</li>
-    </ul>
-  </section>
-  <section id="diagramas">
-    <h2>Diagramas</h2>
-    <p>As vistas abrem no tema Branco e Preto, claro. O botão <strong>Paleta</strong>, na barra do canto, mostra as mesmas telas em qualquer tema de cor do design system, no modo claro ou escuro.</p>
+  <section id="telas">
+    <h2>Telas</h2>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
       <a href="../2_Diagramas/vista-quest-acesso_v05_20261029-0315.svg"><img src="../2_Diagramas/vista-quest-acesso_v05_20261029-0315.svg" alt="Vista do acesso do quest: perfis acessados, código de acesso e quem está acessando no compact; acesso em duas colunas no medium e no expanded; tema de cor e modo pelo botão Paleta"></a>
       <figcaption><strong>Quest · acesso · vista</strong><code>2_Diagramas/vista-quest-acesso_v05_20261029-0315.svg</code></figcaption>
@@ -1109,7 +1142,8 @@ Cenário: Feed
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v16</span></td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
+      <tr><td><span class="boaz-versao">v17</span></td><td>2026-11-01 18:20</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão</td></tr>
+      <tr><td>v16</td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
       <tr><td>v15</td><td>2026-11-01 01:14</td><td>Feed com as publicações dos módulos para o participante (<code class="id">RF-97</code>, 09 RN-222)</td></tr>
       <tr><td>v14</td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
       <tr><td>v13</td><td>2026-11-01 00:43</td><td>Vista da casca v08: item Atualização dos cards no Perfil, com Na abertura e Ao vivo (<code class="id">RF-94</code>) (<a class="ref" href="15_modulos.html#RF-133">15 RF-133</a>)</td></tr>
@@ -1118,11 +1152,10 @@ Cenário: Feed
       <tr><td>v10</td><td>2026-10-31 22:18</td><td>Carteira em grade nos tamanhos reduzida, normal e expandida (<code class="id">RF-93</code>, <code class="id">RNF-156</code>); Ordenar a Carteira com o menu do card (<code class="id">RF-131</code>); botão de encolher a barra lateral (<code class="id">RF-97</code>); vistas da casca e do módulo aberto</td></tr>
       <tr><td>v09</td><td>2026-10-31 18:44</td><td>Barra lateral em acordeão com os quatro destinos a partir do medium, no lugar do trilho (<code class="id">RF-97</code>, <code class="id">RN-127</code>, <code class="id">RN-139</code>); vistas novas</td></tr>
       <tr><td>v08</td><td>2026-10-31 16:44</td><td>Só a carcaça: Tarefas vira o espaço reservado do módulo Tarefas (<code class="id">RF-91</code>), e a agenda, as listas e os desafios saem para o documento do módulo (saem <code class="id">RF-92</code>, <code class="id">RF-100</code>, <code class="id">RN-133</code> e <code class="id">RNF-155</code>); Fixos vira Carteira, com cards só de carcaça (<code class="id">RF-93</code>, <code class="id">RNF-156</code>); painel do perfil reservado (<code class="id">RF-94</code>); navegação com Tarefas, Feed, Carteira e Perfil e Feed reservado (<code class="id">RF-97</code>); módulo aberto genérico (<code class="id">RF-96</code>); <code class="id">RN-211</code> novo; vistas da casca v04 e do módulo aberto v04; status → Em revisão</td></tr>
-      <tr><td>v07</td><td>2026-10-31 15:53</td><td>Aprovado</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v16 · 2026-11-01 01:20</span>
+    <span>boaz · v17 · 2026-11-01 18:20</span>
     <span class="boaz-arquivo">1_Requisitos/13_quest-ui.html</span>
   </div>
 </footer>

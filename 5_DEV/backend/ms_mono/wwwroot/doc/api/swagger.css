@@ -158,6 +158,56 @@ body,
   color: var(--md-sys-color-primary);
 }
 
+/* guias: títulos de seção, blocos de exemplo e os diagramas (sistema/guias/) */
+#swagger-ui .swagger-ui .info .description h2 {
+  color: var(--md-sys-color-on-surface);
+  margin-top: 36px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+#swagger-ui .swagger-ui .info .description h3,
+#swagger-ui .swagger-ui .info .description strong {
+  color: var(--md-sys-color-on-surface);
+}
+
+#swagger-ui .swagger-ui .info .description pre {
+  background: var(--md-sys-color-surface-container-high);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+#swagger-ui .swagger-ui .info .description pre code {
+  color: var(--md-sys-color-on-surface);
+}
+
+/* os diagramas têm fundo escuro próprio: saem da coluna do Swagger (1460px) e
+   ficam centralizados na tela, do tamanho natural até a largura da janela menos
+   a margem (24px; 16px no compact); o toque abre o diagrama inteiro */
+#swagger-ui .swagger-ui .info .description a:has(> img:not([alt="deboaz"])) {
+  --margem-do-diagrama: 24px;
+  display: flex;
+  justify-content: center;
+  width: calc(100vw - 2 * var(--margem-do-diagrama));
+  margin: 8px 0 24px calc(50% - 50vw + var(--margem-do-diagrama));
+}
+
+@media (max-width: 599px) {
+  #swagger-ui .swagger-ui .info .description a:has(> img:not([alt="deboaz"])) {
+    --margem-do-diagrama: 16px;
+  }
+}
+
+#swagger-ui .swagger-ui .info .description a img:not([alt="deboaz"]) {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 12px;
+}
+
 /* a capa do catálogo não tem endpoints: some o aviso "No operations defined in spec!" */
 #swagger-ui .swagger-ui .wrapper > section.block > h3:only-child {
   display: none;

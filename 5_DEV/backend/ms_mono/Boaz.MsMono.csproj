@@ -11,6 +11,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Adaptadores de saída (infra/out): banco e cache, nas versões do qa -->
+    <PackageReference Include="MongoDB.Driver" Version="3.13.0" />
+    <PackageReference Include="StackExchange.Redis" Version="3.4.29" />
+  </ItemGroup>
+
   <!--
     Os textos da documentação vêm de WithSummary/WithDescription, não de
     comentários XML: o gerador de comentários do OpenApi sai do build, e com
@@ -21,6 +27,12 @@
       <Analyzer Remove="@(Analyzer)" Condition="'%(Filename)' == 'Microsoft.AspNetCore.OpenApi.SourceGenerators'" />
     </ItemGroup>
   </Target>
+
+  <ItemGroup>
+    <!-- Guias de uso de cada API do Swagger (sistema/DocumentacaoApi.cs) -->
+    <EmbeddedResource Include="sistema/guias/*.md" LogicalName="guias/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="sistema/exemplos/*.json" LogicalName="exemplos/%(Filename)%(Extension)" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../core/commons/Boaz.Core.Commons.csproj" />

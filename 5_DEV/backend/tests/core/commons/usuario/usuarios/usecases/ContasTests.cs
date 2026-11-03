@@ -1,0 +1,218 @@
+using Boaz.Core.Commons.Tests.Usuario.Usuarios.Mocks;
+using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
+using Boaz.Core.Commons.Usuario.Usuarios.Domain;
+using Boaz.Core.Commons.Usuario.Usuarios.Dtos;
+using static Boaz.Core.Commons.Tests.Usuario.Usuarios.Mocks.Esperado;
+
+namespace Boaz.Core.Commons.Tests.Usuario.Usuarios.UseCases;
+
+/// <summary>Contas assinantes: criação, sigla, ajuda da master, estado e leitura (RF-104, RF-111, RF-113, RN-172 a RN-179, RN-187, RN-242, RNF-205).</summary>
+public class ContasTests
+{
+    readonly Cenario mundo = new();
+    UsuariosEmMemoria Mock => mundo.Mock;
+
+    static NovaContaDto Colsa(string tipo = "INSTITUICAO", string documento = "98.765.432/0001-10", string sigla = "COLSA",
+        string dominio = "colegio_salesiano") =>
+        new(tipo, "Colégio Salesiano", documento, "Maria da Silva", "(51) 97777-0000", dominio, sigla);
+
+    [Fact]
+    public async Task RF_104_escola_cria_a_conta()
+    {
+        var criada = await Mock.CriarConta.Executar(new("INSTITUICAO", "Escola Nova", "11.222.333/0001-44", "Gustavo Boaz de Moura Souza",
+            "(51) 99999-1111", "Escola_Nova", "ENOVA"));
+
+        Assert.Equal(("conta-enova", "escola_nova@deboaz.com"), (criada.ContaId, criada.Login));
+        Assert.Matches(@"^Gu[!@#$%&*]Boaz\d{6}$", criada.Senha);
+        var master = Mock.Usuario("usr-enova-master")!;
+        Assert.Equal((TipoUsuario.Master, EstadoUsuario.Pendente), (master.Tipo, master.Estado));
+        Assert.True(ResumoDeSenha.Confere(criada.Senha, master.ResumoSenha));
+        var geracao = Assert.Single(Mock.Geracoes(master.Id));
+        Assert.Equal(Credenciais.Resumo(criada.Comprovante), geracao.ResumoComprovante);
+        Assert.Equal(TempoDaConta.Padrao, Mock.Tempo("conta-enova"));
+        Assert.Contains(Mock.Auditoria, a => a.Acao == AcaoAuditada.CriarConta && a.Alvo == "conta-enova");
+    }
+
+    [Fact]
+    public async Task RF_104_sigla_ja_usada() =>
+        await Falha("SIGLA_EM_USO", () => Mock.CriarConta.Executar(Colsa(sigla: "EBFGA")));
+
+    [Fact]
+    public async Task RF_104_dominio_ja_usado() =>
+        await Falha("DOMINIO_EM_USO", () => Mock.CriarConta.Executar(Colsa(dominio: "objetivo_unidade1")));
+
+    [Fact]
+    public async Task RN_164_staff_nao_se_cadastra() =>
+        Assert.Equal("tipo", (await Falha("DADOS_INVALIDOS", () => Mock.CriarConta.Executar(Colsa(tipo: "STAFF")))).Campo);
+
+    [Theory]
+    [InlineData("ebfga", "SIGLA_EM_USO")]
+    [InlineData("DBOAZ", "SIGLA_INVALIDA")]
+    [InlineData("EBF", "SIGLA_INVALIDA")]
+    [InlineData("COLSA", null)]
+    public async Task RN_179_sigla_recusada(string sigla, string? codigo)
+    {
+        if (codigo is null) Assert.Equal("conta-colsa", (await Mock.CriarConta.Executar(Colsa(sigla: sigla))).ContaId);
+        else await Falha(codigo, () => Mock.CriarConta.Executar(Colsa(sigla: sigla)));
+    }
+
+    [Fact]
+    public async Task RN_179_sigla_sugerida()
+    {
+        Assert.Equal(new SiglaSugeridaDto("EBFGA", false), await Mock.SugerirSigla.Executar(new("Escola Bento Freitas Gonçalves Araújo")));
+        Assert.Equal(new SiglaSugeridaDto("CSALE", true), await Mock.SugerirSigla.Executar(new("Colégio Salesiano")));
+        Assert.Equal(new SiglaSugeridaDto(null, false), await Mock.SugerirSigla.Executar(new("Xuxa")));
+    }
+
+    [Theory]
+    [InlineData("INSTITUICAO", "12.345.678/0001-90", true)]
+    [InlineData("AUTONOMO", "123.456.789-09", true)]
+    [InlineData("AUTONOMO", "12.345.678/0001-90", false)]
+    public async Task RN_242_documento_de_cada_conta(string tipo, string documento, bool aceita)
+    {
+        if (aceita) Assert.Equal("conta-colsa", (await Mock.CriarConta.Executar(Colsa(tipo, documento))).ContaId);
+        else Assert.Equal("documento", (await Falha("DADOS_INVALIDOS", () => Mock.CriarConta.Executar(Colsa(tipo, documento)))).Campo);
+    }
+
+    [Fact]
+    public async Task RF_111_conta_master_esqueceu_a_senha()
+    {
+        await Mock.PedirAjudaDaMaster.Executar(new("Escola Bento Freitas", "(51) 99999-0000", "aparelho-1"));
+        Assert.Equal(("Escola Bento Freitas", "(51) 99999-0000"), (Mock.PedidosDeAjuda[0].Instituicao, Mock.PedidosDeAjuda[0].Contato));
+    }
+
+    [Fact]
+    public async Task RNF_205_quarto_envio_no_dia()
+    {
+        var primeiro = Mock.Relogio.Agora;
+        for (var i = 0; i < 3; i++)
+        {
+            await Mock.PedirAjudaDaMaster.Executar(new("Escola Bento Freitas", "(51) 99999-0000", "aparelho-1"));
+            Mock.Relogio.Avancar(TimeSpan.FromHours(1));
+        }
+        var falha = await Falha("LIMITE_ATENDIMENTO", () => Mock.PedirAjudaDaMaster.Executar(new("Escola Bento Freitas", "x", "aparelho-1")));
+        Assert.Equal(primeiro.AddHours(24), falha.TentarEm);
+        await Mock.PedirAjudaDaMaster.Executar(new("Outra", "x", "aparelho-2"));
+        Mock.Relogio.Agora = primeiro.AddHours(24);
+        await Mock.PedirAjudaDaMaster.Executar(new("Escola Bento Freitas", "x", "aparelho-1"));
+    }
+
+    [Fact]
+    public async Task RF_113_falta_de_pagamento_e_regularizacao()
+    {
+        Assert.Equal(new ContaComEstadoDto("conta-ebfga", "DESATIVADA"),
+            await Mock.MudarEstadoDaConta.Executar(new("usr-dboaz-caio", "conta-ebfga", "DESATIVADA")));
+        Assert.Contains(("conta-ebfga", MotivoFim.ContaIndisponivel), Mock.ContasSemSessao);
+
+        Assert.Equal("ATIVA", (await Mock.MudarEstadoDaConta.Executar(new("usr-dboaz-caio", "conta-ebfga", "ATIVA"))).Estado);
+        Assert.Single(Mock.ContasSemSessao);
+        Assert.Equal(2, Mock.Auditoria.Count(a => a.Acao == AcaoAuditada.MudarEstadoConta));
+    }
+
+    [Theory]
+    [InlineData("ATIVA")]
+    [InlineData("SUSPENSA")]
+    [InlineData("DESATIVADA")]
+    [InlineData("ENCERRADA")]
+    public async Task RN_173_estado_da_conta(string estado) =>
+        Assert.Equal(estado, (await Mock.MudarEstadoDaConta.Executar(new("usr-dboaz-admin", "conta-ebfga", estado))).Estado);
+
+    [Fact]
+    public async Task RN_173_conta_encerrada_nao_volta()
+    {
+        await Mock.MudarEstadoDaConta.Executar(new("usr-dboaz-caio", "conta-ebfga", "ENCERRADA"));
+        await Falha("TRANSICAO_INVALIDA", () => Mock.MudarEstadoDaConta.Executar(new("usr-dboaz-caio", "conta-ebfga", "ATIVA")));
+    }
+
+    [Fact]
+    public async Task RN_174_conta_encerrada_apaga_os_dados()
+    {
+        await Mock.MudarEstadoDaConta.Executar(new("usr-dboaz-caio", "conta-ebfga", "ENCERRADA"));
+        Assert.Equal(["conta-ebfga"], Mock.ContasApagadas);
+        Assert.Null(Mock.Usuario("usr-ebfga-maria"));
+        Assert.Equal(EstadoConta.Encerrada, Mock.Conta("conta-ebfga")!.Estado);
+    }
+
+    [Fact]
+    public async Task RN_169_so_o_time_muda_o_estado()
+    {
+        await Falha("ACESSO_NEGADO", () => Mock.MudarEstadoDaConta.Executar(new("usr-ebfga-master", "conta-ebfga", "SUSPENSA")));
+        await Falha("CONTA_INEXISTENTE", () => Mock.MudarEstadoDaConta.Executar(new("usr-dboaz-caio", "conta-dboaz", "SUSPENSA")));
+        await Falha("DADOS_INVALIDOS", () => Mock.MudarEstadoDaConta.Executar(new("usr-dboaz-caio", "conta-ebfga", "PAUSADA")));
+    }
+
+    [Fact]
+    public async Task RN_187_so_o_cadastro()
+    {
+        var conta = await Mock.LerConta.Executar(new("usr-dboaz-caio", "conta-ebfga"));
+        Assert.Equal(new ContaLidaDto("conta-ebfga", "INSTITUICAO", "Escola Bento Freitas", "12.345.678/0001-90", "EBFGA",
+            "objetivo_unidade1@deboaz.com", "Gustavo Boaz de Moura Souza", "(51) 99999-0000", "ATIVA",
+            new DateTimeOffset(2026, 3, 12, 13, 5, 0, TimeSpan.Zero), "2026-10-05", new DateTimeOffset(2026, 11, 1, 8, 15, 0, TimeSpan.Zero)), conta);
+        Assert.Null((await Mock.LerConta.Executar(new("usr-dboaz-caio", "conta-preis"))).UltimoPagamento);
+    }
+
+    [Fact]
+    public async Task RN_187_conta_que_nao_existe()
+    {
+        await Falha("CONTA_INEXISTENTE", () => Mock.LerConta.Executar(new("usr-dboaz-caio", "conta-zzzzz")));
+        await Falha("CONTA_INEXISTENTE", () => Mock.LerConta.Executar(new("usr-dboaz-caio", "conta-dboaz")));
+        await Falha("ACESSO_NEGADO", () => Mock.LerConta.Executar(new("usr-ebfga-master", "conta-ebfga")));
+        await Falha("ACESSO_NEGADO", () => Mock.LerConta.Executar(new("usr-zzzzz", "conta-ebfga")));
+    }
+
+    [Theory]
+    [InlineData("EBFGA")]
+    [InlineData("12.345.678/0001-90")]
+    [InlineData("bento")]
+    public async Task RN_185_busca_nas_contas(string termo)
+    {
+        var pagina = await Mock.ListarContas.Executar(new("usr-dboaz-caio", termo));
+        var conta = Assert.Single(pagina.Itens);
+        Assert.Equal(("Escola Bento Freitas", 1), (conta.Nome, pagina.Total));
+        Assert.Equal(new DateTimeOffset(2026, 11, 1, 8, 15, 0, TimeSpan.Zero), conta.UltimoAcessoMaster);
+    }
+
+    [Fact]
+    public async Task RN_185_contas_por_estado_sem_a_do_time()
+    {
+        var todas = await Mock.ListarContas.Executar(new("usr-dboaz-admin"));
+        Assert.Equal(["Escola Bento Freitas", "Pedro Reis"], todas.Itens.Select(c => c.Nome));
+        await Mock.MudarEstadoDaConta.Executar(new("usr-dboaz-admin", "conta-preis", "SUSPENSA"));
+        Assert.Equal(["PREIS"], (await Mock.ListarContas.Executar(new("usr-dboaz-admin", Estado: "SUSPENSA"))).Itens.Select(c => c.Sigla));
+        await Falha("ACESSO_NEGADO", () => Mock.ListarContas.Executar(new("usr-ebfga-master")));
+    }
+
+    static ConferenciaDaMasterDto Conferencia(string? telefone = "(51) 99999-0000", string? pagamento = null) =>
+        new("usr-dboaz-analima", "conta-ebfga", "12.345.678/0001-90", "Gustavo Boaz de Moura Souza", telefone, pagamento);
+
+    [Fact]
+    public async Task RN_172_conferencia_pelo_SAC()
+    {
+        var codigo = await Mock.GerarCodigoDaMaster.Executar(Conferencia());
+        Assert.Matches(@"^\d{6}$", codigo.CodigoLiberacao);
+        Assert.Equal(("(51) 99999-0000", Mock.Relogio.Agora.AddHours(72)), (codigo.Contato, codigo.VenceEm));
+        Assert.Null(Mock.Usuario("usr-ebfga-master")!.ResumoSenha);
+        Assert.Contains(("usr-ebfga-master", MotivoFim.NovaSenha), Mock.SessoesEncerradas);
+        Assert.Equal([("conta-ebfga", "usr-dboaz-analima", true)], Mock.Conferencias);
+
+        var senha = await Mock.GerarSenha.Executar(new("objetivo_unidade1@deboaz.com", codigo.CodigoLiberacao));
+        Assert.Matches(@"^Gu[!@#$%&*]Boaz\d{6}$", senha.Senha);
+    }
+
+    [Fact]
+    public async Task RN_172_conferencia_incompleta()
+    {
+        await Falha("CONFERENCIA_INCOMPLETA", () => Mock.GerarCodigoDaMaster.Executar(
+            new("usr-dboaz-analima", "conta-ebfga", "12.345.678/0001-90", null, "(51) 99999-0000", "2026-09-05")));
+        Assert.Equal([("conta-ebfga", "usr-dboaz-analima", false)], Mock.Conferencias);
+        Assert.Empty(Mock.Geracoes("usr-ebfga-master"));
+        Assert.NotNull((await Mock.GerarCodigoDaMaster.Executar(Conferencia(null, "2026-10-05"))).CodigoLiberacao);
+    }
+
+    [Fact]
+    public async Task RN_169_time_deboaz_e_a_conta_master()
+    {
+        Assert.NotNull(await Mock.GerarCodigoDaMaster.Executar(Conferencia() with { QuemPede = "usr-dboaz-caio" }));
+        await Falha("ACESSO_NEGADO", () => Mock.GerarCodigoDaMaster.Executar(Conferencia() with { QuemPede = "usr-ebfga-maria" }));
+    }
+}
