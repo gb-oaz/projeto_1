@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catálogo · boaz · v18</title>
+<title>Catálogo · boaz · v22</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
-<meta name="boaz:documento" content="16_catalogo">
-<meta name="boaz:caminho" content="1_Requisitos/16_catalogo.html">
+<meta name="boaz:documento" content="16_modulo-catalogo">
+<meta name="boaz:caminho" content="1_Requisitos/16_modulo-catalogo.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v18">
-<meta name="boaz:data" content="2026-11-01 18:18">
+<meta name="boaz:versao" content="v22">
+<meta name="boaz:data" content="2026-11-03 12:33">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -917,15 +917,15 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <h1>Catálogo</h1>
   <p class="boaz-objetivo"><span>Objetivo</span>catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante.</p>
   <dl class="boaz-carimbo">
-    <div><dt>Documento</dt><dd>16_catalogo</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v18</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 18:18</dd></div>
+    <div><dt>Documento</dt><dd>16_modulo-catalogo</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v22</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 12:33</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
 <main>
-  <section id="cenarios">
-    <h2>Cenários</h2>
+  <section id="cenarios-tela">
+    <h2>Cenários de tela</h2>
     <article class="criterio" id="exemplo-receita">
       <h3>Exemplo de receita</h3>
       <pre class="gherkin">Esquema do Cenário: receita do módulo Usuários por perfil de conta
@@ -967,13 +967,13 @@ Cenário: conta de instituição
       <pre class="gherkin">Cenário: módulos da conta
   Dado o Catálogo aberto em "Da conta"
   Quando a lista aparece
-  Então vê "Contas", "Perfil", "SAC", "Sugestão", "Turmas" e "Usuários", de A a Z
-  E "Usuários" mostra "Com custo", "Em 128 contas" e o novo preço em 01/12
+  Então vê os módulos da conta de A a Z, cada um no seu espaço da lista
+  E cada espaço mostra o nome, o tipo, o custo, em quantas contas está e o próximo preço, se houver
 
 Cenário: buscar um módulo
   Dado o Catálogo aberto
-  Quando o administrador busca "pres"
-  Então vê só o módulo "Presença", em "Contratáveis"</pre>
+  Quando o administrador busca parte do nome de um módulo
+  Então vê só os módulos com esse nome, cada um no seu tipo</pre>
     </article>
     <article class="criterio" id="RF-118">
       <h3><code class="id">RF-118</code> Preço do módulo Usuários</h3>
@@ -1020,25 +1020,6 @@ Cenário: um usuário a mais nunca baixa a conta
   E desconto por volume de R$ 100,39: 0% em 100 usuários, 5% em 200 e 10% em 52
   E total de R$ 2.224,41 no mês, R$ 26.692,92 em 12 meses e R$ 22.688,98 no plano anual
   E nada é salvo</pre>
-    </article>
-    <article class="criterio" id="RF-121">
-      <h3><code class="id">RF-121</code> Cobrança no módulo Contas</h3>
-      <pre class="gherkin">Cenário: fatura de dezembro
-  Dado a Escola Bento Freitas com 40 staff e 312 participantes ativos no fechamento de dezembro
-  E 3 staff desativados
-  Quando a fatura fecha
-  Então o módulo Contas da escola mostra 40 staff e 312 participantes
-  E o desconto por volume de R$ 100,39 e o total de R$ 2.224,41
-
-Cenário: educador autônomo
-  Dado um educador autônomo com 60 participantes ativos
-  Quando a fatura fecha
-  Então paga R$ 294,00, sem parcela de staff
-
-Cenário: staff criado no meio do mês
-  Dado um staff criado em 10/12 e outro desativado em 20/12
-  Quando a fatura de dezembro fecha
-  Então o criado conta inteiro e o desativado não conta</pre>
     </article>
     <article class="criterio" id="RF-122">
       <h3><code class="id">RF-122</code> Histórico de preços</h3>
@@ -1179,6 +1160,20 @@ Cenário: autônomo e time deboaz
     | "Presença" | com custo e sem preço     | não aparece na vitrine nem entra numa conta |
     | "Quiz"     | com custo e preço valendo | aparece na vitrine                          |</pre>
     </article>
+    <article class="criterio" id="RN-257">
+      <h3><code class="id">RN-257</code> Custo igual em todos os contratos</h3>
+      <pre class="gherkin">Cenário: módulo passa a ter custo
+  Dado um módulo sem custo contratado por 96 instituições e 32 autônomos
+  Quando o administrador marca "Com custo" e salva
+  Então as 128 contratações passam a ter custo
+  E pagam a partir do primeiro preço que valer
+
+Cenário: módulo deixa de ter custo
+  Dado um módulo com custo contratado por 128 contas
+  Quando o administrador marca "Sem custo" e salva
+  Então nenhuma das 128 contas paga por ele na fatura que ainda não fechou
+  E as faturas já fechadas não mudam</pre>
+    </article>
     <article class="criterio" id="RN-200">
       <h3><code class="id">RN-200</code> Catálogo só no time</h3>
       <pre class="gherkin">Cenário: o Catálogo não é contratável
@@ -1202,11 +1197,11 @@ Cenário: autônomo e time deboaz
   Então mostra &lt;dados&gt;
 
   Exemplos:
-    | tamanho       | dados                                                        |
-    | mínima 1x1    | o ícone loja e o selo "6", módulos com custo sem preço       |
-    | reduzida 2x2  | R$ 48k · receita prevista                                    |
-    | normal 4x4    | R$ 48.215,40, a tendência em %, 5 meses em barras e os tipos |
-    | expandida 4x8 | 7 semanas e Com custo, Sem custo e Com custo sem preço       |
+    | tamanho       | dados                                                                          |
+    | mínima 1x1    | o ícone loja e o selo "6", módulos com custo sem preço                         |
+    | reduzida 2x2  | R$ 201k · receita prevista                                                     |
+    | normal 4x4    | R$ 200.996,76, "+4,1% no mês", 5 meses em barras e os tipos                    |
+    | expandida 4x8 | o mesmo da normal, os 5 meses com valores e Com custo, Sem custo e Sem preço   |
 
 Cenário: membro do time
   Quando o Caio vê o card Catálogo
@@ -1219,7 +1214,7 @@ Cenário: sem dados
 
 Cenário: rótulo falado
   Quando o leitor de tela lê o card na reduzida
-  Então diz "Catálogo, receita prevista de 48 mil reais"</pre>
+  Então diz "Catálogo, receita prevista de 201 mil reais"</pre>
     </article>
     <article class="criterio" id="RNF-210">
       <h3><code class="id">RNF-210</code> Mesmo valor em todo lugar</h3>
@@ -1247,6 +1242,467 @@ Cenário: rótulo falado
   Quando o administrador muda os participantes da simulação de 312 para 313
   Então o novo total aparece em até 1 segundo</pre>
     </article>
+  </section>
+  <section id="cenarios-api">
+    <h2>Cenários de API</h2>
+    <article class="criterio" id="formato-comum">
+      <h3>Formato comum</h3>
+      <pre class="gherkin">Cenário: resposta de erro
+  Quando um pedido ao Catálogo é recusado
+  Então o corpo traz o código, a mensagem e, quando houver, o campo:
+    """
+    {
+      "codigo": "DATA_INVALIDA",
+      "mensagem": "Escolha 02/11/2026 ou depois.",
+      "campo": "valeDesde"
+    }
+    """
+
+Cenário: dinheiro, datas e módulo
+  Então todo valor em reais é um número com 2 casas, como 19.90
+  E toda data segue a ISO 8601, como "2026-12-01"
+  E o módulo vai no endereço pelo id do registro de módulos, como "MOD-03"
+
+Cenário: módulo fora do registro
+  Quando o administrador envia GET /catalogo/modulos/MOD-99
+  Então a resposta é 404 MODULO_INEXISTENTE com a mensagem "Módulo não encontrado."</pre>
+    </article>
+    <article class="criterio" id="RF-116-api">
+      <h3><code class="id">RF-116</code> Resumo do catálogo</h3>
+      <pre class="gherkin">Cenário: administrador lê o resumo
+  Dado o administrador do deboaz com o token de acesso
+  Quando envia GET /catalogo/resumo
+  Então a resposta é 200 com:
+    """
+    {
+      "competencia": "2026-12",
+      "receitaPrevista": 200996.76,
+      "ultimosMeses": [
+        {
+          "competencia": "2026-08",
+          "receita": 171204.35
+        },
+        {
+          "competencia": "2026-09",
+          "receita": 178950.12
+        },
+        {
+          "competencia": "2026-10",
+          "receita": 186311.04
+        },
+        {
+          "competencia": "2026-11",
+          "receita": 193118.75
+        },
+        {
+          "competencia": "2026-12",
+          "receita": 200996.76
+        }
+      ],
+      "modulos": {
+        "daConta": 7,
+        "contratavel": 5,
+        "doTime": 2
+      },
+      "comCusto": 7,
+      "semCusto": 7,
+      "comCustoSemPreco": 6
+    }
+    """
+
+Cenário: conta de instituição
+  Quando a conta master da EBFGA envia GET /catalogo/resumo
+  Então a resposta é 403 ACESSO_NEGADO</pre>
+    </article>
+    <article class="criterio" id="RF-117-api">
+      <h3><code class="id">RF-117</code> Lista do catálogo</h3>
+      <pre class="gherkin">Cenário: módulos da conta
+  Quando o administrador envia GET /catalogo/modulos?tipo=DA_CONTA
+  Então a resposta é 200 com os módulos da conta de A a Z, entre eles:
+    """
+    {
+      "id": "MOD-03",
+      "nome": "Usuários",
+      "tipo": "DA_CONTA",
+      "temCusto": true,
+      "modeloCobranca": "POR_USUARIO",
+      "contas": 128,
+      "precoNovoEm": "2026-12-01"
+    }
+    """
+
+Cenário: buscar um módulo
+  Quando o administrador envia GET /catalogo/modulos?busca=pres
+  Então a resposta é 200 só com o item "MOD-06", "Presença", do tipo "CONTRATAVEL"
+
+Cenário: tipo fora da lista
+  Quando o administrador envia GET /catalogo/modulos?tipo=OUTRO
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "tipo"</pre>
+    </article>
+    <article class="criterio" id="RF-118-api">
+      <h3><code class="id">RF-118</code> Agendar preço</h3>
+      <pre class="gherkin">Cenário: agendar preço novo
+  Dado hoje 2026-11-03 e o preço de 18.90 por staff e 4.50 por participante desde 2026-11-01
+  Quando o administrador envia POST /catalogo/modulos/MOD-03/precos com:
+    """
+    {
+      "valorPorStaff": 19.90,
+      "valorPorParticipante": 4.90,
+      "valeDesde": "2026-12-01"
+    }
+    """
+  Então a resposta é 201 com:
+    """
+    {
+      "valorPorStaff": 19.90,
+      "valorPorParticipante": 4.90,
+      "valeDesde": "2026-12-01",
+      "valeAte": null,
+      "anteriorValeAte": "2026-11-30"
+    }
+    """
+
+Cenário: valor zero
+  Quando o administrador envia o mesmo pedido com valorPorStaff 0
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "valorPorStaff"
+  E o preço não muda</pre>
+    </article>
+    <article class="criterio" id="RF-119-api">
+      <h3><code class="id">RF-119</code> Salvar o desconto</h3>
+      <pre class="gherkin">Cenário: faixas de exemplo
+  Quando o administrador envia PUT /catalogo/modulos/MOD-03/desconto com:
+    """
+    {
+      "ligado": true,
+      "percentualAnual": 15,
+      "valeDesde": "2026-12-01",
+      "faixas": [
+        {
+          "inicio": 1,
+          "fim": 100,
+          "percentual": 0
+        },
+        {
+          "inicio": 101,
+          "fim": 300,
+          "percentual": 5
+        },
+        {
+          "inicio": 301,
+          "fim": 1000,
+          "percentual": 10
+        },
+        {
+          "inicio": 1001,
+          "fim": 3000,
+          "percentual": 15
+        },
+        {
+          "inicio": 3001,
+          "fim": null,
+          "percentual": 20
+        }
+      ]
+    }
+    """
+  Então a resposta é 200 com a política salva, igual à de GET /catalogo/modulos/MOD-03/desconto
+
+Cenário: desconto desligado
+  Dado o desconto por volume do módulo Usuários desligado
+  Quando um membro do time envia POST /catalogo/modulos/MOD-03/simulacao com 40 staff e 312 participantes
+  Então a resposta é 200 com descontoPorVolume 0.00 e totalMes 2324.80</pre>
+    </article>
+    <article class="criterio" id="RF-120-api">
+      <h3><code class="id">RF-120</code> Simulação</h3>
+      <pre class="gherkin">Cenário: escola média
+  Dado o preço de 19.90 por staff e 4.90 por participante a partir de 2026-12-01
+  E as faixas de exemplo e o plano anual com 15%
+  Quando um membro do time envia POST /catalogo/modulos/MOD-03/simulacao com:
+    """
+    {
+      "staff": 40,
+      "participantes": 312
+    }
+    """
+  Então a resposta é 200 com:
+    """
+    {
+      "valeDesde": "2026-12-01",
+      "staff": {
+        "quantidade": 40,
+        "valor": 796.00
+      },
+      "participantes": {
+        "quantidade": 312,
+        "valor": 1528.80
+      },
+      "subtotal": 2324.80,
+      "faixas": [
+        {
+          "inicio": 1,
+          "fim": 100,
+          "percentual": 0,
+          "usuarios": 100,
+          "desconto": 0.00
+        },
+        {
+          "inicio": 101,
+          "fim": 300,
+          "percentual": 5,
+          "usuarios": 200,
+          "desconto": 66.05
+        },
+        {
+          "inicio": 301,
+          "fim": 1000,
+          "percentual": 10,
+          "usuarios": 52,
+          "desconto": 34.34
+        }
+      ],
+      "descontoPorVolume": 100.39,
+      "totalMes": 2224.41,
+      "total12Meses": 26692.92,
+      "totalPlanoAnual": 22688.98
+    }
+    """
+  E nada é gravado
+
+Cenário: número negativo
+  Quando envia a simulação com participantes -1
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "participantes"</pre>
+    </article>
+    <article class="criterio" id="RF-122-api">
+      <h3><code class="id">RF-122</code> Histórico de preços</h3>
+      <pre class="gherkin">Cenário: preços do mais novo para o mais antigo
+  Quando um membro do time envia GET /catalogo/modulos/MOD-03/precos
+  Então a resposta é 200 com:
+    """
+    {
+      "precos": [
+        {
+          "valorPorStaff": 19.90,
+          "valorPorParticipante": 4.90,
+          "valeDesde": "2026-12-01",
+          "valeAte": null,
+          "definidoPor": "Administrador do deboaz",
+          "definidoEm": "2026-10-29T03:40:00Z"
+        },
+        {
+          "valorPorStaff": 18.90,
+          "valorPorParticipante": 4.50,
+          "valeDesde": "2026-11-01",
+          "valeAte": "2026-11-30",
+          "definidoPor": "Administrador do deboaz",
+          "definidoEm": "2026-10-20T09:30:00Z"
+        }
+      ]
+    }
+    """</pre>
+    </article>
+    <article class="criterio" id="RF-123-api">
+      <h3><code class="id">RF-123</code> Catalogar um módulo</h3>
+      <pre class="gherkin">Cenário: dados do módulo Usuários
+  Quando um membro do time envia GET /catalogo/modulos/MOD-03
+  Então a resposta é 200 com:
+    """
+    {
+      "id": "MOD-03",
+      "nome": "Usuários",
+      "tipo": "DA_CONTA",
+      "temCusto": true,
+      "modeloCobranca": "POR_USUARIO",
+      "precoHoje": {
+        "valorPorStaff": 18.90,
+        "valorPorParticipante": 4.50,
+        "valeDesde": "2026-11-01"
+      },
+      "contas": {
+        "instituicoes": 96,
+        "autonomos": 32
+      },
+      "catalogadoEm": "2026-08-01T12:00:00Z",
+      "catalogadoPor": {
+        "id": "usr-dboaz-admin",
+        "nome": "Administrador do deboaz"
+      }
+    }
+    """
+
+Cenário: catalogar a Presença com custo
+  Quando o administrador envia PUT /catalogo/modulos/MOD-06 com:
+    """
+    {
+      "temCusto": true,
+      "modeloCobranca": "POR_PARTICIPANTE"
+    }
+    """
+  Então a resposta é 200 com o módulo "MOD-06", temCusto true e precoHoje null
+
+Cenário: modelo que não combina com o custo
+  Quando o administrador envia PUT /catalogo/modulos/MOD-06 com temCusto false e o modelo "POR_USUARIO"
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "modeloCobranca"</pre>
+    </article>
+    <article class="criterio" id="RF-124-api">
+      <h3><code class="id">RF-124</code> Clientes do módulo</h3>
+      <pre class="gherkin">Cenário: instituições que contrataram
+  Quando um membro do time envia GET /catalogo/modulos/MOD-03/clientes?tipoConta=INSTITUICAO&amp;pagina=1
+  Então a resposta é 200 com total 96, página 1 e até 50 itens de A a Z pela sigla, o primeiro:
+    """
+    {
+      "contaId": "conta-clarr",
+      "sigla": "CLARR",
+      "nome": "Colégio Aurora",
+      "estado": "ATIVA",
+      "desde": "2026-02-02",
+      "plano": "MENSAL"
+    }
+    """
+
+Cenário: buscar um autônomo
+  Quando envia GET /catalogo/modulos/MOD-03/clientes?tipoConta=AUTONOMO&amp;busca=marina
+  Então a resposta é 200 com total 1 e o item "MRNCS", "Marina Costa"</pre>
+    </article>
+    <article class="criterio" id="RF-125-api">
+      <h3><code class="id">RF-125</code> Plano anual</h3>
+      <pre class="gherkin">Cenário: percentual do plano anual
+  Quando um membro do time envia GET /catalogo/modulos/MOD-03/desconto
+  Então a resposta é 200 com percentualAnual 15
+
+Cenário: simulação no plano anual
+  Quando envia POST /catalogo/modulos/MOD-03/simulacao com 40 staff e 312 participantes
+  Então a resposta traz total12Meses 26692.92 e totalPlanoAnual 22688.98</pre>
+    </article>
+    <article class="criterio" id="RN-191-api">
+      <h3><code class="id">RN-191</code> Só o administrador salva</h3>
+      <pre class="gherkin">Esquema do Cenário: quem salva
+  Quando &lt;quem&gt; envia &lt;pedido&gt;
+  Então a resposta é &lt;resposta&gt;
+
+  Exemplos:
+    | quem                                | pedido                                   | resposta          |
+    | o administrador do deboaz           | POST /catalogo/modulos/MOD-03/precos     | 201               |
+    | o membro do time Caio, com MOD-14 U | POST /catalogo/modulos/MOD-03/precos     | 403 ACESSO_NEGADO |
+    | o membro do time Caio, com MOD-14 U | PUT /catalogo/modulos/MOD-03/desconto    | 403 ACESSO_NEGADO |
+    | o membro do time Caio, com MOD-14 U | PUT /catalogo/modulos/MOD-06             | 403 ACESSO_NEGADO |
+    | o membro do time Caio, com MOD-14 U | POST /catalogo/modulos/MOD-03/simulacao  | 200               |</pre>
+    </article>
+    <article class="criterio" id="RN-192-api">
+      <h3><code class="id">RN-192</code> Desconto progressivo</h3>
+      <pre class="gherkin">Esquema do Cenário: um usuário a mais nunca baixa a conta
+  Dado as faixas de exemplo e o preço de 19.90 por staff e 4.90 por participante
+  Quando envia POST /catalogo/modulos/MOD-03/simulacao com 40 staff e &lt;part&gt; participantes
+  Então a resposta traz totalMes &lt;mês&gt;
+
+  Exemplos:
+    | part | mês     |
+    | 260  | 2001.00 |
+    | 261  | 2005.28 |</pre>
+    </article>
+    <article class="criterio" id="RN-193-api">
+      <h3><code class="id">RN-193</code> Regras das faixas</h3>
+      <pre class="gherkin">Esquema do Cenário: faixa recusada
+  Dado as faixas "1 a 100" com 0% e "101 a 300" com 5%
+  Quando o administrador envia PUT /catalogo/modulos/MOD-03/desconto com a terceira faixa &lt;faixa&gt;
+  Então a resposta é 422 FAIXA_INVALIDA com o campo "faixas[2]" e a mensagem &lt;mensagem&gt;
+  E o desconto não muda
+
+  Exemplos:
+    | faixa                 | mensagem                                           |
+    | "350 a 1.000" com 10% | "Falta a faixa de 301 a 349."                      |
+    | "250 a 1.000" com 10% | "A faixa 250 a 1.000 sobrepõe a faixa 101 a 300."  |
+    | "301 a 1.000" com 3%  | "Use 5% ou mais: a faixa anterior tem 5%."         |
+    | "301 a 1.000" com 55% | "O percentual vai até 50%."                        |
+
+Cenário: primeira e última faixa
+  Quando a primeira faixa começa em 2 ou a última tem fim
+  Então a resposta é 422 FAIXA_INVALIDA com "A primeira faixa começa em 1 usuário." ou "A última faixa não tem fim."</pre>
+    </article>
+    <article class="criterio" id="RN-194-api">
+      <h3><code class="id">RN-194</code> Data de início</h3>
+      <pre class="gherkin">Cenário: preço para hoje
+  Dado hoje 2026-11-01
+  Quando o administrador envia POST /catalogo/modulos/MOD-03/precos com valeDesde "2026-11-01"
+  Então a resposta é 422 com:
+    """
+    {
+      "codigo": "DATA_INVALIDA",
+      "mensagem": "Escolha 02/11/2026 ou depois.",
+      "campo": "valeDesde",
+      "minimo": "2026-11-02"
+    }
+    """
+
+Cenário: desconto para hoje
+  Quando o administrador envia PUT /catalogo/modulos/MOD-03/desconto com valeDesde de hoje
+  Então a resposta é 422 DATA_INVALIDA e a política que vale continua igual</pre>
+    </article>
+    <article class="criterio" id="RN-196-api">
+      <h3><code class="id">RN-196</code> Arredondamento</h3>
+      <pre class="gherkin">Cenário: meio centavo para cima, só no fim
+  Dado o desconto calculado de R$ 100,385 para 40 staff e 312 participantes
+  Quando envia POST /catalogo/modulos/MOD-03/simulacao
+  Então a resposta traz descontoPorVolume 100.39 e totalMes 2224.41</pre>
+    </article>
+    <article class="criterio" id="RN-199-api">
+      <h3><code class="id">RN-199</code> Módulo sem custo e sem preço</h3>
+      <pre class="gherkin">Esquema do Cenário: recusa pelo custo
+  Quando o administrador envia &lt;pedido&gt;
+  Então a resposta é 422 &lt;código&gt; com a mensagem &lt;mensagem&gt;
+
+  Exemplos:
+    | pedido                                  | código    | mensagem                                 |
+    | POST /catalogo/modulos/MOD-13/precos    | SEM_CUSTO | "O módulo Perfil não tem custo."         |
+    | PUT /catalogo/modulos/MOD-13/desconto   | SEM_CUSTO | "O módulo Perfil não tem custo."         |
+    | POST /catalogo/modulos/MOD-06/simulacao | SEM_PRECO | "O módulo Presença ainda não tem preço." |</pre>
+    </article>
+    <article class="criterio" id="RN-257-api">
+      <h3><code class="id">RN-257</code> Custo igual em todos os contratos</h3>
+      <pre class="gherkin">Cenário: o custo muda em todas as contratações
+  Dado o módulo "MOD-06" sem custo, com 128 contratações
+  Quando o administrador envia PUT /catalogo/modulos/MOD-06 com temCusto true e o modelo "POR_PARTICIPANTE"
+  Então a resposta é 200 com temCusto true
+  E as 128 contratações do "MOD-06" passam a ter custo, sem mudar as cobranças já fechadas</pre>
+    </article>
+    <article class="criterio" id="RN-200-api">
+      <h3><code class="id">RN-200</code> Catálogo só no time</h3>
+      <pre class="gherkin">Esquema do Cenário: fora do time ou sem o Catálogo
+  Quando &lt;quem&gt; envia GET /catalogo/modulos
+  Então a resposta é 403 ACESSO_NEGADO com a mensagem "Você não tem permissão para esta ação."
+
+  Exemplos:
+    | quem                                    |
+    | a conta master da EBFGA                 |
+    | a staff Maria, da EBFGA                 |
+    | o membro do time Caio, sem o MOD-14     |</pre>
+    </article>
+    <article class="criterio" id="RNF-210-api">
+      <h3><code class="id">RNF-210</code> Mesmo valor em todo lugar</h3>
+      <pre class="gherkin">Esquema do Cenário: simulação igual ao fechamento
+  Quando envia POST /catalogo/modulos/MOD-03/simulacao com &lt;staff&gt; staff e &lt;part&gt; participantes
+  Então a resposta traz totalMes &lt;mês&gt;, o mesmo total da cobrança fechada com esses números
+
+  Exemplos:
+    | staff | part | mês     |
+    | 15    | 135  | 944.00  |
+    | 40    | 312  | 2224.41 |
+    | 80    | 1120 | 6431.00 |
+    | 0     | 60   | 294.00  |</pre>
+    </article>
+    <article class="criterio" id="RNF-211-api">
+      <h3><code class="id">RNF-211</code> Registro de preços</h3>
+      <pre class="gherkin">Cenário: preço anterior guardado
+  Dado o preço de 18.90 por staff agendado pelo administrador
+  Quando ele envia POST /catalogo/modulos/MOD-03/precos com 19.90 por staff
+  Então GET /catalogo/modulos/MOD-03/precos traz os dois, cada um com definidoPor e definidoEm
+  E não existe endereço para alterar nem apagar um preço</pre>
+    </article>
+    <article class="criterio" id="RNF-212-api">
+      <h3><code class="id">RNF-212</code> Simulação rápida</h3>
+      <pre class="gherkin">Cenário: resposta em até 1 s
+  Quando envia POST /catalogo/modulos/MOD-03/simulacao com 40 staff e 313 participantes
+  Então a resposta 200 chega em até 1 segundo</pre>
+    </article>
     <article class="criterio" id="exemplo-entidades">
       <h3>Exemplo de cada entidade</h3>
       <pre class="gherkin">Cenário: documento em modulos
@@ -1255,28 +1711,28 @@ Cenário: rótulo falado
   Então o exemplo é:
     """
     {
-      "_id": "mod-usuarios",
+      "_id": "MOD-03",
       "nome": "Usuários",
       "tipo": "DA_CONTA",
       "temCusto": true,
       "modeloCobranca": "POR_USUARIO",
       "catalogadoEm": "2026-08-01T12:00:00Z",
-      "catalogadoPor": "usr-gustavo-dboaz",
+      "catalogadoPor": "usr-dboaz-admin",
       "precos": [
         { "valorPorStaff": 17.90, "valorPorParticipante": 3.90,
           "valeDesde": "2026-08-01", "valeAte": "2026-10-31",
-          "definidoPor": "usr-gustavo-dboaz", "definidoEm": "2026-07-25T14:10:00Z" },
+          "definidoPor": "usr-dboaz-admin", "definidoEm": "2026-07-25T14:10:00Z" },
         { "valorPorStaff": 18.90, "valorPorParticipante": 4.50,
           "valeDesde": "2026-11-01", "valeAte": "2026-11-30",
-          "definidoPor": "usr-gustavo-dboaz", "definidoEm": "2026-10-20T09:30:00Z" },
+          "definidoPor": "usr-dboaz-admin", "definidoEm": "2026-10-20T09:30:00Z" },
         { "valorPorStaff": 19.90, "valorPorParticipante": 4.90,
           "valeDesde": "2026-12-01", "valeAte": null,
-          "definidoPor": "usr-gustavo-dboaz", "definidoEm": "2026-10-29T03:40:00Z" }
+          "definidoPor": "usr-dboaz-admin", "definidoEm": "2026-10-29T03:40:00Z" }
       ],
       "politicas": [
         { "ligado": true, "percentualAnual": 15,
           "valeDesde": "2026-12-01", "valeAte": null,
-          "definidoPor": "usr-gustavo-dboaz",
+          "definidoPor": "usr-dboaz-admin",
           "faixas": [
             { "inicio": 1,    "fim": 100,  "percentual": 0 },
             { "inicio": 101,  "fim": 300,  "percentual": 5 },
@@ -1294,15 +1750,15 @@ Cenário: documento em contratacoes
   Então o exemplo é:
     """
     {
-      "_id": "ctr-ebfga-usuarios",
+      "_id": "ctr-ebfga-MOD-03",
       "contaId": "conta-ebfga",
       "sigla": "EBFGA",
       "nomeConta": "Escola Bento Freitas",
       "tipoConta": "INSTITUICAO",
-      "moduloId": "mod-usuarios",
+      "moduloId": "MOD-03",
       "nomeModulo": "Usuários",
       "plano": "MENSAL",
-      "desde": "2026-03-12",
+      "desde": "2026-03-12T00:00:00Z",
       "ate": null,
       "automatica": true
     }
@@ -1314,10 +1770,10 @@ Cenário: documento em cobrancas
   Então o exemplo é:
     """
     {
-      "_id": "cob-ebfga-usuarios-2026-12",
+      "_id": "cob-ebfga-MOD-03-2026-12",
       "contaId": "conta-ebfga",
-      "contratacaoId": "ctr-ebfga-usuarios",
-      "moduloId": "mod-usuarios",
+      "contratacaoId": "ctr-ebfga-MOD-03",
+      "moduloId": "MOD-03",
       "competencia": "2026-12",
       "fechadaEm": "2026-12-31T23:59:59Z",
       "staffAtivos": 40,
@@ -1343,33 +1799,49 @@ Cenário: documento em cobrancas
   E cupom, preço especial e teste grátis ficam de fora
   E impostos, nota fiscal e formas de pagamento ficam de fora
   E reajuste automático por índice fica de fora
-  E os valores definitivos são configuração do administrador; os daqui são exemplo</pre>
+  E os valores definitivos são configuração do administrador; os daqui são exemplo
+  E a fatura que a conta vê e paga é do módulo Contas (MOD-01): o Catálogo grava a cobrança fechada e o Contas a mostra</pre>
     </article>
   </section>
   <section id="telas">
     <h2>Telas</h2>
+    <h3>Web</h3>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-hub-catalogo-deboaz_v03_20261031-1528.svg"><img src="../2_Diagramas/vista-hub-catalogo-deboaz_v03_20261031-1528.svg" alt="Vista do catálogo do time deboaz: card do Catálogo em Módulos, módulos por tipo, dados e clientes do módulo Usuários, preço por staff e por participante, faixas de desconto e simulação"></a>
-      <figcaption><strong>Hub · catálogo · vista</strong><code>2_Diagramas/vista-hub-catalogo-deboaz_v03_20261031-1528.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-catalogo-deboaz-web_v01_20261103-1149.svg"><img src="../2_Diagramas/vista-hub-catalogo-deboaz-web_v01_20261103-1149.svg" alt="Web: vista do catálogo do time deboaz: card do Catálogo nos tamanhos mínima, reduzida, normal e expandida no compact, no medium e no expanded, só com o Catálogo; módulos por tipo, dados e clientes do módulo Usuários, preço por staff e por participante, faixas de desconto e simulação"></a>
+      <figcaption><strong>Hub · catálogo · web · vista</strong><code>2_Diagramas/vista-hub-catalogo-deboaz-web_v01_20261103-1149.svg</code></figcaption>
+    </figure>
+    <h3>PWA</h3>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-catalogo-deboaz-pwa_v02_20261103-1232.svg"><img src="../2_Diagramas/vista-hub-catalogo-deboaz-pwa_v02_20261103-1232.svg" alt="PWA: vista do catálogo do time deboaz: card do Catálogo nos tamanhos mínima, reduzida, normal e expandida no compact, no medium e no expanded, só com o Catálogo; módulos por tipo, dados e clientes do módulo Usuários, preço por staff e por participante, faixas de desconto e simulação"></a>
+      <figcaption><strong>Hub · catálogo · pwa · vista</strong><code>2_Diagramas/vista-hub-catalogo-deboaz-pwa_v02_20261103-1232.svg</code></figcaption>
+    </figure>
+    <h3>Mobile</h3>
+    <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
+      <a href="../2_Diagramas/vista-hub-catalogo-deboaz-mobile_v02_20261103-1232.svg"><img src="../2_Diagramas/vista-hub-catalogo-deboaz-mobile_v02_20261103-1232.svg" alt="Mobile: vista do catálogo do time deboaz: card do Catálogo nos tamanhos mínima, reduzida, normal e expandida no compact, no medium e no expanded, só com o Catálogo; módulos por tipo, dados e clientes do módulo Usuários, preço por staff e por participante, faixas de desconto e simulação"></a>
+      <figcaption><strong>Hub · catálogo · mobile · vista</strong><code>2_Diagramas/vista-hub-catalogo-deboaz-mobile_v02_20261103-1232.svg</code></figcaption>
     </figure>
   </section>
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-casos-de-uso_v01_20261031-1244.svg"><img src="../2_Diagramas/catalogo-casos-de-uso_v01_20261031-1244.svg" alt="Casos de uso do catálogo: o membro do time deboaz vê o card, lista e busca módulos, vê quem contratou, o histórico e simula; o administrador também cataloga, agenda o preço, configura as faixas e o percentual do plano anual, tudo registrado no histórico; o fechamento do mês fecha a cobrança com o mesmo cálculo da simulação"></a>
-      <figcaption><strong>Catálogo · casos de uso</strong><code>2_Diagramas/catalogo-casos-de-uso_v01_20261031-1244.svg</code></figcaption>
+      <a href="../2_Diagramas/catalogo-casos-de-uso_v02_20261103-1232.svg"><img src="../2_Diagramas/catalogo-casos-de-uso_v02_20261103-1232.svg" alt="Casos de uso do catálogo: o membro do time deboaz vê o card, lista e busca módulos, vê quem contratou, o histórico e simula; o administrador também cataloga, agenda o preço, configura as faixas e o percentual do plano anual, tudo registrado no histórico; o fechamento do mês fecha a cobrança com o mesmo cálculo da simulação"></a>
+      <figcaption><strong>Catálogo · casos de uso</strong><code>2_Diagramas/catalogo-casos-de-uso_v02_20261103-1232.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-sequencia_v01_20261031-1244.svg"><img src="../2_Diagramas/catalogo-sequencia_v01_20261031-1244.svg" alt="Sequência do catálogo: o administrador agenda o preço do módulo Usuários com papel e data conferidos e auditoria gravada; um membro simula 40 staff e 312 participantes sem salvar; o fechamento do mês conta os ativos de cada contratação, calcula igual à simulação, aplica o plano anual e grava a cobrança fechada"></a>
-      <figcaption><strong>Catálogo · sequência</strong><code>2_Diagramas/catalogo-sequencia_v01_20261031-1244.svg</code></figcaption>
+      <a href="../2_Diagramas/catalogo-sequencia_v04_20261103-1232.svg"><img src="../2_Diagramas/catalogo-sequencia_v04_20261103-1232.svg" alt="Sequência do catálogo: o administrador agenda o preço do módulo Usuários com papel e data conferidos e auditoria gravada; um membro simula 40 staff e 312 participantes sem salvar; o fechamento do mês conta os ativos de cada contratação, calcula igual à simulação, aplica o plano anual e grava a cobrança fechada; com as telas do hub de cada fase e o endpoint que cada uma chama"></a>
+      <figcaption><strong>Catálogo · sequência com as telas</strong><code>2_Diagramas/catalogo-sequencia_v04_20261103-1232.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-classes_v03_20261031-1526.svg"><img src="../2_Diagramas/catalogo-classes_v03_20261031-1526.svg" alt="Diagrama de classes do catálogo: Módulo com tipo, custo e modelo de cobrança, Preço e PolíticaDeDesconto com vigência, FaixaDeDesconto, Contratação por conta e Cobrança mensal"></a>
-      <figcaption><strong>Catálogo · classes</strong><code>2_Diagramas/catalogo-classes_v03_20261031-1526.svg</code></figcaption>
+      <a href="../2_Diagramas/catalogo-contrato-api_v02_20261103-1232.svg"><img src="../2_Diagramas/catalogo-contrato-api_v02_20261103-1232.svg" alt="Contrato de API do catálogo: resumo, lista e dados do módulo, catalogar, clientes, preços, desconto e simulação, com o formato de erro e as mensagens exatas"></a>
+      <figcaption><strong>Catálogo · contrato de API</strong><code>2_Diagramas/catalogo-contrato-api_v02_20261103-1232.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-documentos_v03_20261031-1526.svg"><img src="../2_Diagramas/catalogo-documentos_v03_20261031-1526.svg" alt="Modelo de documentos do catálogo: modulos com precos e politicas com faixas embutidos, contratacoes e cobrancas particionadas por contaId, com referências a contas e usuarios"></a>
-      <figcaption><strong>Catálogo · modelo de documentos</strong><code>2_Diagramas/catalogo-documentos_v03_20261031-1526.svg</code></figcaption>
+      <a href="../2_Diagramas/catalogo-classes_v04_20261103-1232.svg"><img src="../2_Diagramas/catalogo-classes_v04_20261103-1232.svg" alt="Diagrama de classes do catálogo: Módulo com tipo, custo e modelo de cobrança, Preço e PolíticaDeDesconto com vigência, FaixaDeDesconto, Contratação por conta e Cobrança mensal"></a>
+      <figcaption><strong>Catálogo · classes</strong><code>2_Diagramas/catalogo-classes_v04_20261103-1232.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/catalogo-documentos_v04_20261103-1232.svg"><img src="../2_Diagramas/catalogo-documentos_v04_20261103-1232.svg" alt="Modelo de documentos do catálogo: modulos com precos e politicas com faixas embutidos, contratacoes e cobrancas particionadas por contaId, com referências a contas e usuarios"></a>
+      <figcaption><strong>Catálogo · modelo de documentos</strong><code>2_Diagramas/catalogo-documentos_v04_20261103-1232.svg</code></figcaption>
     </figure>
   </section>
 </main>
@@ -1378,21 +1850,21 @@ Cenário: documento em cobrancas
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v18</span></td><td>2026-11-01 18:18</td><td>Só Gherkin, telas e diagramas: contexto e exemplo de receita, RF, RN, RNF, ficha do módulo, exemplos de entidades e fora de escopo viram cenários (mesmos IDs como âncora)</td></tr>
+      <tr><td><span class="boaz-versao">v22</span></td><td>2026-11-03 12:33</td><td>Lista do catálogo só com o espaço de cada módulo, sem nomes de outros módulos (<code class="id">RF-117</code>, vistas pwa e mobile v02); <code class="id">RF-121</code> sai para o módulo Contas (fora de escopo); nova <code class="id">RN-257</code>: mudar o custo vale para todas as contratações; diagramas com a referência 16_modulo-catalogo (casos de uso v02, sequência v04, contrato v02, classes v04, documentos v04)</td></tr>
+      <tr><td>v21</td><td>2026-11-03 11:49</td><td>Estrutura do módulo (06 <code class="id">RNF-103</code> v17): Telas em Web, PWA e Mobile, uma vista por plataforma, separadas da vista hub-catalogo-deboaz v04</td></tr>
+      <tr><td>v20</td><td>2026-11-03 11:02</td><td>Telas: card do Catálogo nos quatro tamanhos no compact, no medium e no expanded, sem outros módulos e sem o Painel de administração (vista-hub-catalogo-deboaz v04, catalogo-sequencia v03); ficha do módulo com a receita do resumo (R$ 200.996,76, R$ 201k) e os 5 meses do contrato no lugar das 7 semanas</td></tr>
+      <tr><td>v19</td><td>2026-11-03 10:48</td><td>Documento renomeado para 16_modulo-catalogo; cenários divididos em Cenários de tela e Cenários de API, com os endereços e códigos do contrato catalogo-contrato-api v01 (<code class="id">RF-116</code> a <code class="id">RF-120</code>, <code class="id">RF-122</code> a <code class="id">RF-125</code>, <code class="id">RN-191</code> a <code class="id">RN-194</code>, <code class="id">RN-196</code>, <code class="id">RN-199</code>, <code class="id">RN-200</code>, <code class="id">RNF-210</code> a <code class="id">RNF-212</code>, âncoras -api); exemplos de entidades com o id do registro (MOD-03) e o administrador usr-dboaz-admin; catalogo-sequencia v02, com as telas</td></tr>
+      <tr><td>v18</td><td>2026-11-01 18:18</td><td>Só Gherkin, telas e diagramas: contexto e exemplo de receita, RF, RN, RNF, ficha do módulo, exemplos de entidades e fora de escopo viram cenários (mesmos IDs como âncora)</td></tr>
       <tr><td>v17</td><td>2026-11-01 03:48</td><td>Exemplo de receita: as 128 contas vêm da lista Contas do módulo Usuários do time deboaz, no lugar do painel retirado (Módulos <code class="id">MOD-15</code>)</td></tr>
       <tr><td>v16</td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
       <tr><td>v15</td><td>2026-11-01 01:14</td><td>Exemplo do card com 7 módulos da conta e 5 contratáveis, depois de Tarefas virar da conta (ca-RF-116)</td></tr>
       <tr><td>v14</td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
       <tr><td>v13</td><td>2026-10-31 23:46</td><td>Ficha do módulo <code class="id">MOD-14</code> em Regras de negócio: ícone <code>loja</code>, dados de cada tamanho do card para o administrador e o membro do time deboaz, a partir de <code class="id">RF-116</code></td></tr>
-      <tr><td>v12</td><td>2026-10-31 16:46</td><td>Meus módulos vira Módulos em <code class="id">RF-116</code>, nos critérios e nos exemplos</td></tr>
-      <tr><td>v11</td><td>2026-10-31 15:55</td><td>Aprovado</td></tr>
-      <tr><td>v10</td><td>2026-10-31 15:29</td><td>Exemplos pelo registro de módulos (15_modulos): 6 da conta, 6 contratáveis e 2 do time, 7 com custo, 7 sem custo e 6 sem preço (<code class="id">RF-116</code>, <code class="id">RF-117</code>); valor por participante dos contratáveis em Fora de escopo; catalogo-classes v03, catalogo-documentos v03 (POR_PARTICIPANTE) e vista do catálogo do deboaz v03</td></tr>
-      <tr><td>v09</td><td>2026-10-31 13:23</td><td><code class="id">RN-198</code> removido: os tipos de módulo passam para <a class="ref" href="15_modulos.html#RN-203">Módulos RN-203</a></td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v18 · 2026-11-01 18:18</span>
-    <span class="boaz-arquivo">1_Requisitos/16_catalogo.html</span>
+    <span>boaz · v22 · 2026-11-03 12:33</span>
+    <span class="boaz-arquivo">1_Requisitos/16_modulo-catalogo.html</span>
   </div>
 </footer>
 </body>

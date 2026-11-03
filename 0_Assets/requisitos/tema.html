@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tema dos documentos de requisito · boaz · v09</title>
+<title>Tema dos documentos de requisito · boaz · v10</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="tema">
 <meta name="boaz:caminho" content="0_Assets/requisitos/tema.html">
 <meta name="boaz:tipo" content="Tema">
-<meta name="boaz:versao" content="v09">
-<meta name="boaz:data" content="2026-11-02 00:11">
+<meta name="boaz:versao" content="v10">
+<meta name="boaz:data" content="2026-11-03 11:37">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -934,8 +934,8 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
   <p class="boaz-objetivo"><span>Objetivo</span>padronizar marca d'água, formato (cenários em Gherkin, telas e diagramas) e estilo de todo documento <code>.html</code> de <code>1_Requisitos/</code> e mostrar, renderizado, cada componente que um documento pode usar.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>tema</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v09</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 00:11</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v10</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 11:37</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1086,8 +1086,8 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
 &lt;main&gt;
   &lt;section id="cenarios-tela"&gt;&lt;h2&gt;Cenários de tela&lt;/h2&gt;…&lt;/section&gt;
   &lt;section id="cenarios-api"&gt;&lt;h2&gt;Cenários de API&lt;/h2&gt;…&lt;/section&gt;   ← quando há contrato de API
-  &lt;section id="telas"&gt;&lt;h2&gt;Telas&lt;/h2&gt;…&lt;/section&gt;
-  &lt;section id="diagramas"&gt;&lt;h2&gt;Diagramas&lt;/h2&gt;…&lt;/section&gt;
+  &lt;section id="telas"&gt;&lt;h2&gt;Telas&lt;/h2&gt;…&lt;/section&gt;          ← h3 Web, PWA e Mobile: uma vista por plataforma
+  &lt;section id="diagramas"&gt;&lt;h2&gt;Diagramas&lt;/h2&gt;…&lt;/section&gt;  ← casos de uso, sequência com telas, contrato, classes, documentos
   &lt;section id="em-aberto"&gt;&lt;h2&gt;Em aberto&lt;/h2&gt;…&lt;/section&gt;
 &lt;/main&gt;
 &lt;footer class="boaz-marca-rodape"&gt;…&lt;/footer&gt;
@@ -1133,6 +1133,7 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
       <li>Datas <code>AAAA-MM-DD</code>, horas <code>HH:MM</code>; número e unidade com espaço (<code>2 s</code>, <code>R$ 1.500,00</code>), decimal com vírgula</li>
       <li>Dúvida não vira cenário: vai para Em aberto</li>
       <li>Funcionalidade com contrato de API: os cenários se dividem em <strong>Cenários de tela</strong> (<code>section#cenarios-tela</code>: o que a pessoa vê, toca e lê, sem endereço) e <strong>Cenários de API</strong> (<code>section#cenarios-api</code>: método e endereço do contrato, pedido em JSON, status e código de erro, como <code>Quando envia POST /auth/hub/entrar … Então a resposta é 401 ENTRADA_INVALIDA</code>); sem contrato, a seção é uma só, <code>section#cenarios</code></li>
+      <li>Ordem de um módulo (funcionalidade): <strong>Cenários de tela</strong> → <strong>Cenários de API</strong> → <strong>Telas</strong> (<code>&lt;h3&gt;</code> Web, PWA e Mobile, cada uma com as vistas daquela plataforma: <code>vista-&lt;aplicação&gt;-&lt;tela&gt;-web</code>, <code>-pwa</code> e <code>-mobile</code>) → <strong>Diagramas</strong>, nesta ordem: casos de uso, sequência com as telas de cada passo, contrato de API, classes e modelo de documentos do banco</li>
       <li>Regra que vale nas duas seções tem um cenário em cada: o de tela fica com o <code>id</code> do ID (<code>RF-139</code>, os links continuam valendo) e o de API ganha <code>-api</code> (<code>RF-139-api</code>); regra só de uma seção fica com o <code>id</code> do ID. Os de API são a base do qa do backend; os de tela, do qa da web e do mobile</li>
     </ul>
     <p>Palavras vagas são proibidas; troque por um valor no cenário:</p>
@@ -1302,7 +1303,7 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
       <thead><tr><th>Tipo</th><th>Arquivo</th><th>Seções, na ordem (<strong>obrigatórias</strong> em negrito)</th></tr></thead>
       <tbody>
         <tr><td>Visão do produto</td><td><code>00_visao-produto.html</code></td><td><strong>Problema</strong> (lista), <strong>Objetivos e métricas</strong>, <strong>Personas</strong>, <strong>Escopo</strong>, Identidade, Fora de escopo</td></tr>
-        <tr><td>Funcionalidade</td><td><code>01</code>–<code>89</code></td><td><strong>Cenários</strong> (de tela e de API, quando há contrato), Telas, Diagramas, Em aberto</td></tr>
+        <tr><td>Funcionalidade</td><td><code>01</code>–<code>89</code></td><td><strong>Cenários de tela</strong>, Cenários de API (quando há contrato), Telas (Web, PWA, Mobile), Diagramas (casos de uso, sequência com telas, contrato, classes, documentos), Em aberto</td></tr>
         <tr><td>Transversal</td><td><code>90</code>–<code>98</code> e as regras do projeto</td><td><strong>Cenários</strong>, Diagramas, Em aberto</td></tr>
         <tr><td>Glossário</td><td><code>99_glossario.html</code></td><td><strong>Termos</strong></td></tr>
       </tbody>
@@ -1331,7 +1332,8 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v09</span></td><td>2026-11-02 00:11</td><td>Escrita e esqueleto: cenários de tela e de API em seções separadas (<code>cenarios-tela</code>, <code>cenarios-api</code>, sufixo <code>-api</code>)</td></tr>
+      <tr><td><span class="boaz-versao">v10</span></td><td>2026-11-03 11:37</td><td>Ordem de um módulo: cenários de tela, cenários de API, telas por plataforma (Web, PWA e Mobile, uma vista para cada) e diagramas na ordem casos de uso, sequência com telas, contrato, classes e documentos</td></tr>
+      <tr><td>v09</td><td>2026-11-02 00:11</td><td>Escrita e esqueleto: cenários de tela e de API em seções separadas (<code>cenarios-tela</code>, <code>cenarios-api</code>, sufixo <code>-api</code>)</td></tr>
       <tr><td>v08</td><td>2026-11-01 22:01</td><td>Escrita: JSON sempre expandido nas doc strings</td></tr>
       <tr><td>v07</td><td>2026-11-01 18:31</td><td>Requisito só com Gherkin, telas e diagramas: funcionalidade = Cenários, Telas, Diagramas e Em aberto; transversal = Cenários, Diagramas e Em aberto; visão enxuta, em listas; cada regra (RF, RN, RNF) é um cenário com o ID como âncora; saem Contexto, tabelas de requisitos, prioridade, história e destaques; Gherkin quebra a linha em vez de cortar; casca v07</td></tr>
       <tr><td>v06</td><td>2026-10-24 03:59</td><td>Vista com paletas: <code>figure.diagrama[data-paletas]</code> e o botão <strong>Paleta</strong> na barra, que troca o tema de cor e o modo (claro ou escuro) das vistas de tela pelo fragmento <code>#paleta-&lt;id&gt;-&lt;modo&gt;</code> do <code>.svg</code>; casca v06</td></tr>
@@ -1343,7 +1345,7 @@ details.boaz-snippet > pre { margin-top: 10px; font-size: 12px; }
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v09 · 2026-11-02 00:11</span>
+    <span>boaz · v10 · 2026-11-03 11:37</span>
     <span class="boaz-arquivo">0_Assets/requisitos/tema.html</span>
   </div>
 </footer>

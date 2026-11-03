@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo Usuários · Autenticação · boaz · v16</title>
+<title>Módulo Usuários · Autenticação · boaz · v17</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="17_modulo-usuario-a-autenticacao">
 <meta name="boaz:caminho" content="1_Requisitos/17_modulo-usuario-a-autenticacao.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v16">
-<meta name="boaz:data" content="2026-11-02 00:11">
+<meta name="boaz:versao" content="v17">
+<meta name="boaz:data" content="2026-11-03 11:45">
 <meta name="boaz:status" content="Em revisão">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -918,8 +918,8 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>17_modulo-usuario-a-autenticacao</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v16</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-02 · 00:11</dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v17</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 11:45</dd></div>
     <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
   </dl>
 </header>
@@ -1546,17 +1546,44 @@ Cenário: sem aparelhos conectados no quest
   </section>
   <section id="telas">
     <h2>Telas</h2>
+    <h3>Web</h3>
     <figure class="diagrama">
-      <a href="../2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg"><img src="../2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg" alt="Vista dos aparelhos conectados no hub: linha Aparelhos conectados na Conta, lista com este aparelho marcado, sair de um aparelho e sair de todos com confirmação, no compact, no medium e no expanded"></a>
-      <figcaption><strong>Hub · aparelhos conectados · vista</strong><code>2_Diagramas/vista-hub-aparelhos_v01_20261101-1219.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-aparelhos-web_v01_20261103-1139.svg"><img src="../2_Diagramas/vista-hub-aparelhos-web_v01_20261103-1139.svg" alt="Web: vista dos aparelhos conectados no hub: linha Aparelhos conectados na Conta, lista com este aparelho marcado, sair de um aparelho e sair de todos com confirmação, no compact, no medium e no expanded"></a>
+      <figcaption><strong>Hub · aparelhos conectados · web · vista</strong><code>2_Diagramas/vista-hub-aparelhos-web_v01_20261103-1139.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/vista-hub-entrar_v01_20261101-1306.svg"><img src="../2_Diagramas/vista-hub-entrar_v01_20261101-1306.svg" alt="Vista de Entrar no hub pela conta master, pelo staff, pelo educador autônomo e pelo membro do time deboaz, cada um no compact, no medium e no expanded, com as recusas de entrada ou senha incorretas, acesso indisponível e entrada bloqueada e a sessão terminada"></a>
-      <figcaption><strong>Hub · entrar · vista</strong><code>2_Diagramas/vista-hub-entrar_v01_20261101-1306.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-hub-entrar-web_v01_20261103-1139.svg"><img src="../2_Diagramas/vista-hub-entrar-web_v01_20261103-1139.svg" alt="Web: vista de Entrar no hub pela conta master, pelo staff, pelo educador autônomo e pelo membro do time deboaz, cada um no compact, no medium e no expanded, com as recusas de entrada ou senha incorretas, acesso indisponível e entrada bloqueada e a sessão terminada"></a>
+      <figcaption><strong>Hub · entrar · web · vista</strong><code>2_Diagramas/vista-hub-entrar-web_v01_20261103-1139.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/vista-quest-entrar_v01_20261101-1306.svg"><img src="../2_Diagramas/vista-quest-entrar_v01_20261101-1306.svg" alt="Vista de entrar no quest: código de acesso, participante, responsável e acesso anônimo, cada um no compact, no medium e no expanded, com o código inválido, o código bloqueado e a sessão terminada"></a>
-      <figcaption><strong>Quest · entrar · vista</strong><code>2_Diagramas/vista-quest-entrar_v01_20261101-1306.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-quest-entrar-web_v01_20261103-1139.svg"><img src="../2_Diagramas/vista-quest-entrar-web_v01_20261103-1139.svg" alt="Web: vista de entrar no quest: código de acesso, participante, responsável e acesso anônimo, cada um no compact, no medium e no expanded, com o código inválido, o código bloqueado e a sessão terminada"></a>
+      <figcaption><strong>Quest · entrar · web · vista</strong><code>2_Diagramas/vista-quest-entrar-web_v01_20261103-1139.svg</code></figcaption>
+    </figure>
+    <h3>PWA</h3>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/vista-hub-aparelhos-pwa_v01_20261103-1139.svg"><img src="../2_Diagramas/vista-hub-aparelhos-pwa_v01_20261103-1139.svg" alt="PWA: vista dos aparelhos conectados no hub: linha Aparelhos conectados na Conta, lista com este aparelho marcado, sair de um aparelho e sair de todos com confirmação, no compact, no medium e no expanded"></a>
+      <figcaption><strong>Hub · aparelhos conectados · pwa · vista</strong><code>2_Diagramas/vista-hub-aparelhos-pwa_v01_20261103-1139.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/vista-hub-entrar-pwa_v01_20261103-1139.svg"><img src="../2_Diagramas/vista-hub-entrar-pwa_v01_20261103-1139.svg" alt="PWA: vista de Entrar no hub pela conta master, pelo staff, pelo educador autônomo e pelo membro do time deboaz, cada um no compact, no medium e no expanded, com as recusas de entrada ou senha incorretas, acesso indisponível e entrada bloqueada e a sessão terminada"></a>
+      <figcaption><strong>Hub · entrar · pwa · vista</strong><code>2_Diagramas/vista-hub-entrar-pwa_v01_20261103-1139.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/vista-quest-entrar-pwa_v01_20261103-1139.svg"><img src="../2_Diagramas/vista-quest-entrar-pwa_v01_20261103-1139.svg" alt="PWA: vista de entrar no quest: código de acesso, participante, responsável e acesso anônimo, cada um no compact, no medium e no expanded, com o código inválido, o código bloqueado e a sessão terminada"></a>
+      <figcaption><strong>Quest · entrar · pwa · vista</strong><code>2_Diagramas/vista-quest-entrar-pwa_v01_20261103-1139.svg</code></figcaption>
+    </figure>
+    <h3>Mobile</h3>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/vista-hub-aparelhos-mobile_v01_20261103-1139.svg"><img src="../2_Diagramas/vista-hub-aparelhos-mobile_v01_20261103-1139.svg" alt="Mobile: vista dos aparelhos conectados no hub: linha Aparelhos conectados na Conta, lista com este aparelho marcado, sair de um aparelho e sair de todos com confirmação, no compact, no medium e no expanded"></a>
+      <figcaption><strong>Hub · aparelhos conectados · mobile · vista</strong><code>2_Diagramas/vista-hub-aparelhos-mobile_v01_20261103-1139.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/vista-hub-entrar-mobile_v01_20261103-1139.svg"><img src="../2_Diagramas/vista-hub-entrar-mobile_v01_20261103-1139.svg" alt="Mobile: vista de Entrar no hub pela conta master, pelo staff, pelo educador autônomo e pelo membro do time deboaz, cada um no compact, no medium e no expanded, com as recusas de entrada ou senha incorretas, acesso indisponível e entrada bloqueada e a sessão terminada"></a>
+      <figcaption><strong>Hub · entrar · mobile · vista</strong><code>2_Diagramas/vista-hub-entrar-mobile_v01_20261103-1139.svg</code></figcaption>
+    </figure>
+    <figure class="diagrama">
+      <a href="../2_Diagramas/vista-quest-entrar-mobile_v01_20261103-1139.svg"><img src="../2_Diagramas/vista-quest-entrar-mobile_v01_20261103-1139.svg" alt="Mobile: vista de entrar no quest: código de acesso, participante, responsável e acesso anônimo, cada um no compact, no medium e no expanded, com o código inválido, o código bloqueado e a sessão terminada"></a>
+      <figcaption><strong>Quest · entrar · mobile · vista</strong><code>2_Diagramas/vista-quest-entrar-mobile_v01_20261103-1139.svg</code></figcaption>
     </figure>
   </section>
   <section id="diagramas">
@@ -1566,8 +1593,8 @@ Cenário: sem aparelhos conectados no quest
       <figcaption><strong>Autenticação · casos de uso</strong><code>2_Diagramas/autenticacao-casos-de-uso_v01_20261101-2337.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/autenticacao-sequencia_v02_20261101-1214.svg"><img src="../2_Diagramas/autenticacao-sequencia_v02_20261101-1214.svg" alt="Sequência da autenticação: entrada no hub com limite de 5 sessões, entrada do participante no quest com o código de acesso, recusas e bloqueio por tentativas, conferência de cada ação pela sessão e pela versão das permissões, renovação com troca do token e detecção de cópia, e sair de todos os aparelhos"></a>
-      <figcaption><strong>Autenticação · sequência</strong><code>2_Diagramas/autenticacao-sequencia_v02_20261101-1214.svg</code></figcaption>
+      <a href="../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg"><img src="../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg" alt="Sequência da autenticação: entrada no hub com limite de 5 sessões, entrada do participante no quest com o código de acesso, recusas e bloqueio por tentativas, conferência de cada ação pela sessão e pela versão das permissões, renovação com troca do token e detecção de cópia, e sair de todos os aparelhos, com as telas de cada fase"></a>
+      <figcaption><strong>Autenticação · sequência</strong><code>2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
       <a href="../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg"><img src="../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg" alt="Contrato de API da autenticação: entrar no hub, no quest e na sala, confirmar a senha anotada, renovar, sair, listar e encerrar sessões e chaves públicas do token, com pedido, respostas e códigos de erro"></a>
@@ -1588,7 +1615,8 @@ Cenário: sem aparelhos conectados no quest
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v16</span></td><td>2026-11-02 00:11</td><td>Cenários separados em Cenários de tela e Cenários de API; os de API usam os endereços, pedidos e códigos do contrato (IDs nos dois: <code>&lt;ID&gt;-api</code>)</td></tr>
+      <tr><td><span class="boaz-versao">v17</span></td><td>2026-11-03 11:45</td><td>Estrutura do módulo (06 <code class="id">RNF-103</code> v17): Telas em Web, PWA e Mobile, uma vista por plataforma; sequência v03 com as telas do hub e do quest em cada fase</td></tr>
+      <tr><td>v16</td><td>2026-11-02 00:11</td><td>Cenários separados em Cenários de tela e Cenários de API; os de API usam os endereços, pedidos e códigos do contrato (IDs nos dois: <code>&lt;ID&gt;-api</code>)</td></tr>
       <tr><td>v15</td><td>2026-11-01 23:41</td><td>Diagramas de casos de uso e de documentos da autenticação v01</td></tr>
       <tr><td>v14</td><td>2026-11-01 22:01</td><td>JSON do token e da sessão expandidos (RNF-215, RNF-217); contrato de API v02, com JSON expandido</td></tr>
       <tr><td>v13</td><td>2026-11-01 17:59</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão</td></tr>
@@ -1597,11 +1625,10 @@ Cenário: sem aparelhos conectados no quest
       <tr><td>v10</td><td>2026-11-01 13:15</td><td>Aprovado</td></tr>
       <tr><td>v09</td><td>2026-11-01 13:09</td><td>Aviso de ação em toda tentativa de entrar: nova <code class="id">RF-159</code>, entrada concluída com aviso flutuante, e <code class="id">RN-250</code>, o tom de cada resultado; vistas de entrada refeitas com os selos animados (vista-hub-entrar v01 e vista-quest-entrar v01 de 13:06)</td></tr>
       <tr><td>v08</td><td>2026-11-01 12:45</td><td>Vistas de entrada por tipo de usuário no compact, no medium e no expanded: vista-hub-entrar v01 (conta master, staff, educador autônomo e membro do time) e vista-quest-entrar v01 (participante, responsável e anônimo), com as recusas; nova <code class="id">RF-158</code>, aviso da entrada bloqueada</td></tr>
-      <tr><td>v07</td><td>2026-11-01 12:35</td><td>Aprovado</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v16 · 2026-11-02 00:11</span>
+    <span>boaz · v17 · 2026-11-03 11:45</span>
     <span class="boaz-arquivo">1_Requisitos/17_modulo-usuario-a-autenticacao.html</span>
   </div>
 </footer>

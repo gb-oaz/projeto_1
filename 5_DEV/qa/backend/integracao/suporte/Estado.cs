@@ -70,7 +70,7 @@ public static class Estado
             Builders<BsonDocument>.Filter.Eq("_id", usuarioId),
             Builders<BsonDocument>.Update.Set("permissoes.versao", versao).Set("permissoes.pv", versao));
 
-    // a conta contrata um módulo hoje (16_catalogo, coleção contratacoes)
+    // a conta contrata um módulo hoje (16_modulo-catalogo, coleção contratacoes)
     public static Task Contratar(string contaId, string sigla, string moduloId) =>
         Banco.GetCollection<BsonDocument>("contratacoes").InsertOneAsync(new BsonDocument
         {
