@@ -316,7 +316,9 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
   # segredos do ambiente local, novos a cada execução: no lugar do Key Vault,
   # a chave que assina o token (PKCS#8 em base64) e a senha do administrador
   # do deboaz (17 RN-190, RNF-207); o qa do backend recebe os mesmos valores
-  CHAVE_PRIVADA=$(openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -outform DER 2>/dev/null | base64 | tr -d '\n')
+  # (o pkcs8 -topk8 garante PKCS#8: o OpenSSL 3 grava "genpkey -outform DER" em PKCS#1)
+  CHAVE_PRIVADA=$(openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 2>/dev/null \
+    | openssl pkcs8 -topk8 -nocrypt -outform DER | base64 | tr -d '\n')
   ADMIN_ENTRADA=admin.dboaz@deboaz.com
   ADMIN_SENHA="Ad#Ci$(od -An -N4 -tu4 /dev/urandom | tr -dc 0-9 | cut -c1-6)"
   {

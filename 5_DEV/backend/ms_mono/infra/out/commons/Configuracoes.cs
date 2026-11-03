@@ -91,6 +91,8 @@ public static class Configuracoes
             .ValidateOnStart();
         servicos.AddOptions<OpcoesDaAutenticacao>().BindConfiguration(OpcoesDaAutenticacao.Secao)
             .Validate(o => Preenchido(o.ChaveId), Falta("Autenticacao__ChaveId"))
+            .Validate(o => !Preenchido(o.ChavePrivada) || ChaveRsaPkcs8(o.ChavePrivada!),
+                "Autenticacao__ChavePrivada: chave RSA em PKCS#8 base64 (MIIEv…); converta com openssl pkcs8 -topk8 -nocrypt -outform DER.")
             .ValidateOnStart();
         return servicos;
     }
@@ -98,6 +100,23 @@ public static class Configuracoes
     static bool Preenchido(string? valor) => !string.IsNullOrWhiteSpace(valor);
 
     static string Falta(string variavel) => $"Defina {variavel} (appsettings.json ou variável de ambiente).";
+
+    // A chave importa como PKCS#8. O OpenSSL 3 grava "genpkey -outform DER" em
+    // PKCS#1 (MIIEo…), que o ImportPkcs8PrivateKey recusa: sem esta conferência,
+    // o backend subia e só o pedido que assina um token respondia 500.
+    static bool ChaveRsaPkcs8(string base64)
+    {
+        try
+        {
+            using var rsa = System.Security.Cryptography.RSA.Create();
+            rsa.ImportPkcs8PrivateKey(Convert.FromBase64String(base64), out _);
+            return true;
+        }
+        catch (Exception erro) when (erro is FormatException or System.Security.Cryptography.CryptographicException)
+        {
+            return false;
+        }
+    }
 
     static bool NomeCurtoValido(string? nomeCurto)
     {
