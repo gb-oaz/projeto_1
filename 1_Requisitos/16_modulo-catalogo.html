@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catálogo · boaz · v23</title>
+<title>Catálogo · boaz · v25</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="16_modulo-catalogo">
 <meta name="boaz:caminho" content="1_Requisitos/16_modulo-catalogo.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v23">
-<meta name="boaz:data" content="2026-11-03 13:52">
-<meta name="boaz:status" content="Em revisão">
+<meta name="boaz:versao" content="v25">
+<meta name="boaz:data" content="2026-11-03 22:11">
+<meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -918,9 +918,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante, e a vitrine de cada módulo contratável, que a instituição e o educador autônomo veem em A contratar, simulam e incluem na conta.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>16_modulo-catalogo</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v23</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 13:52</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v25</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 22:11</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
 <main>
@@ -1138,7 +1138,13 @@ Cenário: desistir
 Cenário: membro do time sem permissão
   Dado um membro do time deboaz que não é o administrador
   Quando abre a aba Vitrine
-  Então vê a vitrine sem poder salvar</pre>
+  Então vê a vitrine sem poder salvar
+
+Cenário: adicionar uma imagem
+  Dado o administrador do deboaz na aba Vitrine
+  Quando escolhe uma imagem PNG do computador
+  Então a aba converte a imagem em SVG antes de enviar (15_modulos RN-260)
+  E a imagem aparece na lista da vitrine, na próxima posição</pre>
     </article>
     <article class="criterio" id="RN-191">
       <h3><code class="id">RN-191</code> Só o administrador muda preços</h3>
@@ -1282,7 +1288,8 @@ Cenário: módulo deixa de ter custo
     | da conta ou do time                                             | nunca aparece em A contratar |
 
 Cenário: limites da vitrine
-  Então a vitrine tem de 1 a 5 imagens, de 1 a 5 passos e de 1 a 4 papéis em "Quem usa"</pre>
+  Então a vitrine tem de 1 a 5 imagens, de 1 a 5 passos e de 1 a 4 papéis em "Quem usa"
+  E a frase e a descrição têm até 500 caracteres cada</pre>
     </article>
     <article class="criterio" id="RN-259">
       <h3><code class="id">RN-259</code> Uma contratação por módulo</h3>
@@ -1819,8 +1826,18 @@ Esquema do Cenário: recusas
   Então a resposta é 200 com a vitrine, completa true, salvaEm e salvaPor
 
 Cenário: enviar uma imagem
-  Quando o administrador envia POST /catalogo/modulos/MOD-05/vitrine/imagens com uma imagem PNG, JPEG ou WebP
+  Dado uma imagem já convertida em SVG pela aba Vitrine (15_modulos RN-260)
+  Quando o administrador envia POST /catalogo/modulos/MOD-05/vitrine/imagens com:
+    """
+    {
+      "svg": "&lt;svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1200 800\"&gt;…&lt;/svg&gt;"
+    }
+    """
   Então a resposta é 201 com o id e a url da imagem
+
+Cenário: texto que não é SVG
+  Quando o administrador envia POST /catalogo/modulos/MOD-05/vitrine/imagens com "svg" igual a "foto.png"
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "svg"
 
 Cenário: ver a vitrine no time
   Quando um membro do time envia GET /catalogo/modulos/MOD-05/vitrine
@@ -1941,9 +1958,11 @@ Cenário: desconto para hoje
 
   Exemplos:
     | pedido       | campo     |
-    | 6 imagens    | "imagens" |
-    | 6 passos     | "passos"  |
-    | 5 papéis     | "quemUsa" |
+    | 6 imagens                    | "imagens"   |
+    | 6 passos                     | "passos"    |
+    | 5 papéis                     | "quemUsa"   |
+    | frase com 501 caracteres     | "frase"     |
+    | descrição com 501 caracteres | "descricao" |
 
 Cenário: vitrine salva incompleta
   Quando o administrador salva a vitrine do MOD-05 sem imagens
@@ -2175,12 +2194,12 @@ Cenário: documento em cobrancas
       <figcaption><strong>Catálogo · sequência com as telas</strong><code>2_Diagramas/catalogo-sequencia_v04_20261103-1232.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-vitrine-sequencia_v01_20261103-1349.svg"><img src="../2_Diagramas/catalogo-vitrine-sequencia_v01_20261103-1349.svg" alt="Sequência da vitrine com as telas: o administrador envia as imagens e salva a vitrine; a conta master abre A contratar, vê o detalhe, simula 30 participantes no plano mensal sem salvar e inclui o módulo, que vai para Contratados; staff ou módulo já na conta recebe 403 ou 409"></a>
-      <figcaption><strong>Catálogo · vitrine · sequência com as telas</strong><code>2_Diagramas/catalogo-vitrine-sequencia_v01_20261103-1349.svg</code></figcaption>
+      <a href="../2_Diagramas/catalogo-vitrine-sequencia_v02_20261103-2203.svg"><img src="../2_Diagramas/catalogo-vitrine-sequencia_v02_20261103-2203.svg" alt="Sequência da vitrine com as telas: o administrador envia as imagens e salva a vitrine; a conta master abre A contratar, vê o detalhe, simula 30 participantes no plano mensal sem salvar e inclui o módulo, que vai para Contratados; staff ou módulo já na conta recebe 403 ou 409"></a>
+      <figcaption><strong>Catálogo · vitrine · sequência com as telas</strong><code>2_Diagramas/catalogo-vitrine-sequencia_v02_20261103-2203.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/catalogo-contrato-api_v03_20261103-1349.svg"><img src="../2_Diagramas/catalogo-contrato-api_v03_20261103-1349.svg" alt="Contrato de API do catálogo: resumo, lista e dados do módulo, catalogar, clientes, preços, desconto e simulação, e a vitrine (A contratar, detalhe, calculadora, incluir na conta e aba Vitrine), com o formato de erro e as mensagens exatas"></a>
-      <figcaption><strong>Catálogo · contrato de API</strong><code>2_Diagramas/catalogo-contrato-api_v03_20261103-1349.svg</code></figcaption>
+      <a href="../2_Diagramas/catalogo-contrato-api_v04_20261103-2202.svg"><img src="../2_Diagramas/catalogo-contrato-api_v04_20261103-2202.svg" alt="Contrato de API do catálogo: resumo, lista e dados do módulo, catalogar, clientes, preços, desconto e simulação, e a vitrine (A contratar, detalhe, calculadora, incluir na conta e aba Vitrine), com o formato de erro e as mensagens exatas"></a>
+      <figcaption><strong>Catálogo · contrato de API</strong><code>2_Diagramas/catalogo-contrato-api_v04_20261103-2202.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
       <a href="../2_Diagramas/catalogo-classes_v05_20261103-1351.svg"><img src="../2_Diagramas/catalogo-classes_v05_20261103-1351.svg" alt="Diagrama de classes do catálogo: Módulo com tipo, custo e modelo de cobrança, Preço e PolíticaDeDesconto com vigência, FaixaDeDesconto, Contratação por conta, uma ativa por módulo, Cobrança mensal e a Vitrine do módulo contratável"></a>
@@ -2191,20 +2210,15 @@ Cenário: documento em cobrancas
       <figcaption><strong>Catálogo · modelo de documentos</strong><code>2_Diagramas/catalogo-documentos_v05_20261103-1351.svg</code></figcaption>
     </figure>
   </section>
-  <section id="em-aberto">
-    <h2>Em aberto</h2>
-    <ul class="pendencias">
-      <li>Quantos caracteres a frase e a descrição da vitrine podem ter? <span class="tag dono">Produto</span></li>
-      <li>Qual o tamanho máximo e a proporção de cada imagem da vitrine? <span class="tag dono">Produto</span></li>
-    </ul>
-  </section>
 </main>
 <footer class="boaz-marca-rodape">
   <p class="boaz-eyebrow">Histórico</p>
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v23</span></td><td>2026-11-03 13:52</td><td>Vitrine do módulo trazida de 12_hub-ui (<code class="id">RF-164</code> a <code class="id">RF-168</code>, <code class="id">RN-258</code>, <code class="id">RN-259</code>, com as âncoras -api): A contratar, detalhe com carrossel, descrição, como funciona, quem usa e calculadora, Incluir na conta e a aba Vitrine do time; telas vista-hub-vitrine-modulo v01 (web, pwa, mobile) e vista-hub-catalogo-deboaz v03 (pwa, mobile); casos de uso v03, sequência da vitrine v01, contrato v03, classes v05, documentos v05; exemplos da vitrine e da contratação incluída; Em aberto: limites de texto e de imagem</td></tr>
+      <tr><td><span class="boaz-versao">v25</span></td><td>2026-11-03 22:11</td><td>Aprovado, sem pendências em aberto</td></tr>
+      <tr><td>v24</td><td>2026-11-03 22:03</td><td>Em aberto respondido: frase e descrição da vitrine com até 500 caracteres (<code class="id">RN-258</code>); imagem convertida em SVG na aba Vitrine e enviada como texto, com 422 para texto que não é SVG (<code class="id">RF-168</code>, <a class="ref" href="15_modulos.html#RN-260">15 RN-260</a>); contrato v04 e sequência da vitrine v02</td></tr>
+      <tr><td>v23</td><td>2026-11-03 13:52</td><td>Vitrine do módulo trazida de 12_hub-ui (<code class="id">RF-164</code> a <code class="id">RF-168</code>, <code class="id">RN-258</code>, <code class="id">RN-259</code>, com as âncoras -api): A contratar, detalhe com carrossel, descrição, como funciona, quem usa e calculadora, Incluir na conta e a aba Vitrine do time; telas vista-hub-vitrine-modulo v01 (web, pwa, mobile) e vista-hub-catalogo-deboaz v03 (pwa, mobile); casos de uso v03, sequência da vitrine v01, contrato v03, classes v05, documentos v05; exemplos da vitrine e da contratação incluída; Em aberto: limites de texto e de imagem</td></tr>
       <tr><td>v22</td><td>2026-11-03 12:33</td><td>Lista do catálogo só com o espaço de cada módulo, sem nomes de outros módulos (<code class="id">RF-117</code>, vistas pwa e mobile v02); <code class="id">RF-121</code> sai para o módulo Contas (fora de escopo); nova <code class="id">RN-257</code>: mudar o custo vale para todas as contratações; diagramas com a referência 16_modulo-catalogo (casos de uso v02, sequência v04, contrato v02, classes v04, documentos v04)</td></tr>
       <tr><td>v21</td><td>2026-11-03 11:49</td><td>Estrutura do módulo (06 <code class="id">RNF-103</code> v17): Telas em Web, PWA e Mobile, uma vista por plataforma, separadas da vista hub-catalogo-deboaz v04</td></tr>
       <tr><td>v20</td><td>2026-11-03 11:02</td><td>Telas: card do Catálogo nos quatro tamanhos no compact, no medium e no expanded, sem outros módulos e sem o Painel de administração (vista-hub-catalogo-deboaz v04, catalogo-sequencia v03); ficha do módulo com a receita do resumo (R$ 200.996,76, R$ 201k) e os 5 meses do contrato no lugar das 7 semanas</td></tr>
@@ -2212,12 +2226,10 @@ Cenário: documento em cobrancas
       <tr><td>v18</td><td>2026-11-01 18:18</td><td>Só Gherkin, telas e diagramas: contexto e exemplo de receita, RF, RN, RNF, ficha do módulo, exemplos de entidades e fora de escopo viram cenários (mesmos IDs como âncora)</td></tr>
       <tr><td>v17</td><td>2026-11-01 03:48</td><td>Exemplo de receita: as 128 contas vêm da lista Contas do módulo Usuários do time deboaz, no lugar do painel retirado (Módulos <code class="id">MOD-15</code>)</td></tr>
       <tr><td>v16</td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
-      <tr><td>v15</td><td>2026-11-01 01:14</td><td>Exemplo do card com 7 módulos da conta e 5 contratáveis, depois de Tarefas virar da conta (ca-RF-116)</td></tr>
-      <tr><td>v14</td><td>2026-11-01 01:00</td><td>Aprovação</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v23 · 2026-11-03 13:52</span>
+    <span>boaz · v25 · 2026-11-03 22:11</span>
     <span class="boaz-arquivo">1_Requisitos/16_modulo-catalogo.html</span>
   </div>
 </footer>

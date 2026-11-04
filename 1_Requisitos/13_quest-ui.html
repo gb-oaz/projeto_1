@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quest · UI · boaz · v18</title>
+<title>Quest · UI · boaz · v20</title>
 <!-- boaz:marca -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="13_quest-ui">
 <meta name="boaz:caminho" content="1_Requisitos/13_quest-ui.html">
 <meta name="boaz:tipo" content="Funcionalidade">
-<meta name="boaz:versao" content="v18">
-<meta name="boaz:data" content="2026-11-03 14:35">
-<meta name="boaz:status" content="Em revisão">
+<meta name="boaz:versao" content="v20">
+<meta name="boaz:data" content="2026-11-03 22:11">
+<meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -918,9 +918,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir como as telas do quest ficam no celular e na web — acesso, tarefas, feed, carteira, perfil e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>13_quest-ui</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v18</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 14:35</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v20</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 22:11</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
 <main>
@@ -997,7 +997,12 @@ Cenário: expanded
       <pre class="gherkin">Cenário: trocar perfil no celular
   Dado um responsável no perfil de Lucas numa janela compact
   Quando abre Perfil e toca em "Trocar perfil"
-  Então volta ao acesso com os perfis do aparelho</pre>
+  Então volta ao acesso com os perfis do aparelho
+
+Cenário: Atualização dos cards fica no perfil
+  Dado o Lucas com "Ao vivo" marcado em Perfil, no celular
+  Quando entra no quest pelo computador da escola
+  Então "Atualização dos cards" mostra "Ao vivo" marcado</pre>
     </article>
     <article class="criterio" id="RF-95">
       <h3><code class="id">RF-95</code> Foto ou mascote</h3>
@@ -1008,7 +1013,12 @@ Cenário: expanded
 
 Cenário: adotar outro mascote
   Quando o estudante abre "Foto ou mascote", escolhe a estrela e toca em "Usar este mascote"
-  Então a estrela aparece no lugar da foto no topo, em Perfil e no card do acesso</pre>
+  Então a estrela aparece no lugar da foto no topo, em Perfil e no card do acesso
+
+Cenário: enviar uma foto
+  Quando o estudante abre "Foto ou mascote" e envia uma foto
+  Então a foto aparece no lugar do mascote no topo, em Perfil e no card do acesso
+  E segue para o deboaz convertida em SVG (15_modulos RN-260)</pre>
     </article>
     <article class="criterio" id="RF-96">
       <h3><code class="id">RF-96</code> Módulo aberto</h3>
@@ -1031,7 +1041,8 @@ Cenário: barra encolhida
   Então a barra mostra só os ícones dos quatro destinos, com o selo 5 na Carteira
 Cenário: Feed
   Quando o estudante toca em "Feed"
-  Então vê no espaço do Feed as publicações dos módulos para a turma dele e para toda a instituição</pre>
+  Então vê o espaço reservado do Feed
+  E o conteúdo do Feed fica no documento do módulo Feed</pre>
     </article>
     <article class="criterio" id="RN-127">
       <h3><code class="id">RN-127</code> Topo do quest</h3>
@@ -1058,6 +1069,19 @@ Cenário: estudante menor de idade
   Então a foto segue a autorização dos responsáveis
   E a foto da carteirinha continua pedida pelo módulo dela</pre>
     </article>
+    <article class="criterio" id="RN-261">
+      <h3><code class="id">RN-261</code> Quem aparece no perfil</h3>
+      <pre class="gherkin">Esquema do Cenário: estudante ou responsável
+  Dado o perfil de Lucas Andrade, da Escola Horizonte, acessado por &lt;quem&gt;
+  Quando alguém vê o topo, o Perfil ou o card do acesso
+  Então vê &lt;dados&gt;
+  E vê &lt;imagem&gt;
+
+  Exemplos:
+    | quem                       | dados                                                 | imagem                          |
+    | o estudante                | "Lucas Andrade" e "Escola Horizonte"                  | a foto ou o mascote de Lucas    |
+    | a responsável Ana Andrade  | "Lucas Andrade", "Escola Horizonte" e "Ana Andrade"   | as iniciais "AA", sem mascote   |</pre>
+    </article>
     <article class="criterio" id="RN-139">
       <h3><code class="id">RN-139</code> Fundo Estampa</h3>
       <pre class="gherkin">Cenário: fundo das telas
@@ -1077,7 +1101,12 @@ Cenário: estudante menor de idade
       <pre class="gherkin">Cenário: espaços reservados
   Quando alguém abre a vista da casca do quest
   Então Tarefas, Feed, os cards da Carteira e o painel do perfil são espaços reservados
-  E as telas de cada módulo ficam no documento do módulo</pre>
+  E as telas de cada módulo ficam no documento do módulo
+
+Cenário: de onde vem o conteúdo
+  Dado um card da Carteira ou o espaço de Tarefas
+  Então o que ele mostra e de onde vem ficam no documento do módulo dele
+  E este documento trata o card só de forma genérica</pre>
     </article>
     <article class="criterio" id="RN-131">
       <h3><code class="id">RN-131</code> Mudança exige versão</h3>
@@ -1142,8 +1171,8 @@ Cenário: mascote decorativo
       <figcaption><strong>Quest · acesso · pwa · vista</strong><code>2_Diagramas/vista-quest-acesso-pwa_v01_20261103-1426.svg</code></figcaption>
     </figure>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-quest-casca-pwa_v01_20261103-1426.svg"><img src="../2_Diagramas/vista-quest-casca-pwa_v01_20261103-1426.svg" alt="PWA: Tarefas, Feed, Carteira nos quatro tamanhos, rolagem, Ordenar a Carteira, Perfil e Foto ou mascote no compact, só com a carcaça"></a>
-      <figcaption><strong>Quest · tarefas, feed, carteira e perfil · pwa · vista</strong><code>2_Diagramas/vista-quest-casca-pwa_v01_20261103-1426.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-quest-casca-pwa_v02_20261103-2210.svg"><img src="../2_Diagramas/vista-quest-casca-pwa_v02_20261103-2210.svg" alt="PWA: Tarefas, Feed, Carteira nos quatro tamanhos, rolagem, Ordenar a Carteira, Perfil, Foto ou mascote e o perfil pela responsável no compact, só com a carcaça"></a>
+      <figcaption><strong>Quest · tarefas, feed, carteira e perfil · pwa · vista</strong><code>2_Diagramas/vista-quest-casca-pwa_v02_20261103-2210.svg</code></figcaption>
     </figure>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
       <a href="../2_Diagramas/vista-quest-modulo-pwa_v01_20261103-1426.svg"><img src="../2_Diagramas/vista-quest-modulo-pwa_v01_20261103-1426.svg" alt="PWA: módulo aberto no compact, com e sem o aviso para completar"></a>
@@ -1155,8 +1184,8 @@ Cenário: mascote decorativo
       <figcaption><strong>Quest · acesso · mobile · vista</strong><code>2_Diagramas/vista-quest-acesso-mobile_v01_20261103-1426.svg</code></figcaption>
     </figure>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
-      <a href="../2_Diagramas/vista-quest-casca-mobile_v01_20261103-1426.svg"><img src="../2_Diagramas/vista-quest-casca-mobile_v01_20261103-1426.svg" alt="Mobile: Tarefas, Feed, Carteira nos quatro tamanhos, rolagem, Ordenar a Carteira, Perfil e Foto ou mascote no compact, só com a carcaça"></a>
-      <figcaption><strong>Quest · tarefas, feed, carteira e perfil · mobile · vista</strong><code>2_Diagramas/vista-quest-casca-mobile_v01_20261103-1426.svg</code></figcaption>
+      <a href="../2_Diagramas/vista-quest-casca-mobile_v02_20261103-2210.svg"><img src="../2_Diagramas/vista-quest-casca-mobile_v02_20261103-2210.svg" alt="Mobile: Tarefas, Feed, Carteira nos quatro tamanhos, rolagem, Ordenar a Carteira, Perfil, Foto ou mascote e o perfil pela responsável no compact, só com a carcaça"></a>
+      <figcaption><strong>Quest · tarefas, feed, carteira e perfil · mobile · vista</strong><code>2_Diagramas/vista-quest-casca-mobile_v02_20261103-2210.svg</code></figcaption>
     </figure>
     <figure class="diagrama" data-paletas="branco-preto|Branco e Preto|#000000|#5e5e5e|#3b3b3b,roxo|Roxo|#65558f|#625b71|#7e5260,oceano|Oceano|#00477f|#4b607c|#004f46,floresta|Floresta|#0d631b|#476644|#7d4900,aurora|Aurora|#a93200|#98462a|#4153b7,grafite|Grafite|#526068|#586064|#006874,magenta|Magenta|#8a0062|#914370|#005147,sol|Sol|#785900|#745b21|#4059aa,girassol|Girassol|#785a00|#735b1e|#ac3400,rubi|Rubi|#91000a|#9e4038|#5c4100,cereja|Cereja|#b7131a|#a13d36|#00685c,neon|Neon|#106e00|#006875|#ad009b,vaporwave|Vaporwave|#a72683|#822cc7|#006781,algodao-doce|Algodão-doce|#894a67|#655591|#1a6a59,terra|Terra|#953f19|#566427|#735400,retro|Retrô|#795900|#a04100|#066a61,meia-noite|Meia-noite|#0b1a7d|#575c82|#3b2600,arco-iris|Arco-íris|#bc004b|#8b5000|#0060a8,salada-de-frutas|Salada de frutas|#705d00|#6f5d0d|#3b6939,naruto|Naruto|#974900|#4058b1|#715d00,sasuke|Sasuke|#142450|#595e72|#560000,sakura|Sakura|#8e4767|#b51a1e|#006e1c,hinata|Hinata|#625195|#5d5987|#6e517d,kiba|Kiba|#7f1816|#5f5d68|#553b32,shino|Shino|#37451a|#5a614b|#553c0a,shikamaru|Shikamaru|#596150|#5b6055|#835425,ino|Ino|#610e75|#006782|#6f5d00,choji|Chōji|#984403|#1b6d24|#b1262b,neji|Neji|#6f5a4a|#6a5c51|#645495,rock-lee|Rock Lee|#006e2c|#406653|#904d00,tenten|Tenten|#9e3b60|#396759|#5b5f62,branco|Branco|#000000|#5e5e5e|#3b3b3b,preto|Preto|#000000|#5e5e5e|#3b3b3b">
       <a href="../2_Diagramas/vista-quest-modulo-mobile_v01_20261103-1426.svg"><img src="../2_Diagramas/vista-quest-modulo-mobile_v01_20261103-1426.svg" alt="Mobile: módulo aberto no compact, com e sem o aviso para completar"></a>
@@ -1166,12 +1195,12 @@ Cenário: mascote decorativo
   <section id="diagramas">
     <h2>Diagramas</h2>
     <figure class="diagrama">
-      <a href="../2_Diagramas/quest-casos-de-uso_v01_20261103-1428.svg"><img src="../2_Diagramas/quest-casos-de-uso_v01_20261103-1428.svg" alt="Casos de uso da carcaça do quest: o participante e o responsável escolhem o perfil do aparelho, inserem outro código, dizem quem está acessando, entram numa sala, veem Tarefas, Feed, Carteira e Perfil, ordenam a Carteira, abrem o módulo, trocam a foto ou o mascote e trocam de perfil; a entrada vem do 17-a e o conteúdo de cada módulo, do documento dele"></a>
-      <figcaption><strong>Quest · casos de uso</strong><code>2_Diagramas/quest-casos-de-uso_v01_20261103-1428.svg</code></figcaption>
+      <a href="../2_Diagramas/quest-casos-de-uso_v02_20261103-2204.svg"><img src="../2_Diagramas/quest-casos-de-uso_v02_20261103-2204.svg" alt="Casos de uso da carcaça do quest: o participante e o responsável escolhem o perfil do aparelho, inserem outro código, dizem quem está acessando, entram numa sala, veem Tarefas, Feed, Carteira e Perfil, ordenam a Carteira, abrem o módulo, trocam a foto ou o mascote e trocam de perfil; a entrada vem do 17-a e o conteúdo de cada módulo, do documento dele"></a>
+      <figcaption><strong>Quest · casos de uso</strong><code>2_Diagramas/quest-casos-de-uso_v02_20261103-2204.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
-      <a href="../2_Diagramas/quest-sequencia_v01_20261103-1431.svg"><img src="../2_Diagramas/quest-sequencia_v01_20261103-1431.svg" alt="Sequência da carcaça do quest com as telas: entrar pelo perfil do aparelho ou por outro código (referência à entrada do 17-a), navegar por Tarefas, Feed e Carteira, ordenar a Carteira só no aparelho, abrir um módulo com aviso, ver o Perfil, adotar um mascote e trocar de perfil; os passos sem contrato ficam marcados como em aberto"></a>
-      <figcaption><strong>Quest · carcaça · sequência com as telas</strong><code>2_Diagramas/quest-sequencia_v01_20261103-1431.svg</code></figcaption>
+      <a href="../2_Diagramas/quest-sequencia_v02_20261103-2205.svg"><img src="../2_Diagramas/quest-sequencia_v02_20261103-2205.svg" alt="Sequência da carcaça do quest com as telas: entrar pelo perfil do aparelho ou por outro código (referência à entrada do 17-a), navegar por Tarefas, Feed e Carteira, ordenar a Carteira só no aparelho, abrir um módulo com aviso, ver o Perfil, adotar um mascote e trocar de perfil; os dados do perfil vêm do módulo Usuários (17) e a foto vai em SVG"></a>
+      <figcaption><strong>Quest · carcaça · sequência com as telas</strong><code>2_Diagramas/quest-sequencia_v02_20261103-2205.svg</code></figcaption>
     </figure>
     <figure class="diagrama">
       <a href="../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg"><img src="../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg" alt="Sequência da autenticação do 17-a, com a entrada no quest pelo código de acesso e por quem está acessando"></a>
@@ -1182,23 +1211,15 @@ Cenário: mascote decorativo
       <figcaption><strong>Entrada no quest · contrato de API (17_modulo-usuario-a)</strong><code>2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg</code></figcaption>
     </figure>
   </section>
-  <section id="em-aberto">
-    <h2>Em aberto</h2>
-    <ul class="pendencias">
-      <li>Quais dados do perfil o quest recebe para o topo, o Perfil e o card do acesso (nome, instituição, turma, ano, foto ou mascote), e em qual contrato? <span class="tag dono">Produto</span></li>
-      <li>Como o quest guarda o mascote adotado ou a foto enviada, e como confere a autorização dos responsáveis (<code class="id">RN-128</code>)? <span class="tag dono">Produto</span></li>
-      <li>Em qual contrato o quest recebe os módulos da Carteira, com o selo e o "Completar" (<code class="id">RF-93</code>)? <span class="tag dono">Produto</span></li>
-      <li>Em qual contrato o quest recebe as publicações do Feed da turma e da instituição (<code class="id">RF-97</code>, <a class="ref" href="09_quest-ux.html#RN-222">09 <code class="id">RN-222</code></a>)? <span class="tag dono">Produto</span></li>
-      <li>A Atualização dos cards (Na abertura ou Ao vivo) fica guardada no aparelho ou no perfil (<code class="id">RF-94</code>)? <span class="tag dono">Produto</span></li>
-    </ul>
-  </section>
 </main>
 <footer class="boaz-marca-rodape">
   <p class="boaz-eyebrow">Histórico</p>
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v18</span></td><td>2026-11-03 14:35</td><td>Telas separadas em Web, PWA e Mobile (vistas acesso, casca e módulo v01); Diagramas: casos de uso e sequência com as telas da carcaça do quest, com a entrada do <a class="ref" href="17_modulo-usuario-a-autenticacao.html#RF-135">17-a RF-135</a> como referência; Em aberto: os contratos ainda não definidos do perfil, da foto ou mascote, da Carteira, do Feed e da Atualização dos cards</td></tr>
+      <tr><td><span class="boaz-versao">v20</span></td><td>2026-11-03 22:11</td><td>Vista da casca pwa e mobile v02, com o Feed definido no documento do módulo Feed e o perfil pela responsável (<code class="id">RN-261</code>); aprovado, sem pendências em aberto</td></tr>
+      <tr><td>v19</td><td>2026-11-03 22:05</td><td>Em aberto respondido: conteúdo e contrato de cada card no documento do módulo (<code class="id">RN-211</code>); Feed como espaço reservado do futuro módulo Feed (<code class="id">RF-97</code>); quem aparece no perfil: nome do estudante e instituição, com o nome do responsável quando é ele, foto ou mascote do estudante e iniciais do responsável (<code class="id">RN-261</code>); foto enviada em SVG (<code class="id">RF-95</code>, <a class="ref" href="15_modulos.html#RN-260">15 RN-260</a>); Atualização dos cards guardada no perfil (<code class="id">RF-94</code>); casos de uso e sequência v02</td></tr>
+      <tr><td>v18</td><td>2026-11-03 14:35</td><td>Telas separadas em Web, PWA e Mobile (vistas acesso, casca e módulo v01); Diagramas: casos de uso e sequência com as telas da carcaça do quest, com a entrada do <a class="ref" href="17_modulo-usuario-a-autenticacao.html#RF-135">17-a RF-135</a> como referência; Em aberto: os contratos ainda não definidos do perfil, da foto ou mascote, da Carteira, do Feed e da Atualização dos cards</td></tr>
       <tr><td>v17</td><td>2026-11-01 18:20</td><td>Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão</td></tr>
       <tr><td>v16</td><td>2026-11-01 01:20</td><td>Aprovação</td></tr>
       <tr><td>v15</td><td>2026-11-01 01:14</td><td>Feed com as publicações dos módulos para o participante (<code class="id">RF-97</code>, 09 RN-222)</td></tr>
@@ -1206,12 +1227,10 @@ Cenário: mascote decorativo
       <tr><td>v13</td><td>2026-11-01 00:43</td><td>Vista da casca v08: item Atualização dos cards no Perfil, com Na abertura e Ao vivo (<code class="id">RF-94</code>) (<a class="ref" href="15_modulos.html#RF-133">15 RF-133</a>)</td></tr>
       <tr><td>v12</td><td>2026-10-31 23:30</td><td>Carteira com célula de 76dp ou mais, no mínimo 4 colunas e quantas couberem na janela, com o card do mesmo tamanho em qualquer janela, e rolagem com o topo escondido (<code class="id">RF-93</code>, <code class="id">RNF-156</code>); vista da casca v07</td></tr>
       <tr><td>v11</td><td>2026-10-31 22:55</td><td>Carteira com os quatro tamanhos de células quadradas, mínima 1x1, reduzida 2x2, normal 4x4 e expandida 4x8 (<code class="id">RF-93</code>, <code class="id">RNF-156</code>); Mínima no menu do card (<code class="id">RF-131</code>); vista da casca v06</td></tr>
-      <tr><td>v10</td><td>2026-10-31 22:18</td><td>Carteira em grade nos tamanhos reduzida, normal e expandida (<code class="id">RF-93</code>, <code class="id">RNF-156</code>); Ordenar a Carteira com o menu do card (<code class="id">RF-131</code>); botão de encolher a barra lateral (<code class="id">RF-97</code>); vistas da casca e do módulo aberto</td></tr>
-      <tr><td>v09</td><td>2026-10-31 18:44</td><td>Barra lateral em acordeão com os quatro destinos a partir do medium, no lugar do trilho (<code class="id">RF-97</code>, <code class="id">RN-127</code>, <code class="id">RN-139</code>); vistas novas</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v18 · 2026-11-03 14:35</span>
+    <span>boaz · v20 · 2026-11-03 22:11</span>
     <span class="boaz-arquivo">1_Requisitos/13_quest-ui.html</span>
   </div>
 </footer>

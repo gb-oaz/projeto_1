@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CI e qualidade · boaz · v24</title>
+<title>CI e qualidade · boaz · v25</title>
 <!-- boaz:marca — metadados lidos pelo ./boaz.sh (um por linha, nesta ordem) -->
 <meta name="boaz:projeto" content="boaz">
 <meta name="boaz:documento" content="03_ci-qualidade">
 <meta name="boaz:caminho" content="1_Requisitos/03_ci-qualidade.html">
 <meta name="boaz:tipo" content="Transversal">
-<meta name="boaz:versao" content="v24">
-<meta name="boaz:data" content="2026-11-01 18:27">
-<meta name="boaz:status" content="Em revisão">
+<meta name="boaz:versao" content="v25">
+<meta name="boaz:data" content="2026-11-03 22:11">
+<meta name="boaz:status" content="Aprovado">
 <!-- boaz:casca:inicio — copie este bloco sem alterar para o <head> de todo documento -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -919,9 +919,9 @@ figure.diagrama figcaption .boaz-paleta-atual { color: var(--accent); font-weigh
   <p class="boaz-objetivo"><span>Objetivo</span>definir onde e quando o CI roda e quais testes e verificações de qualidade reprovam um build.</p>
   <dl class="boaz-carimbo">
     <div><dt>Documento</dt><dd>03_ci-qualidade</dd></div>
-    <div><dt>Versão</dt><dd><span class="boaz-versao">v24</span></dd></div>
-    <div><dt>Data</dt><dd class="boaz-data">2026-11-01 · 18:27</dd></div>
-    <div><dt>Status</dt><dd><span class="status status-em-revisao">Em revisão</span></dd></div>
+    <div><dt>Versão</dt><dd><span class="boaz-versao">v25</span></dd></div>
+    <div><dt>Data</dt><dd class="boaz-data">2026-11-03 · 22:11</dd></div>
+    <div><dt>Status</dt><dd><span class="status status-aprovado">Aprovado</span></dd></div>
   </dl>
 </header>
 
@@ -1218,7 +1218,8 @@ Cenário: motivo
   <table class="boaz-historico">
     <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
     <tbody>
-      <tr><td><span class="boaz-versao">v24</span></td><td>2026-11-01 18:27</td><td>Só Gherkin e diagramas: contexto, RN e RNF viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
+      <tr><td><span class="boaz-versao">v25</span></td><td>2026-11-03 22:11</td><td>Aprovado, sem pendências em aberto</td></tr>
+      <tr><td>v24</td><td>2026-11-01 18:27</td><td>Só Gherkin e diagramas: contexto, RN e RNF viram cenários (mesmos IDs como âncora); status → Em revisão</td></tr>
       <tr><td>v23</td><td>2026-10-25 03:57</td><td><code class="id">RNF-35</code> alterado: sem arquivo comum só aos apps mobile, porque as propriedades comuns do mobile passaram para <code>5_DEV/frontend/mobile/</code>, já coberta pelos jobs Android e iOS; status: Aprovado</td></tr>
       <tr><td>v22</td><td>2026-10-25 01:12</td><td>Status → Aprovado</td></tr>
       <tr><td>v21</td><td>2026-10-24 23:21</td><td><code class="id">RNF-160</code> alterado: o funcional do mobile pede o Node.js de <code>.nvmrc</code> e o emulador ou o simulador; o Appium e os drivers vêm do <code>package.json</code> da suíte</td></tr>
@@ -1227,11 +1228,10 @@ Cenário: motivo
       <tr><td>v18</td><td>2026-10-24 21:15</td><td><code class="id">RNF-34</code>, <code class="id">RNF-35</code> e <code class="id">RNF-166</code> alterados para a estrutura de <code>14_estrutura-projetos</code> (backend, web e mobile num projeto cada); <code class="id">RNF-188</code> (job da web, com build e e2e por app) e <code class="id">RNF-189</code> (jobs Android e iOS) incluídos; diagrama atualizado para <code>ci-local_v04</code>; status → Em revisão</td></tr>
       <tr><td>v17</td><td>2026-10-24 07:58</td><td><code class="id">RNF-35</code> inclui <code>.xcode-version</code> entre os arquivos comuns e <code>5_DEV/frontend/Directory.Build.props</code> como comum aos apps mobile; status → Aprovado</td></tr>
       <tr><td>v16</td><td>2026-10-24 06:06</td><td>CI local em <code>4_CI_CD/local/</code>: <code class="id">RN-140</code> a <code class="id">RN-142</code> e <code class="id">RNF-160</code> a <code class="id">RNF-166</code> e <code class="id">RNF-172</code> incluídos, com backend e web em contêineres, Android e iOS direto na máquina e qa do backend, do frontend ou em conjunto; contexto atualizado; diagrama <code>ci-local_v03</code> incluído; status → Em revisão</td></tr>
-      <tr><td>v15</td><td>2026-10-15 00:21</td><td>Diagrama atualizado para <code>pipeline-ci_v08</code> (environment do token do Docker Hub: <code>dockerhub-publish</code>)</td></tr>
     </tbody>
   </table>
   <div class="boaz-rodape-linha">
-    <span>boaz · v24 · 2026-11-01 18:27</span>
+    <span>boaz · v25 · 2026-11-03 22:11</span>
     <span class="boaz-arquivo">1_Requisitos/03_ci-qualidade.html</span>
   </div>
 </footer>

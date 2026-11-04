@@ -1,0 +1,859 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 7614" width="1392" height="7614">
+  <title>Catálogo · contrato de API</title>
+  <desc>Contrato dos endereços do Catálogo no ms_mono, do requisito 16_modulo-catalogo: resumo do card, lista e dados dos módulos, catalogar, clientes, preços com histórico, desconto por faixas e plano anual, e a simulação, só na conta do time deboaz; e a vitrine do módulo: A contratar, detalhe, calculadora e incluir na conta, na conta da instituição ou do autônomo, e a aba Vitrine do time. v01: criação. v02: fechamento sem RF-121. v03: endereços da vitrine (RF-164 a RF-168). v04: imagem enviada em SVG como texto, com 422 para texto que não é SVG; frase e descrição até 500 caracteres.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1392" height="7614"/>
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="1392" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="1392" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · CONTRATO DE API</text>
+    <text class="title" x="40" y="72">Catálogo · módulos, preços, desconto e vitrine</text>
+    <text class="subtitle" x="40" y="94">O time deboaz cataloga, precifica e monta a vitrine; a conta vê a vitrine, simula e inclui o módulo</text>
+    <text class="wm-meta-label" x="1104" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v04</text>
+    <line class="wm-sep" x1="1176" y1="32" x2="1176" y2="80"/>
+    <text class="wm-meta-label" x="1200" y="44">DATA</text>
+    <text class="wm-meta-value" x="1200" y="72">2026-11-03 · 22:02</text>
+  </g>
+  <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V768 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
+    <text class="mono" x="64" y="204" xml:space="preserve">Toda resposta de erro:</text>
+    <text class="mono" x="64" y="224" xml:space="preserve">{</text>
+    <text class="mono" x="64" y="244" xml:space="preserve">  "codigo": "DATA_INVALIDA",</text>
+    <text class="mono" x="64" y="264" xml:space="preserve">  "mensagem": "Escolha 04/11/2026 ou depois.",</text>
+    <text class="mono" x="64" y="284" xml:space="preserve">  "campo": "valeDesde"</text>
+    <text class="mono" x="64" y="304" xml:space="preserve">}</text>
+    <text class="mono" x="64" y="324" xml:space="preserve">/catalogo/modulos e /catalogo/resumo: só na conta do time deboaz (RN-200), com o Catálogo (MOD-14 · U); salvar exige o papel ADMINISTRADOR (RN-191)</text>
+    <text class="mono" x="64" y="344" xml:space="preserve">/catalogo/vitrine: na conta da instituição ou do autônomo; a staff consulta e só a conta master ou o autônomo inclui (08 RN-76, RN-77)</text>
+    <text class="mono" x="64" y="364" xml:space="preserve">Módulo: o id do registro de módulos (MOD-NN, 15_modulos); nome e tipo vêm do registro, o catálogo guarda custo, preço e desconto</text>
+    <text class="mono" x="64" y="384" xml:space="preserve">Dinheiro em reais, número com 2 casas (19.90); arredonda meio centavo para cima, só no fim (RN-196); datas ISO 8601</text>
+    <text class="mono" x="64" y="404" xml:space="preserve">Preço e desconto valem a partir de amanhã (RN-194): o que vale hoje e as faturas fechadas não mudam; toda mudança vai ao histórico (RNF-211)</text>
+    <text class="mono" x="64" y="424" xml:space="preserve">Fechamento do mês: roda no servidor, sem endereço; usa o mesmo cálculo da simulação (RNF-210) e grava a cobrança que o módulo Contas mostra</text>
+    <line class="divider" x1="40" y1="440" x2="1352" y2="440"/><text class="boundary-label" x="64" y="464">MENSAGENS DE ERRO · CAMPO "mensagem", TEXTO EXATO</text>
+    <rect class="node-red" x="64" y="478" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="492" text-anchor="middle">403</text>
+    <text class="mono" x="116" y="492">ACESSO_NEGADO</text><text class="mono" x="332" y="492">"Você não tem permissão para esta ação."</text>
+    <rect class="node-red" x="64" y="504" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="518" text-anchor="middle">404</text>
+    <text class="mono" x="116" y="518">MODULO_INEXISTENTE</text><text class="mono" x="332" y="518">"Módulo não encontrado."</text>
+    <rect class="node-red" x="64" y="530" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="544" text-anchor="middle">422</text>
+    <text class="mono" x="116" y="544">SEM_CUSTO</text><text class="mono" x="332" y="544">"O módulo {nome} não tem custo."</text>
+    <rect class="node-red" x="64" y="556" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="570" text-anchor="middle">422</text>
+    <text class="mono" x="116" y="570">SEM_PRECO</text><text class="mono" x="332" y="570">"O módulo {nome} ainda não tem preço."</text>
+    <rect class="node-red" x="64" y="582" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="596" text-anchor="middle">422</text>
+    <text class="mono" x="116" y="596">DATA_INVALIDA</text><text class="mono" x="332" y="596">"Escolha {dd/mm/aaaa} ou depois."  (amanhã, RN-194)</text>
+    <rect class="node-red" x="64" y="608" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="622" text-anchor="middle">422</text>
+    <text class="mono" x="116" y="622">FAIXA_INVALIDA</text><text class="mono" x="332" y="622">"Falta a faixa de {início} a {fim}." · "A faixa {a} a {b} sobrepõe a faixa {c} a {d}."</text>
+    <text class="mono" x="116" y="648"></text><text class="mono" x="332" y="648">"Use {n}% ou mais: a faixa anterior tem {n}%." · "O percentual vai até 50%."</text>
+    <text class="mono" x="116" y="674"></text><text class="mono" x="332" y="674">"A primeira faixa começa em 1 usuário." · "A última faixa não tem fim."</text>
+    <rect class="node-red" x="64" y="686" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="700" text-anchor="middle">404</text>
+    <text class="mono" x="116" y="700">FORA_DA_VITRINE</text><text class="mono" x="332" y="700">"Este módulo não está disponível para contratar."</text>
+    <rect class="node-red" x="64" y="712" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="726" text-anchor="middle">409</text>
+    <text class="mono" x="116" y="726">JA_CONTRATADO</text><text class="mono" x="332" y="726">"Este módulo já está na conta."</text>
+    <rect class="node-red" x="64" y="738" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="752" text-anchor="middle">422</text>
+    <text class="mono" x="116" y="752">DADOS_INVALIDOS</text><text class="mono" x="332" y="752">"O campo "{campo}" está faltando ou é inválido."</text>
+  </g>
+  <g id="enderecos">
+  <g id="ep-get-catalogo-resumo">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="816" width="632" height="934" rx="10"/></g>
+    <rect class="node-green" x="56" y="832" width="41" height="24" rx="6"/><text class="label-strong" x="76.5" y="849" text-anchor="middle">GET</text>
+    <text class="label-strong" x="109" y="849">/catalogo/resumo</text>
+    <rect class="node-external" x="572" y="832" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="848" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="40" y1="872" x2="672" y2="872"/><text class="boundary-label" x="56" y="894">USO</text>
+    <text class="label" x="56" y="918">Para quê: montar o card Catálogo em Módulos, em todos os tamanhos</text>
+    <text class="label" x="56" y="936">Quem usa: administrador e membros do time deboaz, no início do hub</text>
+    <text class="label" x="56" y="954">Login: sim, token de acesso; exige MOD-14 · U</text>
+    <text class="muted" x="56" y="972">Requisitos: RF-116 · RN-200 · ficha do módulo Catálogo</text>
+    <line class="divider" x1="40" y1="992" x2="672" y2="992"/><text class="boundary-label" x="56" y="1014">PEDIDO</text>
+    <text class="mono" x="56" y="1038" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+    <text class="muted" x="56" y="1056">receita prevista: soma do mês corrente, com o preço que vale nele</text>
+    <line class="divider" x1="40" y1="1076" x2="672" y2="1076"/><text class="boundary-label" x="56" y="1098">RESPOSTAS</text>
+    <rect class="chip" x="56" y="1100" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1114" text-anchor="middle">200</text>
+    <text class="mono" x="108" y="1114" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="1132" xml:space="preserve">  "competencia": "2026-12",</text>
+    <text class="mono" x="108" y="1150" xml:space="preserve">  "receitaPrevista": 200996.76,</text>
+    <text class="mono" x="108" y="1168" xml:space="preserve">  "ultimosMeses": [</text>
+    <text class="mono" x="108" y="1186" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="1204" xml:space="preserve">      "competencia": "2026-08",</text>
+    <text class="mono" x="108" y="1222" xml:space="preserve">      "receita": 171204.35</text>
+    <text class="mono" x="108" y="1240" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="1258" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="1276" xml:space="preserve">      "competencia": "2026-09",</text>
+    <text class="mono" x="108" y="1294" xml:space="preserve">      "receita": 178950.12</text>
+    <text class="mono" x="108" y="1312" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="1330" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="1348" xml:space="preserve">      "competencia": "2026-10",</text>
+    <text class="mono" x="108" y="1366" xml:space="preserve">      "receita": 186311.04</text>
+    <text class="mono" x="108" y="1384" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="1402" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="1420" xml:space="preserve">      "competencia": "2026-11",</text>
+    <text class="mono" x="108" y="1438" xml:space="preserve">      "receita": 193118.75</text>
+    <text class="mono" x="108" y="1456" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="1474" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="1492" xml:space="preserve">      "competencia": "2026-12",</text>
+    <text class="mono" x="108" y="1510" xml:space="preserve">      "receita": 200996.76</text>
+    <text class="mono" x="108" y="1528" xml:space="preserve">    }</text>
+    <text class="mono" x="108" y="1546" xml:space="preserve">  ],</text>
+    <text class="mono" x="108" y="1564" xml:space="preserve">  "modulos": {</text>
+    <text class="mono" x="108" y="1582" xml:space="preserve">    "daConta": 7,</text>
+    <text class="mono" x="108" y="1600" xml:space="preserve">    "contratavel": 5,</text>
+    <text class="mono" x="108" y="1618" xml:space="preserve">    "doTime": 2</text>
+    <text class="mono" x="108" y="1636" xml:space="preserve">  },</text>
+    <text class="mono" x="108" y="1654" xml:space="preserve">  "comCusto": 7,</text>
+    <text class="mono" x="108" y="1672" xml:space="preserve">  "semCusto": 7,</text>
+    <text class="mono" x="108" y="1690" xml:space="preserve">  "comCustoSemPreco": 6</text>
+    <text class="mono" x="108" y="1708" xml:space="preserve">}</text>
+    <rect class="node-red" x="56" y="1720" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1734" text-anchor="middle">403</text>
+    <text class="mono" x="108" y="1734">ACESSO_NEGADO · fora do time deboaz ou sem o Catálogo (MOD-14 · U)</text>
+  </g>
+  <g id="ep-get-catalogo-modulos">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="816" width="632" height="618" rx="10"/></g>
+    <rect class="node-green" x="736" y="832" width="41" height="24" rx="6"/><text class="label-strong" x="756.5" y="849" text-anchor="middle">GET</text>
+    <text class="label-strong" x="789" y="849">/catalogo/modulos</text>
+    <rect class="node-external" x="1252" y="832" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="848" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="720" y1="872" x2="1352" y2="872"/><text class="boundary-label" x="736" y="894">USO</text>
+    <text class="label" x="736" y="918">Para quê: listar e buscar os módulos catalogados, de A a Z</text>
+    <text class="label" x="736" y="936">Quem usa: administrador e membros do time, na lista do Catálogo</text>
+    <text class="label" x="736" y="954">Login: sim, token de acesso; exige MOD-14 · U</text>
+    <text class="muted" x="736" y="972">Requisitos: RF-117 · RN-197</text>
+    <line class="divider" x1="720" y1="992" x2="1352" y2="992"/><text class="boundary-label" x="736" y="1014">PEDIDO</text>
+    <text class="mono" x="736" y="1038" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+    <text class="mono" x="736" y="1056" xml:space="preserve">?tipo=DA_CONTA&amp;busca=usu</text>
+    <text class="muted" x="736" y="1074">tipo: DA_CONTA, CONTRATAVEL ou DO_TIME; sem tipo, todos</text>
+    <text class="muted" x="736" y="1092">busca: parte do nome, sem acento nem maiúscula</text>
+    <line class="divider" x1="720" y1="1112" x2="1352" y2="1112"/><text class="boundary-label" x="736" y="1134">RESPOSTAS</text>
+    <rect class="chip" x="736" y="1136" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1150" text-anchor="middle">200</text>
+    <text class="mono" x="788" y="1150" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="1168" xml:space="preserve">  "itens": [</text>
+    <text class="mono" x="788" y="1186" xml:space="preserve">    {</text>
+    <text class="mono" x="788" y="1204" xml:space="preserve">      "id": "MOD-03",</text>
+    <text class="mono" x="788" y="1222" xml:space="preserve">      "nome": "Usuários",</text>
+    <text class="mono" x="788" y="1240" xml:space="preserve">      "tipo": "DA_CONTA",</text>
+    <text class="mono" x="788" y="1258" xml:space="preserve">      "temCusto": true,</text>
+    <text class="mono" x="788" y="1276" xml:space="preserve">      "modeloCobranca": "POR_USUARIO",</text>
+    <text class="mono" x="788" y="1294" xml:space="preserve">      "contas": 128,</text>
+    <text class="mono" x="788" y="1312" xml:space="preserve">      "precoNovoEm": "2026-12-01"</text>
+    <text class="mono" x="788" y="1330" xml:space="preserve">    }</text>
+    <text class="mono" x="788" y="1348" xml:space="preserve">  ]</text>
+    <text class="mono" x="788" y="1366" xml:space="preserve">}</text>
+    <rect class="node-red" x="736" y="1378" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1392" text-anchor="middle">403</text>
+    <text class="mono" x="788" y="1392">ACESSO_NEGADO · fora do time deboaz ou sem o Catálogo (MOD-14 · U)</text>
+    <rect class="node-red" x="736" y="1404" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1418" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="1418">DADOS_INVALIDOS · tipo fora da lista</text>
+  </g>
+  <g id="ep-get-catalogo-modulos-id">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="1482" width="632" height="726" rx="10"/></g>
+    <rect class="node-green" x="736" y="1498" width="41" height="24" rx="6"/><text class="label-strong" x="756.5" y="1515" text-anchor="middle">GET</text>
+    <text class="label-strong" x="789" y="1515">/catalogo/modulos/{id}</text>
+    <rect class="node-external" x="1252" y="1498" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="1514" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="720" y1="1538" x2="1352" y2="1538"/><text class="boundary-label" x="736" y="1560">USO</text>
+    <text class="label" x="736" y="1584">Para quê: abrir a aba Dados de um módulo</text>
+    <text class="label" x="736" y="1602">Quem usa: administrador e membros do time</text>
+    <text class="label" x="736" y="1620">Login: sim, token de acesso; exige MOD-14 · U</text>
+    <text class="muted" x="736" y="1638">Requisitos: RF-123 · RN-199</text>
+    <line class="divider" x1="720" y1="1658" x2="1352" y2="1658"/><text class="boundary-label" x="736" y="1680">PEDIDO</text>
+    <text class="mono" x="736" y="1704" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+    <text class="muted" x="736" y="1722">id: o do registro de módulos, como MOD-03</text>
+    <line class="divider" x1="720" y1="1742" x2="1352" y2="1742"/><text class="boundary-label" x="736" y="1764">RESPOSTAS</text>
+    <rect class="chip" x="736" y="1766" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1780" text-anchor="middle">200</text>
+    <text class="mono" x="788" y="1780" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="1798" xml:space="preserve">  "id": "MOD-03",</text>
+    <text class="mono" x="788" y="1816" xml:space="preserve">  "nome": "Usuários",</text>
+    <text class="mono" x="788" y="1834" xml:space="preserve">  "tipo": "DA_CONTA",</text>
+    <text class="mono" x="788" y="1852" xml:space="preserve">  "temCusto": true,</text>
+    <text class="mono" x="788" y="1870" xml:space="preserve">  "modeloCobranca": "POR_USUARIO",</text>
+    <text class="mono" x="788" y="1888" xml:space="preserve">  "precoHoje": {</text>
+    <text class="mono" x="788" y="1906" xml:space="preserve">    "valorPorStaff": 18.90,</text>
+    <text class="mono" x="788" y="1924" xml:space="preserve">    "valorPorParticipante": 4.50,</text>
+    <text class="mono" x="788" y="1942" xml:space="preserve">    "valeDesde": "2026-11-01"</text>
+    <text class="mono" x="788" y="1960" xml:space="preserve">  },</text>
+    <text class="mono" x="788" y="1978" xml:space="preserve">  "contas": {</text>
+    <text class="mono" x="788" y="1996" xml:space="preserve">    "instituicoes": 96,</text>
+    <text class="mono" x="788" y="2014" xml:space="preserve">    "autonomos": 32</text>
+    <text class="mono" x="788" y="2032" xml:space="preserve">  },</text>
+    <text class="mono" x="788" y="2050" xml:space="preserve">  "catalogadoEm": "2026-08-01T12:00:00Z",</text>
+    <text class="mono" x="788" y="2068" xml:space="preserve">  "catalogadoPor": {</text>
+    <text class="mono" x="788" y="2086" xml:space="preserve">    "id": "usr-dboaz-admin",</text>
+    <text class="mono" x="788" y="2104" xml:space="preserve">    "nome": "Administrador do deboaz"</text>
+    <text class="mono" x="788" y="2122" xml:space="preserve">  }</text>
+    <text class="mono" x="788" y="2140" xml:space="preserve">}</text>
+    <rect class="node-red" x="736" y="2152" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2166" text-anchor="middle">403</text>
+    <text class="mono" x="788" y="2166">ACESSO_NEGADO · fora do time deboaz ou sem o Catálogo (MOD-14 · U)</text>
+    <rect class="node-red" x="736" y="2178" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2192" text-anchor="middle">404</text>
+    <text class="mono" x="788" y="2192">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+  </g>
+  <g id="ep-put-catalogo-modulos-id">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="1798" width="632" height="536" rx="10"/></g>
+    <rect class="node-blue" x="56" y="1814" width="41" height="24" rx="6"/><text class="label-strong" x="76.5" y="1831" text-anchor="middle">PUT</text>
+    <text class="label-strong" x="109" y="1831">/catalogo/modulos/{id}</text>
+    <rect class="node-external" x="572" y="1814" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="1830" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="40" y1="1854" x2="672" y2="1854"/><text class="boundary-label" x="56" y="1876">USO</text>
+    <text class="label" x="56" y="1900">Para quê: catalogar o módulo: se tem custo e como é cobrado</text>
+    <text class="label" x="56" y="1918">Quem usa: só o administrador do deboaz, na aba Dados</text>
+    <text class="label" x="56" y="1936">Login: sim, token de acesso; exige o papel ADMINISTRADOR</text>
+    <text class="muted" x="56" y="1954">Requisitos: RF-123 · RN-191 · RN-197 · RN-199 · RN-200</text>
+    <line class="divider" x1="40" y1="1974" x2="672" y2="1974"/><text class="boundary-label" x="56" y="1996">PEDIDO</text>
+    <text class="mono" x="56" y="2020">Authorization: Bearer &lt;token&gt;</text>
+    <text class="mono" x="56" y="2038" xml:space="preserve">{</text>
+    <text class="mono" x="56" y="2056" xml:space="preserve">  "temCusto": true,</text>
+    <text class="mono" x="56" y="2074" xml:space="preserve">  "modeloCobranca": "POR_PARTICIPANTE"</text>
+    <text class="mono" x="56" y="2092" xml:space="preserve">}</text>
+    <text class="muted" x="56" y="2110">modeloCobranca: SEM_CUSTO, POR_USUARIO ou POR_PARTICIPANTE</text>
+    <text class="muted" x="56" y="2128">nome e tipo vêm do registro de módulos (15_modulos)</text>
+    <line class="divider" x1="40" y1="2148" x2="672" y2="2148"/><text class="boundary-label" x="56" y="2170">RESPOSTAS</text>
+    <rect class="chip" x="56" y="2172" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2186" text-anchor="middle">200</text>
+    <text class="muted" x="108" y="2186">o módulo, como no GET /catalogo/modulos/{id}</text>
+    <rect class="node-red" x="56" y="2198" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2212" text-anchor="middle">403</text>
+    <text class="mono" x="108" y="2212">ACESSO_NEGADO · só o administrador do deboaz salva (RN-191)</text>
+    <rect class="node-red" x="56" y="2224" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2238" text-anchor="middle">404</text>
+    <text class="mono" x="108" y="2238">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+    <rect class="node-red" x="56" y="2250" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2264" text-anchor="middle">422</text>
+    <text class="mono" x="108" y="2264">DADOS_INVALIDOS · modelo e custo não combinam, ou módulo do time</text>
+    <text class="mono" x="108" y="2282" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="2300" xml:space="preserve">  "campo": "modeloCobranca"</text>
+    <text class="mono" x="108" y="2318" xml:space="preserve">}</text>
+  </g>
+  <g id="ep-get-catalogo-modulos-id-clientes">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="2256" width="632" height="806" rx="10"/></g>
+    <rect class="node-green" x="736" y="2272" width="41" height="24" rx="6"/><text class="label-strong" x="756.5" y="2289" text-anchor="middle">GET</text>
+    <text class="label-strong" x="789" y="2289">/catalogo/modulos/{id}/clientes</text>
+    <rect class="node-external" x="1252" y="2272" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="2288" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="720" y1="2312" x2="1352" y2="2312"/><text class="boundary-label" x="736" y="2334">USO</text>
+    <text class="label" x="736" y="2358">Para quê: ver as contas que contrataram o módulo</text>
+    <text class="label" x="736" y="2376">Quem usa: administrador e membros do time, na aba Clientes</text>
+    <text class="label" x="736" y="2394">Login: sim, token de acesso; exige MOD-14 · U</text>
+    <text class="muted" x="736" y="2412">Requisitos: RF-124</text>
+    <line class="divider" x1="720" y1="2432" x2="1352" y2="2432"/><text class="boundary-label" x="736" y="2454">PEDIDO</text>
+    <text class="mono" x="736" y="2478" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+    <text class="mono" x="736" y="2496" xml:space="preserve">?tipoConta=INSTITUICAO&amp;busca=&amp;pagina=1</text>
+    <text class="muted" x="736" y="2514">tipoConta: INSTITUICAO ou AUTONOMO; busca na sigla e no nome</text>
+    <text class="muted" x="736" y="2532">50 por página, de A a Z pela sigla</text>
+    <line class="divider" x1="720" y1="2552" x2="1352" y2="2552"/><text class="boundary-label" x="736" y="2574">RESPOSTAS</text>
+    <rect class="chip" x="736" y="2576" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2590" text-anchor="middle">200</text>
+    <text class="mono" x="788" y="2590" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="2608" xml:space="preserve">  "total": 96,</text>
+    <text class="mono" x="788" y="2626" xml:space="preserve">  "pagina": 1,</text>
+    <text class="mono" x="788" y="2644" xml:space="preserve">  "itens": [</text>
+    <text class="mono" x="788" y="2662" xml:space="preserve">    {</text>
+    <text class="mono" x="788" y="2680" xml:space="preserve">      "contaId": "conta-clarr",</text>
+    <text class="mono" x="788" y="2698" xml:space="preserve">      "sigla": "CLARR",</text>
+    <text class="mono" x="788" y="2716" xml:space="preserve">      "nome": "Colégio Aurora",</text>
+    <text class="mono" x="788" y="2734" xml:space="preserve">      "estado": "ATIVA",</text>
+    <text class="mono" x="788" y="2752" xml:space="preserve">      "desde": "2026-02-02",</text>
+    <text class="mono" x="788" y="2770" xml:space="preserve">      "plano": "MENSAL"</text>
+    <text class="mono" x="788" y="2788" xml:space="preserve">    },</text>
+    <text class="mono" x="788" y="2806" xml:space="preserve">    {</text>
+    <text class="mono" x="788" y="2824" xml:space="preserve">      "contaId": "conta-ebfga",</text>
+    <text class="mono" x="788" y="2842" xml:space="preserve">      "sigla": "EBFGA",</text>
+    <text class="mono" x="788" y="2860" xml:space="preserve">      "nome": "Escola Bento Freitas",</text>
+    <text class="mono" x="788" y="2878" xml:space="preserve">      "estado": "ATIVA",</text>
+    <text class="mono" x="788" y="2896" xml:space="preserve">      "desde": "2026-03-12",</text>
+    <text class="mono" x="788" y="2914" xml:space="preserve">      "plano": "ANUAL"</text>
+    <text class="mono" x="788" y="2932" xml:space="preserve">    }</text>
+    <text class="mono" x="788" y="2950" xml:space="preserve">  ]</text>
+    <text class="mono" x="788" y="2968" xml:space="preserve">}</text>
+    <rect class="node-red" x="736" y="2980" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2994" text-anchor="middle">403</text>
+    <text class="mono" x="788" y="2994">ACESSO_NEGADO · fora do time deboaz ou sem o Catálogo (MOD-14 · U)</text>
+    <rect class="node-red" x="736" y="3006" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3020" text-anchor="middle">404</text>
+    <text class="mono" x="788" y="3020">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+    <rect class="node-red" x="736" y="3032" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3046" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="3046">DADOS_INVALIDOS · tipoConta ou pagina</text>
+  </g>
+  <g id="ep-get-catalogo-modulos-id-precos">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="2382" width="632" height="708" rx="10"/></g>
+    <rect class="node-green" x="56" y="2398" width="41" height="24" rx="6"/><text class="label-strong" x="76.5" y="2415" text-anchor="middle">GET</text>
+    <text class="label-strong" x="109" y="2415">/catalogo/modulos/{id}/precos</text>
+    <rect class="node-external" x="572" y="2398" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="2414" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="40" y1="2438" x2="672" y2="2438"/><text class="boundary-label" x="56" y="2460">USO</text>
+    <text class="label" x="56" y="2484">Para quê: mostrar o preço de hoje, o agendado e o histórico</text>
+    <text class="label" x="56" y="2502">Quem usa: administrador e membros do time, na aba Preço</text>
+    <text class="label" x="56" y="2520">Login: sim, token de acesso; exige MOD-14 · U</text>
+    <text class="muted" x="56" y="2538">Requisitos: RF-118 · RF-122 · RNF-211</text>
+    <line class="divider" x1="40" y1="2558" x2="672" y2="2558"/><text class="boundary-label" x="56" y="2580">PEDIDO</text>
+    <text class="mono" x="56" y="2604" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+    <text class="muted" x="56" y="2622">do mais novo para o mais antigo; nada é apagado</text>
+    <line class="divider" x1="40" y1="2642" x2="672" y2="2642"/><text class="boundary-label" x="56" y="2664">RESPOSTAS</text>
+    <rect class="chip" x="56" y="2666" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2680" text-anchor="middle">200</text>
+    <text class="mono" x="108" y="2680" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="2698" xml:space="preserve">  "precos": [</text>
+    <text class="mono" x="108" y="2716" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="2734" xml:space="preserve">      "valorPorStaff": 19.90,</text>
+    <text class="mono" x="108" y="2752" xml:space="preserve">      "valorPorParticipante": 4.90,</text>
+    <text class="mono" x="108" y="2770" xml:space="preserve">      "valeDesde": "2026-12-01",</text>
+    <text class="mono" x="108" y="2788" xml:space="preserve">      "valeAte": null,</text>
+    <text class="mono" x="108" y="2806" xml:space="preserve">      "definidoPor": "Administrador do deboaz",</text>
+    <text class="mono" x="108" y="2824" xml:space="preserve">      "definidoEm": "2026-10-29T03:40:00Z"</text>
+    <text class="mono" x="108" y="2842" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="2860" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="2878" xml:space="preserve">      "valorPorStaff": 18.90,</text>
+    <text class="mono" x="108" y="2896" xml:space="preserve">      "valorPorParticipante": 4.50,</text>
+    <text class="mono" x="108" y="2914" xml:space="preserve">      "valeDesde": "2026-11-01",</text>
+    <text class="mono" x="108" y="2932" xml:space="preserve">      "valeAte": "2026-11-30",</text>
+    <text class="mono" x="108" y="2950" xml:space="preserve">      "definidoPor": "Administrador do deboaz",</text>
+    <text class="mono" x="108" y="2968" xml:space="preserve">      "definidoEm": "2026-10-20T09:30:00Z"</text>
+    <text class="mono" x="108" y="2986" xml:space="preserve">    }</text>
+    <text class="mono" x="108" y="3004" xml:space="preserve">  ]</text>
+    <text class="mono" x="108" y="3022" xml:space="preserve">}</text>
+    <rect class="node-red" x="56" y="3034" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="3048" text-anchor="middle">403</text>
+    <text class="mono" x="108" y="3048">ACESSO_NEGADO · fora do time deboaz ou sem o Catálogo (MOD-14 · U)</text>
+    <rect class="node-red" x="56" y="3060" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="3074" text-anchor="middle">404</text>
+    <text class="mono" x="108" y="3074">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+  </g>
+  <g id="ep-post-catalogo-modulos-id-precos">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="3110" width="632" height="732" rx="10"/></g>
+    <rect class="node-blue" x="736" y="3126" width="50" height="24" rx="6"/><text class="label-strong" x="761.0" y="3143" text-anchor="middle">POST</text>
+    <text class="label-strong" x="798" y="3143">/catalogo/modulos/{id}/precos</text>
+    <rect class="node-external" x="1252" y="3126" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="3142" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="720" y1="3166" x2="1352" y2="3166"/><text class="boundary-label" x="736" y="3188">USO</text>
+    <text class="label" x="736" y="3212">Para quê: agendar o preço novo do módulo</text>
+    <text class="label" x="736" y="3230">Quem usa: só o administrador do deboaz, em Salvar preço</text>
+    <text class="label" x="736" y="3248">Login: sim, token de acesso; exige o papel ADMINISTRADOR</text>
+    <text class="muted" x="736" y="3266">Requisitos: RF-118 · RN-191 · RN-194 · RN-199 · RNF-211</text>
+    <line class="divider" x1="720" y1="3286" x2="1352" y2="3286"/><text class="boundary-label" x="736" y="3308">PEDIDO</text>
+    <text class="mono" x="736" y="3332">Authorization: Bearer &lt;token&gt;</text>
+    <text class="mono" x="736" y="3350" xml:space="preserve">{</text>
+    <text class="mono" x="736" y="3368" xml:space="preserve">  "valorPorStaff": 19.90,</text>
+    <text class="mono" x="736" y="3386" xml:space="preserve">  "valorPorParticipante": 4.90,</text>
+    <text class="mono" x="736" y="3404" xml:space="preserve">  "valeDesde": "2026-12-01"</text>
+    <text class="mono" x="736" y="3422" xml:space="preserve">}</text>
+    <text class="muted" x="736" y="3440">POR_PARTICIPANTE: sem valorPorStaff; valores em reais, maiores que 0</text>
+    <text class="muted" x="736" y="3458">o preço anterior passa a valer até a véspera; fica no histórico</text>
+    <line class="divider" x1="720" y1="3478" x2="1352" y2="3478"/><text class="boundary-label" x="736" y="3500">RESPOSTAS</text>
+    <rect class="chip" x="736" y="3502" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3516" text-anchor="middle">201</text>
+    <text class="mono" x="788" y="3516" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="3534" xml:space="preserve">  "valorPorStaff": 19.90,</text>
+    <text class="mono" x="788" y="3552" xml:space="preserve">  "valorPorParticipante": 4.90,</text>
+    <text class="mono" x="788" y="3570" xml:space="preserve">  "valeDesde": "2026-12-01",</text>
+    <text class="mono" x="788" y="3588" xml:space="preserve">  "valeAte": null,</text>
+    <text class="mono" x="788" y="3606" xml:space="preserve">  "anteriorValeAte": "2026-11-30"</text>
+    <text class="mono" x="788" y="3624" xml:space="preserve">}</text>
+    <rect class="node-red" x="736" y="3636" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3650" text-anchor="middle">403</text>
+    <text class="mono" x="788" y="3650">ACESSO_NEGADO · só o administrador do deboaz salva (RN-191)</text>
+    <rect class="node-red" x="736" y="3662" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3676" text-anchor="middle">404</text>
+    <text class="mono" x="788" y="3676">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+    <rect class="node-red" x="736" y="3688" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3702" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="3702">DATA_INVALIDA · hoje ou antes (RN-194)</text>
+    <text class="mono" x="788" y="3720" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="3738" xml:space="preserve">  "campo": "valeDesde",</text>
+    <text class="mono" x="788" y="3756" xml:space="preserve">  "minimo": "2026-11-04"</text>
+    <text class="mono" x="788" y="3774" xml:space="preserve">}</text>
+    <rect class="node-red" x="736" y="3786" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3800" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="3800">SEM_CUSTO · módulo catalogado sem custo (RN-199)</text>
+    <rect class="node-red" x="736" y="3812" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3826" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="3826">DADOS_INVALIDOS · valor zero, negativo ou faltando</text>
+  </g>
+  <g id="ep-get-catalogo-modulos-id-desconto">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="3138" width="632" height="924" rx="10"/></g>
+    <rect class="node-green" x="56" y="3154" width="41" height="24" rx="6"/><text class="label-strong" x="76.5" y="3171" text-anchor="middle">GET</text>
+    <text class="label-strong" x="109" y="3171">/catalogo/modulos/{id}/desconto</text>
+    <rect class="node-external" x="572" y="3154" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="3170" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="40" y1="3194" x2="672" y2="3194"/><text class="boundary-label" x="56" y="3216">USO</text>
+    <text class="label" x="56" y="3240">Para quê: abrir a aba Desconto: faixas e plano anual</text>
+    <text class="label" x="56" y="3258">Quem usa: administrador e membros do time</text>
+    <text class="label" x="56" y="3276">Login: sim, token de acesso; exige MOD-14 · U</text>
+    <text class="muted" x="56" y="3294">Requisitos: RF-119 · RF-125</text>
+    <line class="divider" x1="40" y1="3314" x2="672" y2="3314"/><text class="boundary-label" x="56" y="3336">PEDIDO</text>
+    <text class="mono" x="56" y="3360" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+    <text class="muted" x="56" y="3378">a política que vale hoje e, se houver, a agendada</text>
+    <line class="divider" x1="40" y1="3398" x2="672" y2="3398"/><text class="boundary-label" x="56" y="3420">RESPOSTAS</text>
+    <rect class="chip" x="56" y="3422" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="3436" text-anchor="middle">200</text>
+    <text class="mono" x="108" y="3436" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="3454" xml:space="preserve">  "ligado": true,</text>
+    <text class="mono" x="108" y="3472" xml:space="preserve">  "percentualAnual": 15,</text>
+    <text class="mono" x="108" y="3490" xml:space="preserve">  "valeDesde": "2026-12-01",</text>
+    <text class="mono" x="108" y="3508" xml:space="preserve">  "faixas": [</text>
+    <text class="mono" x="108" y="3526" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="3544" xml:space="preserve">      "inicio": 1,</text>
+    <text class="mono" x="108" y="3562" xml:space="preserve">      "fim": 100,</text>
+    <text class="mono" x="108" y="3580" xml:space="preserve">      "percentual": 0</text>
+    <text class="mono" x="108" y="3598" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="3616" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="3634" xml:space="preserve">      "inicio": 101,</text>
+    <text class="mono" x="108" y="3652" xml:space="preserve">      "fim": 300,</text>
+    <text class="mono" x="108" y="3670" xml:space="preserve">      "percentual": 5</text>
+    <text class="mono" x="108" y="3688" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="3706" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="3724" xml:space="preserve">      "inicio": 301,</text>
+    <text class="mono" x="108" y="3742" xml:space="preserve">      "fim": 1000,</text>
+    <text class="mono" x="108" y="3760" xml:space="preserve">      "percentual": 10</text>
+    <text class="mono" x="108" y="3778" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="3796" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="3814" xml:space="preserve">      "inicio": 1001,</text>
+    <text class="mono" x="108" y="3832" xml:space="preserve">      "fim": 3000,</text>
+    <text class="mono" x="108" y="3850" xml:space="preserve">      "percentual": 15</text>
+    <text class="mono" x="108" y="3868" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="3886" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="3904" xml:space="preserve">      "inicio": 3001,</text>
+    <text class="mono" x="108" y="3922" xml:space="preserve">      "fim": null,</text>
+    <text class="mono" x="108" y="3940" xml:space="preserve">      "percentual": 20</text>
+    <text class="mono" x="108" y="3958" xml:space="preserve">    }</text>
+    <text class="mono" x="108" y="3976" xml:space="preserve">  ]</text>
+    <text class="mono" x="108" y="3994" xml:space="preserve">}</text>
+    <rect class="node-red" x="56" y="4006" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="4020" text-anchor="middle">403</text>
+    <text class="mono" x="108" y="4020">ACESSO_NEGADO · fora do time deboaz ou sem o Catálogo (MOD-14 · U)</text>
+    <rect class="node-red" x="56" y="4032" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="4046" text-anchor="middle">404</text>
+    <text class="mono" x="108" y="4046">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+  </g>
+  <g id="ep-put-catalogo-modulos-id-desconto">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="3890" width="632" height="516" rx="10"/></g>
+    <rect class="node-blue" x="736" y="3906" width="41" height="24" rx="6"/><text class="label-strong" x="756.5" y="3923" text-anchor="middle">PUT</text>
+    <text class="label-strong" x="789" y="3923">/catalogo/modulos/{id}/desconto</text>
+    <rect class="node-external" x="1252" y="3906" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="3922" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="720" y1="3946" x2="1352" y2="3946"/><text class="boundary-label" x="736" y="3968">USO</text>
+    <text class="label" x="736" y="3992">Para quê: salvar as faixas, o liga/desliga e o % do plano anual</text>
+    <text class="label" x="736" y="4010">Quem usa: só o administrador do deboaz, em Salvar desconto</text>
+    <text class="label" x="736" y="4028">Login: sim, token de acesso; exige o papel ADMINISTRADOR</text>
+    <text class="muted" x="736" y="4046">Requisitos: RF-119 · RF-125 · RN-191 · RN-193 · RN-194 · RN-201</text>
+    <line class="divider" x1="720" y1="4066" x2="1352" y2="4066"/><text class="boundary-label" x="736" y="4088">PEDIDO</text>
+    <text class="mono" x="736" y="4112" xml:space="preserve">o mesmo corpo do GET, com todas as faixas</text>
+    <text class="muted" x="736" y="4130">faixas inteiras: a primeira começa em 1 e a última sem fim</text>
+    <text class="muted" x="736" y="4148">percentual de 0 a 50, nunca menor que o da faixa anterior</text>
+    <line class="divider" x1="720" y1="4168" x2="1352" y2="4168"/><text class="boundary-label" x="736" y="4190">RESPOSTAS</text>
+    <rect class="chip" x="736" y="4192" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="4206" text-anchor="middle">200</text>
+    <text class="muted" x="788" y="4206">a política salva, como no GET</text>
+    <rect class="node-red" x="736" y="4218" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="4232" text-anchor="middle">403</text>
+    <text class="mono" x="788" y="4232">ACESSO_NEGADO · só o administrador do deboaz salva (RN-191)</text>
+    <rect class="node-red" x="736" y="4244" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="4258" text-anchor="middle">404</text>
+    <text class="mono" x="788" y="4258">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+    <rect class="node-red" x="736" y="4270" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="4284" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="4284">FAIXA_INVALIDA · buraco, sobreposição ou percentual (RN-193)</text>
+    <text class="mono" x="788" y="4302" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="4320" xml:space="preserve">  "campo": "faixas[2]"</text>
+    <text class="mono" x="788" y="4338" xml:space="preserve">}</text>
+    <rect class="node-red" x="736" y="4350" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="4364" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="4364">DATA_INVALIDA · hoje ou antes (RN-194)</text>
+    <rect class="node-red" x="736" y="4376" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="4390" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="4390">SEM_CUSTO · módulo sem custo não tem desconto</text>
+  </g>
+  <g id="ep-post-catalogo-modulos-id-simulacao">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="4110" width="632" height="1192" rx="10"/></g>
+    <rect class="node-blue" x="56" y="4126" width="50" height="24" rx="6"/><text class="label-strong" x="81.0" y="4143" text-anchor="middle">POST</text>
+    <text class="label-strong" x="118" y="4143">/catalogo/modulos/{id}/simulacao</text>
+    <rect class="node-external" x="572" y="4126" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="4142" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="40" y1="4166" x2="672" y2="4166"/><text class="boundary-label" x="56" y="4188">USO</text>
+    <text class="label" x="56" y="4212">Para quê: simular o valor do mês para um número de usuários</text>
+    <text class="label" x="56" y="4230">Quem usa: administrador e membros do time, na aba Simular</text>
+    <text class="label" x="56" y="4248">Login: sim, token de acesso; exige MOD-14 · U</text>
+    <text class="muted" x="56" y="4266">Requisitos: RF-120 · RN-192 · RN-196 · RNF-210 · RNF-212</text>
+    <line class="divider" x1="40" y1="4286" x2="672" y2="4286"/><text class="boundary-label" x="56" y="4308">PEDIDO</text>
+    <text class="mono" x="56" y="4332">Authorization: Bearer &lt;token&gt;</text>
+    <text class="mono" x="56" y="4350" xml:space="preserve">{</text>
+    <text class="mono" x="56" y="4368" xml:space="preserve">  "staff": 40,</text>
+    <text class="mono" x="56" y="4386" xml:space="preserve">  "participantes": 312</text>
+    <text class="mono" x="56" y="4404" xml:space="preserve">}</text>
+    <text class="muted" x="56" y="4422">usa o preço e as faixas mais novos, agendados inclusive;</text>
+    <text class="muted" x="56" y="4440">o mesmo cálculo do fechamento; nada é salvo; responde em até 1 s</text>
+    <line class="divider" x1="40" y1="4460" x2="672" y2="4460"/><text class="boundary-label" x="56" y="4482">RESPOSTAS</text>
+    <rect class="chip" x="56" y="4484" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="4498" text-anchor="middle">200</text>
+    <text class="mono" x="108" y="4498" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="4516" xml:space="preserve">  "valeDesde": "2026-12-01",</text>
+    <text class="mono" x="108" y="4534" xml:space="preserve">  "staff": {</text>
+    <text class="mono" x="108" y="4552" xml:space="preserve">    "quantidade": 40,</text>
+    <text class="mono" x="108" y="4570" xml:space="preserve">    "valor": 796.00</text>
+    <text class="mono" x="108" y="4588" xml:space="preserve">  },</text>
+    <text class="mono" x="108" y="4606" xml:space="preserve">  "participantes": {</text>
+    <text class="mono" x="108" y="4624" xml:space="preserve">    "quantidade": 312,</text>
+    <text class="mono" x="108" y="4642" xml:space="preserve">    "valor": 1528.80</text>
+    <text class="mono" x="108" y="4660" xml:space="preserve">  },</text>
+    <text class="mono" x="108" y="4678" xml:space="preserve">  "subtotal": 2324.80,</text>
+    <text class="mono" x="108" y="4696" xml:space="preserve">  "faixas": [</text>
+    <text class="mono" x="108" y="4714" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="4732" xml:space="preserve">      "inicio": 1,</text>
+    <text class="mono" x="108" y="4750" xml:space="preserve">      "fim": 100,</text>
+    <text class="mono" x="108" y="4768" xml:space="preserve">      "percentual": 0,</text>
+    <text class="mono" x="108" y="4786" xml:space="preserve">      "usuarios": 100,</text>
+    <text class="mono" x="108" y="4804" xml:space="preserve">      "desconto": 0.00</text>
+    <text class="mono" x="108" y="4822" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="4840" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="4858" xml:space="preserve">      "inicio": 101,</text>
+    <text class="mono" x="108" y="4876" xml:space="preserve">      "fim": 300,</text>
+    <text class="mono" x="108" y="4894" xml:space="preserve">      "percentual": 5,</text>
+    <text class="mono" x="108" y="4912" xml:space="preserve">      "usuarios": 200,</text>
+    <text class="mono" x="108" y="4930" xml:space="preserve">      "desconto": 66.05</text>
+    <text class="mono" x="108" y="4948" xml:space="preserve">    },</text>
+    <text class="mono" x="108" y="4966" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="4984" xml:space="preserve">      "inicio": 301,</text>
+    <text class="mono" x="108" y="5002" xml:space="preserve">      "fim": 1000,</text>
+    <text class="mono" x="108" y="5020" xml:space="preserve">      "percentual": 10,</text>
+    <text class="mono" x="108" y="5038" xml:space="preserve">      "usuarios": 52,</text>
+    <text class="mono" x="108" y="5056" xml:space="preserve">      "desconto": 34.34</text>
+    <text class="mono" x="108" y="5074" xml:space="preserve">    }</text>
+    <text class="mono" x="108" y="5092" xml:space="preserve">  ],</text>
+    <text class="mono" x="108" y="5110" xml:space="preserve">  "descontoPorVolume": 100.39,</text>
+    <text class="mono" x="108" y="5128" xml:space="preserve">  "totalMes": 2224.41,</text>
+    <text class="mono" x="108" y="5146" xml:space="preserve">  "total12Meses": 26692.92,</text>
+    <text class="mono" x="108" y="5164" xml:space="preserve">  "totalPlanoAnual": 22688.98</text>
+    <text class="mono" x="108" y="5182" xml:space="preserve">}</text>
+    <rect class="node-red" x="56" y="5194" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5208" text-anchor="middle">403</text>
+    <text class="mono" x="108" y="5208">ACESSO_NEGADO · fora do time deboaz ou sem o Catálogo (MOD-14 · U)</text>
+    <rect class="node-red" x="56" y="5220" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5234" text-anchor="middle">404</text>
+    <text class="mono" x="108" y="5234">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+    <rect class="node-red" x="56" y="5246" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5260" text-anchor="middle">422</text>
+    <text class="mono" x="108" y="5260">SEM_PRECO · módulo com custo ainda sem preço (RN-199)</text>
+    <rect class="node-red" x="56" y="5272" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5286" text-anchor="middle">422</text>
+    <text class="mono" x="108" y="5286">DADOS_INVALIDOS · número negativo ou faltando</text>
+  </g>
+  <g id="ep-get-catalogo-vitrine">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="4454" width="632" height="530" rx="10"/></g>
+    <rect class="node-green" x="736" y="4470" width="41" height="24" rx="6"/><text class="label-strong" x="756.5" y="4487" text-anchor="middle">GET</text>
+    <text class="label-strong" x="789" y="4487">/catalogo/vitrine</text>
+    <rect class="node-external" x="1252" y="4470" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="4486" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="720" y1="4510" x2="1352" y2="4510"/><text class="boundary-label" x="736" y="4532">USO</text>
+    <text class="label" x="736" y="4556">Para quê: listar os módulos de A contratar, de A a Z</text>
+    <text class="label" x="736" y="4574">Quem usa: conta master, autônomo e staff da conta, em Módulos</text>
+    <text class="label" x="736" y="4592">Login: sim, token de acesso da conta</text>
+    <text class="muted" x="736" y="4610">Requisitos: RF-164 · RN-258</text>
+    <line class="divider" x1="720" y1="4630" x2="1352" y2="4630"/><text class="boundary-label" x="736" y="4652">PEDIDO</text>
+    <text class="mono" x="736" y="4676" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+    <text class="muted" x="736" y="4694">só contratáveis com vitrine completa e preço valendo,</text>
+    <text class="muted" x="736" y="4712">sem os já contratados; conta do time recebe a lista vazia</text>
+    <line class="divider" x1="720" y1="4732" x2="1352" y2="4732"/><text class="boundary-label" x="736" y="4754">RESPOSTAS</text>
+    <rect class="chip" x="736" y="4756" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="4770" text-anchor="middle">200</text>
+    <text class="mono" x="788" y="4770" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="4788" xml:space="preserve">  "itens": [</text>
+    <text class="mono" x="788" y="4806" xml:space="preserve">    {</text>
+    <text class="mono" x="788" y="4824" xml:space="preserve">      "moduloId": "MOD-05",</text>
+    <text class="mono" x="788" y="4842" xml:space="preserve">      "nome": "Quiz",</text>
+    <text class="mono" x="788" y="4860" xml:space="preserve">      "frase": "Frase curta da vitrine.",</text>
+    <text class="mono" x="788" y="4878" xml:space="preserve">      "modeloCobranca": "POR_PARTICIPANTE",</text>
+    <text class="mono" x="788" y="4896" xml:space="preserve">      "valorPorParticipante": 4.90,</text>
+    <text class="mono" x="788" y="4914" xml:space="preserve">      "valorPorStaff": null</text>
+    <text class="mono" x="788" y="4932" xml:space="preserve">    }</text>
+    <text class="mono" x="788" y="4950" xml:space="preserve">  ]</text>
+    <text class="mono" x="788" y="4968" xml:space="preserve">}</text>
+  </g>
+  <g id="ep-get-catalogo-vitrine-id">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="5032" width="632" height="844" rx="10"/></g>
+    <rect class="node-green" x="736" y="5048" width="41" height="24" rx="6"/><text class="label-strong" x="756.5" y="5065" text-anchor="middle">GET</text>
+    <text class="label-strong" x="789" y="5065">/catalogo/vitrine/{id}</text>
+    <rect class="node-external" x="1252" y="5048" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="5064" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="720" y1="5088" x2="1352" y2="5088"/><text class="boundary-label" x="736" y="5110">USO</text>
+    <text class="label" x="736" y="5134">Para quê: abrir o detalhe do módulo, com a calculadora</text>
+    <text class="label" x="736" y="5152">Quem usa: conta master, autônomo e staff da conta</text>
+    <text class="label" x="736" y="5170">Login: sim, token de acesso da conta</text>
+    <text class="muted" x="736" y="5188">Requisitos: RF-165 · RN-258 · 08 RN-77</text>
+    <line class="divider" x1="720" y1="5208" x2="1352" y2="5208"/><text class="boundary-label" x="736" y="5230">PEDIDO</text>
+    <text class="mono" x="736" y="5254" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+    <text class="muted" x="736" y="5272">url: endereço da imagem, na ordem do carrossel</text>
+    <text class="muted" x="736" y="5290">podeIncluir: false para a staff e para o módulo já na conta</text>
+    <line class="divider" x1="720" y1="5310" x2="1352" y2="5310"/><text class="boundary-label" x="736" y="5332">RESPOSTAS</text>
+    <rect class="chip" x="736" y="5334" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="5348" text-anchor="middle">200</text>
+    <text class="mono" x="788" y="5348" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="5366" xml:space="preserve">  "moduloId": "MOD-05",</text>
+    <text class="mono" x="788" y="5384" xml:space="preserve">  "nome": "Quiz",</text>
+    <text class="mono" x="788" y="5402" xml:space="preserve">  "frase": "Frase curta da vitrine.",</text>
+    <text class="mono" x="788" y="5420" xml:space="preserve">  "descricao": "Descrição do módulo na vitrine.",</text>
+    <text class="mono" x="788" y="5438" xml:space="preserve">  "imagens": [</text>
+    <text class="mono" x="788" y="5456" xml:space="preserve">    {</text>
+    <text class="mono" x="788" y="5474" xml:space="preserve">      "id": "img-MOD-05-1",</text>
+    <text class="mono" x="788" y="5492" xml:space="preserve">      "url": "/catalogo/vitrine/MOD-05/imagens/img-MOD-05-1",</text>
+    <text class="mono" x="788" y="5510" xml:space="preserve">      "legenda": "Primeira imagem"</text>
+    <text class="mono" x="788" y="5528" xml:space="preserve">    }</text>
+    <text class="mono" x="788" y="5546" xml:space="preserve">  ],</text>
+    <text class="mono" x="788" y="5564" xml:space="preserve">  "passos": [</text>
+    <text class="mono" x="788" y="5582" xml:space="preserve">    "Primeiro passo",</text>
+    <text class="mono" x="788" y="5600" xml:space="preserve">    "Segundo passo",</text>
+    <text class="mono" x="788" y="5618" xml:space="preserve">    "Terceiro passo"</text>
+    <text class="mono" x="788" y="5636" xml:space="preserve">  ],</text>
+    <text class="mono" x="788" y="5654" xml:space="preserve">  "quemUsa": [</text>
+    <text class="mono" x="788" y="5672" xml:space="preserve">    {</text>
+    <text class="mono" x="788" y="5690" xml:space="preserve">      "papel": "Configura",</text>
+    <text class="mono" x="788" y="5708" xml:space="preserve">      "texto": "Quem prepara o módulo"</text>
+    <text class="mono" x="788" y="5726" xml:space="preserve">    }</text>
+    <text class="mono" x="788" y="5744" xml:space="preserve">  ],</text>
+    <text class="mono" x="788" y="5762" xml:space="preserve">  "modeloCobranca": "POR_PARTICIPANTE",</text>
+    <text class="mono" x="788" y="5780" xml:space="preserve">  "valorPorParticipante": 4.90,</text>
+    <text class="mono" x="788" y="5798" xml:space="preserve">  "valorPorStaff": null,</text>
+    <text class="mono" x="788" y="5816" xml:space="preserve">  "podeIncluir": true</text>
+    <text class="mono" x="788" y="5834" xml:space="preserve">}</text>
+    <rect class="node-red" x="736" y="5846" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="5860" text-anchor="middle">404</text>
+    <text class="mono" x="788" y="5860">FORA_DA_VITRINE · vitrine incompleta, sem preço ou não contratável</text>
+  </g>
+  <g id="ep-post-catalogo-vitrine-id-simulacao">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="5350" width="632" height="564" rx="10"/></g>
+    <rect class="node-blue" x="56" y="5366" width="50" height="24" rx="6"/><text class="label-strong" x="81.0" y="5383" text-anchor="middle">POST</text>
+    <text class="label-strong" x="118" y="5383">/catalogo/vitrine/{id}/simulacao</text>
+    <rect class="node-external" x="572" y="5366" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="5382" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="40" y1="5406" x2="672" y2="5406"/><text class="boundary-label" x="56" y="5428">USO</text>
+    <text class="label" x="56" y="5452">Para quê: calcular o custo na calculadora do detalhe</text>
+    <text class="label" x="56" y="5470">Quem usa: conta master, autônomo e staff da conta</text>
+    <text class="label" x="56" y="5488">Login: sim, token de acesso da conta</text>
+    <text class="muted" x="56" y="5506">Requisitos: RF-166 · RN-192 · RN-196 · RN-201 · RNF-210</text>
+    <line class="divider" x1="40" y1="5526" x2="672" y2="5526"/><text class="boundary-label" x="56" y="5548">PEDIDO</text>
+    <text class="mono" x="56" y="5572">Authorization: Bearer &lt;token&gt;</text>
+    <text class="mono" x="56" y="5590" xml:space="preserve">{</text>
+    <text class="mono" x="56" y="5608" xml:space="preserve">  "staff": 0,</text>
+    <text class="mono" x="56" y="5626" xml:space="preserve">  "participantes": 30</text>
+    <text class="mono" x="56" y="5644" xml:space="preserve">}</text>
+    <text class="muted" x="56" y="5662">o mesmo cálculo do fechamento, com o preço que vale hoje; nada é salvo</text>
+    <line class="divider" x1="40" y1="5682" x2="672" y2="5682"/><text class="boundary-label" x="56" y="5704">RESPOSTAS</text>
+    <rect class="chip" x="56" y="5706" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5720" text-anchor="middle">200</text>
+    <text class="mono" x="108" y="5720" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="5738" xml:space="preserve">  "totalMes": 147.00,</text>
+    <text class="mono" x="108" y="5756" xml:space="preserve">  "total12Meses": 1764.00,</text>
+    <text class="mono" x="108" y="5774" xml:space="preserve">  "totalPlanoAnual": 1499.40</text>
+    <text class="mono" x="108" y="5792" xml:space="preserve">}</text>
+    <rect class="node-red" x="56" y="5804" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5818" text-anchor="middle">404</text>
+    <text class="mono" x="108" y="5818">FORA_DA_VITRINE · vitrine incompleta, sem preço ou não contratável</text>
+    <rect class="node-red" x="56" y="5830" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5844" text-anchor="middle">422</text>
+    <text class="mono" x="108" y="5844">DADOS_INVALIDOS · número negativo ou faltando</text>
+    <text class="mono" x="108" y="5862" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="5880" xml:space="preserve">  "campo": "participantes"</text>
+    <text class="mono" x="108" y="5898" xml:space="preserve">}</text>
+  </g>
+  <g id="ep-post-catalogo-vitrine-id-contratacao">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="5924" width="632" height="670" rx="10"/></g>
+    <rect class="node-blue" x="736" y="5940" width="50" height="24" rx="6"/><text class="label-strong" x="761.0" y="5957" text-anchor="middle">POST</text>
+    <text class="label-strong" x="798" y="5957">/catalogo/vitrine/{id}/contratacao</text>
+    <rect class="node-external" x="1252" y="5940" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="5956" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="720" y1="5980" x2="1352" y2="5980"/><text class="boundary-label" x="736" y="6002">USO</text>
+    <text class="label" x="736" y="6026">Para quê: incluir o módulo na conta, em Incluir na conta</text>
+    <text class="label" x="736" y="6044">Quem usa: só a conta master ou o autônomo</text>
+    <text class="label" x="736" y="6062">Login: sim, token de acesso da conta</text>
+    <text class="muted" x="736" y="6080">Requisitos: RF-167 · RN-195 · RN-201 · RN-259 · 08 RN-76</text>
+    <line class="divider" x1="720" y1="6100" x2="1352" y2="6100"/><text class="boundary-label" x="736" y="6122">PEDIDO</text>
+    <text class="mono" x="736" y="6146">Authorization: Bearer &lt;token&gt;</text>
+    <text class="mono" x="736" y="6164" xml:space="preserve">{</text>
+    <text class="mono" x="736" y="6182" xml:space="preserve">  "plano": "MENSAL"</text>
+    <text class="mono" x="736" y="6200" xml:space="preserve">}</text>
+    <text class="muted" x="736" y="6218">plano: MENSAL ou ANUAL (12 meses); entra na cobrança deste mês</text>
+    <text class="muted" x="736" y="6236">uma contratação ativa por módulo; o módulo sai de A contratar</text>
+    <line class="divider" x1="720" y1="6256" x2="1352" y2="6256"/><text class="boundary-label" x="736" y="6278">RESPOSTAS</text>
+    <rect class="chip" x="736" y="6280" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="6294" text-anchor="middle">201</text>
+    <text class="mono" x="788" y="6294" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="6312" xml:space="preserve">  "id": "ctr-ebfga-MOD-05",</text>
+    <text class="mono" x="788" y="6330" xml:space="preserve">  "contaId": "conta-ebfga",</text>
+    <text class="mono" x="788" y="6348" xml:space="preserve">  "moduloId": "MOD-05",</text>
+    <text class="mono" x="788" y="6366" xml:space="preserve">  "plano": "MENSAL",</text>
+    <text class="mono" x="788" y="6384" xml:space="preserve">  "desde": "2026-11-03",</text>
+    <text class="mono" x="788" y="6402" xml:space="preserve">  "ate": null</text>
+    <text class="mono" x="788" y="6420" xml:space="preserve">}</text>
+    <rect class="node-red" x="736" y="6432" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="6446" text-anchor="middle">403</text>
+    <text class="mono" x="788" y="6446">ACESSO_NEGADO · staff da conta (08 RN-77)</text>
+    <rect class="node-red" x="736" y="6458" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="6472" text-anchor="middle">404</text>
+    <text class="mono" x="788" y="6472">FORA_DA_VITRINE · vitrine incompleta, sem preço ou não contratável</text>
+    <rect class="node-red" x="736" y="6484" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="6498" text-anchor="middle">409</text>
+    <text class="mono" x="788" y="6498">JA_CONTRATADO · módulo já na conta (RN-259)</text>
+    <rect class="node-red" x="736" y="6510" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="6524" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="6524">DADOS_INVALIDOS · plano fora da lista</text>
+    <text class="mono" x="788" y="6542" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="6560" xml:space="preserve">  "campo": "plano"</text>
+    <text class="mono" x="788" y="6578" xml:space="preserve">}</text>
+  </g>
+  <g id="ep-get-catalogo-modulos-id-vitrine">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="5962" width="632" height="798" rx="10"/></g>
+    <rect class="node-green" x="56" y="5978" width="41" height="24" rx="6"/><text class="label-strong" x="76.5" y="5995" text-anchor="middle">GET</text>
+    <text class="label-strong" x="109" y="5995">/catalogo/modulos/{id}/vitrine</text>
+    <rect class="node-external" x="572" y="5978" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="5994" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="40" y1="6018" x2="672" y2="6018"/><text class="boundary-label" x="56" y="6040">USO</text>
+    <text class="label" x="56" y="6064">Para quê: abrir a aba Vitrine do módulo</text>
+    <text class="label" x="56" y="6082">Quem usa: administrador e membros do time</text>
+    <text class="label" x="56" y="6100">Login: sim, token de acesso; exige MOD-14 · U</text>
+    <text class="muted" x="56" y="6118">Requisitos: RF-168 · RN-258</text>
+    <line class="divider" x1="40" y1="6138" x2="672" y2="6138"/><text class="boundary-label" x="56" y="6160">PEDIDO</text>
+    <text class="mono" x="56" y="6184" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+    <text class="muted" x="56" y="6202">completa: false quando falta preço, frase, descrição, imagem, passo ou papel</text>
+    <line class="divider" x1="40" y1="6222" x2="672" y2="6222"/><text class="boundary-label" x="56" y="6244">RESPOSTAS</text>
+    <rect class="chip" x="56" y="6246" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="6260" text-anchor="middle">200</text>
+    <text class="mono" x="108" y="6260" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="6278" xml:space="preserve">  "frase": "Frase curta da vitrine.",</text>
+    <text class="mono" x="108" y="6296" xml:space="preserve">  "descricao": "Descrição do módulo na vitrine.",</text>
+    <text class="mono" x="108" y="6314" xml:space="preserve">  "imagens": [</text>
+    <text class="mono" x="108" y="6332" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="6350" xml:space="preserve">      "id": "img-MOD-05-1",</text>
+    <text class="mono" x="108" y="6368" xml:space="preserve">      "url": "/catalogo/vitrine/MOD-05/imagens/img-MOD-05-1",</text>
+    <text class="mono" x="108" y="6386" xml:space="preserve">      "legenda": "Primeira imagem"</text>
+    <text class="mono" x="108" y="6404" xml:space="preserve">    }</text>
+    <text class="mono" x="108" y="6422" xml:space="preserve">  ],</text>
+    <text class="mono" x="108" y="6440" xml:space="preserve">  "passos": [</text>
+    <text class="mono" x="108" y="6458" xml:space="preserve">    "Primeiro passo",</text>
+    <text class="mono" x="108" y="6476" xml:space="preserve">    "Segundo passo",</text>
+    <text class="mono" x="108" y="6494" xml:space="preserve">    "Terceiro passo"</text>
+    <text class="mono" x="108" y="6512" xml:space="preserve">  ],</text>
+    <text class="mono" x="108" y="6530" xml:space="preserve">  "quemUsa": [</text>
+    <text class="mono" x="108" y="6548" xml:space="preserve">    {</text>
+    <text class="mono" x="108" y="6566" xml:space="preserve">      "papel": "Configura",</text>
+    <text class="mono" x="108" y="6584" xml:space="preserve">      "texto": "Quem prepara o módulo"</text>
+    <text class="mono" x="108" y="6602" xml:space="preserve">    }</text>
+    <text class="mono" x="108" y="6620" xml:space="preserve">  ],</text>
+    <text class="mono" x="108" y="6638" xml:space="preserve">  "completa": true,</text>
+    <text class="mono" x="108" y="6656" xml:space="preserve">  "salvaEm": "2026-11-02T14:20:00Z",</text>
+    <text class="mono" x="108" y="6674" xml:space="preserve">  "salvaPor": "usr-dboaz-admin"</text>
+    <text class="mono" x="108" y="6692" xml:space="preserve">}</text>
+    <rect class="node-red" x="56" y="6704" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="6718" text-anchor="middle">403</text>
+    <text class="mono" x="108" y="6718">ACESSO_NEGADO · fora do time deboaz ou sem o Catálogo (MOD-14 · U)</text>
+    <rect class="node-red" x="56" y="6730" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="6744" text-anchor="middle">404</text>
+    <text class="mono" x="108" y="6744">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+  </g>
+  <g id="ep-put-catalogo-modulos-id-vitrine">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="6642" width="632" height="788" rx="10"/></g>
+    <rect class="node-blue" x="736" y="6658" width="41" height="24" rx="6"/><text class="label-strong" x="756.5" y="6675" text-anchor="middle">PUT</text>
+    <text class="label-strong" x="789" y="6675">/catalogo/modulos/{id}/vitrine</text>
+    <rect class="node-external" x="1252" y="6658" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="6674" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="720" y1="6698" x2="1352" y2="6698"/><text class="boundary-label" x="736" y="6720">USO</text>
+    <text class="label" x="736" y="6744">Para quê: salvar a vitrine do módulo contratável</text>
+    <text class="label" x="736" y="6762">Quem usa: só o administrador do deboaz, em Salvar vitrine</text>
+    <text class="label" x="736" y="6780">Login: sim, token de acesso; exige o papel ADMINISTRADOR</text>
+    <text class="muted" x="736" y="6798">Requisitos: RF-168 · RN-191 · RN-258</text>
+    <line class="divider" x1="720" y1="6818" x2="1352" y2="6818"/><text class="boundary-label" x="736" y="6840">PEDIDO</text>
+    <text class="mono" x="736" y="6864">Authorization: Bearer &lt;token&gt;</text>
+    <text class="mono" x="736" y="6882" xml:space="preserve">{</text>
+    <text class="mono" x="736" y="6900" xml:space="preserve">  "frase": "Frase curta da vitrine.",</text>
+    <text class="mono" x="736" y="6918" xml:space="preserve">  "descricao": "Descrição do módulo na vitrine.",</text>
+    <text class="mono" x="736" y="6936" xml:space="preserve">  "imagens": [</text>
+    <text class="mono" x="736" y="6954" xml:space="preserve">    "img-MOD-05-1"</text>
+    <text class="mono" x="736" y="6972" xml:space="preserve">  ],</text>
+    <text class="mono" x="736" y="6990" xml:space="preserve">  "passos": [</text>
+    <text class="mono" x="736" y="7008" xml:space="preserve">    "Primeiro passo",</text>
+    <text class="mono" x="736" y="7026" xml:space="preserve">    "Segundo passo",</text>
+    <text class="mono" x="736" y="7044" xml:space="preserve">    "Terceiro passo"</text>
+    <text class="mono" x="736" y="7062" xml:space="preserve">  ],</text>
+    <text class="mono" x="736" y="7080" xml:space="preserve">  "quemUsa": [</text>
+    <text class="mono" x="736" y="7098" xml:space="preserve">    {</text>
+    <text class="mono" x="736" y="7116" xml:space="preserve">      "papel": "Configura",</text>
+    <text class="mono" x="736" y="7134" xml:space="preserve">      "texto": "Quem prepara o módulo"</text>
+    <text class="mono" x="736" y="7152" xml:space="preserve">    }</text>
+    <text class="mono" x="736" y="7170" xml:space="preserve">  ]</text>
+    <text class="mono" x="736" y="7188" xml:space="preserve">}</text>
+    <text class="muted" x="736" y="7206">imagens: ids enviados antes, na ordem; até 5 imagens, 5 passos e 4 papéis</text>
+    <text class="muted" x="736" y="7224">incompleta: completa false, fora de A contratar · frase e descrição: até 500</text>
+    <line class="divider" x1="720" y1="7244" x2="1352" y2="7244"/><text class="boundary-label" x="736" y="7266">RESPOSTAS</text>
+    <rect class="chip" x="736" y="7268" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="7282" text-anchor="middle">200</text>
+    <text class="muted" x="788" y="7282">a vitrine, como no GET, com completa, salvaEm e salvaPor</text>
+    <rect class="node-red" x="736" y="7294" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="7308" text-anchor="middle">403</text>
+    <text class="mono" x="788" y="7308">ACESSO_NEGADO · só o administrador do deboaz salva (RN-191)</text>
+    <rect class="node-red" x="736" y="7320" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="7334" text-anchor="middle">404</text>
+    <text class="mono" x="788" y="7334">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+    <rect class="node-red" x="736" y="7346" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="7360" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="7360">DADOS_INVALIDOS · acima do limite (RN-258)</text>
+    <text class="mono" x="788" y="7378" xml:space="preserve">{</text>
+    <text class="mono" x="788" y="7396" xml:space="preserve">  "campo": "imagens"</text>
+    <text class="mono" x="788" y="7414" xml:space="preserve">}</text>
+  </g>
+  <g id="ep-post-catalogo-modulos-id-vitrine-imagens">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="6808" width="632" height="608" rx="10"/></g>
+    <rect class="node-blue" x="56" y="6824" width="50" height="24" rx="6"/><text class="label-strong" x="81.0" y="6841" text-anchor="middle">POST</text>
+    <text class="label-strong" x="118" y="6841">/catalogo/modulos/{id}/vitrine/imagens</text>
+    <rect class="node-external" x="572" y="6824" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="6840" text-anchor="middle">COM LOGIN</text>
+    <line class="divider" x1="40" y1="6864" x2="672" y2="6864"/><text class="boundary-label" x="56" y="6886">USO</text>
+    <text class="label" x="56" y="6910">Para quê: enviar uma imagem da vitrine</text>
+    <text class="label" x="56" y="6928">Quem usa: só o administrador do deboaz, na aba Vitrine</text>
+    <text class="label" x="56" y="6946">Login: sim, token de acesso; exige o papel ADMINISTRADOR</text>
+    <text class="muted" x="56" y="6964">Requisitos: RF-168 · RN-191 · 15 RN-260</text>
+    <line class="divider" x1="40" y1="6984" x2="672" y2="6984"/><text class="boundary-label" x="56" y="7006">PEDIDO</text>
+    <text class="mono" x="56" y="7030" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+    <text class="mono" x="56" y="7048" xml:space="preserve">Content-Type: application/json</text>
+    <text class="mono" x="56" y="7066" xml:space="preserve">{</text>
+    <text class="mono" x="56" y="7084" xml:space="preserve">  "svg": "&lt;svg xmlns=\"http://www.w3.org/2000/svg\"&gt;…&lt;/svg&gt;"</text>
+    <text class="mono" x="56" y="7102" xml:space="preserve">}</text>
+    <text class="muted" x="56" y="7120">svg: a imagem convertida em SVG na aba Vitrine, como texto (15 RN-260)</text>
+    <text class="muted" x="56" y="7138">a imagem só entra na vitrine quando o id vai no PUT</text>
+    <line class="divider" x1="40" y1="7158" x2="672" y2="7158"/><text class="boundary-label" x="56" y="7180">RESPOSTAS</text>
+    <rect class="chip" x="56" y="7192" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="7206" text-anchor="middle">201</text>
+    <text class="mono" x="108" y="7206" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="7224" xml:space="preserve">  "id": "img-MOD-05-1",</text>
+    <text class="mono" x="108" y="7242" xml:space="preserve">  "url": "/catalogo/vitrine/MOD-05/imagens/img-MOD-05-1"</text>
+    <text class="mono" x="108" y="7260" xml:space="preserve">}</text>
+    <rect class="node-red" x="56" y="7272" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="7286" text-anchor="middle">403</text>
+    <text class="mono" x="108" y="7286">ACESSO_NEGADO · só o administrador do deboaz salva (RN-191)</text>
+    <rect class="node-red" x="56" y="7298" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="7312" text-anchor="middle">404</text>
+    <text class="mono" x="108" y="7312">MODULO_INEXISTENTE · id fora do registro de módulos</text>
+    <rect class="node-red" x="56" y="7324" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="7338" text-anchor="middle">422</text>
+    <text class="mono" x="108" y="7338">DADOS_INVALIDOS · "svg" não é um SVG</text>
+    <text class="mono" x="108" y="7356" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="7374" xml:space="preserve">  "campo": "svg"</text>
+    <text class="mono" x="108" y="7392" xml:space="preserve">}</text>
+  </g>
+  </g>
+  <g id="marca-rodape" transform="translate(0,7472)">
+    <rect class="wm-band" x="0" y="0" width="1392" height="142"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="1392" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">POST e PUT</text>
+    <rect class="node-green" x="152" y="47" width="14" height="14" rx="3"/><text class="label" x="174" y="58">GET</text>
+    <rect class="node-external" x="221" y="47" width="14" height="14" rx="3"/><text class="label" x="243" y="58">com login: token de acesso</text>
+    <rect class="node-red" x="442" y="47" width="14" height="14" rx="3"/><text class="label" x="464" y="58">resposta de erro (4xx)</text>
+    <rect class="chip" x="637" y="47" width="14" height="14" rx="3"/><text class="label" x="659" y="58">resposta de sucesso</text>
+    <rect class="node" x="812" y="47" width="14" height="14" rx="3"/><text class="label" x="834" y="58">endereço e regra comum</text>
+    <line class="divider" x1="40" y1="88" x2="1352" y2="88"/>
+    <text class="footer" x="40" y="116">v04 · imagem da vitrine enviada em SVG como texto (15 RN-260) e frase e descrição com até 500 caracteres</text>
+    <text class="wm-file" x="1352" y="116" text-anchor="end">catalogo-contrato-api_v04_20261103-2202.svg</text>
+  </g>
+</svg>
