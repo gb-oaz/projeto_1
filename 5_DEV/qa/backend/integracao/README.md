@@ -12,7 +12,7 @@ Ferramentas: **Reqnroll** (Gherkin em português) sobre **xUnit** e o
 ## 1. Como o Reqnroll funciona, em 4 passos
 
 ```
-requisito (.html)  ──copiar-cenarios.py──►  autenticacao.feature   (Gherkin)
+requisito (.md)    ──copiar-cenarios.py──►  autenticacao.feature   (Gherkin)
                                                   │  dotnet build
                                                   ▼
                                           autenticacao.feature.cs  (gerado, não vai para o git)
@@ -67,13 +67,13 @@ integracao/
 │   ├── Jwt.cs                      lê e assina tokens
 │   ├── Estado.cs                   limpa e prepara o banco e o cache
 │   └── Ganchos.cs                  antes de cada cenário: limpa tudo
-├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.html
+├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.md
 │   ├── autenticacao.feature
 │   └── AutenticacaoPassos.cs
-├── commons/autorizacao/            17_modulo-usuario-b-autorizacao.html
+├── commons/autorizacao/            17_modulo-usuario-b-autorizacao.md
 │   ├── autorizacao.feature
 │   └── AutorizacaoPassos.cs
-└── hub/usuarios/                   17_modulo-usuario.html (contas, staff, participantes, time)
+└── hub/usuarios/                   17_modulo-usuario.md (contas, staff, participantes, time)
     ├── usuarios.feature
     └── UsuariosPassos.cs
 ```
@@ -87,7 +87,7 @@ A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
 
 ```bash
 python3 5_DEV/qa/backend/integracao/scripts/copiar-cenarios.py \
-  1_Requisitos/17_modulo-usuario-a-autenticacao.html \
+  1_Requisitos/17_modulo-usuario-a-autenticacao.md \
   5_DEV/qa/backend/integracao/commons/autenticacao/autenticacao.feature \
   Autenticação
 ```
@@ -99,9 +99,9 @@ Os outros requisitos, do mesmo jeito:
 
 | Requisito | `.feature` | Funcionalidade |
 |---|---|---|
-| `17_modulo-usuario-a-autenticacao.html` | `commons/autenticacao/autenticacao.feature` | `Autenticação` |
-| `17_modulo-usuario-b-autorizacao.html` | `commons/autorizacao/autorizacao.feature` | `Autorização` |
-| `17_modulo-usuario.html` | `hub/usuarios/usuarios.feature` | `Usuários` |
+| `17_modulo-usuario-a-autenticacao.md` | `commons/autenticacao/autenticacao.feature` | `Autenticação` |
+| `17_modulo-usuario-b-autorizacao.md` | `commons/autorizacao/autorizacao.feature` | `Autorização` |
+| `17_modulo-usuario.md` | `hub/usuarios/usuarios.feature` | `Usuários` |
 
 Dois cenários com o mesmo nome no requisito: o segundo ganha o ID no fim
 (`nome curto repetido · RF-153`), porque o Reqnroll não aceita nome repetido.

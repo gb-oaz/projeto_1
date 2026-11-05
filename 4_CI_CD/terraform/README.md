@@ -1,7 +1,7 @@
 # Terraform · Azure
 
 Infraestrutura dos ambientes de homologação (`hml`) e produção (`prd`), conforme
-[`1_Requisitos/05_cd-implantacao.html`](../../1_Requisitos/05_cd-implantacao.html).
+[`1_Requisitos/05_cd-implantacao.md`](../../1_Requisitos/05_cd-implantacao.md).
 Diagramas em `3_Arquitetura/implantacao-hml_*`, `implantacao-prd_*` e `pipeline-cd_*`.
 
 ```

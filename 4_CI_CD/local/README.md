@@ -4,7 +4,7 @@ Repete na sua máquina o CI do GitHub Actions
 ([`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)) antes do push e,
 depois, sobe as aplicações em contêiner e roda o qa contra elas. Se passar aqui,
 a mesma mudança deve passar no GitHub Actions. Requisito:
-[`03_ci-qualidade`](../../1_Requisitos/03_ci-qualidade.html) (RNF-160 a RNF-166,
+[`03_ci-qualidade`](../../1_Requisitos/03_ci-qualidade.md) (RNF-160 a RNF-166,
 RN-140 a RN-142).
 
 ```bash
@@ -83,7 +83,7 @@ As mesmas do `ci.yml` (cabeçalho do arquivo), mais:
 - as imagens escutam na porta **8080** e respondem **200 em `/health`** (as
   mesmas da homologação e da produção, `terraform/infra/aplicacoes.tf`);
 - cada suíte de qa segue o contrato de
-  [`14_estrutura-projetos`](../../1_Requisitos/14_estrutura-projetos.html)
+  [`14_estrutura-projetos`](../../1_Requisitos/14_estrutura-projetos.md)
   (RNF-191): `Dockerfile` na raiz da pasta da suíte, alvo em `API_URL`,
   `APP_URL` e `APP`, JUnit XML em `/resultados` e código de saída 0 só se
   tudo passou; suíte sem `Dockerfile` é pulada com aviso; o funcional do

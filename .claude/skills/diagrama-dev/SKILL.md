@@ -83,7 +83,7 @@ Se o `boaz.sh` não estiver disponível, calcule pela regra acima.
 ## Fluxo
 
 **Diagrama novo**
-1. Leia os documentos relevantes de `1_Requisitos/` (`.html`) e rode `./boaz.sh diagramas` para reaproveitar nomes e evitar duplicatas.
+1. Leia os documentos relevantes de `1_Requisitos/` (`.md`) e rode `./boaz.sh diagramas` para reaproveitar nomes e evitar duplicatas.
 2. Se a ambiguidade mudar o desenho, faça no máximo 1–2 perguntas; caso contrário, assuma e declare as premissas na resposta.
 3. Escolha a legenda, gere o caminho e escreva o SVG.
 
@@ -91,7 +91,7 @@ Se o `boaz.sh` não estiver disponível, calcule pela regra acima.
 1. Identifique a legenda e abra a **maior versão** (`ls 2_Diagramas/<legenda>_v*`).
 2. Aplique só a mudança pedida, preservando layout, ids e o restante do desenho.
 3. Salve como a próxima versão (`./boaz.sh svg 2_Diagramas <legenda>`).
-4. Rode `grep -rn "<legenda>_v" 1_Requisitos` e, se houver referências à versão anterior, pergunte se devem apontar para a nova. Não altere sem confirmação; confirmado, troque o caminho no `src`/`href` e na legenda da `<figure class="diagrama">`, e cada documento alterado ganha uma versão nova (marca d'água e histórico, como na skill `requisito`).
+4. Rode `grep -rn "<legenda>_v" 1_Requisitos` e, se houver referências à versão anterior, pergunte se devem apontar para a nova. Não altere sem confirmação; confirmado, troque o caminho na legenda e nos dois links da imagem (`[![…](…)](…)`), e cada documento alterado ganha uma versão nova (front matter, carimbo, histórico e rodapé, como na skill `requisito`).
 
 ## Assets (`0_Assets/`)
 
@@ -106,7 +106,7 @@ Antes de desenhar, rode `ls 0_Assets/projeto 0_Assets/diagramas` e reaproveite o
 
 ## Vista de tela
 
-A vista é o desenho de uma tela antes do código (`1_Requisitos/06_design-system-telas.html`, RN-27, RN-33, RNF-102 a RNF-105). Vale tudo desta skill (versionamento, marca d'água, revisão), com estas diferenças:
+A vista é o desenho de uma tela antes do código (`1_Requisitos/06_design-system-telas.md`, RN-27, RN-33, RNF-102 a RNF-105). Vale tudo desta skill (versionamento, marca d'água, revisão), com estas diferenças:
 
 - **Nome**: uma vista por plataforma, `vista-<aplicacao>-<tela>-<web|pwa|mobile>` (ex.: `vista-hub-inicio-web`), em `2_Diagramas/`; no documento, a seção Telas as agrupa em Web, PWA e Mobile.
 - **Quadro × tela**: o quadro (fundo, marca d'água, legenda, anotações) segue o tema dos diagramas; **dentro das molduras das telas** vale o design system de `0_Assets/design/`, não o tema dos diagramas. Lá dentro, cores e medidas literais são permitidas, mas só as do design system:
@@ -170,11 +170,10 @@ Se o arquivo não existir, rode `./boaz.sh init` para recriá-lo.
 
 ## Resposta
 
-Responda curto: caminho do arquivo criado, premissas assumidas (se houver) e o trecho para referenciar no requisito (`.html`, componente **Diagramas** de `0_Assets/requisitos/tema.html`):
+Responda curto: caminho do arquivo criado, premissas assumidas (se houver) e o trecho para referenciar no requisito (`.md`, componente **Diagramas e telas** de `0_Assets/requisitos/tema.md`):
 
-```html
-<figure class="diagrama">
-  <a href="../2_Diagramas/<arquivo>.svg"><img src="../2_Diagramas/<arquivo>.svg" alt="<o que o diagrama mostra>"></a>
-  <figcaption><strong><Título></strong><code>2_Diagramas/<arquivo>.svg</code></figcaption>
-</figure>
+```markdown
+**<Título>** — `2_Diagramas/<arquivo>.svg`
+
+[![<o que o diagrama mostra>](../2_Diagramas/<arquivo>.svg)](../2_Diagramas/<arquivo>.svg)
 ```

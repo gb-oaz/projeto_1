@@ -1,6 +1,6 @@
 # =============================================================================
 # CD · implantação num ambiente — chamado por cd.yml
-# Requisito 1_Requisitos/05_cd-implantacao.html: RNF-48 a RNF-54, RN-21
+# Requisito 1_Requisitos/05_cd-implantacao.md: RNF-48 a RNF-54, RN-21
 #
 #   terraform plan → issue de aprovação → terraform apply → verificação
 #

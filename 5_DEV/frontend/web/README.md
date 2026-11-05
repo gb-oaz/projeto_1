@@ -2,7 +2,7 @@
 
 Um único projeto Vite com três apps, `landing_page`, `hub` e `quest`, na
 estrutura hexagonal de
-[`14_estrutura-projetos`](../../../1_Requisitos/14_estrutura-projetos.html)
+[`14_estrutura-projetos`](../../../1_Requisitos/14_estrutura-projetos.md)
 (RN-143 a RN-149, RNF-179 a RNF-182, RNF-193).
 
 ```

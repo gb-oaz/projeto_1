@@ -1,7 +1,7 @@
 # backend
 
 Um único serviço, `ms_mono`, com a estrutura hexagonal de
-[`14_estrutura-projetos`](../../1_Requisitos/14_estrutura-projetos.html)
+[`14_estrutura-projetos`](../../1_Requisitos/14_estrutura-projetos.md)
 (RN-143 a RN-149, RNF-175 a RNF-178).
 
 ```

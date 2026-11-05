@@ -19,7 +19,7 @@
 //   sp.animada('quest', { largura: 900, altura: 1600, cores, momento: 'primeiro-acesso', movimentoReduzido });
 //   sp.nativa('hub', { largura: 900, altura: 1600, fundo: '#000000', cor: '#FFFFFF' });
 //   sp.icone('hub', { cor: '#FFFFFF' });   // ícone da splash do Android 12+ (área segura de 2/3)
-// Regras de uso: 1_Requisitos/90_identidade-visual.html e o catálogo design-system.html#splash.
+// Regras de uso: 1_Requisitos/90_identidade-visual.md e o catálogo design-system.html#splash.
 // =============================================================================
 
 /** Frentes com splash: variação do símbolo e mascote da abertura de sempre (null = só o logo). */

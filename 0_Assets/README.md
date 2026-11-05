@@ -6,7 +6,7 @@ Recursos reutilizáveis do projeto e dos diagramas.
 0_Assets/
 ├── design/       # identidade visual e design system (Material Design 3): marca, tokens, componentes
 ├── projeto/      # material do projeto que não é identidade: mockups, capturas, referências
-├── requisitos/   # tema.html: marca d'água, estilo, formato e componentes dos documentos de requisito
+├── requisitos/   # tema.md (formato e componentes), requisito.mjs (HTML/PDF e conferência) e casca.html (visual do PDF)
 └── diagramas/    # tema.svg (estilo padrão), ícones de cloud/tecnologias, logos de integrações
 ```
 
@@ -19,10 +19,10 @@ Recursos reutilizáveis do projeto e dos diagramas.
   gerado (o diagrama continua autocontido e renderiza em qualquer lugar).
 - `diagramas/tema.svg` define o visual de todos os diagramas: edite-o para mudar
   cores e tipografia dos próximos diagramas (os antigos não mudam).
-- `requisitos/tema.html` define o padrão dos documentos de `1_Requisitos/` (marca
-  d'água, estilo, formato e componentes). Abra-o no navegador para ver o catálogo;
-  para mudar o visual use a skill `/requisito-estilo` — cada documento adota o
-  tema novo quando for atualizado por ela.
+- `requisitos/tema.md` define o padrão dos documentos `.md` de `1_Requisitos/` (marca
+  d'água, formato e catálogo de componentes); `requisitos/requisito.mjs` gera o HTML
+  do PDF com o visual de `requisitos/casca.html` e confere os documentos. Para mudar
+  formato ou visual use a skill `/requisito-estilo`.
 - `design/` é a identidade visual do produto: cores, tipografia, logos, ícones,
   imagens, animações, tokens e componentes (Material Design 3) para web e
   mobile. Abra `design/design-system.html`; para mudar, use a skill

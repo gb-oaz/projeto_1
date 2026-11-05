@@ -87,7 +87,7 @@ Se o `boaz.sh` não estiver disponível, calcule pela regra acima.
 ## Fluxo
 
 **Diagrama novo**
-1. Leia os documentos relevantes de `1_Requisitos/` (`.html`) e rode `./boaz.sh diagramas` para reaproveitar nomes e evitar duplicatas.
+1. Leia os documentos relevantes de `1_Requisitos/` (`.md`) e rode `./boaz.sh diagramas` para reaproveitar nomes e evitar duplicatas.
 2. Se a ambiguidade mudar o desenho, faça no máximo 1–2 perguntas; caso contrário, assuma e declare as premissas na resposta.
 3. Escolha a legenda, gere o caminho e escreva o SVG.
 
@@ -95,7 +95,7 @@ Se o `boaz.sh` não estiver disponível, calcule pela regra acima.
 1. Identifique a legenda e abra a **maior versão** (`ls 3_Arquitetura/<legenda>_v*`).
 2. Aplique só a mudança pedida, preservando layout, ids e o restante do desenho.
 3. Salve como a próxima versão (`./boaz.sh svg 3_Arquitetura <legenda>`).
-4. Rode `grep -rn "<legenda>_v" 1_Requisitos` e, se houver referências à versão anterior, pergunte se devem apontar para a nova. Não altere sem confirmação; confirmado, troque o caminho no `src`/`href` e na legenda da `<figure class="diagrama">`, e cada documento alterado ganha uma versão nova (marca d'água e histórico, como na skill `requisito`).
+4. Rode `grep -rn "<legenda>_v" 1_Requisitos` e, se houver referências à versão anterior, pergunte se devem apontar para a nova. Não altere sem confirmação; confirmado, troque o caminho na legenda e nos dois links da imagem (`[![…](…)](…)`), e cada documento alterado ganha uma versão nova (front matter, carimbo, histórico e rodapé, como na skill `requisito`).
 
 ## Assets (`0_Assets/`)
 
@@ -157,11 +157,10 @@ Se o arquivo não existir, rode `./boaz.sh init` para recriá-lo.
 
 ## Resposta
 
-Responda curto: caminho do arquivo criado, premissas assumidas (se houver) e o trecho para referenciar no requisito (`.html`, componente **Diagramas** de `0_Assets/requisitos/tema.html`):
+Responda curto: caminho do arquivo criado, premissas assumidas (se houver) e o trecho para referenciar no requisito (`.md`, componente **Diagramas e telas** de `0_Assets/requisitos/tema.md`):
 
-```html
-<figure class="diagrama">
-  <a href="../3_Arquitetura/<arquivo>.svg"><img src="../3_Arquitetura/<arquivo>.svg" alt="<o que o diagrama mostra>"></a>
-  <figcaption><strong><Título></strong><code>3_Arquitetura/<arquivo>.svg</code></figcaption>
-</figure>
+```markdown
+**<Título>** — `3_Arquitetura/<arquivo>.svg`
+
+[![<o que o diagrama mostra>](../3_Arquitetura/<arquivo>.svg)](../3_Arquitetura/<arquivo>.svg)
 ```

@@ -6,7 +6,7 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 
 namespace Boaz.Qa.Integracao.Commons.Autorizacao;
 
-// Passos dos Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.html.
+// Passos dos Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.md.
 // Como os passos casam com as frases: comentário no topo de AutenticacaoPassos.cs
 // e README. Os passos de resposta ("a resposta é 403 ACESSO_NEGADO") e os
 // de sessão já existentes (Autenticação) valem aqui também.

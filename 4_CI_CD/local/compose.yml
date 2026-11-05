@@ -1,5 +1,5 @@
 # =============================================================================
-# CI local — requisito 1_Requisitos/03_ci-qualidade.html (RNF-160 a RNF-166)
+# CI local — requisito 1_Requisitos/03_ci-qualidade.md (RNF-160 a RNF-166)
 # =============================================================================
 #
 # Não rode este arquivo direto: o ponto de partida é ./ci.sh, que descobre os

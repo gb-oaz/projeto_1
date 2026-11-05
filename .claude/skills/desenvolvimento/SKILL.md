@@ -17,17 +17,17 @@ O teste vem antes do código, e o requisito vem antes do teste: **nenhuma linha 
 ## Regras que esta skill aplica
 
 Leia, se ainda não leu nesta conversa, e siga mesmo quando divergirem deste resumo:
-- `1_Requisitos/02_metodologia-git.html` — branch própria a partir da `master` (RN-05), nome `tarefa_<NN>-<descricao>` / `fix_<NN>-<descricao>` (RN-06), entrada na `master` só por PR com squash (RN-07, RNF-42).
-- `1_Requisitos/03_ci-qualidade.html` — o que reprova o build: cobertura ≥ 80 % no backend e na web (RNF-25), `dotnet format` (RNF-15), avisos como erro (RNF-22), ESLint/Prettier/vue-tsc (RNF-17); o qa cobre comportamento visível, o detalhe interno fica nos unitários (RN-142).
-- `1_Requisitos/14_estrutura-projetos.html` — `core/<contexto>/<feature>/` com `domain/`, `usecases/`, `ports/in/`, `ports/out/`; adaptadores em `infra/in|out/<contexto>/<feature>/`; contextos só importam `commons` (RN-143 a RN-149); qa caixa-preta, testes em `<contexto>/<feature>/` citando o ID (RN-151 a RN-156) e contratos das suítes (RNF-190 a RNF-196).
+- `1_Requisitos/02_metodologia-git.md` — branch própria a partir da `master` (RN-05), nome `tarefa_<NN>-<descricao>` / `fix_<NN>-<descricao>` (RN-06), entrada na `master` só por PR com squash (RN-07, RNF-42).
+- `1_Requisitos/03_ci-qualidade.md` — o que reprova o build: cobertura ≥ 80 % no backend e na web (RNF-25), `dotnet format` (RNF-15), avisos como erro (RNF-22), ESLint/Prettier/vue-tsc (RNF-17); o qa cobre comportamento visível, o detalhe interno fica nos unitários (RN-142).
+- `1_Requisitos/14_estrutura-projetos.md` — `core/<contexto>/<feature>/` com `domain/`, `usecases/`, `ports/in/`, `ports/out/`; adaptadores em `infra/in|out/<contexto>/<feature>/`; contextos só importam `commons` (RN-143 a RN-149); qa caixa-preta, testes em `<contexto>/<feature>/` citando o ID (RN-151 a RN-156) e contratos das suítes (RNF-190 a RNF-196).
 - `5_DEV/qa/README.md` e o `README.md` da frente que vai mudar.
-- Tela nova ou alterada: `1_Requisitos/06_design-system-telas.html` e a skill `design-system`.
+- Tela nova ou alterada: `1_Requisitos/06_design-system-telas.md` e a skill `design-system`.
 
 ## 0 · Branch e worktree (sempre primeiro)
 
 A tarefa vive numa branch própria **dentro de um worktree próprio**, para que a cópia principal, a `master` e as outras tarefas em andamento (suas, de outra sessão ou de outra pessoa) nunca fiquem bloqueadas, sujas ou trocadas de branch.
 
-1. **Número e nome.** `<NN>` é o número do documento de requisito da funcionalidade (`08_hub-ux.html` → `08`); se o requisito ainda não existe, é o próximo número livre que a skill `requisito` vai usar (`ls 1_Requisitos`). `<descricao>` em snake_case, curta, sem acento. Funcionalidade → `tarefa_<NN>-<descricao>`; bug → `fix_<NN>-<descricao>`.
+1. **Número e nome.** `<NN>` é o número do documento de requisito da funcionalidade (`08_hub-ux.md` → `08`); se o requisito ainda não existe, é o próximo número livre que a skill `requisito` vai usar (`ls 1_Requisitos`). `<descricao>` em snake_case, curta, sem acento. Funcionalidade → `tarefa_<NN>-<descricao>`; bug → `fix_<NN>-<descricao>`.
 2. **Já existe?** `git worktree list` e `git branch --list 'tarefa_<NN>-*' 'fix_<NN>-*'`. Se a branch da tarefa já existe, continue nela (no worktree dela, ou crie um worktree para ela sem `-b`); não abra uma segunda branch para a mesma tarefa. Na dúvida entre duas branches parecidas, pergunte.
 3. **Criar**, a partir da `master` remota atualizada:
    ```bash
@@ -42,7 +42,7 @@ A tarefa vive numa branch própria **dentro de um worktree próprio**, para que 
 ## 1 · Requisito → `1_Requisitos/`
 
 Use a skill **`requisito`** (dentro do worktree) para criar ou alterar o documento da funcionalidade. Para o TDD, ele precisa ter:
-- um **cenário em Gherkin** (`<article class="criterio" id="RF-…">` + `<pre class="gherkin">`) para cada regra (`RF-…`, `RN-…`, `RNF-…`) que a tarefa vai entregar — é dele que sai o cenário de teste;
+- um **cenário em Gherkin** (âncora `<a id="RF-…"></a>` + `### \`RF-…\` Título` + bloco ` ```gherkin `) para cada regra (`RF-…`, `RN-…`, `RNF-…`) que a tarefa vai entregar — é dele que sai o cenário de teste;
 - os limites mensuráveis (tempo, volume, taxa de erro) se houver teste de carga (RN-155);
 - nenhum item em **Em aberto** que mude o comportamento a testar. Se houver, pergunte antes de seguir; não invente a regra no teste nem no código.
 
@@ -54,7 +54,7 @@ Correção de bug (`fix_…`): se o comportamento esperado já está no requisit
 
 ## 2 · Cenários de teste → `5_DEV/qa/` (vermelho)
 
-**Escolha da suíte** pelo que o critério observa (RN-152, RNF-190). Documento com contrato de API traz os cenários separados: os de `section#cenarios-api` (`id` do ID ou `<ID>-api`) vão para o qa do backend; os de `section#cenarios-tela`, para o funcional da web ou do mobile:
+**Escolha da suíte** pelo que o critério observa (RN-152, RNF-190). Documento com contrato de API traz os cenários separados: os da seção `cenarios-api` (âncora do ID ou `<ID>-api`) vão para o qa do backend; os da seção `cenarios-tela`, para o funcional da web ou do mobile:
 
 | O critério observa… | Suíte |
 |---|---|
@@ -70,7 +70,7 @@ Os testes ficam em `<suite>/<contexto>/<feature>/`, com os nomes do core (`hub/s
 ```bash
 grep -rlsE 'Reqnroll|SpecFlow|cucumber' <suite> --include='*.csproj' --include='package.json' --include='*.config.*' ; find <suite> -name '*.feature' | head
 ```
-- **Tem** → escreva `<suite>/<contexto>/<feature>/<feature>.feature`, em português (`# language: pt`), com `Funcionalidade:` apontando para o documento (`1_Requisitos/<NN>_<nome>.html`) e os `Cenário:`/`Esquema do Cenário:` de cada ID, **copiados do `<pre class="gherkin">` do requisito** (desescape `&lt;` `&gt;` `&amp;`) e marcado com a tag do ID (`@RF-17`). Depois, os *step definitions* na mesma pasta, reaproveitando passos existentes antes de criar novos. Se o texto do requisito não der para automatizar como está, ajuste o requisito (nova versão) em vez de deixar o `.feature` divergir.
+- **Tem** → escreva `<suite>/<contexto>/<feature>/<feature>.feature`, em português (`# language: pt`), com `Funcionalidade:` apontando para o documento (`1_Requisitos/<NN>_<nome>.md`) e os `Cenário:`/`Esquema do Cenário:` de cada ID, **copiados do bloco ` ```gherkin ` do requisito** (texto puro, sem desescapar) e marcado com a tag do ID (`@RF-17`). Depois, os *step definitions* na mesma pasta, reaproveitando passos existentes antes de criar novos. Se o texto do requisito não der para automatizar como está, ajuste o requisito (nova versão) em vez de deixar o `.feature` divergir.
 - **Não tem, mas a suíte está nascendo ou ainda não tem testes** → proponha adotar a ferramenta BDD da linguagem dela (C#/xUnit: Reqnroll com `Reqnroll.xUnit`; Cypress: `@badeball/cypress-cucumber-preprocessor`), na versão estável mais recente e fixada (RN-01, RNF-19). Trocar ou somar ferramenta de uma suíte não muda o CI se o contrato for mantido (RN-153). Pergunte uma vez antes de adotar.
 - **Não tem e a suíte já tem testes em outro formato** → siga o formato dela: um teste por cenário, nome com o ID (`RF_17_criar_conta_de_educador_autonomo`, ou `it('RF-17 · …')`), um `Trait`/tag com o ID e o corpo dividido em `// Dado`, `// Quando`, `// Então` com as frases do critério.
 

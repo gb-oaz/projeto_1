@@ -1,4 +1,4 @@
-Contas assinantes e as pessoas de cada conta: staff, participantes e membros do time deboaz. Requisito: `1_Requisitos/17_modulo-usuario.html` · contrato: `usuarios-contrato-api`.
+Contas assinantes e as pessoas de cada conta: staff, participantes e membros do time deboaz. Requisito: `1_Requisitos/17_modulo-usuario.md` · contrato: `usuarios-contrato-api`.
 
 ## Quem é quem
 

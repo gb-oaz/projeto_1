@@ -7,7 +7,7 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 
 namespace Boaz.Qa.Integracao.Hub.Usuarios;
 
-// Passos dos Cenários de API de 1_Requisitos/17_modulo-usuario.html (contas,
+// Passos dos Cenários de API de 1_Requisitos/17_modulo-usuario.md (contas,
 // staff, participantes e membros do time). Como os passos casam com as frases:
 // comentário no topo de AutenticacaoPassos.cs e README.
 //

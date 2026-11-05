@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# CI local — requisito 1_Requisitos/03_ci-qualidade.html (RNF-160 a RNF-166)
+# CI local — requisito 1_Requisitos/03_ci-qualidade.md (RNF-160 a RNF-166)
 # =============================================================================
 #
 # Repete na máquina o CI do GitHub Actions (.github/workflows/ci.yml) e, depois,

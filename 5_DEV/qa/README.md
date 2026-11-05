@@ -3,7 +3,7 @@
 Testes que olham o produto de fora, pelo que está rodando: a API do backend,
 as aplicações web e os apps. Nenhuma suíte importa código de `5_DEV/backend/`
 ou de `5_DEV/frontend/`. Regras completas em
-[`14_estrutura-projetos`](../../1_Requisitos/14_estrutura-projetos.html)
+[`14_estrutura-projetos`](../../1_Requisitos/14_estrutura-projetos.md)
 (RN-151 a RN-156, RNF-190 a RNF-192 e RNF-196).
 
 ```

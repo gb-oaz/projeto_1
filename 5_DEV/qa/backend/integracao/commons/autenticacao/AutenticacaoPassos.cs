@@ -5,7 +5,7 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 
 namespace Boaz.Qa.Integracao.Commons.Autenticacao;
 
-// Passos dos Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.html.
+// Passos dos Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.md.
 //
 // Como funciona: cada linha Dado/Quando/Então/E do autenticacao.feature procura
 // aqui um método cujo atributo [Given]/[When]/[Then] tenha uma expressão

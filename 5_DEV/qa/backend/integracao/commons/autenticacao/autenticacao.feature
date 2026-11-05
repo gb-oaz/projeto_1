@@ -1,8 +1,8 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.html (v16), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.md (v16), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Autenticação
-  1_Requisitos/17_modulo-usuario-a-autenticacao.html · Cenários de API
+  1_Requisitos/17_modulo-usuario-a-autenticacao.md · Cenários de API
 
   @formas-de-entrar
   Esquema do Cenário: um endereço de entrada por frente

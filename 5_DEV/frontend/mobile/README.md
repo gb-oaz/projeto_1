@@ -2,7 +2,7 @@
 
 A solution `Boaz.Mobile.slnx`, com um projeto .NET MAUI por app (`hub` e
 `quest`), cada um gerando o Android e o iOS, na estrutura hexagonal de
-[`14_estrutura-projetos`](../../../1_Requisitos/14_estrutura-projetos.html)
+[`14_estrutura-projetos`](../../../1_Requisitos/14_estrutura-projetos.md)
 (RN-143 a RN-149, RNF-183 a RNF-187).
 
 ```

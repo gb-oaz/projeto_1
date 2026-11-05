@@ -92,7 +92,7 @@ function xamlMarca(nome) {
   Grid (Scale) para o tamanho desejado; cada Path recebe a cor da peça:
     anel → Tertiary, antena do b → Primary, antena do d → Secondary,
     "de" → Secondary, "boaz" → Primary (com AppThemeBinding Light/Dark).
-  No tema monocromático, todas as peças em OnSurface. Regras: 1_Requisitos/90_identidade-visual.html.
+  No tema monocromático, todas as peças em OnSurface. Regras: 1_Requisitos/90_identidade-visual.md.
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">

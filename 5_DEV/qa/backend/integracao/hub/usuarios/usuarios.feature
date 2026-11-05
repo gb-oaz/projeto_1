@@ -1,8 +1,8 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.html (v44), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v44), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
-  1_Requisitos/17_modulo-usuario.html · Cenários de API
+  1_Requisitos/17_modulo-usuario.md · Cenários de API
 
   @RF-104
   Cenário: escola cria a conta

@@ -26,7 +26,7 @@ import * as mascotes from './mascotes.mjs';
 //   import temas from '../design/fundos-temas.json';
 //   el.innerHTML = fundos.desenhar('halo', { largura: 1600, altura: 900, cores: temas[paleta][modo],
 //     mascote: { expressao: 'feliz', forma: 'bolha', movimento: 'flutuar' }, logo: 'abertura' });
-// Regras de uso: 1_Requisitos/90_identidade-visual.html.
+// Regras de uso: 1_Requisitos/90_identidade-visual.md.
 // =============================================================================
 
 /** Os conceitos, na ordem do catálogo. */
