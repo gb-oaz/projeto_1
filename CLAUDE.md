@@ -19,3 +19,18 @@ Monorepo organizado pelo boaz. Cada pasta tem uma única responsabilidade:
 - Todo diagrama segue o tema dark de `0_Assets/diagramas/tema.svg` e embute (inline) os assets que usar de `0_Assets/`.
 - Nome do diagrama: `<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg`. Versões nunca são sobrescritas; cada alteração gera um novo arquivo.
 - `./boaz.sh svg <pasta> <legenda>` devolve o próximo nome; `./boaz.sh diagramas` lista a versão mais recente de cada um.
+
+## Agentes
+
+O time é formado por agentes especialistas em `.claude/agents/`. Cada um é dono de uma área e carrega as skills dela; delegue a tarefa ao dono e respeite a passagem de bastão entre eles.
+
+| Agente | Responsável por | Skills |
+|---|---|---|
+| `deboaz-po` | requisitos em Gherkin em `1_Requisitos/` (cenários de tela e de API, PDF) | `requisito`, `requisito-estilo` |
+| `deboaz-uxui` | vistas de tela (`vista-<app>-<tela>-web\|pwa\|mobile`) e design system em `0_Assets/design/` | `design-system`, `diagrama-dev` |
+| `deboaz-arc` | diagramas UML em `2_Diagramas/` (menos as vistas), arquitetura em `3_Arquitetura/`, CI/CD em `4_CI_CD/` e `.github/workflows/` | `diagrama-dev`, `diagrama-arquitetura` |
+| `deboaz-qa` | testes de integração, funcionais (web e mobile) e carga em `5_DEV/qa/`, a partir do Gherkin | `desenvolvimento` |
+| `deboaz-backend` | `5_DEV/backend/`: domínio, casos de uso, API, banco e cache, a partir dos diagramas | `desenvolvimento` |
+| `deboaz-frontend` | `5_DEV/frontend/` web e mobile, a partir das vistas e do design system | `desenvolvimento`, `design-system` |
+
+Ordem de uma funcionalidade: `deboaz-po` (Gherkin) → `deboaz-uxui` (vistas) → `deboaz-arc` (diagramas) → `deboaz-qa` (testes vermelhos) → `deboaz-backend` / `deboaz-frontend` (verde). Lacuna ou divergência volta ao dono da etapa anterior em vez de virar decisão silenciosa.
