@@ -17,8 +17,8 @@ Monorepo organizado pelo boaz. Cada pasta tem uma única responsabilidade:
 - Desenvolvimento (funcionalidade ou bug) segue a skill `desenvolvimento`, em TDD: requisito em `1_Requisitos/` → cenários vermelhos em `5_DEV/qa/` (Gherkin quando a suíte tiver BDD) → código em `5_DEV/backend/` ou `5_DEV/frontend/` até ficar verde, sempre na branch `tarefa_<NN>-…`/`fix_<NN>-…` num worktree próprio em `.claude/worktrees/`, sem trocar a branch da cópia principal.
 - Diagramas são criados/alterados somente pelas skills `diagrama-dev` (2_) e `diagrama-arquitetura` (3_).
 - Todo diagrama segue o tema dark de `0_Assets/diagramas/tema.svg` e embute (inline) os assets que usar de `0_Assets/`.
-- Nome do diagrama: `<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg`. Versões nunca são sobrescritas; cada alteração gera um novo arquivo.
-- `./boaz.sh svg <pasta> <legenda>` devolve o próximo nome; `./boaz.sh diagramas` lista a versão mais recente de cada um.
+- Nome do diagrama: `<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg`. Cada alteração gera um novo arquivo com a versão seguinte e, na mesma tarefa, a versão anterior é apagada (`git rm`) depois que todas as referências (requisitos `.md` e outros arquivos) forem atualizadas para a nova; o histórico fica no git.
+- `./boaz.sh svg <pasta> <legenda>` devolve o próximo nome; `./boaz.sh diagramas` lista a versão mais recente de cada um; `./boaz.sh antigas` lista as versões antigas já sem referência (`--apagar` as remove).
 
 ## Agentes
 
@@ -34,3 +34,11 @@ O time é formado por agentes especialistas em `.claude/agents/`. Cada um é don
 | `deboaz-frontend` | `5_DEV/frontend/` web e mobile, a partir das vistas e do design system | `desenvolvimento`, `design-system` |
 
 Ordem de uma funcionalidade: `deboaz-po` (Gherkin) → `deboaz-uxui` (vistas) → `deboaz-arc` (diagramas) → `deboaz-qa` (testes vermelhos) → `deboaz-backend` / `deboaz-frontend` (verde). Lacuna ou divergência volta ao dono da etapa anterior em vez de virar decisão silenciosa.
+
+### Contexto isolado
+
+- **Uma tarefa pontual por conversa.** Não tente resolver o projeto inteiro nem várias tarefas na mesma sessão: um documento, um diagrama, um conjunto de testes ou uma fatia de código por vez. Pedido com várias tarefas → faça a primeira e liste as outras para sessões novas.
+- **Terminou a tarefa, encerre o chat** (`/clear` ou feche a sessão) e comece a próxima numa sessão limpa. O estado passa pelo disco e pelo git (arquivos, versões, commits), nunca pela memória da conversa; para retomar, use `git log` e `./boaz.sh diagramas`.
+- **Cada agente roda num contexto isolado.** Ao delegar, nunca repasse o histórico da sessão nem use `fork`: o pedido leva só a tarefa pontual, os caminhos dos arquivos e o trecho exato necessário (IDs, âncoras, linhas, versão do `.svg`). O agente lê o resto do disco, só o que precisar.
+- **Leia só o necessário**: `grep` pelo ID/âncora e leitura por intervalo de linhas; nada de varrer pastas ou ler documentos inteiros "por garantia" (exceto o que a skill manda ler inteiro).
+- **Bastão curto**: a resposta de um agente traz caminhos, versões, IDs e resultado, nunca o conteúdo dos arquivos nem o histórico do trabalho.

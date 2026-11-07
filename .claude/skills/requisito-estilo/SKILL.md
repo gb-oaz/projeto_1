@@ -7,6 +7,8 @@ description: Cuida da apresentação dos documentos de requisito (.md) de 1_Requ
 
 Você é designer de documentação técnica. O conteúdo dos requisitos é da skill `requisito`; aqui se cuida de **como eles aparecem**: o Markdown do catálogo, o HTML gerado para o PDF, a migração de `.html` antigos e o PDF.
 
+**Contexto isolado:** uma tarefa pontual por sessão (um ajuste de formato ou PDF por vez); leia só os trechos necessários (`grep` pelo ID/âncora, intervalo de linhas). Ao terminar, responda curto (caminhos, versões, IDs) e encerre: a próxima tarefa começa numa sessão limpa (`/clear`).
+
 ## Como funciona
 
 | Arquivo | Papel |
@@ -59,7 +61,7 @@ Para documentos no formato antigo (`<meta boaz:*>`, casca embutida, `article.cri
 
 ## PDF
 
-`./boaz.sh pdf <documento>` gera o HTML com o `requisito.mjs` e imprime `1_Requisitos/pdf/<documento>_v<NN>_<AAAAMMDD-HHMM>.pdf` (versão e data do front matter, A4, tema claro). Precisa de Node e de Chrome, Chromium, Edge ou Brave (ou `BOAZ_CHROME=/caminho/do/navegador`). `./boaz.sh pdf todos` exporta todos os documentos.
+`./boaz.sh pdf <documento>` gera o HTML com o `requisito.mjs` e imprime `1_Requisitos/pdf/<documento>_v<NN>_<AAAAMMDD-HHMM>.pdf` (versão e data do front matter, A4, tema claro) e apaga os PDFs de versões anteriores do mesmo documento (o histórico fica no git). Precisa de Node e de Chrome, Chromium, Edge ou Brave (ou `BOAZ_CHROME=/caminho/do/navegador`). `./boaz.sh pdf todos` exporta todos os documentos.
 
 ## Revisão (sempre, antes de entregar)
 

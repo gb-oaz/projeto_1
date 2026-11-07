@@ -14,9 +14,16 @@ Você é a pessoa desenvolvedora do time. Uma tarefa sempre anda nesta ordem, e 
 
 O teste vem antes do código, e o requisito vem antes do teste: **nenhuma linha de 5_DEV/backend/ ou 5_DEV/frontend/ é escrita sem um cenário vermelho que ela faça passar**, e nenhum cenário de teste existe sem o cenário do requisito que ele cobre.
 
+## Uma etapa por sessão (contexto isolado)
+
+- Cada etapa (1 requisito, 2 cenários, 3 código de **uma** frente, 4 verificação, 5 entrega) é uma tarefa pontual numa **sessão limpa**, do agente dono dela. Não leve a funcionalidade inteira numa conversa só.
+- A etapa termina num **commit** e numa resposta curta (branch, worktree, etapa, IDs, arquivos); depois, encerre o chat (`/clear`). A próxima sessão retoma pelo git (seção **Retomar uma tarefa**), nunca pelo histórico da anterior.
+- Ao delegar, passe só a branch, o caminho do worktree, os IDs e os caminhos/trechos exatos que a etapa usa — nunca o histórico da sessão.
+- Leia só o necessário dos documentos (`grep` pelo ID, intervalo de linhas); os documentos listados abaixo são de consulta, não de leitura integral a cada sessão.
+
 ## Regras que esta skill aplica
 
-Leia, se ainda não leu nesta conversa, e siga mesmo quando divergirem deste resumo:
+Consulte (os trechos que a etapa usa) e siga mesmo quando divergirem deste resumo:
 - `1_Requisitos/02_metodologia-git.md` — branch própria a partir da `master` (RN-05), nome `tarefa_<NN>-<descricao>` / `fix_<NN>-<descricao>` (RN-06), entrada na `master` só por PR com squash (RN-07, RNF-42).
 - `1_Requisitos/03_ci-qualidade.md` — o que reprova o build: cobertura ≥ 80 % no backend e na web (RNF-25), `dotnet format` (RNF-15), avisos como erro (RNF-22), ESLint/Prettier/vue-tsc (RNF-17); o qa cobre comportamento visível, o detalhe interno fica nos unitários (RN-142).
 - `1_Requisitos/14_estrutura-projetos.md` — `core/<contexto>/<feature>/` com `domain/`, `usecases/`, `ports/in/`, `ports/out/`; adaptadores em `infra/in|out/<contexto>/<feature>/`; contextos só importam `commons` (RN-143 a RN-149); qa caixa-preta, testes em `<contexto>/<feature>/` citando o ID (RN-151 a RN-156) e contratos das suítes (RNF-190 a RNF-196).
@@ -124,4 +131,4 @@ Os cenários do passo 2 têm de estar **verdes agora**, a cobertura de linhas �
 
 ## Resposta
 
-Curta, no fim de cada etapa ou da tarefa: branch e caminho do worktree; etapa em que a tarefa está; requisito e versão; cenários criados (arquivo e IDs) e se usou Gherkin; o que foi implementado por frente; resultado dos testes (vermelho/verde, cobertura) e do `ci.sh`; o que falta ou depende de alguém (pendências do requisito, aprovação da vista, PR).
+Curta, no fim de cada etapa (e então a sessão se encerra): branch e caminho do worktree; etapa em que a tarefa está; requisito e versão; cenários criados (arquivo e IDs) e se usou Gherkin; o que foi implementado por frente; resultado dos testes (vermelho/verde, cobertura) e do `ci.sh`; o que falta ou depende de alguém (pendências do requisito, aprovação da vista, PR).

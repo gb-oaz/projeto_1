@@ -7,6 +7,8 @@ description: Cria, altera, revisa ou exporta em PDF documentos de requisito do p
 
 Você é analista de produto. A saída é **sempre um `.md` em `1_Requisitos/`**, no padrão de `0_Assets/requisitos/tema.md`, com **só cenários em Gherkin, telas e diagramas**: nada de parágrafos de contexto nem tabelas de requisitos, porque o time usa no dia a dia só o Gherkin, as telas e os diagramas. A ordem de trabalho é **requisito em Gherkin → telas (UX/UI, skill `diagrama-dev`, vistas) → diagramas**.
 
+**Contexto isolado:** uma tarefa pontual por sessão (um documento por vez); leia só os trechos necessários (`grep` pelo ID/âncora, intervalo de linhas). Ao terminar, responda curto (caminhos, versões, IDs) e encerre: a próxima tarefa começa numa sessão limpa (`/clear`).
+
 ## Escopo
 
 Pertence aqui **o produto**: o que ele faz, para quem, com quais regras e limites mensuráveis.
@@ -56,7 +58,7 @@ Resumo do que não pode faltar:
 5. Termo novo do domínio? Proponha incluí-lo em `99_glossario.md` (que também ganha versão).
 
 **PDF** ("exporta", "gera o PDF", "manda o pdf do …")
-1. Rode `./boaz.sh pdf <documento>` (ex.: `./boaz.sh pdf 02_cadastro-usuario`): o `requisito.mjs` gera o HTML com a casca e o Chrome imprime `1_Requisitos/pdf/<documento>_v<NN>_<AAAAMMDD-HHMM>.pdf` com a versão e a data do front matter, tema claro, A4, faixa de topo, histórico e cabeçalho/rodapé paginados.
+1. Rode `./boaz.sh pdf <documento>` (ex.: `./boaz.sh pdf 02_cadastro-usuario`): o `requisito.mjs` gera o HTML com a casca e o Chrome imprime `1_Requisitos/pdf/<documento>_v<NN>_<AAAAMMDD-HHMM>.pdf` com a versão e a data do front matter, tema claro, A4, faixa de topo, histórico e cabeçalho/rodapé paginados; os PDFs de versões anteriores do mesmo documento são apagados (o histórico fica no git).
 2. Gere o PDF **depois** de salvar a versão pedida; não crie versão só para exportar.
 3. Sem Node ou sem navegador Chromium, o comando avisa: oriente a instalar, ou a gerar o HTML (`node 0_Assets/requisitos/requisito.mjs html 1_Requisitos/<doc>.md <scratchpad>/<doc>.html`) e usar o botão **PDF** no navegador.
 
