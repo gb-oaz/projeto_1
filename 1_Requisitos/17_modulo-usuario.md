@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v60"
-data: "2026-11-07 12:16"
-status: "Em revisão"
+versao: "v61"
+data: "2026-11-07 13:36"
+status: "Aprovado"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v60** · 2026-11-07 12:16 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v61** · 2026-11-07 13:36 · **Aprovado**
 
 # Módulo Usuários
 
@@ -2092,7 +2092,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v60** | 2026-11-07 12:16 | Diagramas: sequência da inicialização v03 e modelo de documentos v07; cenários sem mudança |
+| **v61** | 2026-11-07 13:36 | Status → Aprovado, com autorização do usuário; cenários sem mudança |
+| v60 | 2026-11-07 12:16 | Diagramas: sequência da inicialização v03 e modelo de documentos v07; cenários sem mudança |
 | v59 | 2026-11-07 12:07 | Lista de módulos iniciais das contas qa com a parte "staff", contratada por "QAINS" e "QAAUT", e a parte "time" do "qamembro" ("MOD-03" e "MOD-14"); concediveis traz também os módulos da conta "MOD-08" e "MOD-09" (`RN-268`, `RN-268-api`); exemplo da volta ao estado inicial com "MOD-02" no lugar de "MOD-12", que a conta do time não contrata (`RN-267`); status → Em revisão |
 | v58 | 2026-11-07 03:10 | Administrador não age sobre outro administrador: "qaadmin" e "admin" não desativam, não reativam nem geram nova senha um do outro, tela recusa e a API responde 403 ACESSO_NEGADO (`RN-169`, `RN-169-api`); a volta ao estado inicial vale só para as contas qa e o "admin" real fica como estava (`RN-267`); sequência da inicialização trocada para a v02; Em revisão pela mudança de regra e Aprovado na mesma versão, com autorização do usuário |
 | v57 | 2026-11-07 02:55 | Status → Aprovado, junto com o glossário v45; cenários sem mudança |
@@ -2101,8 +2102,7 @@ Cenário: o que este documento não trata
 | v54 | 2026-11-07 00:50 | `RN-265-api`: o tipo de cada conta qa é lido por quem tem acesso (a própria conta, a conta master da QAINS e o administrador só para o membro do time), sem contrariar `RN-235` e `RN-187` |
 | v53 | 2026-11-06 23:37 | Diagramas: modelo de documentos v05; pacotes da arquitetura hexagonal (`usuario-hexagonal` v01) e sequência da inicialização com Key Vault, validação e contas sem duplicar (`usuario-inicializacao-sequencia` v01) |
 | v52 | 2026-11-06 23:15 | Contas iniciais: o administrador criado na primeira inicialização (`RN-190`); uma conta qa para cada tipo de usuário só em homologação (`RN-265`, `RN-265-api`, `RN-266`); inicialização sem duplicar (`RN-267`); entradas e senhas só pelo Key Vault, como variáveis de ambiente na partida (`RNF-225`); segredo ausente ou inválido impede a partida (`RNF-226`); Em aberto com 7 pendências; status → Em revisão |
-| v51 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 
 ---
 
-<sub>boaz · v60 · 2026-11-07 12:16 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v61 · 2026-11-07 13:36 · `1_Requisitos/17_modulo-usuario.md`</sub>
