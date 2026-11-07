@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v55), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v66), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -930,6 +930,74 @@ Funcionalidade: Usuários
     Dado a senha "Gu#B5" no Key Vault para "qastaff.qains@deboaz.com"
     Quando a aplicação de homologação inicia
     Então para antes de aceitar o primeiro pedido, porque a senha não segue a RNF-202
+
+  @RNF-227
+  Esquema do Cenário: coleção pronta antes do primeiro pedido
+    Dado o banco de homologação vazio
+    Quando a aplicação inicia
+    Então antes de aceitar o primeiro pedido, a coleção "<colecao>" existe
+    E tem os índices <indices>
+
+    Exemplos:
+      | colecao            | indices                                                       |
+      | contas             | sigla único, dominio único, documentoNumeros                  |
+      | usuarios           | login único, contaId+nomeCurto único                          |
+      | usuarios           | contaId+matricula único só com matrícula                      |
+      | usuarios           | contaId+tipo+estado+nome                                      |
+      | auditoria          | contaId+quando, sem prazo de expiração                        |
+      | geracoesSenha      | usuarioId+pedidaEm↓, resumoComprovante, contaId+pedidaEm      |
+      | registrosPermissao | usuarioId+em↓+versao↓                                         |
+      | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205             |
+
+  @RNF-227
+  Cenário: segunda partida não duplica
+    Dado a aplicação de homologação iniciada em 2026-11-05, com as 6 coleções e seus índices
+    Quando ela inicia de novo em 2026-11-06
+    Então cada coleção continua uma só, com os mesmos índices, nenhum repetido
+    E nenhum documento das coleções é apagado nem duplicado
+
+  @RNF-227
+  Esquema do Cenário: índice que não pode ser criado
+    Dado <impedimento> na coleção "<colecao>"
+    Quando a aplicação inicia
+    Então o índice <indice> não é criado
+    E o log cita o nome do índice e da coleção, nunca o valor que impediu
+    E a aplicação <resultado>
+
+    Exemplos:
+      | colecao       | indice            | impedimento                | resultado                 |
+      | contas        | sigla único       | duas contas com "EBFGA"    | para antes do 1º pedido   |
+      | usuarios      | login único       | dois usuários com um login | para antes do 1º pedido   |
+      | geracoesSenha | resumoComprovante | o banco recusa o índice    | aceita pedidos, com aviso |
+
+  @RNF-227
+  Cenário: pronta depois da partida
+    Dado a partida de homologação concluída, com as 6 coleções e seus índices prontos
+    E os módulos gravados e as contas iniciais garantidas
+    Quando envia GET /health, sem login, sem corpo nem cabeçalho
+    Então a resposta é 200, sem corpo
+
+  @RNF-227
+  Esquema do Cenário: sem resposta antes ou sem a partida
+    Dado a aplicação de homologação <situacao>
+    Quando envia GET /health, sem login
+    Então não há resposta, a conexão é recusada
+    E o processo <processo>
+
+    Exemplos:
+      | situacao                                         | processo             |
+      | ainda na partida                                 | segue na partida     |
+      | sem o índice único de sigla em "contas"          | termina com código 1 |
+      | sem a senha do administrador, como na RNF-226    | termina com código 1 |
+      | com a senha fraca "Gu#B5" de "qastaff.qains"     | termina com código 1 |
+      | com o banco fora do ar                           | termina com código 1 |
+
+  @RNF-227
+  Cenário: índice não único que não pode ser criado
+    Dado o banco recusa o índice resumoComprovante em "geracoesSenha" na partida
+    Quando envia GET /health, sem login
+    Então a resposta é 200, sem corpo
+    E o log traz um aviso com o nome do índice e da coleção, nunca o valor
 
   @exemplo-entidades
   Cenário: escola EBFGA cadastrada

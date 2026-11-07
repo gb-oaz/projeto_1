@@ -1,14 +1,18 @@
+using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Boaz.MsMono.Infra.Out.Commons;
 
-// Os índices do MongoDB como o diagrama identidade-acesso-documentos (v05)
-// especifica, criados na partida, antes do primeiro pedido. Criar um índice
-// que já existe igual não faz nada; um que não pode ser criado (dados que
-// ferem um único, ou um recurso que o servidor não tem) vai para o log como
-// aviso e a partida segue: o índice é desempenho e proteção extra, a regra de
-// negócio continua conferida pela aplicação.
+// Os índices do MongoDB como o diagrama identidade-acesso-documentos (v10)
+// especifica, criados na partida, antes do primeiro pedido (RNF-227). Criar um
+// índice que já existe igual não faz nada. Um índice não único que não pode ser
+// criado vai para o log como aviso e a partida segue: é só desempenho. Um único
+// que não pode ser criado (dados que ferem a unicidade) também vai para o log,
+// e a partida não segue (FalhaNaInicializacao, como na RNF-226): a regra de
+// negócio continua conferida pela aplicação (RN-179), mas o banco precisa
+// garanti-la. O log e a falha trazem o nome do índice, a coleção e o código do
+// erro, nunca a mensagem do servidor, que traz o valor duplicado (RNF-225).
 public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
 {
     static IndexKeysDefinitionBuilder<BsonDocument> Chave => Builders<BsonDocument>.IndexKeys;
@@ -42,10 +46,12 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
         (Colecoes.PedidosAjuda, Comum(Chave.Ascending("aparelho").Ascending("quando"), "aparelho_quando")),
     ];
 
-    // Cria os índices; devolve quantos não puderam ser criados.
+    // Cria os índices; devolve quantos não únicos não puderam ser criados.
+    // <exception cref="FalhaNaInicializacao">Algum índice único não foi criado.</exception>
     public async Task<int> Criar(CancellationToken ct = default)
     {
         var falhas = 0;
+        var unicos = new List<string>();
         foreach (var (colecao, indice) in Todos)
         {
             try
@@ -54,10 +60,12 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
             }
             catch (MongoCommandException erro)
             {
-                falhas++;
                 log.LogWarning("Índice {Indice} de {Colecao} não criado: {Motivo}", indice.Options.Name, colecao, erro.CodeName);
+                if (indice.Options.Unique == true) unicos.Add($"{indice.Options.Name} em {colecao}");
+                else falhas++;
             }
         }
+        if (unicos.Count > 0) throw FalhaNaInicializacao.IndiceUnico(unicos);
         return falhas;
     }
 

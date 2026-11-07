@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v20"
-data: "2026-11-06 23:23"
+versao: "v21"
+data: "2026-11-07 14:05"
 status: "Aprovado"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v20** · 2026-11-06 23:23 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v21** · 2026-11-07 14:05 · **Aprovado**
 
 # Módulo Usuários · Autorização
 
@@ -883,9 +883,9 @@ Cenário: o que este documento não trata
 
 [![Diagrama de classes da autorização: permissões do usuário com versão e pv, permissão por módulo e abas, mudança de permissão imutável, cálculo das permissões, autorização no token e exigência de cada rota, com papéis e abas](../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg)](../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg)
 
-**Autorização · documentos** — `2_Diagramas/autorizacao-documentos_v02_20261106-2322.svg`
+**Autorização · documentos** — `2_Diagramas/autorizacao-documentos_v03_20261107-1402.svg`
 
-[![Modelo de dados da autorização: permissoes embutidas em usuarios com versao, pv, mods e suspensos, registrosPermissao imutável, o pv da sessao no Redis, as coleções contratacoes e modulos e as claims do token](../2_Diagramas/autorizacao-documentos_v02_20261106-2322.svg)](../2_Diagramas/autorizacao-documentos_v02_20261106-2322.svg)
+[![Modelo de dados da autorização: permissoes embutidas em usuarios com versao, pv, mods e suspensos, registrosPermissao imutável, o pv da sessao no Redis, as coleções contratacoes e modulos e as claims do token](../2_Diagramas/autorizacao-documentos_v03_20261107-1402.svg)](../2_Diagramas/autorizacao-documentos_v03_20261107-1402.svg)
 
 ---
 
@@ -895,7 +895,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v20** | 2026-11-06 23:23 | Diagrama autorizacao-documentos v02, fiel ao código: suspensos só no requisito, modulos com quemUsa, tipo ADMINISTRADOR |
+| **v21** | 2026-11-07 14:05 | Diagrama autorizacao-documentos v03: índices como o ms_mono cria na partida (login, registrosPermissao com versao); contratacoes com _id e sigla, ainda sem índice; cenários sem mudança |
+| v20 | 2026-11-06 23:23 | Diagrama autorizacao-documentos v02, fiel ao código: suspensos só no requisito, modulos com quemUsa, tipo ADMINISTRADOR |
 | v19 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v18 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v17 | 2026-11-03 11:45 | Estrutura do módulo (06 `RNF-103` v17): seção Telas nova, com a vista hub-usuarios em Web, PWA e Mobile (permissões, salvar, recusas, registro de mudanças e aviso de quem recebe) |
@@ -909,4 +910,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v20 · 2026-11-06 23:23 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v21 · 2026-11-07 14:05 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>

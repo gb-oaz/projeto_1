@@ -1,4 +1,5 @@
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
+using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
 using Boaz.MsMono.Infra.Out.Commons;
@@ -103,6 +104,33 @@ public class PartidaTests(Backend backend) : IClassFixture<Backend>
         Assert.Contains(nomes, i => i["name"] == "login_unico" && i["unique"].AsBoolean);
         Assert.Contains(nomes, i => i["name"] == "contaId_matricula_unica");
         // de novo: índice igual não muda nada
+        Assert.Equal(0, await backend.Services.GetRequiredService<Indices>().Criar());
+    }
+
+    // RNF-227: duas contas com a mesma sigla antes do índice único — a partida
+    // não segue; depois de corrigir os dados, o índice nasce
+    [Fact]
+    public async Task RNF_227_indice_unico_que_nao_pode_ser_criado_nao_inicia()
+    {
+        _ = backend.Server;
+        var contas = backend.Banco.GetCollection<BsonDocument>("contas");
+        await contas.Indexes.DropOneAsync("sigla_unica");
+        var ids = new[] { "conta-dupl-rnf227-1", "conta-dupl-rnf227-2" };
+        foreach (var (id, n) in ids.Select((id, n) => (id, n)))
+        {
+            await contas.InsertOneAsync(new BsonDocument { ["_id"] = id, ["sigla"] = "DUPLA", ["dominio"] = $"dupla_rnf227_{n}" });
+        }
+        try
+        {
+            Assert.False(await Partida(KeyVault("prd")).Executar());
+            var falha = await Assert.ThrowsAsync<FalhaNaInicializacao>(() => backend.Services.GetRequiredService<Indices>().Criar());
+            Assert.Contains("sigla_unica em contas", falha.Message);
+            Assert.DoesNotContain("DUPLA", falha.Message);
+        }
+        finally
+        {
+            await contas.DeleteManyAsync(Builders<BsonDocument>.Filter.In("_id", ids));
+        }
         Assert.Equal(0, await backend.Services.GetRequiredService<Indices>().Criar());
     }
 }

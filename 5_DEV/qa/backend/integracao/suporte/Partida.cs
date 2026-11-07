@@ -35,6 +35,13 @@ public sealed class Partida : IDisposable
     int porta;
     Api? api;
 
+    // o endereço da instância, para os pedidos que não podem passar pelo Api
+    // (conexão recusada, RNF-227)
+    public string Url => $"http://127.0.0.1:{porta}";
+
+    // o processo ainda roda (a partida não terminou nem parou)
+    public bool Rodando => processo is { HasExited: false };
+
     public string AmbienteDaPartida { get; set; } = "hml";
 
     // o Key Vault do cenário: nome da variável → valor (null = segredo ausente)
@@ -105,6 +112,14 @@ public sealed class Partida : IDisposable
     // processo terminou antes disso (o caso da RNF-226)
     public async Task<bool> Iniciar()
     {
+        Lancar();
+        return await EsperarPronta();
+    }
+
+    // só sobe o processo, sem esperar /health: para conferir o que acontece
+    // enquanto a partida roda (17 RNF-227)
+    public void Lancar()
+    {
         if (Ambiente.ApiComando.Length == 0)
         {
             throw new PendingStepException(
@@ -144,8 +159,13 @@ public sealed class Partida : IDisposable
         processo.BeginOutputReadLine();
         processo.BeginErrorReadLine();
         api?.Dispose();
-        api = Api.Para($"http://127.0.0.1:{porta}");
+        api = Api.Para(Url);
+    }
 
+    // espera: true quando /health responde 200; false se o processo terminou antes
+    public async Task<bool> EsperarPronta()
+    {
+        if (processo is null) throw new InvalidOperationException("a instância não foi lançada");
         using var saude = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
         var limite = DateTime.UtcNow + LimiteDaPartida;
         while (DateTime.UtcNow < limite)

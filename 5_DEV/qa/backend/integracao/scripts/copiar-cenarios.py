@@ -15,7 +15,7 @@ out = ['# language: pt',
        '# mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.',
        f'Funcionalidade: {nome}', f'  {arq} · Cenários de API', '']
 vistos = set()
-for m in re.finditer(r'^<a id="([^"]+)"></a>\n\n### .*?\n\n(?:> .*\n\n)?```gherkin\n(.*?)\n```$', sec, re.S | re.M):
+for m in re.finditer(r'^<a id="([^"]+)"></a>\n\n### .*?\n\n(?:> [^\n]*\n\n)?```gherkin\n(.*?)\n```$', sec, re.S | re.M):
     tag = '@' + re.sub(r'-api$', '', m.group(1))
     g = m.group(2)
     for bloco in re.split(r'\n\n(?=(?:Cenário|Esquema do Cenário):)', g):

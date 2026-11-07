@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-a-autenticacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autenticação"
-versao: "v20"
-data: "2026-11-06 23:23"
+versao: "v21"
+data: "2026-11-07 14:05"
 status: "Aprovado"
 objetivo: "definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v20** · 2026-11-06 23:23 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v21** · 2026-11-07 14:05 · **Aprovado**
 
 # Módulo Usuários · Autenticação
 
@@ -911,9 +911,9 @@ Cenário: sem aparelhos conectados no quest
 
 [![Diagrama de classes da autenticação: Sessão no Redis com frente, aparelho, quem entrou, versão das permissões e resumo da renovação, índice de sessões com o limite do hub, token de acesso JWT, token de renovação de uso único, chave de assinatura no Key Vault e tentativas de entrada com bloqueio progressivo](../2_Diagramas/autenticacao-classes_v01_20261101-1501.svg)](../2_Diagramas/autenticacao-classes_v01_20261101-1501.svg)
 
-**Autenticação · documentos** — `2_Diagramas/autenticacao-documentos_v02_20261106-2322.svg`
+**Autenticação · documentos** — `2_Diagramas/autenticacao-documentos_v03_20261107-1402.svg`
 
-[![Modelo de dados da autenticação: sessao, sessoes e tentativas no Redis; os campos de usuarios, contas e geracoesSenha que a entrada lê ou grava; a chave de assinatura no Key Vault e o token de acesso, que não é guardado](../2_Diagramas/autenticacao-documentos_v02_20261106-2322.svg)](../2_Diagramas/autenticacao-documentos_v02_20261106-2322.svg)
+[![Modelo de dados da autenticação: sessao, sessoes e tentativas no Redis; os campos de usuarios, contas e geracoesSenha que a entrada lê ou grava; a chave de assinatura no Key Vault e o token de acesso, que não é guardado](../2_Diagramas/autenticacao-documentos_v03_20261107-1402.svg)](../2_Diagramas/autenticacao-documentos_v03_20261107-1402.svg)
 
 ---
 
@@ -923,7 +923,8 @@ Cenário: sem aparelhos conectados no quest
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v20** | 2026-11-06 23:23 | Diagrama autenticacao-documentos v02, fiel ao código: tempoDoTime na conta do time, tempoSemUso e ultimoErro no Redis, tipo ADMINISTRADOR |
+| **v21** | 2026-11-07 14:05 | Diagrama autenticacao-documentos v03: índices como o ms_mono cria na partida (login, sigla e domínio únicos, resumoComprovante); cenários sem mudança |
+| v20 | 2026-11-06 23:23 | Diagrama autenticacao-documentos v02, fiel ao código: tempoDoTime na conta do time, tempoSemUso e ultimoErro no Redis, tipo ADMINISTRADOR |
 | v19 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v18 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v17 | 2026-11-03 11:45 | Estrutura do módulo (06 `RNF-103` v17): Telas em Web, PWA e Mobile, uma vista por plataforma; sequência v03 com as telas do hub e do quest em cada fase |
@@ -937,4 +938,4 @@ Cenário: sem aparelhos conectados no quest
 
 ---
 
-<sub>boaz · v20 · 2026-11-06 23:23 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>
+<sub>boaz · v21 · 2026-11-07 14:05 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>

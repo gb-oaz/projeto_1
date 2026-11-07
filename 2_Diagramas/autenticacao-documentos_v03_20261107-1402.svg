@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1720 1046" width="1720" height="1046">
   <title>Autenticação · documentos</title>
-  <desc>Modelo de dados do requisito 17-a (Módulo Usuários · Autenticação): as chaves sessao, sessoes e tentativas no Redis, os campos de usuarios, contas e geracoesSenha que a entrada lê ou grava no Cosmos DB for MongoDB, a chave de assinatura no Key Vault e o token de acesso, que não é guardado. v01: criação. v02: fiel ao ms_mono — tempo dos membros e masters em contas.tempoDoTime (conta-dboaz), tempoSemUso na sessão, ultimoErro nas tentativas, tipo ADMINISTRADOR, índice único de login ainda não criado e validade de 72 h conferida pela aplicação.</desc>
+  <desc>Modelo de dados do requisito 17-a (Módulo Usuários · Autenticação): as chaves sessao, sessoes e tentativas no Redis, os campos de usuarios, contas e geracoesSenha que a entrada lê ou grava no Cosmos DB for MongoDB, a chave de assinatura no Key Vault e o token de acesso, que não é guardado. v01: criação. v02: fiel ao ms_mono — tempo dos membros e masters em contas.tempoDoTime (conta-dboaz), tempoSemUso na sessão, ultimoErro nas tentativas, tipo ADMINISTRADOR, índice único de login ainda não criado e validade de 72 h conferida pela aplicação. v03: índices como Indices.cs cria na partida — login único criado, sigla e domínio únicos em contas, resumoComprovante em geracoesSenha.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -117,10 +117,10 @@
     <text class="title" x="40" y="72">Autenticação · documentos</text>
     <text class="subtitle" x="40" y="94">Sessões e tentativas no Redis, o que a autenticação lê das coleções de Usuários e a chave do token</text>
     <text class="wm-meta-label" x="1432" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1432" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1456" y="71" text-anchor="middle">v02</text>
+    <rect class="wm-badge" x="1432" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1456" y="71" text-anchor="middle">v03</text>
     <line class="wm-sep" x1="1504" y1="32" x2="1504" y2="80"/>
     <text class="wm-meta-label" x="1528" y="44">DATA</text>
-    <text class="wm-meta-value" x="1528" y="72">2026-11-06 · 23:22</text>
+    <text class="wm-meta-value" x="1528" y="72">2026-11-07 · 14:02</text>
   </g>
   <g id="desenho" transform="translate(0,152)">
     <path class="edge edge-async" d="M500,56 L560,56 L560,20 L620,20" marker-end="url(#seta-aberta)"/>
@@ -173,7 +173,7 @@
     <text class="mono" x="634" y="132" xml:space="preserve">permissoes.pv  (vai no token)</text>
     <text class="mono" x="634" y="150" xml:space="preserve">ultimoAcesso · ultimoAcessoQuem  (grava)</text>
     <line class="divider" x1="620" y1="162" x2="1100" y2="162"/><text class="uml-keyword" x="634" y="182">índices</text>
-    <text class="mono" x="634" y="202">único: login (a criar)</text>
+    <text class="mono" x="634" y="202">único: login (criado na partida)</text>
     <g id="c-contas" filter="url(#sombra)"><rect class="node-external" x="620" y="268" width="480" height="234" rx="6"/></g>
     <text class="label-strong" x="634" y="294">contas</text>
     <rect class="chip" x="986" y="280" width="102" height="20" rx="10"/><text class="chip-text" x="1037" y="294" text-anchor="middle">sem partição</text>
@@ -184,7 +184,7 @@
     <text class="mono" x="646" y="400" xml:space="preserve">staffNavegador · staffApp · participante</text>
     <text class="mono" x="646" y="418" xml:space="preserve">tempoDoTime: membros · masters (dboaz)</text>
     <line class="divider" x1="620" y1="444" x2="1100" y2="444"/><text class="uml-keyword" x="634" y="464">índices</text>
-    <text class="mono" x="634" y="484">único: dominio</text>
+    <text class="mono" x="634" y="484">único: sigla · único: dominio</text>
     <g id="c-geracoes" filter="url(#sombra)"><rect class="node-external" x="620" y="550" width="480" height="166" rx="6"/></g>
     <text class="label-strong" x="634" y="576">geracoesSenha</text>
     <rect class="chip" x="966" y="562" width="122" height="20" rx="10"/><text class="chip-text" x="1027" y="576" text-anchor="middle">partição: sigla</text>
@@ -193,7 +193,7 @@
     <text class="mono" x="634" y="628" xml:space="preserve">resumoComprovante  (confirmar-senha, RF-143)</text>
     <text class="mono" x="634" y="646" xml:space="preserve">senhaMostradaEm · confirmadaEm  (grava)</text>
     <line class="divider" x1="620" y1="658" x2="1100" y2="658"/><text class="uml-keyword" x="634" y="678">índices</text>
-    <text class="mono" x="634" y="698">validade 72 h pela aplicação</text>
+    <text class="mono" x="634" y="698">resumoComprovante · validade 72 h pela aplicação</text>
     <g id="c-chave" filter="url(#sombra)"><rect class="node-external" x="1220" y="0" width="460" height="166" rx="6"/></g>
     <text class="label-strong" x="1234" y="26">chave de assinatura</text>
     <rect class="chip" x="1587" y="12" width="81" height="20" rx="10"/><text class="chip-text" x="1627" y="26" text-anchor="middle">Key Vault</text>
@@ -233,7 +233,7 @@
     <rect class="node-note" x="618" y="47" width="14" height="14" rx="3"/><text class="label" x="640" y="58">nota</text>
     <line class="edge edge-async" x1="695" y1="54" x2="737" y2="54" marker-end="url(#seta-aberta)"/><text class="label" x="751" y="58">referência por id</text>
     <line class="divider" x1="40" y1="76" x2="1680" y2="76"/>
-    <text class="footer" x="40" y="100">v02 · fiel ao código: tempoDoTime na conta do time, tempoSemUso e ultimoErro no Redis, tipo ADMINISTRADOR, índice único de login a criar</text>
-    <text class="wm-file" x="1680" y="100" text-anchor="end">autenticacao-documentos_v02_20261106-2322.svg</text>
+    <text class="footer" x="40" y="100">v03 · índices como o ms_mono cria na partida: login único, sigla e domínio únicos em contas, resumoComprovante em geracoesSenha</text>
+    <text class="wm-file" x="1680" y="100" text-anchor="end">autenticacao-documentos_v03_20261107-1402.svg</text>
   </g>
 </svg>

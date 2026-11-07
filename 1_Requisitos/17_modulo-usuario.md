@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v61"
-data: "2026-11-07 13:36"
-status: "Aprovado"
+versao: "v66"
+data: "2026-11-07 14:17"
+status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v61** · 2026-11-07 13:36 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v66** · 2026-11-07 14:17 · **Em revisão**
 
 # Módulo Usuários
 
@@ -1839,6 +1839,82 @@ Cenário: senha fraca no Key Vault
   Então para antes de aceitar o primeiro pedido, porque a senha não segue a RNF-202
 ```
 
+<a id="RNF-227"></a>
+
+### `RNF-227` Coleções e índices prontos na partida
+
+> Fora deste cenário: módulos ([15_modulos](15_modulos.md)) e contratações ([16_modulo-catalogo](16_modulo-catalogo.md)), cada um no próprio requisito
+
+```gherkin
+Esquema do Cenário: coleção pronta antes do primeiro pedido
+  Dado o banco de homologação vazio
+  Quando a aplicação inicia
+  Então antes de aceitar o primeiro pedido, a coleção "<colecao>" existe
+  E tem os índices <indices>
+
+  Exemplos:
+    | colecao            | indices                                                       |
+    | contas             | sigla único, dominio único, documentoNumeros                  |
+    | usuarios           | login único, contaId+nomeCurto único                          |
+    | usuarios           | contaId+matricula único só com matrícula                      |
+    | usuarios           | contaId+tipo+estado+nome                                      |
+    | auditoria          | contaId+quando, sem prazo de expiração                        |
+    | geracoesSenha      | usuarioId+pedidaEm↓, resumoComprovante, contaId+pedidaEm      |
+    | registrosPermissao | usuarioId+em↓+versao↓                                         |
+    | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205             |
+
+Cenário: segunda partida não duplica
+  Dado a aplicação de homologação iniciada em 2026-11-05, com as 6 coleções e seus índices
+  Quando ela inicia de novo em 2026-11-06
+  Então cada coleção continua uma só, com os mesmos índices, nenhum repetido
+  E nenhum documento das coleções é apagado nem duplicado
+
+Esquema do Cenário: índice que não pode ser criado
+  Dado <impedimento> na coleção "<colecao>"
+  Quando a aplicação inicia
+  Então o índice <indice> não é criado
+  E o log cita o nome do índice e da coleção, nunca o valor que impediu
+  E a aplicação <resultado>
+
+  Exemplos:
+    | colecao       | indice            | impedimento                | resultado                 |
+    | contas        | sigla único       | duas contas com "EBFGA"    | para antes do 1º pedido   |
+    | usuarios      | login único       | dois usuários com um login | para antes do 1º pedido   |
+    | geracoesSenha | resumoComprovante | o banco recusa o índice    | aceita pedidos, com aviso |
+```
+
+<a id="RNF-227-api"></a>
+
+### `RNF-227` Coleções e índices prontos na partida
+
+```gherkin
+Cenário: pronta depois da partida
+  Dado a partida de homologação concluída, com as 6 coleções e seus índices prontos
+  E os módulos gravados e as contas iniciais garantidas
+  Quando envia GET /health, sem login, sem corpo nem cabeçalho
+  Então a resposta é 200, sem corpo
+
+Esquema do Cenário: sem resposta antes ou sem a partida
+  Dado a aplicação de homologação <situacao>
+  Quando envia GET /health, sem login
+  Então não há resposta, a conexão é recusada
+  E o processo <processo>
+
+  Exemplos:
+    | situacao                                         | processo             |
+    | ainda na partida                                 | segue na partida     |
+    | sem o índice único de sigla em "contas"          | termina com código 1 |
+    | sem a senha do administrador, como na RNF-226    | termina com código 1 |
+    | com a senha fraca "Gu#B5" de "qastaff.qains"     | termina com código 1 |
+    | com o banco fora do ar                           | termina com código 1 |
+
+Cenário: índice não único que não pode ser criado
+  Dado o banco recusa o índice resumoComprovante em "geracoesSenha" na partida
+  Quando envia GET /health, sem login
+  Então a resposta é 200, sem corpo
+  E o log traz um aviso com o nome do índice e da coleção, nunca o valor
+```
+
 <a id="exemplo-entidades"></a>
 
 ### Exemplo de cada entidade
@@ -2068,9 +2144,9 @@ Cenário: o que este documento não trata
 
 [![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)
 
-**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v04_20261107-0315.svg`
+**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v05_20261107-1414.svg`
 
-[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v04_20261107-0315.svg)](../2_Diagramas/usuarios-contrato-api_v04_20261107-0315.svg)
+[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v05_20261107-1414.svg)](../2_Diagramas/usuarios-contrato-api_v05_20261107-1414.svg)
 
 **Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v03_20261101-1500.svg`
 
@@ -2080,9 +2156,9 @@ Cenário: o que este documento não trata
 
 [![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)
 
-**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v07_20261107-1214.svg`
+**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v10_20261107-1417.svg`
 
-[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios particionados pela sigla com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v07_20261107-1214.svg)](../2_Diagramas/identidade-acesso-documentos_v07_20261107-1214.svg)
+[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios particionados pela sigla com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v10_20261107-1417.svg)](../2_Diagramas/identidade-acesso-documentos_v10_20261107-1417.svg)
 
 ---
 
@@ -2092,17 +2168,17 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v61** | 2026-11-07 13:36 | Status → Aprovado, com autorização do usuário; cenários sem mudança |
+| **v66** | 2026-11-07 14:17 | `RNF-227-api`: GET /health responde 200 sem corpo só depois da partida, sem resposta enquanto ela roda ou quando para (índice único, `RNF-226`, banco fora do ar), e 200 com aviso no log quando falha um índice não único; diagramas: contrato v05 e modelo de documentos v09 |
+| v65 | 2026-11-07 14:13 | `RNF-227`: índice único que não pode ser criado impede a partida, como no `RNF-226`; índice não único que falha fica só no aviso do log e a partida segue; o log cita índice e coleção, nunca o valor |
+| v64 | 2026-11-07 14:12 | `RNF-227`: passo "Então antes de aceitar o primeiro pedido…" sem vírgula após a palavra-chave, igual ao .feature do qa |
+| v63 | 2026-11-07 14:06 | Coleções e índices do modelo de documentos prontos na partida, antes do primeiro pedido, sem duplicar a cada partida; índice que não pode ser criado vira aviso no log e a partida segue (`RNF-227`); status → Em revisão |
+| v62 | 2026-11-07 14:05 | Diagrama: modelo de documentos v08 — índices criados na partida, contratacoes com _id e sigla e ainda sem índice, partição pela sigla por coleção; cenários sem mudança |
+| v61 | 2026-11-07 13:36 | Status → Aprovado, com autorização do usuário; cenários sem mudança |
 | v60 | 2026-11-07 12:16 | Diagramas: sequência da inicialização v03 e modelo de documentos v07; cenários sem mudança |
 | v59 | 2026-11-07 12:07 | Lista de módulos iniciais das contas qa com a parte "staff", contratada por "QAINS" e "QAAUT", e a parte "time" do "qamembro" ("MOD-03" e "MOD-14"); concediveis traz também os módulos da conta "MOD-08" e "MOD-09" (`RN-268`, `RN-268-api`); exemplo da volta ao estado inicial com "MOD-02" no lugar de "MOD-12", que a conta do time não contrata (`RN-267`); status → Em revisão |
 | v58 | 2026-11-07 03:10 | Administrador não age sobre outro administrador: "qaadmin" e "admin" não desativam, não reativam nem geram nova senha um do outro, tela recusa e a API responde 403 ACESSO_NEGADO (`RN-169`, `RN-169-api`); a volta ao estado inicial vale só para as contas qa e o "admin" real fica como estava (`RN-267`); sequência da inicialização trocada para a v02; Em revisão pela mudança de regra e Aprovado na mesma versão, com autorização do usuário |
 | v57 | 2026-11-07 02:55 | Status → Aprovado, junto com o glossário v45; cenários sem mudança |
-| v56 | 2026-11-07 02:38 | Em aberto resolvido: administrador mantém "admin.dboaz@deboaz.com" (`RN-190`, `RNF-225`); conta qa própria "qaadmin.dboaz@deboaz.com" com o papel `ADMINISTRADOR`, 6 contas qa (`RN-265`, `RN-265-api`, `RN-266`); módulos iniciais das contas qa pela lista do Key Vault de homologação, produção pela contratação (`RN-268`, `RN-268-api`); dados fictícios no formato do projeto (`RN-269`); inicialização volta senha, estado, permissões e módulos (`RN-267`); segredo qa ausente impede homologação (`RNF-226`); siglas "QA…" reservadas em produção (`RN-179`, `RN-179-api`) |
-| v55 | 2026-11-07 01:52 | `RN-265-api`: sai o exemplo do qamembro lendo o próprio registro, que exige `MOD-03` com `U` e ele nasce sem módulos (`RN-246`); o tipo MEMBRO_TIME segue conferido pelo administrador |
-| v54 | 2026-11-07 00:50 | `RN-265-api`: o tipo de cada conta qa é lido por quem tem acesso (a própria conta, a conta master da QAINS e o administrador só para o membro do time), sem contrariar `RN-235` e `RN-187` |
-| v53 | 2026-11-06 23:37 | Diagramas: modelo de documentos v05; pacotes da arquitetura hexagonal (`usuario-hexagonal` v01) e sequência da inicialização com Key Vault, validação e contas sem duplicar (`usuario-inicializacao-sequencia` v01) |
-| v52 | 2026-11-06 23:15 | Contas iniciais: o administrador criado na primeira inicialização (`RN-190`); uma conta qa para cada tipo de usuário só em homologação (`RN-265`, `RN-265-api`, `RN-266`); inicialização sem duplicar (`RN-267`); entradas e senhas só pelo Key Vault, como variáveis de ambiente na partida (`RNF-225`); segredo ausente ou inválido impede a partida (`RNF-226`); Em aberto com 7 pendências; status → Em revisão |
 
 ---
 
-<sub>boaz · v61 · 2026-11-07 13:36 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v66 · 2026-11-07 14:17 · `1_Requisitos/17_modulo-usuario.md`</sub>

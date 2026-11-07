@@ -68,6 +68,7 @@ integracao/
 │   ├── Estado.cs                   limpa e prepara o banco e o cache (menos as contas iniciais)
 │   ├── ContasIniciais.cs           administrador e contas qa: ids e variáveis do Key Vault
 │   ├── Partida.cs                  sobe uma instância própria do backend (cenários de inicialização)
+│   ├── BancoDaPartida.cs           coleções e índices do banco dessa instância (RNF-227)
 │   └── Ganchos.cs                  antes de cada cenário: limpa tudo
 ├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.md
 │   ├── autenticacao.feature
@@ -78,7 +79,8 @@ integracao/
 └── hub/usuarios/                   17_modulo-usuario.md (contas, staff, participantes, time)
     ├── usuarios.feature
     ├── UsuariosPassos.cs
-    └── ContasIniciaisPassos.cs     contas iniciais (RN-179, RN-190, RN-265 a RN-268, RNF-225, RNF-226)
+    ├── ContasIniciaisPassos.cs     contas iniciais (RN-179, RN-190, RN-265 a RN-268, RNF-225, RNF-226)
+    └── IndicesPassos.cs            coleções e índices prontos na partida e GET /health (RNF-227, RNF-227-api)
 ```
 
 A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
@@ -236,7 +238,11 @@ ela.
 
 - **Caixa-preta**: nada de `5_DEV/backend/` é referenciado (RN-151).
 - **Banco e cache só preparam**, nunca conferem: o que só eles mostram fica
-  nos testes do backend.
+  nos testes do backend. Única exceção: a RNF-227 (coleções e índices prontos
+  na partida) promete o próprio esquema do banco, sem endereço na API; os
+  passos leem só os metadados (coleções, chave e opções dos índices) e os `_id`
+  do banco da instância de Partida (`PARTIDA_Mongo__Banco`, sem ela ficam
+  pendentes), nunca o conteúdo nem os nomes internos dos índices.
 - **Valores dos exemplos**: `usr-ebfga-maria`, `3f9c2a71` (sessão da Maria no
   navegador) e `EBFGA-LUCAS-0412` são trocados pelos valores reais na hora do
   pedido (`Mundo.Apelidos`); a pessoa é criada pela API na primeira vez que

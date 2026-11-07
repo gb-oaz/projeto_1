@@ -27,6 +27,13 @@ public static class Ambiente
     // RNF-226). Sem ele, esses cenários ficam pendentes. Ver suporte/Partida.cs.
     public static string ApiComando => Ler("API_COMANDO", "");
 
+    // o banco da instância de Partida, para os cenários de coleções e índices
+    // (17 RNF-227): o mesmo Mongo e o mesmo banco que as PARTIDA_* entregam a
+    // ela. Sem PARTIDA_Mongo__Banco, a suíte não sabe qual banco olhar (vazio)
+    public static string PartidaMongoUrl =>
+        Ler("PARTIDA_ConnectionStrings__MongoDb", Ler("PARTIDA_ConnectionStrings__Mongo", MongoUrl));
+    public static string PartidaMongoBanco => Ler("PARTIDA_Mongo__Banco", "");
+
     // valor de uma variável do Key Vault (USUARIO_*), ou vazio
     public static string Segredo(string nome) => Ler(nome, "");
 

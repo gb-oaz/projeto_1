@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1720 900" width="1720" height="900">
   <title>Autorização · documentos</title>
-  <desc>Modelo de dados do requisito 17-b (Módulo Usuários · Autorização): as permissões embutidas em usuarios com versao e pv, o registro imutável das mudanças, o pv da sessão no Redis comparado em cada pedido, e as coleções modulos e contratacoes que limitam o que pode ser concedido. v01: criação. v02: fiel ao ms_mono — permissoes.suspensos não é gravado (RN-238 sai do cálculo), modulos traz quemUsa, tipo ADMINISTRADOR, índice de registrosPermissao por usuarioId + em, e salvar ainda grava em duas operações (RNF-223 pede uma).</desc>
+  <desc>Modelo de dados do requisito 17-b (Módulo Usuários · Autorização): as permissões embutidas em usuarios com versao e pv, o registro imutável das mudanças, o pv da sessão no Redis comparado em cada pedido, e as coleções modulos e contratacoes que limitam o que pode ser concedido. v01: criação. v02: fiel ao ms_mono — permissoes.suspensos não é gravado (RN-238 sai do cálculo), modulos traz quemUsa, tipo ADMINISTRADOR, índice de registrosPermissao por usuarioId + em, e salvar ainda grava em duas operações (RNF-223 pede uma). v03: índices como Indices.cs cria na partida — login único criado, registrosPermissao por usuarioId + em + versao; contratacoes com _id e sigla, ainda sem índice.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -117,10 +117,10 @@
     <text class="title" x="40" y="72">Autorização · documentos</text>
     <text class="subtitle" x="40" y="94">Permissões no usuário, registro de mudanças, a versão nas sessões e as coleções de módulos e contratações</text>
     <text class="wm-meta-label" x="1432" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1432" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1456" y="71" text-anchor="middle">v02</text>
+    <rect class="wm-badge" x="1432" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1456" y="71" text-anchor="middle">v03</text>
     <line class="wm-sep" x1="1504" y1="32" x2="1504" y2="80"/>
     <text class="wm-meta-label" x="1528" y="44">DATA</text>
-    <text class="wm-meta-value" x="1528" y="72">2026-11-06 · 23:22</text>
+    <text class="wm-meta-value" x="1528" y="72">2026-11-07 · 14:02</text>
   </g>
   <g id="desenho" transform="translate(0,152)">
     <path class="edge edge-async" d="M300,372 L300,324" marker-end="url(#seta-aberta)"/>
@@ -141,7 +141,7 @@
     <text class="mono" x="66" y="222" xml:space="preserve">  "MOD-06": "U"</text>
     <text class="mono" x="66" y="240" xml:space="preserve">suspensos: só no requisito (RN-238)</text>
     <line class="divider" x1="40" y1="266" x2="560" y2="266"/><text class="uml-keyword" x="54" y="286">índices</text>
-    <text class="mono" x="54" y="306">único: login (a criar)</text>
+    <text class="mono" x="54" y="306">único: login (criado na partida)</text>
     <g id="c-registros" filter="url(#sombra)"><rect class="node-green" x="40" y="372" width="520" height="220" rx="6"/></g>
     <text class="label-strong" x="54" y="398">registrosPermissao</text>
     <rect class="chip" x="426" y="384" width="122" height="20" rx="10"/><text class="chip-text" x="487" y="398" text-anchor="middle">partição: sigla</text>
@@ -152,7 +152,7 @@
     <text class="mono" x="54" y="486" xml:space="preserve">versao</text>
     <text class="mono" x="54" y="504" xml:space="preserve">antes · depois  (mapas MOD-NN → abas)</text>
     <line class="divider" x1="40" y1="516" x2="560" y2="516"/><text class="uml-keyword" x="54" y="536">índices</text>
-    <text class="mono" x="54" y="556">usuarioId + em (decrescente)</text>
+    <text class="mono" x="54" y="556">usuarioId + em + versao (decrescentes)</text>
     <text class="mono" x="54" y="574">só inclusão: nada muda nem é apagado (RN-256)</text>
     <g id="c-sessao" filter="url(#sombra)"><rect class="node-purple" x="680" y="0" width="460" height="166" rx="6"/></g>
     <text class="label-strong" x="694" y="26">sessao:&lt;sid&gt;</text>
@@ -167,7 +167,7 @@
     <text class="label-strong" x="694" y="240">contratacoes</text>
     <rect class="chip" x="1033" y="226" width="95" height="20" rx="10"/><text class="chip-text" x="1081" y="240" text-anchor="middle">16_catalogo</text>
     <line class="divider" x1="680" y1="254" x2="1140" y2="254"/>
-    <text class="mono" x="694" y="274" xml:space="preserve">contaId → contas</text>
+    <text class="mono" x="694" y="274" xml:space="preserve">_id · sigla · contaId → contas</text>
     <text class="mono" x="694" y="292" xml:space="preserve">moduloId → modulos</text>
     <text class="mono" x="694" y="310" xml:space="preserve">desde · ate</text>
     <line class="divider" x1="680" y1="322" x2="1140" y2="322"/><text class="uml-keyword" x="694" y="342">índices</text>
@@ -206,7 +206,7 @@
     <rect class="node-note" x="762" y="47" width="14" height="14" rx="3"/><text class="label" x="784" y="58">nota</text>
     <line class="edge edge-async" x1="839" y1="54" x2="881" y2="54" marker-end="url(#seta-aberta)"/><text class="label" x="895" y="58">referência por id</text>
     <line class="divider" x1="40" y1="76" x2="1680" y2="76"/>
-    <text class="footer" x="40" y="100">v02 · fiel ao código: suspensos só no requisito, modulos com quemUsa, tipo ADMINISTRADOR, índices e transação ainda a fazer</text>
-    <text class="wm-file" x="1680" y="100" text-anchor="end">autorizacao-documentos_v02_20261106-2322.svg</text>
+    <text class="footer" x="40" y="100">v03 · índices como o ms_mono cria na partida (login, registrosPermissao com versao); contratacoes com _id e sigla, sem índice; transação ainda a fazer</text>
+    <text class="wm-file" x="1680" y="100" text-anchor="end">autorizacao-documentos_v03_20261107-1402.svg</text>
   </g>
 </svg>

@@ -141,7 +141,8 @@ app.MapAutorizacao();
 // A partida, antes de aceitar pedidos (usuario-inicializacao-sequencia): a
 // configuração conferida, o registro de módulos, os índices e as contas
 // iniciais do Key Vault (RN-190, RN-265 a RN-267). Segredo ausente ou senha
-// fraca (RNF-226) ou banco fora do ar: termina com código 1, sem /health.
+// fraca (RNF-226), índice único que não pôde ser criado (RNF-227) ou banco
+// fora do ar: termina com código 1, sem /health.
 app.Services.GetService<IStartupValidator>()?.Validate();
 bool pronta;
 try

@@ -180,8 +180,9 @@ public sealed record AmbienteDaAplicacao(string? Nome)
 }
 
 /// <summary>
-/// A inicialização não pode seguir (RNF-226): falta um segredo ou uma senha não
-/// segue a RNF-202. A mensagem traz só o nome das variáveis, nunca um valor
+/// A inicialização não pode seguir (RNF-226, RNF-227): falta um segredo, uma
+/// senha não segue a RNF-202 ou um índice único não pôde ser criado. A mensagem
+/// traz só o nome das variáveis ou dos índices e coleções, nunca um valor
 /// (RNF-225).
 /// </summary>
 public sealed class FalhaNaInicializacao : Exception
@@ -199,6 +200,14 @@ public sealed class FalhaNaInicializacao : Exception
     public static FalhaNaInicializacao ListaInvalida(string variavel) =>
         new($"Lista de módulos iniciais inválida em {variavel}: use {{\"staff\": {{\"mods\": {{\"MOD-NN\": \"C\" | \"U\" | \"CU\"}}}}, \"time\": {{\"mods\": {{…}}}}}} (RN-268, RNF-226).",
             [variavel]);
+
+    /// <summary>
+    /// Índices únicos que não puderam ser criados (RNF-227), como "sigla_unica em
+    /// contas": a unicidade não está garantida no banco. Sem variável.
+    /// </summary>
+    public static FalhaNaInicializacao IndiceUnico(IReadOnlyList<string> indices) =>
+        new($"Índice único não criado: {string.Join(", ", indices)}; corrija os documentos que ferem a unicidade e inicie de novo (RNF-227).",
+            []);
 
     /// <summary>Senhas fora da RNF-202.</summary>
     public static FalhaNaInicializacao SenhaFraca(IReadOnlyList<string> variaveis) =>
