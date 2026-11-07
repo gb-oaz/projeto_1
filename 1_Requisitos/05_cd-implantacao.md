@@ -706,9 +706,9 @@ Cenário: Key Vault aberto ao CD
 
 ## Diagramas
 
-**Implantação · homologação** — `3_Arquitetura/implantacao-hml_v05_20261106-2318.svg`
+**Implantação · homologação** — `3_Arquitetura/implantacao-hml_v06_20261107-0407.svg`
 
-[![Ambiente de homologação na Azure: assinatura deb-boaz-app-hml, grupo de recursos deb-boaz-app-hml_rg, com VNet 10.10.0.0/16; na subnet snet-aca, o ambiente externo do Container Apps com backend-mono e as três aplicações web, 1 a 2 réplicas, acessadas por HTTPS pelo usuário web, pela pessoa desenvolvedora via documentação da API em /doc/api e pelos apps móveis; na subnet snet-pe, private endpoints de Key Vault, Cosmos DB for MongoDB serverless e Azure Managed Redis, com zonas Private DNS; Log Analytics, Application Insights e orçamento; imagens baixadas do Docker Hub e infraestrutura aplicada pelo CD com Terraform](../3_Arquitetura/implantacao-hml_v05_20261106-2318.svg)](../3_Arquitetura/implantacao-hml_v05_20261106-2318.svg)
+[![Ambiente de homologação na Azure: assinatura deb-boaz-app-hml, grupo de recursos deb-boaz-app-hml_rg, com VNet 10.10.0.0/16; na subnet snet-aca, o ambiente externo do Container Apps com backend-mono e as três aplicações web, 1 a 2 réplicas, acessadas por HTTPS pelo usuário web, pela pessoa desenvolvedora via documentação da API em /doc/api e pelos apps móveis; na subnet snet-pe, private endpoints de Key Vault, Cosmos DB for MongoDB serverless e Azure Managed Redis, com zonas Private DNS; Log Analytics, Application Insights e orçamento; imagens baixadas do Docker Hub e infraestrutura aplicada pelo CD com Terraform; segredos das contas iniciais (admin, contas qa e módulos de teste) lidos do Key Vault pelo backend-mono](../3_Arquitetura/implantacao-hml_v06_20261107-0407.svg)](../3_Arquitetura/implantacao-hml_v06_20261107-0407.svg)
 
 **Implantação · produção** — `3_Arquitetura/implantacao-prd_v05_20261106-2318.svg`
 

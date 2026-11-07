@@ -77,6 +77,22 @@ public sealed class UsuariosNoBanco(Armazenamento armazenamento) : IUsuarios
         return resultado.UpsertedId is not null;
     }
 
+    // as permissões do usuário qa voltam à lista (RN-267, RN-268); se os mods
+    // mudaram, a versão e o pv sobem: o token antigo é refeito (RN-230)
+    public async Task ReporModulos(string usuarioId, IReadOnlyDictionary<string, string> mods, CancellationToken ct = default)
+    {
+        var d = await Usuarios.Find(Bson.Filtro.Eq("_id", usuarioId)).FirstOrDefaultAsync(ct);
+        if (d is null) return;
+        var lista = new BsonDocument(mods.OrderBy(m => m.Key, StringComparer.Ordinal).Select(m => new BsonElement(m.Key, m.Value)));
+        var p = d.Documento("permissoes");
+        if (p?.Documento("mods") is { } atuais && atuais.Equals(lista)) return;
+        var versao = p?.Inteiro("versao", 1) ?? 0;
+        var pv = p?.Inteiro("pv", versao) ?? 0;
+        await Usuarios.UpdateOneAsync(Bson.Filtro.Eq("_id", usuarioId),
+            Bson.Mudar.Set("permissoes.versao", versao + 1).Set("permissoes.pv", Math.Max(pv, versao) + 1).Set("permissoes.mods", lista),
+            cancellationToken: ct);
+    }
+
     // a busca acha nome, entrada (ou código) e matrícula (RN-185)
     public Task<PaginaDe<UsuarioCadastrado>> Listar(FiltroDeUsuarios filtro, CancellationToken ct = default)
     {
@@ -140,6 +156,30 @@ public sealed class ContasNoBanco(Armazenamento armazenamento) : IContas
             Bson.Mudar.Combine(d.Elements.Where(e => e.Name != "_id").Select(e => Bson.Mudar.SetOnInsert(e.Name, e.Value))),
             new UpdateOptions { IsUpsert = true }, ct);
         return resultado.UpsertedId is not null;
+    }
+
+    // só os módulos da lista em vigor na conta qa (RN-268): as de fora
+    // terminam agora, as que faltam começam agora
+    public async Task ReporContratacoes(ContaAssinante conta, IReadOnlySet<string> modulos, DateTimeOffset agora, CancellationToken ct = default)
+    {
+        var colecao = armazenamento.Colecao(Colecoes.Contratacoes);
+        var emVigor = Bson.Filtro.Eq("contaId", conta.Id)
+            & Bson.Filtro.Lte("desde", Bson.Valor(agora))
+            & (Bson.Filtro.Eq("ate", BsonNull.Value) | Bson.Filtro.Gt("ate", Bson.Valor(agora)));
+        var vigentes = await colecao.Find(emVigor).ToListAsync(ct);
+        await colecao.UpdateManyAsync(emVigor & Bson.Filtro.Nin("moduloId", modulos), Bson.Mudar.Set("ate", Bson.Valor(agora)),
+            cancellationToken: ct);
+        var faltam = modulos.Except(vigentes.Select(c => c.Texto("moduloId")).OfType<string>()).Order(StringComparer.Ordinal).ToList();
+        if (faltam.Count == 0) return;
+        await colecao.InsertManyAsync(faltam.Select(m => new BsonDocument
+        {
+            ["_id"] = Guid.NewGuid().ToString("N"),
+            ["contaId"] = conta.Id,
+            ["sigla"] = conta.Sigla,
+            ["moduloId"] = m,
+            ["desde"] = Bson.Valor(agora),
+            ["ate"] = BsonNull.Value,
+        }), cancellationToken: ct);
     }
 
     public Task Atualizar(ContaAssinante conta, CancellationToken ct = default) =>

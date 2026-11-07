@@ -9,9 +9,11 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// <summary>
 /// POST /contas (RF-104, RN-179, RN-242): a conta, a conta master e a senha dela,
 /// gerada do nome do responsável e mostrada uma vez, com o comprovante que abre
-/// a primeira sessão.
+/// a primeira sessão. Fora de homologação, a sigla iniciada por "QA" é recusada
+/// (RN-179).
 /// </summary>
-public sealed class CriarConta(IUsuarios usuarios, IContas contas, IAuditoria auditoria, TimeProvider relogio) : ICriarConta
+public sealed class CriarConta(IUsuarios usuarios, IContas contas, IAuditoria auditoria, TimeProvider relogio, AmbienteDaAplicacao ambiente)
+    : ICriarConta
 {
     readonly Apoio apoio = new(usuarios, contas, auditoria, relogio);
 
@@ -19,6 +21,7 @@ public sealed class CriarConta(IUsuarios usuarios, IContas contas, IAuditoria au
     public async Task<ContaCriadaDto> Executar(NovaContaDto pedido, CancellationToken ct = default)
     {
         var (tipo, nome, documento, responsavel, telefone, dominio, sigla) = pedido.Validar();
+        Sigla.ValidarNoAmbiente(sigla, ambiente);
         if (await contas.SiglaEmUso(sigla, ct)) throw FalhaDeUsuarios.SiglaEmUso();
         if (await contas.DominioEmUso(dominio, ct)) throw FalhaDeUsuarios.DominioEmUso();
 

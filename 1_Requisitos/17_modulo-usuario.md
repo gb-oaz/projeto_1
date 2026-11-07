@@ -3,19 +3,19 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v55"
-data: "2026-11-07 01:52"
+versao: "v60"
+data: "2026-11-07 12:16"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v55** · 2026-11-07 01:52 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v60** · 2026-11-07 12:16 · **Em revisão**
 
 # Módulo Usuários
 
 **Objetivo:** definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.
 
-**Sumário:** [Cenários de tela](#cenarios-tela) · [Cenários de API](#cenarios-api) · [Telas](#telas) · [Diagramas](#diagramas) · [Em aberto](#em-aberto) · [Histórico](#historico)
+**Sumário:** [Cenários de tela](#cenarios-tela) · [Cenários de API](#cenarios-api) · [Telas](#telas) · [Diagramas](#diagramas) · [Histórico](#historico)
 
 ---
 
@@ -342,6 +342,8 @@ Esquema do Cenário: quem age sobre quem
     | o João, com Adm. usuários | a staff Ana               | aparece     |
     | o João, com Adm. usuários | o Lucas                   | aparece     |
     | o João, com Adm. usuários | o Rui, também com Adm.    | não aparece |
+    | o qaadmin                 | o admin                   | não aparece |
+    | o admin                   | o qaadmin                 | não aparece |
     | a staff Ana               | o João                    | não aparece |
 ```
 
@@ -403,11 +405,12 @@ Esquema do Cenário: sigla recusada
   Então <resultado>
 
   Exemplos:
-    | sigla | resultado                       |
-    | ebfga | é recusada, já existe           |
-    | DBOAZ | é recusada, reservada ao time   |
-    | EBF   | é recusada, precisa de 5 letras |
-    | COLSA | é aceita                        |
+    | sigla | resultado                                   |
+    | ebfga | é recusada, já existe                       |
+    | DBOAZ | é recusada, reservada ao time               |
+    | QAEDU | em produção, é recusada, reservada ao time  |
+    | EBF   | é recusada, precisa de 5 letras             |
+    | COLSA | é aceita                                    |
 
 Cenário: sigla não muda
   Quando a conta master da EBFGA procura mudar a sigla
@@ -608,6 +611,7 @@ Esquema do Cenário: uma conta qa para cada tipo de usuário no hub
 
   Exemplos:
     | entrada                   | tipo                                    |
+    | qaadmin.dboaz@deboaz.com  | administrador do deboaz, só para testes |
     | qamembro.dboaz@deboaz.com | membro do time deboaz                   |
     | qa_instituicao@deboaz.com | conta master da instituição "QAINS"     |
     | qa_autonomo@deboaz.com    | educador autônomo, conta "QAAUT"        |
@@ -622,6 +626,62 @@ Cenário: contas qa não existem em produção
   Dado a aplicação de produção iniciada
   Quando alguém informa "qastaff.qains@deboaz.com" e uma senha em Entrar
   Então vê "Entrada ou senha incorretas."
+```
+
+<a id="RN-268"></a>
+
+### `RN-268` Módulos iniciais das contas qa
+
+```gherkin
+Cenário: contas qa começam com os módulos da lista
+  Dado o Key Vault de homologação com a parte da staff "MOD-03", "MOD-04" e "MOD-05"
+  E a parte do time "MOD-03" e "MOD-14"
+  Quando a aplicação de homologação inicia
+  Então a conta master da "QAINS" e o educador da "QAAUT" veem os 3 cards da staff em Contratados
+  E o "qastaff" entra e vê os 3 cards em Módulos, com as abas da parte da staff
+  E o "qamembro" entra e vê "MOD-03" e "MOD-14" em Módulos, com as abas da parte do time
+
+Cenário: lista trocada sem mudar o requisito
+  Dado a parte da staff trocada para "MOD-03" e "MOD-12"
+  E a parte do time trocada para "MOD-03" e "MOD-02"
+  Quando a aplicação de homologação inicia de novo
+  Então as contas "QAINS" e "QAAUT" e o "qastaff" ganham "MOD-12" e perdem "MOD-04" e "MOD-05"
+  E o "qamembro" vê "MOD-02" no lugar de "MOD-14"
+
+Cenário: produção segue a contratação
+  Dado a aplicação de produção iniciada
+  Quando a conta master da EBFGA entra pela primeira vez
+  Então vê em Contratados só os módulos que a EBFGA contratou
+  E nenhum módulo vem da inicialização
+```
+
+<a id="RN-269"></a>
+
+### `RN-269` Dados fictícios das contas qa
+
+```gherkin
+Esquema do Cenário: conta qa com nome e documento no formato do projeto
+  Dado a aplicação de homologação iniciada
+  Quando o administrador qa toca Ver a conta da "<sigla>"
+  Então vê o nome "<nome>" e o <documento>
+  E nenhum desses dados é de uma pessoa ou empresa real
+
+  Exemplos:
+    | sigla | nome                     | documento               |
+    | QAINS | Instituição QA de Testes | CNPJ 98.765.432/0001-98 |
+    | QAAUT | Educador QA de Testes    | CPF 987.654.321-00      |
+
+Esquema do Cenário: nome de cada pessoa qa
+  Dado a aplicação de homologação iniciada
+  Quando a pessoa de testes entra com "<entrada>"
+  Então vê o nome "<nome>" na Conta
+
+  Exemplos:
+    | entrada                   | nome               |
+    | qaadmin.dboaz@deboaz.com  | Administrador QA   |
+    | qamembro.dboaz@deboaz.com | Membro QA          |
+    | qastaff.qains@deboaz.com  | Staff QA           |
+    | QAINS-QAPART-0001         | Participante QA    |
 ```
 
 ---
@@ -1063,7 +1123,22 @@ Esquema do Cenário: quem age sobre quem
     | o João, com Adm. usuários | a staff Ana               | 204               |
     | o João, com Adm. usuários | o Lucas                   | 204               |
     | o João, com Adm. usuários | o Rui, também com Adm.    | 403 ACESSO_NEGADO |
+    | o qaadmin                 | o admin                   | 403 ACESSO_NEGADO |
+    | o admin                   | o qaadmin                 | 403 ACESSO_NEGADO |
     | a staff Ana               | o João                    | 403 ACESSO_NEGADO |
+
+Esquema do Cenário: administrador sobre outro administrador
+  Dado o token de "<quem>" em homologação
+  Quando envia POST /usuarios/{id}/<ação> de "<alvo>"
+  Então a resposta é 403 ACESSO_NEGADO
+  E "<alvo>" continua com o mesmo estado e a mesma senha
+
+  Exemplos:
+    | quem                     | ação               | alvo                     |
+    | qaadmin.dboaz@deboaz.com | reativar           | admin.dboaz@deboaz.com   |
+    | qaadmin.dboaz@deboaz.com | nova-geracao-senha | admin.dboaz@deboaz.com   |
+    | admin.dboaz@deboaz.com   | reativar           | qaadmin.dboaz@deboaz.com |
+    | admin.dboaz@deboaz.com   | nova-geracao-senha | qaadmin.dboaz@deboaz.com |
 
 Cenário: time deboaz e a conta master
   Quando o membro do time Caio envia POST /contas/conta-ebfga/codigo-master
@@ -1230,11 +1305,12 @@ Esquema do Cenário: sigla recusada
   Então a resposta é <resposta>
 
   Exemplos:
-    | sigla | resposta                                |
-    | ebfga | 409 SIGLA_EM_USO                        |
-    | DBOAZ | 422 SIGLA_INVALIDA, reservada ao time   |
-    | EBF   | 422 SIGLA_INVALIDA, precisa de 5 letras |
-    | COLSA | 201                                     |
+    | sigla | resposta                                            |
+    | ebfga | 409 SIGLA_EM_USO                                    |
+    | DBOAZ | 422 SIGLA_INVALIDA, reservada ao time               |
+    | QAEDU | em produção, 422 SIGLA_INVALIDA, reservada ao time  |
+    | EBF   | 422 SIGLA_INVALIDA, precisa de 5 letras             |
+    | COLSA | 201                                                 |
 ```
 
 <a id="RN-242-api"></a>
@@ -1543,11 +1619,12 @@ Esquema do Cenário: papel de cada conta qa no hub
   Então a resposta é 200 e o token tem o papel "<papel>"
 
   Exemplos:
-    | entrada                   | papel       |
-    | qamembro.dboaz@deboaz.com | MEMBRO_TIME |
-    | qa_instituicao@deboaz.com | MASTER      |
-    | qa_autonomo@deboaz.com    | AUTONOMO    |
-    | qastaff.qains@deboaz.com  | STAFF       |
+    | entrada                   | papel         |
+    | qaadmin.dboaz@deboaz.com  | ADMINISTRADOR |
+    | qamembro.dboaz@deboaz.com | MEMBRO_TIME   |
+    | qa_instituicao@deboaz.com | MASTER        |
+    | qa_autonomo@deboaz.com    | AUTONOMO      |
+    | qastaff.qains@deboaz.com  | STAFF         |
 
 Cenário: participante qa no quest
   Dado a aplicação de homologação iniciada
@@ -1563,7 +1640,7 @@ Esquema do Cenário: tipo de cada conta qa, lido por quem tem acesso
     | quem                      | alvo                      | tipo         |
     | qa_instituicao@deboaz.com | qa_instituicao@deboaz.com | MASTER       |
     | qa_autonomo@deboaz.com    | qa_autonomo@deboaz.com    | MASTER       |
-    | admin.dboaz@deboaz.com    | qamembro.dboaz@deboaz.com | MEMBRO_TIME  |
+    | qaadmin.dboaz@deboaz.com  | qamembro.dboaz@deboaz.com | MEMBRO_TIME  |
     | qa_instituicao@deboaz.com | qastaff.qains@deboaz.com  | STAFF        |
     | qa_instituicao@deboaz.com | QAINS-QAPART-0001         | PARTICIPANTE |
 ```
@@ -1579,7 +1656,7 @@ Esquema do Cenário: contas que a inicialização garante em cada ambiente
 
   Exemplos:
     | ambiente    | contas                                                        |
-    | homologação | o administrador, as 5 contas qa e as contas "QAINS" e "QAAUT" |
+    | homologação | o administrador, as 6 contas qa e as contas "QAINS" e "QAAUT" |
     | produção    | só o administrador, na conta "DBOAZ"                          |
 
 Cenário: segredo qa em produção por engano
@@ -1606,10 +1683,64 @@ Cenário: senha trocada no Key Vault
   Então POST /auth/hub/entrar aceita só a senha nova
   E a senha antiga recebe 401 ENTRADA_INVALIDA
 
-Cenário: conta qa desativada por um teste
-  Dado a staff "qastaff.qains@deboaz.com" desativada durante um teste
+Esquema do Cenário: conta qa mudada por um teste volta ao estado inicial
+  Dado <mudança> durante um teste
   Quando a aplicação de homologação inicia de novo
-  Então a staff volta ativa, com a senha do Key Vault
+  Então <volta>
+  E só as contas qa voltam ao estado inicial
+  E "admin.dboaz@deboaz.com" fica como estava, sem volta nem mudança vinda do "qaadmin"
+
+  Exemplos:
+    | mudança                                     | volta                                         |
+    | a staff "qastaff.qains" desativada          | a staff fica ativa                            |
+    | a senha do "qamembro.dboaz" gerada de novo  | vale só a senha do Key Vault                  |
+    | "MOD-05" tirado das abas do "qastaff.qains" | o "qastaff" só com as abas da parte da staff  |
+    | "MOD-02" concedido ao "qamembro.dboaz"      | o "qamembro" só com as abas da parte do time  |
+```
+
+<a id="RN-268-api"></a>
+
+### `RN-268` Módulos iniciais das contas qa
+
+```gherkin
+Cenário: permissões iniciais lidas do Key Vault
+  Dado o Key Vault de homologação com a lista de módulos iniciais:
+    """
+    {
+      "staff": {
+        "mods": {
+          "MOD-03": "CU",
+          "MOD-04": "U",
+          "MOD-05": "U"
+        }
+      },
+      "time": {
+        "mods": {
+          "MOD-03": "U",
+          "MOD-14": "U"
+        }
+      }
+    }
+    """
+  Quando a aplicação de homologação inicia
+  Então GET /usuarios/{id}/permissoes do "qastaff.qains@deboaz.com" traz os mods de "staff"
+  E GET /usuarios/{id}/permissoes do "qamembro.dboaz@deboaz.com" traz os mods de "time"
+
+Cenário: contas qa com os módulos da lista contratados
+  Dado a mesma lista no Key Vault de homologação
+  Quando "qa_instituicao@deboaz.com" envia GET /usuarios/{id}/permissoes do "qastaff"
+  Então concediveis traz "MOD-03", "MOD-04" e "MOD-05", da parte "staff", com "CU"
+  E traz também os módulos da conta "MOD-08" Turmas e "MOD-09" Tarefas, que entram sozinhos
+
+Cenário: parte do time não vira contratação
+  Dado a mesma lista no Key Vault de homologação
+  Quando a aplicação de homologação inicia
+  Então "QAINS" e "QAAUT" não contratam "MOD-14" nem nenhum módulo da parte "time"
+
+Cenário: produção sem módulos da inicialização
+  Dado a aplicação de produção iniciada
+  Quando a conta master da EBFGA envia GET /usuarios/usr-ebfga-maria/permissoes
+  Então concediveis traz só os módulos contratados pela escola
 ```
 
 <a id="RNF-201"></a>
@@ -1694,11 +1825,13 @@ Esquema do Cenário: aplicação não inicia sem o segredo
   E o log diz o nome da variável que falta, nunca um valor
 
   Exemplos:
-    | ambiente    | segredo                                 |
-    | produção    | a senha do administrador                |
-    | homologação | a entrada do administrador              |
-    | homologação | a senha da staff "qastaff.qains"        |
-    | homologação | o código do participante "QAINS-QAPART" |
+    | ambiente    | segredo                                   |
+    | produção    | a senha do administrador                  |
+    | homologação | a entrada do administrador                |
+    | homologação | a senha do administrador qa "qaadmin"     |
+    | homologação | a senha da staff "qastaff.qains"          |
+    | homologação | o código do participante "QAINS-QAPART"   |
+    | homologação | a lista de módulos iniciais das contas qa |
 
 Cenário: senha fraca no Key Vault
   Dado a senha "Gu#B5" no Key Vault para "qastaff.qains@deboaz.com"
@@ -1931,13 +2064,13 @@ Cenário: o que este documento não trata
 
 [![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v02_20261103-1143.svg)](../2_Diagramas/usuarios-sequencia_v02_20261103-1143.svg)
 
-**Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v01_20261106-2320.svg`
+**Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg`
 
-[![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, e cria o administrador e, em homologação, as contas qa sem duplicar as que já existem](../2_Diagramas/usuario-inicializacao-sequencia_v01_20261106-2320.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v01_20261106-2320.svg)
+[![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)
 
-**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg`
+**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v04_20261107-0315.svg`
 
-[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg)](../2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg)
+[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v04_20261107-0315.svg)](../2_Diagramas/usuarios-contrato-api_v04_20261107-0315.svg)
 
 **Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v03_20261101-1500.svg`
 
@@ -1947,23 +2080,9 @@ Cenário: o que este documento não trata
 
 [![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)
 
-**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v05_20261106-2320.svg`
+**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v07_20261107-1214.svg`
 
-[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios particionados pela sigla com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas](../2_Diagramas/identidade-acesso-documentos_v05_20261106-2320.svg)](../2_Diagramas/identidade-acesso-documentos_v05_20261106-2320.svg)
-
----
-
-<a id="em-aberto"></a>
-
-## Em aberto
-
-- A entrada do administrador é "admin.dboaz@deboaz.com" ou outra? — **Produto**
-- O papel `ADMINISTRADOR` ganha uma conta qa própria em homologação, ou os testes usam o administrador do Key Vault de homologação (hoje só existe um administrador, no topo da ordem de superior)? — **Produto**
-- Sem um segredo de conta qa, homologação deve parar (como na `RNF-226`) ou iniciar sem aquela conta e avisar? — **Produto**
-- A cada inicialização, a conta qa volta ao estado inicial (ativa, senha do Key Vault, `RN-267`) também nas permissões, ou só na senha e no estado? — **Produto**
-- Que módulos as contas "QAINS" e "QAAUT" têm contratados e que permissões o "qastaff" e o "qamembro" recebem na criação (hoje começam sem módulos, como na `RN-246`)? — **Produto**
-- Que documento (CNPJ e CPF de teste) e que nome as contas "QAINS" e "QAAUT" levam? — **Produto**
-- As siglas iniciadas por "QA" ficam reservadas em produção, como a "DBOAZ" na `RN-179`? — **Produto**
+[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios particionados pela sigla com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v07_20261107-1214.svg)](../2_Diagramas/identidade-acesso-documentos_v07_20261107-1214.svg)
 
 ---
 
@@ -1973,17 +2092,17 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v55** | 2026-11-07 01:52 | `RN-265-api`: sai o exemplo do qamembro lendo o próprio registro, que exige `MOD-03` com `U` e ele nasce sem módulos (`RN-246`); o tipo MEMBRO_TIME segue conferido pelo administrador |
+| **v60** | 2026-11-07 12:16 | Diagramas: sequência da inicialização v03 e modelo de documentos v07; cenários sem mudança |
+| v59 | 2026-11-07 12:07 | Lista de módulos iniciais das contas qa com a parte "staff", contratada por "QAINS" e "QAAUT", e a parte "time" do "qamembro" ("MOD-03" e "MOD-14"); concediveis traz também os módulos da conta "MOD-08" e "MOD-09" (`RN-268`, `RN-268-api`); exemplo da volta ao estado inicial com "MOD-02" no lugar de "MOD-12", que a conta do time não contrata (`RN-267`); status → Em revisão |
+| v58 | 2026-11-07 03:10 | Administrador não age sobre outro administrador: "qaadmin" e "admin" não desativam, não reativam nem geram nova senha um do outro, tela recusa e a API responde 403 ACESSO_NEGADO (`RN-169`, `RN-169-api`); a volta ao estado inicial vale só para as contas qa e o "admin" real fica como estava (`RN-267`); sequência da inicialização trocada para a v02; Em revisão pela mudança de regra e Aprovado na mesma versão, com autorização do usuário |
+| v57 | 2026-11-07 02:55 | Status → Aprovado, junto com o glossário v45; cenários sem mudança |
+| v56 | 2026-11-07 02:38 | Em aberto resolvido: administrador mantém "admin.dboaz@deboaz.com" (`RN-190`, `RNF-225`); conta qa própria "qaadmin.dboaz@deboaz.com" com o papel `ADMINISTRADOR`, 6 contas qa (`RN-265`, `RN-265-api`, `RN-266`); módulos iniciais das contas qa pela lista do Key Vault de homologação, produção pela contratação (`RN-268`, `RN-268-api`); dados fictícios no formato do projeto (`RN-269`); inicialização volta senha, estado, permissões e módulos (`RN-267`); segredo qa ausente impede homologação (`RNF-226`); siglas "QA…" reservadas em produção (`RN-179`, `RN-179-api`) |
+| v55 | 2026-11-07 01:52 | `RN-265-api`: sai o exemplo do qamembro lendo o próprio registro, que exige `MOD-03` com `U` e ele nasce sem módulos (`RN-246`); o tipo MEMBRO_TIME segue conferido pelo administrador |
 | v54 | 2026-11-07 00:50 | `RN-265-api`: o tipo de cada conta qa é lido por quem tem acesso (a própria conta, a conta master da QAINS e o administrador só para o membro do time), sem contrariar `RN-235` e `RN-187` |
 | v53 | 2026-11-06 23:37 | Diagramas: modelo de documentos v05; pacotes da arquitetura hexagonal (`usuario-hexagonal` v01) e sequência da inicialização com Key Vault, validação e contas sem duplicar (`usuario-inicializacao-sequencia` v01) |
 | v52 | 2026-11-06 23:15 | Contas iniciais: o administrador criado na primeira inicialização (`RN-190`); uma conta qa para cada tipo de usuário só em homologação (`RN-265`, `RN-265-api`, `RN-266`); inicialização sem duplicar (`RN-267`); entradas e senhas só pelo Key Vault, como variáveis de ambiente na partida (`RNF-225`); segredo ausente ou inválido impede a partida (`RNF-226`); Em aberto com 7 pendências; status → Em revisão |
 | v51 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
-| v50 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
-| v49 | 2026-11-03 12:30 | Vistas web de hub-acesso e quest-sala-anonima (medium e expanded); Telas com as quatro vistas em Web, PWA e Mobile |
-| v48 | 2026-11-03 11:45 | Estrutura do módulo (06 `RNF-103` v17): Telas em Web, PWA e Mobile, uma vista por plataforma (hub-acesso e quest-sala-anonima ainda sem a web); Diagramas na ordem casos de uso, sequência, contrato, classes e documentos; sequência v02 com as telas de cada fase |
-| v47 | 2026-11-02 17:22 | Contrato de API de Usuários v03: em `RN-185`, GET /usuarios com tipo opcional (sem tipo, a busca percorre todos os tipos que quem pede pode listar) e o tipo em cada item da lista; a staff concede também Administrar usuários, só com as abas que tem (`RN-167`, Autorização `RN-252`) |
-| v46 | 2026-11-02 15:08 | Contrato de API de Usuários v02: regras do core (ids, sigla sugerida, documento, senha, tempos em horas, conta do time), mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam (RF-104 a RF-114, RF-152 a RF-154, RN-163 a RN-190, RN-242 a RN-246) |
 
 ---
 
-<sub>boaz · v55 · 2026-11-07 01:52 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v60 · 2026-11-07 12:16 · `1_Requisitos/17_modulo-usuario.md`</sub>

@@ -318,8 +318,10 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
   # homologação: a chave que assina o token (PKCS#8 em base64) e as contas
   # iniciais (17 RN-190, RN-265, RNF-207, RNF-225) — o administrador do deboaz
   # e as contas qa, com as entradas do requisito e senhas geradas aqui
-  # (RNF-202). O backend sobe com AMBIENTE=hml e o qa do backend recebe as
-  # mesmas USUARIO_*; nenhum valor fica no repositório.
+  # (RNF-202), e a lista de módulos das contas qa (RN-268, RNF-226). O
+  # backend sobe com AMBIENTE=hml e o qa do backend recebe as mesmas
+  # USUARIO_*; nenhum valor fica no repositório. No compose, os valores vão
+  # entre aspas simples: o JSON da lista tem aspas duplas.
   # (o pkcs8 -topk8 garante PKCS#8: o OpenSSL 3 grava "genpkey -outform DER" em PKCS#1)
   CHAVE_PRIVADA=$(openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 2>/dev/null \
     | openssl pkcs8 -topk8 -nocrypt -outform DER | base64 | tr -d '\n')
@@ -333,6 +335,8 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
   USUARIOS=(
     "USUARIO_ADMIN_ENTRADA=admin.dboaz@deboaz.com"
     "USUARIO_ADMIN_SENHA=$(senha_nova)"
+    "USUARIO_QA_ADMIN_ENTRADA=qaadmin.dboaz@deboaz.com"
+    "USUARIO_QA_ADMIN_SENHA=$(senha_nova)"
     "USUARIO_QA_MEMBRO_ENTRADA=qamembro.dboaz@deboaz.com"
     "USUARIO_QA_MEMBRO_SENHA=$(senha_nova)"
     "USUARIO_QA_MASTER_ENTRADA=qa_instituicao@deboaz.com"
@@ -342,6 +346,9 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
     "USUARIO_QA_STAFF_ENTRADA=qastaff.qains@deboaz.com"
     "USUARIO_QA_STAFF_SENHA=$(senha_nova)"
     "USUARIO_QA_PARTICIPANTE_CODIGO=QAINS-QAPART-0001"
+    # módulos e abas iniciais das contas qa (RN-268), em JSON {"mods": {…}}:
+    # o exemplo do requisito, o mesmo que o qa usa (suporte/Partida.cs)
+    'USUARIO_QA_MODULOS={"staff":{"mods":{"MOD-03":"CU","MOD-04":"U","MOD-05":"U"}},"time":{"mods":{"MOD-03":"U","MOD-14":"U"}}}'
   )
   # no GitHub Actions, as senhas e a chave não aparecem no log
   if [ "${GITHUB_ACTIONS:-}" = true ]; then
@@ -366,7 +373,7 @@ $($QA_MOBILE && echo '    ports: ["127.0.0.1:18080:8080"]')
       Swagger__Habilitado: "true"
       Autenticacao__ChaveId: deboaz-local
       Autenticacao__ChavePrivada: "$CHAVE_PRIVADA"
-$(for v in "${USUARIOS[@]}"; do printf '      %s: "%s"\n' "${v%%=*}" "${v#*=}"; done)
+$(for v in "${USUARIOS[@]}"; do printf "      %s: '%s'\\n" "${v%%=*}" "${v#*=}"; done)
     depends_on:
       mongodb: { condition: service_healthy }
       redis: { condition: service_healthy }

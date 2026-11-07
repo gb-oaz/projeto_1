@@ -56,6 +56,24 @@ public class ContasTests
         else await Falha(codigo, () => Mock.CriarConta.Executar(Colsa(sigla: sigla)));
     }
 
+    [Theory]
+    [InlineData("prd", "QAEDU", "SIGLA_INVALIDA")]
+    [InlineData("prd", "qaedu", "SIGLA_INVALIDA")]
+    [InlineData(null, "QAEDU", "SIGLA_INVALIDA")]
+    [InlineData("hml", "QAEDU", null)]
+    [InlineData("prd", "AQUAS", null)]
+    public async Task RN_179_sigla_qa_reservada_em_producao(string? ambiente, string sigla, string? codigo)
+    {
+        var mock = new UsuariosEmMemoria(ambiente!);
+        if (codigo is null)
+        {
+            Assert.Equal($"conta-{sigla.ToLowerInvariant()}", (await mock.CriarConta.Executar(Colsa(sigla: sigla))).ContaId);
+            return;
+        }
+        var falha = await Assert.ThrowsAsync<FalhaDeUsuarios>(() => mock.CriarConta.Executar(Colsa(sigla: sigla)));
+        Assert.Equal((codigo, "Siglas QA são reservadas ao time deboaz.", "sigla"), (falha.Codigo, falha.Message, falha.Campo));
+    }
+
     [Fact]
     public async Task RN_179_sigla_sugerida()
     {

@@ -28,6 +28,9 @@ servicos.AddConfiguracoes();
 servicos.AddDocumentacaoApi();
 servicos.AddJsonDasApis();
 servicos.AddSingleton(TimeProvider.System);
+// AMBIENTE (hml ou prd): só homologação tem as contas qa (17 RN-179, RN-266)
+servicos.AddSingleton(new Boaz.Core.Commons.Usuario.Usuarios.Domain.AmbienteDaAplicacao(
+    builder.Configuration[Boaz.Core.Commons.Usuario.Usuarios.Domain.ContasIniciais.VariavelDoAmbiente]));
 
 // ── infra/out: banco, cache, índices e o registro de módulos ─────────────────
 servicos.AddSingleton<Armazenamento>();

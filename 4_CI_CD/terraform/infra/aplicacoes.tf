@@ -32,16 +32,22 @@ locals {
   imagem     = { for a in local.apps : a => local.tag[a] == "" ? local.provisoria : "docker.io/${var.dockerhub_usuario}/${a}:${local.tag[a]}" }
   porta      = { for a in local.apps : a => local.tag[a] == "" ? 80 : var.porta[a] }
 
-  # Contas iniciais do backend (17: RN-190, RN-265 a RN-267, RNF-225, RNF-226).
+  # Contas iniciais do backend (17: RN-190, RN-265 a RN-268, RNF-225, RNF-226).
   # Segredo do Key Vault → variável de ambiente lida no start. Os valores são
   # gravados à mão no Key Vault de cada ambiente (README) e nunca passam pelo
   # repositório, pela imagem nem pelo pipeline: aqui só há referências. As
   # contas qa existem só em homologação, então os segredos usuario-qa-* não
-  # são referenciados em produção. Segredo ausente impede a revisão de subir.
+  # são referenciados em produção; usuario-qa-modulos traz os módulos e abas
+  # iniciais delas em JSON {"staff": {"mods": {…}}, "time": {"mods": {…}}}
+  # (RN-268): "staff" é contratada pela QAINS e pela QAAUT e dá as abas do
+  # qastaff; "time" dá só as abas do qamembro, sem contratação. Segredo
+  # ausente impede a revisão de subir.
   segredos_usuarios = merge({
     "usuario-admin-entrada" = "USUARIO_ADMIN_ENTRADA"
     "usuario-admin-senha"   = "USUARIO_ADMIN_SENHA"
     }, local.prd ? {} : {
+    "usuario-qa-admin-entrada"       = "USUARIO_QA_ADMIN_ENTRADA"
+    "usuario-qa-admin-senha"         = "USUARIO_QA_ADMIN_SENHA"
     "usuario-qa-membro-entrada"      = "USUARIO_QA_MEMBRO_ENTRADA"
     "usuario-qa-membro-senha"        = "USUARIO_QA_MEMBRO_SENHA"
     "usuario-qa-master-entrada"      = "USUARIO_QA_MASTER_ENTRADA"
@@ -51,6 +57,7 @@ locals {
     "usuario-qa-staff-entrada"       = "USUARIO_QA_STAFF_ENTRADA"
     "usuario-qa-staff-senha"         = "USUARIO_QA_STAFF_SENHA"
     "usuario-qa-participante-codigo" = "USUARIO_QA_PARTICIPANTE_CODIGO"
+    "usuario-qa-modulos"             = "USUARIO_QA_MODULOS"
   })
 }
 

@@ -20,7 +20,7 @@ namespace Boaz.Qa.Integracao.Hub.Usuarios;
 // /usuarios com:" criar a Maria, "usr-ebfga-maria" é ela. Valores gerados
 // (senha, código de liberação, comprovante) valem pelo formato.
 [Binding]
-public sealed partial class UsuariosPassos(Mundo mundo)
+public sealed partial class UsuariosPassos(Mundo mundo, Partida partida)
 {
     const string SoNoBackend = "conferido nos testes do backend: o qa não olha o banco";
     const string SemSala = "abrir e fechar uma sala não está no contrato";
@@ -33,6 +33,8 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     string alvo = "";
     JsonObject? antes;
     string loginAntes = "", codigo = "";
+    // a sigla do último POST /contas do cenário (RN-179)
+    string siglaEnviada = "";
     Pessoa? leitor;
     Dictionary<string, string> modsAntes = [];
     readonly List<string> senhas = [];
@@ -68,6 +70,7 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     [When(@"^envia POST /contas com a sigla ""(\w+)""$")]
     public async Task ContaComSigla(string sigla)
     {
+        siglaEnviada = sigla;
         await mundo.Conta();
         await NovaConta("INSTITUICAO", sigla, $"dominio_{sigla.ToLowerInvariant()}", Cnpj(20000001));
     }
@@ -107,6 +110,18 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     // o motivo da tabela é para quem lê; a resposta é o status e o código
     [Then(@"^a resposta é (\d{3}) ([A-Z_]+), (?:reservada ao time|precisa de 5 letras)$")]
     public void SiglaInvalida(int status, string codigo) => Respostas.Confere(mundo.Ultima, status, codigo);
+
+    // as siglas "QA…" são das contas qa de homologação: a recusa é em produção,
+    // numa instância própria (suporte/Partida.cs), com o mesmo pedido
+    [Then(@"^a resposta é em produção, (\d{3}) ([A-Z_]+), reservada ao time$")]
+    public async Task SiglaQaEmProducao(int status, string codigo)
+    {
+        partida.KeyVaultCompleto("prd");
+        await partida.IniciarPronta("produção");
+        var r = await partida.Api.Enviar("POST", "/contas",
+            ContaNova("INSTITUICAO", "Escola Nova", Cnpj(20000001), $"dominio_{siglaEnviada.ToLowerInvariant()}", siglaEnviada));
+        Respostas.Confere(r, status, codigo);
+    }
 
     [When(@"^envia GET /contas/sigla-sugerida\?nome=(.+)$")]
     public Task SiglaSugerida(string nome) =>
@@ -583,7 +598,8 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     public async Task ContinuaNaLista(string caminho, string estado) => Assert.Equal(estado, Texto(await Ler(caminho), "estado"));
 
     // quem age sobre quem (RN-169): o João tem Administrar usuários; a Ana foi criada por ele
-    [When(@"^(o administrador|a conta master|o João, com Adm\. usuários|a staff Ana) envia POST /usuarios/\{id\}/desativar de (o membro Caio|o João, com Adm\. usuários|a staff Ana|o Lucas|o Rui, também com Adm\.|o João)$")]
+    // o qaadmin e o admin: os dois administradores, um sobre o outro (RN-169)
+    [When(@"^(o administrador|a conta master|o João, com Adm\. usuários|a staff Ana|o qaadmin|o admin) envia POST /usuarios/\{id\}/desativar de (o membro Caio|o João, com Adm\. usuários|a staff Ana|o Lucas|o Rui, também com Adm\.|o João|o qaadmin|o admin)$")]
     public async Task Desativa(string quem, string de)
     {
         var joao = await mundo.Joao();
@@ -593,6 +609,8 @@ public sealed partial class UsuariosPassos(Mundo mundo)
             "o administrador" => mundo.Admin(),
             "a conta master" => await mundo.Master(),
             "a staff Ana" => await mundo.Ana(),
+            "o qaadmin" => mundo.QaAdmin(),
+            "o admin" => mundo.AdminReal(),
             _ => joao,
         };
         var alvoDe = de switch
@@ -601,9 +619,50 @@ public sealed partial class UsuariosPassos(Mundo mundo)
             "a staff Ana" => await mundo.Ana(),
             "o Lucas" => await mundo.Lucas(),
             "o Rui, também com Adm." => await mundo.Rui(),
+            "o qaadmin" => mundo.QaAdmin(),
+            "o admin" => mundo.AdminReal(),
             _ => joao,
         };
         await mundo.EnviarComo(por, "POST", $"/usuarios/{alvoDe.Id}/desativar");
+    }
+
+    // administrador sobre outro administrador (RN-169): o backend de API_URL,
+    // em homologação, com as entradas e senhas das USUARIO_*
+    Pessoa? quemAge;
+    string estadoAntes = "";
+
+    [Given(@"^o token de ""(.+)"" em homologação$")]
+    public async Task TokenEmHomologacao(string entrada)
+    {
+        quemAge = PessoaDe(ContasIniciais.PorEntrada(entrada));
+        await mundo.SessaoDe(quemAge, Navegador);
+    }
+
+    [When(@"^envia POST /usuarios/\{id\}/(reativar|nova-geracao-senha) de ""(.+)""$")]
+    public async Task AdminSobreAdmin(string acaoNoAlvo, string entrada)
+    {
+        var alvoDe = ContasIniciais.PorEntrada(entrada);
+        estadoAntes = await EstadoPeloProprio(alvoDe, "preparo: ");
+        alvo = alvoDe.Id;
+        acao = await mundo.EnviarComo(quemAge!, "POST", $"/usuarios/{alvoDe.Id}/{acaoNoAlvo}");
+    }
+
+    [Then(@"^""(.+)"" continua com o mesmo estado e a mesma senha$")]
+    public async Task MesmoEstadoEMesmaSenha(string entrada)
+    {
+        Assert.Equal(estadoAntes, await EstadoPeloProprio(ContasIniciais.PorEntrada(entrada), ""));
+    }
+
+    // o estado do alvo lido com o token dele mesmo, entrando com a senha do Key
+    // Vault: quem age não lê o outro administrador (RN-169, 403 ACESSO_NEGADO)
+    async Task<string> EstadoPeloProprio(ContaInicial conta, string prefixo)
+    {
+        var alvoDe = PessoaDe(conta);
+        var entrou = await mundo.Enviar("POST", "/auth/hub/entrar", Partida.CorpoDoHub(alvoDe.Entrada, alvoDe.Senha));
+        Assert.True(entrou.Status == 200, $"{prefixo}{alvoDe.Nome} não entra com a senha do Key Vault: {entrou}");
+        var token = Texto(entrou, "tokenAcesso");
+        return Texto(Exigir(await mundo.Enviar("GET", $"/usuarios/{conta.Id}", token: token), 200,
+            $"{prefixo}GET /usuarios/{{id}} de {alvoDe.Nome}, com o token dele"), "estado");
     }
 
     // ── edição (RF-153, RN-244) ────────────────────────────────────────────
@@ -829,7 +888,7 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     }
 
     // "concediveis traz só ""MOD-03"" com ""CU"" e ""MOD-05"" com ""U"""
-    [Then(@"^concediveis traz só (""MOD-.+)$")]
+    [Then(@"^concediveis traz só (""MOD-\d+"" com .+)$")]
     public void SoEstesConcediveis(string pares)
     {
         Respostas.Confere(mundo.Ultima, 200);

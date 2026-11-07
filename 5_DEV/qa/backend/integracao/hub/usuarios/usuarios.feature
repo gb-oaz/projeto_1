@@ -357,7 +357,23 @@ Funcionalidade: Usuários
       | o João, com Adm. usuários | a staff Ana               | 204               |
       | o João, com Adm. usuários | o Lucas                   | 204               |
       | o João, com Adm. usuários | o Rui, também com Adm.    | 403 ACESSO_NEGADO |
+      | o qaadmin                 | o admin                   | 403 ACESSO_NEGADO |
+      | o admin                   | o qaadmin                 | 403 ACESSO_NEGADO |
       | a staff Ana               | o João                    | 403 ACESSO_NEGADO |
+
+  @RN-169
+  Esquema do Cenário: administrador sobre outro administrador
+    Dado o token de "<quem>" em homologação
+    Quando envia POST /usuarios/{id}/<ação> de "<alvo>"
+    Então a resposta é 403 ACESSO_NEGADO
+    E "<alvo>" continua com o mesmo estado e a mesma senha
+
+    Exemplos:
+      | quem                     | ação               | alvo                     |
+      | qaadmin.dboaz@deboaz.com | reativar           | admin.dboaz@deboaz.com   |
+      | qaadmin.dboaz@deboaz.com | nova-geracao-senha | admin.dboaz@deboaz.com   |
+      | admin.dboaz@deboaz.com   | reativar           | qaadmin.dboaz@deboaz.com |
+      | admin.dboaz@deboaz.com   | nova-geracao-senha | qaadmin.dboaz@deboaz.com |
 
   @RN-169
   Cenário: time deboaz e a conta master
@@ -491,11 +507,12 @@ Funcionalidade: Usuários
     Então a resposta é <resposta>
 
     Exemplos:
-      | sigla | resposta                                |
-      | ebfga | 409 SIGLA_EM_USO                        |
-      | DBOAZ | 422 SIGLA_INVALIDA, reservada ao time   |
-      | EBF   | 422 SIGLA_INVALIDA, precisa de 5 letras |
-      | COLSA | 201                                     |
+      | sigla | resposta                                            |
+      | ebfga | 409 SIGLA_EM_USO                                    |
+      | DBOAZ | 422 SIGLA_INVALIDA, reservada ao time               |
+      | QAEDU | em produção, 422 SIGLA_INVALIDA, reservada ao time  |
+      | EBF   | 422 SIGLA_INVALIDA, precisa de 5 letras             |
+      | COLSA | 201                                                 |
 
   @RN-242
   Esquema do Cenário: documento de cada conta
@@ -730,11 +747,12 @@ Funcionalidade: Usuários
     Então a resposta é 200 e o token tem o papel "<papel>"
 
     Exemplos:
-      | entrada                   | papel       |
-      | qamembro.dboaz@deboaz.com | MEMBRO_TIME |
-      | qa_instituicao@deboaz.com | MASTER      |
-      | qa_autonomo@deboaz.com    | AUTONOMO    |
-      | qastaff.qains@deboaz.com  | STAFF       |
+      | entrada                   | papel         |
+      | qaadmin.dboaz@deboaz.com  | ADMINISTRADOR |
+      | qamembro.dboaz@deboaz.com | MEMBRO_TIME   |
+      | qa_instituicao@deboaz.com | MASTER        |
+      | qa_autonomo@deboaz.com    | AUTONOMO      |
+      | qastaff.qains@deboaz.com  | STAFF         |
 
   @RN-265
   Cenário: participante qa no quest
@@ -752,7 +770,7 @@ Funcionalidade: Usuários
       | quem                      | alvo                      | tipo         |
       | qa_instituicao@deboaz.com | qa_instituicao@deboaz.com | MASTER       |
       | qa_autonomo@deboaz.com    | qa_autonomo@deboaz.com    | MASTER       |
-      | admin.dboaz@deboaz.com    | qamembro.dboaz@deboaz.com | MEMBRO_TIME  |
+      | qaadmin.dboaz@deboaz.com  | qamembro.dboaz@deboaz.com | MEMBRO_TIME  |
       | qa_instituicao@deboaz.com | qastaff.qains@deboaz.com  | STAFF        |
       | qa_instituicao@deboaz.com | QAINS-QAPART-0001         | PARTICIPANTE |
 
@@ -763,7 +781,7 @@ Funcionalidade: Usuários
 
     Exemplos:
       | ambiente    | contas                                                        |
-      | homologação | o administrador, as 5 contas qa e as contas "QAINS" e "QAAUT" |
+      | homologação | o administrador, as 6 contas qa e as contas "QAINS" e "QAAUT" |
       | produção    | só o administrador, na conta "DBOAZ"                          |
 
   @RN-266
@@ -788,10 +806,62 @@ Funcionalidade: Usuários
     E a senha antiga recebe 401 ENTRADA_INVALIDA
 
   @RN-267
-  Cenário: conta qa desativada por um teste
-    Dado a staff "qastaff.qains@deboaz.com" desativada durante um teste
+  Esquema do Cenário: conta qa mudada por um teste volta ao estado inicial
+    Dado <mudança> durante um teste
     Quando a aplicação de homologação inicia de novo
-    Então a staff volta ativa, com a senha do Key Vault
+    Então <volta>
+    E só as contas qa voltam ao estado inicial
+    E "admin.dboaz@deboaz.com" fica como estava, sem volta nem mudança vinda do "qaadmin"
+
+    Exemplos:
+      | mudança                                     | volta                                         |
+      | a staff "qastaff.qains" desativada          | a staff fica ativa                            |
+      | a senha do "qamembro.dboaz" gerada de novo  | vale só a senha do Key Vault                  |
+      | "MOD-05" tirado das abas do "qastaff.qains" | o "qastaff" só com as abas da parte da staff  |
+      | "MOD-02" concedido ao "qamembro.dboaz"      | o "qamembro" só com as abas da parte do time  |
+
+  @RN-268
+  Cenário: permissões iniciais lidas do Key Vault
+    Dado o Key Vault de homologação com a lista de módulos iniciais:
+      """
+      {
+        "staff": {
+          "mods": {
+            "MOD-03": "CU",
+            "MOD-04": "U",
+            "MOD-05": "U"
+          }
+        },
+        "time": {
+          "mods": {
+            "MOD-03": "U",
+            "MOD-14": "U"
+          }
+        }
+      }
+      """
+    Quando a aplicação de homologação inicia
+    Então GET /usuarios/{id}/permissoes do "qastaff.qains@deboaz.com" traz os mods de "staff"
+    E GET /usuarios/{id}/permissoes do "qamembro.dboaz@deboaz.com" traz os mods de "time"
+
+  @RN-268
+  Cenário: contas qa com os módulos da lista contratados
+    Dado a mesma lista no Key Vault de homologação
+    Quando "qa_instituicao@deboaz.com" envia GET /usuarios/{id}/permissoes do "qastaff"
+    Então concediveis traz "MOD-03", "MOD-04" e "MOD-05", da parte "staff", com "CU"
+    E traz também os módulos da conta "MOD-08" Turmas e "MOD-09" Tarefas, que entram sozinhos
+
+  @RN-268
+  Cenário: parte do time não vira contratação
+    Dado a mesma lista no Key Vault de homologação
+    Quando a aplicação de homologação inicia
+    Então "QAINS" e "QAAUT" não contratam "MOD-14" nem nenhum módulo da parte "time"
+
+  @RN-268
+  Cenário: produção sem módulos da inicialização
+    Dado a aplicação de produção iniciada
+    Quando a conta master da EBFGA envia GET /usuarios/usr-ebfga-maria/permissoes
+    Então concediveis traz só os módulos contratados pela escola
 
   @RNF-201
   Cenário: ninguém lê a senha
@@ -847,11 +917,13 @@ Funcionalidade: Usuários
     E o log diz o nome da variável que falta, nunca um valor
 
     Exemplos:
-      | ambiente    | segredo                                 |
-      | produção    | a senha do administrador                |
-      | homologação | a entrada do administrador              |
-      | homologação | a senha da staff "qastaff.qains"        |
-      | homologação | o código do participante "QAINS-QAPART" |
+      | ambiente    | segredo                                   |
+      | produção    | a senha do administrador                  |
+      | homologação | a entrada do administrador                |
+      | homologação | a senha do administrador qa "qaadmin"     |
+      | homologação | a senha da staff "qastaff.qains"          |
+      | homologação | o código do participante "QAINS-QAPART"   |
+      | homologação | a lista de módulos iniciais das contas qa |
 
   @RNF-226
   Cenário: senha fraca no Key Vault

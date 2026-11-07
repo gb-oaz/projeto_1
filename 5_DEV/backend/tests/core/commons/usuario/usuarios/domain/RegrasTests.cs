@@ -51,6 +51,15 @@ public class RegrasTests
     }
 
     [Fact]
+    public void RN_169_administrador_sobre_outro_administrador()
+    {
+        var admin = Novo("admin", TipoUsuario.Administrador);
+        var qaadmin = Novo("qaadmin", TipoUsuario.Administrador);
+        Assert.False(Hierarquia.PodeAdministrar(qaadmin, admin, []));
+        Assert.False(Hierarquia.PodeAdministrar(admin, qaadmin, []));
+    }
+
+    [Fact]
     public void RNF_205_tres_pedidos_em_24_h()
     {
         Assert.Null(LimiteDeAtendimento.TentarEm([Agora.AddHours(-2), Agora.AddHours(-1)], Agora));

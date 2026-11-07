@@ -435,8 +435,8 @@ jobs:
   # CI local (ci.sh --so-qa): o que passa lá passa aqui. A carga não roda aqui
   # (RN-156), só em qa-carga.yml. Os JUnit XML viram artefato.
   # O backend sobe com AMBIENTE=hml. O ci.sh gera, a cada execução, a chave do
-  # token e as contas iniciais (USUARIO_*, 17 RN-190, RN-265, RNF-225, senhas
-  # na RNF-202), passa as mesmas ao backend e à suíte e as mascara no log
+  # token e as contas iniciais (USUARIO_*, 17 RN-190, RN-265, RN-268, RNF-225,
+  # senhas na RNF-202), passa as mesmas ao backend e à suíte e as mascara no log
   # (::add-mask::); nenhum segredo do GitHub é usado. A suíte de integração
   # recebe o backend publicado (API_COMANDO) e as PARTIDA_* para os cenários
   # de inicialização. O MongoDB do compose é um replica set de um nó (RNF-223).

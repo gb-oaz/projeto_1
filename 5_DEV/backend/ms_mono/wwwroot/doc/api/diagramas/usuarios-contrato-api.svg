@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 7544" width="1392" height="7544">
   <title>Usuários · contrato de API</title>
-  <desc>Contrato dos endereços do módulo Usuários do ms_mono, do requisito 17 (Módulo Usuários): criar a conta, gerar a senha com o código de liberação, atendimento sem login, listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar, tempo de sessão, card do módulo e, no time deboaz, contas e código da conta master. v01: criação. v02: regras do core no quadro comum, mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam em cada endereço. v03: GET /usuarios com tipo opcional (sem tipo, busca em todos os tipos que quem pede pode listar) e o tipo em cada item.</desc>
+  <desc>Contrato dos endereços do módulo Usuários do ms_mono, do requisito 17 (Módulo Usuários): criar a conta, gerar a senha com o código de liberação, atendimento sem login, listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar, tempo de sessão, card do módulo e, no time deboaz, contas e código da conta master. v01: criação. v02: regras do core no quadro comum, mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam em cada endereço. v03: GET /usuarios com tipo opcional (sem tipo, busca em todos os tipos que quem pede pode listar) e o tipo em cada item. v04: POST /contas responde 422 SIGLA_INVALIDA para siglas iniciadas por QA em produção (RN-179); desativar, reativar e nova-geracao-senha respondem 403 ACESSO_NEGADO quando um administrador age sobre outro, como qaadmin e admin (RN-169).</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -90,10 +90,10 @@
     <text class="title" x="40" y="72">Usuários · contas, staff, participantes e membros</text>
     <text class="subtitle" x="40" y="94">Criar conta, primeiro acesso, cadastro e ações sobre cada usuário, tempo de sessão, card e time deboaz</text>
     <text class="wm-meta-label" x="1104" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v03</text>
+    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v04</text>
     <line class="wm-sep" x1="1176" y1="32" x2="1176" y2="80"/>
     <text class="wm-meta-label" x="1200" y="44">DATA</text>
-    <text class="wm-meta-value" x="1200" y="72">2026-11-02 · 17:20</text>
+    <text class="wm-meta-value" x="1200" y="72">2026-11-07 · 03:15</text>
   </g>
   <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V1036 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
     <text class="mono" x="64" y="204">Toda resposta de erro:</text>
@@ -135,7 +135,7 @@
     <rect class="node-red" x="64" y="798" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="812" text-anchor="middle">410</text>
     <text class="mono" x="116" y="812">CODIGO_VENCIDO</text><text class="mono" x="332" y="812">"O código de liberação venceu. Peça uma nova geração de senha."</text>
     <rect class="node-red" x="64" y="824" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="838" text-anchor="middle">422</text>
-    <text class="mono" x="116" y="838">SIGLA_INVALIDA</text><text class="mono" x="332" y="838">"A sigla precisa de 5 letras." · "A sigla DBOAZ é reservada ao time deboaz."</text>
+    <text class="mono" x="116" y="838">SIGLA_INVALIDA</text><text class="mono" x="332" y="838">"A sigla precisa de 5 letras." · "A sigla DBOAZ é reservada ao time deboaz." · "Siglas QA são reservadas ao time deboaz."</text>
     <rect class="node-red" x="64" y="850" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="864" text-anchor="middle">422</text>
     <text class="mono" x="116" y="864">SEM_SENHA</text><text class="mono" x="332" y="864">"O participante entra pelo código de acesso, sem senha."</text>
     <rect class="node-red" x="64" y="876" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="890" text-anchor="middle">422</text>
@@ -188,7 +188,7 @@
     <rect class="node-red" x="56" y="1060" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1074" text-anchor="middle">409</text>
     <text class="mono" x="108" y="1074">DOMINIO_EM_USO</text>
     <rect class="node-red" x="56" y="1086" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1100" text-anchor="middle">422</text>
-    <text class="mono" x="108" y="1100">SIGLA_INVALIDA · 5 letras, e DBOAZ é reservada ao time</text>
+    <text class="mono" x="108" y="1100">SIGLA_INVALIDA · 5 letras; DBOAZ e, em produção, QA… reservadas</text>
     <rect class="node-red" x="56" y="1112" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1126" text-anchor="middle">422</text>
     <text class="mono" x="108" y="1126">DADOS_INVALIDOS · o campo errado vai em "campo"</text>
     <text class="muted" x="56" y="1146">a conta master nasce PENDENTE e fica ATIVA no confirmar-senha</text>
@@ -451,7 +451,7 @@
     <text class="mono" x="788" y="3448">}</text>
     <text class="muted" x="788" y="3466">mostrado uma vez; a senha antiga e as sessões terminam</text>
     <rect class="node-red" x="736" y="3478" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3492" text-anchor="middle">403</text>
-    <text class="mono" x="788" y="3492">ACESSO_NEGADO · par ou superior</text>
+    <text class="mono" x="788" y="3492">ACESSO_NEGADO · par ou superior; administrador sobre administrador</text>
     <rect class="node-red" x="736" y="3504" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3518" text-anchor="middle">422</text>
     <text class="mono" x="788" y="3518">SEM_SENHA · participante entra pelo código de acesso</text>
     <rect class="node-red" x="736" y="3530" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3544" text-anchor="middle">404</text>
@@ -500,7 +500,7 @@
     <rect class="chip" x="736" y="3884" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3898" text-anchor="middle">204</text>
     <text class="muted" x="788" y="3898">estado DESATIVADO; todas as sessões terminam; continua na lista</text>
     <rect class="node-red" x="736" y="3910" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3924" text-anchor="middle">403</text>
-    <text class="mono" x="788" y="3924">ACESSO_NEGADO · par ou superior</text>
+    <text class="mono" x="788" y="3924">ACESSO_NEGADO · par ou superior; administrador sobre administrador</text>
     <rect class="node-red" x="736" y="3936" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3950" text-anchor="middle">409</text>
     <text class="mono" x="788" y="3950">ESTADO_IGUAL · já está desativado (ou ativo, no reativar)</text>
     <rect class="node-red" x="736" y="3962" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="3976" text-anchor="middle">404</text>
@@ -764,7 +764,7 @@
     <rect class="chip" x="822" y="47" width="14" height="14" rx="3"/><text class="label" x="844" y="58">resposta de sucesso</text>
     <rect class="node" x="997" y="47" width="14" height="14" rx="3"/><text class="label" x="1019" y="58">endereço e regra comum</text>
     <line class="divider" x1="40" y1="88" x2="1352" y2="88"/>
-    <text class="footer" x="40" y="116">v03 · GET /usuarios com tipo opcional: sem tipo, busca em todos os tipos que quem pede pode listar; cada item traz o tipo</text>
-    <text class="wm-file" x="1352" y="116" text-anchor="end">usuarios-contrato-api_v03_20261102-1720.svg</text>
+    <text class="footer" x="40" y="116">v04 · POST /contas recusa siglas QA… em produção (RN-179); administrador não age sobre outro administrador: 403 (RN-169)</text>
+    <text class="wm-file" x="1352" y="116" text-anchor="end">usuarios-contrato-api_v04_20261107-0315.svg</text>
   </g>
 </svg>

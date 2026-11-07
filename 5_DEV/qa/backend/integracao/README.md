@@ -78,7 +78,7 @@ integracao/
 └── hub/usuarios/                   17_modulo-usuario.md (contas, staff, participantes, time)
     ├── usuarios.feature
     ├── UsuariosPassos.cs
-    └── ContasIniciaisPassos.cs     contas iniciais (RN-190, RN-265 a RN-267, RNF-225, RNF-226)
+    └── ContasIniciaisPassos.cs     contas iniciais (RN-179, RN-190, RN-265 a RN-268, RNF-225, RNF-226)
 ```
 
 A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
@@ -195,7 +195,8 @@ método. No TDD, enquanto o endpoint não existe, o vermelho esperado é o 404.
 | `MONGO_BANCO` | o banco do backend dentro do Mongo (contratações, versão das permissões) | `boaz` |
 | `QA_PODE_LIMPAR=sim` | autoriza apagar o banco e o cache antes de cada cenário; sem ela, nada roda | — |
 | `USUARIO_ADMIN_ENTRADA`, `USUARIO_ADMIN_SENHA` | o administrador do deboaz: as mesmas variáveis que o backend recebe do Key Vault (RN-190, RNF-225). `ADMIN_ENTRADA` e `ADMIN_SENHA` (nomes antigos) são lidas só se faltarem as `USUARIO_ADMIN_*` | `admin.dboaz@deboaz.com`, vazia |
-| `USUARIO_QA_MEMBRO_*`, `USUARIO_QA_MASTER_*`, `USUARIO_QA_AUTONOMO_*`, `USUARIO_QA_STAFF_*` (`_ENTRADA`, `_SENHA`), `USUARIO_QA_PARTICIPANTE_CODIGO` | as contas qa de homologação (RN-265), as mesmas do backend; nunca valor fixo no repositório | entradas do requisito; senha sem padrão (o cenário falha dizendo a variável) |
+| `USUARIO_QA_ADMIN_*`, `USUARIO_QA_MEMBRO_*`, `USUARIO_QA_MASTER_*`, `USUARIO_QA_AUTONOMO_*`, `USUARIO_QA_STAFF_*` (`_ENTRADA`, `_SENHA`), `USUARIO_QA_PARTICIPANTE_CODIGO`, `USUARIO_QA_MODULOS` (JSON `{"staff": {"mods": {…}}, "time": {"mods": {…}}}`, RN-268) | as contas qa de homologação (RN-265), as mesmas do backend; nunca valor fixo no repositório | entradas do requisito; senha sem padrão (o cenário falha dizendo a variável) |
+| — | os cenários usam o administrador qa (`USUARIO_QA_ADMIN_*`, RN-265) no lugar do administrador real; enquanto o CI não entrega `USUARIO_QA_ADMIN_SENHA`, a suíte usa as `USUARIO_ADMIN_*` | — |
 | `API_COMANDO` | comando (por `/bin/sh -c`) que sobe o backend publicado, para os cenários de inicialização: primeira partida, segunda partida, produção, segredo ausente (RN-190, RN-266, RN-267, RNF-225, RNF-226). Sem ele, esses cenários ficam pendentes | vazia |
 | `PARTIDA_*` | repassadas sem o prefixo à instância do `API_COMANDO` (conexões, chave e **um banco próprio**, diferente do `MONGO_BANCO`) | — |
 | `CHAVE_PRIVADA` | a chave do token (PKCS#8 em base64), para montar os tokens recusados de RNF-216 | vazia |
@@ -205,7 +206,7 @@ Vault e novas a cada execução:
 
 - o backend sobe com `AMBIENTE=hml`;
 - o `ci.sh` gera a chave do token (`Autenticacao__ChaveId`,
-  `Autenticacao__ChavePrivada`, que vira `CHAVE_PRIVADA` aqui) e as 11
+  `Autenticacao__ChavePrivada`, que vira `CHAVE_PRIVADA` aqui) e as
   `USUARIO_*` (administrador e contas qa) e passa os mesmos valores ao backend
   e a esta suíte;
 - a suíte roda numa imagem derivada (`qa-backend-integracao-api:ci`), com o

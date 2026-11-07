@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "99_glossario"
 tipo: "Glossário"
 titulo: "Glossário"
-versao: "v43"
-data: "2026-11-06 23:15"
-status: "Em revisão"
+versao: "v45"
+data: "2026-11-07 02:55"
+status: "Aprovado"
 objetivo: "dar um significado único aos termos do domínio usados nos documentos de requisito."
 ---
 
-> **boaz · Glossário** · `99_glossario` · **v43** · 2026-11-06 23:15 · **Em revisão**
+> **boaz · Glossário** · `99_glossario` · **v45** · 2026-11-07 02:55 · **Aprovado**
 
 # Glossário
 
@@ -39,7 +39,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="componente-comum"></a>**Componente comum** | componente usado por mais de um módulo, com uma única implementação compartilhada por frente |
 | <a id="componente-composto"></a>**Componente composto** | bloco reutilizável que junta componentes e elementos de identidade visual, como uma barra de navegação com o logo, botões e imagens da marca |
 | <a id="conta-master"></a>**Conta master** | conta que decide e paga a contratação de módulos de uma instituição; o educador autônomo é a conta master da própria conta |
-| <a id="conta-qa"></a>**Conta qa** | conta de testes, com entrada iniciada por “qa”, que a aplicação cria ao iniciar só em homologação, uma para cada tipo de usuário, com a entrada e a senha lidas do Key Vault; não existe em produção ([Módulo Usuários RN-265](17_modulo-usuario.md#RN-265)) |
+| <a id="conta-qa"></a>**Conta qa** | conta de testes, com entrada iniciada por “qa”, que a aplicação cria ao iniciar só em homologação, uma para cada tipo de usuário, inclusive um administrador próprio (“qaadmin.dboaz@deboaz.com”), com a entrada, a senha e a lista de módulos iniciais lidas do Key Vault, e dados fictícios no formato do projeto; a cada inicialização volta à senha, ao estado ativo, às permissões e aos módulos iniciais; não existe em produção, onde as siglas iniciadas por “QA” ficam reservadas ao time ([Módulo Usuários RN-265](17_modulo-usuario.md#RN-265), [RN-268](17_modulo-usuario.md#RN-268)) |
 | <a id="contas-acessadas"></a>**Contas acessadas** | contas que já entraram no hub num aparelho, listadas na tela Entrar, uma por instituição |
 | <a id="deboaz"></a>**deboaz** | nome do produto: junta o nome Boaz com a gíria “de boa” |
 | <a id="depoimento"></a>**Depoimento** | texto curto de uma instituição ou de um educador autônomo sobre o deboaz, escrito no hub e mostrado na landing page só com a autorização do autor |
@@ -96,7 +96,9 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v43** | 2026-11-06 23:15 | Termo Conta qa (Módulo Usuários `RN-265`); status → Em revisão |
+| **v45** | 2026-11-07 02:55 | Status → Aprovado, junto com o Módulo Usuários v57; termos sem mudança |
+| v44 | 2026-11-07 02:38 | Termo Conta qa: administrador qa próprio, lista de módulos iniciais do Key Vault, dados fictícios, volta ao estado inicial a cada inicialização e siglas “QA” reservadas em produção (Módulo Usuários v56 `RN-265`, `RN-267`, `RN-268`, `RN-269`, `RN-179`) |
+| v43 | 2026-11-06 23:15 | Termo Conta qa (Módulo Usuários `RN-265`); status → Em revisão |
 | v42 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v41 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v40 | 2026-11-01 18:32 | Casca v07 do tema (Gherkin quebra a linha); termos sem mudança; status → Em revisão |
@@ -104,9 +106,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | v38 | 2026-11-01 12:19 | Termos da autenticação e da autorização: aparelho conectado, papel, sessão, token de acesso, token de renovação e versão das permissões |
 | v37 | 2026-11-01 03:57 | Aprovado |
 | v36 | 2026-11-01 03:48 | Termo Painel de administração do deboaz retirado (Módulos `MOD-15`); Time deboaz e Módulo Usuários dizem que o time cuida das contas de instituição e de educador autônomo no módulo Usuários |
-| v35 | 2026-11-01 01:20 | Aprovação |
-| v34 | 2026-11-01 01:14 | Feed: publicações dos módulos por público; a conta do time deboaz não tem Feed |
 
 ---
 
-<sub>boaz · v43 · 2026-11-06 23:15 · `1_Requisitos/99_glossario.md`</sub>
+<sub>boaz · v45 · 2026-11-07 02:55 · `1_Requisitos/99_glossario.md`</sub>

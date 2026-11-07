@@ -12,6 +12,25 @@ public class InicializarContasTests
 
     static readonly DadosDoTimeDto Time = new("Time deboaz", "", "", "");
 
+    // a lista de módulos iniciais do exemplo do requisito (RN-268)
+    const string Lista = """
+        {
+          "staff": {
+            "mods": {
+              "MOD-05": "U",
+              "MOD-03": "CU",
+              "MOD-04": "U"
+            }
+          },
+          "time": {
+            "mods": {
+              "MOD-14": "U",
+              "MOD-03": "U"
+            }
+          }
+        }
+        """;
+
     // o Key Vault de homologação completo: entradas do requisito e senhas da RNF-202
     static Dictionary<string, string?> KeyVault(bool comQa = true)
     {
@@ -21,6 +40,8 @@ public class InicializarContasTests
             ["USUARIO_ADMIN_SENHA"] = "Ad#Senha123456",
         };
         if (!comQa) return kv;
+        kv["USUARIO_QA_ADMIN_ENTRADA"] = "qaadmin.dboaz@deboaz.com";
+        kv["USUARIO_QA_ADMIN_SENHA"] = "Qa#Admin123456";
         kv["USUARIO_QA_MEMBRO_ENTRADA"] = "qamembro.dboaz@deboaz.com";
         kv["USUARIO_QA_MEMBRO_SENHA"] = "Qa#Membro123456";
         kv["USUARIO_QA_MASTER_ENTRADA"] = "qa_instituicao@deboaz.com";
@@ -30,6 +51,7 @@ public class InicializarContasTests
         kv["USUARIO_QA_STAFF_ENTRADA"] = "qastaff.qains@deboaz.com";
         kv["USUARIO_QA_STAFF_SENHA"] = "Qa#Staff123456";
         kv["USUARIO_QA_PARTICIPANTE_CODIGO"] = "qains-qapart-0001";
+        kv["USUARIO_QA_MODULOS"] = Lista;
         return kv;
     }
 
@@ -67,7 +89,7 @@ public class InicializarContasTests
         var participante = mock.Usuario("usr-qains-qapart")!;
         Assert.Equal(("QAINS-QAPART-0001", null, EstadoUsuario.Ativo), (participante.Login, participante.ResumoSenha, participante.Estado));
         Assert.NotNull(participante.CodigoGeradoEm);
-        Assert.Equal(9, garantidas.Criados.Count);
+        Assert.Equal(10, garantidas.Criados.Count);
     }
 
     [Fact]
@@ -137,6 +159,129 @@ public class InicializarContasTests
     public void RN_266_so_hml_e_homologacao(string? ambiente, bool homologacao)
     {
         Assert.Equal(homologacao, ContasIniciais.EmHomologacao(ambiente));
-        Assert.Equal(homologacao ? 11 : 2, ContasIniciais.VariaveisDo(ambiente).Count);
+        Assert.Equal(homologacao ? 14 : 2, ContasIniciais.VariaveisDo(ambiente).Count);
+    }
+
+    [Fact]
+    public async Task RN_265_administrador_qa_em_homologacao()
+    {
+        await Iniciar("hml", KeyVault());
+
+        var qaadmin = mock.Usuario("usr-dboaz-qaadmin")!;
+        Assert.Equal((TipoUsuario.Administrador, EstadoUsuario.Ativo, "qaadmin.dboaz@deboaz.com", "conta-dboaz", "qaadmin"),
+            (qaadmin.Tipo, qaadmin.Estado, qaadmin.Login, qaadmin.ContaId, qaadmin.NomeCurto));
+        Assert.True(ResumoDeSenha.Confere("Qa#Admin123456", qaadmin.ResumoSenha));
+    }
+
+    [Theory]
+    [InlineData("usr-dboaz-qaadmin", "Administrador QA")]
+    [InlineData("usr-dboaz-qamembro", "Membro QA")]
+    [InlineData("usr-qains-qastaff", "Staff QA")]
+    [InlineData("usr-qains-qapart", "Participante QA")]
+    public async Task RN_269_nome_ficticio_de_cada_pessoa_qa(string id, string nome)
+    {
+        await Iniciar("hml", KeyVault());
+
+        Assert.Equal(nome, mock.Usuario(id)!.Nome);
+    }
+
+    [Theory]
+    [InlineData("conta-qains", "Instituição QA de Testes", "98.765.432/0001-98")]
+    [InlineData("conta-qaaut", "Educador QA de Testes", "987.654.321-00")]
+    public async Task RN_269_conta_qa_com_nome_e_documento_ficticios(string id, string nome, string documento)
+    {
+        await Iniciar("hml", KeyVault());
+
+        Assert.Equal((nome, documento), (mock.Conta(id)!.Nome, mock.Conta(id)!.Documento));
+    }
+
+    [Fact]
+    public async Task RN_268_modulos_da_lista_nas_contas_qa()
+    {
+        await Iniciar("hml", KeyVault());
+
+        Assert.Equal(["usr-dboaz-qamembro", "usr-qains-qastaff"], mock.ModulosRepostos.Keys.Order());
+        Assert.Equal(new Dictionary<string, string> { ["MOD-03"] = "CU", ["MOD-04"] = "U", ["MOD-05"] = "U" },
+            mock.ModulosRepostos["usr-qains-qastaff"]);
+        Assert.Equal(new Dictionary<string, string> { ["MOD-03"] = "U", ["MOD-14"] = "U" }, mock.ModulosRepostos["usr-dboaz-qamembro"]);
+        Assert.Equal(["MOD-03", "MOD-04", "MOD-05"], mock.Contratacoes["conta-qains"]);
+        Assert.Equal(["MOD-03", "MOD-04", "MOD-05"], mock.Contratacoes["conta-qaaut"]);
+        Assert.False(mock.Contratacoes.ContainsKey("conta-dboaz"));
+    }
+
+    [Fact]
+    public async Task RN_268_producao_sem_modulos_da_partida()
+    {
+        await Iniciar("prd", KeyVault());
+
+        Assert.Empty(mock.ModulosRepostos);
+        Assert.Empty(mock.Contratacoes);
+    }
+
+    [Fact]
+    public async Task RN_268_lista_trocada_vale_na_proxima_partida()
+    {
+        await Iniciar("hml", KeyVault());
+        var kv = KeyVault();
+        kv["USUARIO_QA_MODULOS"] = """{"staff": {"mods": {"MOD-03": "C", "MOD-12": "U"}}, "time": {"mods": {"MOD-03": "U", "MOD-02": "U"}}}""";
+
+        await Iniciar("hml", kv);
+
+        Assert.Equal(new Dictionary<string, string> { ["MOD-03"] = "C", ["MOD-12"] = "U" }, mock.ModulosRepostos["usr-qains-qastaff"]);
+        Assert.Equal(new Dictionary<string, string> { ["MOD-02"] = "U", ["MOD-03"] = "U" }, mock.ModulosRepostos["usr-dboaz-qamembro"]);
+        Assert.Equal(["MOD-03", "MOD-12"], mock.Contratacoes["conta-qains"]);
+        Assert.Equal(["MOD-03", "MOD-12"], mock.Contratacoes["conta-qaaut"]);
+    }
+
+    [Theory]
+    [InlineData("USUARIO_QA_ADMIN_SENHA")]
+    [InlineData("USUARIO_QA_MODULOS")]
+    public async Task RNF_226_sem_a_senha_do_qaadmin_ou_sem_a_lista(string variavel)
+    {
+        var kv = KeyVault();
+        kv.Remove(variavel);
+
+        var falha = await Assert.ThrowsAsync<FalhaNaInicializacao>(() => Iniciar("hml", kv));
+
+        Assert.Equal([variavel], falha.Variaveis);
+        Assert.Contains(variavel, falha.Message);
+    }
+
+    [Theory]
+    [InlineData("não é json")]
+    [InlineData("[]")]
+    [InlineData("""{"mods": {"MOD-03": "CU"}}""")]
+    [InlineData("""{"staff": {"mods": {}}}""")]
+    [InlineData("""{"time": {"mods": {}}}""")]
+    [InlineData("""{"staff": [], "time": {"mods": {}}}""")]
+    [InlineData("""{"staff": {"modulos": {}}, "time": {"mods": {}}}""")]
+    [InlineData("""{"staff": {"mods": []}, "time": {"mods": {}}}""")]
+    [InlineData("""{"staff": {"mods": {}}, "time": {"mods": {"MOD-3": "U"}}}""")]
+    [InlineData("""{"staff": {"mods": {"MOD-03": "X"}}, "time": {"mods": {}}}""")]
+    [InlineData("""{"staff": {"mods": {}}, "time": {"mods": {"MOD-03": 1}}}""")]
+    [InlineData("""{"staff": {"mods": {"MOD-03": "U", "MOD-03": "C"}}, "time": {"mods": {}}}""")]
+    public async Task RNF_226_lista_invalida_diz_so_o_nome(string lista)
+    {
+        var kv = KeyVault();
+        kv["USUARIO_QA_MODULOS"] = lista;
+
+        var falha = await Assert.ThrowsAsync<FalhaNaInicializacao>(() => Iniciar("hml", kv));
+
+        Assert.Equal(["USUARIO_QA_MODULOS"], falha.Variaveis);
+        Assert.DoesNotContain(lista, falha.Message);
+        Assert.Null(mock.Usuario("usr-dboaz-admin"));
+    }
+
+    [Fact]
+    public async Task RNF_226_lista_vazia_vale_sem_modulos()
+    {
+        var kv = KeyVault();
+        kv["USUARIO_QA_MODULOS"] = """{"staff": {"mods": {}}, "time": {"mods": {}}}""";
+
+        await Iniciar("hml", kv);
+
+        Assert.Empty(mock.ModulosRepostos["usr-qains-qastaff"]);
+        Assert.Empty(mock.ModulosRepostos["usr-dboaz-qamembro"]);
+        Assert.Empty(mock.Contratacoes["conta-qains"]);
     }
 }

@@ -12,7 +12,7 @@ using MongoDB.Driver;
 
 namespace Boaz.MsMono.Tests.Integracao;
 
-// A partida com o banco de verdade (17 RN-190, RN-265 a RN-267, RNF-226): as
+// A partida com o banco de verdade (17 RN-190, RN-265 a RN-268, RNF-226): as
 // contas iniciais pelo _id, sem duplicar, e os índices do diagrama
 // identidade-acesso-documentos. Cada teste roda a partida de novo no banco da
 // fixture, com o Key Vault que ele monta.
@@ -23,6 +23,8 @@ public class PartidaTests(Backend backend) : IClassFixture<Backend>
         ["AMBIENTE"] = ambiente,
         ["USUARIO_ADMIN_ENTRADA"] = Backend.AdminEntrada,
         ["USUARIO_ADMIN_SENHA"] = Backend.AdminSenha,
+        ["USUARIO_QA_ADMIN_ENTRADA"] = "qaadmin.dboaz@deboaz.com",
+        ["USUARIO_QA_ADMIN_SENHA"] = "Qa#Admin123456",
         ["USUARIO_QA_MEMBRO_ENTRADA"] = "qamembro.dboaz@deboaz.com",
         ["USUARIO_QA_MEMBRO_SENHA"] = "Qa#Membro123456",
         ["USUARIO_QA_MASTER_ENTRADA"] = "qa_instituicao@deboaz.com",
@@ -32,6 +34,7 @@ public class PartidaTests(Backend backend) : IClassFixture<Backend>
         ["USUARIO_QA_STAFF_ENTRADA"] = "qastaff.qains@deboaz.com",
         ["USUARIO_QA_STAFF_SENHA"] = "Qa#Staff123456",
         ["USUARIO_QA_PARTICIPANTE_CODIGO"] = "QAINS-QAPART-0001",
+        ["USUARIO_QA_MODULOS"] = """{"staff": {"mods": {"MOD-03": "CU"}}, "time": {"mods": {"MOD-14": "U"}}}""",
     };
 
     Partida Partida(Dictionary<string, string?> kv) => new(
@@ -65,6 +68,12 @@ public class PartidaTests(Backend backend) : IClassFixture<Backend>
         var contas = backend.Banco.GetCollection<BsonDocument>("contas");
         var qaaut = await contas.Find(Builders<BsonDocument>.Filter.Eq("_id", "conta-qaaut")).FirstAsync();
         Assert.Equal(("QAAUT", "AUTONOMO", "qa_autonomo"), (qaaut["sigla"].AsString, qaaut["tipo"].AsString, qaaut["dominio"].AsString));
+        Assert.Equal("CU", (await Usuario("usr-qains-qastaff"))["permissoes"]["mods"]["MOD-03"].AsString);
+        Assert.Equal("U", (await Usuario("usr-dboaz-qamembro"))["permissoes"]["mods"]["MOD-14"].AsString);
+        Assert.Equal(0, await backend.Banco.GetCollection<BsonDocument>("contratacoes").CountDocumentsAsync(
+            Builders<BsonDocument>.Filter.Eq("moduloId", "MOD-14")));
+        Assert.Equal(1, await backend.Banco.GetCollection<BsonDocument>("contratacoes").CountDocumentsAsync(
+            Builders<BsonDocument>.Filter.Eq("contaId", "conta-qains") & Builders<BsonDocument>.Filter.Eq("moduloId", "MOD-03")));
         Assert.Equal(0, await backend.Banco.GetCollection<BsonDocument>("auditoria")
             .CountDocumentsAsync(Builders<BsonDocument>.Filter.In("alvo", new[] { "usr-qains-qastaff", "conta-qains" })));
     }
@@ -73,6 +82,8 @@ public class PartidaTests(Backend backend) : IClassFixture<Backend>
     [InlineData("prd", "USUARIO_ADMIN_SENHA", null)]
     [InlineData("hml", "USUARIO_QA_PARTICIPANTE_CODIGO", null)]
     [InlineData("hml", "USUARIO_QA_STAFF_SENHA", "Gu#B5")]
+    [InlineData("hml", "USUARIO_QA_ADMIN_SENHA", null)]
+    [InlineData("hml", "USUARIO_QA_MODULOS", null)]
     public async Task RNF_226_segredo_ausente_ou_fraco_nao_inicia(string ambiente, string variavel, string? valor)
     {
         _ = backend.Server;

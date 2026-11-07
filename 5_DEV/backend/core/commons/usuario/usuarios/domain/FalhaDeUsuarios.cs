@@ -77,6 +77,10 @@ public sealed class FalhaDeUsuarios : Exception
     public static FalhaDeUsuarios SiglaReservada() =>
         new(GrupoDeFalha.DadosInvalidos, "SIGLA_INVALIDA", "A sigla DBOAZ é reservada ao time deboaz.") { Campo = "sigla" };
 
+    /// <summary>Sigla iniciada por QA fora de homologação, que é das contas qa do time (RN-179).</summary>
+    public static FalhaDeUsuarios SiglaQaReservada() =>
+        new(GrupoDeFalha.DadosInvalidos, "SIGLA_INVALIDA", "Siglas QA são reservadas ao time deboaz.") { Campo = "sigla" };
+
     /// <summary>Nome curto já usado na mesma conta (RF-106, RF-153).</summary>
     public static FalhaDeUsuarios NomeCurtoEmUso() =>
         new(GrupoDeFalha.Conflito, "NOME_CURTO_EM_USO", "Esse nome curto já existe na escola.") { Campo = "nomeCurto" };

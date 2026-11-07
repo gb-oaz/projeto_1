@@ -469,9 +469,9 @@ Cenário: o que este documento não trata
 
 [![Contrato de API da autenticação do 17-a, com a entrada no hub e o sair](../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg)](../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg)
 
-**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg`
+**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v04_20261107-0315.svg`
 
-[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg)](../2_Diagramas/usuarios-contrato-api_v03_20261102-1720.svg)
+[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v04_20261107-0315.svg)](../2_Diagramas/usuarios-contrato-api_v04_20261107-0315.svg)
 
 ---
 

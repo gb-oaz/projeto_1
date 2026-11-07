@@ -24,7 +24,8 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     TempoDoTime? tempoDoTime;
 
     /// <summary>Cria o mock e liga os casos de uso.</summary>
-    public UsuariosEmMemoria()
+    /// <param name="ambiente">O AMBIENTE da aplicação (hml ou prd).</param>
+    public UsuariosEmMemoria(string ambiente = "prd")
     {
         ListarUsuarios = new ListarUsuarios(this, this, this, Relogio);
         LerUsuario = new LerUsuario(this, this, this, Relogio);
@@ -36,7 +37,7 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
         DesativarUsuario = new DesativarUsuario(this, this, this, this, Relogio);
         ReativarUsuario = new ReativarUsuario(this, this, this, Relogio);
         LerCardDeUsuarios = new LerCardDeUsuarios(this, this, this, this, Relogio);
-        CriarConta = new CriarConta(this, this, this, Relogio);
+        CriarConta = new CriarConta(this, this, this, Relogio, new AmbienteDaAplicacao(ambiente));
         SugerirSigla = new SugerirSigla(this);
         PedirAjudaDaMaster = new PedirAjudaDaMaster(this, Relogio);
         ListarContas = new ListarContas(this, this, this, Relogio);
@@ -126,6 +127,12 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     /// <summary>Um usuário como está guardado.</summary>
     public UsuarioCadastrado? Usuario(string id) => usuarios.GetValueOrDefault(id);
 
+    /// <summary>Os módulos e abas que a partida repôs em cada usuário qa (RN-268).</summary>
+    public Dictionary<string, Dictionary<string, string>> ModulosRepostos { get; } = [];
+
+    /// <summary>Os módulos em vigor que a partida deixou em cada conta qa (RN-268).</summary>
+    public Dictionary<string, List<string>> Contratacoes { get; } = [];
+
     /// <summary>Uma conta como está guardada.</summary>
     public ContaAssinante? Conta(string id) => contas.GetValueOrDefault(id);
 
@@ -201,6 +208,12 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
         return Task.FromResult(false);
     }
 
+    Task IUsuarios.ReporModulos(string usuarioId, IReadOnlyDictionary<string, string> mods, CancellationToken ct)
+    {
+        ModulosRepostos[usuarioId] = new Dictionary<string, string>(mods);
+        return Task.CompletedTask;
+    }
+
     Task<PaginaDe<UsuarioCadastrado>> IUsuarios.Listar(FiltroDeUsuarios filtro, CancellationToken ct)
     {
         var achados = usuarios.Values
@@ -233,6 +246,12 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
         if (!contas.TryAdd(conta.Id, conta)) return Task.FromResult(false);
         if (tempo is not null) temposDasContas[conta.Id] = tempo;
         return Task.FromResult(true);
+    }
+
+    Task IContas.ReporContratacoes(ContaAssinante conta, IReadOnlySet<string> modulos, DateTimeOffset agora, CancellationToken ct)
+    {
+        Contratacoes[conta.Id] = [.. modulos.Order(StringComparer.Ordinal)];
+        return Task.CompletedTask;
     }
 
     Task IContas.Atualizar(ContaAssinante conta, CancellationToken ct)

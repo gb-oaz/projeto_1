@@ -2,12 +2,13 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json.Nodes;
 using Reqnroll;
 
 namespace Boaz.Qa.Integracao.Suporte;
 
 // Uma instância própria do backend, para os cenários que falam da
-// inicialização (17 RN-190, RN-266, RN-267, RNF-225, RNF-226): subir pela
+// inicialização (17 RN-179, RN-190, RN-266 a RN-268, RNF-225, RNF-226): subir pela
 // primeira vez, subir de novo com outro segredo, subir em produção, subir sem
 // um segredo. O backend do API_URL já está no ar e não serve para isso.
 //
@@ -47,7 +48,8 @@ public sealed class Partida : IDisposable
     public Api Api => api ?? throw new InvalidOperationException("a instância não foi iniciada");
 
     // o Key Vault completo do ambiente: o administrador e, em homologação, as
-    // contas qa. Entradas do requisito, senhas novas que seguem a RNF-202
+    // contas qa e a lista de módulos delas (RN-268). Entradas do requisito,
+    // senhas novas que seguem a RNF-202
     public void KeyVaultCompleto(string ambiente)
     {
         AmbienteDaPartida = ambiente;
@@ -57,7 +59,44 @@ public sealed class Partida : IDisposable
             KeyVault[conta.VariavelEntrada] = conta.EntradaDoExemplo;
             if (conta.VariavelSenha is { } senha) KeyVault[senha] = ContasIniciais.SenhaNova();
         }
+        if (ambiente == "hml") Modulos(ContasIniciais.ModulosDaStaff, ContasIniciais.ModulosDoTime);
     }
+
+    // a lista de módulos iniciais das contas qa no Key Vault (RN-268):
+    // {"staff": {"mods": {…}}, "time": {"mods": {…}}}
+    public void Modulos(IReadOnlyDictionary<string, string> staff, IReadOnlyDictionary<string, string> time) =>
+        KeyVault[ContasIniciais.VariavelModulos] = new JsonObject
+        {
+            ["staff"] = Parte(staff),
+            ["time"] = Parte(time),
+        }.ToJsonString();
+
+    static JsonObject Parte(IReadOnlyDictionary<string, string> mods) => new()
+    {
+        ["mods"] = new JsonObject(mods.Select(m => KeyValuePair.Create(m.Key, (JsonNode?)m.Value))),
+    };
+
+    // entrada de uma conta inicial nesta instância, com o que o Key Vault do cenário tem
+    public Task<Resposta> Entrar(ContaInicial conta) => conta.Participante
+        ? Api.Enviar("POST", "/auth/quest/entrar", CorpoDoQuest(Entrada(conta)))
+        : Api.Enviar("POST", "/auth/hub/entrar", CorpoDoHub(Entrada(conta), Senha(conta)));
+
+    public async Task<string> Token(ContaInicial conta) =>
+        Mundo.Texto(Mundo.Exigir(await Entrar(conta), 200, $"POST /auth/hub/entrar de {conta.Nome}"), "tokenAcesso");
+
+    public static string CorpoDoHub(string entrada, string senha) => new JsonObject
+    {
+        ["entrada"] = entrada,
+        ["senha"] = senha,
+        ["aparelho"] = Mundo.Navegador,
+    }.ToJsonString();
+
+    public static string CorpoDoQuest(string codigo) => new JsonObject
+    {
+        ["codigo"] = codigo,
+        ["aparelho"] = Mundo.Navegador,
+        ["quem"] = new JsonObject { ["tipo"] = "PARTICIPANTE" },
+    }.ToJsonString();
 
     public string Entrada(ContaInicial conta) => KeyVault.GetValueOrDefault(conta.VariavelEntrada) ?? conta.EntradaDoExemplo;
     public string Senha(ContaInicial conta) => KeyVault.GetValueOrDefault(conta.VariavelSenha ?? "") ?? "";

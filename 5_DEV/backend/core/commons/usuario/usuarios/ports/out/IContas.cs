@@ -28,6 +28,12 @@ public interface IContas
     /// </summary>
     Task<bool> Garantir(ContaAssinante conta, TempoDaConta? tempo, CancellationToken ct = default);
 
+    /// <summary>
+    /// Deixa em vigor, numa conta qa, só as contratações dos módulos da lista
+    /// (RN-268): as de fora terminam agora e as que faltam começam agora.
+    /// </summary>
+    Task ReporContratacoes(ContaAssinante conta, IReadOnlySet<string> modulos, DateTimeOffset agora, CancellationToken ct = default);
+
     /// <summary>Grava o estado novo da conta.</summary>
     Task Atualizar(ContaAssinante conta, CancellationToken ct = default);
 

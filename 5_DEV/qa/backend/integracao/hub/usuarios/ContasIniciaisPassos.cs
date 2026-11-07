@@ -7,8 +7,9 @@ namespace Boaz.Qa.Integracao.Hub.Usuarios;
 
 // Passos das contas iniciais de 1_Requisitos/17_modulo-usuario.md: o
 // administrador do deboaz (RN-190), as contas qa de homologação (RN-265,
-// RN-266), a inicialização sem duplicar (RN-267) e os segredos do Key Vault
-// (RNF-225, RNF-226).
+// RN-266), a inicialização que não duplica e volta as contas qa ao estado
+// inicial (RN-267), os módulos iniciais das contas qa (RN-268) e os segredos do
+// Key Vault (RNF-225, RNF-226).
 //
 // Duas fontes, conforme o cenário:
 //   - "a aplicação de homologação iniciada": o backend de API_URL, que o CI sobe
@@ -35,6 +36,18 @@ public sealed class ContasIniciaisPassos(Mundo mundo, Partida partida)
     // a variável que o Dado tirou do Key Vault (RNF-226)
     string variavelAusente = "";
     readonly List<Resposta> respostasDaPartida = [];
+    // a lista de módulos iniciais do Key Vault do cenário, por parte (RN-268)
+    Dictionary<string, string> staffDoCenario = new(ContasIniciais.ModulosDaStaff);
+    Dictionary<string, string> timeDoCenario = new(ContasIniciais.ModulosDoTime);
+
+    Dictionary<string, string> ParteDoCenario(string parte) => parte switch
+    {
+        "staff" or "da staff" => staffDoCenario,
+        "time" or "do time" => timeDoCenario,
+        _ => throw new InvalidOperationException($"\"{parte}\" não é uma parte da lista de módulos iniciais (RN-268)"),
+    };
+    // a última resposta da instância do cenário, para os Então que a leem
+    Resposta? ultimaDaPartida;
 
     static string Sigla(string ambiente) => ambiente == "produção" ? "prd" : "hml";
 
@@ -133,7 +146,7 @@ public sealed class ContasIniciaisPassos(Mundo mundo, Partida partida)
         pronta = await partida.Iniciar();
     }
 
-    [Then(@"^existem o administrador, as 5 contas qa e as contas ""(\w+)"" e ""(\w+)""$")]
+    [Then(@"^existem o administrador, as 6 contas qa e as contas ""(\w+)"" e ""(\w+)""$")]
     public async Task ExistemTodas(string qains, string qaaut)
     {
         ExigirPronta();
@@ -253,22 +266,237 @@ public sealed class ContasIniciaisPassos(Mundo mundo, Partida partida)
     {
         var staff = ContasIniciais.PorEntrada(entrada);
         await HomologacaoPronta();
+        await AnotarForaDasQa();
         var master = await TokenNaPartida(ContasIniciais.Master);
         Exigir(await partida.Api.Enviar("POST", $"/usuarios/{staff.Id}/desativar", token: master), 204, "POST /usuarios/{id}/desativar");
         citada = staff;
     }
 
-    [Then(@"^a staff volta ativa, com a senha do Key Vault$")]
-    public async Task VoltaAtiva()
+    [Given(@"^a senha do ""(.+)"" gerada de novo durante um teste$")]
+    public async Task SenhaGeradaNoTeste(string entrada)
+    {
+        var conta = ContasIniciais.PorEntrada(entrada);
+        await HomologacaoPronta();
+        await AnotarForaDasQa();
+        var r = await partida.Api.Enviar("POST", $"/usuarios/{conta.Id}/nova-geracao-senha", token: await TokenNaPartida(QuemConcede(conta)));
+        Assert.True(r.Status is >= 200 and < 300, $"preparo: POST /usuarios/{{id}}/nova-geracao-senha de {conta.Nome} respondeu {r}");
+        citada = conta;
+    }
+
+    [Given(@"^""(MOD-\d+)"" tirado das abas do ""(.+)"" durante um teste$")]
+    public async Task ModuloTirado(string mod, string entrada)
+    {
+        var conta = ContasIniciais.PorEntrada(entrada);
+        await HomologacaoPronta();
+        await AnotarForaDasQa();
+        var mods = await ModsNaPartida(conta);
+        Assert.True(mods.Remove(mod), $"preparo: {conta.Nome} não começou com {mod}, da lista do Key Vault: {string.Join(", ", mods.Keys)}");
+        await SalvarNaPartida(conta, mods);
+        citada = conta;
+    }
+
+    [Given(@"^""(MOD-\d+)"" concedido ao ""(.+)"" durante um teste$")]
+    public async Task ModuloConcedido(string mod, string entrada)
+    {
+        var conta = ContasIniciais.PorEntrada(entrada);
+        await HomologacaoPronta();
+        await AnotarForaDasQa();
+        var mods = await ModsNaPartida(conta);
+        mods[mod] = "U";
+        await SalvarNaPartida(conta, mods);
+        citada = conta;
+    }
+
+    [Then(@"^a staff fica ativa$")]
+    public async Task FicaAtiva()
     {
         ExigirPronta();
         var staff = citada!;
         var r = await EntrarNaPartida(staff);
         Assert.True(r.Status == 200, $"a staff desativada não voltou: a entrada com a senha do Key Vault respondeu {r}");
+        await EstaAtiva(staff);
+    }
+
+    [Then(@"^vale só a senha do Key Vault$")]
+    public async Task SoASenhaDoKeyVault()
+    {
+        ExigirPronta();
+        var conta = citada!;
+        var r = await EntrarNaPartida(conta);
+        Assert.True(r.Status == 200, $"{conta.Nome}: a senha do Key Vault não voltou a valer, a entrada respondeu {r}");
+        Assert.Null(r.Corpo?["comprovante"]);
+        await EstaAtiva(conta);
+    }
+
+    [Then(@"^o ""(\w+)"" só com as abas da parte (da staff|do time)$")]
+    public async Task SoAsAbasDaParte(string apelido, string parte)
+    {
+        ExigirPronta();
+        var conta = ContasIniciais.PorEntrada(apelido);
+        Assert.Equal(ParteDoCenario(parte), await ModsNaPartida(conta));
+    }
+
+    // o que não é conta qa fica como estava (RN-267): uma staff de teste da
+    // QAINS, criada e desativada antes da nova partida, e o administrador real
+    string? idDeFora;
+    string estadoDeFora = "", estadoDoAdmin = "";
+
+    async Task AnotarForaDasQa()
+    {
         var master = await TokenNaPartida(ContasIniciais.Master);
-        var veio = await partida.Api.Enviar("GET", $"/usuarios/{staff.Id}", token: master);
-        Respostas.Confere(veio, 200);
-        Assert.Equal("ATIVO", veio.Corpo?["estado"]?.GetValue<string>());
+        var criada = Exigir(await partida.Api.Enviar("POST", "/usuarios", new JsonObject
+        {
+            ["tipo"] = "STAFF",
+            ["nome"] = "Staff de Teste",
+            ["nomeCurto"] = "teste",
+            ["matricula"] = "20260999",
+        }.ToJsonString(), token: master), 201, "preparo: POST /usuarios da staff de teste");
+        idDeFora = Texto(criada, "id");
+        Exigir(await partida.Api.Enviar("POST", $"/usuarios/{idDeFora}/desativar", token: master), 204, "preparo: POST /usuarios/{id}/desativar da staff de teste");
+        estadoDeFora = await EstadoNaPartida(idDeFora, ContasIniciais.Master);
+        estadoDoAdmin = await EstadoNaPartida(ContasIniciais.Admin.Id, ContasIniciais.Admin);
+    }
+
+    async Task<string> EstadoNaPartida(string id, ContaInicial por) =>
+        Texto(Exigir(await partida.Api.Enviar("GET", $"/usuarios/{id}", token: await TokenNaPartida(por)), 200, $"GET /usuarios/{id}"), "estado");
+
+    [Then(@"^só as contas qa voltam ao estado inicial$")]
+    public async Task SoAsQaVoltam()
+    {
+        ExigirPronta();
+        Assert.Equal(estadoDeFora, await EstadoNaPartida(idDeFora!, ContasIniciais.Master));
+    }
+
+    [Then(@"^""(.+)"" fica como estava, sem volta nem mudança vinda do ""qaadmin""$")]
+    public async Task AdminComoEstava(string entrada)
+    {
+        ExigirPronta();
+        var admin = ContasIniciais.PorEntrada(entrada);
+        var r = await EntrarNaPartida(admin);
+        Assert.True(r.Status == 200, $"{admin.Nome}: a entrada com a senha do Key Vault respondeu {r}");
+        Assert.Equal(estadoDoAdmin, await EstadoNaPartida(admin.Id, admin));
+    }
+
+    // ── módulos iniciais das contas qa (RN-268) ────────────────────────────
+    [Given(@"^o Key Vault de homologação com a lista de módulos iniciais:$")]
+    public void ListaNoKeyVault(string json)
+    {
+        partida.KeyVaultCompleto("hml");
+        var lista = JsonNode.Parse(json)!;
+        staffDoCenario = ModsDaParte(lista, "staff");
+        timeDoCenario = ModsDaParte(lista, "time");
+        partida.Modulos(staffDoCenario, timeDoCenario);
+        keyVaultDoCenario = true;
+    }
+
+    [Given(@"^a mesma lista no Key Vault de homologação$")]
+    public Task MesmaLista() => HomologacaoPronta();
+
+    static Dictionary<string, string> ModsDaParte(JsonNode lista, string parte) =>
+        lista[parte]!["mods"]!.AsObject().ToDictionary(m => m.Key, m => m.Value!.GetValue<string>());
+
+    [Then(@"^GET /usuarios/\{id\}/permissoes do ""(.+)"" traz os mods de ""(staff|time)""$")]
+    public async Task TrazOsModsDaParte(string entrada, string parte)
+    {
+        ExigirPronta();
+        var conta = ContasIniciais.PorEntrada(entrada);
+        Assert.Equal(ParteDoCenario(parte), await ModsNaPartida(conta));
+    }
+
+    [When(@"^""(.+)"" envia GET /usuarios/\{id\}/permissoes do ""(.+)""$")]
+    public async Task LePermissoesNaPartida(string quem, string alvo) =>
+        ultimaDaPartida = await partida.Api.Enviar("GET", $"/usuarios/{ContasIniciais.PorEntrada(alvo).Id}/permissoes",
+            token: await TokenNaPartida(ContasIniciais.PorEntrada(quem)));
+
+    // "concediveis traz ""MOD-03"", ""MOD-04"" e ""MOD-05"", da parte ""staff"", com ""CU"""
+    [Then(@"^concediveis traz (""MOD-\d+""(?:(?:, | e )""MOD-\d+"")*), da parte ""(staff|time)"", com ""(\w+)""$")]
+    public void TrazOsDaParteComAsAbas(string lista, string parte, string abas)
+    {
+        var r = ultimaDaPartida ?? throw new InvalidOperationException("nenhum pedido à instância do cenário");
+        Respostas.Confere(r, 200);
+        var esperados = System.Text.RegularExpressions.Regex.Matches(lista, @"MOD-\d+").Select(m => m.Value).ToList();
+        Assert.Equal(ParteDoCenario(parte).Keys.Order(), esperados.Order());
+        var vieram = Concediveis(r);
+        foreach (var mod in esperados)
+        {
+            Assert.True(vieram.TryGetValue(mod, out var veio), $"concediveis não traz {mod}, da parte \"{parte}\" da lista: {r}");
+            Assert.Equal(abas, veio);
+        }
+    }
+
+    // os módulos da conta entram sozinhos, fora da lista (RN-268)
+    [Then(@"^traz também os módulos da conta ""(MOD-\d+)"" \w+ e ""(MOD-\d+)"" \w+, que entram sozinhos$")]
+    public void TrazOsDaConta(string um, string outro)
+    {
+        var r = ultimaDaPartida ?? throw new InvalidOperationException("nenhum pedido à instância do cenário");
+        var vieram = Concediveis(r);
+        foreach (var mod in new[] { um, outro })
+        {
+            Assert.True(vieram.ContainsKey(mod), $"concediveis não traz {mod}, módulo da conta: {r}");
+        }
+    }
+
+    // a parte "time" vai só para o qamembro: o que só ela tem não aparece nos
+    // módulos da "QAINS" (token da conta master, concediveis do qastaff) nem nos
+    // da "QAAUT" (token do autônomo, que traz os da conta e os contratados)
+    [Then(@"^""QAINS"" e ""QAAUT"" não contratam ""(MOD-\d+)"" nem nenhum módulo da parte ""time""$")]
+    public async Task ParteDoTimeNaoContratada(string citado)
+    {
+        ExigirPronta();
+        var soDoTime = timeDoCenario.Keys.Except(staffDoCenario.Keys).Append(citado).Distinct().ToList();
+        var deCadaConta = new Dictionary<string, IEnumerable<string>>
+        {
+            ["QAINS, token da conta master"] = Jwt.Carga(await TokenNaPartida(ContasIniciais.Master))["mods"]!.AsObject().Select(m => m.Key),
+            ["QAAUT, token do autônomo"] = Jwt.Carga(await TokenNaPartida(ContasIniciais.Autonomo))["mods"]!.AsObject().Select(m => m.Key),
+            ["QAINS, concediveis do qastaff"] = Concediveis(await PermissoesNaPartida(ContasIniciais.Staff)).Keys,
+        };
+        foreach (var (onde, mods) in deCadaConta)
+        {
+            var vieram = mods.Intersect(soDoTime).ToList();
+            Assert.True(vieram.Count == 0, $"{onde}: {string.Join(", ", vieram)}, da parte \"time\", virou contratação");
+        }
+    }
+
+    [Given(@"^a aplicação de produção iniciada$")]
+    public async Task ProducaoIniciada()
+    {
+        partida.KeyVaultCompleto("prd");
+        keyVaultDoCenario = true;
+        await partida.IniciarPronta("produção");
+        pronta = true;
+    }
+
+    // a escola, a conta master e a Maria criadas pela API na instância de
+    // produção; a escola não contratou nada (o preparo de contratações é no
+    // banco do backend de API_URL, não no desta instância)
+    [When(@"^a conta master da EBFGA envia GET /usuarios/usr-ebfga-maria/permissoes$")]
+    public async Task MasterDaEbfgaLeAMaria()
+    {
+        ExigirPronta();
+        var conta = Exigir(await partida.Api.Enviar("POST", "/contas",
+            ContaNova("INSTITUICAO", "Escola Bento Freitas", "12.345.678/0001-90", "objetivo_unidade1", "EBFGA")), 201, "preparo: POST /contas da EBFGA");
+        var confirmada = Exigir(await partida.Api.Enviar("POST", "/auth/hub/confirmar-senha",
+            new JsonObject { ["comprovante"] = Texto(conta, "comprovante") }.ToJsonString()), 200, "preparo: POST /auth/hub/confirmar-senha da EBFGA");
+        var master = Texto(confirmada, "tokenAcesso");
+        var maria = Exigir(await partida.Api.Enviar("POST", "/usuarios", new JsonObject
+        {
+            ["tipo"] = "STAFF",
+            ["nome"] = "Maria Souza",
+            ["nomeCurto"] = "maria",
+            ["matricula"] = "20260087",
+        }.ToJsonString(), token: master), 201, "preparo: POST /usuarios da Maria");
+        ultimaDaPartida = await partida.Api.Enviar("GET", $"/usuarios/{Texto(maria, "id")}/permissoes", token: master);
+    }
+
+    // a EBFGA não contratou nenhum módulo contratável: nenhum deles pode vir da inicialização
+    [Then(@"^concediveis traz só os módulos contratados pela escola$")]
+    public void SoOsContratados()
+    {
+        var r = ultimaDaPartida ?? throw new InvalidOperationException("nenhum pedido à instância do cenário");
+        Respostas.Confere(r, 200);
+        string[] contrataveis = ["MOD-05", "MOD-06", "MOD-07", "MOD-12"];
+        var vieram = Concediveis(r).Keys.Intersect(contrataveis).ToList();
+        Assert.True(vieram.Count == 0, $"em produção, a EBFGA não contratou {string.Join(", ", vieram)}, que veio em concediveis: {r}");
     }
 
     // ── contas iniciais só pelo Key Vault (RNF-225) ────────────────────────
@@ -332,7 +560,7 @@ public sealed class ContasIniciaisPassos(Mundo mundo, Partida partida)
     public static void SoOResumo() => throw new PendingStepException(SoNoBackend);
 
     // ── segredo ausente ou inválido (RNF-226) ──────────────────────────────
-    [Given(@"^a aplicação de (homologação|produção) sem (a senha do administrador|a entrada do administrador|a senha da staff ""qastaff\.qains""|o código do participante ""QAINS-QAPART"")$")]
+    [Given(@"^a aplicação de (homologação|produção) sem (a senha do administrador|a entrada do administrador|a senha do administrador qa ""qaadmin""|a senha da staff ""qastaff\.qains""|o código do participante ""QAINS-QAPART""|a lista de módulos iniciais das contas qa)$")]
     public void SemOSegredo(string ambiente, string segredo)
     {
         partida.KeyVaultCompleto(Sigla(ambiente));
@@ -341,6 +569,8 @@ public sealed class ContasIniciaisPassos(Mundo mundo, Partida partida)
             "a senha do administrador" => ContasIniciais.Admin.VariavelSenha!,
             "a entrada do administrador" => ContasIniciais.Admin.VariavelEntrada,
             "o código do participante \"QAINS-QAPART\"" => ContasIniciais.Participante.VariavelEntrada,
+            "a senha do administrador qa \"qaadmin\"" => ContasIniciais.QaAdmin.VariavelSenha!,
+            "a lista de módulos iniciais das contas qa" => ContasIniciais.VariavelModulos,
             _ => ContasIniciais.Staff.VariavelSenha!,
         };
         partida.KeyVault[variavelAusente] = null;
@@ -410,29 +640,47 @@ public sealed class ContasIniciaisPassos(Mundo mundo, Partida partida)
         if (!pronta) throw new InvalidOperationException($"a aplicação de {partida.AmbienteDaPartida} terminou com {partida.CodigoDeSaida} antes de atender. Log:\n{partida.Log}");
     }
 
+    // quem concede as permissões de uma conta qa: o administrador qa para o
+    // membro do time; a conta master da QAINS para a staff
+    static ContaInicial QuemConcede(ContaInicial conta) =>
+        conta.ContaId == ContasIniciais.ContaDoTime ? ContasIniciais.QaAdmin : ContasIniciais.Master;
+
+    async Task<Resposta> PermissoesNaPartida(ContaInicial conta) =>
+        Exigir(await partida.Api.Enviar("GET", $"/usuarios/{conta.Id}/permissoes", token: await TokenNaPartida(QuemConcede(conta))),
+            200, $"GET /usuarios/{{id}}/permissoes de {conta.Nome}");
+
+    async Task<Dictionary<string, string>> ModsNaPartida(ContaInicial conta) =>
+        (await PermissoesNaPartida(conta)).Corpo!["mods"]!.AsObject().ToDictionary(m => m.Key, m => m.Value!.GetValue<string>());
+
+    // PUT substitui todos os módulos, com a versão lida antes
+    async Task SalvarNaPartida(ContaInicial conta, Dictionary<string, string> mods)
+    {
+        var versao = (await PermissoesNaPartida(conta)).Corpo!["versao"]!.GetValue<int>();
+        var corpo = new JsonObject { ["mods"] = new JsonObject(mods.Select(m => KeyValuePair.Create(m.Key, (JsonNode?)m.Value))) };
+        Exigir(await partida.Api.Enviar("PUT", $"/usuarios/{conta.Id}/permissoes", corpo.ToJsonString(),
+            token: await TokenNaPartida(QuemConcede(conta)), ifMatch: versao.ToString()), 200, $"preparo: PUT /usuarios/{{id}}/permissoes de {conta.Nome}");
+    }
+
+    async Task EstaAtiva(ContaInicial conta)
+    {
+        var veio = await partida.Api.Enviar("GET", $"/usuarios/{conta.Id}", token: await TokenNaPartida(QuemConcede(conta)));
+        Respostas.Confere(veio, 200);
+        Assert.Equal("ATIVO", veio.Corpo?["estado"]?.GetValue<string>());
+    }
+
+    static Dictionary<string, string> Concediveis(Resposta r) =>
+        r.Corpo!["concediveis"]!.AsArray().ToDictionary(c => c!["mod"]!.GetValue<string>(), c => c!["abas"]!.GetValue<string>());
+
     async Task<Resposta> EntrarNoHub(string entrada, string senha) =>
         await mundo.Enviar("POST", "/auth/hub/entrar", CorpoDoHub(entrada, senha));
 
-    Task<Resposta> EntrarNaPartida(ContaInicial conta) => conta.Participante
-        ? partida.Api.Enviar("POST", "/auth/quest/entrar", CorpoDoQuest(partida.Entrada(conta)))
-        : partida.Api.Enviar("POST", "/auth/hub/entrar", CorpoDoHub(partida.Entrada(conta), partida.Senha(conta)));
+    Task<Resposta> EntrarNaPartida(ContaInicial conta) => partida.Entrar(conta);
 
-    async Task<string> TokenNaPartida(ContaInicial conta) =>
-        Texto(Exigir(await EntrarNaPartida(conta), 200, $"POST /auth/hub/entrar de {conta.Nome}"), "tokenAcesso");
+    Task<string> TokenNaPartida(ContaInicial conta) => partida.Token(conta);
 
-    static string CorpoDoHub(string entrada, string senha) => new JsonObject
-    {
-        ["entrada"] = entrada,
-        ["senha"] = senha,
-        ["aparelho"] = Navegador,
-    }.ToJsonString();
+    static string CorpoDoHub(string entrada, string senha) => Partida.CorpoDoHub(entrada, senha);
 
-    static string CorpoDoQuest(string codigo) => new JsonObject
-    {
-        ["codigo"] = codigo,
-        ["aparelho"] = Navegador,
-        ["quem"] = new JsonObject { ["tipo"] = "PARTICIPANTE" },
-    }.ToJsonString();
+    static string CorpoDoQuest(string codigo) => Partida.CorpoDoQuest(codigo);
 
     static string? Papel(Resposta r) =>
         r.Corpo?["tokenAcesso"]?.GetValue<string>() is { } token ? Jwt.Carga(token)["papel"]?.GetValue<string>() : null;
