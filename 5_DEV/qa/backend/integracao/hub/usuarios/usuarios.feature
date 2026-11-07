@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v66), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v68), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -513,6 +513,7 @@ Funcionalidade: Usuários
       | QAEDU | em produção, 422 SIGLA_INVALIDA, reservada ao time  |
       | EBF   | 422 SIGLA_INVALIDA, precisa de 5 letras             |
       | COLSA | 201                                                 |
+      | colsa | 201, conta "conta-colsa" com a sigla "COLSA"        |
 
   @RN-242
   Esquema do Cenário: documento de cada conta
@@ -968,6 +969,7 @@ Funcionalidade: Usuários
       | colecao       | indice            | impedimento                | resultado                 |
       | contas        | sigla único       | duas contas com "EBFGA"    | para antes do 1º pedido   |
       | usuarios      | login único       | dois usuários com um login | para antes do 1º pedido   |
+      | contas        | sigla único       | índice único de outro nome | para antes do 1º pedido   |
       | geracoesSenha | resumoComprovante | o banco recusa o índice    | aceita pedidos, com aviso |
 
   @RNF-227

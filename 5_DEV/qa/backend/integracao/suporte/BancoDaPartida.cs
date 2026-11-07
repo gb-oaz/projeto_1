@@ -60,9 +60,9 @@ public static class BancoDaPartida
     // sem a suíte saber o nome interno dele
     public const string IndiceQueImpede = "qa_rnf227_impede";
 
-    public static Task CriarIndiceQueImpede(string colecao, string campo) =>
+    public static Task CriarIndiceQueImpede(string colecao, string campo, bool unico = false) =>
         Colecao(colecao).Indexes.CreateOneAsync(new CreateIndexModel<BsonDocument>(
-            Builders<BsonDocument>.IndexKeys.Ascending(campo), new CreateIndexOptions { Name = IndiceQueImpede }));
+            Builders<BsonDocument>.IndexKeys.Ascending(campo), new CreateIndexOptions { Name = IndiceQueImpede, Unique = unico }));
 
     public static async Task<List<string>> Ids(string colecao) =>
         [.. (await Colecao(colecao).Find(FilterDefinition<BsonDocument>.Empty)

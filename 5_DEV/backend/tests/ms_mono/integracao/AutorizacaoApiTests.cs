@@ -12,7 +12,7 @@ public class AutorizacaoApiTests(Backend backend) : IClassFixture<Backend>
 {
     readonly Preparo preparo = new(backend);
 
-    static string Sigla() => string.Concat(Guid.NewGuid().ToByteArray().Take(5).Select(b => (char)('A' + b % 26)));
+    static string Sigla() => Preparo.SiglaSorteada();
 
     [Fact]
     public async Task RF_160_RF_161_le_salva_e_o_token_antigo_pede_renovacao()

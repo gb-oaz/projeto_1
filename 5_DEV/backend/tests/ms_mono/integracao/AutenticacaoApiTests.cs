@@ -10,7 +10,7 @@ public class AutenticacaoApiTests(Backend backend) : IClassFixture<Backend>
 {
     readonly Preparo preparo = new(backend);
 
-    static string Sigla() => string.Concat(Guid.NewGuid().ToByteArray().Take(5).Select(b => (char)('A' + b % 26)));
+    static string Sigla() => Preparo.SiglaSorteada();
 
     [Fact]
     public async Task RF_134_entra_no_navegador_com_o_cookie_e_renova()

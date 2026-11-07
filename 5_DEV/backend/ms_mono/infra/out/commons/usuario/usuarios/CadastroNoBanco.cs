@@ -122,9 +122,10 @@ public sealed class ContasNoBanco(Armazenamento armazenamento) : IContas
     public async Task<ContaAssinante?> Buscar(string id, CancellationToken ct = default) =>
         await Contas.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct) is { } d ? Documentos.Conta(d) : null;
 
-    // a sigla vale sem diferenciar maiúsculas (RN-179)
+    // a sigla é gravada sempre em maiúsculas (RN-179): a busca exata usa o
+    // índice sigla_unica (identidade-acesso-documentos v11)
     public Task<bool> SiglaEmUso(string sigla, CancellationToken ct = default) =>
-        Contas.Find(Bson.Filtro.Regex("sigla", new BsonRegularExpression($"^{System.Text.RegularExpressions.Regex.Escape(sigla)}$", "i"))).AnyAsync(ct);
+        Contas.Find(Bson.Filtro.Eq("sigla", sigla.ToUpperInvariant())).AnyAsync(ct);
 
     public Task<bool> DominioEmUso(string dominio, CancellationToken ct = default) =>
         Contas.Find(Bson.Filtro.Eq("dominio", dominio)).AnyAsync(ct);
@@ -136,11 +137,43 @@ public sealed class ContasNoBanco(Armazenamento armazenamento) : IContas
         var d = Documentos.DaConta(conta);
         d["tempoSessao"] = Documentos.DoTempo(tempo);
         d["conferencias"] = new BsonArray();
-        await Contas.InsertOneAsync(d, cancellationToken: ct);
+        await InserirConta(d, ct);
         var usuario = Documentos.DoCadastro(master);
         usuario.InsertAt(0, new BsonElement("_id", master.Id));
         await armazenamento.Colecao(Colecoes.Usuarios).InsertOneAsync(usuario, cancellationToken: ct);
         await armazenamento.Colecao(Colecoes.GeracoesSenha).InsertOneAsync(Documentos.DaGeracao(geracao), cancellationToken: ct);
+    }
+
+    // Dois pedidos com a mesma sigla ou o mesmo domínio ao mesmo tempo passam
+    // pela conferência do caso de uso; o índice único recusa o segundo, que
+    // responde como a conferência (RN-179): SIGLA_EM_USO ou DOMINIO_EM_USO. O
+    // _id sai da sigla (conta-<sigla>), por isso _id_ também é sigla em uso.
+    async Task InserirConta(BsonDocument conta, CancellationToken ct)
+    {
+        try
+        {
+            await Contas.InsertOneAsync(conta, cancellationToken: ct);
+        }
+        catch (MongoWriteException erro) when (erro.WriteError.Category == ServerErrorCategory.DuplicateKey)
+        {
+            throw IndiceDuplicado(erro.WriteError.Message) switch
+            {
+                "dominio_unico" => FalhaDeUsuarios.DominioEmUso(),
+                "sigla_unica" or "_id_" => FalhaDeUsuarios.SiglaEmUso(),
+                _ => erro,
+            };
+        }
+    }
+
+    // "E11000 duplicate key error collection: boaz.contas index: sigla_unica dup key: …" → "sigla_unica"
+    public static string? IndiceDuplicado(string mensagem)
+    {
+        const string marca = "index: ";
+        var inicio = mensagem.IndexOf(marca, StringComparison.Ordinal);
+        if (inicio < 0) return null;
+        inicio += marca.Length;
+        var fim = mensagem.IndexOf(' ', inicio);
+        return fim < 0 ? mensagem[inicio..] : mensagem[inicio..fim];
     }
 
     // upsert pelo _id (RN-267): a conta inicial só é gravada se não existir

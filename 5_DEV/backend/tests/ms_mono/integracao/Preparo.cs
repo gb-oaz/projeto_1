@@ -17,6 +17,22 @@ public sealed class Preparo(Backend backend)
 {
     T Caso<T>() where T : notnull => backend.Services.GetRequiredService<T>();
 
+    // Uma sigla de 5 letras ao acaso para a conta do teste, nunca uma reservada:
+    // "QA…" fora de homologação (RN-179, RN-266) nem DBOAZ. Sem isso, cerca de
+    // 1 sorteio em 676 começava por QA e o preparo falhava ao acaso.
+    public static string SiglaSorteada()
+    {
+        while (true)
+        {
+            var sigla = string.Concat(Guid.NewGuid().ToByteArray().Take(5).Select(b => (char)('A' + b % 26)));
+            if (!sigla.StartsWith(Core.Commons.Usuario.Usuarios.Domain.Sigla.PrefixoQa, StringComparison.Ordinal)
+                && sigla != Core.Commons.Usuario.Usuarios.Domain.Sigla.DoTime)
+            {
+                return sigla;
+            }
+        }
+    }
+
     // Conta criada e confirmada; devolve a conta master já com o token.
     public async Task<(string ContaId, Pessoa Master)> Conta(string sigla, string tipo = "INSTITUICAO")
     {

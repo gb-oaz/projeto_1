@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace Boaz.MsMono.Infra.Out.Commons;
 
-// Os índices do MongoDB como o diagrama identidade-acesso-documentos (v10)
+// Os índices do MongoDB como o diagrama identidade-acesso-documentos (v11)
 // especifica, criados na partida, antes do primeiro pedido (RNF-227). Criar um
 // índice que já existe igual não faz nada. Um índice não único que não pode ser
 // criado vai para o log como aviso e a partida segue: é só desempenho. Um único

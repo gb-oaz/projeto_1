@@ -241,6 +241,15 @@ public sealed partial class IndicesPassos(Partida partida)
         valoresGravados.Add(login);
     }
 
+    // índice único já existe na mesma chave com outro nome: o banco recusa o da
+    // aplicação (IndexOptionsConflict), e a partida tem de parar como nos dados repetidos
+    [Given(@"^índice único de outro nome na coleção ""(contas)""$")]
+    public async Task UnicoDeOutroNome(string nome)
+    {
+        await Preparar(nome);
+        await BancoDaPartida.CriarIndiceQueImpede(nome, "sigla", unico: true);
+    }
+
     // índice não único: o banco o recusa porque a suíte criou antes um índice
     // na mesma chave com outro nome (BancoDaPartida.CriarIndiceQueImpede)
     [Given(@"^o banco recusa o índice na coleção ""(geracoesSenha)""$")]

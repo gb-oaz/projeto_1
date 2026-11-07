@@ -11,7 +11,7 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
     readonly Preparo preparo = new(backend);
 
     // 5 letras novas a cada teste, para as contas não se encontrarem
-    static string Sigla() => string.Concat(Guid.NewGuid().ToByteArray().Take(5).Select(b => (char)('A' + b % 26)));
+    static string Sigla() => Preparo.SiglaSorteada();
 
     [Fact]
     public async Task RF_104_cria_a_conta_e_recusa_a_sigla_repetida()

@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v66"
-data: "2026-11-07 14:17"
+versao: "v68"
+data: "2026-11-07 14:53"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v66** · 2026-11-07 14:17 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v68** · 2026-11-07 14:53 · **Em revisão**
 
 # Módulo Usuários
 
@@ -411,6 +411,7 @@ Esquema do Cenário: sigla recusada
     | QAEDU | em produção, é recusada, reservada ao time  |
     | EBF   | é recusada, precisa de 5 letras             |
     | COLSA | é aceita                                    |
+    | colsa | é aceita e gravada como "COLSA"             |
 
 Cenário: sigla não muda
   Quando a conta master da EBFGA procura mudar a sigla
@@ -1311,6 +1312,7 @@ Esquema do Cenário: sigla recusada
     | QAEDU | em produção, 422 SIGLA_INVALIDA, reservada ao time  |
     | EBF   | 422 SIGLA_INVALIDA, precisa de 5 letras             |
     | COLSA | 201                                                 |
+    | colsa | 201, conta "conta-colsa" com a sigla "COLSA"        |
 ```
 
 <a id="RN-242-api"></a>
@@ -1880,6 +1882,7 @@ Esquema do Cenário: índice que não pode ser criado
     | colecao       | indice            | impedimento                | resultado                 |
     | contas        | sigla único       | duas contas com "EBFGA"    | para antes do 1º pedido   |
     | usuarios      | login único       | dois usuários com um login | para antes do 1º pedido   |
+    | contas        | sigla único       | índice único de outro nome | para antes do 1º pedido   |
     | geracoesSenha | resumoComprovante | o banco recusa o índice    | aceita pedidos, com aviso |
 ```
 
@@ -2156,9 +2159,9 @@ Cenário: o que este documento não trata
 
 [![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)
 
-**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v10_20261107-1417.svg`
+**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v11_20261107-1452.svg`
 
-[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios particionados pela sigla com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v10_20261107-1417.svg)](../2_Diagramas/identidade-acesso-documentos_v10_20261107-1417.svg)
+[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios particionados pela sigla com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v11_20261107-1452.svg)](../2_Diagramas/identidade-acesso-documentos_v11_20261107-1452.svg)
 
 ---
 
@@ -2168,7 +2171,9 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v66** | 2026-11-07 14:17 | `RNF-227-api`: GET /health responde 200 sem corpo só depois da partida, sem resposta enquanto ela roda ou quando para (índice único, `RNF-226`, banco fora do ar), e 200 com aviso no log quando falha um índice não único; diagramas: contrato v05 e modelo de documentos v09 |
+| **v68** | 2026-11-07 14:53 | `RN-179` e `RN-179-api`: exemplo da sigla "colsa", aceita e gravada como "COLSA" (201, conta "conta-colsa"); diagramas: modelo de documentos v10 → v11 |
+| v67 | 2026-11-07 14:52 | `RNF-227`: exemplo do índice único já existente na mesma chave com outro nome, que o banco recusa; a partida para, como nos outros índices únicos |
+| v66 | 2026-11-07 14:17 | `RNF-227-api`: GET /health responde 200 sem corpo só depois da partida, sem resposta enquanto ela roda ou quando para (índice único, `RNF-226`, banco fora do ar), e 200 com aviso no log quando falha um índice não único; diagramas: contrato v05 e modelo de documentos v09 |
 | v65 | 2026-11-07 14:13 | `RNF-227`: índice único que não pode ser criado impede a partida, como no `RNF-226`; índice não único que falha fica só no aviso do log e a partida segue; o log cita índice e coleção, nunca o valor |
 | v64 | 2026-11-07 14:12 | `RNF-227`: passo "Então antes de aceitar o primeiro pedido…" sem vírgula após a palavra-chave, igual ao .feature do qa |
 | v63 | 2026-11-07 14:06 | Coleções e índices do modelo de documentos prontos na partida, antes do primeiro pedido, sem duplicar a cada partida; índice que não pode ser criado vira aviso no log e a partida segue (`RNF-227`); status → Em revisão |
@@ -2176,9 +2181,7 @@ Cenário: o que este documento não trata
 | v61 | 2026-11-07 13:36 | Status → Aprovado, com autorização do usuário; cenários sem mudança |
 | v60 | 2026-11-07 12:16 | Diagramas: sequência da inicialização v03 e modelo de documentos v07; cenários sem mudança |
 | v59 | 2026-11-07 12:07 | Lista de módulos iniciais das contas qa com a parte "staff", contratada por "QAINS" e "QAAUT", e a parte "time" do "qamembro" ("MOD-03" e "MOD-14"); concediveis traz também os módulos da conta "MOD-08" e "MOD-09" (`RN-268`, `RN-268-api`); exemplo da volta ao estado inicial com "MOD-02" no lugar de "MOD-12", que a conta do time não contrata (`RN-267`); status → Em revisão |
-| v58 | 2026-11-07 03:10 | Administrador não age sobre outro administrador: "qaadmin" e "admin" não desativam, não reativam nem geram nova senha um do outro, tela recusa e a API responde 403 ACESSO_NEGADO (`RN-169`, `RN-169-api`); a volta ao estado inicial vale só para as contas qa e o "admin" real fica como estava (`RN-267`); sequência da inicialização trocada para a v02; Em revisão pela mudança de regra e Aprovado na mesma versão, com autorização do usuário |
-| v57 | 2026-11-07 02:55 | Status → Aprovado, junto com o glossário v45; cenários sem mudança |
 
 ---
 
-<sub>boaz · v66 · 2026-11-07 14:17 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v68 · 2026-11-07 14:53 · `1_Requisitos/17_modulo-usuario.md`</sub>

@@ -91,6 +91,16 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida)
     async Task NovaConta(string tipo, string sigla, string dominio, string documento) =>
         acao = await mundo.Enviar("POST", "/contas", ContaNova(tipo, tipo == "AUTONOMO" ? "Pedro Reis" : "Escola Nova", documento, dominio, sigla));
 
+    // a sigla em minúsculas é gravada em maiúsculas (RN-179): conferida pela
+    // leitura da conta na API, nunca pelo banco
+    [Then(@"^a resposta é 201, conta ""(.+)"" com a sigla ""(\w+)""$")]
+    public async Task ContaCriadaComASigla(string id, string sigla)
+    {
+        Respostas.Confere(mundo.Ultima, 201);
+        var r = Exigir(await mundo.EnviarComo(mundo.Admin(), "GET", $"/contas/{id}"), 200, $"GET /contas/{id}");
+        Assert.Equal(sigla, r.Corpo?["sigla"]?.GetValue<string>());
+    }
+
     [Then(@"^a resposta é 409 SIGLA_EM_USO e nenhuma conta é criada$")]
     public async Task NenhumaConta()
     {
