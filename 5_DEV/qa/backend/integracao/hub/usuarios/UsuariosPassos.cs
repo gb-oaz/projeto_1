@@ -354,6 +354,50 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida)
     public async Task ComAMatricula(string caminho, string matricula) =>
         Assert.Equal(matricula, Texto(await Ler(caminho), "matricula"));
 
+    // ── autônomo sem matrícula (RN-188): o participante vai sem o campo, e a
+    // ausência de matrícula vale vinda sem o campo ou com null
+    readonly List<string> semMatricula = [];
+
+    [Given(@"^o token do educador autônomo Pedro, com o participante Lucas sem matrícula$")]
+    public async Task PedroComOLucas()
+    {
+        mundo.Sujeito = await mundo.Pedro();
+        var r = Exigir(await mundo.EnviarComo(mundo.Sujeito, "POST", "/usuarios", ParticipanteSemMatricula("Lucas Andrade", "lucas")),
+            201, "preparo: POST /usuarios do Lucas pelo Pedro");
+        semMatricula.Add(Texto(r, "id"));
+    }
+
+    [When(@"^envia POST /usuarios da participante Bia, também sem matrícula$")]
+    public async Task BiaSemMatricula()
+    {
+        var r = await mundo.EnviarComo(mundo.Sujeito!, "POST", "/usuarios", ParticipanteSemMatricula("Bia Lima", "bia"));
+        if (r.Status == 201) semMatricula.Add(Texto(r, "id"));
+    }
+
+    [Then(@"^a resposta é 201, e não 409 MATRICULA_EM_USO$")]
+    public void CriadaSemMatricula() => Respostas.Confere(mundo.Ultima, 201);
+
+    [Then(@"^o Lucas e a Bia ficam os dois sem matrícula$")]
+    public async Task OsDoisSemMatricula()
+    {
+        Assert.Equal(2, semMatricula.Count);
+        foreach (var id in semMatricula)
+        {
+            var r = Exigir(await mundo.EnviarComo(mundo.Sujeito!, "GET", $"/usuarios/{id}"), 200, $"GET /usuarios/{id}");
+            var matricula = r.Corpo?["matricula"];
+            Assert.True(matricula is null || (matricula is JsonValue v && v.TryGetValue<string>(out var t) && t.Length == 0),
+                $"{id} devia ficar sem matrícula; veio \"{matricula?.ToJsonString()}\"");
+        }
+    }
+
+    static string ParticipanteSemMatricula(string nome, string nomeCurto) => new JsonObject
+    {
+        ["tipo"] = "PARTICIPANTE",
+        ["nome"] = nome,
+        ["nomeCurto"] = nomeCurto,
+        ["responsaveis"] = new JsonArray(),
+    }.ToJsonString();
+
     [When(@"^o administrador envia POST /usuarios com o tipo ""MEMBRO_TIME"" para o Caio Reis$")]
     public Task CriaOCaio() => mundo.EnviarComo(mundo.Admin(), "POST", "/usuarios", new JsonObject
     {

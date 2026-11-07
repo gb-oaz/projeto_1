@@ -3,7 +3,9 @@ using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.MsMono.Infra.Out.Commons.Usuario.Usuarios;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using IContas = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IContas;
+using IUsuarios = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IUsuarios;
 
 namespace Boaz.MsMono.Tests.Integracao;
 
@@ -64,10 +66,23 @@ public class ContasNoBancoTests(Backend backend) : IClassFixture<Backend>
         Assert.Equal("DOMINIO_EM_USO", falha.Codigo);
     }
 
-    [Theory]
-    [InlineData("E11000 duplicate key error collection: boaz.contas index: sigla_unica dup key: { sigla: \"X\" }", "sigla_unica")]
-    [InlineData("E11000 duplicate key error collection: boaz.contas index: _id_", "_id_")]
-    [InlineData("outra mensagem", null)]
-    public void Indice_da_chave_duplicada(string mensagem, string? indice) =>
-        Assert.Equal(indice, ContasNoBanco.IndiceDuplicado(mensagem));
+    // RN-188: sem matrícula, o campo fica ausente; dois sem matrícula na mesma
+    // conta não colidem no índice único contaId+matricula
+    [Fact]
+    public async Task RN_188_dois_sem_matricula_na_mesma_conta()
+    {
+        _ = backend.Server;
+        var usuarios = backend.Services.GetRequiredService<IUsuarios>();
+        var agora = DateTimeOffset.UtcNow;
+        foreach (var nome in new[] { "semmatra", "semmatrb" })
+        {
+            await usuarios.Inserir(new UsuarioCadastrado($"usr-rn188-{nome}", "conta-rn188", "RNOIT", TipoUsuario.Participante,
+                $"Pessoa {nome}", nome, $"RNOIT-{nome.ToUpperInvariant()}-0001", null, EstadoUsuario.Ativo, null, [], null, agora));
+        }
+
+        var gravados = await backend.Banco.GetCollection<BsonDocument>("usuarios")
+            .Find(Builders<BsonDocument>.Filter.Eq("contaId", "conta-rn188")).ToListAsync();
+        Assert.Equal(2, gravados.Count);
+        Assert.All(gravados, d => Assert.False(d.Contains("matricula")));
+    }
 }

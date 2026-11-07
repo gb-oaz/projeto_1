@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v68), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v69), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -687,6 +687,13 @@ Funcionalidade: Usuários
   Cenário: matrícula que a escola já usa
     Quando a conta master envia POST /usuarios da Maria com a matrícula "20260087"
     Então GET /usuarios/usr-ebfga-maria traz a matrícula "20260087"
+
+  @RN-188
+  Cenário: dois participantes sem matrícula no autônomo
+    Dado o token do educador autônomo Pedro, com o participante Lucas sem matrícula
+    Quando envia POST /usuarios da participante Bia, também sem matrícula
+    Então a resposta é 201, e não 409 MATRICULA_EM_USO
+    E o Lucas e a Bia ficam os dois sem matrícula
 
   @RN-189
   Cenário: dados do card

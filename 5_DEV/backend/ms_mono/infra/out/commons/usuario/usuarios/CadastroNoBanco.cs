@@ -147,7 +147,9 @@ public sealed class ContasNoBanco(Armazenamento armazenamento) : IContas
     // Dois pedidos com a mesma sigla ou o mesmo domínio ao mesmo tempo passam
     // pela conferência do caso de uso; o índice único recusa o segundo, que
     // responde como a conferência (RN-179): SIGLA_EM_USO ou DOMINIO_EM_USO. O
-    // _id sai da sigla (conta-<sigla>), por isso _id_ também é sigla em uso.
+    // Cosmos DB não diz qual índice recusou ("Failed _id or unique index
+    // constraint"), por isso o banco é relido: o _id sai da sigla
+    // (conta-<sigla>), então _id ou sigla existentes são sigla em uso.
     async Task InserirConta(BsonDocument conta, CancellationToken ct)
     {
         try
@@ -156,24 +158,14 @@ public sealed class ContasNoBanco(Armazenamento armazenamento) : IContas
         }
         catch (MongoWriteException erro) when (erro.WriteError.Category == ServerErrorCategory.DuplicateKey)
         {
-            throw IndiceDuplicado(erro.WriteError.Message) switch
+            var sigla = conta.Texto("sigla") ?? "";
+            if (await Contas.Find(Bson.Filtro.Eq("_id", conta["_id"]) | Bson.Filtro.Eq("sigla", sigla)).AnyAsync(ct))
             {
-                "dominio_unico" => FalhaDeUsuarios.DominioEmUso(),
-                "sigla_unica" or "_id_" => FalhaDeUsuarios.SiglaEmUso(),
-                _ => erro,
-            };
+                throw FalhaDeUsuarios.SiglaEmUso();
+            }
+            if (await DominioEmUso(conta.Texto("dominio") ?? "", ct)) throw FalhaDeUsuarios.DominioEmUso();
+            throw;
         }
-    }
-
-    // "E11000 duplicate key error collection: boaz.contas index: sigla_unica dup key: …" → "sigla_unica"
-    public static string? IndiceDuplicado(string mensagem)
-    {
-        const string marca = "index: ";
-        var inicio = mensagem.IndexOf(marca, StringComparison.Ordinal);
-        if (inicio < 0) return null;
-        inicio += marca.Length;
-        var fim = mensagem.IndexOf(' ', inicio);
-        return fim < 0 ? mensagem[inicio..] : mensagem[inicio..fim];
     }
 
     // upsert pelo _id (RN-267): a conta inicial só é gravada se não existir

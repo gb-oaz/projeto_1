@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v68"
-data: "2026-11-07 14:53"
+versao: "v69"
+data: "2026-11-07 15:52"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v68** · 2026-11-07 14:53 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v69** · 2026-11-07 15:52 · **Em revisão**
 
 # Módulo Usuários
 
@@ -557,6 +557,11 @@ Cenário: gerar automaticamente
 Cenário: autônomo sem matrícula
   Quando o educador autônomo cria um participante
   Então o formulário não pede matrícula
+
+Cenário: dois participantes sem matrícula no autônomo
+  Dado o educador autônomo Pedro com o participante Lucas, sem matrícula
+  Quando cria a participante Bia, também sem matrícula
+  Então a Bia é criada sem aviso de matrícula em uso
 ```
 
 <a id="RN-189"></a>
@@ -1548,6 +1553,12 @@ Cenário: gerar automaticamente
 Cenário: matrícula que a escola já usa
   Quando a conta master envia POST /usuarios da Maria com a matrícula "20260087"
   Então GET /usuarios/usr-ebfga-maria traz a matrícula "20260087"
+
+Cenário: dois participantes sem matrícula no autônomo
+  Dado o token do educador autônomo Pedro, com o participante Lucas sem matrícula
+  Quando envia POST /usuarios da participante Bia, também sem matrícula
+  Então a resposta é 201, e não 409 MATRICULA_EM_USO
+  E o Lucas e a Bia ficam os dois sem matrícula
 ```
 
 <a id="RN-189-api"></a>
@@ -2159,9 +2170,9 @@ Cenário: o que este documento não trata
 
 [![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)
 
-**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v11_20261107-1452.svg`
+**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v12_20261107-1542.svg`
 
-[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios particionados pela sigla com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v11_20261107-1452.svg)](../2_Diagramas/identidade-acesso-documentos_v11_20261107-1452.svg)
+[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v12_20261107-1542.svg)](../2_Diagramas/identidade-acesso-documentos_v12_20261107-1542.svg)
 
 ---
 
@@ -2171,7 +2182,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v68** | 2026-11-07 14:53 | `RN-179` e `RN-179-api`: exemplo da sigla "colsa", aceita e gravada como "COLSA" (201, conta "conta-colsa"); diagramas: modelo de documentos v10 → v11 |
+| **v69** | 2026-11-07 15:52 | `RN-188` e `RN-188-api`: exemplo de dois participantes sem matrícula no educador autônomo, aceitos (201, sem 409 MATRICULA_EM_USO), porque a matrícula só é única quando existe; diagramas: modelo de documentos v11 → v12, sem partição pela sigla |
+| v68 | 2026-11-07 14:53 | `RN-179` e `RN-179-api`: exemplo da sigla "colsa", aceita e gravada como "COLSA" (201, conta "conta-colsa"); diagramas: modelo de documentos v10 → v11 |
 | v67 | 2026-11-07 14:52 | `RNF-227`: exemplo do índice único já existente na mesma chave com outro nome, que o banco recusa; a partida para, como nos outros índices únicos |
 | v66 | 2026-11-07 14:17 | `RNF-227-api`: GET /health responde 200 sem corpo só depois da partida, sem resposta enquanto ela roda ou quando para (índice único, `RNF-226`, banco fora do ar), e 200 com aviso no log quando falha um índice não único; diagramas: contrato v05 e modelo de documentos v09 |
 | v65 | 2026-11-07 14:13 | `RNF-227`: índice único que não pode ser criado impede a partida, como no `RNF-226`; índice não único que falha fica só no aviso do log e a partida segue; o log cita índice e coleção, nunca o valor |
@@ -2180,8 +2192,7 @@ Cenário: o que este documento não trata
 | v62 | 2026-11-07 14:05 | Diagrama: modelo de documentos v08 — índices criados na partida, contratacoes com _id e sigla e ainda sem índice, partição pela sigla por coleção; cenários sem mudança |
 | v61 | 2026-11-07 13:36 | Status → Aprovado, com autorização do usuário; cenários sem mudança |
 | v60 | 2026-11-07 12:16 | Diagramas: sequência da inicialização v03 e modelo de documentos v07; cenários sem mudança |
-| v59 | 2026-11-07 12:07 | Lista de módulos iniciais das contas qa com a parte "staff", contratada por "QAINS" e "QAAUT", e a parte "time" do "qamembro" ("MOD-03" e "MOD-14"); concediveis traz também os módulos da conta "MOD-08" e "MOD-09" (`RN-268`, `RN-268-api`); exemplo da volta ao estado inicial com "MOD-02" no lugar de "MOD-12", que a conta do time não contrata (`RN-267`); status → Em revisão |
 
 ---
 
-<sub>boaz · v68 · 2026-11-07 14:53 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v69 · 2026-11-07 15:52 · `1_Requisitos/17_modulo-usuario.md`</sub>

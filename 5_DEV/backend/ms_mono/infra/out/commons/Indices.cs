@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace Boaz.MsMono.Infra.Out.Commons;
 
-// Os índices do MongoDB como o diagrama identidade-acesso-documentos (v11)
+// Os índices do MongoDB como o diagrama identidade-acesso-documentos (v12)
 // especifica, criados na partida, antes do primeiro pedido (RNF-227). Criar um
 // índice que já existe igual não faz nada. Um índice não único que não pode ser
 // criado vai para o log como aviso e a partida segue: é só desempenho. Um único
@@ -31,8 +31,9 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
         {
             Name = "contaId_matricula_unica",
             Unique = true,
-            // só quando há matrícula: o autônomo e o time não têm (RN-188)
-            PartialFilterExpression = Builders<BsonDocument>.Filter.Type("matricula", BsonType.String),
+            // só quando há matrícula: o autônomo e o time não têm, e o campo fica
+            // ausente (RN-188); $exists é o filtro parcial que o Cosmos DB aceita
+            PartialFilterExpression = Builders<BsonDocument>.Filter.Exists("matricula"),
         })),
         (Colecoes.Usuarios, Comum(Chave.Ascending("contaId").Ascending("tipo").Ascending("estado").Ascending("nome"), "contaId_tipo_estado_nome")),
         // geracoesSenha

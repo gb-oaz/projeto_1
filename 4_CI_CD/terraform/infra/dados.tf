@@ -29,6 +29,19 @@ resource "azurerm_cosmosdb_account" "cosmos" {
     consistency_level = "Session"
   }
 
+  # Backup periódico, fixado (RNF-227): com backup contínuo o Cosmos DB for
+  # MongoDB (RU) só aceita índice único na criação da coleção (customAction
+  # CreateCollection), e a partida cria os índices com createIndexes
+  backup {
+    type = "Periodic"
+  }
+
+  # As coleções nascem na partida, sem chave de partição (não particionadas):
+  # índice único em coleção particionada exige a chave de partição na frente,
+  # e transação só vale em coleção não particionada. Não criar coleções nem
+  # índices aqui: o bloco index do provedor não tem ordem decrescente nem filtro
+  # parcial, e um índice de outro nome na mesma chave para a partida (RNF-227)
+
   geo_location {
     location          = var.regiao
     failover_priority = 0
