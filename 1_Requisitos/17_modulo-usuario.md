@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v69"
-data: "2026-11-07 15:52"
-status: "Em revisão"
+versao: "v70"
+data: "2026-11-07 16:40"
+status: "Aprovado"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v69** · 2026-11-07 15:52 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v70** · 2026-11-07 16:40 · **Aprovado**
 
 # Módulo Usuários
 
@@ -2182,7 +2182,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v69** | 2026-11-07 15:52 | `RN-188` e `RN-188-api`: exemplo de dois participantes sem matrícula no educador autônomo, aceitos (201, sem 409 MATRICULA_EM_USO), porque a matrícula só é única quando existe; diagramas: modelo de documentos v11 → v12, sem partição pela sigla |
+| **v70** | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
+| v69 | 2026-11-07 15:52 | `RN-188` e `RN-188-api`: exemplo de dois participantes sem matrícula no educador autônomo, aceitos (201, sem 409 MATRICULA_EM_USO), porque a matrícula só é única quando existe; diagramas: modelo de documentos v11 → v12, sem partição pela sigla |
 | v68 | 2026-11-07 14:53 | `RN-179` e `RN-179-api`: exemplo da sigla "colsa", aceita e gravada como "COLSA" (201, conta "conta-colsa"); diagramas: modelo de documentos v10 → v11 |
 | v67 | 2026-11-07 14:52 | `RNF-227`: exemplo do índice único já existente na mesma chave com outro nome, que o banco recusa; a partida para, como nos outros índices únicos |
 | v66 | 2026-11-07 14:17 | `RNF-227-api`: GET /health responde 200 sem corpo só depois da partida, sem resposta enquanto ela roda ou quando para (índice único, `RNF-226`, banco fora do ar), e 200 com aviso no log quando falha um índice não único; diagramas: contrato v05 e modelo de documentos v09 |
@@ -2191,8 +2192,7 @@ Cenário: o que este documento não trata
 | v63 | 2026-11-07 14:06 | Coleções e índices do modelo de documentos prontos na partida, antes do primeiro pedido, sem duplicar a cada partida; índice que não pode ser criado vira aviso no log e a partida segue (`RNF-227`); status → Em revisão |
 | v62 | 2026-11-07 14:05 | Diagrama: modelo de documentos v08 — índices criados na partida, contratacoes com _id e sigla e ainda sem índice, partição pela sigla por coleção; cenários sem mudança |
 | v61 | 2026-11-07 13:36 | Status → Aprovado, com autorização do usuário; cenários sem mudança |
-| v60 | 2026-11-07 12:16 | Diagramas: sequência da inicialização v03 e modelo de documentos v07; cenários sem mudança |
 
 ---
 
-<sub>boaz · v69 · 2026-11-07 15:52 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v70 · 2026-11-07 16:40 · `1_Requisitos/17_modulo-usuario.md`</sub>
