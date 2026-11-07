@@ -10,7 +10,7 @@ namespace Boaz.MsMono.Infra.Out.Commons.Usuario.Autenticacao;
 
 // O que a Autenticação lê do cadastro (usuarios, contas, geracoesSenha) e o
 // pouco que grava nele: o último acesso e a confirmação da senha.
-public sealed class CadastroDaEntrada(Armazenamento armazenamento, TimeDeboaz time) : IUsuarios, IContas, IGeracoesDeSenha
+public sealed class CadastroDaEntrada(Armazenamento armazenamento) : IUsuarios, IContas, IGeracoesDeSenha
 {
     IMongoCollection<BsonDocument> Usuarios => armazenamento.Colecao(Colecoes.Usuarios);
 
@@ -24,7 +24,6 @@ public sealed class CadastroDaEntrada(Armazenamento armazenamento, TimeDeboaz ti
     {
         var filtro = Bson.Filtro.Eq("login", entrada) & Bson.Filtro.Ne("tipo", "PARTICIPANTE");
         var achado = await Usuarios.Find(filtro).FirstOrDefaultAsync(ct);
-        if (achado is null && await time.GarantirSeFor(entrada: entrada, ct: ct)) achado = await Usuarios.Find(filtro).FirstOrDefaultAsync(ct);
         return achado is null ? null : Usuario(achado);
     }
 
@@ -33,12 +32,8 @@ public sealed class CadastroDaEntrada(Armazenamento armazenamento, TimeDeboaz ti
             ? Usuario(d)
             : null;
 
-    public async Task<UsuarioDaEntrada?> Buscar(string id, CancellationToken ct = default)
-    {
-        var achado = await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
-        if (achado is null && await time.GarantirSeFor(usuarioId: id, ct: ct)) achado = await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
-        return achado is null ? null : Usuario(achado);
-    }
+    public async Task<UsuarioDaEntrada?> Buscar(string id, CancellationToken ct = default) =>
+        await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct) is { } achado ? Usuario(achado) : null;
 
     public async Task RegistrarUltimoAcesso(string usuarioId, DateTimeOffset quando, string? quem, CancellationToken ct = default)
     {
@@ -62,16 +57,11 @@ public sealed class CadastroDaEntrada(Armazenamento armazenamento, TimeDeboaz ti
             ? Conta(conta, await DoTime(ct))
             : null;
 
-    public async Task<ContaDaEntrada> BuscarTimeDeboaz(CancellationToken ct = default)
-    {
-        var doTime = await DoTime(ct);
-        if (doTime is null)
-        {
-            await time.Garantir(ct);
-            doTime = await DoTime(ct);
-        }
-        return Conta(doTime!, doTime);
-    }
+    // a conta do time nasce na partida (IInicializarContas, RN-190)
+    public async Task<ContaDaEntrada> BuscarTimeDeboaz(CancellationToken ct = default) =>
+        await DoTime(ct) is { } doTime
+            ? Conta(doTime, doTime)
+            : throw new InvalidOperationException("conta-dboaz ausente: ela nasce na partida da aplicação (RN-190)");
 
     Task<BsonDocument?> DoTime(CancellationToken ct) =>
         Contas.Find(Bson.Filtro.Eq("_id", TimeDeboaz.ContaId)).FirstOrDefaultAsync(ct)!;

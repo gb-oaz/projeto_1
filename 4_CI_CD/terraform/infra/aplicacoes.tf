@@ -31,6 +31,27 @@ locals {
   tag        = { for a in local.apps : a => lookup(var.imagens, a, "") }
   imagem     = { for a in local.apps : a => local.tag[a] == "" ? local.provisoria : "docker.io/${var.dockerhub_usuario}/${a}:${local.tag[a]}" }
   porta      = { for a in local.apps : a => local.tag[a] == "" ? 80 : var.porta[a] }
+
+  # Contas iniciais do backend (17: RN-190, RN-265 a RN-267, RNF-225, RNF-226).
+  # Segredo do Key Vault → variável de ambiente lida no start. Os valores são
+  # gravados à mão no Key Vault de cada ambiente (README) e nunca passam pelo
+  # repositório, pela imagem nem pelo pipeline: aqui só há referências. As
+  # contas qa existem só em homologação, então os segredos usuario-qa-* não
+  # são referenciados em produção. Segredo ausente impede a revisão de subir.
+  segredos_usuarios = merge({
+    "usuario-admin-entrada" = "USUARIO_ADMIN_ENTRADA"
+    "usuario-admin-senha"   = "USUARIO_ADMIN_SENHA"
+    }, local.prd ? {} : {
+    "usuario-qa-membro-entrada"      = "USUARIO_QA_MEMBRO_ENTRADA"
+    "usuario-qa-membro-senha"        = "USUARIO_QA_MEMBRO_SENHA"
+    "usuario-qa-master-entrada"      = "USUARIO_QA_MASTER_ENTRADA"
+    "usuario-qa-master-senha"        = "USUARIO_QA_MASTER_SENHA"
+    "usuario-qa-autonomo-entrada"    = "USUARIO_QA_AUTONOMO_ENTRADA"
+    "usuario-qa-autonomo-senha"      = "USUARIO_QA_AUTONOMO_SENHA"
+    "usuario-qa-staff-entrada"       = "USUARIO_QA_STAFF_ENTRADA"
+    "usuario-qa-staff-senha"         = "USUARIO_QA_STAFF_SENHA"
+    "usuario-qa-participante-codigo" = "USUARIO_QA_PARTICIPANTE_CODIGO"
+  })
 }
 
 resource "azurerm_container_app" "app" {
@@ -67,6 +88,17 @@ resource "azurerm_container_app" "app" {
       name                = secret.value
       identity            = azurerm_user_assigned_identity.id.id
       key_vault_secret_id = azurerm_key_vault_secret.segredo[secret.value].versionless_id
+    }
+  }
+
+  # Contas iniciais: referência sem versão ao segredo gravado à mão no Key
+  # Vault, para a troca de senha valer no próximo start (RN-267)
+  dynamic "secret" {
+    for_each = each.key == "backend-mono" ? keys(local.segredos_usuarios) : []
+    content {
+      name                = secret.value
+      identity            = azurerm_user_assigned_identity.id.id
+      key_vault_secret_id = "${azurerm_key_vault.kv.vault_uri}secrets/${secret.value}"
     }
   }
 
@@ -112,6 +144,15 @@ resource "azurerm_container_app" "app" {
         content {
           name        = env.key
           secret_name = env.value
+        }
+      }
+
+      # Contas iniciais: cada segredo vira a variável de ambiente do start
+      dynamic "env" {
+        for_each = each.key == "backend-mono" ? local.segredos_usuarios : {}
+        content {
+          name        = env.value
+          secret_name = env.key
         }
       }
 

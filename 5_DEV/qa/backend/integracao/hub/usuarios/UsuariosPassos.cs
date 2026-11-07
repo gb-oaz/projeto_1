@@ -1184,7 +1184,11 @@ public sealed partial class UsuariosPassos(Mundo mundo)
             default:
                 por = mundo.Admin();
                 await mundo.Conta();
-                for (var i = 1; i < 112; i++)
+                // as contas que a inicialização criou (QAINS e QAAUT em homologação,
+                // RN-265) também contam: completa até 112 ativas
+                var ativas = Exigir(await mundo.EnviarComo(por, "GET", "/contas?estado=ATIVA"), 200, "GET /contas?estado=ATIVA")
+                    .Corpo?["total"]?.GetValue<int>() ?? 1;
+                for (var i = 1; i <= 112 - ativas; i++)
                 {
                     var sigla = $"CT{Letras(i)}".ToUpperInvariant();
                     await mundo.NovaConta(sigla, ContaNova("INSTITUICAO", $"Escola {sigla}", Cnpj(30000000 + i), $"conta_{i}", sigla));

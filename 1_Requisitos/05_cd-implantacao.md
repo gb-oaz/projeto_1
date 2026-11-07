@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "05_cd-implantacao"
 tipo: "Transversal"
 titulo: "CD e implantação na Azure"
-versao: "v10"
-data: "2026-11-05 12:34"
+versao: "v11"
+data: "2026-11-06 23:37"
 status: "Em revisão"
 objetivo: "definir como as imagens publicadas pelo CI chegam, após aprovação manual, aos ambientes de homologação e produção na Azure, descritos em Terraform e com custo mínimo."
 ---
 
-> **boaz · Transversal** · `05_cd-implantacao` · **v10** · 2026-11-05 12:34 · **Em revisão**
+> **boaz · Transversal** · `05_cd-implantacao` · **v11** · 2026-11-06 23:37 · **Em revisão**
 
 # CD e implantação na Azure
 
@@ -706,13 +706,13 @@ Cenário: Key Vault aberto ao CD
 
 ## Diagramas
 
-**Implantação · homologação** — `3_Arquitetura/implantacao-hml_v04_20261026-2350.svg`
+**Implantação · homologação** — `3_Arquitetura/implantacao-hml_v05_20261106-2318.svg`
 
-[![Ambiente de homologação na Azure: assinatura deb-boaz-app-hml, grupo de recursos deb-boaz-app-hml_rg, com VNet 10.10.0.0/16; na subnet snet-aca, o ambiente externo do Container Apps com backend-mono e as três aplicações web, 1 a 2 réplicas, acessadas por HTTPS pelo usuário web, pela pessoa desenvolvedora via documentação da API em /doc/api e pelos apps móveis; na subnet snet-pe, private endpoints de Key Vault, Cosmos DB for MongoDB serverless e Azure Managed Redis, com zonas Private DNS; Log Analytics, Application Insights e orçamento; imagens baixadas do Docker Hub e infraestrutura aplicada pelo CD com Terraform](../3_Arquitetura/implantacao-hml_v04_20261026-2350.svg)](../3_Arquitetura/implantacao-hml_v04_20261026-2350.svg)
+[![Ambiente de homologação na Azure: assinatura deb-boaz-app-hml, grupo de recursos deb-boaz-app-hml_rg, com VNet 10.10.0.0/16; na subnet snet-aca, o ambiente externo do Container Apps com backend-mono e as três aplicações web, 1 a 2 réplicas, acessadas por HTTPS pelo usuário web, pela pessoa desenvolvedora via documentação da API em /doc/api e pelos apps móveis; na subnet snet-pe, private endpoints de Key Vault, Cosmos DB for MongoDB serverless e Azure Managed Redis, com zonas Private DNS; Log Analytics, Application Insights e orçamento; imagens baixadas do Docker Hub e infraestrutura aplicada pelo CD com Terraform](../3_Arquitetura/implantacao-hml_v05_20261106-2318.svg)](../3_Arquitetura/implantacao-hml_v05_20261106-2318.svg)
 
-**Implantação · produção** — `3_Arquitetura/implantacao-prd_v04_20261026-2350.svg`
+**Implantação · produção** — `3_Arquitetura/implantacao-prd_v05_20261106-2318.svg`
 
-[![Ambiente de produção na Azure: assinatura deb-boaz-app-prd, grupo de recursos deb-boaz-app-prd_rg, com VNet 10.20.0.0/16; Application Gateway WAF_v2 com IP público em snet-appgw como único ponto público, roteando a web para as aplicações web e /mobile/* para o backend, com política de WAF; ambiente interno do Container Apps em snet-aca com 1 a 5 réplicas, em que as aplicações web encaminham /api/* ao backend; private endpoints de Key Vault, Cosmos DB autoscale e Azure Managed Redis em snet-pe com zonas Private DNS; Log Analytics, Application Insights e orçamento](../3_Arquitetura/implantacao-prd_v04_20261026-2350.svg)](../3_Arquitetura/implantacao-prd_v04_20261026-2350.svg)
+[![Ambiente de produção na Azure: assinatura deb-boaz-app-prd, grupo de recursos deb-boaz-app-prd_rg, com VNet 10.20.0.0/16; Application Gateway WAF_v2 com IP público em snet-appgw como único ponto público, roteando a web para as aplicações web e /mobile/* para o backend, com política de WAF; ambiente interno do Container Apps em snet-aca com 1 a 5 réplicas, em que as aplicações web encaminham /api/* ao backend; private endpoints de Key Vault, Cosmos DB autoscale e Azure Managed Redis em snet-pe com zonas Private DNS; Log Analytics, Application Insights e orçamento](../3_Arquitetura/implantacao-prd_v05_20261106-2318.svg)](../3_Arquitetura/implantacao-prd_v05_20261106-2318.svg)
 
 **Pipeline de CD** — `3_Arquitetura/pipeline-cd_v06_20261015-2357.svg`
 
@@ -734,7 +734,8 @@ Cenário: Key Vault aberto ao CD
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v10** | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
+| **v11** | 2026-11-06 23:37 | Diagramas de implantação de homologação e de produção atualizados para v05 |
+| v10 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v09 | 2026-11-01 18:28 | Só Gherkin e diagramas: premissas, RN, RNF e nomes dos recursos viram cenários (mesmos IDs como âncora); Em aberto mantido; status → Em revisão |
 | v08 | 2026-10-27 00:49 | Status → Aprovado |
 | v07 | 2026-10-27 00:15 | Documentação da API em `/doc/api` (antes `/swagger`), com a identidade deboaz, capa do catálogo, seletor de APIs e a raiz levando ao catálogo (`RNF-73`); WAF bloqueia `/doc/api` (`RNF-79`); diagramas de implantação atualizados para v04 |
@@ -743,8 +744,7 @@ Cenário: Key Vault aberto ao CD
 | v04 | 2026-10-15 01:00 | Ajustes da implementação: plano guardado só no executor, sem artefato (`RNF-48` e `RNF-51` alterados); environments `azure-hml` e `azure-prd` restritos à branch principal (`RNF-52` alterado); diagrama `pipeline-cd` atualizado para v04 |
 | v03 | 2026-10-14 23:15 | Assinaturas `deb-boaz-app-hml` e `deb-boaz-app-prd` e grupos `deb-boaz-app-<amb>_rg` (`RN-17` e `RNF-52` alterados); estado do Terraform em cada assinatura (`RNF-56` alterado); nomenclatura dos recursos (`RNF-88` a `RNF-90` incluídos); diagramas atualizados para v03 |
 | v02 | 2026-10-13 23:55 | Pendências respondidas: homologação sem Application Gateway confirmada; região Brazil South (`RNF-86`); tag de versão passa por homologação antes de produção (`RN-19`, `RN-20`, `RNF-49` e `RNF-52` alterados, `RN-25` incluído); Swagger de homologação aberto (`RNF-72`); escala a partir de 30 requisições simultâneas (`RNF-66`); WAF com 100 requisições/min por IP (`RNF-79`); orçamentos de R$ 300,00 e R$ 1.500,00 (`RNF-84`); versões do Cosmos DB e do Redis (`RNF-87`); diagramas atualizados para v02 |
-| v01 | 2026-10-13 22:59 | Criação: `RN-17` a `RN-24` e `RNF-47` a `RNF-85`; diagramas de homologação, produção e pipeline de CD |
 
 ---
 
-<sub>boaz · v10 · 2026-11-05 12:34 · `1_Requisitos/05_cd-implantacao.md`</sub>
+<sub>boaz · v11 · 2026-11-06 23:37 · `1_Requisitos/05_cd-implantacao.md`</sub>

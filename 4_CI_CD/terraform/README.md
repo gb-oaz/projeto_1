@@ -56,6 +56,29 @@ No GitHub (Settings → Environments → `azure-hml` e `azure-prd`):
 E no repositório: variável `ALERTA_EMAIL` (alertas de orçamento) e, opcional,
 `APROVADORES` (quem pode aprovar a implantação; padrão `GustavoBoaz`).
 
+### Contas iniciais no Key Vault (17: RN-190, RN-265 a RN-267, RNF-225, RNF-226)
+
+Depois do primeiro `apply`, grave à mão no Key Vault `deb-boaz-app-<amb>-kv`
+os segredos das contas que o backend cria no start. Os valores nunca vão para
+o repositório, a imagem, o pipeline nem o log; o Terraform só referencia o
+nome, e o `backend-mono` recebe cada um como variável de ambiente. Sem um
+deles, a revisão não sobe (RNF-226).
+
+| Segredo | Variável de ambiente | hml | prd |
+|---|---|---|---|
+| `usuario-admin-entrada` · `usuario-admin-senha` | `USUARIO_ADMIN_ENTRADA` · `USUARIO_ADMIN_SENHA` | sim | sim |
+| `usuario-qa-membro-entrada` · `-senha` | `USUARIO_QA_MEMBRO_ENTRADA` · `_SENHA` | sim | não |
+| `usuario-qa-master-entrada` · `-senha` | `USUARIO_QA_MASTER_ENTRADA` · `_SENHA` | sim | não |
+| `usuario-qa-autonomo-entrada` · `-senha` | `USUARIO_QA_AUTONOMO_ENTRADA` · `_SENHA` | sim | não |
+| `usuario-qa-staff-entrada` · `-senha` | `USUARIO_QA_STAFF_ENTRADA` · `_SENHA` | sim | não |
+| `usuario-qa-participante-codigo` | `USUARIO_QA_PARTICIPANTE_CODIGO` | sim | não |
+
+```bash
+# o valor é digitado no terminal, fora do histórico e de qualquer arquivo
+read -rs VALOR && az keyvault secret set --vault-name deb-boaz-app-hml-kv \
+  --name usuario-admin-senha --value "$VALOR" --output none && unset VALOR
+```
+
 ## Rodar localmente
 
 O CD é o caminho normal (`.github/workflows/cd.yml`). Para conferir um plano:

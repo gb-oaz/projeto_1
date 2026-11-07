@@ -241,6 +241,10 @@ jobs:
     runs-on: ubuntu-24.04
     # RNF-37: MongoDB e Redis sobem como contêineres ao lado do job, nas versões
     # de 01_stack-desenvolvimento, para os testes de integração.
+    # O MongoDB daqui é standalone: "services" não aceita o argumento
+    # --replSet. Se os testes do backend precisarem de transação (17 RNF-223),
+    # subir o MongoDB num passo (docker run ... --replSet rs0 e rs.initiate),
+    # como faz o 4_CI_CD/local/compose.yml.
     services:
       mongodb:
         image: mongo:8.0
@@ -430,6 +434,12 @@ jobs:
   # pela própria imagem (14_estrutura-projetos, RNF-191). Usa a mesma etapa do
   # CI local (ci.sh --so-qa): o que passa lá passa aqui. A carga não roda aqui
   # (RN-156), só em qa-carga.yml. Os JUnit XML viram artefato.
+  # O backend sobe com AMBIENTE=hml. O ci.sh gera, a cada execução, a chave do
+  # token e as contas iniciais (USUARIO_*, 17 RN-190, RN-265, RNF-225, senhas
+  # na RNF-202), passa as mesmas ao backend e à suíte e as mascara no log
+  # (::add-mask::); nenhum segredo do GitHub é usado. A suíte de integração
+  # recebe o backend publicado (API_COMANDO) e as PARTIDA_* para os cenários
+  # de inicialização. O MongoDB do compose é um replica set de um nó (RNF-223).
   # ===========================================================================
   qa:
     name: QA

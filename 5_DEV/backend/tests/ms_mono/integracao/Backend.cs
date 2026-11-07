@@ -23,8 +23,8 @@ public sealed class Backend : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected override void ConfigureWebHost(IWebHostBuilder builder) => builder
         .UseSetting("Mongo:Banco", NomeDoBanco)
-        .UseSetting("Administrador:Entrada", AdminEntrada)
-        .UseSetting("Administrador:Senha", AdminSenha)
+        .UseSetting("USUARIO_ADMIN_ENTRADA", AdminEntrada)
+        .UseSetting("USUARIO_ADMIN_SENHA", AdminSenha)
         .UseSetting("Time:Nome", NomeDoTime);
 
     // O banco do teste, para preparar o que a API não cria (uma contratação).

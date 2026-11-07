@@ -19,9 +19,6 @@ public class ConfiguracoesTests(WebApplicationFactory<Program> fabrica) : IClass
     [Theory]
     [InlineData("Mongo:Banco", "", "Mongo__Banco")]
     [InlineData("Time:Nome", "", "Time__Nome")]
-    [InlineData("Administrador:Nome", " ", "Administrador__Nome")]
-    [InlineData("Administrador:NomeCurto", "Admin Geral", "Administrador__NomeCurto")]
-    [InlineData("Administrador:Entrada", "", "Administrador__Entrada")]
     [InlineData("Autenticacao:ChaveId", "", "Autenticacao__ChaveId")]
     public void Sem_o_parametro_o_backend_nao_sobe(string chave, string valor, string variavel)
     {

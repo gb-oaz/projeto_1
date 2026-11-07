@@ -26,11 +26,19 @@ public sealed record Resposta(int Status, string Texto, IReadOnlyList<string> Co
 // renovação é Secure e o HttpClient não o mandaria por http.
 public sealed class Api : IDisposable
 {
-    readonly HttpClient http = new(new HttpClientHandler { UseCookies = false })
+    readonly HttpClient http;
+
+    // o backend de API_URL; o Reqnroll usa este construtor
+    public Api() : this(Ambiente.ApiUrl) { }
+
+    Api(string url) => http = new(new HttpClientHandler { UseCookies = false })
     {
-        BaseAddress = new Uri(Ambiente.ApiUrl),
+        BaseAddress = new Uri(url),
         Timeout = TimeSpan.FromSeconds(10),
     };
+
+    // outra instância do backend, subida pelo cenário (Partida)
+    public static Api Para(string url) => new(url);
 
     public async Task<Resposta> Enviar(
         string metodo, string caminho, string? corpo = null, string? token = null,

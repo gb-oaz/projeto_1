@@ -221,3 +221,24 @@ public sealed record TempoDoTimeDto(
 /// <summary>GET /contas/sigla-sugerida?nome=, sem login (RN-179).</summary>
 /// <param name="Nome">Nome da instituição ou do educador.</param>
 public sealed record NomeDaContaDto(string? Nome);
+
+/// <summary>
+/// A partida da aplicação (RN-190, RN-265 a RN-267): o AMBIENTE, as variáveis
+/// que o Key Vault entregou (RNF-225) e o cadastro da conta do time, que vem da
+/// configuração. Os valores ficam só em memória.
+/// </summary>
+/// <param name="Ambiente">O valor de AMBIENTE (hml ou prd).</param>
+/// <param name="Variaveis">Nome → valor das variáveis USUARIO_*; ausente ou vazio = não entregue.</param>
+/// <param name="Time">O cadastro da conta-dboaz.</param>
+public sealed record PartidaDto(string? Ambiente, IReadOnlyDictionary<string, string?> Variaveis, DadosDoTimeDto Time)
+{
+    /// <summary>O valor de uma variável, ou null.</summary>
+    public string? Ler(string variavel) => Variaveis.GetValueOrDefault(variavel);
+}
+
+/// <summary>O cadastro da conta do time deboaz, gravado só quando ela nasce.</summary>
+/// <param name="Nome">Nome da conta.</param>
+/// <param name="Documento">CNPJ.</param>
+/// <param name="Responsavel">Responsável.</param>
+/// <param name="Telefone">Telefone.</param>
+public sealed record DadosDoTimeDto(string Nome, string Documento, string Responsavel, string Telefone);

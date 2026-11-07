@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v44), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v55), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -715,6 +715,84 @@ Funcionalidade: Usuários
     Quando o administrador envia POST /usuarios/usr-dboaz-caio/nova-geracao-senha
     Então a resposta é 201 com o código de liberação para entregar ao Caio
 
+  @RN-190
+  Cenário: única conta criada no início, em todo ambiente
+    Dado o Key Vault do ambiente com a entrada "admin.dboaz@deboaz.com"
+    E a senha do administrador
+    Quando a aplicação inicia pela primeira vez, em homologação ou em produção
+    Então o administrador do deboaz passa a existir, ativo, com essa entrada e essa senha
+    E POST /auth/hub/entrar com elas devolve 200 e o papel "ADMINISTRADOR"
+
+  @RN-265
+  Esquema do Cenário: papel de cada conta qa no hub
+    Dado a aplicação de homologação iniciada
+    Quando envia POST /auth/hub/entrar com a entrada "<entrada>" e a senha do Key Vault
+    Então a resposta é 200 e o token tem o papel "<papel>"
+
+    Exemplos:
+      | entrada                   | papel       |
+      | qamembro.dboaz@deboaz.com | MEMBRO_TIME |
+      | qa_instituicao@deboaz.com | MASTER      |
+      | qa_autonomo@deboaz.com    | AUTONOMO    |
+      | qastaff.qains@deboaz.com  | STAFF       |
+
+  @RN-265
+  Cenário: participante qa no quest
+    Dado a aplicação de homologação iniciada
+    Quando envia POST /auth/quest/entrar com o código "QAINS-QAPART-0001" do Key Vault
+    Então a resposta é 200 e o token tem o papel "PARTICIPANTE"
+
+  @RN-265
+  Esquema do Cenário: tipo de cada conta qa, lido por quem tem acesso
+    Dado o token de "<quem>"
+    Quando envia GET /usuarios/{id} de "<alvo>"
+    Então a resposta é 200 com o tipo "<tipo>"
+
+    Exemplos:
+      | quem                      | alvo                      | tipo         |
+      | qa_instituicao@deboaz.com | qa_instituicao@deboaz.com | MASTER       |
+      | qa_autonomo@deboaz.com    | qa_autonomo@deboaz.com    | MASTER       |
+      | admin.dboaz@deboaz.com    | qamembro.dboaz@deboaz.com | MEMBRO_TIME  |
+      | qa_instituicao@deboaz.com | qastaff.qains@deboaz.com  | STAFF        |
+      | qa_instituicao@deboaz.com | QAINS-QAPART-0001         | PARTICIPANTE |
+
+  @RN-266
+  Esquema do Cenário: contas que a inicialização garante em cada ambiente
+    Quando a aplicação de <ambiente> inicia
+    Então existem <contas>
+
+    Exemplos:
+      | ambiente    | contas                                                        |
+      | homologação | o administrador, as 5 contas qa e as contas "QAINS" e "QAAUT" |
+      | produção    | só o administrador, na conta "DBOAZ"                          |
+
+  @RN-266
+  Cenário: segredo qa em produção por engano
+    Dado o Key Vault de produção com a entrada "qastaff.qains@deboaz.com" e uma senha
+    Quando a aplicação de produção inicia
+    Então nenhuma conta qa nem as contas "QAINS" e "QAAUT" são criadas
+    E POST /auth/hub/entrar com "qastaff.qains@deboaz.com" recebe 401 ENTRADA_INVALIDA
+
+  @RN-267
+  Cenário: segunda inicialização
+    Dado a staff "qastaff.qains@deboaz.com" criada na inicialização de 2026-11-05
+    Quando a aplicação de homologação inicia de novo em 2026-11-06
+    Então GET /usuarios?tipo=STAFF da "QAINS" traz uma só "qastaff.qains@deboaz.com"
+    E a auditoria não ganha um registro novo de criação dela
+
+  @RN-267
+  Cenário: senha trocada no Key Vault
+    Dado a senha de "qa_instituicao@deboaz.com" trocada no Key Vault
+    Quando a aplicação inicia
+    Então POST /auth/hub/entrar aceita só a senha nova
+    E a senha antiga recebe 401 ENTRADA_INVALIDA
+
+  @RN-267
+  Cenário: conta qa desativada por um teste
+    Dado a staff "qastaff.qains@deboaz.com" desativada durante um teste
+    Quando a aplicação de homologação inicia de novo
+    Então a staff volta ativa, com a senha do Key Vault
+
   @RNF-201
   Cenário: ninguém lê a senha
     Dado a senha da Maria guardada
@@ -747,6 +825,39 @@ Funcionalidade: Usuários
     Quando o time deboaz procura alterar ou apagar o registro
     Então nenhum endereço da API faz isso
     E o banco recusa a alteração e a remoção
+
+  @RNF-225
+  Cenário: entradas e senhas entregues na partida
+    Dado o Key Vault de homologação com a entrada e a senha de cada conta inicial
+    Quando a aplicação de homologação inicia
+    Então recebe cada entrada, senha e código como variável de ambiente lida do Key Vault
+    E nenhuma delas está no código, no repositório, na imagem nem no pipeline
+
+  @RNF-225
+  Cenário: senha fora de registros e respostas
+    Quando a aplicação cria ou confere uma conta inicial
+    Então nenhum log, registro de auditoria ou resposta traz a senha ou o código
+    E no banco fica só o resumo irreversível da senha, como na RNF-201
+
+  @RNF-226
+  Esquema do Cenário: aplicação não inicia sem o segredo
+    Dado a aplicação de <ambiente> sem <segredo>
+    Quando ela inicia
+    Então para antes de aceitar o primeiro pedido
+    E o log diz o nome da variável que falta, nunca um valor
+
+    Exemplos:
+      | ambiente    | segredo                                 |
+      | produção    | a senha do administrador                |
+      | homologação | a entrada do administrador              |
+      | homologação | a senha da staff "qastaff.qains"        |
+      | homologação | o código do participante "QAINS-QAPART" |
+
+  @RNF-226
+  Cenário: senha fraca no Key Vault
+    Dado a senha "Gu#B5" no Key Vault para "qastaff.qains@deboaz.com"
+    Quando a aplicação de homologação inicia
+    Então para antes de aceitar o primeiro pedido, porque a senha não segue a RNF-202
 
   @exemplo-entidades
   Cenário: escola EBFGA cadastrada

@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "99_glossario"
 tipo: "Glossário"
 titulo: "Glossário"
-versao: "v42"
-data: "2026-11-05 12:34"
-status: "Aprovado"
+versao: "v43"
+data: "2026-11-06 23:15"
+status: "Em revisão"
 objetivo: "dar um significado único aos termos do domínio usados nos documentos de requisito."
 ---
 
-> **boaz · Glossário** · `99_glossario` · **v42** · 2026-11-05 12:34 · **Aprovado**
+> **boaz · Glossário** · `99_glossario` · **v43** · 2026-11-06 23:15 · **Em revisão**
 
 # Glossário
 
@@ -39,6 +39,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="componente-comum"></a>**Componente comum** | componente usado por mais de um módulo, com uma única implementação compartilhada por frente |
 | <a id="componente-composto"></a>**Componente composto** | bloco reutilizável que junta componentes e elementos de identidade visual, como uma barra de navegação com o logo, botões e imagens da marca |
 | <a id="conta-master"></a>**Conta master** | conta que decide e paga a contratação de módulos de uma instituição; o educador autônomo é a conta master da própria conta |
+| <a id="conta-qa"></a>**Conta qa** | conta de testes, com entrada iniciada por “qa”, que a aplicação cria ao iniciar só em homologação, uma para cada tipo de usuário, com a entrada e a senha lidas do Key Vault; não existe em produção ([Módulo Usuários RN-265](17_modulo-usuario.md#RN-265)) |
 | <a id="contas-acessadas"></a>**Contas acessadas** | contas que já entraram no hub num aparelho, listadas na tela Entrar, uma por instituição |
 | <a id="deboaz"></a>**deboaz** | nome do produto: junta o nome Boaz com a gíria “de boa” |
 | <a id="depoimento"></a>**Depoimento** | texto curto de uma instituição ou de um educador autônomo sobre o deboaz, escrito no hub e mostrado na landing page só com a autorização do autor |
@@ -95,7 +96,8 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v42** | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
+| **v43** | 2026-11-06 23:15 | Termo Conta qa (Módulo Usuários `RN-265`); status → Em revisão |
+| v42 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v41 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v40 | 2026-11-01 18:32 | Casca v07 do tema (Gherkin quebra a linha); termos sem mudança; status → Em revisão |
 | v39 | 2026-11-01 12:35 | Aprovado |
@@ -104,8 +106,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | v36 | 2026-11-01 03:48 | Termo Painel de administração do deboaz retirado (Módulos `MOD-15`); Time deboaz e Módulo Usuários dizem que o time cuida das contas de instituição e de educador autônomo no módulo Usuários |
 | v35 | 2026-11-01 01:20 | Aprovação |
 | v34 | 2026-11-01 01:14 | Feed: publicações dos módulos por público; a conta do time deboaz não tem Feed |
-| v33 | 2026-11-01 01:00 | Aprovação |
 
 ---
 
-<sub>boaz · v42 · 2026-11-05 12:34 · `1_Requisitos/99_glossario.md`</sub>
+<sub>boaz · v43 · 2026-11-06 23:15 · `1_Requisitos/99_glossario.md`</sub>

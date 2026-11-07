@@ -144,8 +144,8 @@ Monorepo organizado pelo boaz. Cada pasta tem uma única responsabilidade:
 - Requisitos são documentos \`.md\`, criados/alterados pela skill \`requisito\` no padrão de \`0_Assets/requisitos/tema.md\` (front matter e carimbo de topo com projeto, documento, versão, data/hora e status; histórico no rodapé; diagramas e telas como imagens \`.svg\` versionadas). A skill \`requisito-estilo\` cuida do formato, do HTML/PDF gerado por \`0_Assets/requisitos/requisito.mjs\` com a \`casca.html\`, da migração de \`.html\` antigos e do PDF. \`./boaz.sh requisitos\` lista os documentos; \`./boaz.sh pdf <documento>\` exporta o PDF versionado para \`1_Requisitos/pdf/\`.
 - Diagramas são criados/alterados somente pelas skills \`diagrama-dev\` (2_) e \`diagrama-arquitetura\` (3_).
 - Todo diagrama segue o tema dark de \`0_Assets/diagramas/tema.svg\` e embute (inline) os assets que usar de \`0_Assets/\`.
-- Nome do diagrama: \`<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg\`. Versões nunca são sobrescritas; cada alteração gera um novo arquivo.
-- \`./boaz.sh svg <pasta> <legenda>\` devolve o próximo nome; \`./boaz.sh diagramas\` lista a versão mais recente de cada um.
+- Nome do diagrama: \`<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg\`. Cada alteração gera um novo arquivo com a versão seguinte e, na mesma tarefa, a versão anterior é apagada (\`git rm\`) depois que todas as referências (requisitos \`.md\` e outros arquivos) forem atualizadas para a nova; o histórico fica no git.
+- \`./boaz.sh svg <pasta> <legenda>\` devolve o próximo nome; \`./boaz.sh diagramas\` lista a versão mais recente de cada um; \`./boaz.sh antigas\` lista as versões antigas já sem referência (\`--apagar\` as remove).
 EOF
 
   write_once "0_Assets/README.md" << 'EOF'
@@ -187,9 +187,10 @@ Aqui não se fala de backend, frontend ou tecnologia.
 - Cada documento abre com a marca de topo (projeto, documento, versão, data/hora, status)
   e fecha com o histórico. Toda alteração soma 1 na versão.
 - `./boaz.sh requisitos` lista os documentos com versão, data e status.
-- `./boaz.sh pdf <documento>` gera `pdf/<documento>_v<NN>_<AAAAMMDD-HHMM>.pdf`.
-- Para ilustrar, referencie um diagrama **com a versão explícita**:
-  `[![…](../2_Diagramas/fluxo-cadastro_v02_20261010-1430.svg)](../2_Diagramas/fluxo-cadastro_v02_20261010-1430.svg)`
+- `./boaz.sh pdf <documento>` gera `pdf/<documento>_v<NN>_<AAAAMMDD-HHMM>.pdf` e apaga os PDFs de versões anteriores do mesmo documento.
+- Para ilustrar, referencie um diagrama **com a versão explícita** (exemplo de formato, não é um arquivo real):
+  `[![…](../2_Diagramas/<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg)](../2_Diagramas/<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg)`
+- Quando o diagrama ganha versão nova, a referência passa para ela e a versão anterior é apagada.
 - `node 0_Assets/requisitos/requisito.mjs conferir 1_Requisitos/*.md` confere marca d'água, links e imagens.
 EOF
 
@@ -200,7 +201,9 @@ Diagramas de desenvolvimento (backend e frontend): sequência, classes, ER,
 fluxos, estados, componentes, navegação de telas, contratos de API.
 
 - Somente `.svg`, gerados pela skill `/diagrama-dev`.
-- Nome: `<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg` — versões antigas são mantidas.
+- Nome: `<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg`. Cada alteração gera a versão seguinte;
+  a anterior é apagada na mesma tarefa, depois de atualizadas as referências
+  (o histórico fica no git). `./boaz.sh antigas` lista as que sobraram.
 EOF
 
   write_once "3_Arquitetura/README.md" << 'EOF'
@@ -210,7 +213,9 @@ Diagramas de alto nível: contexto do sistema, contêineres, cloud, rede,
 ambientes, tecnologias escolhidas e integrações externas.
 
 - Somente `.svg`, gerados pela skill `/diagrama-arquitetura`.
-- Nome: `<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg` — versões antigas são mantidas.
+- Nome: `<legenda>_v<NN>_<AAAAMMDD-HHMM>.svg`. Cada alteração gera a versão seguinte;
+  a anterior é apagada na mesma tarefa, depois de atualizadas as referências
+  (o histórico fica no git). `./boaz.sh antigas` lista as que sobraram.
 EOF
 
   write_once "4_CI_CD/README.md" << 'EOF'
@@ -420,7 +425,7 @@ Obtenha o caminho exato com:
 ```
 
 Se o `boaz.sh` não estiver disponível, calcule pela regra acima.
-**Nunca** sobrescreva, renomeie ou apague uma versão existente — cada alteração é um arquivo novo.
+Nunca sobrescreva nem renomeie uma versão: cada alteração gera um novo arquivo com a versão seguinte e, **na mesma tarefa**, a versão anterior é apagada (`git rm`; `rm` se nunca foi para o git) depois que todas as referências a ela (requisitos `.md` e outros arquivos) forem atualizadas para a nova. O histórico fica no git.
 
 ## Fluxo
 
@@ -433,7 +438,8 @@ Se o `boaz.sh` não estiver disponível, calcule pela regra acima.
 1. Identifique a legenda e abra a **maior versão** (`ls __PASTA__/<legenda>_v*`).
 2. Aplique só a mudança pedida, preservando layout, ids e o restante do desenho.
 3. Salve como a próxima versão (`./boaz.sh svg __PASTA__ <legenda>`).
-4. Rode `grep -rn "<legenda>_v" 1_Requisitos` e, se houver referências à versão anterior, pergunte se devem apontar para a nova. Não altere sem confirmação; confirmado, troque o caminho na legenda e nos dois links da imagem (`[![…](…)](…)`), e cada documento alterado ganha uma versão nova (front matter, carimbo, histórico e rodapé, como na skill `requisito`).
+4. Rode `grep -rn "<legenda>_v" --exclude-dir=node_modules 1_Requisitos 0_Assets .claude 4_CI_CD 5_DEV CLAUDE.md boaz.sh` e, se houver referências à versão anterior, pergunte se devem apontar para a nova. Não altere sem confirmação; confirmado, troque o caminho na legenda e nos dois links da imagem (`[![…](…)](…)`), e cada documento alterado ganha uma versão nova (front matter, carimbo, histórico e rodapé, como na skill `requisito`).
+5. Com nenhuma referência à versão anterior, apague-a (`git rm __PASTA__/<legenda>_v<NN-1>_*.svg`). Se alguma referência não puder ser trocada agora (requisito de outro dono, cópia em `5_DEV/`), mantenha a anterior e diga na resposta o que falta trocar; `./boaz.sh antigas` lista as versões antigas que já podem sair.
 
 ## Assets (`0_Assets/`)
 
@@ -711,7 +717,7 @@ Resumo do que não pode faltar:
 5. Termo novo do domínio? Proponha incluí-lo em `99_glossario.md` (que também ganha versão).
 
 **PDF** ("exporta", "gera o PDF", "manda o pdf do …")
-1. Rode `./boaz.sh pdf <documento>` (ex.: `./boaz.sh pdf 02_cadastro-usuario`): o `requisito.mjs` gera o HTML com a casca e o Chrome imprime `1_Requisitos/pdf/<documento>_v<NN>_<AAAAMMDD-HHMM>.pdf` com a versão e a data do front matter, tema claro, A4, faixa de topo, histórico e cabeçalho/rodapé paginados.
+1. Rode `./boaz.sh pdf <documento>` (ex.: `./boaz.sh pdf 02_cadastro-usuario`): o `requisito.mjs` gera o HTML com a casca e o Chrome imprime `1_Requisitos/pdf/<documento>_v<NN>_<AAAAMMDD-HHMM>.pdf` com a versão e a data do front matter, tema claro, A4, faixa de topo, histórico e cabeçalho/rodapé paginados; os PDFs de versões anteriores do mesmo documento são apagados (o histórico fica no git).
 2. Gere o PDF **depois** de salvar a versão pedida; não crie versão só para exportar.
 3. Sem Node ou sem navegador Chromium, o comando avisa: oriente a instalar, ou a gerar o HTML (`node 0_Assets/requisitos/requisito.mjs html 1_Requisitos/<doc>.md <scratchpad>/<doc>.html`) e usar o botão **PDF** no navegador.
 
@@ -790,7 +796,7 @@ Para documentos no formato antigo (`<meta boaz:*>`, casca embutida, `article.cri
 
 ## PDF
 
-`./boaz.sh pdf <documento>` gera o HTML com o `requisito.mjs` e imprime `1_Requisitos/pdf/<documento>_v<NN>_<AAAAMMDD-HHMM>.pdf` (versão e data do front matter, A4, tema claro). Precisa de Node e de Chrome, Chromium, Edge ou Brave (ou `BOAZ_CHROME=/caminho/do/navegador`). `./boaz.sh pdf todos` exporta todos os documentos.
+`./boaz.sh pdf <documento>` gera o HTML com o `requisito.mjs` e imprime `1_Requisitos/pdf/<documento>_v<NN>_<AAAAMMDD-HHMM>.pdf` (versão e data do front matter, A4, tema claro) e apaga os PDFs de versões anteriores do mesmo documento (o histórico fica no git). Precisa de Node e de Chrome, Chromium, Edge ou Brave (ou `BOAZ_CHROME=/caminho/do/navegador`). `./boaz.sh pdf todos` exporta todos os documentos.
 
 ## Revisão (sempre, antes de entregar)
 
@@ -862,6 +868,37 @@ cmd_diagramas() {
   done
 }
 
+# Versões antigas (não são a mais recente da legenda) que nenhum arquivo do
+# repositório cita mais; com --apagar, remove (git rm se versionada, rm se não).
+REF_PATHS="CLAUDE.md boaz.sh 0_Assets 1_Requisitos .claude 4_CI_CD 5_DEV .github"
+cmd_antigas() {
+  local apagar=0 dir f name ref refs kept=0 gone=0
+  [ "${1:-}" = "--apagar" ] && apagar=1
+  for dir in $DIAGRAM_DIRS; do
+    [ -d "$dir" ] || continue
+    title "$dir"
+    list_versions "$dir" \
+      | sort -k1,1 -k2,2n \
+      | awk '{ if ($1 == prev) print pf; prev = $1; pf = $3 }' \
+      | while read -r f; do
+          name=$(basename "$f")
+          # shellcheck disable=SC2086
+          refs=$(grep -rlIF --exclude-dir=node_modules --exclude-dir=bin --exclude-dir=obj \
+                   --exclude-dir=worktrees --exclude-dir=.git -e "$name" $REF_PATHS 2>/dev/null || true)
+          if [ -n "$refs" ]; then
+            ref=$(echo "$refs" | head -1)
+            echo "  ${Y}●${NC} ${f}  ${D}(citada em ${ref}$( [ "$(echo "$refs" | wc -l)" -gt 1 ] && echo " e outros"))${NC}"
+          elif [ $apagar -eq 1 ]; then
+            if git ls-files --error-unmatch "$f" &>/dev/null; then git rm -q "$f"; else rm -f "$f"; fi
+            echo "  ${R}✖${NC} ${f}  ${D}(apagada)${NC}"
+          else
+            echo "  ${G}●${NC} ${f}  ${D}(sem referência — pode sair)${NC}"
+          fi
+        done
+  done
+  [ $apagar -eq 1 ] || { echo ""; info "Rode ${W}./boaz.sh antigas --apagar${NC} para remover as sem referência (as citadas ficam)."; }
+}
+
 # ── REQUISITOS ───────────────────────────────────────────────
 # Valor do campo $2 do front matter do documento $1 (valor entre aspas duplas, como no tema.md)
 req_meta() {
@@ -931,6 +968,13 @@ pdf_one() {
   rm -rf "$tmp"
   if [ -s "$out" ]; then
     success "PDF: ${D}${out}${NC}"
+    # só a versão atual fica na pasta; as anteriores ficam no histórico do git
+    local antigo
+    for antigo in "$REQ_DIR/pdf/${doc}"_v[0-9]*_*.pdf; do
+      [ -e "$antigo" ] && [ "$antigo" != "$out" ] || continue
+      if git ls-files --error-unmatch "$antigo" &>/dev/null; then git rm -q "$antigo"; else rm -f "$antigo"; fi
+      info "Apagado: ${D}${antigo}${NC}"
+    done
   else
     warn "Falha ao gerar o PDF de $(basename "$f")"
     return 1
@@ -991,6 +1035,8 @@ cmd_help() {
   ${C}requisitos${NC}                Lista os documentos de requisito com versão, data e status
   ${C}pdf <documento|todos>${NC}     Exporta o requisito para 1_Requisitos/pdf/<documento>_v<NN>_<data>.pdf
   ${C}diagramas${NC}                 Lista a versão mais recente de cada diagrama
+  ${C}antigas [--apagar]${NC}        Lista as versões antigas de diagramas (e quem ainda as cita);
+                            --apagar remove as que nenhum arquivo cita mais
   ${C}svg <pasta> <legenda>${NC}     Imprime o próximo nome versionado de um diagrama
                             ex.: ./boaz.sh svg 2_Diagramas "Fluxo de cadastro"
   ${C}help${NC}                      Esta ajuda
@@ -1014,6 +1060,7 @@ case "$cmd" in
   requisitos) cmd_requisitos ;;
   pdf)       cmd_pdf "$@" ;;
   diagramas) cmd_diagramas ;;
+  antigas)   cmd_antigas "$@" ;;
   svg)       cmd_svg "$@" ;;
   help|-h|--help) cmd_help ;;
   *)         warn "Comando desconhecido: $cmd"; cmd_help; exit 1 ;;

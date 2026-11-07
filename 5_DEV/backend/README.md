@@ -44,16 +44,19 @@ Precisa de:
 
 - **.NET 10 SDK** (`dotnet --version`);
 - **Docker**, para o MongoDB 8.0 e o Redis 8.0 (as mesmas versões do CI);
-- a **senha do administrador** do deboaz, que você escolhe: ela não fica no
-  `appsettings.json` (é segredo) e vale só para o seu banco local.
+- a **entrada e a senha do administrador** do deboaz, que você escolhe: elas
+  não ficam no `appsettings.json` (são segredo, RNF-225) e valem só para o seu
+  banco local. Sem elas o backend não sobe (RNF-226).
 
 ```bash
 # 1. MongoDB e Redis nas portas padrão do appsettings.json (uma vez; --rm apaga ao parar)
 docker run -d --rm --name boaz-mongo -p 127.0.0.1:27017:27017 mongo:8.0
 docker run -d --rm --name boaz-redis -p 127.0.0.1:6379:6379 redis:8.0
 
-# 2. backend, na pasta 5_DEV/backend, com a senha do administrador
-Administrador__Senha='<escolha uma senha>' dotnet run --project ms_mono
+# 2. backend, na pasta 5_DEV/backend, com a entrada e a senha do administrador
+#    (senha da RNF-202: 8+ caracteres, com maiúscula, número e especial)
+USUARIO_ADMIN_ENTRADA=admin.dboaz@deboaz.com USUARIO_ADMIN_SENHA='<escolha uma senha>' \
+  dotnet run --project ms_mono
 ```
 
 - `http://localhost:8080/health` responde 200 quando o backend está no ar;
@@ -85,20 +88,26 @@ Administrador__Senha='<escolha uma senha>' dotnet run --project ms_mono
 
 Ninguém se cadastra como administrador: o time deboaz nasce da configuração.
 
-1. **Na partida**, o backend grava no banco o registro de módulos e garante a
-   conta do time (`conta-dboaz`, seção `Time`) e o administrador
-   (`usr-dboaz-<Administrador__NomeCurto>`, entrada `Administrador__Entrada`),
-   já `ATIVO` e com o resumo (PBKDF2) de `Administrador__Senha`
-   (`infra/out/commons/usuario/TimeDeboaz.cs`). Se o banco estiver fora do ar, isso
-   acontece no primeiro uso.
-2. **Só cria o que falta**: se o administrador já existe, nada muda, nem a
-   senha. A senha da variável vale só no nascimento dele; um backend que subiu
-   sem ela deixa o administrador **sem senha**, e toda entrada dá
-   `401 ENTRADA_INVALIDA`. O mesmo vale se o banco for esvaziado: o primeiro
-   pedido que procura o time o recria com a configuração do processo que estiver
-   rodando. Para corrigir no banco local, apague o administrador
-   (`db.usuarios.deleteOne({ _id: "usr-dboaz-admin" })` no `mongosh`) e suba o
-   backend de novo com a senha.
+1. **Na partida**, antes de aceitar o primeiro pedido (`/health` inclusive), o
+   backend grava o registro de módulos, cria os índices do MongoDB
+   (`infra/out/commons/Indices.cs`, diagrama `identidade-acesso-documentos`) e
+   garante as contas iniciais (`IInicializarContas`, chamado por
+   `infra/in/commons/usuario/usuarios/Partida.cs`; RN-190, RN-265 a RN-267):
+   - em todo ambiente, a conta do time (`conta-dboaz`, seção `Time`) e o
+     administrador `usr-dboaz-admin`, com `USUARIO_ADMIN_ENTRADA` e o resumo
+     (PBKDF2) de `USUARIO_ADMIN_SENHA`;
+   - só com `AMBIENTE=hml`, as contas `conta-qains` (instituição) e
+     `conta-qaaut` (autônomo) e as contas qa `usr-dboaz-qamembro`,
+     `usr-qains-master`, `usr-qaaut-master`, `usr-qains-qastaff` e
+     `usr-qains-qapart`, com as `USUARIO_QA_*`. Com outro `AMBIENTE` (`prd`,
+     ou sem a variável) as `USUARIO_QA_*` são ignoradas (RN-266).
+2. **Sem duplicar** (RN-267): cada conta é gravada pelo `_id`; o cadastro só no
+   nascimento, e a cada partida a entrada (ou o código), o resumo da senha do
+   Key Vault e o estado `ATIVO` valem de novo. Trocar a senha no Key Vault e
+   reiniciar troca a senha; uma conta qa desativada por um teste volta ativa.
+   Falta um segredo ou uma senha está fora da RNF-202: o log diz só o nome da
+   variável e o processo termina com código 1, sem atender pedido (RNF-226).
+   Banco fora do ar na partida também termina com código 1.
 3. **Depois dele**, tudo nasce pela API:
    - o administrador cria os membros do time em `POST /usuarios` e dá as
      permissões deles em `PUT /usuarios/{id}/permissoes`;
@@ -160,15 +169,19 @@ obrigatório, o backend não sobe e diz qual variável definir
 | `Time__Documento` | vazio | CNPJ da conta do time |
 | `Time__Responsavel` | vazio | Responsável pela conta do time |
 | `Time__Telefone` | vazio | Telefone do responsável |
-| `Administrador__Nome` | `Administrador do deboaz` | Nome do administrador |
-| `Administrador__NomeCurto` | `admin` | Forma o id `usr-dboaz-<nome curto>` |
-| `Administrador__Entrada` | `admin.dboaz@deboaz.com` | Entrada do administrador no hub |
-| `Administrador__Senha` | — **segredo** | Senha da primeira entrada do administrador; sem ela, ele nasce sem senha e não entra |
+| `AMBIENTE` | — | `hml` cria também as contas qa (RN-265); qualquer outro valor só o administrador (RN-266) |
+| `USUARIO_ADMIN_ENTRADA`, `USUARIO_ADMIN_SENHA` | — **segredo** | Entrada e senha do administrador do deboaz (Key Vault, RN-190); obrigatórias |
+| `USUARIO_QA_MEMBRO_*`, `USUARIO_QA_MASTER_*`, `USUARIO_QA_AUTONOMO_*`, `USUARIO_QA_STAFF_*` (`_ENTRADA`, `_SENHA`), `USUARIO_QA_PARTICIPANTE_CODIGO` | — **segredo** | Contas qa; obrigatórias só com `AMBIENTE=hml` |
 | `Autenticacao__ChaveId` | `deboaz-local` | O `kid` da chave que assina o token |
 | `Autenticacao__ChavePrivada` | — **segredo** | Chave RSA em PKCS#8 base64; sem ela, uma chave nova a cada partida e os tokens caem quando o backend reinicia |
 | `Swagger__Habilitado` | `false` (`true` em Development) | Liga `/doc/api` |
 
-Os dados do time e do administrador são gravados só quando eles nascem no banco:
-mudar a variável depois não altera o que já existe. A sigla `DBOAZ`, o id
+Os dados da conta do time são gravados só quando ela nasce no banco: mudar a
+variável depois não altera o que já existe. A entrada e a senha das contas
+iniciais, ao contrário, valem de novo a cada partida (RN-267).
+
+Salvar permissões grava `usuarios` e `registrosPermissao` numa transação
+quando o MongoDB é replica set (RNF-223); num MongoDB standalone (o do job
+`backend` do GitHub Actions) grava em sequência, sem transação. A sigla `DBOAZ`, o id
 `conta-dboaz` e o domínio `deboaz.com` das entradas são regras do produto
 (requisito 17, RN-179 e RN-180) e ficam no core.

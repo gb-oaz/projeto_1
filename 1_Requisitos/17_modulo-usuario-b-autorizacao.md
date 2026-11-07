@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v19"
-data: "2026-11-05 12:34"
+versao: "v20"
+data: "2026-11-06 23:23"
 status: "Aprovado"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v19** · 2026-11-05 12:34 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v20** · 2026-11-06 23:23 · **Aprovado**
 
 # Módulo Usuários · Autorização
 
@@ -883,9 +883,9 @@ Cenário: o que este documento não trata
 
 [![Diagrama de classes da autorização: permissões do usuário com versão e pv, permissão por módulo e abas, mudança de permissão imutável, cálculo das permissões, autorização no token e exigência de cada rota, com papéis e abas](../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg)](../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg)
 
-**Autorização · documentos** — `2_Diagramas/autorizacao-documentos_v01_20261101-2340.svg`
+**Autorização · documentos** — `2_Diagramas/autorizacao-documentos_v02_20261106-2322.svg`
 
-[![Modelo de dados da autorização: permissoes embutidas em usuarios com versao, pv, mods e suspensos, registrosPermissao imutável, o pv da sessao no Redis, as coleções contratacoes e modulos e as claims do token](../2_Diagramas/autorizacao-documentos_v01_20261101-2340.svg)](../2_Diagramas/autorizacao-documentos_v01_20261101-2340.svg)
+[![Modelo de dados da autorização: permissoes embutidas em usuarios com versao, pv, mods e suspensos, registrosPermissao imutável, o pv da sessao no Redis, as coleções contratacoes e modulos e as claims do token](../2_Diagramas/autorizacao-documentos_v02_20261106-2322.svg)](../2_Diagramas/autorizacao-documentos_v02_20261106-2322.svg)
 
 ---
 
@@ -895,7 +895,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v19** | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
+| **v20** | 2026-11-06 23:23 | Diagrama autorizacao-documentos v02, fiel ao código: suspensos só no requisito, modulos com quemUsa, tipo ADMINISTRADOR |
+| v19 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v18 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v17 | 2026-11-03 11:45 | Estrutura do módulo (06 `RNF-103` v17): seção Telas nova, com a vista hub-usuarios em Web, PWA e Mobile (permissões, salvar, recusas, registro de mudanças e aviso de quem recebe) |
 | v16 | 2026-11-02 17:24 | Staff com Administrar usuários repassa o MOD-03 ao staff abaixo, só com as abas que tem (`RN-252`): sai o 403 "Só a conta master concede o módulo Usuários." e o MOD-03 entra nas concedíveis da staff (`RF-160`); contrato de API v05 |
@@ -908,4 +909,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v19 · 2026-11-05 12:34 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v20 · 2026-11-06 23:23 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>

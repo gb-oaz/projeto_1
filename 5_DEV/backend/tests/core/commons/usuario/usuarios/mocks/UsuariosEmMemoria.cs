@@ -47,6 +47,7 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
         SalvarTempoDaConta = new SalvarTempoDaConta(this, this, this, Relogio);
         LerTempoDoTime = new LerTempoDoTime(this, this, this, Relogio);
         SalvarTempoDoTime = new SalvarTempoDoTime(this, this, this, Relogio);
+        InicializarContas = new InicializarContas(this, this, Relogio);
     }
 
     /// <summary>O relógio dos casos de uso.</summary>
@@ -94,6 +95,8 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     public ILerTempoDoTime LerTempoDoTime { get; }
     /// <summary>PUT /time/tempo-sessao.</summary>
     public ISalvarTempoDoTime SalvarTempoDoTime { get; }
+    /// <summary>A partida da aplicação.</summary>
+    public IInicializarContas InicializarContas { get; }
 
     // ── preparo do cenário ─────────────────────────────────────────────────────
 
@@ -184,6 +187,20 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
         return Task.CompletedTask;
     }
 
+    // upsert pelo id: o cadastro fica; a entrada, o resumo e o estado vêm de novo
+    Task<bool> IUsuarios.Garantir(UsuarioCadastrado usuario, CancellationToken ct)
+    {
+        if (usuarios.GetValueOrDefault(usuario.Id) is not { } guardado)
+        {
+            usuarios.Add(usuario.Id, usuario);
+            return Task.FromResult(true);
+        }
+        usuarios[usuario.Id] = new UsuarioCadastrado(guardado.Id, guardado.ContaId, guardado.Sigla, guardado.Tipo, guardado.Nome,
+            guardado.NomeCurto, usuario.Login, guardado.Matricula, usuario.Estado, usuario.ResumoSenha, guardado.Responsaveis,
+            guardado.CriadoPor, guardado.CriadoEm, guardado.CodigoGeradoEm, guardado.UltimoAcesso, guardado.UltimoAcessoQuem);
+        return Task.FromResult(false);
+    }
+
     Task<PaginaDe<UsuarioCadastrado>> IUsuarios.Listar(FiltroDeUsuarios filtro, CancellationToken ct)
     {
         var achados = usuarios.Values
@@ -209,6 +226,13 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
         geracoes.Add(geracao);
         temposDasContas[conta.Id] = tempo;
         return Task.CompletedTask;
+    }
+
+    Task<bool> IContas.Garantir(ContaAssinante conta, TempoDaConta? tempo, CancellationToken ct)
+    {
+        if (!contas.TryAdd(conta.Id, conta)) return Task.FromResult(false);
+        if (tempo is not null) temposDasContas[conta.Id] = tempo;
+        return Task.FromResult(true);
     }
 
     Task IContas.Atualizar(ContaAssinante conta, CancellationToken ct)

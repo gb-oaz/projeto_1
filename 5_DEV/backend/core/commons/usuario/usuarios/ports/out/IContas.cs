@@ -22,6 +22,12 @@ public interface IContas
     Task Criar(ContaAssinante conta, UsuarioCadastrado master, GeracaoDeSenhaPedida geracao, TempoDaConta tempo,
         CancellationToken ct = default);
 
+    /// <summary>
+    /// Garante uma conta inicial pelo id (RN-267): grava o cadastro e o tempo de
+    /// sessão (se dado) só se ela não existir. Devolve true se ela nasceu agora.
+    /// </summary>
+    Task<bool> Garantir(ContaAssinante conta, TempoDaConta? tempo, CancellationToken ct = default);
+
     /// <summary>Grava o estado novo da conta.</summary>
     Task Atualizar(ContaAssinante conta, CancellationToken ct = default);
 

@@ -289,7 +289,8 @@ imagem_suite() {
   fi
   docker build -q -t "boaz-ci-local/qa-${1//\//-}:ci" "$dir" >/dev/null
 }
-# Roda a suíte $1, registrada como $2, com as variáveis $3... (VAR=valor)
+# Roda a suíte $1, registrada como $2, com as variáveis $3... (VAR=valor);
+# IMAGEM_SUITE troca a imagem gerada do Dockerfile da suíte por outra
 rodar_suite() {
   local suite=$1 nome=$2 args=() v; shift 2
   local saida # qa · web · funcional · hub → resultados/web-funcional-hub/
@@ -297,7 +298,7 @@ rodar_suite() {
   for v in "$@"; do args+=(-e "$v"); done
   mkdir -p "$saida"
   titulo "3 · $nome"
-  if docker run --rm --network "$REDE" -v "$saida:/resultados" "${args[@]}" "boaz-ci-local/qa-${suite//\//-}:ci"; then
+  if docker run --rm --network "$REDE" -v "$saida:/resultados" "${args[@]}" "${IMAGEM_SUITE:-boaz-ci-local/qa-${suite//\//-}:ci}"; then
     registrar "$nome" "qa" "passou"
   else registrar "$nome" "qa" "falhou"; VERDE=false; fi
 }
@@ -313,14 +314,40 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
     for d in 5_DEV/frontend/web/apps/*/; do [ -d "$d" ] && APPS_IMAGEM+=("$(basename "$d")"); done
   fi
   titulo "2 · aplicações"
-  # segredos do ambiente local, novos a cada execução: no lugar do Key Vault,
-  # a chave que assina o token (PKCS#8 em base64) e a senha do administrador
-  # do deboaz (17 RN-190, RNF-207); o qa do backend recebe os mesmos valores
+  # segredos do CI, novos a cada execução, no lugar do Key Vault de
+  # homologação: a chave que assina o token (PKCS#8 em base64) e as contas
+  # iniciais (17 RN-190, RN-265, RNF-207, RNF-225) — o administrador do deboaz
+  # e as contas qa, com as entradas do requisito e senhas geradas aqui
+  # (RNF-202). O backend sobe com AMBIENTE=hml e o qa do backend recebe as
+  # mesmas USUARIO_*; nenhum valor fica no repositório.
   # (o pkcs8 -topk8 garante PKCS#8: o OpenSSL 3 grava "genpkey -outform DER" em PKCS#1)
   CHAVE_PRIVADA=$(openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 2>/dev/null \
     | openssl pkcs8 -topk8 -nocrypt -outform DER | base64 | tr -d '\n')
-  ADMIN_ENTRADA=admin.dboaz@deboaz.com
-  ADMIN_SENHA="Ad#Ci$(od -An -N4 -tu4 /dev/urandom | tr -dc 0-9 | cut -c1-6)"
+  # senha da RNF-202: 8+ caracteres, maiúscula, minúscula, número e especial
+  senha_nova() {
+    local letras
+    letras=$(LC_ALL=C tr -dc 'a-hjkmnp-z' </dev/urandom 2>/dev/null | head -c 6)
+    printf 'Ci#%s%s%s' "$(printf '%s' "${letras:0:1}" | tr a-z A-Z)" "${letras:1}" \
+      "$(od -An -N4 -tu4 /dev/urandom | tr -dc 0-9 | cut -c1-6)"
+  }
+  USUARIOS=(
+    "USUARIO_ADMIN_ENTRADA=admin.dboaz@deboaz.com"
+    "USUARIO_ADMIN_SENHA=$(senha_nova)"
+    "USUARIO_QA_MEMBRO_ENTRADA=qamembro.dboaz@deboaz.com"
+    "USUARIO_QA_MEMBRO_SENHA=$(senha_nova)"
+    "USUARIO_QA_MASTER_ENTRADA=qa_instituicao@deboaz.com"
+    "USUARIO_QA_MASTER_SENHA=$(senha_nova)"
+    "USUARIO_QA_AUTONOMO_ENTRADA=qa_autonomo@deboaz.com"
+    "USUARIO_QA_AUTONOMO_SENHA=$(senha_nova)"
+    "USUARIO_QA_STAFF_ENTRADA=qastaff.qains@deboaz.com"
+    "USUARIO_QA_STAFF_SENHA=$(senha_nova)"
+    "USUARIO_QA_PARTICIPANTE_CODIGO=QAINS-QAPART-0001"
+  )
+  # no GitHub Actions, as senhas e a chave não aparecem no log
+  if [ "${GITHUB_ACTIONS:-}" = true ]; then
+    echo "::add-mask::$CHAVE_PRIVADA"
+    for v in "${USUARIOS[@]}"; do case "${v%%=*}" in *_SENHA) echo "::add-mask::${v#*=}" ;; esac; done
+  fi
   {
     echo "# gerado por ci.sh — não edite"
     echo "services:"
@@ -332,15 +359,14 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
     profiles: [aplicacoes]
 $($QA_MOBILE && echo '    ports: ["127.0.0.1:18080:8080"]')
     environment:
-      AMBIENTE: local
+      AMBIENTE: hml
       ConnectionStrings__Mongo: mongodb://mongodb:27017
       ConnectionStrings__MongoDb: mongodb://mongodb:27017
       ConnectionStrings__Redis: redis:6379
       Swagger__Habilitado: "true"
       Autenticacao__ChaveId: deboaz-local
       Autenticacao__ChavePrivada: "$CHAVE_PRIVADA"
-      Administrador__Entrada: $ADMIN_ENTRADA
-      Administrador__Senha: "$ADMIN_SENHA"
+$(for v in "${USUARIOS[@]}"; do printf '      %s: "%s"\n' "${v%%=*}" "${v#*=}"; done)
     depends_on:
       mongodb: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -380,10 +406,40 @@ EOF
         [ $t = carga ] && ! $QA_CARGA && continue
         # a integração prepara o estado pelo banco e pelo cache, que estão em
         # memória (tmpfs): por isso pode limpá-los antes de cada cenário
-        if $TEM_BACKEND; then suite "backend/$t" "qa · backend · $t" "API_URL=$API" \
+        if ! $TEM_BACKEND; then
+          aviso "sem 5_DEV/backend/Dockerfile: suíte backend/$t pulada"; registrar "qa · backend · $t" "qa" "pulado"
+        elif [ $t = integracao ]; then
+          # cenários de inicialização (17 RN-190, RN-266, RN-267, RNF-226): a
+          # suíte sobe instâncias próprias do backend publicado. A imagem da
+          # suíte ganha o /app da imagem backend-mono (a sdk:10.0 já traz o
+          # runtime ASP.NET), e as PARTIDA_* vão sem o prefixo a essas
+          # instâncias: as mesmas dependências, um banco próprio no MongoDB e
+          # outro banco lógico no Redis, para não tocar o backend principal
+          if ! imagem_suite backend/integracao; then
+            registrar "qa · backend · integracao" "qa" "pulado"
+          elif ! docker build -q -t boaz-ci-local/qa-backend-integracao-api:ci - >/dev/null <<'DOCKERFILE'
+FROM boaz-ci-local/qa-backend-integracao:ci
+COPY --from=boaz-ci-local/backend-mono:ci /app /api
+DOCKERFILE
+          then
+            aviso "imagem da suíte com o backend publicado não foi gerada"
+            registrar "qa · backend · integracao" "qa" "falhou"; VERDE=false
+          else
+            IMAGEM_SUITE=boaz-ci-local/qa-backend-integracao-api:ci rodar_suite backend/integracao "qa · backend · integracao" \
+              "API_URL=$API" "MONGO_URL=mongodb://mongodb:27017" "REDIS_URL=redis:6379" "QA_PODE_LIMPAR=sim" \
+              "CHAVE_PRIVADA=$CHAVE_PRIVADA" "${USUARIOS[@]}" \
+              "API_COMANDO=cd /api && exec dotnet Boaz.MsMono.dll" \
+              "PARTIDA_ConnectionStrings__Mongo=mongodb://mongodb:27017" \
+              "PARTIDA_ConnectionStrings__MongoDb=mongodb://mongodb:27017" \
+              "PARTIDA_ConnectionStrings__Redis=redis:6379,defaultDatabase=1" \
+              "PARTIDA_Mongo__Banco=boaz_partida" \
+              "PARTIDA_Autenticacao__ChaveId=deboaz-local" \
+              "PARTIDA_Autenticacao__ChavePrivada=$CHAVE_PRIVADA"
+          fi
+        else suite "backend/$t" "qa · backend · $t" "API_URL=$API" \
           "MONGO_URL=mongodb://mongodb:27017" "REDIS_URL=redis:6379" "QA_PODE_LIMPAR=sim" \
-          "ADMIN_ENTRADA=$ADMIN_ENTRADA" "ADMIN_SENHA=$ADMIN_SENHA" "CHAVE_PRIVADA=$CHAVE_PRIVADA"
-        else aviso "sem 5_DEV/backend/Dockerfile: suíte backend/$t pulada"; registrar "qa · backend · $t" "qa" "pulado"; fi
+          "CHAVE_PRIVADA=$CHAVE_PRIVADA" "${USUARIOS[@]}"
+        fi
       done
       # funcional da web: uma vez por app, contra o contêiner dele (RNF-192)
       if $QA_FRONTEND && [ ${#APPS_IMAGEM[@]} -gt 0 ]; then

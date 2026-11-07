@@ -29,16 +29,12 @@ static class Ordem
 
 // Os usuários do cadastro (usuarios). Grava só os campos do cadastro: o último
 // acesso é da Autenticação e as permissões, da Autorização.
-public sealed class UsuariosNoBanco(Armazenamento armazenamento, TimeDeboaz time) : IUsuarios
+public sealed class UsuariosNoBanco(Armazenamento armazenamento) : IUsuarios
 {
     IMongoCollection<BsonDocument> Usuarios => armazenamento.Colecao(Colecoes.Usuarios);
 
-    public async Task<UsuarioCadastrado?> Buscar(string id, CancellationToken ct = default)
-    {
-        var d = await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
-        if (d is null && await time.GarantirSeFor(usuarioId: id, ct: ct)) d = await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
-        return d is null ? null : Documentos.Usuario(d);
-    }
+    public async Task<UsuarioCadastrado?> Buscar(string id, CancellationToken ct = default) =>
+        await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct) is { } d ? Documentos.Usuario(d) : null;
 
     public async Task<UsuarioCadastrado?> BuscarPorEntrada(string entrada, CancellationToken ct = default) =>
         await Usuarios.Find(Bson.Filtro.Eq("login", entrada)).FirstOrDefaultAsync(ct) is { } d ? Documentos.Usuario(d) : null;
@@ -69,6 +65,18 @@ public sealed class UsuariosNoBanco(Armazenamento armazenamento, TimeDeboaz time
         return Usuarios.UpdateOneAsync(Bson.Filtro.Eq("_id", usuario.Id), Bson.Mudar.Combine(mudancas), cancellationToken: ct);
     }
 
+    // upsert pelo _id (RN-267): o cadastro só no nascimento; a entrada (ou o
+    // código), o resumo da senha e o estado ATIVO a cada partida
+    public async Task<bool> Garantir(UsuarioCadastrado usuario, CancellationToken ct = default)
+    {
+        var sempre = new HashSet<string> { "login", "resumoSenha", "estado" };
+        var cadastro = Documentos.DoCadastro(usuario);
+        var mudancas = cadastro.Elements.Select(e => sempre.Contains(e.Name) ? Bson.Mudar.Set(e.Name, e.Value) : Bson.Mudar.SetOnInsert(e.Name, e.Value));
+        var resultado = await Usuarios.UpdateOneAsync(Bson.Filtro.Eq("_id", usuario.Id), Bson.Mudar.Combine(mudancas),
+            new UpdateOptions { IsUpsert = true }, ct);
+        return resultado.UpsertedId is not null;
+    }
+
     // a busca acha nome, entrada (ou código) e matrícula (RN-185)
     public Task<PaginaDe<UsuarioCadastrado>> Listar(FiltroDeUsuarios filtro, CancellationToken ct = default)
     {
@@ -91,16 +99,12 @@ public sealed class UsuariosNoBanco(Armazenamento armazenamento, TimeDeboaz time
 
 // As contas assinantes (contas), com o tempo de sessão de cada uma; o tempo do
 // time deboaz fica na conta do time (tempoDoTime).
-public sealed class ContasNoBanco(Armazenamento armazenamento, TimeDeboaz time) : IContas
+public sealed class ContasNoBanco(Armazenamento armazenamento) : IContas
 {
     IMongoCollection<BsonDocument> Contas => armazenamento.Colecao(Colecoes.Contas);
 
-    public async Task<ContaAssinante?> Buscar(string id, CancellationToken ct = default)
-    {
-        var d = await Contas.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
-        if (d is null && await time.GarantirSeFor(contaId: id, ct: ct)) d = await Contas.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
-        return d is null ? null : Documentos.Conta(d);
-    }
+    public async Task<ContaAssinante?> Buscar(string id, CancellationToken ct = default) =>
+        await Contas.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct) is { } d ? Documentos.Conta(d) : null;
 
     // a sigla vale sem diferenciar maiúsculas (RN-179)
     public Task<bool> SiglaEmUso(string sigla, CancellationToken ct = default) =>
@@ -121,6 +125,21 @@ public sealed class ContasNoBanco(Armazenamento armazenamento, TimeDeboaz time) 
         usuario.InsertAt(0, new BsonElement("_id", master.Id));
         await armazenamento.Colecao(Colecoes.Usuarios).InsertOneAsync(usuario, cancellationToken: ct);
         await armazenamento.Colecao(Colecoes.GeracoesSenha).InsertOneAsync(Documentos.DaGeracao(geracao), cancellationToken: ct);
+    }
+
+    // upsert pelo _id (RN-267): a conta inicial só é gravada se não existir
+    public async Task<bool> Garantir(ContaAssinante conta, TempoDaConta? tempo, CancellationToken ct = default)
+    {
+        var d = Documentos.DaConta(conta);
+        if (tempo is not null)
+        {
+            d["tempoSessao"] = Documentos.DoTempo(tempo);
+            d["conferencias"] = new BsonArray();
+        }
+        var resultado = await Contas.UpdateOneAsync(Bson.Filtro.Eq("_id", conta.Id),
+            Bson.Mudar.Combine(d.Elements.Where(e => e.Name != "_id").Select(e => Bson.Mudar.SetOnInsert(e.Name, e.Value))),
+            new UpdateOptions { IsUpsert = true }, ct);
+        return resultado.UpsertedId is not null;
     }
 
     public Task Atualizar(ContaAssinante conta, CancellationToken ct = default) =>
@@ -156,12 +175,9 @@ public sealed class ContasNoBanco(Armazenamento armazenamento, TimeDeboaz time) 
     public async Task<TempoDoTime?> TempoDoTime(CancellationToken ct = default) =>
         Documentos.TempoDoTime(await Contas.Find(Bson.Filtro.Eq("_id", TimeDeboaz.ContaId)).FirstOrDefaultAsync(ct));
 
-    public async Task SalvarTempoDoTime(TempoDoTime tempo, CancellationToken ct = default)
-    {
-        await time.Garantir(ct);
-        await Contas.UpdateOneAsync(Bson.Filtro.Eq("_id", TimeDeboaz.ContaId), Bson.Mudar.Set("tempoDoTime", Documentos.DoTempo(tempo)),
+    public Task SalvarTempoDoTime(TempoDoTime tempo, CancellationToken ct = default) =>
+        Contas.UpdateOneAsync(Bson.Filtro.Eq("_id", TimeDeboaz.ContaId), Bson.Mudar.Set("tempoDoTime", Documentos.DoTempo(tempo)),
             cancellationToken: ct);
-    }
 
     // a conferência do SAC fica na conta (contas.conferencias, RN-172)
     public Task RegistrarConferencia(string contaId, string quem, bool conferiu, DateTimeOffset quando, CancellationToken ct = default) =>

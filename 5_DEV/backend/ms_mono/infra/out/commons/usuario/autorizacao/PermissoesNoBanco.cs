@@ -9,7 +9,7 @@ namespace Boaz.MsMono.Infra.Out.Commons.Usuario.Autorizacao;
 // Permissões guardadas no documento do usuário (permissoes: versao, pv e mods)
 // e o registro de mudanças (registrosPermissao), conforme autorizacao-documentos.
 // A gravação só vale se a versão não mudou desde a leitura (RNF-222, RNF-223).
-public sealed class PermissoesNoBanco(Armazenamento armazenamento, TimeDeboaz time) : IUsuarios, IPermissoesGuardadas
+public sealed class PermissoesNoBanco(Armazenamento armazenamento) : IUsuarios, IPermissoesGuardadas
 {
     IMongoCollection<BsonDocument> Usuarios => armazenamento.Colecao(Colecoes.Usuarios);
 
@@ -20,7 +20,6 @@ public sealed class PermissoesNoBanco(Armazenamento armazenamento, TimeDeboaz ti
     public async Task<UsuarioAutorizado?> Buscar(string id, CancellationToken ct = default)
     {
         var d = await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
-        if (d is null && await time.GarantirSeFor(usuarioId: id, ct: ct)) d = await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
         if (d is null) return null;
         var contaId = d.Texto("contaId")!;
         var deAutonomo = false;
@@ -45,16 +44,27 @@ public sealed class PermissoesNoBanco(Armazenamento armazenamento, TimeDeboaz ti
         return new PermissoesDoUsuario(usuarioId, versao, p.Inteiro("pv", versao), mods);
     }
 
-    public async Task<bool> Salvar(PermissoesDoUsuario permissoes, MudancaDePermissao mudanca, int versaoLida, CancellationToken ct = default)
+    // as permissões e o registro da mudança numa só operação (RNF-223): numa
+    // transação quando o MongoDB aceita (replica set); num standalone, em
+    // sequência (Armazenamento.NumaOperacao)
+    public Task<bool> Salvar(PermissoesDoUsuario permissoes, MudancaDePermissao mudanca, int versaoLida, CancellationToken ct = default) =>
+        armazenamento.NumaOperacao((sessao, c) => Gravar(sessao, permissoes, mudanca, versaoLida, c), ct);
+
+    async Task<bool> Gravar(IClientSessionHandle? sessao, PermissoesDoUsuario permissoes, MudancaDePermissao mudanca, int versaoLida,
+        CancellationToken ct)
     {
         var lida = Bson.Filtro.Eq("permissoes.versao", versaoLida);
         if (versaoLida == 1) lida |= Bson.Filtro.Exists("permissoes.versao", false);
-        var resultado = await Usuarios.UpdateOneAsync(Bson.Filtro.Eq("_id", permissoes.UsuarioId) & lida, Bson.Mudar
+        var filtro = Bson.Filtro.Eq("_id", permissoes.UsuarioId) & lida;
+        var mudar = Bson.Mudar
             .Set("permissoes.versao", permissoes.Versao)
             .Set("permissoes.pv", permissoes.Pv)
-            .Set("permissoes.mods", Mods(permissoes.Mods)), cancellationToken: ct);
+            .Set("permissoes.mods", Mods(permissoes.Mods));
+        var resultado = sessao is null
+            ? await Usuarios.UpdateOneAsync(filtro, mudar, cancellationToken: ct)
+            : await Usuarios.UpdateOneAsync(sessao, filtro, mudar, cancellationToken: ct);
         if (resultado.ModifiedCount == 0) return false;
-        await Registros.InsertOneAsync(new BsonDocument
+        var registro = new BsonDocument
         {
             ["_id"] = Guid.NewGuid().ToString("N"),
             ["usuarioId"] = mudanca.UsuarioId,
@@ -64,7 +74,9 @@ public sealed class PermissoesNoBanco(Armazenamento armazenamento, TimeDeboaz ti
             ["versao"] = mudanca.Versao,
             ["antes"] = Mods(mudanca.Antes),
             ["depois"] = Mods(mudanca.Depois),
-        }, cancellationToken: ct);
+        };
+        if (sessao is null) await Registros.InsertOneAsync(registro, cancellationToken: ct);
+        else await Registros.InsertOneAsync(sessao, registro, cancellationToken: ct);
         return true;
     }
 

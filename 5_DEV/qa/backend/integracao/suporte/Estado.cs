@@ -17,9 +17,14 @@ public static class Estado
 
     static readonly string[] BancosDoSistema = ["admin", "config", "local"];
 
-    // cada cenário começa com o banco e o cache vazios. Apaga tudo o que está
-    // em MONGO_URL e REDIS_URL: só roda com QA_PODE_LIMPAR=sim, para nunca
-    // atingir um banco que não seja descartável (o do CI é em memória)
+    // o que a inicialização do backend criou (17 RN-190, RN-265): guardado na
+    // primeira limpeza e devolvido depois de cada uma, como estava
+    static List<(string Colecao, BsonDocument Documento)>? daInicializacao;
+
+    // cada cenário começa com o banco e o cache vazios, menos as contas que a
+    // inicialização criou. Apaga tudo o que está em MONGO_URL e REDIS_URL: só
+    // roda com QA_PODE_LIMPAR=sim, para nunca atingir um banco que não seja
+    // descartável (o do CI é em memória)
     public static async Task Limpar()
     {
         if (!Ambiente.PodeLimpar)
@@ -27,6 +32,7 @@ public static class Estado
             throw new InvalidOperationException(
                 "QA_PODE_LIMPAR=sim ausente: a suíte apaga o banco e o cache de MONGO_URL e REDIS_URL antes de cada cenário");
         }
+        daInicializacao ??= await GuardarInicializacao();
         // o registro de módulos (15_modulos) fica: é dado do sistema, não do cenário
         foreach (var nome in await (await mongo.Value.ListDatabaseNamesAsync()).ToListAsync())
         {
@@ -39,6 +45,28 @@ public static class Estado
         }
         foreach (var servidor in redis.Value.GetServers()) await servidor.FlushAllDatabasesAsync();
         await SemearModulos();
+        foreach (var grupo in daInicializacao.GroupBy(d => d.Colecao))
+        {
+            await Banco.GetCollection<BsonDocument>(grupo.Key).InsertManyAsync(grupo.Select(d => d.Documento.DeepClone().AsBsonDocument));
+        }
+    }
+
+    // os documentos das contas e dos usuários iniciais (pelos _id do diagrama
+    // usuario-inicializacao-sequencia), em qualquer coleção do banco do backend.
+    // Só os copia: a suíte não confere o que eles têm
+    static async Task<List<(string, BsonDocument)>> GuardarInicializacao()
+    {
+        var guardados = new List<(string, BsonDocument)>();
+        var filtro = Builders<BsonDocument>.Filter.In("_id", ContasIniciais.Ids.Select(id => (BsonValue)id));
+        foreach (var colecao in await (await Banco.ListCollectionNamesAsync()).ToListAsync())
+        {
+            if (colecao == "modulos") continue;
+            foreach (var documento in await Banco.GetCollection<BsonDocument>(colecao).Find(filtro).ToListAsync())
+            {
+                guardados.Add((colecao, documento));
+            }
+        }
+        return guardados;
     }
 
     // os módulos que os cenários citam, se o backend ainda não os registrou

@@ -37,6 +37,29 @@ public sealed class Armazenamento
     // Cache das sessões e das tentativas.
     public IDatabase Cache => cache.Value.GetDatabase();
 
+    // O servidor aceita transação: replica set (setName no hello) ou mongos
+    // (msg isdbgrid). Um MongoDB standalone, como o do job backend do GitHub
+    // Actions, não aceita. Perguntado uma vez por processo.
+    public async Task<bool> AceitaTransacao(CancellationToken ct = default)
+    {
+        if (aceitaTransacao is { } sabido) return sabido;
+        var hello = await Banco.RunCommandAsync<BsonDocument>(new BsonDocument("hello", 1), cancellationToken: ct);
+        aceitaTransacao = hello.Contains("setName") || hello.GetValue("msg", "").ToString() == "isdbgrid";
+        return aceitaTransacao.Value;
+    }
+
+    bool? aceitaTransacao;
+
+    // Grava numa só operação (RNF-223): numa transação, quando o servidor
+    // aceita; senão, em sequência, sem sessão. A gravação recebe a sessão (ou
+    // null) e a usa em cada escrita.
+    public async Task<T> NumaOperacao<T>(Func<IClientSessionHandle?, CancellationToken, Task<T>> gravar, CancellationToken ct = default)
+    {
+        if (!await AceitaTransacao(ct)) return await gravar(null, ct);
+        using var sessao = await Banco.Client.StartSessionAsync(cancellationToken: ct);
+        return await sessao.WithTransactionAsync((s, c) => gravar(s, c), cancellationToken: ct);
+    }
+
     // Uma coleção como documentos soltos: cada módulo grava só os próprios
     // campos de um documento compartilhado (usuarios), com $set campo a campo.
     public IMongoCollection<BsonDocument> Colecao(string nome) => Banco.GetCollection<BsonDocument>(nome);
