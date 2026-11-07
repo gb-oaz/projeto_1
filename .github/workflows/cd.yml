@@ -7,6 +7,7 @@
 #   CI concluído com sucesso (workflow_run)          RNF-47
 #   ou disparo manual em homologação (workflow_dispatch): implantar,
 #   ligar ou desligar o ambiente                     RN-26, RNF-91
+#   e, opcional, esvaziar o banco de homologação     RNF-227
 #           │
 #           ▼
 #     ┌──────────┐  1. confere se algum job "Publicar · <imagem>" passou
@@ -44,6 +45,17 @@ on:
         type: choice
         options: [implantar, ligar, desligar]
         default: implantar
+      # RNF-227: índice único só nasce em coleção vazia no Cosmos DB. Apaga
+      # todas as coleções do banco de hml pelo plano de controle (ARM, sem abrir
+      # a rede) e reinicia o backend-mono, cuja partida as recria. Nunca em prd
+      esvaziar_banco:
+        description: "Homologação: APAGAR todas as coleções do banco (a partida as recria)"
+        type: boolean
+        default: false
+      confirmacao:
+        description: "Para esvaziar, digite: esvaziar hml"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -67,18 +79,29 @@ jobs:
       tag: ${{ steps.manual.outputs.tag || steps.automatico.outputs.tag }}
       producao: ${{ steps.manual.outputs.producao || steps.automatico.outputs.producao }}
       implantar: ${{ steps.manual.outputs.implantar || steps.automatico.outputs.implantar }}
+      esvaziar: ${{ steps.manual.outputs.esvaziar || 'false' }}
     steps:
       # Manual: só homologação, sem imagem nova; as tags implantadas são mantidas
       - id: manual
         if: github.event_name == 'workflow_dispatch'
         env:
           REF: ${{ github.ref_name }}
+          PEDIU_ESVAZIAR: ${{ inputs.esvaziar_banco }}
+          CONFIRMACAO: ${{ inputs.confirmacao }}
         run: |
           if [ "$REF" != master ]; then
             echo "::error::Rode o CD manual a partir da master (environment azure-hml)"; exit 1
           fi
+          esvaziar=false
+          if [ "$PEDIU_ESVAZIAR" = true ]; then
+            if [ "$CONFIRMACAO" != "esvaziar hml" ]; then
+              echo "::error::Para esvaziar o banco de homologação, digite exatamente: esvaziar hml"; exit 1
+            fi
+            esvaziar=true
+            echo "::warning::Esta execução APAGA todas as coleções do banco de homologação depois da aprovação"
+          fi
           {
-            echo "imagens=[]"; echo "tag="; echo "producao=false"; echo "implantar=true"
+            echo "imagens=[]"; echo "tag="; echo "producao=false"; echo "implantar=true"; echo "esvaziar=$esvaziar"
           } >>"$GITHUB_OUTPUT"
 
       - id: automatico
@@ -130,6 +153,7 @@ jobs:
     with:
       ambiente: hml
       acao: ${{ inputs.acao || 'implantar' }}
+      esvaziar: ${{ needs.preparar.outputs.esvaziar == 'true' }}
       tag: ${{ needs.preparar.outputs.tag }}
       imagens: ${{ needs.preparar.outputs.imagens }}
       sha: ${{ github.event.workflow_run.head_sha || github.sha }}

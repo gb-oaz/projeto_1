@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "05_cd-implantacao"
 tipo: "Transversal"
 titulo: "CD e implantação na Azure"
-versao: "v11"
-data: "2026-11-06 23:37"
+versao: "v12"
+data: "2026-11-07 16:15"
 status: "Em revisão"
 objetivo: "definir como as imagens publicadas pelo CI chegam, após aprovação manual, aos ambientes de homologação e produção na Azure, descritos em Terraform e com custo mínimo."
 ---
 
-> **boaz · Transversal** · `05_cd-implantacao` · **v11** · 2026-11-06 23:37 · **Em revisão**
+> **boaz · Transversal** · `05_cd-implantacao` · **v12** · 2026-11-07 16:15 · **Em revisão**
 
 # CD e implantação na Azure
 
@@ -207,6 +207,46 @@ Cenário: desligar homologação
   Quando homologação é desligada
   Então o Redis e os private endpoints são removidos e as aplicações vão a zero réplica
   E Cosmos DB, Key Vault, Log Analytics e a rede continuam
+```
+
+<a id="RNF-228"></a>
+
+### `RNF-228` Esvaziar o banco de homologação
+
+> Índices criados na partida: [17_modulo-usuario `RNF-227`](17_modulo-usuario.md#RNF-227)
+
+```gherkin
+Cenário: esvaziamento confirmado em homologação
+  Dado o dono dispara o cd.yml na master para homologação
+  E marca "esvaziar_banco" e digita "esvaziar hml" em "confirmacao"
+  Quando a issue de aprovação abre
+  Então ela traz em destaque o aviso de que o banco de homologação será esvaziado
+  Quando o dono comenta "approve"
+  Então todas as coleções do Cosmos DB de homologação são apagadas antes do terraform apply
+  E o acesso público ao Cosmos DB continua desabilitado
+  E depois do apply a revisão atual do backend-mono é reiniciada
+  E a partida recria as coleções, os índices e as contas iniciais
+  E a execução falha se o backend-mono não chegar a Running e Healthy em até 5 min
+
+Esquema do Cenário: confirmação errada ou ausente
+  Dado o dono dispara o cd.yml na master para homologação
+  E <opção> com <texto> em "confirmacao"
+  Então <resultado>
+  E nenhuma coleção é apagada
+
+  Exemplos:
+    | opção                      | texto          | resultado                                   |
+    | marca "esvaziar_banco"     | "esvaziar"     | o job preparar falha antes da aprovação     |
+    | marca "esvaziar_banco"     | "ESVAZIAR HML" | o job preparar falha antes da aprovação     |
+    | marca "esvaziar_banco"     | o campo vazio  | o job preparar falha antes da aprovação     |
+    | não marca "esvaziar_banco" | "esvaziar hml" | segue a ação escolhida, sem esvaziar        |
+
+Cenário: tentativa em produção
+  Dado uma implantação em produção que pede o esvaziamento do banco
+  Então ela falha antes da issue de aprovação
+  E aparece "Esvaziar o banco só é permitido em homologação"
+  E o banco de produção não é tocado
+  E o merge na master e a tag vX.Y.Z nunca esvaziam banco algum
 ```
 
 <a id="RNF-48"></a>
@@ -714,9 +754,9 @@ Cenário: Key Vault aberto ao CD
 
 [![Ambiente de produção na Azure: assinatura deb-boaz-app-prd, grupo de recursos deb-boaz-app-prd_rg, com VNet 10.20.0.0/16; Application Gateway WAF_v2 com IP público em snet-appgw como único ponto público, roteando a web para as aplicações web e /mobile/* para o backend, com política de WAF; ambiente interno do Container Apps em snet-aca com 1 a 5 réplicas, em que as aplicações web encaminham /api/* ao backend; private endpoints de Key Vault, Cosmos DB autoscale e Azure Managed Redis em snet-pe com zonas Private DNS; Log Analytics, Application Insights e orçamento](../3_Arquitetura/implantacao-prd_v05_20261106-2318.svg)](../3_Arquitetura/implantacao-prd_v05_20261106-2318.svg)
 
-**Pipeline de CD** — `3_Arquitetura/pipeline-cd_v06_20261015-2357.svg`
+**Pipeline de CD** — `3_Arquitetura/pipeline-cd_v07_20261107-1614.svg`
 
-[![Pipeline de CD no GitHub Actions: o fim do CI com as imagens publicadas dispara o cd.yml; login na Azure por OIDC, terraform plan com estado numa storage account de cada assinatura, aprovação manual por issue pelo dono do repositório, terraform apply em deb-boaz-app-hml_rg no merge na master e na tag vX.Y.Z, e depois em deb-boaz-app-prd_rg na tag, e verificação de /health; o Container Apps baixa as imagens do Docker Hub](../3_Arquitetura/pipeline-cd_v06_20261015-2357.svg)](../3_Arquitetura/pipeline-cd_v06_20261015-2357.svg)
+[![Pipeline de CD no GitHub Actions: o fim do CI com as imagens publicadas dispara o cd.yml; login na Azure por OIDC, terraform plan com estado numa storage account de cada assinatura, aprovação manual por issue pelo dono do repositório, terraform apply em deb-boaz-app-hml_rg no merge na master e na tag vX.Y.Z, e depois em deb-boaz-app-prd_rg na tag, e verificação de /health; o Container Apps baixa as imagens do Docker Hub; no disparo manual em homologação, o esvaziamento do banco pelo plano de controle depois da aprovação e antes do apply, com o backend-mono reiniciado em seguida](../3_Arquitetura/pipeline-cd_v07_20261107-1614.svg)](../3_Arquitetura/pipeline-cd_v07_20261107-1614.svg)
 
 ---
 
@@ -734,7 +774,8 @@ Cenário: Key Vault aberto ao CD
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v11** | 2026-11-06 23:37 | Diagramas de implantação de homologação e de produção atualizados para v05 |
+| **v12** | 2026-11-07 16:15 | Esvaziar o banco de homologação pelo disparo manual (`RNF-228` incluído); diagrama `pipeline-cd` atualizado para v07 |
+| v11 | 2026-11-06 23:37 | Diagramas de implantação de homologação e de produção atualizados para v05 |
 | v10 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v09 | 2026-11-01 18:28 | Só Gherkin e diagramas: premissas, RN, RNF e nomes dos recursos viram cenários (mesmos IDs como âncora); Em aberto mantido; status → Em revisão |
 | v08 | 2026-10-27 00:49 | Status → Aprovado |
@@ -743,8 +784,7 @@ Cenário: Key Vault aberto ao CD
 | v05 | 2026-10-15 01:16 | Estrutura do Terraform: módulo raiz em `infra/`, valores em `ambientes/<amb>/` e bootstrap em `scripts/`, sem IDs da Azure no repositório (`RNF-55` alterado); diagrama `pipeline-cd` atualizado para v05 |
 | v04 | 2026-10-15 01:00 | Ajustes da implementação: plano guardado só no executor, sem artefato (`RNF-48` e `RNF-51` alterados); environments `azure-hml` e `azure-prd` restritos à branch principal (`RNF-52` alterado); diagrama `pipeline-cd` atualizado para v04 |
 | v03 | 2026-10-14 23:15 | Assinaturas `deb-boaz-app-hml` e `deb-boaz-app-prd` e grupos `deb-boaz-app-<amb>_rg` (`RN-17` e `RNF-52` alterados); estado do Terraform em cada assinatura (`RNF-56` alterado); nomenclatura dos recursos (`RNF-88` a `RNF-90` incluídos); diagramas atualizados para v03 |
-| v02 | 2026-10-13 23:55 | Pendências respondidas: homologação sem Application Gateway confirmada; região Brazil South (`RNF-86`); tag de versão passa por homologação antes de produção (`RN-19`, `RN-20`, `RNF-49` e `RNF-52` alterados, `RN-25` incluído); Swagger de homologação aberto (`RNF-72`); escala a partir de 30 requisições simultâneas (`RNF-66`); WAF com 100 requisições/min por IP (`RNF-79`); orçamentos de R$ 300,00 e R$ 1.500,00 (`RNF-84`); versões do Cosmos DB e do Redis (`RNF-87`); diagramas atualizados para v02 |
 
 ---
 
-<sub>boaz · v11 · 2026-11-06 23:37 · `1_Requisitos/05_cd-implantacao.md`</sub>
+<sub>boaz · v12 · 2026-11-07 16:15 · `1_Requisitos/05_cd-implantacao.md`</sub>

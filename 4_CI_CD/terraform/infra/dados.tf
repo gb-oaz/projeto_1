@@ -10,7 +10,10 @@ resource "azurerm_cosmosdb_account" "cosmos" {
   offer_type                    = "Standard"
   kind                          = "MongoDB"
   mongo_server_version          = var.mongo_versao
-  public_network_access_enabled = false # RNF-62
+  # RNF-62: rede de dados fechada, só o private endpoint em snet-pe. O CD não
+  # abre a rede nem com filtro de IP: o esvaziamento de hml (RNF-227) apaga as
+  # coleções pelo plano de controle (ARM), em cd-ambiente.yml
+  public_network_access_enabled = false
   minimal_tls_version           = "Tls12"
   tags                          = local.tags
 
