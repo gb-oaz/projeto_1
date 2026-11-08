@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 2376" width="1392" height="2376">
   <title>Autorização · contrato de API</title>
-  <desc>Contrato dos endereços de permissões do ms_mono, do requisito 17-b (Módulo Usuários · Autorização): ler as permissões e as concedíveis de uma pessoa, salvar o conjunto com a versão, e o histórico das mudanças. v01: criação. v02: uso, quem usa, login com selo e JSON expandido. v03: mensagem neutra no PERMISSAO_ACIMA. v04: mensagens de todos os erros, DADOS_INVALIDOS no PUT e quem está abaixo. v05: staff com Administrar usuários repassa o MOD-03, só com as abas que tem. v06: PUT /usuarios/{id}/permissoes auditado (EDITAR_PERMISSOES em auditoria e registrosPermissao, recusas em auditoriaErros, 500 ERRO_INESPERADO, X-Trace-Id).</desc>
+  <desc>Contrato dos endereços de permissões do ms_mono, do requisito 17-b (Módulo Usuários · Autorização): ler as permissões e as concedíveis de uma pessoa, salvar o conjunto com a versão, e o histórico das mudanças. v01: criação. v02: uso, quem usa, login com selo e JSON expandido. v03: mensagem neutra no PERMISSAO_ACIMA. v04: mensagens de todos os erros, DADOS_INVALIDOS no PUT e quem está abaixo. v05: staff com Administrar usuários repassa o MOD-03, só com as abas que tem. v06: PUT /usuarios/{id}/permissoes auditado (EDITAR_PERMISSOES em auditoria e registrosPermissao, recusas em auditoriaErros, 500 ERRO_INESPERADO, X-Trace-Id). v07: EDITAR_PERMISSOES com contaId da conta de quem pede e alvo a pessoa, desde o INICIADO (RN-178).</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -90,10 +90,10 @@
     <text class="title" x="40" y="72">Autorização · conceder permissões</text>
     <text class="subtitle" x="40" y="94">Ler e salvar as permissões de uma pessoa e o histórico das mudanças</text>
     <text class="wm-meta-label" x="1104" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v06</text>
+    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v07</text>
     <line class="wm-sep" x1="1176" y1="32" x2="1176" y2="80"/>
     <text class="wm-meta-label" x="1200" y="44">DATA</text>
-    <text class="wm-meta-value" x="1200" y="72">2026-11-08 · 02:12</text>
+    <text class="wm-meta-value" x="1200" y="72">2026-11-08 · 09:49</text>
   </g>
   <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V770 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
     <text class="mono" x="64" y="204">Toda resposta de erro:</text>
@@ -173,7 +173,7 @@
     <text class="mono" x="108" y="1142">USUARIO_INEXISTENTE · inclusive o de outra conta (RN-235)</text>
   </g>
   <g id="ep-put-usuarios-id-permissoes">
-    <g filter="url(#sombra)"><rect class="node" x="720" y="424" width="632" height="1108" rx="10"/></g>
+    <g filter="url(#sombra)"><rect class="node" x="720" y="424" width="632" height="1128" rx="10"/></g>
     <rect class="node-blue" x="736" y="440" width="40" height="24" rx="6"/><text class="label-strong" x="756.0" y="457" text-anchor="middle">PUT</text>
     <text class="label-strong" x="788" y="457">/usuarios/{id}/permissoes</text>
     <rect class="node-external" x="1252" y="440" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="456" text-anchor="middle">COM LOGIN</text><rect class="node-purple" x="1150" y="440" width="90" height="24" rx="12"/><text class="chip-text" x="1195.0" y="456" text-anchor="middle">X-Trace-Id</text>
@@ -234,6 +234,7 @@
     <text class="mono" x="788" y="1462">}</text>
     <rect class="node-red" x="736" y="1474" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1488" text-anchor="middle">500</text><text class="mono" x="788" y="1488">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
     <text class="muted" x="736" y="1508">toda recusa: só o INICIADO e auditoriaErros (4xx ALERTA, 500 ERRO), com X-Trace-Id</text>
+    <text class="muted" x="736" y="1528">auditoria: quem pede, contaId (a conta de quem pede) e alvo (a pessoa) desde o INICIADO</text>
   </g>
   <g id="ep-get-usuarios-id-permissoes-historico">
     <g filter="url(#sombra)"><rect class="node" x="40" y="1190" width="632" height="582" rx="10"/></g>
@@ -280,7 +281,7 @@
     <rect class="chip" x="762" y="47" width="14" height="14" rx="3"/><text class="label" x="784" y="58">resposta de sucesso</text>
     <rect class="node" x="40" y="73" width="14" height="14" rx="3"/><text class="label" x="62" y="84">endereço e regra comum</text><rect class="node-purple" x="246" y="73" width="14" height="14" rx="3"/><text class="label" x="268" y="84">auditado: responde o cabeçalho X-Trace-Id</text>
     <line class="divider" x1="40" y1="114" x2="1352" y2="114"/>
-    <text class="footer" x="40" y="142">v06 · PUT permissões auditado: EDITAR_PERMISSOES em auditoria e registrosPermissao, recusas em auditoriaErros, 500 ERRO_INESPERADO, X-Trace-Id</text>
-    <text class="wm-file" x="1352" y="142" text-anchor="end">autorizacao-contrato-api_v06_20261108-0212.svg</text>
+    <text class="footer" x="40" y="142">v07 · PUT permissões: contaId da auditoria é a conta de quem pede; alvo, a pessoa (RN-178)</text>
+    <text class="wm-file" x="1352" y="142" text-anchor="end">autorizacao-contrato-api_v07_20261108-0949.svg</text>
   </g>
 </svg>

@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-a-autenticacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autenticação"
-versao: "v24"
-data: "2026-11-08 02:22"
+versao: "v25"
+data: "2026-11-08 09:50"
 status: "Em revisão"
 objetivo: "definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v24** · 2026-11-08 02:22 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v25** · 2026-11-08 09:50 · **Em revisão**
 
 # Módulo Usuários · Autenticação
 
@@ -1003,9 +1003,9 @@ Cenário: sem aparelhos conectados no quest
 
 [![Sequência da autenticação: entrada no hub com limite de 5 sessões, entrada do participante no quest com o código de acesso, recusas e bloqueio por tentativas, conferência de cada ação pela sessão e pela versão das permissões, renovação com troca do token e detecção de cópia, e sair de todos os aparelhos, com as telas de cada fase](../2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg)](../2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg)
 
-**Autenticação · contrato de API** — `2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg`
+**Autenticação · contrato de API** — `2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg`
 
-[![Contrato de API da autenticação: entrar no hub, no quest e na sala, confirmar a senha anotada, renovar, sair, listar e encerrar sessões e chaves públicas do token, com pedido, respostas e códigos de erro](../2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg)](../2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg)
+[![Contrato de API da autenticação: entrar no hub, no quest e na sala, confirmar a senha anotada, renovar, sair, listar e encerrar sessões e chaves públicas do token, com pedido, respostas e códigos de erro](../2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg)](../2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg)
 
 **Autenticação · classes** — `2_Diagramas/autenticacao-classes_v01_20261101-1501.svg`
 
@@ -1023,7 +1023,8 @@ Cenário: sem aparelhos conectados no quest
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v24** | 2026-11-08 02:22 | `RN-273`: 401 CODIGO_INVALIDO no quest, 403 ACESSO_INDISPONIVEL no quest e 404 SESSAO_NAO_ENCONTRADA em DELETE /auth/sessoes/{sid} como ALERTA; 401 de token inválido em sair e GET /auth/sessoes recusado antes do caso de uso, sem X-Trace-Id nem registros; `RN-272`: alvo já no INICIADO de SAIR, ENCERRAR_SESSAO e ENCERRAR_SESSOES |
+| **v25** | 2026-11-08 09:50 | Diagrama (`RN-273`): contrato de API v03 → v04 (POST /auth/hub/confirmar-senha com 403 ACESSO_INDISPONIVEL, ALERTA já com quem e contaId, porque o comprovante identifica a pessoa, como no hub e no quest) |
+| v24 | 2026-11-08 02:22 | `RN-273`: 401 CODIGO_INVALIDO no quest, 403 ACESSO_INDISPONIVEL no quest e 404 SESSAO_NAO_ENCONTRADA em DELETE /auth/sessoes/{sid} como ALERTA; 401 de token inválido em sair e GET /auth/sessoes recusado antes do caso de uso, sem X-Trace-Id nem registros; `RN-272`: alvo já no INICIADO de SAIR, ENCERRAR_SESSAO e ENCERRAR_SESSOES |
 | v23 | 2026-11-08 02:20 | Diagramas da v22 (`RN-272`, `RN-273`): contrato de API v02 → v03 (quadro Auditoria e X-Trace-Id, selo X-Trace-Id e ação nos 8 endereços auditados, recusas 4xx como ALERTA, 500 ERRO_INESPERADO), sequência v03 → v04 (INICIADO com quem, contaId e alvo null, CONCLUIDO com o alvo, auditoriaErros e gravações no Redis destacadas) |
 | v22 | 2026-11-08 02:05 | `RN-272`: entradas, confirmação da senha, renovação, saída e encerramento de sessões auditados com INICIADO e CONCLUIDO, ações ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO e ENCERRAR_SESSOES, e X-Trace-Id; quem, contaId e alvo null até a pessoa ser identificada; `RN-273`: recusas em "auditoriaErros" (4xx ALERTA, 500 ERRO_INESPERADO) e nenhum segredo nos registros; status → Em revisão |
 | v21 | 2026-11-07 14:05 | Diagrama autenticacao-documentos v03: índices como o ms_mono cria na partida (login, sigla e domínio únicos, resumoComprovante); cenários sem mudança |
@@ -1036,4 +1037,4 @@ Cenário: sem aparelhos conectados no quest
 
 ---
 
-<sub>boaz · v24 · 2026-11-08 02:22 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>
+<sub>boaz · v25 · 2026-11-08 09:50 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>
