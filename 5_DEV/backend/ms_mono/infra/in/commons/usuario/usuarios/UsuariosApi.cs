@@ -29,6 +29,9 @@ public static class UsuariosApi
 {
     public const string Tag = "Usuários";
 
+    // O alvo do PUT /time/tempo-sessao na auditoria: os tempos do time, não uma conta (RN-178).
+    const string AlvoDoTempoDoTime = "time";
+
     // A API deste módulo no seletor do Swagger (/doc/api/usuarios.json).
     public const string Documento = "usuarios";
     public const string Descricao =
@@ -109,7 +112,7 @@ public static class UsuariosApi
         api.MapPost("/usuarios", async (NovoUsuarioCorpo? corpo, HttpContext http, ICriarUsuario criar, CancellationToken ct) =>
                 Results.Json(await criar.Executar(new NovoUsuarioDto(http.QuemPede(), corpo?.Tipo, corpo?.Nome, corpo?.NomeCurto, corpo?.Matricula,
                     corpo?.Responsaveis), http.NovoTraceId(), ct), statusCode: StatusCodes.Status201Created))
-            .ComAcesso(uso)
+            .ComAcesso(uso, AcaoAuditada.CriarUsuario, _ => null)
             .WithSummary("Cadastrar um staff, um participante ou um membro do time")
             .WithDescription("Exige MOD-03 · U (RF-106, RF-108, RN-164, RN-165, RN-188, RN-246). O participante recebe o código de acesso " +
                 "como login, sem senha; staff e membros recebem o código de liberação, mostrado uma vez, e começam sem módulos.")
@@ -120,7 +123,7 @@ public static class UsuariosApi
         api.MapPatch("/usuarios/{id}", (string id, EdicaoDeUsuarioCorpo? corpo, HttpContext http, IEditarUsuario editar, CancellationToken ct) =>
                 editar.Executar(new EdicaoDeUsuarioDto(http.QuemPede(), id, corpo?.Nome, corpo?.NomeCurto, corpo?.Matricula, corpo?.Responsaveis),
                     http.NovoTraceId(), ct))
-            .ComAcesso(uso)
+            .ComAcesso(uso, AcaoAuditada.EditarUsuario, IdDaRota)
             .WithSummary("Editar nome, nome curto, matrícula e responsáveis")
             .WithDescription("Exige MOD-03 · U e ser superior (RF-153, RN-244). Nome curto novo: o staff mantém a senha e as sessões " +
                 "terminam; o participante recebe código novo. \"responsaveis\" vai inteiro.")
@@ -131,7 +134,7 @@ public static class UsuariosApi
 
         api.MapPost("/usuarios/{id}/nova-geracao-senha", async (string id, HttpContext http, IPedirNovaGeracaoDeSenha pedir, CancellationToken ct) =>
                 Results.Json(await pedir.Executar(new PedidoDeUsuarioDto(http.QuemPede(), id), http.NovoTraceId(), ct), statusCode: StatusCodes.Status201Created))
-            .ComAcesso(uso)
+            .ComAcesso(uso, AcaoAuditada.NovaGeracaoSenha, IdDaRota)
             .WithSummary("Gerar o código de liberação para quem esqueceu a senha")
             .WithDescription("Exige MOD-03 · U e ser superior (RF-110, RN-169, RN-190, RNF-203). A senha antiga e as sessões terminam.")
             .Produces<CodigoDeLiberacaoDto>(StatusCodes.Status201Created)
@@ -140,7 +143,7 @@ public static class UsuariosApi
 
         api.MapPost("/usuarios/{id}/novo-codigo-acesso", (string id, HttpContext http, IGerarNovoCodigoDeAcesso gerar, CancellationToken ct) =>
                 gerar.Executar(new PedidoDeUsuarioDto(http.QuemPede(), id), http.NovoTraceId(), ct))
-            .ComAcesso(uso)
+            .ComAcesso(uso, AcaoAuditada.NovoCodigoAcesso, IdDaRota)
             .WithSummary("Trocar o código de acesso perdido de um participante")
             .WithDescription("Exige MOD-03 · U (RF-154, RN-184, RN-245). O código anterior e as sessões dele terminam na hora.")
             .Produces<CodigoDeAcessoDto>()
@@ -152,7 +155,7 @@ public static class UsuariosApi
                 await desativar.Executar(new PedidoDeUsuarioDto(http.QuemPede(), id), http.NovoTraceId(), ct);
                 return Results.NoContent();
             })
-            .ComAcesso(uso)
+            .ComAcesso(uso, AcaoAuditada.DesativarUsuario, IdDaRota)
             .WithSummary("Tirar o acesso de quem saiu, sem apagar")
             .WithDescription("Exige MOD-03 · U e ser superior (RF-112, RF-141, RN-169, RN-174, RN-175). Todas as sessões terminam.")
             .Produces(StatusCodes.Status204NoContent)
@@ -164,7 +167,7 @@ public static class UsuariosApi
                 await reativar.Executar(new PedidoDeUsuarioDto(http.QuemPede(), id), http.NovoTraceId(), ct);
                 return Results.NoContent();
             })
-            .ComAcesso(uso)
+            .ComAcesso(uso, AcaoAuditada.ReativarUsuario, IdDaRota)
             .WithSummary("Devolver o acesso, com as mesmas permissões")
             .WithDescription("Exige MOD-03 · U e ser superior (RF-112). Volta PENDENTE se nunca gerou a senha nem entrou; senão ATIVO.")
             .Produces(StatusCodes.Status204NoContent)
@@ -184,7 +187,7 @@ public static class UsuariosApi
         api.MapPut("/contas/{id}/tempo-sessao", (string id, TempoDaContaCorpo? corpo, HttpContext http, ISalvarTempoDaConta salvar,
                 CancellationToken ct) => salvar.Executar(new TempoDaContaDto(http.QuemPede(), id, corpo?.StaffNavegador, corpo?.StaffApp,
                     corpo?.Participante), http.NovoTraceId(), ct))
-            .ComAcesso(configuracao)
+            .ComAcesso(configuracao, AcaoAuditada.SalvarTempoSessao, IdDaRota)
             .WithSummary("Salvar o tempo de sessão do staff e dos participantes")
             .WithDescription("Exige MOD-03 · C (RF-114, RN-183). Fora dos limites: FORA_DOS_LIMITES com o campo, o mínimo e o máximo.")
             .Produces<TempoDaContaLidoDto>()
@@ -211,7 +214,7 @@ public static class UsuariosApi
 
         api.MapPost("/contas/{id}/estado", (string id, EstadoDaContaCorpo? corpo, HttpContext http, IMudarEstadoDaConta mudar, CancellationToken ct) =>
                 mudar.Executar(new EstadoDaContaDto(http.QuemPede(), id, corpo?.Estado), http.NovoTraceId(), ct))
-            .ComAcesso(uso)
+            .ComAcesso(uso, AcaoAuditada.MudarEstadoConta, IdDaRota)
             .WithSummary("Suspender, desativar, reativar ou encerrar uma conta")
             .WithDescription("Só o time deboaz, com MOD-03 · U (RF-113, RN-173, RN-174, RN-175, RNF-203). Fora de ATIVA ninguém da conta " +
                 "entra e as sessões terminam; encerrada não volta.")
@@ -223,7 +226,7 @@ public static class UsuariosApi
         api.MapPost("/contas/{id}/codigo-master", async (string id, ConferenciaDaMasterCorpo? corpo, HttpContext http, IGerarCodigoDaMaster gerar,
                 CancellationToken ct) => Results.Json(await gerar.Executar(new ConferenciaDaMasterDto(http.QuemPede(), id, corpo?.Documento,
                     corpo?.Responsavel, corpo?.Telefone, corpo?.UltimoPagamento), http.NovoTraceId(), ct), statusCode: StatusCodes.Status201Created))
-            .ComAcesso(uso)
+            .ComAcesso(uso, AcaoAuditada.CodigoMaster, _ => null)
             .WithSummary("Conferir o cadastro e gerar o código da conta master")
             .WithDescription("Só o time deboaz, com MOD-03 · U (RN-172, RN-190): o CNPJ e 2 de 3 entre quem cadastrou, telefone e " +
                 "data do último pagamento.")
@@ -240,7 +243,7 @@ public static class UsuariosApi
         api.MapPut("/time/tempo-sessao", (TempoDoTimeCorpo? corpo, HttpContext http, ISalvarTempoDoTime salvar, CancellationToken ct) =>
                 salvar.Executar(new TempoDoTimeDto(http.QuemPede(), corpo?.MembrosNavegador, corpo?.MembrosApp, corpo?.MastersNavegador,
                     corpo?.MastersApp), http.NovoTraceId(), ct))
-            .ComAcesso(configuracao)
+            .ComAcesso(configuracao, AcaoAuditada.SalvarTempoSessao, _ => AlvoDoTempoDoTime)
             .WithSummary("Salvar o tempo de sessão dos membros do time e das contas master")
             .WithDescription("Só o time deboaz, com MOD-03 · C (RF-152, RN-243). Fora dos limites: FORA_DOS_LIMITES.")
             .Produces<TempoDoTimeLidoDto>()

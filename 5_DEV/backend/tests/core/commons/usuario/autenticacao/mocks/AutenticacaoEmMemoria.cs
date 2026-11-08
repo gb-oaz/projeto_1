@@ -55,8 +55,8 @@ public sealed class AutenticacaoEmMemoria :
         ListarSessoes = new ListarSessoes(ConferirAcesso, this, Relogio);
         EncerrarSessao = new EncerrarSessao(this, this, this, Relogio);
         EncerrarTodasAsSessoes = new EncerrarTodasAsSessoes(this, this, this, Relogio);
-        EncerrarSessoesDoUsuario = new EncerrarSessoesDoUsuario(this);
-        AvisarPermissoesNovas = new AvisarPermissoesNovas(this);
+        EncerrarSessoesDoUsuario = new EncerrarSessoesDoUsuario(this, this, this, Relogio);
+        AvisarPermissoesNovas = new AvisarPermissoesNovas(this, this, this, Relogio);
         LerChavesPublicas = new LerChavesPublicas(this);
     }
 
@@ -238,7 +238,9 @@ public sealed class AutenticacaoEmMemoria :
     }
 
     Task<IReadOnlyList<Sessao>> ISessoes.DoUsuario(string usuarioId, CancellationToken ct) =>
-        Task.FromResult<IReadOnlyList<Sessao>>(Sessoes.Where(s => s.UsuarioId == usuarioId).ToList());
+        FalhaDoRedis is { } falha
+            ? Task.FromException<IReadOnlyList<Sessao>>(falha)
+            : Task.FromResult<IReadOnlyList<Sessao>>(Sessoes.Where(s => s.UsuarioId == usuarioId).ToList());
 
     // a chave some quando expira, como no Redis
     bool Viva(Sessao s) => s.ExpiraEm is not { } fim || fim > Relogio.Agora;

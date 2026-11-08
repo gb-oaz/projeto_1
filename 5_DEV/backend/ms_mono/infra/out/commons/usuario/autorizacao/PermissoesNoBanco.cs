@@ -1,6 +1,7 @@
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
+using ExecucaoDeQuemChama = Boaz.Core.Commons.Usuario.Usuarios.Domain.ExecucaoDeQuemChama;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -129,8 +130,10 @@ public sealed class ContratacoesNoBanco(Armazenamento armazenamento) : IContrata
     }
 }
 
-// As permissões mudaram: o pv novo vai para as sessões abertas da pessoa (RN-230).
+// As permissões mudaram: o pv novo vai para as sessões abertas da pessoa (RN-230),
+// na execução de quem chama (RN-275).
 public sealed class AvisoDePermissoes(IAvisarPermissoesNovas avisar) : ISessoesDoUsuario
 {
-    public Task AvisarPv(string usuarioId, int pv, CancellationToken ct = default) => avisar.Executar(usuarioId, pv, ct);
+    public Task AvisarPv(string usuarioId, int pv, ExecucaoDeQuemChama chamada, CancellationToken ct = default) =>
+        avisar.Executar(usuarioId, pv, chamada, ct);
 }

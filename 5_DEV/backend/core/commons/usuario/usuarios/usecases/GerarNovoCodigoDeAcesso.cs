@@ -31,17 +31,17 @@ public sealed class GerarNovoCodigoDeAcesso(
     {
         var alvo = await ParticipanteAdministravel(pedido, ct);
         var agora = apoio.Agora;
-        await TrocarCodigo(alvo, agora, ct);
+        await TrocarCodigo(alvo, agora, execucao, ct);
         await auditada.Concluir(execucao, ct);
         return new(alvo.Login, agora);
     }
 
     /// <summary>Um código livre no lugar do anterior, gravado, e as sessões do código antigo encerradas (RN-245).</summary>
-    async Task TrocarCodigo(UsuarioCadastrado alvo, DateTimeOffset agora, CancellationToken ct)
+    async Task TrocarCodigo(UsuarioCadastrado alvo, DateTimeOffset agora, Execucao execucao, CancellationToken ct)
     {
         alvo.TrocarCodigo(await apoio.NovoCodigo(alvo.Sigla, alvo.NomeCurto, ct), agora);
         await usuarios.Atualizar(alvo, ct);
-        await sessoes.EncerrarDoUsuario(alvo.Id, MotivoFim.NovoCodigo, ct);
+        await sessoes.EncerrarDoUsuario(alvo.Id, MotivoFim.NovoCodigo, execucao.Chamada, ct);
     }
 
     /// <summary>O alvo, se quem pede está acima dele e ele é participante (RN-169, RN-245).</summary>

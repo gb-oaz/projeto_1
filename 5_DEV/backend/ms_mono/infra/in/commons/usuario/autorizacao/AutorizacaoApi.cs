@@ -3,6 +3,7 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using static Boaz.MsMono.Infra.In.Commons.Http;
+using AcaoAuditada = Boaz.Core.Commons.Usuario.Usuarios.Domain.AcaoAuditada;
 
 namespace Boaz.MsMono.Infra.In.Commons.Usuario.Autorizacao;
 
@@ -38,7 +39,7 @@ public static class AutorizacaoApi
         api.MapPut("", (string id, PermissoesCorpo? corpo, HttpContext http, ISalvarPermissoes salvar, CancellationToken ct) =>
                 salvar.Executar(new SalvamentoDePermissoesDto(http.QuemPede(), id, http.Request.Headers.IfMatch.ToString() is { Length: > 0 } v ? v : null,
                     corpo?.Mods), http.NovoTraceId(), ct))
-            .ComAcesso(uso)
+            .ComAcesso(uso, AcaoAuditada.EditarPermissoes, IdDaRota)
             .WithSummary("Salvar o conjunto inteiro de permissões da pessoa")
             .WithDescription("Exige MOD-03 · U, ser superior e o If-Match com a versão lida (RF-161, RF-162, RN-241, RN-254, RN-255). " +
                 "Módulo fora do mapa é retirado; o pv da pessoa sobe e as sessões dela renovam.")

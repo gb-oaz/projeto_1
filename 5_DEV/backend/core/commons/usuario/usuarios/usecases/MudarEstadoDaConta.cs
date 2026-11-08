@@ -31,7 +31,7 @@ public sealed class MudarEstadoDaConta(
     async Task<ContaComEstadoDto> Mudar(EstadoDaContaDto pedido, Execucao execucao, CancellationToken ct)
     {
         var (conta, novo) = await ContaEEstadoPedidos(pedido, ct);
-        if (conta.MudarEstado(novo)) await Gravar(conta, novo, ct);
+        if (conta.MudarEstado(novo)) await Gravar(conta, novo, execucao, ct);
         await auditada.Concluir(execucao, ct);
         return new(conta.Id, conta.Estado.Texto());
     }
@@ -46,10 +46,10 @@ public sealed class MudarEstadoDaConta(
     }
 
     /// <summary>Grava o estado novo; fora de ATIVA as sessões terminam e ENCERRADA apaga os dados (RN-173 a RN-175).</summary>
-    async Task Gravar(ContaAssinante conta, EstadoConta novo, CancellationToken ct)
+    async Task Gravar(ContaAssinante conta, EstadoConta novo, Execucao execucao, CancellationToken ct)
     {
         await contas.Atualizar(conta, ct);
-        if (novo != EstadoConta.Ativa) await sessoes.EncerrarDaConta(conta.Id, MotivoFim.ContaIndisponivel, ct);
+        if (novo != EstadoConta.Ativa) await sessoes.EncerrarDaConta(conta.Id, MotivoFim.ContaIndisponivel, execucao.Chamada, ct);
         if (novo == EstadoConta.Encerrada) await contas.Encerrar(conta.Id, apoio.Agora, ct);
     }
 }

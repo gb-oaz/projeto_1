@@ -32,8 +32,9 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
         LerPermissoes = new LerPermissoes(this, this, this, this, Relogio);
         SalvarPermissoes = new SalvarPermissoes(this, this, this, this, this, this, this, Relogio);
         LerHistoricoDePermissoes = new LerHistoricoDePermissoes(this, this, this, this, Relogio);
-        AvisarContratacaoMudou = new AvisarContratacaoMudou(this, this);
+        AvisarContratacaoMudou = new AvisarContratacaoMudou(this, this, this, this, Relogio);
         AutorizarPedido = new AutorizarPedido();
+        AutorizarPedidoAuditado = new AutorizarPedidoAuditado(this, this, Relogio);
     }
 
     /// <summary>O relógio dos casos de uso.</summary>
@@ -53,6 +54,8 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
     public IAvisarContratacaoMudou AvisarContratacaoMudou { get; }
     /// <summary>A conferência de cada rota pelo token.</summary>
     public IAutorizarPedido AutorizarPedido { get; }
+    /// <summary>A conferência da rota que muda estado, com o 403 auditado (RN-270).</summary>
+    public IAutorizarPedidoAuditado AutorizarPedidoAuditado { get; }
 
     // ── preparo do cenário ─────────────────────────────────────────────────────
 
@@ -87,6 +90,9 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
 
     /// <summary>O pv avisado a cada sessão, na ordem.</summary>
     public List<(string UsuarioId, int Pv)> Avisos { get; } = [];
+
+    /// <summary>A execução de quem chama, em cada aviso de pv às sessões (RN-275).</summary>
+    public List<ExecucaoDeQuemChama> Chamadas { get; } = [];
 
     /// <summary>As permissões guardadas.</summary>
     public PermissoesDoUsuario? Guardadas(string usuarioId) => permissoes.GetValueOrDefault(usuarioId) is { } p ? Copia(p) : null;
@@ -148,9 +154,10 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
     Task<IReadOnlySet<string>> IContratacoes.EmVigor(string contaId, DateTimeOffset agora, CancellationToken ct) =>
         Task.FromResult<IReadOnlySet<string>>(contratados.GetValueOrDefault(contaId)?.ToHashSet() ?? []);
 
-    Task ISessoesDoUsuario.AvisarPv(string usuarioId, int pv, CancellationToken ct)
+    Task ISessoesDoUsuario.AvisarPv(string usuarioId, int pv, ExecucaoDeQuemChama chamada, CancellationToken ct)
     {
         Avisos.Add((usuarioId, pv));
+        Chamadas.Add(chamada);
         return Task.CompletedTask;
     }
 

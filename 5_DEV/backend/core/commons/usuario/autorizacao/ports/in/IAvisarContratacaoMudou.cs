@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Usuario.Usuarios.Domain;
+
 namespace Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 
 /// <summary>
@@ -6,6 +8,12 @@ namespace Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 /// </summary>
 public interface IAvisarContratacaoMudou
 {
-    /// <summary>Sobe o pv da conta e avisa as sessões.</summary>
-    Task Executar(string contaId, CancellationToken ct = default);
+    /// <summary>
+    /// Sobe o pv da conta e avisa as sessões, auditado na execução do Catálogo,
+    /// ação AVISAR_CONTRATACAO_MUDOU e a conta como alvo (RN-275).
+    /// </summary>
+    /// <param name="contaId">A conta cuja contratação mudou.</param>
+    /// <param name="chamada">A execução do Catálogo: traceId, quem e conta.</param>
+    /// <param name="ct">Cancelamento.</param>
+    Task Executar(string contaId, ExecucaoDeQuemChama chamada, CancellationToken ct = default);
 }

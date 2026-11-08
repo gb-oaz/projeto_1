@@ -83,7 +83,7 @@ public class RenovarSessaoTests
     {
         var sessao = await c.MariaEntra();
         c.Mock.DefinirPermissoes("usr-ebfga-maria", new PermissoesNoToken("STAFF", new Dictionary<string, string>(), 8));
-        await c.Mock.AvisarPermissoesNovas.Executar("usr-ebfga-maria", 8);
+        await c.Mock.AvisarPermissoesNovas.Executar("usr-ebfga-maria", 8, Chamada);
 
         await Falha("PERMISSOES_DESATUALIZADAS", () => c.PedidoAoHub(sessao));
 

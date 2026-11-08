@@ -31,17 +31,17 @@ public sealed class DesativarUsuario(
     async Task Desativar(PedidoDeUsuarioDto pedido, Execucao execucao, CancellationToken ct)
     {
         var alvo = await AlvoAdministravel(pedido, ct);
-        await Gravar(alvo, ct);
+        await Gravar(alvo, execucao, ct);
         await auditada.Concluir(execucao, ct);
     }
 
-    /// <summary>O alvo desativado, gravado, e as sessões dele encerradas (RN-174).</summary>
+    /// <summary>O alvo desativado, gravado, e as sessões dele encerradas na mesma execução (RN-174, RN-275).</summary>
     /// <exception cref="FalhaDeUsuarios">ESTADO_IGUAL, se já está desativado.</exception>
-    async Task Gravar(UsuarioCadastrado alvo, CancellationToken ct)
+    async Task Gravar(UsuarioCadastrado alvo, Execucao execucao, CancellationToken ct)
     {
         alvo.Desativar();
         await usuarios.Atualizar(alvo, ct);
-        await sessoes.EncerrarDoUsuario(alvo.Id, MotivoFim.UsuarioDesativado, ct);
+        await sessoes.EncerrarDoUsuario(alvo.Id, MotivoFim.UsuarioDesativado, execucao.Chamada, ct);
     }
 
     /// <summary>O alvo, se quem pede está acima dele (RN-169).</summary>

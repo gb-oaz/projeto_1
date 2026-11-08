@@ -378,16 +378,17 @@ public sealed class IndicadoresNoBanco(Armazenamento armazenamento) : IIndicador
 }
 
 // Encerrar sessões a pedido do cadastro (desativar, nova senha, conta fora do
-// ar): o caso de uso da Autenticação encerra as de cada usuário.
+// ar): o caso de uso da Autenticação encerra as de cada usuário, na execução de
+// quem chama (RN-275).
 public sealed class SessoesDosUsuarios(Armazenamento armazenamento, IEncerrarSessoesDoUsuario encerrar) : ISessoesDosUsuarios
 {
-    public Task EncerrarDoUsuario(string usuarioId, MotivoFim motivo, CancellationToken ct = default) =>
-        encerrar.Executar(usuarioId, motivo, ct);
+    public Task EncerrarDoUsuario(string usuarioId, MotivoFim motivo, ExecucaoDeQuemChama chamada, CancellationToken ct = default) =>
+        encerrar.Executar(usuarioId, motivo, chamada, ct);
 
-    public async Task EncerrarDaConta(string contaId, MotivoFim motivo, CancellationToken ct = default)
+    public async Task EncerrarDaConta(string contaId, MotivoFim motivo, ExecucaoDeQuemChama chamada, CancellationToken ct = default)
     {
         var ids = await armazenamento.Colecao(Colecoes.Usuarios).Find(Bson.Filtro.Eq("contaId", contaId))
             .Project(Builders<BsonDocument>.Projection.Include("_id")).ToListAsync(ct);
-        foreach (var id in ids) await encerrar.Executar(id["_id"].AsString, motivo, ct);
+        foreach (var id in ids) await encerrar.Executar(id["_id"].AsString, motivo, chamada, ct);
     }
 }

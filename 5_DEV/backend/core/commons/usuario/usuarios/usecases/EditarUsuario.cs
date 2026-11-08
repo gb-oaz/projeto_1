@@ -36,7 +36,7 @@ public sealed class EditarUsuario(
 
         var codigo = await CodigoDoNomeCurtoNovo(alvo, nomeCurto, ct);
         var mudouEntrada = alvo.Editar(nome, nomeCurto, matricula, responsaveis, apoio.Agora, () => codigo);
-        await Gravar(alvo, mudouEntrada, ct);
+        await Gravar(alvo, mudouEntrada, execucao, ct);
         await auditada.Concluir(execucao, ct);
         return new(alvo.Id, alvo.Login);
     }
@@ -56,12 +56,12 @@ public sealed class EditarUsuario(
             : "";
 
     /// <summary>Grava o alvo e, se a entrada mudou, encerra as sessões dele (RN-244).</summary>
-    async Task Gravar(UsuarioCadastrado alvo, bool mudouEntrada, CancellationToken ct)
+    async Task Gravar(UsuarioCadastrado alvo, bool mudouEntrada, Execucao execucao, CancellationToken ct)
     {
         await usuarios.Atualizar(alvo, ct);
         if (!mudouEntrada) return;
         var motivo = alvo.Tipo == TipoUsuario.Participante ? MotivoFim.NovoCodigo : MotivoFim.NovoNomeCurto;
-        await sessoes.EncerrarDoUsuario(alvo.Id, motivo, ct);
+        await sessoes.EncerrarDoUsuario(alvo.Id, motivo, execucao.Chamada, ct);
     }
 
     /// <summary>

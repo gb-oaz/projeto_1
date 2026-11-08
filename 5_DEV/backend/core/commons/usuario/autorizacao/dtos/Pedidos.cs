@@ -39,3 +39,17 @@ public sealed record SalvamentoDePermissoesDto(string QuemPede, string UsuarioId
 /// <param name="Papel">A claim papel.</param>
 /// <param name="Mods">A claim mods.</param>
 public sealed record PedidoAutorizavelDto(string Papel, IReadOnlyDictionary<string, string> Mods);
+
+/// <summary>
+/// A execução de um endereço que muda estado, para auditar o 403 da rota por
+/// faltar o módulo (RN-270): o traceId do X-Trace-Id, a ação do endereço, quem
+/// pede e a conta dele, pelo token, e o alvo do endereço, se ele tem.
+/// </summary>
+/// <param name="TraceId">A execução, devolvida no cabeçalho X-Trace-Id.</param>
+/// <param name="Acao">A ação do endereço, como DESATIVAR_USUARIO.</param>
+/// <param name="ContaId">A conta de quem pede.</param>
+/// <param name="Quem">Quem pede, o sub do token.</param>
+/// <param name="Alvo">O alvo do endereço; null no que cria (POST /usuarios).</param>
+public sealed record ExecucaoDaRotaDto(
+    Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId TraceId, Boaz.Core.Commons.Usuario.Usuarios.Domain.AcaoAuditada Acao, string? ContaId,
+    string Quem, string? Alvo);

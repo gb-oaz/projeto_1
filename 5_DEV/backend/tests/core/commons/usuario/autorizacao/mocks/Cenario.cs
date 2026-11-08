@@ -2,6 +2,7 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using static Boaz.Core.Commons.Usuario.Autorizacao.Domain.FrenteDeUso;
 using static Boaz.Core.Commons.Usuario.Autorizacao.Domain.Perfil;
+using ExecucaoDeQuemChama = Boaz.Core.Commons.Usuario.Usuarios.Domain.ExecucaoDeQuemChama;
 using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
@@ -14,6 +15,9 @@ namespace Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
 /// </summary>
 public sealed class Cenario
 {
+    /// <summary>A execução do Catálogo em que o Caio descontrata um módulo da EBFGA (RN-275).</summary>
+    public static readonly ExecucaoDeQuemChama Catalogo = new(new TraceId("trc-5b81e0d4"), "usr-dboaz-caio", "conta-ebfga");
+
     /// <summary>Monta o mundo.</summary>
     public Cenario()
     {

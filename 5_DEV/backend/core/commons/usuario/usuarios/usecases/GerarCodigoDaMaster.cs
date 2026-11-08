@@ -34,7 +34,7 @@ public sealed class GerarCodigoDaMaster(
         var conta = await ContaConferida(pedido, ct);
         var master = await MasterDa(conta, ct);
         var (geracao, codigo) = GeracaoDeSenhaPedida.Pedir(master, pedido.QuemPede, apoio.Agora);
-        await Gravar(master, geracao, ct);
+        await Gravar(master, geracao, execucao, ct);
         await RegistrarConclusao(execucao, master, ct);
         return new(codigo, conta.Telefone, geracao.VenceEm);
     }
@@ -45,12 +45,12 @@ public sealed class GerarCodigoDaMaster(
         await usuarios.MasterDaConta(conta.Id, ct) ?? throw FalhaDeUsuarios.ContaInexistente();
 
     /// <summary>Esquece a senha da master, grava a geração nova e encerra as sessões dela (RN-169).</summary>
-    async Task Gravar(UsuarioCadastrado master, GeracaoDeSenhaPedida geracao, CancellationToken ct)
+    async Task Gravar(UsuarioCadastrado master, GeracaoDeSenhaPedida geracao, Execucao execucao, CancellationToken ct)
     {
         master.EsquecerSenha();
         await usuarios.Atualizar(master, ct);
         await geracoes.Inserir(geracao, ct);
-        await sessoes.EncerrarDoUsuario(master.Id, MotivoFim.NovaSenha, ct);
+        await sessoes.EncerrarDoUsuario(master.Id, MotivoFim.NovaSenha, execucao.Chamada, ct);
     }
 
     /// <summary>O "CONCLUIDO" antes de responder, com a conta master como alvo; o "INICIADO" foi sem alvo (RN-178).</summary>

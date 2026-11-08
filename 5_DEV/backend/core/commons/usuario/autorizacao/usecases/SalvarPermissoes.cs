@@ -71,7 +71,7 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
         var modulos = await leitor.ModulosDe(alvo, ct);
         GarantirQuePodeMudar(alvo, permissoes.Visiveis(modulos.Disponiveis), novos, modulos,
             CalculoDePermissoes.Concediveis(quem, modsDeQuem, alvo, modulos));
-        await Gravar(alvo, permissoes, novos, modulos, quem.Id, versaoLida, ct);
+        await Gravar(alvo, permissoes, novos, modulos, quem.Id, versaoLida, execucao, ct);
         await auditada.Concluir(execucao, ct);
         return new PermissoesSalvasDto(permissoes.Versao, Textos.Mods(permissoes.Visiveis(modulos.Disponiveis)));
     }
@@ -107,11 +107,11 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
 
     /// <summary>
     /// Com mudança, grava as permissões, o registro em "registrosPermissao" e a
-    /// versão juntos (RN-256, RNF-223) e avisa as sessões do alvo.
+    /// versão juntos (RN-256, RNF-223) e avisa as sessões do alvo, na mesma execução (RN-275).
     /// </summary>
     /// <exception cref="FalhaDeAutorizacao">VERSAO_DESATUALIZADA, se outra pessoa salvou no meio.</exception>
     async Task Gravar(UsuarioAutorizado alvo, PermissoesDoUsuario permissoes, IReadOnlyDictionary<string, Abas> novos, ModulosDaConta modulos,
-        string quemId, int versaoLida, CancellationToken ct)
+        string quemId, int versaoLida, Execucao execucao, CancellationToken ct)
     {
         var mudanca = permissoes.Salvar(novos, modulos.Disponiveis, quemId, relogio.GetUtcNow());
         if (mudanca is null) return;
@@ -120,6 +120,6 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
             var atual = await leitor.Guardadas(alvo.Id, ct);
             throw FalhaDeAutorizacao.VersaoDesatualizada(atual.Versao, alvo.Nome);
         }
-        await sessoes.AvisarPv(alvo.Id, permissoes.Pv, ct);
+        await sessoes.AvisarPv(alvo.Id, permissoes.Pv, execucao.Chamada, ct);
     }
 }

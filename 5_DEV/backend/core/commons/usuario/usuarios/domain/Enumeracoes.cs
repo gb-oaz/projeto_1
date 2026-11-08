@@ -60,6 +60,12 @@ public enum AcaoAuditada
     EncerrarSessoes,
     /// <summary>POST /contas/esqueci-senha-master, sem login.</summary>
     EsqueciSenhaMaster,
+    /// <summary>Interna: encerrar as sessões de um usuário, de dentro de outra execução (RN-275).</summary>
+    EncerrarSessoesDoUsuario,
+    /// <summary>Interna: o pv novo nas sessões de um usuário, de dentro de outra execução (RN-275).</summary>
+    AvisarPermissoesNovas,
+    /// <summary>Interna: a contratação de uma conta mudou, avisada pelo Catálogo (RN-275).</summary>
+    AvisarContratacaoMudou,
 }
 
 /// <summary>Os textos do contrato de API para os tipos e estados.</summary>
@@ -128,6 +134,9 @@ public static class Textos
         AcaoAuditada.Sair => "SAIR",
         AcaoAuditada.EncerrarSessao => "ENCERRAR_SESSAO",
         AcaoAuditada.EncerrarSessoes => "ENCERRAR_SESSOES",
+        AcaoAuditada.EncerrarSessoesDoUsuario => "ENCERRAR_SESSOES_DO_USUARIO",
+        AcaoAuditada.AvisarPermissoesNovas => "AVISAR_PERMISSOES_NOVAS",
+        AcaoAuditada.AvisarContratacaoMudou => "AVISAR_CONTRATACAO_MUDOU",
         _ => "ESQUECI_SENHA_MASTER",
     };
 

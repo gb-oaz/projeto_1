@@ -14,7 +14,18 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// <param name="ContaId">Conta do alvo, se já existe.</param>
 /// <param name="Quem">Quem pede, se há login.</param>
 /// <param name="Alvo">Sobre quem ou o quê, se já se sabe.</param>
-readonly record struct Execucao(TraceId TraceId, AcaoAuditada Acao, string? ContaId, string? Quem, string? Alvo);
+readonly record struct Execucao(TraceId TraceId, AcaoAuditada Acao, string? ContaId, string? Quem, string? Alvo)
+{
+    /// <summary>Esta execução para o caso de uso interno que ela chama (RN-275).</summary>
+    public ExecucaoDeQuemChama Chamada => new(TraceId, Quem, ContaId);
+
+    /// <summary>
+    /// A execução de um caso de uso interno: o traceId, quem e a conta de quem
+    /// chama, com a ação e o alvo dele (RN-275).
+    /// </summary>
+    public static Execucao Interna(ExecucaoDeQuemChama chamada, AcaoAuditada acao, string alvo) =>
+        new(chamada.TraceId, acao, chamada.ContaId, chamada.Quem, alvo);
+}
 
 /// <summary>
 /// A execução enquanto a regra corre: começa como o "INICIADO" e ganha quem e a

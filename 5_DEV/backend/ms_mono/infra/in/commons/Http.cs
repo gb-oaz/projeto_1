@@ -84,9 +84,12 @@ public static class Http
     public const string CabecalhoDoTraceId = "X-Trace-Id";
 
     // Um traceId novo para a execução auditada (RN-271), já no cabeçalho
-    // X-Trace-Id da resposta; a recusa o mantém (UseRespostasDeErro).
+    // X-Trace-Id da resposta; a recusa o mantém (UseRespostasDeErro). Se a
+    // execução já começou no filtro da rota (ComAcesso auditado, RN-270), é o
+    // mesmo traceId: um por execução.
     public static TraceId NovoTraceId(this HttpContext contexto)
     {
+        if (contexto.Items[typeof(TraceId)] is TraceId atual) return atual;
         var traceId = TraceId.Novo();
         contexto.Items[typeof(TraceId)] = traceId;
         contexto.Response.Headers[CabecalhoDoTraceId] = traceId.Valor;
@@ -176,16 +179,42 @@ public static class Http
         rota.AddEndpointFilter(async (contexto, proximo) =>
         {
             var http = contexto.HttpContext;
-            var servicos = http.RequestServices;
-            var acesso = await servicos.GetRequiredService<IConferirAcesso>()
-                .Executar(new ConferenciaDeAcessoDto(Token(http), frente), http.RequestAborted);
-            servicos.GetRequiredService<IAutorizarPedido>().Executar(exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods));
+            var acesso = await Conferir(http, frente);
+            http.RequestServices.GetRequiredService<IAutorizarPedido>().Executar(exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods));
             http.Items[typeof(AcessoConferido)] = acesso;
             return await proximo(contexto);
         })
         .ComLogin()
         .Produces<Erro>(StatusCodes.Status401Unauthorized)
         .Produces<Erro>(StatusCodes.Status403Forbidden);
+
+    // O endereço que muda estado (RN-270): o token é conferido como em ComAcesso,
+    // e o 401 sai sem registro; o 403 por faltar o módulo grava o "INICIADO" da
+    // ação e o ALERTA ACESSO_NEGADO, com quem e a conta do token, o alvo do
+    // endereço e o traceId do X-Trace-Id, que o caso de uso reaproveita quando a
+    // rota atende (RN-271).
+    public static RouteHandlerBuilder ComAcesso(this RouteHandlerBuilder rota, ExigenciaDaRota exigencia, AcaoAuditada acao,
+        Func<HttpContext, string?> alvo, Frente frente = Frente.Hub) =>
+        rota.AddEndpointFilter(async (contexto, proximo) =>
+        {
+            var http = contexto.HttpContext;
+            var acesso = await Conferir(http, frente);
+            var execucao = new ExecucaoDaRotaDto(http.NovoTraceId(), acao, acesso.ContaId, acesso.Sub, alvo(http));
+            await http.RequestServices.GetRequiredService<IAutorizarPedidoAuditado>()
+                .Executar(exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods), execucao, http.RequestAborted);
+            http.Items[typeof(AcessoConferido)] = acesso;
+            return await proximo(contexto);
+        })
+        .ComLogin()
+        .Produces<Erro>(StatusCodes.Status401Unauthorized)
+        .Produces<Erro>(StatusCodes.Status403Forbidden);
+
+    // O alvo do endereço: o {id} da rota.
+    public static string? IdDaRota(HttpContext contexto) => contexto.Request.RouteValues["id"]?.ToString();
+
+    // O token do pedido, conferido pela Autenticação (assinatura, sessão viva e pv atual).
+    static Task<AcessoConferido> Conferir(HttpContext http, Frente frente) =>
+        http.RequestServices.GetRequiredService<IConferirAcesso>().Executar(new ConferenciaDeAcessoDto(Token(http), frente), http.RequestAborted);
 
     // Marca a rota como "com login": a documentação põe o cadeado do Bearer nela
     // (DocumentacaoApi). Quem confere o token é o filtro ou o caso de uso.

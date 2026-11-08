@@ -33,7 +33,7 @@ public sealed class PedirNovaGeracaoDeSenha(
         var quem = await apoio.Quem(pedido.QuemPede, ct);
         var alvo = await AlvoComSenha(quem, pedido.UsuarioId, ct);
         var (geracao, codigo) = GeracaoDeSenhaPedida.Pedir(alvo, quem.Id, apoio.Agora);
-        await Gravar(alvo, geracao, ct);
+        await Gravar(alvo, geracao, execucao, ct);
         await auditada.Concluir(execucao, ct);
         return new(codigo, geracao.VenceEm);
     }
@@ -47,11 +47,11 @@ public sealed class PedirNovaGeracaoDeSenha(
     }
 
     /// <summary>Esquece a senha antiga, grava a geração nova e encerra as sessões do alvo (RNF-203).</summary>
-    async Task Gravar(UsuarioCadastrado alvo, GeracaoDeSenhaPedida geracao, CancellationToken ct)
+    async Task Gravar(UsuarioCadastrado alvo, GeracaoDeSenhaPedida geracao, Execucao execucao, CancellationToken ct)
     {
         alvo.EsquecerSenha();
         await usuarios.Atualizar(alvo, ct);
         await geracoes.Inserir(geracao, ct);
-        await sessoes.EncerrarDoUsuario(alvo.Id, MotivoFim.NovaSenha, ct);
+        await sessoes.EncerrarDoUsuario(alvo.Id, MotivoFim.NovaSenha, execucao.Chamada, ct);
     }
 }

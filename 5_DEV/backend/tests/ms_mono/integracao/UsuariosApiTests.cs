@@ -75,6 +75,31 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
         Assert.Equal(erro["quando"].ToUniversalTime().AddYears(5), erro["guardarAte"].ToUniversalTime());
     }
 
+    // RN-270, RN-271: o 403 por faltar o módulo num endereço que muda estado é
+    // auditado — "INICIADO" da ação, ALERTA ACESSO_NEGADO e o X-Trace-Id —; o da
+    // leitura sai sem cabeçalho e sem registro
+    [Fact]
+    public async Task RN_270_sem_o_modulo_o_403_que_muda_estado_e_auditado()
+    {
+        var (contaId, master) = await preparo.Conta(Sigla());
+        var maria = await preparo.Usuario(master, "maria");
+        var paulo = await preparo.Usuario(master, "paulo");
+        using var api = backend.Cliente();
+
+        var desativar = await api.Enviar("POST", $"/usuarios/{paulo.Id}/desativar", token: maria.Token);
+        var leitura = await api.Enviar("GET", "/usuarios?tipo=STAFF", token: maria.Token);
+
+        Assert.Equal((HttpStatusCode.Forbidden, "ACESSO_NEGADO"), (desativar.Status, desativar.Codigo));
+        Assert.Matches("^trc-[0-9a-f]{8}$", desativar.TraceId);
+        var iniciado = Assert.Single(await Registros("auditoria", desativar.TraceId!));
+        Assert.Equal(("INICIADO", "DESATIVAR_USUARIO", maria.Id, contaId, paulo.Id),
+            (iniciado["etapa"].AsString, iniciado["acao"].AsString, iniciado["quem"].AsString, iniciado["contaId"].AsString, iniciado["alvo"].AsString));
+        var erro = Assert.Single(await Registros("auditoriaErros", desativar.TraceId!));
+        Assert.Equal(("DESATIVAR_USUARIO", "ACESSO_NEGADO", "ALERTA", paulo.Id),
+            (erro["acao"].AsString, erro["codigo"].AsString, erro["nivel"].AsString, erro["alvo"].AsString));
+        Assert.Equal((HttpStatusCode.Forbidden, (string?)null), (leitura.Status, leitura.TraceId));
+    }
+
     // os registros de uma execução
     Task<List<BsonDocument>> Registros(string colecao, string traceId) =>
         backend.Banco.GetCollection<BsonDocument>(colecao).Find(Builders<BsonDocument>.Filter.Eq("traceId", traceId)).ToListAsync();

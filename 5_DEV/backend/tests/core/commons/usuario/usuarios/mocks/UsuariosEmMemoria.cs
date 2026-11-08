@@ -1,5 +1,6 @@
 using Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
+using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
@@ -150,6 +151,15 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     /// <summary>Sessões encerradas por conta, com o motivo.</summary>
     public List<(string ContaId, MotivoFim Motivo)> ContasSemSessao { get; } = [];
+
+    /// <summary>A execução de quem chama, em cada pedido de encerrar sessões (RN-275).</summary>
+    public List<ExecucaoDeQuemChama> Chamadas { get; } = [];
+
+    /// <summary>
+    /// Se não for null, o encerramento por usuário chega a este caso de uso da
+    /// Autenticação, como o adaptador real (RN-275).
+    /// </summary>
+    public IEncerrarSessoesDoUsuario? Autenticacao { get; set; }
 
     /// <summary>A auditoria inteira.</summary>
     public List<RegistroDeAuditoria> Auditoria { get; } = [];
@@ -358,15 +368,17 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     // ── ISessoesDosUsuarios e IAuditoria ───────────────────────────────────────
 
-    Task ISessoesDosUsuarios.EncerrarDoUsuario(string usuarioId, MotivoFim motivo, CancellationToken ct)
+    Task ISessoesDosUsuarios.EncerrarDoUsuario(string usuarioId, MotivoFim motivo, ExecucaoDeQuemChama chamada, CancellationToken ct)
     {
         SessoesEncerradas.Add((usuarioId, motivo));
-        return Task.CompletedTask;
+        Chamadas.Add(chamada);
+        return Autenticacao?.Executar(usuarioId, motivo, chamada, ct) ?? Task.CompletedTask;
     }
 
-    Task ISessoesDosUsuarios.EncerrarDaConta(string contaId, MotivoFim motivo, CancellationToken ct)
+    Task ISessoesDosUsuarios.EncerrarDaConta(string contaId, MotivoFim motivo, ExecucaoDeQuemChama chamada, CancellationToken ct)
     {
         ContasSemSessao.Add((contaId, motivo));
+        Chamadas.Add(chamada);
         return Task.CompletedTask;
     }
 

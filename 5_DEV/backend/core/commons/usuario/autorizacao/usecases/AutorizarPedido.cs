@@ -14,9 +14,14 @@ public sealed class AutorizarPedido : IAutorizarPedido
     /// <inheritdoc />
     public void Executar(ExigenciaDaRota? exigencia, PedidoAutorizavelDto pedido)
     {
+        if (!Atende(exigencia, pedido)) throw FalhaDeAutorizacao.AcessoNegado();
+    }
+
+    /// <summary>O papel e os módulos do token atendem à exigência declarada da rota (RNF-220).</summary>
+    internal static bool Atende(ExigenciaDaRota? exigencia, PedidoAutorizavelDto pedido)
+    {
         var papel = Papeis.De(pedido.Papel);
-        var mods = ModsDoToken(pedido);
-        if (exigencia is null || papel is null || !exigencia.Atende(papel.Value, mods)) throw FalhaDeAutorizacao.AcessoNegado();
+        return exigencia is not null && papel is not null && exigencia.Atende(papel.Value, ModsDoToken(pedido));
     }
 
     /// <summary>Os módulos do token com abas do contrato; o resto não conta (RNF-220).</summary>

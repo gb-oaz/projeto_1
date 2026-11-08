@@ -1,5 +1,6 @@
 using System.Net;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
+using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -118,7 +119,8 @@ public class AutorizacaoApiTests(Backend backend) : IClassFixture<Backend>
         var maria = await preparo.Usuario(master, "maria");
         using var api = backend.Cliente();
 
-        await backend.Services.GetRequiredService<IAvisarContratacaoMudou>().Executar(contaId);
+        await backend.Services.GetRequiredService<IAvisarContratacaoMudou>()
+            .Executar(contaId, new ExecucaoDeQuemChama(TraceId.Novo(), "usr-dboaz-admin", contaId));
 
         Assert.Equal("PERMISSOES_DESATUALIZADAS", (await api.Enviar("GET", "/auth/sessoes", token: maria.Token)).Codigo);
         var usuario = await backend.Banco.GetCollection<BsonDocument>("usuarios").Find(Builders<BsonDocument>.Filter.Eq("_id", maria.Id)).FirstAsync();

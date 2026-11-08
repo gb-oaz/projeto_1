@@ -91,7 +91,7 @@ public class SessoesTests
         var navegador = await c.MariaEntra();
         var app = await c.MariaEntra("APP");
 
-        await c.Mock.EncerrarSessoesDoUsuario.Executar("usr-ebfga-maria", motivo);
+        await c.Mock.EncerrarSessoesDoUsuario.Executar("usr-ebfga-maria", motivo, Chamada);
 
         await Falha("SESSAO_TERMINADA", () => c.PedidoAoHub(navegador));
         await Falha("SESSAO_TERMINADA", () => c.PedidoAoHub(app));

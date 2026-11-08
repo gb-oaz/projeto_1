@@ -21,6 +21,16 @@ public readonly record struct TraceId(string Valor)
     public override string ToString() => Valor;
 }
 
+/// <summary>
+/// A execução de quem chama um caso de uso interno (RN-275): o caso de uso
+/// interno grava os registros dele com o traceId, quem e a conta dela, entre o
+/// "INICIADO" e o "CONCLUIDO" de quem chama.
+/// </summary>
+/// <param name="TraceId">A execução de quem chama.</param>
+/// <param name="Quem">Quem pede na execução de quem chama, se há login.</param>
+/// <param name="ContaId">A conta da execução de quem chama, se há.</param>
+public sealed record ExecucaoDeQuemChama(TraceId TraceId, string? Quem, string? ContaId);
+
 /// <summary>A etapa da execução gravada na auditoria (RN-178).</summary>
 public enum EtapaDaExecucao
 {

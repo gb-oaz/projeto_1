@@ -1,5 +1,6 @@
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
+using ExecucaoDeQuemChama = Boaz.Core.Commons.Usuario.Usuarios.Domain.ExecucaoDeQuemChama;
 using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
@@ -54,6 +55,9 @@ public sealed class Cenario
 
     /// <summary>O traceId de toda execução dos testes.</summary>
     public static readonly TraceId Trace = new("trc-7f3a9c21");
+
+    /// <summary>A execução de quem chama os casos de uso internos: a conta master da EBFGA (RN-275).</summary>
+    public static readonly ExecucaoDeQuemChama Chamada = new(Trace, "usr-ebfga-master", "conta-ebfga");
 
     /// <summary>O token conferido, como o endereço entrega ao caso de uso.</summary>
     public Task<AcessoConferido> Conferido(SessaoAbertaDto sessao, Frente frente = Frente.Hub) =>

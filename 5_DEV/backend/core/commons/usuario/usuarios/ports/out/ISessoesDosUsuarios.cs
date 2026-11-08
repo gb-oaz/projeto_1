@@ -10,9 +10,9 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 /// </summary>
 public interface ISessoesDosUsuarios
 {
-    /// <summary>Encerra as sessões do usuário.</summary>
-    Task EncerrarDoUsuario(string usuarioId, MotivoFim motivo, CancellationToken ct = default);
+    /// <summary>Encerra as sessões do usuário, na execução de quem chama (RN-275).</summary>
+    Task EncerrarDoUsuario(string usuarioId, MotivoFim motivo, ExecucaoDeQuemChama chamada, CancellationToken ct = default);
 
-    /// <summary>Encerra as sessões de todos os usuários da conta.</summary>
-    Task EncerrarDaConta(string contaId, MotivoFim motivo, CancellationToken ct = default);
+    /// <summary>Encerra as sessões de todos os usuários da conta, na execução de quem chama (RN-275).</summary>
+    Task EncerrarDaConta(string contaId, MotivoFim motivo, ExecucaoDeQuemChama chamada, CancellationToken ct = default);
 }

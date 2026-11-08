@@ -114,6 +114,7 @@ servicos.AddSingleton<IInicializarContas, InicializarContas>();
 servicos.AddSingleton<ICalcularPermissoes, CalcularPermissoes>();
 servicos.AddSingleton<ICalcularPermissoesDoAnonimo, CalcularPermissoesDoAnonimo>();
 servicos.AddSingleton<IAutorizarPedido, AutorizarPedido>();
+servicos.AddSingleton<IAutorizarPedidoAuditado, AutorizarPedidoAuditado>();
 servicos.AddSingleton<ILerPermissoes, LerPermissoes>();
 servicos.AddSingleton<ISalvarPermissoes, SalvarPermissoes>();
 servicos.AddSingleton<ILerHistoricoDePermissoes, LerHistoricoDePermissoes>();
