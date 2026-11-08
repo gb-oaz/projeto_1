@@ -28,6 +28,7 @@ public class AuditoriaInternaEDaRotaTests
     [Fact]
     public async Task RN_275_contratacao_mudou_avisada_pelo_catalogo()
     {
+        mundo.Mock.Contratar("conta-ebfga", "MOD-06");
         await mundo.Conceder("usr-ebfga-maria", ("MOD-06", "U"));
         EsquecerOPreparo();
 

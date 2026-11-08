@@ -93,7 +93,9 @@ public class RegrasTests
         foreach (var estado in Enum.GetValues<EstadoConta>()) Assert.Equal(estado, Textos.EstadoDaContaDe(estado.Texto()));
         foreach (var tipo in Enum.GetValues<TipoConta>()) Assert.Equal(tipo, Textos.TipoDaContaDe(tipo.Texto()));
         Assert.Equal(["CRIAR_CONTA", "CRIAR_USUARIO", "EDITAR_USUARIO", "NOVA_GERACAO_SENHA", "GERAR_SENHA", "NOVO_CODIGO_ACESSO",
-            "DESATIVAR_USUARIO", "REATIVAR_USUARIO", "MUDAR_ESTADO_CONTA", "CODIGO_MASTER", "SALVAR_TEMPO_SESSAO"],
+            "DESATIVAR_USUARIO", "REATIVAR_USUARIO", "MUDAR_ESTADO_CONTA", "CODIGO_MASTER", "SALVAR_TEMPO_SESSAO", "EDITAR_PERMISSOES",
+            "ENTRAR_HUB", "ENTRAR_QUEST", "ENTRAR_SALA", "CONFIRMAR_SENHA", "RENOVAR_SESSAO", "SAIR", "ENCERRAR_SESSAO", "ENCERRAR_SESSOES",
+            "ESQUECI_SENHA_MASTER", "ENCERRAR_SESSOES_DO_USUARIO", "AVISAR_PERMISSOES_NOVAS", "AVISAR_CONTRATACAO_MUDOU"],
             Enum.GetValues<AcaoAuditada>().Select(a => a.Texto()));
         Assert.Null(Textos.TipoDe("CHEFE"));
         Assert.Null(Textos.TipoDaContaDe(null));

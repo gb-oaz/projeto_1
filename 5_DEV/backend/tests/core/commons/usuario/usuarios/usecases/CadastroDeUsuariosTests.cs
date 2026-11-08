@@ -36,8 +36,10 @@ public class CadastroDeUsuariosTests
 
         Assert.Equal(new[] { "INICIADO", "CONCLUIDO" }, mock.Gravacoes);
         Assert.All(mock.Auditoria, a => Assert.Equal(
-            (traceId, AcaoAuditada.CriarUsuario, "conta-ebfga", "usr-ebfga-maria", criado.Id),
-            (a.TraceId, a.Acao, a.ContaId, a.Quem, a.Alvo)));
+            (traceId, AcaoAuditada.CriarUsuario, "conta-ebfga", "usr-ebfga-maria"),
+            (a.TraceId, a.Acao, a.ContaId, a.Quem)));
+        Assert.Equal(new[] { (EtapaDaExecucao.Iniciado, (string?)null), (EtapaDaExecucao.Concluido, criado.Id) },
+            mock.Auditoria.Select(a => (a.Etapa, a.Alvo)));
         Assert.Equal("usr-ebfga-lia", criado.Id);
         Assert.Empty(mock.Erros);
     }
