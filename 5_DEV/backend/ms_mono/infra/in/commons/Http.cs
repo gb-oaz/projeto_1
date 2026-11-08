@@ -8,6 +8,8 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http.Metadata;
 using GrupoAutenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Domain.GrupoDeFalha;
 using GrupoAutorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Domain.GrupoDeFalha;
 using GrupoUsuarios = Boaz.Core.Commons.Usuario.Usuarios.Domain.GrupoDeFalha;
@@ -67,6 +69,12 @@ public static class Http
         {
             try
             {
+                if (CorpoQueNaoEJson(contexto))
+                {
+                    contexto.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+                    await contexto.Response.WriteAsJsonAsync(CorpoInvalido);
+                    return;
+                }
                 await proximo(contexto);
             }
             catch (Exception falha) when (Traduzir(falha) is { } traduzida && !contexto.Response.HasStarted)
@@ -79,6 +87,19 @@ public static class Http
         });
         return app;
     }
+
+    // A resposta do corpo que não é JSON (RN-271).
+    static readonly Erro CorpoInvalido = new("DADOS_INVALIDOS", "O campo \"corpo\" está faltando ou é inválido.", "corpo");
+
+    // O endereço espera um corpo JSON e chegou um corpo com outro content-type:
+    // o padrão do ASP.NET responderia 415 sem passar pelo caso de uso; o contrato
+    // pede 422 DADOS_INVALIDOS no campo "corpo", sem X-Trace-Id (RN-271). A mesma
+    // conta da ligação do corpo: só quando o pedido pode ter corpo.
+    static bool CorpoQueNaoEJson(HttpContext contexto) =>
+        contexto.GetEndpoint()?.Metadata.GetMetadata<IAcceptsMetadata>() is { } aceita
+        && aceita.ContentTypes.Any(tipo => tipo.Contains("json", StringComparison.OrdinalIgnoreCase))
+        && contexto.Features.Get<IHttpRequestBodyDetectionFeature>()?.CanHaveBody == true
+        && !contexto.Request.HasJsonContentType();
 
     // O cabeçalho com o traceId de cada execução auditada (RN-271).
     public const string CabecalhoDoTraceId = "X-Trace-Id";
@@ -111,8 +132,7 @@ public static class Http
         FalhaDeUsuarios f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, f.TentarEm, f.Minimo, f.Maximo)),
         FalhaDeAutenticacao f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, f.TentarEm)),
         FalhaDeAutorizacao f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Mod: f.Mod, Abas: f.Abas, Versao: f.Versao)),
-        BadHttpRequestException => (StatusCodes.Status422UnprocessableEntity,
-            new Erro("DADOS_INVALIDOS", "O campo \"corpo\" está faltando ou é inválido.", "corpo")),
+        BadHttpRequestException => (StatusCodes.Status422UnprocessableEntity, CorpoInvalido),
         OperationCanceledException => null,
         _ => (StatusCodes.Status500InternalServerError, ErroInesperado),
     };
