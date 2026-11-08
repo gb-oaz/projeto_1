@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v78"
-data: "2026-11-08 02:11"
+versao: "v79"
+data: "2026-11-08 02:14"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v78** · 2026-11-08 02:11 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v79** · 2026-11-08 02:14 · **Em revisão**
 
 # Módulo Usuários
 
@@ -2308,17 +2308,17 @@ Cenário: o que este documento não trata
 
 [![Casos de uso de identidade e acesso: conta master, staff, participantes, permissões, senhas, edição de staff e participante, novo código de acesso, SAC, contas e tempo de sessão cuidados pelo time deboaz no módulo Usuários e entradas no quest](../2_Diagramas/identidade-acesso_v04_20261101-0351.svg)](../2_Diagramas/identidade-acesso_v04_20261101-0351.svg)
 
-**Usuários · sequência** — `2_Diagramas/usuarios-sequencia_v04_20261108-0203.svg`
+**Usuários · sequência** — `2_Diagramas/usuarios-sequencia_v05_20261108-0213.svg`
 
-[![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v04_20261108-0203.svg)](../2_Diagramas/usuarios-sequencia_v04_20261108-0203.svg)
+[![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v05_20261108-0213.svg)](../2_Diagramas/usuarios-sequencia_v05_20261108-0213.svg)
 
 **Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg`
 
 [![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)
 
-**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v07_20261108-0203.svg`
+**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v08_20261108-0212.svg`
 
-[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v07_20261108-0203.svg)](../2_Diagramas/usuarios-contrato-api_v07_20261108-0203.svg)
+[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v08_20261108-0212.svg)](../2_Diagramas/usuarios-contrato-api_v08_20261108-0212.svg)
 
 **Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v06_20261108-0209.svg`
 
@@ -2340,7 +2340,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v78** | 2026-11-08 02:11 | `RN-178`, `RN-272`, `RN-274`: AcaoAuditada com 21 ações (EDITAR_PERMISSOES, ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO, ENCERRAR_SESSOES, ESQUECI_SENHA_MASTER e as 11 anteriores), auditoria e auditoriaErros gravadas também pela Autenticação; diagramas: classes v05 → v06, modelo de documentos v13 → v14 |
+| **v79** | 2026-11-08 02:14 | Diagramas da v76–v78 (`RN-178`, `RN-271`, `RN-274`): contrato de API v07 → v08 (POST /contas/esqueci-senha-master auditado com ESQUECI_SENHA_MASTER, X-Trace-Id, 429 LIMITE_ATENDIMENTO como ALERTA e 500 ERRO_INESPERADO; 422 de corpo que não é JSON com DADOS_INVALIDOS e campo "corpo", sem X-Trace-Id), sequência v04 → v05 (INICIADO de CRIAR_USUARIO sem alvo, alvo só no CONCLUIDO) |
+| v78 | 2026-11-08 02:11 | `RN-178`, `RN-272`, `RN-274`: AcaoAuditada com 21 ações (EDITAR_PERMISSOES, ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO, ENCERRAR_SESSOES, ESQUECI_SENHA_MASTER e as 11 anteriores), auditoria e auditoriaErros gravadas também pela Autenticação; diagramas: classes v05 → v06, modelo de documentos v13 → v14 |
 | v77 | 2026-11-08 02:08 | `RN-178`: CRIAR_USUARIO sem alvo no INICIADO e na recusa (409 MATRICULA_EM_USO), alvo só no CONCLUIDO; quem e contaId desde o INICIADO; `RN-271`: corpo que não é JSON recebe 422 antes do caso de uso, sem X-Trace-Id nem registros |
 | v76 | 2026-11-08 02:05 | `RN-274`: POST /contas/esqueci-senha-master auditado com a ação ESQUECI_SENHA_MASTER, sem quem nem contaId, X-Trace-Id e 429 LIMITE_ATENDIMENTO como ALERTA; entradas e sessões no 17-a (`RN-272`, `RN-273`); Em aberto resolvido e removido |
 | v75 | 2026-11-08 02:04 | Diagramas da v74 (`RN-178`, `RN-270`, `RN-271`): sequência v03 → v04 (422 com X-Trace-Id só o da regra; corpo que não é JSON recusado antes do endpoint, sem traceId, registros nem X-Trace-Id), contrato de API v06 → v07 (500 ERRO_INESPERADO confirmado, PUT permissões entre os auditados), classes v04 → v05 (EDITAR_PERMISSOES em AcaoAuditada) |
@@ -2354,4 +2355,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v78 · 2026-11-08 02:11 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v79 · 2026-11-08 02:14 · `1_Requisitos/17_modulo-usuario.md`</sub>

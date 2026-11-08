@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 8230" width="1392" height="8230">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 8432" width="1392" height="8432">
   <title>Usuários · contrato de API</title>
-  <desc>Contrato dos endereços do módulo Usuários do ms_mono, do requisito 17 (Módulo Usuários): criar a conta, gerar a senha com o código de liberação, atendimento sem login, listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar, tempo de sessão, card do módulo e, no time deboaz, contas e código da conta master. v01: criação. v02: regras do core no quadro comum, mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam em cada endereço. v03: GET /usuarios com tipo opcional (sem tipo, busca em todos os tipos que quem pede pode listar) e o tipo em cada item. v04: POST /contas responde 422 SIGLA_INVALIDA para siglas iniciadas por QA em produção (RN-179); desativar, reativar e nova-geracao-senha respondem 403 ACESSO_NEGADO quando um administrador age sobre outro, como qaadmin e admin (RN-169). v05: GET /health (sistema, sem login): 200 sem corpo só depois da partida, com coleções e índices prontos (RNF-227); antes disso, ou se a partida parou (índice único não criado, segredo ausente, banco fora do ar), não há resposta. v06: requisito 17 v72 — quadro comum com a auditoria (RN-178, RN-270, RN-271): endereços auditados respondem o cabeçalho X-Trace-Id no sucesso e na recusa; GET não é auditado; 500 ERRO_INESPERADO para a falha inesperada, que grava nivel ERRO; desativar com 409 ESTADO_IGUAL (ALERTA) e 500 (ERRO). v07: requisito 17 v74 — 500 ERRO_INESPERADO confirmado ("Algo deu errado. Tente de novo mais tarde.", nivel ERRO); PUT /usuarios/{id}/permissoes entra nos auditados (EDITAR_PERMISSOES; o endereço fica no contrato de autorização); X-Trace-Id em toda resposta que passa pelo caso de uso; corpo que não é JSON é recusado com 422 antes do endpoint, sem traceId, registros nem X-Trace-Id.</desc>
+  <desc>Contrato dos endereços do módulo Usuários do ms_mono, do requisito 17 (Módulo Usuários): criar a conta, gerar a senha com o código de liberação, atendimento sem login, listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar, tempo de sessão, card do módulo e, no time deboaz, contas e código da conta master. v01: criação. v02: regras do core no quadro comum, mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam em cada endereço. v03: GET /usuarios com tipo opcional (sem tipo, busca em todos os tipos que quem pede pode listar) e o tipo em cada item. v04: POST /contas responde 422 SIGLA_INVALIDA para siglas iniciadas por QA em produção (RN-179); desativar, reativar e nova-geracao-senha respondem 403 ACESSO_NEGADO quando um administrador age sobre outro, como qaadmin e admin (RN-169). v05: GET /health (sistema, sem login): 200 sem corpo só depois da partida, com coleções e índices prontos (RNF-227); antes disso, ou se a partida parou (índice único não criado, segredo ausente, banco fora do ar), não há resposta. v06: requisito 17 v72 — quadro comum com a auditoria (RN-178, RN-270, RN-271): endereços auditados respondem o cabeçalho X-Trace-Id no sucesso e na recusa; GET não é auditado; 500 ERRO_INESPERADO para a falha inesperada, que grava nivel ERRO; desativar com 409 ESTADO_IGUAL (ALERTA) e 500 (ERRO). v07: requisito 17 v74 — 500 ERRO_INESPERADO confirmado ("Algo deu errado. Tente de novo mais tarde.", nivel ERRO); PUT /usuarios/{id}/permissoes entra nos auditados (EDITAR_PERMISSOES; o endereço fica no contrato de autorização); X-Trace-Id em toda resposta que passa pelo caso de uso; corpo que não é JSON é recusado com 422 antes do endpoint, sem traceId, registros nem X-Trace-Id. v08: requisito 17 v78 — POST /contas/esqueci-senha-master auditado (ESQUECI_SENHA_MASTER, RN-274), com X-Trace-Id, 429 LIMITE_ATENDIMENTO como ALERTA e 500 ERRO_INESPERADO (ERRO); CRIAR_USUARIO sem alvo no INICIADO e na recusa (RN-178); corpo que não é JSON responde 422 DADOS_INVALIDOS, "O campo \"corpo\" está faltando ou é inválido.", campo "corpo", sem X-Trace-Id (RN-271).</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -90,12 +90,12 @@
     <text class="title" x="40" y="72">Usuários · contas, staff, participantes e membros</text>
     <text class="subtitle" x="40" y="94">Criar conta, primeiro acesso, cadastro e ações sobre cada usuário, tempo de sessão, card, time deboaz e /health</text>
     <text class="wm-meta-label" x="1104" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v07</text>
+    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v08</text>
     <line class="wm-sep" x1="1176" y1="32" x2="1176" y2="80"/>
     <text class="wm-meta-label" x="1200" y="44">DATA</text>
-    <text class="wm-meta-value" x="1200" y="72">2026-11-08 · 02:03</text>
+    <text class="wm-meta-value" x="1200" y="72">2026-11-08 · 02:12</text>
   </g>
-  <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V1202 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
+  <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V1378 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
     <text class="mono" x="64" y="204">Toda resposta de erro:</text>
     <text class="mono" x="64" y="224">{</text>
     <text class="mono" x="64" y="244" xml:space="preserve">  "codigo": "NOME_CURTO_EM_USO",</text>
@@ -111,14 +111,22 @@
     <text class="mono" x="64" y="444">Senha (RN-171): 2 letras do 1º nome + um de !@#$%&amp;* + a 2ª palavra sem conector (nome de uma palavra: as 2 últimas letras) + 6 números</text>
     <text class="mono" x="64" y="464">Tempos em ISO 8601: em horas nos do time e no staffNavegador (PT24H, nunca P1D); em dias no staffApp e no participante (P7D)</text>
     <text class="mono" x="64" y="484">A conta do time deboaz (conta-dboaz) não aparece para ninguém: lista e leitura respondem CONTA_INEXISTENTE</text>
-    <text class="boundary-label" x="64" y="524">AUDITORIA E X-TRACE-ID · RN-178, RN-270, RN-271</text>
-    <text class="mono" x="64" y="548">Auditados (mudam estado no banco): POST /contas, POST /usuarios/gerar-senha, POST e PATCH /usuarios, nova-geracao-senha, novo-codigo-acesso,</text>
-    <text class="mono" x="64" y="568" xml:space="preserve">  desativar, reativar, POST /contas/{id}/estado e codigo-master, PUT tempo-sessao e PUT /usuarios/{id}/permissoes (EDITAR_PERMISSOES)</text>
-    <text class="mono" x="64" y="588">GET não é auditado. Auditado grava INICIADO e CONCLUIDO com o mesmo traceId; na recusa, só o INICIADO e o registro em auditoriaErros</text>
-    <text class="mono" x="64" y="608">X-Trace-Id: trc-7f3a9c21 (o traceId gravado) em toda resposta do caso de uso; corpo que não é JSON: 422 antes do endpoint, sem traceId nem X-Trace-Id</text>
-    <text class="mono" x="64" y="628">Recusa prevista (4xx) grava nivel ALERTA; falha inesperada responde 500 e grava nivel ERRO, antes de a resposta sair</text>
+    <text class="boundary-label" x="64" y="524">AUDITORIA E X-TRACE-ID · RN-178, RN-270, RN-271, RN-274</text>
+    <text class="mono" x="64" y="548">Auditados (mudam estado no banco): POST /contas, POST /contas/esqueci-senha-master (ESQUECI_SENHA_MASTER), POST /usuarios/gerar-senha,</text>
+    <text class="mono" x="64" y="568" xml:space="preserve">  POST e PATCH /usuarios, nova-geracao-senha, novo-codigo-acesso, desativar, reativar, POST /contas/{id}/estado e codigo-master,</text>
+    <text class="mono" x="64" y="588" xml:space="preserve">  PUT tempo-sessao e PUT /usuarios/{id}/permissoes (EDITAR_PERMISSOES)</text>
+    <text class="mono" x="64" y="608">GET não é auditado. Auditado grava INICIADO e CONCLUIDO com o mesmo traceId; na recusa, só o INICIADO e o registro em auditoriaErros</text>
+    <text class="mono" x="64" y="628">POST /usuarios (CRIAR_USUARIO): INICIADO e recusa sem alvo, o alvo só entra no CONCLUIDO; sem login: sem quem (e sem contaId no esqueci)</text>
+    <text class="mono" x="64" y="648">X-Trace-Id: trc-7f3a9c21 (o traceId gravado) em toda resposta que passa pelo caso de uso, no sucesso e na recusa</text>
+    <text class="mono" x="64" y="668">Recusa prevista (4xx, como 409 e 429 LIMITE_ATENDIMENTO) grava nivel ALERTA; falha inesperada responde 500 e grava nivel ERRO, antes de sair</text>
+    <text class="mono" x="64" y="696">Corpo que não é JSON: 422 do ms_mono antes do caso de uso, sem traceId, sem registros e sem X-Trace-Id</text>
+    <text class="mono" x="64" y="716">{</text>
+    <text class="mono" x="64" y="736" xml:space="preserve">  "codigo": "DADOS_INVALIDOS",</text>
+    <text class="mono" x="64" y="756" xml:space="preserve">  "mensagem": "O campo \"corpo\" está faltando ou é inválido.",</text>
+    <text class="mono" x="64" y="776" xml:space="preserve">  "campo": "corpo"</text>
+    <text class="mono" x="64" y="796">}</text>
     <line class="divider" x1="40" y1="500" x2="1352" y2="500"/>
-    <line class="divider" x1="40" y1="640" x2="1352" y2="640"/><text class="boundary-label" x="64" y="664">MENSAGENS DE ERRO · CAMPO "mensagem", TEXTO EXATO</text>
+    <g id="mensagens-de-erro" transform="translate(0,176)"><line class="divider" x1="40" y1="640" x2="1352" y2="640"/><text class="boundary-label" x="64" y="664">MENSAGENS DE ERRO · CAMPO "mensagem", TEXTO EXATO</text>
     <rect class="node-red" x="64" y="678" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="692" text-anchor="middle">401</text>
     <text class="mono" x="116" y="692">CODIGO_INVALIDO</text><text class="mono" x="332" y="692">"Entrada ou código de liberação incorretos."</text>
     <rect class="node-red" x="64" y="704" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="718" text-anchor="middle">403</text>
@@ -159,8 +167,9 @@
     <text class="mono" x="116" y="1160">LIMITE_ATENDIMENTO</text><text class="mono" x="332" y="1160">"Você já enviou 3 pedidos em 24 h. Tente de novo mais tarde."</text>
     <rect class="node-red" x="64" y="1172" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="1186" text-anchor="middle">500</text>
     <text class="mono" x="116" y="1186">ERRO_INESPERADO</text><text class="mono" x="332" y="1186">"Algo deu errado. Tente de novo mais tarde." · nivel ERRO</text>
+    </g>
   </g>
-  <g id="enderecos" transform="translate(0,830)">
+  <g id="enderecos" transform="translate(0,1006)">
   <g id="grupo-sem-login"><text class="section" x="40" y="428">SEM LOGIN</text><line class="divider" x1="40" y1="440" x2="1352" y2="440"/></g>
   <g id="ep-post-contas">
     <g filter="url(#sombra)"><rect class="node" x="40" y="464" width="632" height="698" rx="10"/></g>
@@ -259,15 +268,15 @@
     <text class="muted" x="736" y="1484">a 5ª tentativa errada seguida já responde 429</text>
   </g>
   <g id="ep-post-contas-esqueci-senha-master">
-    <g filter="url(#sombra)"><rect class="node" x="40" y="1194" width="632" height="464" rx="10"/></g>
+    <g filter="url(#sombra)"><rect class="node" x="40" y="1194" width="632" height="490" rx="10"/></g>
     <rect class="node-blue" x="56" y="1210" width="48" height="24" rx="6"/><text class="label-strong" x="80.0" y="1227" text-anchor="middle">POST</text>
     <text class="label-strong" x="116" y="1227">/contas/esqueci-senha-master</text>
-    <rect class="node-note" x="572" y="1210" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="1226" text-anchor="middle">SEM LOGIN</text>
+    <rect class="node-note" x="572" y="1210" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="1226" text-anchor="middle">SEM LOGIN</text><rect class="node-purple" x="470" y="1210" width="90" height="24" rx="12"/><text class="chip-text" x="515.0" y="1226" text-anchor="middle">X-Trace-Id</text>
     <line class="divider" x1="40" y1="1250" x2="672" y2="1250"/><text class="boundary-label" x="56" y="1272">USO</text>
     <text class="label" x="56" y="1296">Para quê: pedir ajuda ao SAC quando a conta master esqueceu a senha</text>
     <text class="label" x="56" y="1314">Quem usa: a pessoa na tela Entrar do hub, em Esqueci a senha da conta master</text>
     <text class="label" x="56" y="1332">Login: não, endereço público</text>
-    <text class="muted" x="56" y="1350">Requisitos: RF-111 · RNF-205</text>
+    <text class="muted" x="56" y="1350">Requisitos: RF-111 · RNF-205 · RN-274 (ESQUECI_SENHA_MASTER, sem quem nem contaId)</text>
     <line class="divider" x1="40" y1="1370" x2="672" y2="1370"/><text class="boundary-label" x="56" y="1392">PEDIDO</text>
     <text class="mono" x="56" y="1416">{</text>
     <text class="mono" x="56" y="1434" xml:space="preserve">  "instituicao": "Escola Bento Freitas",</text>
@@ -275,15 +284,17 @@
     <text class="mono" x="56" y="1470">}</text>
     <line class="divider" x1="40" y1="1490" x2="672" y2="1490"/><text class="boundary-label" x="56" y="1512">RESPOSTAS</text>
     <rect class="chip" x="56" y="1522" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1536" text-anchor="middle">202</text>
-    <text class="muted" x="108" y="1536">mensagem no SAC; o time confere os dados do cadastro</text>
+    <text class="muted" x="108" y="1536">mensagem no SAC; CONCLUIDO com o alvo do pedido em pedidosAjuda</text>
     <rect class="node-red" x="56" y="1548" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1562" text-anchor="middle">429</text>
-    <text class="mono" x="108" y="1562">LIMITE_ATENDIMENTO · 3 envios em 24 h do mesmo aparelho</text>
+    <text class="mono" x="108" y="1562">LIMITE_ATENDIMENTO · 3 em 24 h no aparelho · grava ALERTA</text>
     <text class="mono" x="108" y="1580">{</text>
     <text class="mono" x="108" y="1598" xml:space="preserve">  "tentarEm": "2026-11-02T08:10:00Z"</text>
     <text class="mono" x="108" y="1616">}</text>
     <rect class="node-red" x="56" y="1628" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1642" text-anchor="middle">422</text>
     <text class="mono" x="108" y="1642">DADOS_INVALIDOS · instituicao ou contato faltando</text>
+    <rect class="node-red" x="56" y="1654" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1668" text-anchor="middle">500</text><text class="mono" x="108" y="1668">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
   </g>
+  <g id="enderecos-seguintes" transform="translate(0,26)">
   <g id="grupo-staff-participantes-e-membros-do-time"><text class="section" x="40" y="1694">STAFF, PARTICIPANTES E MEMBROS DO TIME</text><line class="divider" x1="40" y1="1706" x2="1352" y2="1706"/></g>
   <g id="ep-get-usuarios">
     <g filter="url(#sombra)"><rect class="node" x="40" y="1730" width="632" height="662" rx="10"/></g>
@@ -784,7 +795,8 @@
     <text class="muted" x="56" y="7174">índice não único que não pode ser criado: só aviso no log (nome do índice e da coleção, nunca o valor) e o /health responde 200</text>
   </g>
   </g>
-  <g id="marca-rodape" transform="translate(0,8062)">
+  </g>
+  <g id="marca-rodape" transform="translate(0,8264)">
     <rect class="wm-band" x="0" y="0" width="1392" height="168"/>
     <line class="wm-sep" x1="0" y1="0.5" x2="1392" y2="0.5"/>
     <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
@@ -796,7 +808,7 @@
     <rect class="chip" x="980" y="47" width="14" height="14" rx="3"/><text class="label" x="1002" y="58">resposta de sucesso</text>
     <rect class="node" x="40" y="73" width="14" height="14" rx="3"/><text class="label" x="62" y="84">endereço e regra comum</text><rect class="node-purple" x="246" y="73" width="14" height="14" rx="3"/><text class="label" x="268" y="84">auditado: responde o cabeçalho X-Trace-Id</text>
     <line class="divider" x1="40" y1="114" x2="1352" y2="114"/>
-    <text class="footer" x="40" y="142">v07 · 500 ERRO_INESPERADO confirmado, PUT permissoes auditado (EDITAR_PERMISSOES), corpo que não é JSON: 422 sem X-Trace-Id (requisito 17 v74)</text>
-    <text class="wm-file" x="1352" y="142" text-anchor="end">usuarios-contrato-api_v07_20261108-0203.svg</text>
+    <text class="footer" x="40" y="142">v08 · esqueci-senha-master auditado (X-Trace-Id, 429 ALERTA, 500 ERRO); 422 de corpo não JSON: DADOS_INVALIDOS, campo corpo (requisito 17 v78)</text>
+    <text class="wm-file" x="1352" y="142" text-anchor="end">usuarios-contrato-api_v08_20261108-0212.svg</text>
   </g>
 </svg>
