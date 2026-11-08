@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v77), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v80), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -604,7 +604,8 @@ Funcionalidade: Usuários
   @RN-271
   Cenário: corpo que não é JSON não chega ao caso de uso
     Quando a Maria envia POST /usuarios com o corpo "nome=Lucas", que não é JSON
-    Então a resposta é 422, recusada antes do caso de uso
+    Então a resposta é 422 DADOS_INVALIDOS com o campo "corpo", recusada antes do caso de uso
+    E a mensagem é "O campo "corpo" está faltando ou é inválido."
     E a resposta não traz o cabeçalho X-Trace-Id
     E as coleções "auditoria" e "auditoriaErros" não ganham registro
     E o X-Trace-Id vale só para as respostas que passam pelo caso de uso

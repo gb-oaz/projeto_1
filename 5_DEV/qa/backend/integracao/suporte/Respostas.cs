@@ -21,6 +21,10 @@ public sealed class Respostas(Mundo mundo)
         Assert.Equal(mensagem, mundo.Ultima.Corpo?["mensagem"]?.GetValue<string>());
     }
 
+    [Then(@"^a mensagem é ""(.*)""$")]
+    public void Mensagem(string mensagem) =>
+        Assert.True(mundo.Ultima.Corpo?["mensagem"]?.GetValue<string>() == mensagem, $"esperava a mensagem \"{mensagem}\", veio {mundo.Ultima}");
+
     [Then(@"^a resposta é (\d{3}) com:$")]
     public async Task StatusEJson(int status, string json)
     {

@@ -436,9 +436,6 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public async Task CorpoQueNaoEJson(string corpo) =>
         await Executar(await MariaPronta(), "POST", "/usuarios", corpo);
 
-    [Then(@"^a resposta é 422, recusada antes do caso de uso$")]
-    public void RecusadaAntes() => Respostas.Confere(mundo.Ultima, 422);
-
     // o mesmo endereço, com um corpo válido, passa pelo caso de uso e traz o cabeçalho
     [Then(@"^o X-Trace-Id vale só para as respostas que passam pelo caso de uso$")]
     public async Task SoQuemPassaPeloCasoDeUso()

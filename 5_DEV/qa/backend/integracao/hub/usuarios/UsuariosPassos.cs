@@ -111,6 +111,8 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
 
     [Then(@"^a resposta é (\d{3}) ([A-Z_]+) com o campo ""(\w+)""$")]
     [Then(@"^a resposta é (\d{3}) ([A-Z_]+), campo ""(\w+)""$")]
+    // RN-271: o corpo que não é JSON é recusado antes do caso de uso (sem X-Trace-Id nem auditoria)
+    [Then(@"^a resposta é (\d{3}) ([A-Z_]+) com o campo ""(\w+)"", recusada antes do caso de uso$")]
     public void ComOCampo(int status, string codigo, string campo)
     {
         Respostas.Confere(mundo.Ultima, status, codigo);
