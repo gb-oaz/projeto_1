@@ -65,22 +65,32 @@ Toda resposta de erro traz `codigo` e `mensagem`, além de `campo`, `tentarEm` o
 
 Toque num diagrama para abrir em tamanho real. A versão de cada um está na marca d'água.
 
-**Casos de uso**
+### Casos de uso
+
+**Autenticação: quem entra, renova e sai**
 
 [![Casos de uso da Autenticação](/doc/api/diagramas/autenticacao-casos-de-uso.svg)](/doc/api/diagramas/autenticacao-casos-de-uso.svg)
 
-**Sequência: entrar, renovar e sair**
+### Sequência
+
+**Entrar, renovar e sair**
 
 [![Sequência da Autenticação](/doc/api/diagramas/autenticacao-sequencia.svg)](/doc/api/diagramas/autenticacao-sequencia.svg)
 
-**Contrato de API**
+### Contrato de API
+
+**Endereços, pedidos, respostas e erros de /auth**
 
 [![Contrato de API da Autenticação](/doc/api/diagramas/autenticacao-contrato-api.svg)](/doc/api/diagramas/autenticacao-contrato-api.svg)
 
-**Classes do domínio**
+### Classes
+
+**Domínio, casos de uso e portas da Autenticação**
 
 [![Classes da Autenticação](/doc/api/diagramas/autenticacao-classes.svg)](/doc/api/diagramas/autenticacao-classes.svg)
 
-**Documentos no Redis**
+### Modelo de documentos
+
+**Sessões, renovações e bloqueios no Redis**
 
 [![Documentos da Autenticação](/doc/api/diagramas/autenticacao-documentos.svg)](/doc/api/diagramas/autenticacao-documentos.svg)

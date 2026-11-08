@@ -65,18 +65,40 @@ Todo endereço com cadeado pede o token de acesso e o módulo **Usuários** (`MO
 
 Toque num diagrama para abrir em tamanho real. A versão de cada um está na marca d'água.
 
-**Sequência: conta, staff e primeiro acesso**
+### Casos de uso
+
+**Identidade e acesso: quem cria cada usuário e como se entra**
+
+[![Casos de uso de identidade e acesso](/doc/api/diagramas/identidade-acesso.svg)](/doc/api/diagramas/identidade-acesso.svg)
+
+### Sequência
+
+**Conta, staff e primeiro acesso**
 
 [![Sequência de Usuários](/doc/api/diagramas/usuarios-sequencia.svg)](/doc/api/diagramas/usuarios-sequencia.svg)
 
-**Contrato de API**
+**Inicialização: contas iniciais**
+
+[![Sequência da inicialização](/doc/api/diagramas/usuario-inicializacao-sequencia.svg)](/doc/api/diagramas/usuario-inicializacao-sequencia.svg)
+
+### Contrato de API
+
+**Endereços, pedidos, respostas e erros de /contas, /usuarios e /time**
 
 [![Contrato de API de Usuários](/doc/api/diagramas/usuarios-contrato-api.svg)](/doc/api/diagramas/usuarios-contrato-api.svg)
+
+### Classes e pacotes
 
 **Classes do domínio (identidade e acesso)**
 
 [![Classes de identidade e acesso](/doc/api/diagramas/identidade-acesso-classes.svg)](/doc/api/diagramas/identidade-acesso-classes.svg)
 
-**Documentos no MongoDB**
+**Pacotes do módulo Usuários (arquitetura hexagonal)**
+
+[![Arquitetura hexagonal do módulo Usuários](/doc/api/diagramas/usuario-hexagonal.svg)](/doc/api/diagramas/usuario-hexagonal.svg)
+
+### Modelo de documentos
+
+**Contas, usuários e permissões no MongoDB**
 
 [![Documentos de identidade e acesso](/doc/api/diagramas/identidade-acesso-documentos.svg)](/doc/api/diagramas/identidade-acesso-documentos.svg)

@@ -59,22 +59,32 @@ A resposta `200` traz a versão nova. As sessões da pessoa recebem `401 PERMISS
 
 Toque num diagrama para abrir em tamanho real. A versão de cada um está na marca d'água.
 
-**Casos de uso**
+### Casos de uso
+
+**Autorização: ler, conceder e ver o histórico**
 
 [![Casos de uso da Autorização](/doc/api/diagramas/autorizacao-casos-de-uso.svg)](/doc/api/diagramas/autorizacao-casos-de-uso.svg)
 
-**Sequência: conceder permissões**
+### Sequência
+
+**Conceder permissões**
 
 [![Sequência da Autorização](/doc/api/diagramas/autorizacao-sequencia.svg)](/doc/api/diagramas/autorizacao-sequencia.svg)
 
-**Contrato de API**
+### Contrato de API
+
+**Endereços, pedidos, respostas e erros de /usuarios/{id}/permissoes**
 
 [![Contrato de API da Autorização](/doc/api/diagramas/autorizacao-contrato-api.svg)](/doc/api/diagramas/autorizacao-contrato-api.svg)
 
-**Classes do domínio**
+### Classes
+
+**Domínio, casos de uso e portas da Autorização**
 
 [![Classes da Autorização](/doc/api/diagramas/autorizacao-classes.svg)](/doc/api/diagramas/autorizacao-classes.svg)
 
-**Documentos no MongoDB**
+### Modelo de documentos
+
+**Permissões e histórico no MongoDB**
 
 [![Documentos da Autorização](/doc/api/diagramas/autorizacao-documentos.svg)](/doc/api/diagramas/autorizacao-documentos.svg)
