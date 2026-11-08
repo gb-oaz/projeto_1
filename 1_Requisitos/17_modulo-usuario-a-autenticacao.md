@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-a-autenticacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autenticação"
-versao: "v22"
-data: "2026-11-08 02:05"
+versao: "v23"
+data: "2026-11-08 02:20"
 status: "Em revisão"
 objetivo: "definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v22** · 2026-11-08 02:05 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v23** · 2026-11-08 02:20 · **Em revisão**
 
 # Módulo Usuários · Autenticação
 
@@ -970,13 +970,13 @@ Cenário: sem aparelhos conectados no quest
 
 [![Casos de uso da autenticação: a pessoa do hub entra, confirma a senha anotada, vê os aparelhos conectados e sai de um ou de todos; no hub e no quest renova, sai e vê o aviso de sessão terminada; as aplicações leem as chaves públicas; participante e responsável entram com o código de acesso e o visitante numa sala, com a conferência de tentativas incluída e o limite de 5 sessões estendendo a entrada no hub](../2_Diagramas/autenticacao-casos-de-uso_v01_20261101-2337.svg)](../2_Diagramas/autenticacao-casos-de-uso_v01_20261101-2337.svg)
 
-**Autenticação · sequência** — `2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg`
+**Autenticação · sequência** — `2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg`
 
-[![Sequência da autenticação: entrada no hub com limite de 5 sessões, entrada do participante no quest com o código de acesso, recusas e bloqueio por tentativas, conferência de cada ação pela sessão e pela versão das permissões, renovação com troca do token e detecção de cópia, e sair de todos os aparelhos, com as telas de cada fase](../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg)](../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg)
+[![Sequência da autenticação: entrada no hub com limite de 5 sessões, entrada do participante no quest com o código de acesso, recusas e bloqueio por tentativas, conferência de cada ação pela sessão e pela versão das permissões, renovação com troca do token e detecção de cópia, e sair de todos os aparelhos, com as telas de cada fase](../2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg)](../2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg)
 
-**Autenticação · contrato de API** — `2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg`
+**Autenticação · contrato de API** — `2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg`
 
-[![Contrato de API da autenticação: entrar no hub, no quest e na sala, confirmar a senha anotada, renovar, sair, listar e encerrar sessões e chaves públicas do token, com pedido, respostas e códigos de erro](../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg)](../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg)
+[![Contrato de API da autenticação: entrar no hub, no quest e na sala, confirmar a senha anotada, renovar, sair, listar e encerrar sessões e chaves públicas do token, com pedido, respostas e códigos de erro](../2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg)](../2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg)
 
 **Autenticação · classes** — `2_Diagramas/autenticacao-classes_v01_20261101-1501.svg`
 
@@ -994,7 +994,8 @@ Cenário: sem aparelhos conectados no quest
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v22** | 2026-11-08 02:05 | `RN-272`: entradas, confirmação da senha, renovação, saída e encerramento de sessões auditados com INICIADO e CONCLUIDO, ações ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO e ENCERRAR_SESSOES, e X-Trace-Id; quem, contaId e alvo null até a pessoa ser identificada; `RN-273`: recusas em "auditoriaErros" (4xx ALERTA, 500 ERRO_INESPERADO) e nenhum segredo nos registros; status → Em revisão |
+| **v23** | 2026-11-08 02:20 | Diagramas da v22 (`RN-272`, `RN-273`): contrato de API v02 → v03 (quadro Auditoria e X-Trace-Id, selo X-Trace-Id e ação nos 8 endereços auditados, recusas 4xx como ALERTA, 500 ERRO_INESPERADO), sequência v03 → v04 (INICIADO com quem, contaId e alvo null, CONCLUIDO com o alvo, auditoriaErros e gravações no Redis destacadas) |
+| v22 | 2026-11-08 02:05 | `RN-272`: entradas, confirmação da senha, renovação, saída e encerramento de sessões auditados com INICIADO e CONCLUIDO, ações ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO e ENCERRAR_SESSOES, e X-Trace-Id; quem, contaId e alvo null até a pessoa ser identificada; `RN-273`: recusas em "auditoriaErros" (4xx ALERTA, 500 ERRO_INESPERADO) e nenhum segredo nos registros; status → Em revisão |
 | v21 | 2026-11-07 14:05 | Diagrama autenticacao-documentos v03: índices como o ms_mono cria na partida (login, sigla e domínio únicos, resumoComprovante); cenários sem mudança |
 | v20 | 2026-11-06 23:23 | Diagrama autenticacao-documentos v02, fiel ao código: tempoDoTime na conta do time, tempoSemUso e ultimoErro no Redis, tipo ADMINISTRADOR |
 | v19 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
@@ -1007,4 +1008,4 @@ Cenário: sem aparelhos conectados no quest
 
 ---
 
-<sub>boaz · v22 · 2026-11-08 02:05 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>
+<sub>boaz · v23 · 2026-11-08 02:20 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>

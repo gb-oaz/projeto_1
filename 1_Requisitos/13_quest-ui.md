@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "13_quest-ui"
 tipo: "Funcionalidade"
 titulo: "Quest · UI"
-versao: "v21"
-data: "2026-11-05 12:34"
-status: "Aprovado"
+versao: "v22"
+data: "2026-11-08 02:20"
+status: "Em revisão"
 objetivo: "definir como as telas do quest ficam no celular e na web — acesso, tarefas, feed, carteira, perfil e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco."
 ---
 
-> **boaz · Funcionalidade** · `13_quest-ui` · **v21** · 2026-11-05 12:34 · **Aprovado**
+> **boaz · Funcionalidade** · `13_quest-ui` · **v22** · 2026-11-08 02:20 · **Em revisão**
 
 # Quest · UI
 
@@ -390,13 +390,13 @@ Cenário: o que este documento não trata
 
 [![Sequência da carcaça do quest com as telas: entrar pelo perfil do aparelho ou por outro código (referência à entrada do 17-a), navegar por Tarefas, Feed e Carteira, ordenar a Carteira só no aparelho, abrir um módulo com aviso, ver o Perfil, adotar um mascote e trocar de perfil; os dados do perfil vêm do módulo Usuários (17) e a foto vai em SVG](../2_Diagramas/quest-sequencia_v02_20261103-2205.svg)](../2_Diagramas/quest-sequencia_v02_20261103-2205.svg)
 
-**Entrada no quest · sequência (17_modulo-usuario-a)** — `2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg`
+**Entrada no quest · sequência (17_modulo-usuario-a)** — `2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg`
 
-[![Sequência da autenticação do 17-a, com a entrada no quest pelo código de acesso e por quem está acessando](../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg)](../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg)
+[![Sequência da autenticação do 17-a, com a entrada no quest pelo código de acesso e por quem está acessando](../2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg)](../2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg)
 
-**Entrada no quest · contrato de API (17_modulo-usuario-a)** — `2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg`
+**Entrada no quest · contrato de API (17_modulo-usuario-a)** — `2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg`
 
-[![Contrato de API da autenticação do 17-a, com a entrada no quest](../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg)](../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg)
+[![Contrato de API da autenticação do 17-a, com a entrada no quest](../2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg)](../2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg)
 
 ---
 
@@ -406,7 +406,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v21** | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
+| **v22** | 2026-11-08 02:20 | Diagramas da autenticação do 17-a: contrato de API v02 → v03 e sequência v03 → v04 (auditoria das entradas e sessões, X-Trace-Id, recusas como ALERTA, 500 ERRO_INESPERADO); status → Em revisão |
+| v21 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v20 | 2026-11-03 22:11 | Vista da casca pwa e mobile v02, com o Feed definido no documento do módulo Feed e o perfil pela responsável (`RN-261`); aprovado, sem pendências em aberto |
 | v19 | 2026-11-03 22:05 | Em aberto respondido: conteúdo e contrato de cada card no documento do módulo (`RN-211`); Feed como espaço reservado do futuro módulo Feed (`RF-97`); quem aparece no perfil: nome do estudante e instituição, com o nome do responsável quando é ele, foto ou mascote do estudante e iniciais do responsável (`RN-261`); foto enviada em SVG (`RF-95`, [15 RN-260](15_modulos.md#RN-260)); Atualização dos cards guardada no perfil (`RF-94`); casos de uso e sequência v02 |
 | v18 | 2026-11-03 14:35 | Telas separadas em Web, PWA e Mobile (vistas acesso, casca e módulo v01); Diagramas: casos de uso e sequência com as telas da carcaça do quest, com a entrada do [17-a RF-135](17_modulo-usuario-a-autenticacao.md#RF-135) como referência; Em aberto: os contratos ainda não definidos do perfil, da foto ou mascote, da Carteira, do Feed e da Atualização dos cards |
@@ -419,4 +420,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v21 · 2026-11-05 12:34 · `1_Requisitos/13_quest-ui.md`</sub>
+<sub>boaz · v22 · 2026-11-08 02:20 · `1_Requisitos/13_quest-ui.md`</sub>

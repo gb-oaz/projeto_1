@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "12_hub-ui"
 tipo: "Funcionalidade"
 titulo: "Hub · UI"
-versao: "v34"
-data: "2026-11-08 02:14"
+versao: "v35"
+data: "2026-11-08 02:20"
 status: "Em revisão"
 objetivo: "definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco."
 ---
 
-> **boaz · Funcionalidade** · `12_hub-ui` · **v34** · 2026-11-08 02:14 · **Em revisão**
+> **boaz · Funcionalidade** · `12_hub-ui` · **v35** · 2026-11-08 02:20 · **Em revisão**
 
 # Hub · UI
 
@@ -461,13 +461,13 @@ Cenário: o que este documento não trata
 
 [![Sequência da carcaça do hub com as telas: entrar pela conta do aparelho, por outra conta ou criando a conta (referência ao 17), navegar por Contratados e Feed, ordenar só no aparelho, ver A contratar e o detalhe (referência ao 16), ver a Conta, enviar a foto e escolher o tema; os dados da conta vêm do módulo Usuários (17) e a foto vai em SVG](../2_Diagramas/hub-sequencia_v02_20261103-2205.svg)](../2_Diagramas/hub-sequencia_v02_20261103-2205.svg)
 
-**Entrada no hub · sequência (17_modulo-usuario-a)** — `2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg`
+**Entrada no hub · sequência (17_modulo-usuario-a)** — `2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg`
 
-[![Sequência da autenticação do 17-a, com a entrada no hub por e-mail e senha](../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg)](../2_Diagramas/autenticacao-sequencia_v03_20261103-1143.svg)
+[![Sequência da autenticação do 17-a, com a entrada no hub por e-mail e senha](../2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg)](../2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg)
 
-**Entrada no hub · contrato de API (17_modulo-usuario-a)** — `2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg`
+**Entrada no hub · contrato de API (17_modulo-usuario-a)** — `2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg`
 
-[![Contrato de API da autenticação do 17-a, com a entrada no hub e o sair](../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg)](../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg)
+[![Contrato de API da autenticação do 17-a, com a entrada no hub e o sair](../2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg)](../2_Diagramas/autenticacao-contrato-api_v03_20261108-0216.svg)
 
 **Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v08_20261108-0212.svg`
 
@@ -481,7 +481,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v34** | 2026-11-08 02:14 | Diagrama: contrato de API dos usuários do 17 v07 → v08 (esqueci-senha-master auditado, 422 de corpo que não é JSON com DADOS_INVALIDOS) |
+| **v35** | 2026-11-08 02:20 | Diagramas da autenticação do 17-a: contrato de API v02 → v03 e sequência v03 → v04 (auditoria das entradas e sessões, X-Trace-Id, recusas como ALERTA, 500 ERRO_INESPERADO) |
+| v34 | 2026-11-08 02:14 | Diagrama: contrato de API dos usuários do 17 v07 → v08 (esqueci-senha-master auditado, 422 de corpo que não é JSON com DADOS_INVALIDOS) |
 | v33 | 2026-11-08 02:04 | Diagrama: contrato de API dos usuários do 17 v06 → v07 (500 ERRO_INESPERADO confirmado, PUT permissões auditado) |
 | v32 | 2026-11-08 02:00 | Diagrama: contrato de API dos usuários do 17 v05 → v06 (auditoria, X-Trace-Id); status → Em revisão |
 | v31 | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
@@ -496,4 +497,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v34 · 2026-11-08 02:14 · `1_Requisitos/12_hub-ui.md`</sub>
+<sub>boaz · v35 · 2026-11-08 02:20 · `1_Requisitos/12_hub-ui.md`</sub>
