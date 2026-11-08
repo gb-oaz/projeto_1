@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v71"
-data: "2026-11-08 01:10"
+versao: "v72"
+data: "2026-11-08 01:14"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v71** · 2026-11-08 01:10 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v72** · 2026-11-08 01:14 · **Em revisão**
 
 # Módulo Usuários
 
@@ -1321,14 +1321,25 @@ Cenário: recusa no meio da execução
   Quando envia POST /contas, sem login, com a sigla "EBFGA"
   E a resposta é 409 SIGLA_EM_USO
   Então a coleção "auditoria" fica só com o registro "INICIADO" da ação "CRIAR_CONTA"
-  E a coleção "auditoriaErros" ganha 1 registro com o código "SIGLA_EM_USO"
+  E a coleção "auditoriaErros" ganha 1 registro com o código "SIGLA_EM_USO" e o nivel "ALERTA"
   E os dois registros têm o mesmo traceId
   E nenhum registro "CONCLUIDO" é gravado com esse traceId
 
-Cenário: registro antes da recusa
-  Quando a Maria envia POST /usuarios/usr-ebfga-paulo/desativar e é recusada
-  Então o registro em "auditoriaErros" é gravado antes de a recusa sair do caso de uso
-  E a resposta só chega depois que o registro foi gravado
+Esquema do Cenário: alerta ou erro, gravado antes da recusa
+  Quando a Maria envia POST /usuarios/usr-ebfga-paulo/desativar
+  E <situação>
+  Então a resposta é <resposta>
+  E "auditoriaErros" ganha o registro com o nivel "<nivel>" antes de a recusa sair do caso de uso
+
+  Exemplos:
+    | situação                              | resposta                  | nivel  |
+    | o Paulo já está desativado            | 409, uma recusa prevista  | ALERTA |
+    | o banco cai no meio da gravação       | 500, uma falha inesperada | ERRO   |
+
+Cenário: guardado e imutável como a auditoria
+  Dado o registro "auderr-000031" da sigla "EBFGA" repetida, gravado em 2026-11-08
+  Então ele fica guardado até 2031-11-08, 5 anos depois, como na RN-178
+  E não pode ser alterado nem apagado, como na RNF-206
 
 Cenário: leitura recusada não é auditada
   Quando a Maria envia GET /contas/conta-zzzzz
@@ -1347,11 +1358,21 @@ Cenário: duas execuções, dois traceIds
   Então cada execução tem um traceId próprio, diferente do da outra
   E os registros "INICIADO" e "CONCLUIDO" de cada uma repetem o traceId dela
 
+Esquema do Cenário: traceId no cabeçalho da resposta
+  Quando a Maria envia <pedido>
+  Então a resposta é <resposta> com o cabeçalho X-Trace-Id
+  E o valor de X-Trace-Id é o traceId gravado em <registros>
+
+  Exemplos:
+    | pedido                               | resposta         | registros                    |
+    | POST /usuarios do participante Lucas | 201              | "INICIADO" e "CONCLUIDO"     |
+    | POST /contas com a sigla "EBFGA"     | 409 SIGLA_EM_USO | "INICIADO" e "auditoriaErros" |
+
 Cenário: acompanhamento só pela auditoria
   Dado o traceId "trc-7f3a9c21" de uma execução de POST /contas recusada com 409 SIGLA_EM_USO
   Quando o time deboaz procura o que aconteceu nessa execução
   Então encontra tudo nas coleções "auditoria" e "auditoriaErros" pelo traceId "trc-7f3a9c21"
-  E o caso de uso não escreve nada em log
+  E o caso de uso não escreve nada em log; o log da partida, da RNF-226 e da RNF-227, continua
 ```
 
 <a id="RN-179-api"></a>
@@ -2140,7 +2161,9 @@ Cenário: geração de senha, acesso anônimo, auditoria e erro
       "acao": "CRIAR_CONTA",
       "alvo": null,
       "codigo": "SIGLA_EM_USO",
-      "quando": "2026-11-08T01:10:00Z"
+      "nivel": "ALERTA",
+      "quando": "2026-11-08T01:10:00Z",
+      "guardarAte": "2031-11-08T01:10:00Z"
     }
     """
 ```
@@ -2259,11 +2282,8 @@ Cenário: o que este documento não trata
 
 ## Em aberto
 
-- O que é alerta e o que é erro em "auditoriaErros"? Proposta: alerta = recusa prevista por regra (4xx, como SIGLA_EM_USO); erro = falha inesperada (5xx); e o registro ganha o campo "nivel" — **Produto**
-- Por quanto tempo "auditoriaErros" guarda cada registro, e ele é imutável como a `RNF-206`? — **Produto**
-- O traceId aparece na resposta (corpo ou cabeçalho) para a pessoa informar ao suporte, ou fica só interno? — **Produto**
-- "Sem log" vale também para a partida da aplicação, que hoje escreve no log em `RNF-226` e `RNF-227`? — **Produto**
 - Índices de "auditoriaErros" e do traceId em "auditoria" para entrar na `RNF-227` — **Arquitetura**
+- Nome da ação auditada de PUT /usuarios/{id}/permissoes: "EDITAR_PERMISSOES" (`RN-178`) não existe na lista de ações — **Arquitetura**
 
 ---
 
@@ -2273,7 +2293,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v71** | 2026-11-08 01:10 | `RN-178`: auditoria só do que muda estado, com registros "INICIADO" e "CONCLUIDO" ligados pelo traceId; leitura não é auditada; `RN-270`: coleção "auditoriaErros", gravada antes da recusa; `RN-271`: um traceId por execução, sem log; exemplo de entidades com traceId e registro de erro; status → Em revisão |
+| **v72** | 2026-11-08 01:14 | `RN-270`: nivel "ALERTA" (recusa prevista, 4xx) ou "ERRO" (falha inesperada, 5xx), guarda de 5 anos e imutável como a auditoria; `RN-271`: cabeçalho X-Trace-Id em toda resposta dos endpoints auditados, igual ao traceId gravado; "sem log" só nos casos de uso; exemplo do registro de erro com nivel e guardarAte; pendências de Produto respondidas |
+| v71 | 2026-11-08 01:10 | `RN-178`: auditoria só do que muda estado, com registros "INICIADO" e "CONCLUIDO" ligados pelo traceId; leitura não é auditada; `RN-270`: coleção "auditoriaErros", gravada antes da recusa; `RN-271`: um traceId por execução, sem log; exemplo de entidades com traceId e registro de erro; status → Em revisão |
 | v70 | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
 | v69 | 2026-11-07 15:52 | `RN-188` e `RN-188-api`: exemplo de dois participantes sem matrícula no educador autônomo, aceitos (201, sem 409 MATRICULA_EM_USO), porque a matrícula só é única quando existe; diagramas: modelo de documentos v11 → v12, sem partição pela sigla |
 | v68 | 2026-11-07 14:53 | `RN-179` e `RN-179-api`: exemplo da sigla "colsa", aceita e gravada como "COLSA" (201, conta "conta-colsa"); diagramas: modelo de documentos v10 → v11 |
@@ -2282,8 +2303,7 @@ Cenário: o que este documento não trata
 | v65 | 2026-11-07 14:13 | `RNF-227`: índice único que não pode ser criado impede a partida, como no `RNF-226`; índice não único que falha fica só no aviso do log e a partida segue; o log cita índice e coleção, nunca o valor |
 | v64 | 2026-11-07 14:12 | `RNF-227`: passo "Então antes de aceitar o primeiro pedido…" sem vírgula após a palavra-chave, igual ao .feature do qa |
 | v63 | 2026-11-07 14:06 | Coleções e índices do modelo de documentos prontos na partida, antes do primeiro pedido, sem duplicar a cada partida; índice que não pode ser criado vira aviso no log e a partida segue (`RNF-227`); status → Em revisão |
-| v62 | 2026-11-07 14:05 | Diagrama: modelo de documentos v08 — índices criados na partida, contratacoes com _id e sigla e ainda sem índice, partição pela sigla por coleção; cenários sem mudança |
 
 ---
 
-<sub>boaz · v71 · 2026-11-08 01:10 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v72 · 2026-11-08 01:14 · `1_Requisitos/17_modulo-usuario.md`</sub>
