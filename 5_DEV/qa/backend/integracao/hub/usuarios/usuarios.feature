@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v86), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v87), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -545,8 +545,6 @@ Funcionalidade: Usuários
     Quando a conta master envia PUT /usuarios/usr-ebfga-joao/permissoes
     E a resposta é de sucesso
     Então a coleção "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "EDITAR_PERMISSOES"
-    # no requisito (v86) a linha é "E, à parte, …", que o Gherkin não aceita
-    # (a palavra-chave é "E " com espaço): sem a vírgula até o PO corrigir
     E à parte, "INICIADO" e "CONCLUIDO" de "AVISAR_PERMISSOES_NOVAS", como na RN-275
     E "registrosPermissao" ganha a versão nova das permissões do João, como na RN-256
 

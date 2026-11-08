@@ -196,7 +196,7 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     }
 
     // o aviso das permissões novas do João (RN-275), na execução do PUT
-    [Then(@"^,? ?à parte, ""INICIADO"" e ""CONCLUIDO"" de ""(\w+)"", como na RN-275$")]
+    [Then(@"^à parte, ""INICIADO"" e ""CONCLUIDO"" de ""(\w+)"", como na RN-275$")]
     public async Task InternaDoPut(string interna)
     {
         var todos = await execucoes.Novos(Auditoria.Registros);
