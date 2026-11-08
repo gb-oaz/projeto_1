@@ -92,7 +92,11 @@ sealed class Apoio(IUsuarios usuarios, IContas contas, IAuditoria auditoria, Tim
         throw new InvalidOperationException($"Nenhuma matrícula livre na conta {contaId}.");
     }
 
-    /// <summary>Guarda a ação na auditoria (RN-178).</summary>
+    /// <summary>
+    /// Guarda a ação na auditoria (RN-178), por ora num só registro "CONCLUIDO"
+    /// com um traceId próprio: o "INICIADO", o registro de erro e o traceId do
+    /// endereço (RN-270, RN-271) chegam caso a caso, como no CriarConta.
+    /// </summary>
     public Task Auditar(string contaId, string quem, AcaoAuditada acao, string alvo, CancellationToken ct) =>
-        auditoria.Registrar(new RegistroDeAuditoria(contaId, quem, acao, alvo, Agora), ct);
+        auditoria.Registrar(new RegistroDeAuditoria(TraceId.Novo(), EtapaDaExecucao.Concluido, contaId, quem, acao, alvo, Agora), ct);
 }

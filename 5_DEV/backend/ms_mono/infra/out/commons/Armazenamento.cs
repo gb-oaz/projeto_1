@@ -72,6 +72,7 @@ public static class Colecoes
     public const string Contas = "contas";
     public const string GeracoesSenha = "geracoesSenha";
     public const string Auditoria = "auditoria";
+    public const string AuditoriaErros = "auditoriaErros";
     public const string PedidosAjuda = "pedidosAjuda";
     public const string RegistrosPermissao = "registrosPermissao";
     public const string Modulos = "modulos";

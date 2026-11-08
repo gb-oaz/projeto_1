@@ -20,7 +20,7 @@ public class ContasTests
     public async Task RF_104_escola_cria_a_conta()
     {
         var criada = await Mock.CriarConta.Executar(new("INSTITUICAO", "Escola Nova", "11.222.333/0001-44", "Gustavo Boaz de Moura Souza",
-            "(51) 99999-1111", "Escola_Nova", "ENOVA"));
+            "(51) 99999-1111", "Escola_Nova", "ENOVA"), TraceId.Novo());
 
         Assert.Equal(("conta-enova", "escola_nova@deboaz.com"), (criada.ContaId, criada.Login));
         Assert.Matches(@"^Gu[!@#$%&*]Boaz\d{6}$", criada.Senha);
@@ -34,16 +34,77 @@ public class ContasTests
     }
 
     [Fact]
+    public async Task RN_178_conta_criada_auditada_do_comeco_ao_fim()
+    {
+        var traceId = new TraceId("trc-7f3a9c21");
+
+        var criada = await Mock.CriarConta.Executar(Colsa(), traceId);
+
+        Assert.Equal(new[] { "INICIADO", "CONCLUIDO" }, Mock.Gravacoes);
+        Assert.All(Mock.Auditoria, a => Assert.Equal((traceId, AcaoAuditada.CriarConta, (string?)null), (a.TraceId, a.Acao, a.Quem)));
+        var (iniciado, concluido) = (Mock.Auditoria[0], Mock.Auditoria[1]);
+        Assert.Equal((EtapaDaExecucao.Iniciado, (string?)null, (string?)null), (iniciado.Etapa, iniciado.ContaId, iniciado.Alvo));
+        Assert.Equal((EtapaDaExecucao.Concluido, criada.ContaId, criada.ContaId), (concluido.Etapa, concluido.ContaId, concluido.Alvo));
+        Assert.Equal(Mock.Relogio.GetUtcNow().AddYears(5), concluido.GuardarAte);
+        Assert.Empty(Mock.Erros);
+    }
+
+    [Theory]
+    [InlineData("EBFGA", "colegio_salesiano", "INSTITUICAO", "SIGLA_EM_USO")]
+    [InlineData("COLSA", "objetivo_unidade1", "INSTITUICAO", "DOMINIO_EM_USO")]
+    [InlineData("COLSA", "colegio_salesiano", "STAFF", "DADOS_INVALIDOS")]
+    [InlineData("EBF", "colegio_salesiano", "INSTITUICAO", "SIGLA_INVALIDA")]
+    public async Task RN_270_recusa_grava_o_alerta_antes_de_sair(string sigla, string dominio, string tipo, string codigo)
+    {
+        var traceId = TraceId.Novo();
+
+        await Falha(codigo, () => Mock.CriarConta.Executar(Colsa(tipo, sigla: sigla, dominio: dominio), traceId));
+
+        Assert.Equal(new[] { "INICIADO", $"ALERTA {codigo}" }, Mock.Gravacoes);
+        Assert.Equal(traceId, Assert.Single(Mock.Auditoria).TraceId);
+        var erro = Assert.Single(Mock.Erros);
+        Assert.Equal((traceId, AcaoAuditada.CriarConta, codigo, NivelDoErro.Alerta), (erro.TraceId, erro.Acao, erro.Codigo, erro.Nivel));
+        Assert.Equal(((string?)null, (string?)null, (string?)null), (erro.ContaId, erro.Quem, erro.Alvo));
+        Assert.Equal(Mock.Relogio.GetUtcNow().AddYears(5), erro.GuardarAte);
+    }
+
+    [Fact]
+    public async Task RN_270_falha_inesperada_grava_o_erro_e_segue()
+    {
+        var traceId = TraceId.Novo();
+        var queda = new InvalidOperationException("o banco caiu no meio da gravação");
+        Mock.FalhaAoCriarConta = queda;
+
+        Assert.Same(queda, await Assert.ThrowsAsync<InvalidOperationException>(() => Mock.CriarConta.Executar(Colsa(), traceId)));
+
+        Assert.Equal(new[] { "INICIADO", "ERRO ERRO_INESPERADO" }, Mock.Gravacoes);
+        var erro = Assert.Single(Mock.Erros);
+        Assert.Equal((traceId, NivelDoErro.Erro), (erro.TraceId, erro.Nivel));
+        Assert.Null(Mock.Conta("conta-colsa"));
+    }
+
+    [Fact]
+    public async Task RN_270_pedido_cancelado_nao_e_erro()
+    {
+        Mock.FalhaAoCriarConta = new OperationCanceledException();
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() => Mock.CriarConta.Executar(Colsa(), TraceId.Novo()));
+
+        Assert.Equal(new[] { "INICIADO" }, Mock.Gravacoes);
+        Assert.Empty(Mock.Erros);
+    }
+
+    [Fact]
     public async Task RF_104_sigla_ja_usada() =>
-        await Falha("SIGLA_EM_USO", () => Mock.CriarConta.Executar(Colsa(sigla: "EBFGA")));
+        await Falha("SIGLA_EM_USO", () => Mock.CriarConta.Executar(Colsa(sigla: "EBFGA"), TraceId.Novo()));
 
     [Fact]
     public async Task RF_104_dominio_ja_usado() =>
-        await Falha("DOMINIO_EM_USO", () => Mock.CriarConta.Executar(Colsa(dominio: "objetivo_unidade1")));
+        await Falha("DOMINIO_EM_USO", () => Mock.CriarConta.Executar(Colsa(dominio: "objetivo_unidade1"), TraceId.Novo()));
 
     [Fact]
     public async Task RN_164_staff_nao_se_cadastra() =>
-        Assert.Equal("tipo", (await Falha("DADOS_INVALIDOS", () => Mock.CriarConta.Executar(Colsa(tipo: "STAFF")))).Campo);
+        Assert.Equal("tipo", (await Falha("DADOS_INVALIDOS", () => Mock.CriarConta.Executar(Colsa(tipo: "STAFF"), TraceId.Novo()))).Campo);
 
     [Theory]
     [InlineData("ebfga", "SIGLA_EM_USO")]
@@ -52,8 +113,8 @@ public class ContasTests
     [InlineData("COLSA", null)]
     public async Task RN_179_sigla_recusada(string sigla, string? codigo)
     {
-        if (codigo is null) Assert.Equal("conta-colsa", (await Mock.CriarConta.Executar(Colsa(sigla: sigla))).ContaId);
-        else await Falha(codigo, () => Mock.CriarConta.Executar(Colsa(sigla: sigla)));
+        if (codigo is null) Assert.Equal("conta-colsa", (await Mock.CriarConta.Executar(Colsa(sigla: sigla), TraceId.Novo())).ContaId);
+        else await Falha(codigo, () => Mock.CriarConta.Executar(Colsa(sigla: sigla), TraceId.Novo()));
     }
 
     [Theory]
@@ -67,10 +128,10 @@ public class ContasTests
         var mock = new UsuariosEmMemoria(ambiente!);
         if (codigo is null)
         {
-            Assert.Equal($"conta-{sigla.ToLowerInvariant()}", (await mock.CriarConta.Executar(Colsa(sigla: sigla))).ContaId);
+            Assert.Equal($"conta-{sigla.ToLowerInvariant()}", (await mock.CriarConta.Executar(Colsa(sigla: sigla), TraceId.Novo())).ContaId);
             return;
         }
-        var falha = await Assert.ThrowsAsync<FalhaDeUsuarios>(() => mock.CriarConta.Executar(Colsa(sigla: sigla)));
+        var falha = await Assert.ThrowsAsync<FalhaDeUsuarios>(() => mock.CriarConta.Executar(Colsa(sigla: sigla), TraceId.Novo()));
         Assert.Equal((codigo, "Siglas QA são reservadas ao time deboaz.", "sigla"), (falha.Codigo, falha.Message, falha.Campo));
     }
 
@@ -88,8 +149,8 @@ public class ContasTests
     [InlineData("AUTONOMO", "12.345.678/0001-90", false)]
     public async Task RN_242_documento_de_cada_conta(string tipo, string documento, bool aceita)
     {
-        if (aceita) Assert.Equal("conta-colsa", (await Mock.CriarConta.Executar(Colsa(tipo, documento))).ContaId);
-        else Assert.Equal("documento", (await Falha("DADOS_INVALIDOS", () => Mock.CriarConta.Executar(Colsa(tipo, documento)))).Campo);
+        if (aceita) Assert.Equal("conta-colsa", (await Mock.CriarConta.Executar(Colsa(tipo, documento), TraceId.Novo())).ContaId);
+        else Assert.Equal("documento", (await Falha("DADOS_INVALIDOS", () => Mock.CriarConta.Executar(Colsa(tipo, documento), TraceId.Novo()))).Campo);
     }
 
     [Fact]

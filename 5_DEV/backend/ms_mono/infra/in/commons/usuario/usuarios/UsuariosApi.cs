@@ -43,8 +43,9 @@ public static class UsuariosApi
 
         // ── sem login ──────────────────────────────────────────────────────────
 
-        api.MapPost("/contas", async (NovaContaDto? corpo, ICriarConta criar, CancellationToken ct) =>
-                Results.Json(await criar.Executar(corpo ?? new(null, null, null, null, null, null, null), ct), statusCode: StatusCodes.Status201Created))
+        api.MapPost("/contas", async (NovaContaDto? corpo, HttpContext http, ICriarConta criar, CancellationToken ct) =>
+                Results.Json(await criar.Executar(corpo ?? new(null, null, null, null, null, null, null), http.NovoTraceId(), ct),
+                    statusCode: StatusCodes.Status201Created))
             .WithSummary("Criar a conta de uma instituição ou de um educador autônomo")
             .WithDescription("Endereço público, da tela Criar conta do hub (RF-104, RN-179, RN-180, RN-242). A senha da conta master é " +
                 "gerada e mostrada uma vez; a pessoa anota e confirma em POST /auth/hub/confirmar-senha com o comprovante.")

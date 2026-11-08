@@ -275,17 +275,35 @@ public sealed class GeracoesNoBanco(Armazenamento armazenamento) : IGeracoesDeSe
             .Set("resumoComprovante", Bson.Valor(geracao.ResumoComprovante)), cancellationToken: ct);
 }
 
-// Auditoria (RN-178: 5 anos), pedidos de ajuda ao SAC e o último pagamento.
-public sealed class RegistrosNoBanco(Armazenamento armazenamento) : IAuditoria, IPedidosDeAjuda, IPagamentos
+// Auditoria e erros (RN-178, RN-270: 5 anos, só inclusão), pedidos de ajuda ao
+// SAC e o último pagamento.
+public sealed class RegistrosNoBanco(Armazenamento armazenamento) : IAuditoria, IAuditoriaDeErros, IPedidosDeAjuda, IPagamentos
 {
     public Task Registrar(RegistroDeAuditoria registro, CancellationToken ct = default) =>
         armazenamento.Colecao(Colecoes.Auditoria).InsertOneAsync(new BsonDocument
         {
             ["_id"] = Guid.NewGuid().ToString("N"),
-            ["contaId"] = registro.ContaId,
-            ["quem"] = registro.Quem,
+            ["contaId"] = Bson.Valor(registro.ContaId),
+            ["quem"] = Bson.Valor(registro.Quem),
             ["acao"] = registro.Acao.Texto(),
-            ["alvo"] = registro.Alvo,
+            ["alvo"] = Bson.Valor(registro.Alvo),
+            ["traceId"] = registro.TraceId.Valor,
+            ["etapa"] = registro.Etapa.Texto(),
+            ["quando"] = Bson.Valor(registro.Quando),
+            ["guardarAte"] = Bson.Valor(registro.GuardarAte),
+        }, cancellationToken: ct);
+
+    public Task Registrar(RegistroDeErro registro, CancellationToken ct = default) =>
+        armazenamento.Colecao(Colecoes.AuditoriaErros).InsertOneAsync(new BsonDocument
+        {
+            ["_id"] = Guid.NewGuid().ToString("N"),
+            ["traceId"] = registro.TraceId.Valor,
+            ["contaId"] = Bson.Valor(registro.ContaId),
+            ["quem"] = Bson.Valor(registro.Quem),
+            ["acao"] = registro.Acao.Texto(),
+            ["alvo"] = Bson.Valor(registro.Alvo),
+            ["codigo"] = registro.Codigo,
+            ["nivel"] = registro.Nivel.Texto(),
             ["quando"] = Bson.Valor(registro.Quando),
             ["guardarAte"] = Bson.Valor(registro.GuardarAte),
         }, cancellationToken: ct);

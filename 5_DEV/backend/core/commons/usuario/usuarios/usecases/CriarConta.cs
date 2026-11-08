@@ -13,28 +13,43 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// POST /contas (RF-104, RN-179, RN-242): a conta, a conta master e a senha dela,
 /// gerada do nome do responsável e mostrada uma vez, com o comprovante que abre
 /// a primeira sessão. Fora de homologação, a sigla iniciada por "QA" é recusada
-/// (RN-179).
+/// (RN-179). A execução é auditada com o traceId recebido: "INICIADO" ao chegar,
+/// "CONCLUIDO" antes de responder e, na recusa ou na falha, o registro de erro
+/// antes de a exceção sair daqui (RN-178, RN-270, RN-271). Sem log.
 /// </summary>
-public sealed class CriarConta(IUsuarios usuarios, IContas contas, IAuditoria auditoria, TimeProvider relogio, AmbienteDaAplicacao ambiente)
+public sealed class CriarConta(IContas contas, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio, AmbienteDaAplicacao ambiente)
     : ICriarConta
 {
-    readonly Apoio apoio = new(usuarios, contas, auditoria, relogio);
-
     /// <inheritdoc />
-    public async Task<ContaCriadaDto> Executar(NovaContaDto pedido, CancellationToken ct = default)
+    public async Task<ContaCriadaDto> Executar(NovaContaDto pedido, TraceId traceId, CancellationToken ct = default)
+    {
+        await RegistrarInicio(traceId, ct);
+        try
+        {
+            return await Criar(pedido, traceId, ct);
+        }
+        catch (Exception falha) when (falha is not OperationCanceledException)
+        {
+            await RegistrarErro(traceId, falha, ct);
+            throw;
+        }
+    }
+
+    /// <summary>A regra do POST /contas, do formulário ao "CONCLUIDO".</summary>
+    async Task<ContaCriadaDto> Criar(NovaContaDto pedido, TraceId traceId, CancellationToken ct)
     {
         var dados = ValidarPedido(pedido);
         await GarantirSiglaLivre(dados.Sigla, ct);
         await GarantirDominioLivre(dados.Dominio, ct);
 
-        var agora = apoio.Agora;
+        var agora = relogio.GetUtcNow();
         var conta = MontarConta(dados, agora);
         var senha = Senha.Gerar(dados.Responsavel);
         var comprovante = CodigoDeLiberacao.Comprovante();
         var master = MontarMaster(conta, senha, agora);
 
         await Gravar(conta, master, comprovante, agora, ct);
-        await Auditar(conta, master, ct);
+        await RegistrarConclusao(traceId, conta, ct);
         return new(conta.Id, master.Login, senha, comprovante);
     }
 
@@ -78,7 +93,25 @@ public sealed class CriarConta(IUsuarios usuarios, IContas contas, IAuditoria au
         return contas.Criar(conta, master, geracao, TempoDaConta.Padrao, ct);
     }
 
-    /// <summary>Guarda a criação da conta na auditoria (RN-178).</summary>
-    Task Auditar(ContaAssinante conta, UsuarioCadastrado master, CancellationToken ct) =>
-        apoio.Auditar(conta.Id, master.Id, AcaoAuditada.CriarConta, conta.Id, ct);
+    /// <summary>O "INICIADO" ao chegar: sem login, sem conta e sem alvo, que ainda não existem (RN-178).</summary>
+    Task RegistrarInicio(TraceId traceId, CancellationToken ct) =>
+        auditoria.Registrar(new RegistroDeAuditoria(traceId, EtapaDaExecucao.Iniciado, null, null, AcaoAuditada.CriarConta, null,
+            relogio.GetUtcNow()), ct);
+
+    /// <summary>O "CONCLUIDO" antes de responder, com a conta criada como conta e alvo, sem quem (RN-178).</summary>
+    Task RegistrarConclusao(TraceId traceId, ContaAssinante conta, CancellationToken ct) =>
+        auditoria.Registrar(new RegistroDeAuditoria(traceId, EtapaDaExecucao.Concluido, conta.Id, null, AcaoAuditada.CriarConta, conta.Id,
+            relogio.GetUtcNow()), ct);
+
+    /// <summary>A recusa ou a falha em auditoriaErros, com o traceId do "INICIADO" (RN-270).</summary>
+    Task RegistrarErro(TraceId traceId, Exception falha, CancellationToken ct)
+    {
+        var (codigo, nivel) = Classificar(falha);
+        return erros.Registrar(new RegistroDeErro(traceId, null, null, AcaoAuditada.CriarConta, null, codigo, nivel, relogio.GetUtcNow()), ct);
+    }
+
+    /// <summary>Recusa prevista (FalhaDeUsuarios) é ALERTA com o código dela; o resto é ERRO_INESPERADO, nivel ERRO (RN-270).</summary>
+    static (string Codigo, NivelDoErro Nivel) Classificar(Exception falha) => falha is FalhaDeUsuarios recusa
+        ? (recusa.Codigo, NivelDoErro.Alerta)
+        : (RegistroDeErro.ErroInesperado, NivelDoErro.Erro);
 }

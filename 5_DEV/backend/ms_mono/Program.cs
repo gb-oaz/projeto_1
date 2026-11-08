@@ -43,6 +43,7 @@ servicos.AddSingleton<IContas, ContasNoBanco>();
 servicos.AddSingleton<IGeracoesDeSenha, GeracoesNoBanco>();
 servicos.AddSingleton<RegistrosNoBanco>();
 servicos.AddSingleton<IAuditoria>(s => s.GetRequiredService<RegistrosNoBanco>());
+servicos.AddSingleton<IAuditoriaDeErros>(s => s.GetRequiredService<RegistrosNoBanco>());
 servicos.AddSingleton<IPedidosDeAjuda>(s => s.GetRequiredService<RegistrosNoBanco>());
 servicos.AddSingleton<IPagamentos>(s => s.GetRequiredService<RegistrosNoBanco>());
 servicos.AddSingleton<IIndicadores, IndicadoresNoBanco>();

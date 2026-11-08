@@ -38,7 +38,8 @@ public sealed class Preparo(Backend backend)
     {
         var documento = tipo == "INSTITUICAO" ? "12.345.678/0001-90" : "123.456.789-09";
         var criada = await Caso<ICriarConta>().Executar(new NovaContaDto(tipo, $"Escola {sigla}", documento,
-            "Gustavo Boaz de Moura Souza", "(51) 99999-0000", sigla.ToLowerInvariant(), sigla));
+            "Gustavo Boaz de Moura Souza", "(51) 99999-0000", sigla.ToLowerInvariant(), sigla),
+            Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId.Novo());
         await Confirmar(criada.Comprovante);
         return (criada.ContaId, await Entrar($"usr-{sigla.ToLowerInvariant()}-master", criada.Login, criada.Senha));
     }

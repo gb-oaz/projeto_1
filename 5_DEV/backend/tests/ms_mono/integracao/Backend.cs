@@ -52,8 +52,8 @@ public sealed class Backend : WebApplicationFactory<Program>, IAsyncLifetime
     }
 }
 
-// Uma resposta: o status, o corpo em JSON e os cookies.
-public sealed record Resposta(HttpStatusCode Status, JsonNode? Corpo, IReadOnlyList<string> Cookies)
+// Uma resposta: o status, o corpo em JSON, os cookies e o X-Trace-Id (RN-271).
+public sealed record Resposta(HttpStatusCode Status, JsonNode? Corpo, IReadOnlyList<string> Cookies, string? TraceId = null)
 {
     public string Texto(string campo) => Corpo?[campo]?.GetValue<string>() ?? throw new InvalidOperationException($"sem {campo}: {Corpo}");
 
@@ -84,7 +84,8 @@ public sealed class Cliente(HttpClient http) : IDisposable
         try { json = conteudo.Length > 0 ? JsonNode.Parse(conteudo) : null; }
         catch (System.Text.Json.JsonException) { }
         var cookies = resposta.Headers.TryGetValues("Set-Cookie", out var v) ? v.ToList() : [];
-        return new Resposta(resposta.StatusCode, json, cookies);
+        var traceId = resposta.Headers.TryGetValues("X-Trace-Id", out var t) ? t.Single() : null;
+        return new Resposta(resposta.StatusCode, json, cookies, traceId);
     }
 
     public void Dispose() => http.Dispose();

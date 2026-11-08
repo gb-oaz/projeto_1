@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace Boaz.MsMono.Infra.Out.Commons;
 
-// Os índices do MongoDB como o diagrama identidade-acesso-documentos (v12)
+// Os índices do MongoDB como o diagrama identidade-acesso-documentos (v13)
 // especifica, criados na partida, antes do primeiro pedido (RNF-227). Criar um
 // índice que já existe igual não faz nada. Um índice não único que não pode ser
 // criado vai para o log como aviso e a partida segue: é só desempenho. Um único
@@ -42,8 +42,13 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
         (Colecoes.GeracoesSenha, Comum(Chave.Ascending("contaId").Ascending("pedidaEm"), "contaId_pedidaEm")),
         // registrosPermissao: o histórico, do mais novo ao mais velho (RN-256)
         (Colecoes.RegistrosPermissao, Comum(Chave.Ascending("usuarioId").Descending("em").Descending("versao"), "usuarioId_em_versao")),
-        // auditoria (RN-178) e pedidos de ajuda (limite por aparelho, RNF-205)
+        // auditoria (RN-178) e auditoriaErros (RN-270): não únicos, nascem com
+        // dados no Cosmos DB RU 7.0; o traceId junta a execução (RN-271, 2 por execução)
         (Colecoes.Auditoria, Comum(Chave.Ascending("contaId").Ascending("quando"), "contaId_quando")),
+        (Colecoes.Auditoria, Comum(Chave.Ascending("traceId"), "traceId")),
+        (Colecoes.AuditoriaErros, Comum(Chave.Ascending("traceId"), "traceId")),
+        (Colecoes.AuditoriaErros, Comum(Chave.Ascending("contaId").Ascending("quando"), "contaId_quando")),
+        // pedidos de ajuda (limite por aparelho, RNF-205)
         (Colecoes.PedidosAjuda, Comum(Chave.Ascending("aparelho").Ascending("quando"), "aparelho_quando")),
     ];
 

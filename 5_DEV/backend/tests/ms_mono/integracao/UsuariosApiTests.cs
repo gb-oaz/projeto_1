@@ -38,6 +38,43 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
         Assert.Equal((HttpStatusCode.Conflict, "SIGLA_EM_USO"), (repetida.Status, repetida.Codigo));
     }
 
+    // RN-178, RN-270, RN-271: o X-Trace-Id no sucesso e na recusa, e os registros gravados com ele
+    [Fact]
+    public async Task RN_178_RN_270_RN_271_criar_conta_auditada_pelo_traceId()
+    {
+        using var api = backend.Cliente();
+        var sigla = Sigla();
+        var corpo = new
+        {
+            tipo = "INSTITUICAO",
+            nome = "Escola Bento Freitas",
+            documento = "12.345.678/0001-90",
+            responsavel = "Gustavo Boaz de Moura Souza",
+            telefone = "(51) 99999-0000",
+            dominio = sigla.ToLowerInvariant(),
+            sigla,
+        };
+
+        var criada = await api.Enviar("POST", "/contas", corpo);
+        var repetida = await api.Enviar("POST", "/contas", corpo);
+
+        Assert.Matches("^trc-[0-9a-f]{8}$", criada.TraceId);
+        Assert.Matches("^trc-[0-9a-f]{8}$", repetida.TraceId);
+        Assert.NotEqual(criada.TraceId, repetida.TraceId);
+        var etapas = (await Registros("auditoria", criada.TraceId!)).ToDictionary(d => d["etapa"].AsString);
+        Assert.Equal(new[] { "CONCLUIDO", "INICIADO" }, etapas.Keys.Order().ToArray());
+        Assert.True(etapas["INICIADO"]["contaId"].IsBsonNull && etapas["INICIADO"]["quem"].IsBsonNull && etapas["INICIADO"]["alvo"].IsBsonNull);
+        Assert.Equal($"conta-{sigla.ToLowerInvariant()}", etapas["CONCLUIDO"]["alvo"].AsString);
+        Assert.Equal("INICIADO", Assert.Single(await Registros("auditoria", repetida.TraceId!))["etapa"].AsString);
+        var erro = Assert.Single(await Registros("auditoriaErros", repetida.TraceId!));
+        Assert.Equal(("CRIAR_CONTA", "SIGLA_EM_USO", "ALERTA"), (erro["acao"].AsString, erro["codigo"].AsString, erro["nivel"].AsString));
+        Assert.Equal(erro["quando"].ToUniversalTime().AddYears(5), erro["guardarAte"].ToUniversalTime());
+    }
+
+    // os registros de uma execução
+    Task<List<BsonDocument>> Registros(string colecao, string traceId) =>
+        backend.Banco.GetCollection<BsonDocument>(colecao).Find(Builders<BsonDocument>.Filter.Eq("traceId", traceId)).ToListAsync();
+
     [Fact]
     public async Task Corpo_que_nao_e_json_responde_422()
     {

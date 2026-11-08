@@ -66,11 +66,31 @@ public static class Http
             catch (Exception falha) when (Traduzir(falha) is { } traduzida && !contexto.Response.HasStarted)
             {
                 contexto.Response.Clear();
+                ManterTraceId(contexto);
                 contexto.Response.StatusCode = traduzida.Status;
                 await contexto.Response.WriteAsJsonAsync(traduzida.Erro);
             }
         });
         return app;
+    }
+
+    // O cabeçalho com o traceId de cada execução auditada (RN-271).
+    public const string CabecalhoDoTraceId = "X-Trace-Id";
+
+    // Um traceId novo para a execução auditada (RN-271), já no cabeçalho
+    // X-Trace-Id da resposta; a recusa o mantém (UseRespostasDeErro).
+    public static TraceId NovoTraceId(this HttpContext contexto)
+    {
+        var traceId = TraceId.Novo();
+        contexto.Items[typeof(TraceId)] = traceId;
+        contexto.Response.Headers[CabecalhoDoTraceId] = traceId.Valor;
+        return traceId;
+    }
+
+    // Response.Clear() apaga os cabeçalhos: a recusa repõe o X-Trace-Id da execução.
+    static void ManterTraceId(HttpContext contexto)
+    {
+        if (contexto.Items[typeof(TraceId)] is TraceId traceId) contexto.Response.Headers[CabecalhoDoTraceId] = traceId.Valor;
     }
 
     public static (int Status, Erro Erro)? Traduzir(Exception falha) => falha switch

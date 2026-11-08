@@ -13,7 +13,7 @@ namespace Boaz.Core.Commons.Tests.Usuario.Usuarios.Mocks;
 /// conferências do SAC, pedidos de ajuda e contas apagadas.
 /// </summary>
 public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, ITentativasDeLiberacao, ISessoesDosUsuarios,
-    IAuditoria, IPedidosDeAjuda, IPagamentos, IIndicadores
+    IAuditoria, IAuditoriaDeErros, IPedidosDeAjuda, IPagamentos, IIndicadores
 {
     readonly Dictionary<string, UsuarioCadastrado> usuarios = [];
     readonly Dictionary<string, ContaAssinante> contas = [];
@@ -154,6 +154,18 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     /// <summary>A auditoria inteira.</summary>
     public List<RegistroDeAuditoria> Auditoria { get; } = [];
 
+    /// <summary>Os registros de erro (auditoriaErros).</summary>
+    public List<RegistroDeErro> Erros { get; } = [];
+
+    /// <summary>
+    /// Auditoria e erros na ordem em que foram gravados, como "INICIADO",
+    /// "CONCLUIDO" ou "ALERTA SIGLA_EM_USO"; a recusa só sai do caso de uso depois.
+    /// </summary>
+    public List<string> Gravacoes { get; } = [];
+
+    /// <summary>Se não for null, IContas.Criar lança esta falha (o banco que cai no meio da gravação).</summary>
+    public Exception? FalhaAoCriarConta { get; set; }
+
     /// <summary>As conferências do SAC.</summary>
     public List<(string ContaId, string Quem, bool Conferiu)> Conferencias { get; } = [];
 
@@ -234,6 +246,7 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     Task IContas.Criar(ContaAssinante conta, UsuarioCadastrado master, GeracaoDeSenhaPedida geracao, TempoDaConta tempo, CancellationToken ct)
     {
+        if (FalhaAoCriarConta is { } falha) return Task.FromException(falha);
         contas.Add(conta.Id, conta);
         usuarios.Add(master.Id, master);
         geracoes.Add(geracao);
@@ -346,6 +359,14 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     Task IAuditoria.Registrar(RegistroDeAuditoria registro, CancellationToken ct)
     {
         Auditoria.Add(registro);
+        Gravacoes.Add(registro.Etapa.Texto());
+        return Task.CompletedTask;
+    }
+
+    Task IAuditoriaDeErros.Registrar(RegistroDeErro registro, CancellationToken ct)
+    {
+        Erros.Add(registro);
+        Gravacoes.Add($"{registro.Nivel.Texto()} {registro.Codigo}");
         return Task.CompletedTask;
     }
 
