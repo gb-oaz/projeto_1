@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v77"
-data: "2026-11-08 02:08"
+versao: "v78"
+data: "2026-11-08 02:11"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v77** · 2026-11-08 02:08 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v78** · 2026-11-08 02:11 · **Em revisão**
 
 # Módulo Usuários
 
@@ -2320,17 +2320,17 @@ Cenário: o que este documento não trata
 
 [![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v07_20261108-0203.svg)](../2_Diagramas/usuarios-contrato-api_v07_20261108-0203.svg)
 
-**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v05_20261108-0203.svg`
+**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v06_20261108-0209.svg`
 
-[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v05_20261108-0203.svg)](../2_Diagramas/identidade-acesso-classes_v05_20261108-0203.svg)
+[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v06_20261108-0209.svg)](../2_Diagramas/identidade-acesso-classes_v06_20261108-0209.svg)
 
 **Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg`
 
 [![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)
 
-**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v13_20261108-0118.svg`
+**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v14_20261108-0209.svg`
 
-[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos, auditoria com traceId e etapa e auditoriaErros; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v13_20261108-0118.svg)](../2_Diagramas/identidade-acesso-documentos_v13_20261108-0118.svg)
+[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos, auditoria com traceId e etapa e auditoriaErros; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v14_20261108-0209.svg)](../2_Diagramas/identidade-acesso-documentos_v14_20261108-0209.svg)
 
 ---
 
@@ -2340,7 +2340,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v77** | 2026-11-08 02:08 | `RN-178`: CRIAR_USUARIO sem alvo no INICIADO e na recusa (409 MATRICULA_EM_USO), alvo só no CONCLUIDO; quem e contaId desde o INICIADO; `RN-271`: corpo que não é JSON recebe 422 antes do caso de uso, sem X-Trace-Id nem registros |
+| **v78** | 2026-11-08 02:11 | `RN-178`, `RN-272`, `RN-274`: AcaoAuditada com 21 ações (EDITAR_PERMISSOES, ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO, ENCERRAR_SESSOES, ESQUECI_SENHA_MASTER e as 11 anteriores), auditoria e auditoriaErros gravadas também pela Autenticação; diagramas: classes v05 → v06, modelo de documentos v13 → v14 |
+| v77 | 2026-11-08 02:08 | `RN-178`: CRIAR_USUARIO sem alvo no INICIADO e na recusa (409 MATRICULA_EM_USO), alvo só no CONCLUIDO; quem e contaId desde o INICIADO; `RN-271`: corpo que não é JSON recebe 422 antes do caso de uso, sem X-Trace-Id nem registros |
 | v76 | 2026-11-08 02:05 | `RN-274`: POST /contas/esqueci-senha-master auditado com a ação ESQUECI_SENHA_MASTER, sem quem nem contaId, X-Trace-Id e 429 LIMITE_ATENDIMENTO como ALERTA; entradas e sessões no 17-a (`RN-272`, `RN-273`); Em aberto resolvido e removido |
 | v75 | 2026-11-08 02:04 | Diagramas da v74 (`RN-178`, `RN-270`, `RN-271`): sequência v03 → v04 (422 com X-Trace-Id só o da regra; corpo que não é JSON recusado antes do endpoint, sem traceId, registros nem X-Trace-Id), contrato de API v06 → v07 (500 ERRO_INESPERADO confirmado, PUT permissões entre os auditados), classes v04 → v05 (EDITAR_PERMISSOES em AcaoAuditada) |
 | v74 | 2026-11-08 02:00 | `RN-270`: 500 ERRO_INESPERADO com "Algo deu errado. Tente de novo mais tarde.", nivel ERRO; Paulo já desativado com 409 ESTADO_IGUAL; leitura recusada pelo time deboaz (GET /contas); `RN-178`: PUT permissões grava "auditoria" com EDITAR_PERMISSOES além de "registrosPermissao"; `RNF-227` e `RNF-227-api`: índices de "auditoria" e "auditoriaErros", 7 coleções; Em aberto: auditoria de esqueci-senha-master e /auth/* |
@@ -2353,4 +2354,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v77 · 2026-11-08 02:08 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v78 · 2026-11-08 02:11 · `1_Requisitos/17_modulo-usuario.md`</sub>
