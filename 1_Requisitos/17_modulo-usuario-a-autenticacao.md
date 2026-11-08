@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-a-autenticacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autenticação"
-versao: "v25"
-data: "2026-11-08 09:50"
+versao: "v26"
+data: "2026-11-08 10:13"
 status: "Em revisão"
 objetivo: "definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v25** · 2026-11-08 09:50 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v26** · 2026-11-08 10:13 · **Em revisão**
 
 # Módulo Usuários · Autenticação
 
@@ -704,10 +704,11 @@ Esquema do Cenário: recusa depois de identificar a pessoa
   E esse registro vai com quem "<quem>" e contaId "conta-ebfga"
 
   Exemplos:
-    | situação       | método | endereço         | resposta                  | quem            |
-    | EBFGA suspensa | POST   | hub/entrar       | 403 ACESSO_INDISPONIVEL   | usr-ebfga-maria |
-    | EBFGA suspensa | POST   | quest/entrar     | 403 ACESSO_INDISPONIVEL   | usr-ebfga-lucas |
-    | sessão do João | DELETE | sessoes/9d41b0c3 | 404 SESSAO_NAO_ENCONTRADA | usr-ebfga-maria |
+    | situação       | método | endereço            | resposta                  | quem            |
+    | EBFGA suspensa | POST   | hub/entrar          | 403 ACESSO_INDISPONIVEL   | usr-ebfga-maria |
+    | EBFGA suspensa | POST   | quest/entrar        | 403 ACESSO_INDISPONIVEL   | usr-ebfga-lucas |
+    | EBFGA suspensa | POST   | hub/confirmar-senha | 403 ACESSO_INDISPONIVEL   | usr-ebfga-maria |
+    | sessão do João | DELETE | sessoes/9d41b0c3    | 404 SESSAO_NAO_ENCONTRADA | usr-ebfga-maria |
 
 Esquema do Cenário: token inválido recusado antes do caso de uso
   Quando chega <pedido> com um token de acesso vencido
@@ -1023,7 +1024,8 @@ Cenário: sem aparelhos conectados no quest
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v25** | 2026-11-08 09:50 | Diagrama (`RN-273`): contrato de API v03 → v04 (POST /auth/hub/confirmar-senha com 403 ACESSO_INDISPONIVEL, ALERTA já com quem e contaId, porque o comprovante identifica a pessoa, como no hub e no quest) |
+| **v26** | 2026-11-08 10:13 | `RN-273`: POST /auth/hub/confirmar-senha com 403 ACESSO_INDISPONIVEL na recusa depois de identificar a pessoa (ALERTA com quem e contaId, X-Trace-Id), como no contrato v04 |
+| v25 | 2026-11-08 09:50 | Diagrama (`RN-273`): contrato de API v03 → v04 (POST /auth/hub/confirmar-senha com 403 ACESSO_INDISPONIVEL, ALERTA já com quem e contaId, porque o comprovante identifica a pessoa, como no hub e no quest) |
 | v24 | 2026-11-08 02:22 | `RN-273`: 401 CODIGO_INVALIDO no quest, 403 ACESSO_INDISPONIVEL no quest e 404 SESSAO_NAO_ENCONTRADA em DELETE /auth/sessoes/{sid} como ALERTA; 401 de token inválido em sair e GET /auth/sessoes recusado antes do caso de uso, sem X-Trace-Id nem registros; `RN-272`: alvo já no INICIADO de SAIR, ENCERRAR_SESSAO e ENCERRAR_SESSOES |
 | v23 | 2026-11-08 02:20 | Diagramas da v22 (`RN-272`, `RN-273`): contrato de API v02 → v03 (quadro Auditoria e X-Trace-Id, selo X-Trace-Id e ação nos 8 endereços auditados, recusas 4xx como ALERTA, 500 ERRO_INESPERADO), sequência v03 → v04 (INICIADO com quem, contaId e alvo null, CONCLUIDO com o alvo, auditoriaErros e gravações no Redis destacadas) |
 | v22 | 2026-11-08 02:05 | `RN-272`: entradas, confirmação da senha, renovação, saída e encerramento de sessões auditados com INICIADO e CONCLUIDO, ações ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO e ENCERRAR_SESSOES, e X-Trace-Id; quem, contaId e alvo null até a pessoa ser identificada; `RN-273`: recusas em "auditoriaErros" (4xx ALERTA, 500 ERRO_INESPERADO) e nenhum segredo nos registros; status → Em revisão |
@@ -1032,9 +1034,7 @@ Cenário: sem aparelhos conectados no quest
 | v19 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v18 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v17 | 2026-11-03 11:45 | Estrutura do módulo (06 `RNF-103` v17): Telas em Web, PWA e Mobile, uma vista por plataforma; sequência v03 com as telas do hub e do quest em cada fase |
-| v16 | 2026-11-02 00:11 | Cenários separados em Cenários de tela e Cenários de API; os de API usam os endereços, pedidos e códigos do contrato (IDs nos dois: `<ID>-api`) |
-| v15 | 2026-11-01 23:41 | Diagramas de casos de uso e de documentos da autenticação v01 |
 
 ---
 
-<sub>boaz · v25 · 2026-11-08 09:50 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>
+<sub>boaz · v26 · 2026-11-08 10:13 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>
