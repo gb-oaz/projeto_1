@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v82"
-data: "2026-11-08 10:13"
+versao: "v83"
+data: "2026-11-08 11:31"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v82** · 2026-11-08 10:13 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v83** · 2026-11-08 11:31 · **Em revisão**
 
 # Módulo Usuários
 
@@ -1286,10 +1286,31 @@ Esquema do Cenário: execução auditada do começo ao fim
   E os dois com a Maria, a ação "<acao>", o alvo e a hora, guardados até 5 anos depois
 
   Exemplos:
-    | pedido                                          | acao               |
-    | POST /usuarios/usr-ebfga-ana/nova-geracao-senha | NOVA_GERACAO_SENHA |
-    | PUT /usuarios/usr-ebfga-joao/permissoes         | EDITAR_PERMISSOES  |
-    | POST /usuarios/usr-ebfga-paulo/desativar        | DESATIVAR_USUARIO  |
+    | pedido                                            | acao                |
+    | POST /usuarios/usr-ebfga-ana/nova-geracao-senha   | NOVA_GERACAO_SENHA  |
+    | PUT /usuarios/usr-ebfga-joao/permissoes           | EDITAR_PERMISSOES   |
+    | POST /usuarios/usr-ebfga-paulo/desativar          | DESATIVAR_USUARIO   |
+    | POST /usuarios/usr-ebfga-paulo/reativar           | REATIVAR_USUARIO    |
+    | PATCH /usuarios/usr-ebfga-lucas                   | EDITAR_USUARIO      |
+    | POST /usuarios/usr-ebfga-lucas/novo-codigo-acesso | NOVO_CODIGO_ACESSO  |
+    | PUT /contas/conta-ebfga/tempo-sessao              | SALVAR_TEMPO_SESSAO |
+
+Cenário: senha gerada sem login, conta e alvo só na conclusão
+  Quando envia POST /usuarios/gerar-senha, sem login, com o código de liberação da Maria
+  E a resposta é 200 com a senha
+  Então "auditoria" ganha o "INICIADO" da ação "GERAR_SENHA" sem quem, sem contaId e sem alvo
+  E o "CONCLUIDO", com o mesmo traceId, vai com a "conta-ebfga" e o alvo "usr-ebfga-maria", sem quem
+
+Cenário: time deboaz, a conta pedida e a master só na conclusão
+  Quando o Caio, do time deboaz, envia POST /contas/conta-ebfga/codigo-master
+  E a resposta é 201 com o código de liberação
+  Então o "INICIADO" da ação "CODIGO_MASTER" vai com "usr-dboaz-caio" e a "conta-ebfga", sem alvo
+  E o "CONCLUIDO", com o mesmo traceId, repete os dois e vai com o alvo "usr-ebfga-master"
+
+Cenário: tempo de sessão do time
+  Quando o Caio envia PUT /time/tempo-sessao e a resposta é 200
+  Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "SALVAR_TEMPO_SESSAO"
+  E os dois vão com "usr-dboaz-caio", a "conta-dboaz", a conta de quem pede, e o alvo "time"
 
 Cenário: usuário criado, alvo só na conclusão
   Quando a Maria envia POST /usuarios do participante Lucas
@@ -1368,6 +1389,37 @@ Cenário: falha inesperada
   E o banco cai no meio da gravação
   Então a resposta é 500 ERRO_INESPERADO com a mensagem "Algo deu errado. Tente de novo mais tarde."
   E "auditoriaErros" ganha o registro com o código "ERRO_INESPERADO" e o nivel "ERRO"
+
+Esquema do Cenário: recusa prevista de cada caso de uso vira ALERTA
+  Quando chega <pedido>
+  Então a resposta é <resposta>, com o cabeçalho X-Trace-Id
+  E "auditoria" fica só com o "INICIADO" da ação "<acao>", com esse traceId
+  E "auditoriaErros" ganha o código da resposta e o nivel "ALERTA", com esse traceId
+
+  Exemplos:
+    | pedido                                  | resposta                   | acao                |
+    | o CNPJ de um AUTONOMO em POST /contas   | 422 DADOS_INVALIDOS        | CRIAR_CONTA         |
+    | o nome curto "maria" no POST /usuarios  | 409 NOME_CURTO_EM_USO      | CRIAR_USUARIO       |
+    | a matrícula da Maria no PATCH da Ana    | 409 MATRICULA_EM_USO       | EDITAR_USUARIO      |
+    | o código "111111" em gerar-senha        | 401 CODIGO_INVALIDO        | GERAR_SENHA         |
+    | o código de 73 h em gerar-senha         | 410 CODIGO_VENCIDO         | GERAR_SENHA         |
+    | a nova geração do Rui, pedida pelo João | 403 ACESSO_NEGADO          | NOVA_GERACAO_SENHA  |
+    | a nova geração do participante Lucas    | 422 SEM_SENHA              | NOVA_GERACAO_SENHA  |
+    | o novo código de acesso da staff Maria  | 422 SO_PARTICIPANTE        | NOVO_CODIGO_ACESSO  |
+    | o reativar do Paulo já ativo            | 409 ESTADO_IGUAL           | REATIVAR_USUARIO    |
+    | o João dando à Ana mais do que ele tem  | 403 PERMISSAO_ACIMA        | EDITAR_PERMISSOES   |
+    | as permissões da Maria com If-Match "6" | 412 VERSAO_DESATUALIZADA   | EDITAR_PERMISSOES   |
+    | a EBFGA encerrada de volta a "ATIVA"    | 409 TRANSICAO_INVALIDA     | MUDAR_ESTADO_CONTA  |
+    | o pagamento errado no codigo-master     | 422 CONFERENCIA_INCOMPLETA | CODIGO_MASTER       |
+    | "PT30H" no tempo do time                | 422 FORA_DOS_LIMITES       | SALVAR_TEMPO_SESSAO |
+    | a master da EBFGA no tempo do time      | 403 ACESSO_NEGADO          | SALVAR_TEMPO_SESSAO |
+
+Cenário: sem o módulo, recusada antes do caso de uso
+  Dado o token da staff Ana sem "MOD-03" com "U"
+  Quando ela envia POST /usuarios/usr-ebfga-paulo/desativar
+  Então a resposta é 403 ACESSO_NEGADO, recusada antes do caso de uso
+  E a resposta não traz o cabeçalho X-Trace-Id
+  E as coleções "auditoria" e "auditoriaErros" não ganham registro, como o 422 da RN-271
 
 Cenário: guardado e imutável como a auditoria
   Dado o registro "auderr-000031" da sigla "EBFGA" repetida, gravado em 2026-11-08
@@ -2348,7 +2400,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v82** | 2026-11-08 10:13 | `RN-178`: POST /contas/{id}/estado com o mesmo estado responde 200 e grava INICIADO e CONCLUIDO de MUDAR_ESTADO_CONTA, com contaId e alvo da conta pedida, como no contrato v09 |
+| **v83** | 2026-11-08 11:31 | Auditoria em todos os casos de uso: `RN-178` com REATIVAR_USUARIO, EDITAR_USUARIO, NOVO_CODIGO_ACESSO e SALVAR_TEMPO_SESSAO da conta nos Exemplos e cenários de GERAR_SENHA sem login, CODIGO_MASTER e SALVAR_TEMPO_SESSAO do time (quem, contaId e alvo por etapa); `RN-270` com a recusa prevista de cada caso de uso como ALERTA e o 403 sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registro |
+| v82 | 2026-11-08 10:13 | `RN-178`: POST /contas/{id}/estado com o mesmo estado responde 200 e grava INICIADO e CONCLUIDO de MUDAR_ESTADO_CONTA, com contaId e alvo da conta pedida, como no contrato v09 |
 | v81 | 2026-11-08 09:50 | Diagramas da auditoria (`RN-178`): contrato de API v08 → v09 (quem, contaId e alvo de GERAR_SENHA sem login, MUDAR_ESTADO_CONTA, SALVAR_TEMPO_SESSAO da conta e do time, CODIGO_MASTER e EDITAR_PERMISSOES; o mesmo estado da conta responde 200 e grava INICIADO e CONCLUIDO), sequência v05 → v06 (quem, contaId e alvo de GERAR_SENHA, CODIGO_MASTER e MUDAR_ESTADO_CONTA) |
 | v80 | 2026-11-08 02:15 | `RN-271`: corpo que não é JSON recebe 422 DADOS_INVALIDOS com "O campo "corpo" está faltando ou é inválido." e o campo "corpo", como no contrato v08; segue sem X-Trace-Id e sem registros |
 | v79 | 2026-11-08 02:14 | Diagramas da v76–v78 (`RN-178`, `RN-271`, `RN-274`): contrato de API v07 → v08 (POST /contas/esqueci-senha-master auditado com ESQUECI_SENHA_MASTER, X-Trace-Id, 429 LIMITE_ATENDIMENTO como ALERTA e 500 ERRO_INESPERADO; 422 de corpo que não é JSON com DADOS_INVALIDOS e campo "corpo", sem X-Trace-Id), sequência v04 → v05 (INICIADO de CRIAR_USUARIO sem alvo, alvo só no CONCLUIDO) |
@@ -2357,8 +2410,7 @@ Cenário: o que este documento não trata
 | v76 | 2026-11-08 02:05 | `RN-274`: POST /contas/esqueci-senha-master auditado com a ação ESQUECI_SENHA_MASTER, sem quem nem contaId, X-Trace-Id e 429 LIMITE_ATENDIMENTO como ALERTA; entradas e sessões no 17-a (`RN-272`, `RN-273`); Em aberto resolvido e removido |
 | v75 | 2026-11-08 02:04 | Diagramas da v74 (`RN-178`, `RN-270`, `RN-271`): sequência v03 → v04 (422 com X-Trace-Id só o da regra; corpo que não é JSON recusado antes do endpoint, sem traceId, registros nem X-Trace-Id), contrato de API v06 → v07 (500 ERRO_INESPERADO confirmado, PUT permissões entre os auditados), classes v04 → v05 (EDITAR_PERMISSOES em AcaoAuditada) |
 | v74 | 2026-11-08 02:00 | `RN-270`: 500 ERRO_INESPERADO com "Algo deu errado. Tente de novo mais tarde.", nivel ERRO; Paulo já desativado com 409 ESTADO_IGUAL; leitura recusada pelo time deboaz (GET /contas); `RN-178`: PUT permissões grava "auditoria" com EDITAR_PERMISSOES além de "registrosPermissao"; `RNF-227` e `RNF-227-api`: índices de "auditoria" e "auditoriaErros", 7 coleções; Em aberto: auditoria de esqueci-senha-master e /auth/* |
-| v73 | 2026-11-08 01:26 | Diagramas da auditoria (`RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (INICIADO, CONCLUIDO, auditoriaErros e X-Trace-Id; gravações no MongoDB e no Redis destacadas), contrato de API v05 → v06 (X-Trace-Id nos auditados, 500), classes v03 → v04 (traceId, etapa, RegistroDeErro, IAuditoriaDeErros), modelo de documentos v12 → v13 (auditoriaErros e índices) |
 
 ---
 
-<sub>boaz · v82 · 2026-11-08 10:13 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v83 · 2026-11-08 11:31 · `1_Requisitos/17_modulo-usuario.md`</sub>
