@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-a-autenticacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autenticação"
-versao: "v23"
-data: "2026-11-08 02:20"
+versao: "v24"
+data: "2026-11-08 02:22"
 status: "Em revisão"
 objetivo: "definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v23** · 2026-11-08 02:20 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v24** · 2026-11-08 02:22 · **Em revisão**
 
 # Módulo Usuários · Autenticação
 
@@ -657,6 +657,17 @@ Esquema do Cenário: execução que muda a sessão, auditada do começo ao fim
     | DELETE | sessoes/3f9c2a71    | ENCERRAR_SESSAO  | usr-ebfga-maria         | 3f9c2a71        |
     | DELETE | sessoes             | ENCERRAR_SESSOES | usr-ebfga-maria         | usr-ebfga-maria |
 
+Esquema do Cenário: alvo conhecido desde o começo
+  Quando a Maria envia <método> /auth/<endereço> com o token da sessão 3f9c2a71
+  Então o "INICIADO" da ação "<acao>" já vai com a Maria, a "conta-ebfga" e o alvo "<alvo>"
+  E o "CONCLUIDO", com o mesmo traceId, repete quem, contaId e alvo
+
+  Exemplos:
+    | método | endereço         | acao             | alvo            |
+    | POST   | sair             | SAIR             | 3f9c2a71        |
+    | DELETE | sessoes/9d41b0c3 | ENCERRAR_SESSAO  | 9d41b0c3        |
+    | DELETE | sessoes          | ENCERRAR_SESSOES | usr-ebfga-maria |
+
 Cenário: quem ainda não foi identificado
   Quando a Maria envia POST /auth/hub/entrar com a entrada e a senha certas
   Então o registro "INICIADO" da ação "ENTRAR_HUB" vai com quem, contaId e alvo null
@@ -679,17 +690,35 @@ Esquema do Cenário: recusa vira alerta ou erro
     | pedido                               | resposta                 | acao            | nivel  |
     | senha errada em /auth/hub/entrar     | 401 ENTRADA_INVALIDA     | ENTRAR_HUB      | ALERTA |
     | 5ª senha errada em /auth/hub/entrar  | 429 ENTRADA_BLOQUEADA    | ENTRAR_HUB      | ALERTA |
+    | código errado em /auth/quest/entrar  | 401 CODIGO_INVALIDO      | ENTRAR_QUEST    | ALERTA |
     | comprovante repetido                 | 401 COMPROVANTE_INVALIDO | CONFIRMAR_SENHA | ALERTA |
     | sessão sem uso há 9 h renovada       | 401 SESSAO_TERMINADA     | RENOVAR_SESSAO  | ALERTA |
     | entrada na sala fechada              | 404 SALA_FECHADA         | ENTRAR_SALA     | ALERTA |
     | Redis fora do ar em /auth/hub/entrar | 500 ERRO_INESPERADO      | ENTRAR_HUB      | ERRO   |
 
-Cenário: recusa depois de identificar a pessoa
-  Dado a EBFGA suspensa
-  Quando a Maria envia POST /auth/hub/entrar com a entrada e a senha certas
-  Então a resposta é 403 ACESSO_INDISPONIVEL
-  E "auditoriaErros" ganha o código "ACESSO_INDISPONIVEL" e o nivel "ALERTA"
-  E esse registro vai com quem "usr-ebfga-maria" e contaId "conta-ebfga"
+Esquema do Cenário: recusa depois de identificar a pessoa
+  Dado <situação>
+  Quando chega <método> /auth/<endereço>
+  Então a resposta é <resposta>, com o cabeçalho X-Trace-Id
+  E "auditoriaErros" ganha o código da resposta e o nivel "ALERTA", com esse traceId
+  E esse registro vai com quem "<quem>" e contaId "conta-ebfga"
+
+  Exemplos:
+    | situação       | método | endereço         | resposta                  | quem            |
+    | EBFGA suspensa | POST   | hub/entrar       | 403 ACESSO_INDISPONIVEL   | usr-ebfga-maria |
+    | EBFGA suspensa | POST   | quest/entrar     | 403 ACESSO_INDISPONIVEL   | usr-ebfga-lucas |
+    | sessão do João | DELETE | sessoes/9d41b0c3 | 404 SESSAO_NAO_ENCONTRADA | usr-ebfga-maria |
+
+Esquema do Cenário: token inválido recusado antes do caso de uso
+  Quando chega <pedido> com um token de acesso vencido
+  Então a resposta é 401, recusada antes do caso de uso
+  E a resposta não traz o cabeçalho X-Trace-Id
+  E "auditoria" e "auditoriaErros" não ganham registro, como o 422 da RN-271 do 17
+
+  Exemplos:
+    | pedido            |
+    | POST /auth/sair   |
+    | GET /auth/sessoes |
 
 Esquema do Cenário: nenhum segredo na auditoria
   Quando envia <pedido>
@@ -994,7 +1023,8 @@ Cenário: sem aparelhos conectados no quest
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v23** | 2026-11-08 02:20 | Diagramas da v22 (`RN-272`, `RN-273`): contrato de API v02 → v03 (quadro Auditoria e X-Trace-Id, selo X-Trace-Id e ação nos 8 endereços auditados, recusas 4xx como ALERTA, 500 ERRO_INESPERADO), sequência v03 → v04 (INICIADO com quem, contaId e alvo null, CONCLUIDO com o alvo, auditoriaErros e gravações no Redis destacadas) |
+| **v24** | 2026-11-08 02:22 | `RN-273`: 401 CODIGO_INVALIDO no quest, 403 ACESSO_INDISPONIVEL no quest e 404 SESSAO_NAO_ENCONTRADA em DELETE /auth/sessoes/{sid} como ALERTA; 401 de token inválido em sair e GET /auth/sessoes recusado antes do caso de uso, sem X-Trace-Id nem registros; `RN-272`: alvo já no INICIADO de SAIR, ENCERRAR_SESSAO e ENCERRAR_SESSOES |
+| v23 | 2026-11-08 02:20 | Diagramas da v22 (`RN-272`, `RN-273`): contrato de API v02 → v03 (quadro Auditoria e X-Trace-Id, selo X-Trace-Id e ação nos 8 endereços auditados, recusas 4xx como ALERTA, 500 ERRO_INESPERADO), sequência v03 → v04 (INICIADO com quem, contaId e alvo null, CONCLUIDO com o alvo, auditoriaErros e gravações no Redis destacadas) |
 | v22 | 2026-11-08 02:05 | `RN-272`: entradas, confirmação da senha, renovação, saída e encerramento de sessões auditados com INICIADO e CONCLUIDO, ações ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO e ENCERRAR_SESSOES, e X-Trace-Id; quem, contaId e alvo null até a pessoa ser identificada; `RN-273`: recusas em "auditoriaErros" (4xx ALERTA, 500 ERRO_INESPERADO) e nenhum segredo nos registros; status → Em revisão |
 | v21 | 2026-11-07 14:05 | Diagrama autenticacao-documentos v03: índices como o ms_mono cria na partida (login, sigla e domínio únicos, resumoComprovante); cenários sem mudança |
 | v20 | 2026-11-06 23:23 | Diagrama autenticacao-documentos v02, fiel ao código: tempoDoTime na conta do time, tempoSemUso e ultimoErro no Redis, tipo ADMINISTRADOR |
@@ -1003,9 +1033,7 @@ Cenário: sem aparelhos conectados no quest
 | v17 | 2026-11-03 11:45 | Estrutura do módulo (06 `RNF-103` v17): Telas em Web, PWA e Mobile, uma vista por plataforma; sequência v03 com as telas do hub e do quest em cada fase |
 | v16 | 2026-11-02 00:11 | Cenários separados em Cenários de tela e Cenários de API; os de API usam os endereços, pedidos e códigos do contrato (IDs nos dois: `<ID>-api`) |
 | v15 | 2026-11-01 23:41 | Diagramas de casos de uso e de documentos da autenticação v01 |
-| v14 | 2026-11-01 22:01 | JSON do token e da sessão expandidos (RNF-215, RNF-217); contrato de API v02, com JSON expandido |
-| v13 | 2026-11-01 17:59 | Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão |
 
 ---
 
-<sub>boaz · v23 · 2026-11-08 02:20 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>
+<sub>boaz · v24 · 2026-11-08 02:22 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>
