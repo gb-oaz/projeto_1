@@ -31,8 +31,12 @@ public sealed class PedirAjudaDaMaster(IPedidosDeAjuda pedidos, IAuditoria audit
         var agora = relogio.GetUtcNow();
         await GarantirLimite(pedido.Aparelho, agora, ct);
         var id = await pedidos.Enviar(pedido.Aparelho, instituicao, contato, agora, ct);
-        await auditada.Concluir(execucao with { Alvo = id }, ct);
+        await RegistrarConclusao(execucao, id, ct);
     }
+
+    /// <summary>O "CONCLUIDO" com o pedido gravado em "pedidosAjuda" como alvo; o "INICIADO" foi sem alvo (RN-178).</summary>
+    Task RegistrarConclusao(Execucao execucao, string pedidoId, CancellationToken ct) =>
+        auditada.Concluir(execucao with { Alvo = pedidoId }, ct);
 
     /// <summary>O aparelho ainda tem envio nas últimas 24 h (RNF-205).</summary>
     /// <exception cref="FalhaDeUsuarios">LIMITE_ATENDIMENTO com o tentarEm.</exception>

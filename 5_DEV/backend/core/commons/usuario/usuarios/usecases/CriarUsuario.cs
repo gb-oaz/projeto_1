@@ -35,16 +35,23 @@ public sealed class CriarUsuario(
     async Task<UsuarioCriadoDto> Criar(NovoUsuarioDto pedido, Execucao execucao, CancellationToken ct)
     {
         var dados = pedido.Validar();
-        var quem = await apoio.Quem(pedido.QuemPede, ct);
-        var conta = await apoio.ContaDe(quem, ct);
-        GarantirQuePodeCriar(quem, conta, dados);
+        var (quem, conta) = await QuemPodeCriar(pedido.QuemPede, dados, ct);
         await GarantirNomeCurtoEMatriculaLivres(conta, dados, ct);
 
         var novo = await Montar(quem, conta, dados, ct);
-        await usuarios.Inserir(novo, ct);
-        var (codigo, venceEm) = await PedirGeracao(novo, quem, ct);
-        await auditada.Concluir(execucao with { Alvo = novo.Id }, ct);
+        var (codigo, venceEm) = await Gravar(novo, quem, ct);
+        await RegistrarConclusao(execucao, novo, ct);
         return new(novo.Id, novo.Login, novo.Estado.Texto(), codigo, venceEm);
+    }
+
+    /// <summary>Quem pede e a conta dele, se ele pode criar esse tipo ali (RN-164, RN-188).</summary>
+    /// <exception cref="FalhaDeUsuarios">ACESSO_NEGADO, CONTA_INEXISTENTE ou DADOS_INVALIDOS.</exception>
+    async Task<(UsuarioCadastrado Quem, ContaAssinante Conta)> QuemPodeCriar(string quemPede, DadosDoUsuario dados, CancellationToken ct)
+    {
+        var quem = await apoio.Quem(quemPede, ct);
+        var conta = await apoio.ContaDe(quem, ct);
+        GarantirQuePodeCriar(quem, conta, dados);
+        return (quem, conta);
     }
 
     /// <summary>Quem pede pode criar esse tipo, e o autônomo não manda matrícula (RN-164, RN-188).</summary>
@@ -83,6 +90,13 @@ public sealed class CriarUsuario(
             codigoGeradoEm: participante ? agora : null);
     }
 
+    /// <summary>Grava o usuário novo e, no staff e no membro, a geração de senha com o código de liberação.</summary>
+    async Task<(string? Codigo, DateTimeOffset? VenceEm)> Gravar(UsuarioCadastrado novo, UsuarioCadastrado quem, CancellationToken ct)
+    {
+        await usuarios.Inserir(novo, ct);
+        return await PedirGeracao(novo, quem, ct);
+    }
+
     /// <summary>O staff e o membro recebem o código de liberação, mostrado uma vez (RN-181); o participante, nada.</summary>
     async Task<(string? Codigo, DateTimeOffset? VenceEm)> PedirGeracao(UsuarioCadastrado novo, UsuarioCadastrado quem, CancellationToken ct)
     {
@@ -91,4 +105,8 @@ public sealed class CriarUsuario(
         await geracoes.Inserir(geracao, ct);
         return (codigo, geracao.VenceEm);
     }
+
+    /// <summary>O "CONCLUIDO" antes de responder, já com o usuário criado como alvo (RN-178).</summary>
+    Task RegistrarConclusao(Execucao execucao, UsuarioCadastrado novo, CancellationToken ct) =>
+        auditada.Concluir(execucao with { Alvo = novo.Id }, ct);
 }

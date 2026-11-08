@@ -31,17 +31,37 @@ public sealed class EditarUsuario(
     async Task<UsuarioEditadoDto> Editar(EdicaoDeUsuarioDto pedido, Execucao execucao, CancellationToken ct)
     {
         var (nome, nomeCurto, matricula, responsaveis) = pedido.Validar();
-        var quem = await apoio.Quem(pedido.QuemPede, ct);
-        var alvo = await apoio.Administravel(quem, pedido.UsuarioId, ct);
+        var (quem, alvo) = await AlvoAdministravel(pedido, ct);
         await GarantirDadosDoAlvo(quem, alvo, nomeCurto, matricula, responsaveis is not null, ct);
 
-        var participante = alvo.Tipo == TipoUsuario.Participante;
-        var codigo = nomeCurto is not null && nomeCurto != alvo.NomeCurto && participante ? await apoio.NovoCodigo(alvo.Sigla, nomeCurto, ct) : "";
+        var codigo = await CodigoDoNomeCurtoNovo(alvo, nomeCurto, ct);
         var mudouEntrada = alvo.Editar(nome, nomeCurto, matricula, responsaveis, apoio.Agora, () => codigo);
-        await usuarios.Atualizar(alvo, ct);
-        if (mudouEntrada) await sessoes.EncerrarDoUsuario(alvo.Id, participante ? MotivoFim.NovoCodigo : MotivoFim.NovoNomeCurto, ct);
+        await Gravar(alvo, mudouEntrada, ct);
         await auditada.Concluir(execucao, ct);
         return new(alvo.Id, alvo.Login);
+    }
+
+    /// <summary>Quem pede e o alvo, se quem pede está acima dele (RN-169).</summary>
+    /// <exception cref="FalhaDeUsuarios">ACESSO_NEGADO ou USUARIO_INEXISTENTE.</exception>
+    async Task<(UsuarioCadastrado Quem, UsuarioCadastrado Alvo)> AlvoAdministravel(EdicaoDeUsuarioDto pedido, CancellationToken ct)
+    {
+        var quem = await apoio.Quem(pedido.QuemPede, ct);
+        return (quem, await apoio.Administravel(quem, pedido.UsuarioId, ct));
+    }
+
+    /// <summary>O código de acesso novo do participante cujo nome curto muda (RN-244); fora disso, nenhum.</summary>
+    async Task<string> CodigoDoNomeCurtoNovo(UsuarioCadastrado alvo, string? nomeCurto, CancellationToken ct) =>
+        nomeCurto is not null && nomeCurto != alvo.NomeCurto && alvo.Tipo == TipoUsuario.Participante
+            ? await apoio.NovoCodigo(alvo.Sigla, nomeCurto, ct)
+            : "";
+
+    /// <summary>Grava o alvo e, se a entrada mudou, encerra as sessões dele (RN-244).</summary>
+    async Task Gravar(UsuarioCadastrado alvo, bool mudouEntrada, CancellationToken ct)
+    {
+        await usuarios.Atualizar(alvo, ct);
+        if (!mudouEntrada) return;
+        var motivo = alvo.Tipo == TipoUsuario.Participante ? MotivoFim.NovoCodigo : MotivoFim.NovoNomeCurto;
+        await sessoes.EncerrarDoUsuario(alvo.Id, motivo, ct);
     }
 
     /// <summary>

@@ -34,18 +34,33 @@ public sealed class GerarSenha(
         var (entrada, codigo) = pedido.Validar();
         var (usuario, geracao) = await GeracaoConferida(entrada, codigo, ct);
 
-        // A senha da conta master sai do nome de quem cadastrou a conta (RN-171).
-        var nome = usuario.Tipo == TipoUsuario.Master ? (await apoio.ContaDe(usuario, ct)).Responsavel : usuario.Nome;
-        var senha = Senha.Gerar(nome);
+        var senha = Senha.Gerar(await NomeDaSenha(usuario, ct));
         var comprovante = CodigoDeLiberacao.Comprovante();
+        await Gravar(usuario, geracao, senha, comprovante, ct);
+        await tentativas.Apagar(entrada, ct);
+        await RegistrarConclusao(execucao, usuario, ct);
+        return new(senha, comprovante);
+    }
+
+    /// <summary>O nome de onde a senha sai: o da conta master é o de quem cadastrou a conta (RN-171).</summary>
+    async Task<string> NomeDaSenha(UsuarioCadastrado usuario, CancellationToken ct) =>
+        usuario.Tipo == TipoUsuario.Master ? (await apoio.ContaDe(usuario, ct)).Responsavel : usuario.Nome;
+
+    /// <summary>Grava o resumo da senha no usuário e a geração como mostrada, com o resumo do comprovante.</summary>
+    async Task Gravar(UsuarioCadastrado usuario, GeracaoDeSenhaPedida geracao, string senha, string comprovante, CancellationToken ct)
+    {
         usuario.DefinirSenha(ResumoDeSenha.Gerar(senha));
         geracao.MostrarSenha(Credenciais.Resumo(comprovante), apoio.Agora);
         await usuarios.Atualizar(usuario, ct);
         await geracoes.Atualizar(geracao, ct);
-        await tentativas.Apagar(entrada, ct);
-        await auditada.Concluir(execucao with { ContaId = usuario.ContaId, Alvo = usuario.Id }, ct);
-        return new(senha, comprovante);
     }
+
+    /// <summary>
+    /// O "CONCLUIDO" antes de responder, com a conta e o alvo de quem teve a senha
+    /// gerada, sem quem; o "INICIADO" foi sem nenhum dos três (RN-178).
+    /// </summary>
+    Task RegistrarConclusao(Execucao execucao, UsuarioCadastrado usuario, CancellationToken ct) =>
+        auditada.Concluir(execucao with { ContaId = usuario.ContaId, Alvo = usuario.Id }, ct);
 
     /// <summary>
     /// O usuário e a geração aberta que o código confere; o erro conta tentativa e

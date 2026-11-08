@@ -27,46 +27,89 @@ public sealed class InicializarContas(IUsuarios usuarios, IContas contas, TimePr
         ContasIniciais.Conferir(partida.Ambiente, partida.Ler);
         var lista = ContasIniciais.ModulosDo(partida.Ambiente, partida.Ler);
         var agora = relogio.GetUtcNow();
-        var criados = new List<string>();
-        var idsDasContas = new List<string>();
+        var garantidas = new Garantidas();
+        var usuariosDoAmbiente = ContasIniciais.UsuariosDo(partida.Ambiente);
 
+        await GarantirContaDoTime(partida, agora, garantidas, ct);
+        await GarantirContasDoAmbiente(partida, usuariosDoAmbiente, lista, agora, garantidas, ct);
+        await GarantirUsuarios(partida, usuariosDoAmbiente, lista, agora, garantidas, ct);
+        return new ContasGarantidasDto(garantidas.Contas, [.. usuariosDoAmbiente.Select(u => u.Id)], garantidas.Criados);
+    }
+
+    /// <summary>A conta do time deboaz, em todo ambiente, com o cadastro da partida (RN-190).</summary>
+    Task GarantirContaDoTime(PartidaDto partida, DateTimeOffset agora, Garantidas garantidas, CancellationToken ct)
+    {
         var time = new ContaAssinante(ContaAssinante.IdDa(Sigla.DoTime), Sigla.DoTime, Sigla.DoTime.ToLowerInvariant(), partida.Time.Nome,
             TipoConta.Instituicao, EstadoConta.Ativa, partida.Time.Documento, partida.Time.Responsavel, partida.Time.Telefone, agora);
-        await Conta(time, null);
+        return GarantirConta(time, null, garantidas, ct);
+    }
 
-        var usuariosDoAmbiente = ContasIniciais.UsuariosDo(partida.Ambiente);
+    /// <summary>
+    /// As contas iniciais do ambiente, com o domínio da entrada da conta master
+    /// de cada uma e, em homologação, as contratações da parte "staff" (RN-265, RN-268).
+    /// </summary>
+    async Task GarantirContasDoAmbiente(PartidaDto partida, IReadOnlyList<UsuarioInicial> usuariosDoAmbiente, ModulosIniciais? lista,
+        DateTimeOffset agora, Garantidas garantidas, CancellationToken ct)
+    {
         foreach (var inicial in ContasIniciais.ContasDo(partida.Ambiente))
         {
-            // o domínio da conta é o da entrada da conta master dela
-            var master = usuariosDoAmbiente.First(u => u.ContaId == inicial.Id && u.Tipo == TipoUsuario.Master);
-            var dominio = ContasIniciais.DominioDa(ContasIniciais.Login(master, partida.Ler(master.VariavelEntrada)!));
-            var conta = new ContaAssinante(inicial.Id, inicial.Sigla, dominio, inicial.Nome, inicial.Tipo, EstadoConta.Ativa,
-                inicial.Documento, "Time deboaz", "", agora);
-            await Conta(conta, TempoDaConta.Padrao);
+            var conta = new ContaAssinante(inicial.Id, inicial.Sigla, DominioDaConta(partida, usuariosDoAmbiente, inicial), inicial.Nome,
+                inicial.Tipo, EstadoConta.Ativa, inicial.Documento, "Time deboaz", "", agora);
+            await GarantirConta(conta, TempoDaConta.Padrao, garantidas, ct);
             if (lista is not null) await contas.ReporContratacoes(conta, lista.Modulos, agora, ct);
         }
+    }
 
+    /// <summary>O domínio da conta é o da entrada da conta master dela.</summary>
+    static string DominioDaConta(PartidaDto partida, IReadOnlyList<UsuarioInicial> usuariosDoAmbiente, ContaInicial inicial)
+    {
+        var master = usuariosDoAmbiente.First(u => u.ContaId == inicial.Id && u.Tipo == TipoUsuario.Master);
+        return ContasIniciais.DominioDa(ContasIniciais.Login(master, partida.Ler(master.VariavelEntrada)!));
+    }
+
+    /// <summary>
+    /// Cada usuário inicial, ATIVO e com a senha do Key Vault em resumo (RN-267,
+    /// RNF-225); em homologação, os módulos da lista voltam a ele (RN-268).
+    /// </summary>
+    async Task GarantirUsuarios(PartidaDto partida, IReadOnlyList<UsuarioInicial> usuariosDoAmbiente, ModulosIniciais? lista,
+        DateTimeOffset agora, Garantidas garantidas, CancellationToken ct)
+    {
         foreach (var inicial in usuariosDoAmbiente)
         {
-            var login = ContasIniciais.Login(inicial, partida.Ler(inicial.VariavelEntrada)!);
-            var nomeCurto = inicial.Tipo == TipoUsuario.Master ? ContasIniciais.DominioDa(login) : inicial.NomeCurto;
-            var participante = inicial.Tipo == TipoUsuario.Participante;
-            var resumo = inicial.VariavelSenha is { } senha ? ResumoDeSenha.Gerar(partida.Ler(senha)!) : null;
-            var usuario = new UsuarioCadastrado(inicial.Id, inicial.ContaId, inicial.Sigla, inicial.Tipo, inicial.Nome, nomeCurto, login,
-                null, EstadoUsuario.Ativo, resumo, [], inicial.CriadoPor, agora, codigoGeradoEm: participante ? agora : null);
-            if (await usuarios.Garantir(usuario, ct)) criados.Add(usuario.Id);
+            var usuario = MontarUsuario(partida, inicial, agora);
+            if (await usuarios.Garantir(usuario, ct)) garantidas.Criados.Add(usuario.Id);
             if (lista is not null && ContasIniciais.ModsDaLista(lista, usuario.Id) is { } mods)
             {
                 await usuarios.ReporModulos(usuario.Id, mods, ct);
             }
         }
+    }
 
-        return new ContasGarantidasDto(idsDasContas, [.. usuariosDoAmbiente.Select(u => u.Id)], criados);
+    /// <summary>O usuário inicial com a entrada e a senha das variáveis da partida.</summary>
+    static UsuarioCadastrado MontarUsuario(PartidaDto partida, UsuarioInicial inicial, DateTimeOffset agora)
+    {
+        var login = ContasIniciais.Login(inicial, partida.Ler(inicial.VariavelEntrada)!);
+        var nomeCurto = inicial.Tipo == TipoUsuario.Master ? ContasIniciais.DominioDa(login) : inicial.NomeCurto;
+        var participante = inicial.Tipo == TipoUsuario.Participante;
+        var resumo = inicial.VariavelSenha is { } senha ? ResumoDeSenha.Gerar(partida.Ler(senha)!) : null;
+        return new UsuarioCadastrado(inicial.Id, inicial.ContaId, inicial.Sigla, inicial.Tipo, inicial.Nome, nomeCurto, login,
+            null, EstadoUsuario.Ativo, resumo, [], inicial.CriadoPor, agora, codigoGeradoEm: participante ? agora : null);
+    }
 
-        async Task Conta(ContaAssinante conta, TempoDaConta? tempo)
-        {
-            idsDasContas.Add(conta.Id);
-            if (await contas.Garantir(conta, tempo, ct)) criados.Add(conta.Id);
-        }
+    /// <summary>Garante a conta pelo _id, sem duplicar (RN-267), e anota se ela nasceu agora.</summary>
+    async Task GarantirConta(ContaAssinante conta, TempoDaConta? tempo, Garantidas garantidas, CancellationToken ct)
+    {
+        garantidas.Contas.Add(conta.Id);
+        if (await contas.Garantir(conta, tempo, ct)) garantidas.Criados.Add(conta.Id);
+    }
+
+    /// <summary>O que a partida garantiu: as contas, na ordem, e o que nasceu nela.</summary>
+    sealed class Garantidas
+    {
+        /// <summary>Ids das contas garantidas.</summary>
+        public List<string> Contas { get; } = [];
+
+        /// <summary>Ids das contas e dos usuários criados nesta partida.</summary>
+        public List<string> Criados { get; } = [];
     }
 }

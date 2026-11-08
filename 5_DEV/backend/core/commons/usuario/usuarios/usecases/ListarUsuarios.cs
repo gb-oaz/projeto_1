@@ -21,10 +21,17 @@ public sealed class ListarUsuarios(IUsuarios usuarios, IContas contas, TimeProvi
     {
         var (tipo, busca, estado, pagina) = pedido.Validar();
         var quem = await apoio.Quem(pedido.QuemPede, ct);
-        var conta = await apoio.ContaDe(quem, ct);
-        var tipos = (tipo is { } escolhido ? new[] { escolhido } : Listaveis).Where(t => Hierarquia.PodeListar(quem, conta.DeAutonomo, t)).ToHashSet();
-        if (tipos.Count == 0) throw FalhaDeUsuarios.AcessoNegado();
+        var tipos = await TiposQuePodeListar(quem, tipo, ct);
         var lista = await usuarios.Listar(new FiltroDeUsuarios(quem.ContaId, tipos, busca, estado, pagina), ct);
         return new([.. lista.Itens.Select(UsuarioNaListaDto.De)], lista.Pagina, lista.Total);
+    }
+
+    /// <summary>O tipo pedido, ou todos os listáveis, que quem pede pode listar (RN-165).</summary>
+    /// <exception cref="FalhaDeUsuarios">ACESSO_NEGADO, se não sobra nenhum.</exception>
+    async Task<HashSet<TipoUsuario>> TiposQuePodeListar(UsuarioCadastrado quem, TipoUsuario? tipo, CancellationToken ct)
+    {
+        var conta = await apoio.ContaDe(quem, ct);
+        var tipos = (tipo is { } escolhido ? new[] { escolhido } : Listaveis).Where(t => Hierarquia.PodeListar(quem, conta.DeAutonomo, t)).ToHashSet();
+        return tipos.Count == 0 ? throw FalhaDeUsuarios.AcessoNegado() : tipos;
     }
 }

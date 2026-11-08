@@ -30,12 +30,19 @@ public sealed class MudarEstadoDaConta(
     /// <summary>A regra do estado da conta, de quem pede ao "CONCLUIDO".</summary>
     async Task<ContaComEstadoDto> Mudar(EstadoDaContaDto pedido, Execucao execucao, CancellationToken ct)
     {
-        await apoio.DoTime(pedido.QuemPede, ct);
-        var novo = pedido.Validar();
-        var conta = await apoio.Assinante(pedido.ContaId, ct);
+        var (conta, novo) = await ContaEEstadoPedidos(pedido, ct);
         if (conta.MudarEstado(novo)) await Gravar(conta, novo, ct);
         await auditada.Concluir(execucao, ct);
         return new(conta.Id, conta.Estado.Texto());
+    }
+
+    /// <summary>A conta assinante e o estado pedido, se quem pede é do time deboaz (RN-173).</summary>
+    /// <exception cref="FalhaDeUsuarios">ACESSO_NEGADO, DADOS_INVALIDOS ou CONTA_INEXISTENTE.</exception>
+    async Task<(ContaAssinante Conta, EstadoConta Novo)> ContaEEstadoPedidos(EstadoDaContaDto pedido, CancellationToken ct)
+    {
+        await apoio.DoTime(pedido.QuemPede, ct);
+        var novo = pedido.Validar();
+        return (await apoio.Assinante(pedido.ContaId, ct), novo);
     }
 
     /// <summary>Grava o estado novo; fora de ATIVA as sessões terminam e ENCERRADA apaga os dados (RN-173 a RN-175).</summary>

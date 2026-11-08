@@ -16,8 +16,15 @@ public sealed class LerUsuario(IUsuarios usuarios, IContas contas, TimeProvider 
     {
         var quem = await apoio.Quem(pedido.QuemPede, ct);
         var alvo = await apoio.Alvo(quem, pedido.UsuarioId, ct);
+        await GarantirQuePodeVer(quem, alvo, ct);
+        return UsuarioLidoDto.De(alvo);
+    }
+
+    /// <summary>O próprio, ou quem pode listar o tipo do alvo (RN-170, RN-186).</summary>
+    /// <exception cref="FalhaDeUsuarios">ACESSO_NEGADO.</exception>
+    async Task GarantirQuePodeVer(UsuarioCadastrado quem, UsuarioCadastrado alvo, CancellationToken ct)
+    {
         var conta = await apoio.ContaDe(quem, ct);
         if (alvo.Id != quem.Id && !Hierarquia.PodeListar(quem, conta.DeAutonomo, alvo.Tipo)) throw FalhaDeUsuarios.AcessoNegado();
-        return UsuarioLidoDto.De(alvo);
     }
 }

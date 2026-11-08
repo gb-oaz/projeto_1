@@ -27,10 +27,24 @@ public sealed class ReativarUsuario(IUsuarios usuarios, IContas contas, IAuditor
     /// <summary>A regra do reativar, de quem pede ao "CONCLUIDO".</summary>
     async Task Reativar(PedidoDeUsuarioDto pedido, Execucao execucao, CancellationToken ct)
     {
+        var alvo = await AlvoAdministravel(pedido, ct);
+        await Gravar(alvo, ct);
+        await auditada.Concluir(execucao, ct);
+    }
+
+    /// <summary>O alvo, se quem pede está acima dele (RN-169).</summary>
+    /// <exception cref="FalhaDeUsuarios">ACESSO_NEGADO ou USUARIO_INEXISTENTE.</exception>
+    async Task<UsuarioCadastrado> AlvoAdministravel(PedidoDeUsuarioDto pedido, CancellationToken ct)
+    {
         var quem = await apoio.Quem(pedido.QuemPede, ct);
-        var alvo = await apoio.Administravel(quem, pedido.UsuarioId, ct);
+        return await apoio.Administravel(quem, pedido.UsuarioId, ct);
+    }
+
+    /// <summary>O alvo reativado, com as mesmas permissões, e gravado.</summary>
+    /// <exception cref="FalhaDeUsuarios">ESTADO_IGUAL, se já está ativo.</exception>
+    async Task Gravar(UsuarioCadastrado alvo, CancellationToken ct)
+    {
         alvo.Reativar();
         await usuarios.Atualizar(alvo, ct);
-        await auditada.Concluir(execucao, ct);
     }
 }

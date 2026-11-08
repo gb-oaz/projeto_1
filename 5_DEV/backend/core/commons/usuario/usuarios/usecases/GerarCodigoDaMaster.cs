@@ -32,15 +32,30 @@ public sealed class GerarCodigoDaMaster(
     async Task<CodigoDaMasterDto> Gerar(ConferenciaDaMasterDto pedido, Execucao execucao, CancellationToken ct)
     {
         var conta = await ContaConferida(pedido, ct);
-        var master = await usuarios.MasterDaConta(conta.Id, ct) ?? throw FalhaDeUsuarios.ContaInexistente();
+        var master = await MasterDa(conta, ct);
         var (geracao, codigo) = GeracaoDeSenhaPedida.Pedir(master, pedido.QuemPede, apoio.Agora);
+        await Gravar(master, geracao, ct);
+        await RegistrarConclusao(execucao, master, ct);
+        return new(codigo, conta.Telefone, geracao.VenceEm);
+    }
+
+    /// <summary>A conta master da conta conferida.</summary>
+    /// <exception cref="FalhaDeUsuarios">CONTA_INEXISTENTE, se a conta não tem master.</exception>
+    async Task<UsuarioCadastrado> MasterDa(ContaAssinante conta, CancellationToken ct) =>
+        await usuarios.MasterDaConta(conta.Id, ct) ?? throw FalhaDeUsuarios.ContaInexistente();
+
+    /// <summary>Esquece a senha da master, grava a geração nova e encerra as sessões dela (RN-169).</summary>
+    async Task Gravar(UsuarioCadastrado master, GeracaoDeSenhaPedida geracao, CancellationToken ct)
+    {
         master.EsquecerSenha();
         await usuarios.Atualizar(master, ct);
         await geracoes.Inserir(geracao, ct);
         await sessoes.EncerrarDoUsuario(master.Id, MotivoFim.NovaSenha, ct);
-        await auditada.Concluir(execucao with { Alvo = master.Id }, ct);
-        return new(codigo, conta.Telefone, geracao.VenceEm);
     }
+
+    /// <summary>O "CONCLUIDO" antes de responder, com a conta master como alvo; o "INICIADO" foi sem alvo (RN-178).</summary>
+    Task RegistrarConclusao(Execucao execucao, UsuarioCadastrado master, CancellationToken ct) =>
+        auditada.Concluir(execucao with { Alvo = master.Id }, ct);
 
     /// <summary>A conta, se o cadastro confere; a conferência fica gravada, batendo ou não (RN-172).</summary>
     /// <exception cref="FalhaDeUsuarios">ACESSO_NEGADO, DADOS_INVALIDOS, CONTA_INEXISTENTE ou CONFERENCIA_INCOMPLETA.</exception>
