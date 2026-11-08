@@ -81,19 +81,24 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         await Executar(maria, metodo, await mundo.Traduzir(caminho), corpo);
     }
 
-    // a Maria salva as permissões do João na versão em que estão
+    // a Maria concede ao João a Utilização do Quiz (MOD-05), ou a tira se ele
+    // já a tem: só com mudança há permissões novas e o aviso AVISAR_PERMISSOES_NOVAS
+    // (RN-230, RN-275); salvar o mesmo responde 200 na mesma versão (17-b
+    // RN-254-api). A EBFGA contrata o MOD-05 e a Maria o recebe antes, para
+    // poder concedê-lo (RN-166, RN-241); tudo fora do Executar, antes da marca
     [When(@"^a Maria envia PUT (/usuarios/usr-ebfga-joao/permissoes)$")]
     public async Task EditaPermissoes(string caminho)
     {
+        await mundo.Contratar("MOD-05");
+        await mundo.Conceder(await mundo.Maria(), new() { ["MOD-05"] = "U" });
         var maria = await MariaPronta();
         var joao = await mundo.StaffCriadoPor("joao", maria);
         alvo = joao.Id;
-        var versao = (await mundo.Permissoes(joao))["versao"]!.GetValue<int>().ToString();
-        await Executar(maria, "PUT", await mundo.Traduzir(caminho), """
-            {
-              "mods": {}
-            }
-            """, versao);
+        var atuais = await mundo.Permissoes(joao);
+        var mods = (JsonObject)atuais["mods"]!.DeepClone();
+        if (!mods.Remove("MOD-05")) mods["MOD-05"] = "U";
+        await Executar(maria, "PUT", await mundo.Traduzir(caminho),
+            new JsonObject { ["mods"] = mods }.ToJsonString(), atuais["versao"]!.GetValue<int>().ToString());
     }
 
     // a conta master concede ao João a Utilização do Quiz (MOD-05, de staff,
