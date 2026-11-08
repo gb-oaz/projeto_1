@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v22"
-data: "2026-11-08 02:14"
+versao: "v23"
+data: "2026-11-08 02:15"
 status: "Aprovado"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v22** · 2026-11-08 02:14 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v23** · 2026-11-08 02:15 · **Aprovado**
 
 # Módulo Usuários · Autorização
 
@@ -452,15 +452,15 @@ Esquema do Cenário: módulos de cada papel
   Então o token tem em mods <módulos> com as abas <abas>
 
   Exemplos:
-    | quem           | frente | módulos                                                   | abas     |
-    | administrador  | hub    | SAC, Usuários e Catálogo                                  | C e U    |
-    | membro do time | hub    | os marcados entre SAC, Usuários e Catálogo                | marcadas |
-    | conta master   | hub    | todos os da conta e os contratados usados no hub          | C e U    |
-    | autônomo       | hub    | todos os da conta e os contratados usados no hub          | C e U    |
-    | staff          | hub    | os marcados pela conta master                             | marcadas |
-    | participante   | quest  | Tarefas, Perfil e os que participante ou responsável usam | U        |
-    | responsável    | quest  | os mesmos do participante                                 | U        |
-    | anônimo        | quest  | só o módulo da sala                                       | U        |
+    | quem           | frente | módulos                                               | abas     |
+    | administrador  | hub    | SAC, Usuários e Catálogo                              | C e U    |
+    | membro do time | hub    | os marcados entre SAC, Usuários e Catálogo            | marcadas |
+    | conta master   | hub    | todos os da conta e os contratados usados no hub      | C e U    |
+    | autônomo       | hub    | todos os da conta e os contratados usados no hub      | C e U    |
+    | staff          | hub    | os marcados pela conta master                         | marcadas |
+    | participante   | quest  | Tarefas, Perfil e os do participante e do responsável | U        |
+    | responsável    | quest  | os mesmos do participante                             | U        |
+    | anônimo        | quest  | só o módulo da sala                                   | U        |
 ```
 
 <a id="RN-235"></a>
@@ -895,7 +895,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v22** | 2026-11-08 02:14 | Contrato de API v06 (17 `RN-178`, `RN-270`, `RN-271`): PUT /usuarios/{id}/permissoes grava INICIADO e CONCLUIDO de EDITAR_PERMISSOES em "auditoria" e a versão em "registrosPermissao"; recusas 4xx em "auditoriaErros" (ALERTA); 500 ERRO_INESPERADO (ERRO); X-Trace-Id em toda resposta do caso de uso; cenários sem mudança |
+| **v23** | 2026-11-08 02:15 | `RN-233-api`: tabela de exemplos com linhas de até 100 caracteres (célula do participante reescrita, mesmo sentido); regras sem mudança |
+| v22 | 2026-11-08 02:14 | Contrato de API v06 (17 `RN-178`, `RN-270`, `RN-271`): PUT /usuarios/{id}/permissoes grava INICIADO e CONCLUIDO de EDITAR_PERMISSOES em "auditoria" e a versão em "registrosPermissao"; recusas 4xx em "auditoriaErros" (ALERTA); 500 ERRO_INESPERADO (ERRO); X-Trace-Id em toda resposta do caso de uso; cenários sem mudança |
 | v21 | 2026-11-07 14:05 | Diagrama autorizacao-documentos v03: índices como o ms_mono cria na partida (login, registrosPermissao com versao); contratacoes com _id e sigla, ainda sem índice; cenários sem mudança |
 | v20 | 2026-11-06 23:23 | Diagrama autorizacao-documentos v02, fiel ao código: suspensos só no requisito, modulos com quemUsa, tipo ADMINISTRADOR |
 | v19 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
@@ -904,11 +905,7 @@ Cenário: o que este documento não trata
 | v16 | 2026-11-02 17:24 | Staff com Administrar usuários repassa o MOD-03 ao staff abaixo, só com as abas que tem (`RN-252`): sai o 403 "Só a conta master concede o módulo Usuários." e o MOD-03 entra nas concedíveis da staff (`RF-160`); contrato de API v05 |
 | v15 | 2026-11-02 14:02 | Aprovado |
 | v14 | 2026-11-02 14:01 | Regras explícitas: abaixo é quem a pessoa criou, direta ou indiretamente, e staff nenhum repassa Administrar usuários (`RN-252`); o que cada aba libera (`RN-251`); módulos de cada papel por extenso (`RN-233`); 422 DADOS_INVALIDOS para módulo que não existe ou que a pessoa não usa (`RF-161`); contrato de API v04, com a mensagem de cada erro; sequência v02, com textos neutros |
-| v13 | 2026-11-02 13:32 | Mensagens com texto neutro, sem gênero: "Você não tem mais o módulo Presença para conceder." (`RF-161`) e "As permissões de Maria Souza mudaram agora há pouco." com o nome completo (`RF-162`), nas telas e na API; contrato de API v03 |
-| v12 | 2026-11-02 00:11 | Cenários separados em Cenários de tela e Cenários de API; os de API usam os endereços, pedidos e códigos do contrato (IDs nos dois: `<ID>-api`) |
-| v11 | 2026-11-01 23:41 | Diagramas de casos de uso e de documentos da autorização v01 |
-| v10 | 2026-11-01 22:01 | JSON dos tokens expandidos (RNF-219); contrato de API v02, com JSON expandido |
 
 ---
 
-<sub>boaz · v22 · 2026-11-08 02:14 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v23 · 2026-11-08 02:15 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>

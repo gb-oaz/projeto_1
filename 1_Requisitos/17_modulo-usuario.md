@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v79"
-data: "2026-11-08 02:14"
+versao: "v80"
+data: "2026-11-08 02:15"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v79** · 2026-11-08 02:14 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v80** · 2026-11-08 02:15 · **Em revisão**
 
 # Módulo Usuários
 
@@ -1402,7 +1402,8 @@ Cenário: acompanhamento só pela auditoria
 
 Cenário: corpo que não é JSON não chega ao caso de uso
   Quando a Maria envia POST /usuarios com o corpo "nome=Lucas", que não é JSON
-  Então a resposta é 422, recusada antes do caso de uso
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "corpo", recusada antes do caso de uso
+  E a mensagem é "O campo "corpo" está faltando ou é inválido."
   E a resposta não traz o cabeçalho X-Trace-Id
   E as coleções "auditoria" e "auditoriaErros" não ganham registro
   E o X-Trace-Id vale só para as respostas que passam pelo caso de uso
@@ -2340,7 +2341,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v79** | 2026-11-08 02:14 | Diagramas da v76–v78 (`RN-178`, `RN-271`, `RN-274`): contrato de API v07 → v08 (POST /contas/esqueci-senha-master auditado com ESQUECI_SENHA_MASTER, X-Trace-Id, 429 LIMITE_ATENDIMENTO como ALERTA e 500 ERRO_INESPERADO; 422 de corpo que não é JSON com DADOS_INVALIDOS e campo "corpo", sem X-Trace-Id), sequência v04 → v05 (INICIADO de CRIAR_USUARIO sem alvo, alvo só no CONCLUIDO) |
+| **v80** | 2026-11-08 02:15 | `RN-271`: corpo que não é JSON recebe 422 DADOS_INVALIDOS com "O campo "corpo" está faltando ou é inválido." e o campo "corpo", como no contrato v08; segue sem X-Trace-Id e sem registros |
+| v79 | 2026-11-08 02:14 | Diagramas da v76–v78 (`RN-178`, `RN-271`, `RN-274`): contrato de API v07 → v08 (POST /contas/esqueci-senha-master auditado com ESQUECI_SENHA_MASTER, X-Trace-Id, 429 LIMITE_ATENDIMENTO como ALERTA e 500 ERRO_INESPERADO; 422 de corpo que não é JSON com DADOS_INVALIDOS e campo "corpo", sem X-Trace-Id), sequência v04 → v05 (INICIADO de CRIAR_USUARIO sem alvo, alvo só no CONCLUIDO) |
 | v78 | 2026-11-08 02:11 | `RN-178`, `RN-272`, `RN-274`: AcaoAuditada com 21 ações (EDITAR_PERMISSOES, ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO, ENCERRAR_SESSOES, ESQUECI_SENHA_MASTER e as 11 anteriores), auditoria e auditoriaErros gravadas também pela Autenticação; diagramas: classes v05 → v06, modelo de documentos v13 → v14 |
 | v77 | 2026-11-08 02:08 | `RN-178`: CRIAR_USUARIO sem alvo no INICIADO e na recusa (409 MATRICULA_EM_USO), alvo só no CONCLUIDO; quem e contaId desde o INICIADO; `RN-271`: corpo que não é JSON recebe 422 antes do caso de uso, sem X-Trace-Id nem registros |
 | v76 | 2026-11-08 02:05 | `RN-274`: POST /contas/esqueci-senha-master auditado com a ação ESQUECI_SENHA_MASTER, sem quem nem contaId, X-Trace-Id e 429 LIMITE_ATENDIMENTO como ALERTA; entradas e sessões no 17-a (`RN-272`, `RN-273`); Em aberto resolvido e removido |
@@ -2349,10 +2351,7 @@ Cenário: o que este documento não trata
 | v73 | 2026-11-08 01:26 | Diagramas da auditoria (`RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (INICIADO, CONCLUIDO, auditoriaErros e X-Trace-Id; gravações no MongoDB e no Redis destacadas), contrato de API v05 → v06 (X-Trace-Id nos auditados, 500), classes v03 → v04 (traceId, etapa, RegistroDeErro, IAuditoriaDeErros), modelo de documentos v12 → v13 (auditoriaErros e índices) |
 | v72 | 2026-11-08 01:14 | `RN-270`: nivel "ALERTA" (recusa prevista, 4xx) ou "ERRO" (falha inesperada, 5xx), guarda de 5 anos e imutável como a auditoria; `RN-271`: cabeçalho X-Trace-Id em toda resposta dos endpoints auditados, igual ao traceId gravado; "sem log" só nos casos de uso; exemplo do registro de erro com nivel e guardarAte; pendências de Produto respondidas |
 | v71 | 2026-11-08 01:10 | `RN-178`: auditoria só do que muda estado, com registros "INICIADO" e "CONCLUIDO" ligados pelo traceId; leitura não é auditada; `RN-270`: coleção "auditoriaErros", gravada antes da recusa; `RN-271`: um traceId por execução, sem log; exemplo de entidades com traceId e registro de erro; status → Em revisão |
-| v70 | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
-| v69 | 2026-11-07 15:52 | `RN-188` e `RN-188-api`: exemplo de dois participantes sem matrícula no educador autônomo, aceitos (201, sem 409 MATRICULA_EM_USO), porque a matrícula só é única quando existe; diagramas: modelo de documentos v11 → v12, sem partição pela sigla |
-| v68 | 2026-11-07 14:53 | `RN-179` e `RN-179-api`: exemplo da sigla "colsa", aceita e gravada como "COLSA" (201, conta "conta-colsa"); diagramas: modelo de documentos v10 → v11 |
 
 ---
 
-<sub>boaz · v79 · 2026-11-08 02:14 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v80 · 2026-11-08 02:15 · `1_Requisitos/17_modulo-usuario.md`</sub>
