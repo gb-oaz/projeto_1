@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "12_hub-ui"
 tipo: "Funcionalidade"
 titulo: "Hub · UI"
-versao: "v37"
-data: "2026-11-08 11:35"
+versao: "v38"
+data: "2026-11-08 12:02"
 status: "Em revisão"
 objetivo: "definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco."
 ---
 
-> **boaz · Funcionalidade** · `12_hub-ui` · **v37** · 2026-11-08 11:35 · **Em revisão**
+> **boaz · Funcionalidade** · `12_hub-ui` · **v38** · 2026-11-08 12:02 · **Em revisão**
 
 # Hub · UI
 
@@ -469,9 +469,9 @@ Cenário: o que este documento não trata
 
 [![Contrato de API da autenticação do 17-a, com a entrada no hub e o sair](../2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg)](../2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg)
 
-**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v10_20261108-1133.svg`
+**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v11_20261108-1159.svg`
 
-[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v10_20261108-1133.svg)](../2_Diagramas/usuarios-contrato-api_v10_20261108-1133.svg)
+[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v11_20261108-1159.svg)](../2_Diagramas/usuarios-contrato-api_v11_20261108-1159.svg)
 
 ---
 
@@ -481,7 +481,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v37** | 2026-11-08 11:35 | Diagrama: contrato de API dos usuários do 17 v09 → v10 (403 ACESSO_NEGADO sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registros, `RN-270`) |
+| **v38** | 2026-11-08 12:02 | Diagrama: contrato de API dos usuários do 17 v10 → v11 (403 sem o módulo auditado com INICIADO e ALERTA, X-Trace-Id; ações internas no traceId de quem chama; 17 `RN-270`, `RN-275`) |
+| v37 | 2026-11-08 11:35 | Diagrama: contrato de API dos usuários do 17 v09 → v10 (403 ACESSO_NEGADO sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registros, `RN-270`) |
 | v36 | 2026-11-08 09:50 | Diagramas: contrato de API da autenticação do 17-a v03 → v04 (403 ACESSO_INDISPONIVEL no confirmar-senha com quem e contaId) e dos usuários do 17 v08 → v09 (quem, contaId e alvo da auditoria por endereço) |
 | v35 | 2026-11-08 02:20 | Diagramas da autenticação do 17-a: contrato de API v02 → v03 e sequência v03 → v04 (auditoria das entradas e sessões, X-Trace-Id, recusas como ALERTA, 500 ERRO_INESPERADO) |
 | v34 | 2026-11-08 02:14 | Diagrama: contrato de API dos usuários do 17 v07 → v08 (esqueci-senha-master auditado, 422 de corpo que não é JSON com DADOS_INVALIDOS) |
@@ -499,4 +500,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v37 · 2026-11-08 11:35 · `1_Requisitos/12_hub-ui.md`</sub>
+<sub>boaz · v38 · 2026-11-08 12:02 · `1_Requisitos/12_hub-ui.md`</sub>

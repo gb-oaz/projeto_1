@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v25"
-data: "2026-11-08 11:35"
+versao: "v26"
+data: "2026-11-08 12:02"
 status: "Aprovado"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v25** · 2026-11-08 11:35 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v26** · 2026-11-08 12:02 · **Aprovado**
 
 # Módulo Usuários · Autorização
 
@@ -871,13 +871,13 @@ Cenário: o que este documento não trata
 
 [![Casos de uso da autorização: o administrador e o staff com Administrar usuários, e por generalização a conta master, veem e salvam as permissões e o registro de mudanças, com a conferência do que quem concede tem e a recarga quando outro salvou antes; quem recebe vê o módulo novo sem sair, a casca pelo token e a recusa no endereço direto; no quest, os módulos de Quem usa e da sala](../2_Diagramas/autorizacao-casos-de-uso_v01_20261101-2337.svg)](../2_Diagramas/autorizacao-casos-de-uso_v01_20261101-2337.svg)
 
-**Autorização · conceder permissões · sequência** — `2_Diagramas/autorizacao-sequencia_v03_20261108-1130.svg`
+**Autorização · conceder permissões · sequência** — `2_Diagramas/autorizacao-sequencia_v04_20261108-1157.svg`
 
-[![Sequência de conceder permissões: o administrador do deboaz concede o SAC ao membro do time e a conta master concede a Presença ao staff, com as concedíveis, o salvamento com a versão, as recusas, a nova versão nas sessões e a renovação que leva o módulo à casca, com as telas de exemplo de cada passo](../2_Diagramas/autorizacao-sequencia_v03_20261108-1130.svg)](../2_Diagramas/autorizacao-sequencia_v03_20261108-1130.svg)
+[![Sequência de conceder permissões: o administrador do deboaz concede o SAC ao membro do time e a conta master concede a Presença ao staff, com as concedíveis, o salvamento com a versão, as recusas, a nova versão nas sessões e a renovação que leva o módulo à casca, com as telas de exemplo de cada passo](../2_Diagramas/autorizacao-sequencia_v04_20261108-1157.svg)](../2_Diagramas/autorizacao-sequencia_v04_20261108-1157.svg)
 
-**Autorização · contrato de API** — `2_Diagramas/autorizacao-contrato-api_v08_20261108-1133.svg`
+**Autorização · contrato de API** — `2_Diagramas/autorizacao-contrato-api_v09_20261108-1159.svg`
 
-[![Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, com os códigos de erro](../2_Diagramas/autorizacao-contrato-api_v08_20261108-1133.svg)](../2_Diagramas/autorizacao-contrato-api_v08_20261108-1133.svg)
+[![Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, com os códigos de erro](../2_Diagramas/autorizacao-contrato-api_v09_20261108-1159.svg)](../2_Diagramas/autorizacao-contrato-api_v09_20261108-1159.svg)
 
 **Autorização · classes** — `2_Diagramas/autorizacao-classes_v01_20261101-1502.svg`
 
@@ -895,7 +895,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v25** | 2026-11-08 11:35 | Diagramas (17 `RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (PUT permissões com auditoria INICIADO e CONCLUIDO de EDITAR_PERMISSOES, recusas em "auditoriaErros" com ALERTA, 500 ERRO_INESPERADO com ERRO, X-Trace-Id; renovação auditada como RENOVAR_SESSAO), contrato de API v07 → v08 (403 sem MOD-03 · U antes do caso de uso, sem X-Trace-Id nem registros); cenários sem mudança |
+| **v26** | 2026-11-08 12:02 | Diagramas (17 `RN-270`, `RN-275`): sequência v03 → v04 (AVISAR_PERMISSOES_NOVAS no traceId do PUT, 403 sem MOD-03 · U auditado; setas restauradas), contrato de API v08 → v09 (403 sem o módulo com INICIADO e ALERTA e X-Trace-Id; falha na interna com 2 ERRO); cenários sem mudança |
+| v25 | 2026-11-08 11:35 | Diagramas (17 `RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (PUT permissões com auditoria INICIADO e CONCLUIDO de EDITAR_PERMISSOES, recusas em "auditoriaErros" com ALERTA, 500 ERRO_INESPERADO com ERRO, X-Trace-Id; renovação auditada como RENOVAR_SESSAO), contrato de API v07 → v08 (403 sem MOD-03 · U antes do caso de uso, sem X-Trace-Id nem registros); cenários sem mudança |
 | v24 | 2026-11-08 09:50 | Contrato de API v06 → v07 (17 `RN-178`): EDITAR_PERMISSOES com contaId da conta de quem pede e alvo a pessoa, desde o INICIADO; cenários sem mudança |
 | v23 | 2026-11-08 02:15 | `RN-233-api`: tabela de exemplos com linhas de até 100 caracteres (célula do participante reescrita, mesmo sentido); regras sem mudança |
 | v22 | 2026-11-08 02:14 | Contrato de API v06 (17 `RN-178`, `RN-270`, `RN-271`): PUT /usuarios/{id}/permissoes grava INICIADO e CONCLUIDO de EDITAR_PERMISSOES em "auditoria" e a versão em "registrosPermissao"; recusas 4xx em "auditoriaErros" (ALERTA); 500 ERRO_INESPERADO (ERRO); X-Trace-Id em toda resposta do caso de uso; cenários sem mudança |
@@ -910,4 +911,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v25 · 2026-11-08 11:35 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v26 · 2026-11-08 12:02 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
