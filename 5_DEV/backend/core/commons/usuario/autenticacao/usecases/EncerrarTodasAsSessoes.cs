@@ -32,10 +32,16 @@ public sealed class EncerrarTodasAsSessoes(ISessoes sessoes, IAuditoria auditori
     /// <summary>Apaga cada sessão de quem pede e grava o "CONCLUIDO".</summary>
     async Task Encerrar(AcessoConferido acesso, Execucao execucao, CancellationToken ct)
     {
-        foreach (var sessao in await sessoes.DoUsuario(acesso.Sub, ct))
+        await ApagarTodas(acesso.Sub, ct);
+        await auditada.Concluir(execucao, ct);
+    }
+
+    /// <summary>Apaga cada sessão do usuário, inclusive a deste aparelho (RF-157).</summary>
+    async Task ApagarTodas(string usuarioId, CancellationToken ct)
+    {
+        foreach (var sessao in await sessoes.DoUsuario(usuarioId, ct))
         {
             await sessoes.Apagar(sessao, MotivoFim.SairDeTodos, ct);
         }
-        await auditada.Concluir(execucao, ct);
     }
 }

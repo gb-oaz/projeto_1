@@ -31,7 +31,13 @@ public sealed class SairDoAparelho(ISessoes sessoes, IAuditoria auditoria, IAudi
     /// <summary>Apaga a sessão do token, se ainda existe, e grava o "CONCLUIDO".</summary>
     async Task Sair(AcessoConferido acesso, Execucao execucao, CancellationToken ct)
     {
-        if (await sessoes.Buscar(acesso.Sid, ct) is { } sessao) await sessoes.Apagar(sessao, MotivoFim.Sair, ct);
+        await ApagarSessaoDoToken(acesso.Sid, ct);
         await auditada.Concluir(execucao, ct);
+    }
+
+    /// <summary>Apaga a sessão do token, se ainda existe (RF-138).</summary>
+    async Task ApagarSessaoDoToken(string sid, CancellationToken ct)
+    {
+        if (await sessoes.Buscar(sid, ct) is { } sessao) await sessoes.Apagar(sessao, MotivoFim.Sair, ct);
     }
 }

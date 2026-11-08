@@ -53,9 +53,13 @@ public sealed class EntrarNoHub : IEntrarNoHub
         andamento.Identificar(usuario.ContaId, usuario.Id);
         var conta = await abertura.ContaDisponivel(usuario, primeiroAcesso: false, ct);
         var aberta = await abertura.Abrir(usuario, conta, Frente.Hub, aparelho, null, ct);
-        await auditada.Concluir(andamento.Atual with { Alvo = aberta.Sessao.Sid }, ct);
+        await RegistrarConclusao(andamento, aberta, ct);
         return aberta.Resposta;
     }
+
+    /// <summary>O "CONCLUIDO" com a pessoa identificada, a conta e a sessão aberta como alvo (RN-272).</summary>
+    Task RegistrarConclusao(ExecucaoEmAndamento andamento, SessaoEmitida aberta, CancellationToken ct) =>
+        auditada.Concluir(andamento.Atual with { Alvo = aberta.Sessao.Sid }, ct);
 
     /// <summary>
     /// O staff da entrada, se a senha confere: bloqueio primeiro (RF-158), a

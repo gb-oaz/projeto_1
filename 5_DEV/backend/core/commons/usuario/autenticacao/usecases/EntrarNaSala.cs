@@ -51,11 +51,20 @@ public sealed class EntrarNaSala : IEntrarNaSala
     async Task<SessaoAbertaDto> Entrar(EntradaNaSalaDto pedido, Execucao execucao, CancellationToken ct)
     {
         var (codigo, aparelho) = pedido.Validar();
-        var sala = await salas.BuscarAberta(codigo, ct) ?? throw FalhaDeAutenticacao.SalaFechada();
+        var sala = await SalaDoCodigo(codigo, ct);
         var emitida = await Abrir(sala, aparelho, ct);
-        await auditada.Concluir(execucao with { ContaId = sala.ContaId, Quem = emitida.Sessao.UsuarioId, Alvo = sala.Codigo }, ct);
+        await RegistrarConclusao(execucao, sala, emitida, ct);
         return emitida.Resposta;
     }
+
+    /// <summary>A sala do código, se está aberta.</summary>
+    /// <exception cref="FalhaDeAutenticacao">SALA_FECHADA.</exception>
+    async Task<SalaAberta> SalaDoCodigo(string codigo, CancellationToken ct) =>
+        await salas.BuscarAberta(codigo, ct) ?? throw FalhaDeAutenticacao.SalaFechada();
+
+    /// <summary>O "CONCLUIDO" com o acesso anônimo como quem, a conta da sala e a sala como alvo (RN-272).</summary>
+    Task RegistrarConclusao(Execucao execucao, SalaAberta sala, SessaoEmitida emitida, CancellationToken ct) =>
+        auditada.Concluir(execucao with { ContaId = sala.ContaId, Quem = emitida.Sessao.UsuarioId, Alvo = sala.Codigo }, ct);
 
     /// <summary>Um acesso anônimo novo na sala, com a sessão sem tempo sem uso (RN-231).</summary>
     async Task<SessaoEmitida> Abrir(SalaAberta sala, Aparelho aparelho, CancellationToken ct)

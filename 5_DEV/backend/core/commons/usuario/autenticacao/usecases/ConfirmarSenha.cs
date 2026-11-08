@@ -52,15 +52,31 @@ public sealed class ConfirmarSenha : IConfirmarSenha
         var (comprovante, aparelho) = pedido.Validar();
         var agora = relogio.GetUtcNow();
         var geracao = await GeracaoValida(comprovante, agora, ct);
-        var usuario = await usuarios.Buscar(geracao.UsuarioId, ct) ?? throw FalhaDeAutenticacao.ComprovanteInvalido();
+        var usuario = await UsuarioDa(geracao, ct);
         andamento.Identificar(usuario.ContaId, usuario.Id);
         var conta = await abertura.ContaDisponivel(usuario, primeiroAcesso: true, ct);
 
-        await geracoes.MarcarConfirmada(geracao.Id, agora, ct);
-        var aberta = await abertura.Abrir(usuario, conta, Frente.Hub, aparelho, null, ct);
-        await auditada.Concluir(andamento.Atual with { Alvo = aberta.Sessao.Sid }, ct);
+        var aberta = await AbrirPrimeiraSessao(geracao, usuario, conta, aparelho, agora, ct);
+        await RegistrarConclusao(andamento, aberta, ct);
         return aberta.Resposta;
     }
+
+    /// <summary>O usuário da geração; sem ele, o comprovante não vale.</summary>
+    /// <exception cref="FalhaDeAutenticacao">COMPROVANTE_INVALIDO.</exception>
+    async Task<UsuarioDaEntrada> UsuarioDa(GeracaoDeSenha geracao, CancellationToken ct) =>
+        await usuarios.Buscar(geracao.UsuarioId, ct) ?? throw FalhaDeAutenticacao.ComprovanteInvalido();
+
+    /// <summary>Marca a geração como confirmada, para o comprovante valer uma vez só, e abre a sessão do hub (RN-182).</summary>
+    async Task<SessaoEmitida> AbrirPrimeiraSessao(GeracaoDeSenha geracao, UsuarioDaEntrada usuario, ContaDaEntrada conta, Aparelho aparelho,
+        DateTimeOffset agora, CancellationToken ct)
+    {
+        await geracoes.MarcarConfirmada(geracao.Id, agora, ct);
+        return await abertura.Abrir(usuario, conta, Frente.Hub, aparelho, null, ct);
+    }
+
+    /// <summary>O "CONCLUIDO" com a pessoa identificada, a conta e a sessão aberta como alvo (RN-272).</summary>
+    Task RegistrarConclusao(ExecucaoEmAndamento andamento, SessaoEmitida aberta, CancellationToken ct) =>
+        auditada.Concluir(andamento.Atual with { Alvo = aberta.Sessao.Sid }, ct);
 
     /// <summary>A geração do comprovante, se ainda não foi confirmada e está dentro das 72 h (RN-182).</summary>
     /// <exception cref="FalhaDeAutenticacao">COMPROVANTE_INVALIDO.</exception>
