@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "12_hub-ui"
 tipo: "Funcionalidade"
 titulo: "Hub · UI"
-versao: "v31"
-data: "2026-11-07 16:40"
-status: "Aprovado"
+versao: "v32"
+data: "2026-11-08 02:00"
+status: "Em revisão"
 objetivo: "definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco."
 ---
 
-> **boaz · Funcionalidade** · `12_hub-ui` · **v31** · 2026-11-07 16:40 · **Aprovado**
+> **boaz · Funcionalidade** · `12_hub-ui` · **v32** · 2026-11-08 02:00 · **Em revisão**
 
 # Hub · UI
 
@@ -469,9 +469,9 @@ Cenário: o que este documento não trata
 
 [![Contrato de API da autenticação do 17-a, com a entrada no hub e o sair](../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg)](../2_Diagramas/autenticacao-contrato-api_v02_20261101-2206.svg)
 
-**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v05_20261107-1414.svg`
+**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v06_20261108-0118.svg`
 
-[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v05_20261107-1414.svg)](../2_Diagramas/usuarios-contrato-api_v05_20261107-1414.svg)
+[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v06_20261108-0118.svg)](../2_Diagramas/usuarios-contrato-api_v06_20261108-0118.svg)
 
 ---
 
@@ -481,7 +481,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v31** | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
+| **v32** | 2026-11-08 02:00 | Diagrama: contrato de API dos usuários do 17 v05 → v06 (auditoria, X-Trace-Id); status → Em revisão |
+| v31 | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
 | v30 | 2026-11-07 14:52 | Diagramas: contrato de API dos usuários (17_modulo-usuario) v04 → v05; status → Em revisão |
 | v29 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v28 | 2026-11-03 22:11 | Vista de Módulos pwa e mobile v02, com o Feed definido no documento do módulo Feed; aprovado, sem pendências em aberto |
@@ -490,8 +491,7 @@ Cenário: o que este documento não trata
 | v25 | 2026-11-03 13:54 | A contratar e detalhe do módulo só com a carcaça (`RF-82`, `RF-83`, vista-hub-catalogo v09 e vista-hub-meus-modulos v13, sem desenhar outros módulos, nem no código do time): cards, carrossel, descrição, como funciona, quem usa, calculadora e Incluir na conta passam para o Catálogo ([16_modulo-catalogo `RF-164` a `RF-168`](16_modulo-catalogo.md#RF-164)) |
 | v24 | 2026-11-01 18:21 | Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão |
 | v23 | 2026-11-01 03:57 | Aprovado |
-| v22 | 2026-11-01 03:48 | Painel de administração do deboaz retirado (Módulos `MOD-15`): as mensagens chegam ao SAC e o time deboaz cuida das contas no módulo Usuários |
 
 ---
 
-<sub>boaz · v31 · 2026-11-07 16:40 · `1_Requisitos/12_hub-ui.md`</sub>
+<sub>boaz · v32 · 2026-11-08 02:00 · `1_Requisitos/12_hub-ui.md`</sub>

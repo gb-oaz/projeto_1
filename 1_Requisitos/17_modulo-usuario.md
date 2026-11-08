@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v73"
-data: "2026-11-08 01:26"
+versao: "v74"
+data: "2026-11-08 02:00"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v73** · 2026-11-08 01:26 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v74** · 2026-11-08 02:00 · **Em revisão**
 
 # Módulo Usuários
 
@@ -1292,6 +1292,12 @@ Esquema do Cenário: execução auditada do começo ao fim
     | PUT /usuarios/usr-ebfga-joao/permissoes         | EDITAR_PERMISSOES  |
     | POST /usuarios/usr-ebfga-paulo/desativar        | DESATIVAR_USUARIO  |
 
+Cenário: permissões auditadas nas duas coleções
+  Quando a conta master envia PUT /usuarios/usr-ebfga-joao/permissoes
+  E a resposta é de sucesso
+  Então a coleção "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "EDITAR_PERMISSOES"
+  E "registrosPermissao" ganha a versão nova das permissões do João, como na RN-256
+
 Cenário: conta criada sem login
   Quando envia POST /contas, sem login, com a sigla "COLSA"
   E a resposta é 201 com o contaId "conta-colsa"
@@ -1329,12 +1335,19 @@ Esquema do Cenário: alerta ou erro, gravado antes da recusa
   Quando a Maria envia POST /usuarios/usr-ebfga-paulo/desativar
   E <situação>
   Então a resposta é <resposta>
-  E "auditoriaErros" ganha o registro com o nivel "<nivel>" antes de a recusa sair do caso de uso
+  E "auditoriaErros" ganha o registro com o código "<codigo>" e o nivel "<nivel>"
+  E esse registro é gravado antes de a recusa sair do caso de uso
 
   Exemplos:
-    | situação                              | resposta                  | nivel  |
-    | o Paulo já está desativado            | 409, uma recusa prevista  | ALERTA |
-    | o banco cai no meio da gravação       | 500, uma falha inesperada | ERRO   |
+    | situação                        | resposta             | codigo           | nivel  |
+    | o Paulo já está desativado      | 409 ESTADO_IGUAL     | ESTADO_IGUAL     | ALERTA |
+    | o banco cai no meio da gravação | 500 ERRO_INESPERADO  | ERRO_INESPERADO  | ERRO   |
+
+Cenário: falha inesperada
+  Quando a Maria envia POST /usuarios do participante Lucas
+  E o banco cai no meio da gravação
+  Então a resposta é 500 ERRO_INESPERADO com a mensagem "Algo deu errado. Tente de novo mais tarde."
+  E "auditoriaErros" ganha o registro com o código "ERRO_INESPERADO" e o nivel "ERRO"
 
 Cenário: guardado e imutável como a auditoria
   Dado o registro "auderr-000031" da sigla "EBFGA" repetida, gravado em 2026-11-08
@@ -1342,7 +1355,7 @@ Cenário: guardado e imutável como a auditoria
   E não pode ser alterado nem apagado, como na RNF-206
 
 Cenário: leitura recusada não é auditada
-  Quando a Maria envia GET /contas/conta-zzzzz
+  Quando o time deboaz envia GET /contas/conta-zzzzz
   Então a resposta é 404 CONTA_INEXISTENTE
   E as coleções "auditoria" e "auditoriaErros" não ganham registro
 ```
@@ -1956,13 +1969,14 @@ Esquema do Cenário: coleção pronta antes do primeiro pedido
     | usuarios           | login único, contaId+nomeCurto único                          |
     | usuarios           | contaId+matricula único só com matrícula                      |
     | usuarios           | contaId+tipo+estado+nome                                      |
-    | auditoria          | contaId+quando, sem prazo de expiração                        |
+    | auditoria          | contaId+quando, traceId, sem prazo de expiração               |
+    | auditoriaErros     | traceId, contaId+quando, sem prazo de expiração               |
     | geracoesSenha      | usuarioId+pedidaEm↓, resumoComprovante, contaId+pedidaEm      |
     | registrosPermissao | usuarioId+em↓+versao↓                                         |
     | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205             |
 
 Cenário: segunda partida não duplica
-  Dado a aplicação de homologação iniciada em 2026-11-05, com as 6 coleções e seus índices
+  Dado a aplicação de homologação iniciada em 2026-11-05, com as 7 coleções e seus índices
   Quando ela inicia de novo em 2026-11-06
   Então cada coleção continua uma só, com os mesmos índices, nenhum repetido
   E nenhum documento das coleções é apagado nem duplicado
@@ -1988,7 +2002,7 @@ Esquema do Cenário: índice que não pode ser criado
 
 ```gherkin
 Cenário: pronta depois da partida
-  Dado a partida de homologação concluída, com as 6 coleções e seus índices prontos
+  Dado a partida de homologação concluída, com as 7 coleções e seus índices prontos
   E os módulos gravados e as contas iniciais garantidas
   Quando envia GET /health, sem login, sem corpo nem cabeçalho
   Então a resposta é 200, sem corpo
@@ -2282,8 +2296,7 @@ Cenário: o que este documento não trata
 
 ## Em aberto
 
-- Índices de "auditoriaErros" e do traceId em "auditoria" para entrar na `RNF-227` — **Arquitetura**
-- Nome da ação auditada de PUT /usuarios/{id}/permissoes: "EDITAR_PERMISSOES" (`RN-178`) não existe na lista de ações — **Arquitetura**
+- `POST /contas/esqueci-senha-master` (grava "pedidosAjuda") e os endereços `/auth/*` do 17-a (gravam sessão e tentativas) passam a ser auditados em "auditoria" e "auditoriaErros"? — **Produto**
 
 ---
 
@@ -2293,7 +2306,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v73** | 2026-11-08 01:26 | Diagramas da auditoria (`RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (INICIADO, CONCLUIDO, auditoriaErros e X-Trace-Id; gravações no MongoDB e no Redis destacadas), contrato de API v05 → v06 (X-Trace-Id nos auditados, 500), classes v03 → v04 (traceId, etapa, RegistroDeErro, IAuditoriaDeErros), modelo de documentos v12 → v13 (auditoriaErros e índices) |
+| **v74** | 2026-11-08 02:00 | `RN-270`: 500 ERRO_INESPERADO com "Algo deu errado. Tente de novo mais tarde.", nivel ERRO; Paulo já desativado com 409 ESTADO_IGUAL; leitura recusada pelo time deboaz (GET /contas); `RN-178`: PUT permissões grava "auditoria" com EDITAR_PERMISSOES além de "registrosPermissao"; `RNF-227` e `RNF-227-api`: índices de "auditoria" e "auditoriaErros", 7 coleções; Em aberto: auditoria de esqueci-senha-master e /auth/* |
+| v73 | 2026-11-08 01:26 | Diagramas da auditoria (`RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (INICIADO, CONCLUIDO, auditoriaErros e X-Trace-Id; gravações no MongoDB e no Redis destacadas), contrato de API v05 → v06 (X-Trace-Id nos auditados, 500), classes v03 → v04 (traceId, etapa, RegistroDeErro, IAuditoriaDeErros), modelo de documentos v12 → v13 (auditoriaErros e índices) |
 | v72 | 2026-11-08 01:14 | `RN-270`: nivel "ALERTA" (recusa prevista, 4xx) ou "ERRO" (falha inesperada, 5xx), guarda de 5 anos e imutável como a auditoria; `RN-271`: cabeçalho X-Trace-Id em toda resposta dos endpoints auditados, igual ao traceId gravado; "sem log" só nos casos de uso; exemplo do registro de erro com nivel e guardarAte; pendências de Produto respondidas |
 | v71 | 2026-11-08 01:10 | `RN-178`: auditoria só do que muda estado, com registros "INICIADO" e "CONCLUIDO" ligados pelo traceId; leitura não é auditada; `RN-270`: coleção "auditoriaErros", gravada antes da recusa; `RN-271`: um traceId por execução, sem log; exemplo de entidades com traceId e registro de erro; status → Em revisão |
 | v70 | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
@@ -2303,8 +2317,7 @@ Cenário: o que este documento não trata
 | v66 | 2026-11-07 14:17 | `RNF-227-api`: GET /health responde 200 sem corpo só depois da partida, sem resposta enquanto ela roda ou quando para (índice único, `RNF-226`, banco fora do ar), e 200 com aviso no log quando falha um índice não único; diagramas: contrato v05 e modelo de documentos v09 |
 | v65 | 2026-11-07 14:13 | `RNF-227`: índice único que não pode ser criado impede a partida, como no `RNF-226`; índice não único que falha fica só no aviso do log e a partida segue; o log cita índice e coleção, nunca o valor |
 | v64 | 2026-11-07 14:12 | `RNF-227`: passo "Então antes de aceitar o primeiro pedido…" sem vírgula após a palavra-chave, igual ao .feature do qa |
-| v63 | 2026-11-07 14:06 | Coleções e índices do modelo de documentos prontos na partida, antes do primeiro pedido, sem duplicar a cada partida; índice que não pode ser criado vira aviso no log e a partida segue (`RNF-227`); status → Em revisão |
 
 ---
 
-<sub>boaz · v73 · 2026-11-08 01:26 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v74 · 2026-11-08 02:00 · `1_Requisitos/17_modulo-usuario.md`</sub>
