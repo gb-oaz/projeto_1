@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v82), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v83), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -486,10 +486,34 @@ Funcionalidade: Usuários
     E os dois com a Maria, a ação "<acao>", o alvo e a hora, guardados até 5 anos depois
 
     Exemplos:
-      | pedido                                          | acao               |
-      | POST /usuarios/usr-ebfga-ana/nova-geracao-senha | NOVA_GERACAO_SENHA |
-      | PUT /usuarios/usr-ebfga-joao/permissoes         | EDITAR_PERMISSOES  |
-      | POST /usuarios/usr-ebfga-paulo/desativar        | DESATIVAR_USUARIO  |
+      | pedido                                            | acao                |
+      | POST /usuarios/usr-ebfga-ana/nova-geracao-senha   | NOVA_GERACAO_SENHA  |
+      | PUT /usuarios/usr-ebfga-joao/permissoes           | EDITAR_PERMISSOES   |
+      | POST /usuarios/usr-ebfga-paulo/desativar          | DESATIVAR_USUARIO   |
+      | POST /usuarios/usr-ebfga-paulo/reativar           | REATIVAR_USUARIO    |
+      | PATCH /usuarios/usr-ebfga-lucas                   | EDITAR_USUARIO      |
+      | POST /usuarios/usr-ebfga-lucas/novo-codigo-acesso | NOVO_CODIGO_ACESSO  |
+      | PUT /contas/conta-ebfga/tempo-sessao              | SALVAR_TEMPO_SESSAO |
+
+  @RN-178
+  Cenário: senha gerada sem login, conta e alvo só na conclusão
+    Quando envia POST /usuarios/gerar-senha, sem login, com o código de liberação da Maria
+    E a resposta é 200 com a senha
+    Então "auditoria" ganha o "INICIADO" da ação "GERAR_SENHA" sem quem, sem contaId e sem alvo
+    E o "CONCLUIDO", com o mesmo traceId, vai com a "conta-ebfga" e o alvo "usr-ebfga-maria", sem quem
+
+  @RN-178
+  Cenário: time deboaz, a conta pedida e a master só na conclusão
+    Quando o Caio, do time deboaz, envia POST /contas/conta-ebfga/codigo-master
+    E a resposta é 201 com o código de liberação
+    Então o "INICIADO" da ação "CODIGO_MASTER" vai com "usr-dboaz-caio" e a "conta-ebfga", sem alvo
+    E o "CONCLUIDO", com o mesmo traceId, repete os dois e vai com o alvo "usr-ebfga-master"
+
+  @RN-178
+  Cenário: tempo de sessão do time
+    Quando o Caio envia PUT /time/tempo-sessao e a resposta é 200
+    Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "SALVAR_TEMPO_SESSAO"
+    E os dois vão com "usr-dboaz-caio", a "conta-dboaz", a conta de quem pede, e o alvo "time"
 
   @RN-178
   Cenário: usuário criado, alvo só na conclusão
@@ -571,6 +595,39 @@ Funcionalidade: Usuários
     E o banco cai no meio da gravação
     Então a resposta é 500 ERRO_INESPERADO com a mensagem "Algo deu errado. Tente de novo mais tarde."
     E "auditoriaErros" ganha o registro com o código "ERRO_INESPERADO" e o nivel "ERRO"
+
+  @RN-270
+  Esquema do Cenário: recusa prevista de cada caso de uso vira ALERTA
+    Quando chega <pedido>
+    Então a resposta é <resposta>, com o cabeçalho X-Trace-Id
+    E "auditoria" fica só com o "INICIADO" da ação "<acao>", com esse traceId
+    E "auditoriaErros" ganha o código da resposta e o nivel "ALERTA", com esse traceId
+
+    Exemplos:
+      | pedido                                  | resposta                   | acao                |
+      | o CNPJ de um AUTONOMO em POST /contas   | 422 DADOS_INVALIDOS        | CRIAR_CONTA         |
+      | o nome curto "maria" no POST /usuarios  | 409 NOME_CURTO_EM_USO      | CRIAR_USUARIO       |
+      | a matrícula da Maria no PATCH da Ana    | 409 MATRICULA_EM_USO       | EDITAR_USUARIO      |
+      | o código "111111" em gerar-senha        | 401 CODIGO_INVALIDO        | GERAR_SENHA         |
+      | o código de 73 h em gerar-senha         | 410 CODIGO_VENCIDO         | GERAR_SENHA         |
+      | a nova geração do Rui, pedida pelo João | 403 ACESSO_NEGADO          | NOVA_GERACAO_SENHA  |
+      | a nova geração do participante Lucas    | 422 SEM_SENHA              | NOVA_GERACAO_SENHA  |
+      | o novo código de acesso da staff Maria  | 422 SO_PARTICIPANTE        | NOVO_CODIGO_ACESSO  |
+      | o reativar do Paulo já ativo            | 409 ESTADO_IGUAL           | REATIVAR_USUARIO    |
+      | o João dando à Ana mais do que ele tem  | 403 PERMISSAO_ACIMA        | EDITAR_PERMISSOES   |
+      | as permissões da Maria com If-Match "6" | 412 VERSAO_DESATUALIZADA   | EDITAR_PERMISSOES   |
+      | a EBFGA encerrada de volta a "ATIVA"    | 409 TRANSICAO_INVALIDA     | MUDAR_ESTADO_CONTA  |
+      | o pagamento errado no codigo-master     | 422 CONFERENCIA_INCOMPLETA | CODIGO_MASTER       |
+      | "PT30H" no tempo do time                | 422 FORA_DOS_LIMITES       | SALVAR_TEMPO_SESSAO |
+      | a master da EBFGA no tempo do time      | 403 ACESSO_NEGADO          | SALVAR_TEMPO_SESSAO |
+
+  @RN-270
+  Cenário: sem o módulo, recusada antes do caso de uso
+    Dado o token da staff Ana sem "MOD-03" com "U"
+    Quando ela envia POST /usuarios/usr-ebfga-paulo/desativar
+    Então a resposta é 403 ACESSO_NEGADO, recusada antes do caso de uso
+    E a resposta não traz o cabeçalho X-Trace-Id
+    E as coleções "auditoria" e "auditoriaErros" não ganham registro, como o 422 da RN-271
 
   @RN-270
   Cenário: guardado e imutável como a auditoria

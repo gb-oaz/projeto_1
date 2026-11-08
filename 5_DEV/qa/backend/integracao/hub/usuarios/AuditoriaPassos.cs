@@ -43,6 +43,44 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         await Executar(maria, "POST", await mundo.Traduzir(caminho), null);
     }
 
+    // o reativar do Paulo, desativado pela Maria antes da marca; a edição e o
+    // novo código de acesso do Lucas, criado pela Maria (abaixo dela); o
+    // tempo de sessão da escola, com a aba Configuração (MOD-03 · C) que a
+    // MariaPronta dá. O alvo é o usuário, ou a conta pedida no tempo (RN-178)
+    [When(@"^a Maria envia (POST|PATCH|PUT) (/usuarios/usr-ebfga-paulo/reativar|/usuarios/usr-ebfga-lucas|/usuarios/usr-ebfga-lucas/novo-codigo-acesso|/contas/conta-ebfga/tempo-sessao)$")]
+    public async Task AgeSobreOutros(string metodo, string caminho)
+    {
+        var maria = await MariaPronta();
+        string? corpo = null;
+        if (caminho.Contains("paulo", StringComparison.Ordinal))
+        {
+            var paulo = await mundo.StaffCriadoPor("paulo", maria);
+            alvo = paulo.Id;
+            Exigir(await mundo.EnviarComo(maria, "POST", $"/usuarios/{paulo.Id}/desativar"), 204, "POST /usuarios/{id}/desativar do Paulo");
+        }
+        else if (caminho.Contains("lucas", StringComparison.Ordinal))
+        {
+            alvo = await LucasDaMaria(maria);
+            if (metodo == "PATCH") corpo = """
+                {
+                  "matricula": "2026-0413"
+                }
+                """;
+        }
+        else
+        {
+            alvo = await mundo.Conta();
+            corpo = """
+                {
+                  "staffNavegador": "PT4H",
+                  "staffApp": "P7D",
+                  "participante": "P30D"
+                }
+                """;
+        }
+        await Executar(maria, metodo, await mundo.Traduzir(caminho), corpo);
+    }
+
     // a Maria salva as permissões do João na versão em que estão
     [When(@"^a Maria envia PUT (/usuarios/usr-ebfga-joao/permissoes)$")]
     public async Task EditaPermissoes(string caminho)
@@ -477,6 +515,318 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         var concluido = await execucoes.Etapa("CONCLUIDO", "ESQUECI_SENHA_MASTER");
         Assert.False(string.IsNullOrWhiteSpace(Auditoria.Texto(concluido, "alvo")), $"o CONCLUIDO veio sem alvo: {concluido.ToJson()}");
     }
+
+    // ── GERAR_SENHA, CODIGO_MASTER e SALVAR_TEMPO_SESSAO do time (RN-178) ──
+    // a Maria pendente (RF-109): criada pela conta master, com o código ainda sem uso
+    [When(@"^envia POST /usuarios/gerar-senha, sem login, com o código de liberação da Maria$")]
+    public async Task GeraASenhaDaMaria()
+    {
+        var (maria, codigo) = await mundo.Pendente("Maria Souza", "maria", "20260087");
+        await mundo.Conta();
+        await Executar(null, "POST", "/usuarios/gerar-senha", new JsonObject
+        {
+            ["entrada"] = maria.Entrada,
+            ["codigoLiberacao"] = codigo,
+        }.ToJsonString());
+    }
+
+    [Then(@"^""auditoria"" ganha o ""INICIADO"" da ação ""(\w+)"" sem quem, sem contaId e sem alvo$")]
+    public async Task IniciadoVazio(string acao)
+    {
+        registro = await execucoes.Etapa("INICIADO", acao);
+        Assert.True(Auditoria.Texto(registro, "quem") is null && Auditoria.Texto(registro, "contaId") is null && Auditoria.Texto(registro, "alvo") is null,
+            $"o INICIADO devia ir sem quem, sem contaId e sem alvo: {registro.ToJson()}");
+        execucoes.NaHoraDoPedido(registro);
+        Auditoria.GuardadoCincoAnos(registro);
+    }
+
+    [Then(@"^o ""CONCLUIDO"", com o mesmo traceId, vai com a ""(conta-ebfga)"" e o alvo ""(usr-ebfga-maria)"", sem quem$")]
+    public async Task ConcluidoSemQuem(string conta, string exemploAlvo)
+    {
+        Assert.NotNull(registro);
+        var concluido = await execucoes.Etapa("CONCLUIDO", Auditoria.Texto(registro, "acao")!);
+        Assert.Equal(Auditoria.TraceId(registro), Auditoria.TraceId(concluido));
+        Assert.Equal(await mundo.Traduzir(conta), Auditoria.Texto(concluido, "contaId"));
+        Assert.Equal(await mundo.Traduzir(exemploAlvo), Auditoria.Texto(concluido, "alvo"));
+        Assert.True(Auditoria.Texto(concluido, "quem") is null, $"o CONCLUIDO devia ir sem quem: {concluido.ToJson()}");
+    }
+
+    // o Caio com o MOD-03 em "U" e a conferência certa (CNPJ, responsável e
+    // telefone). O login do Caio e o da conta master (o alvo é o sub do token
+    // dela) saem antes da marca, para não cair entre o antes e o depois
+    [When(@"^o Caio, do time deboaz, envia POST (/contas/conta-ebfga/codigo-master)$")]
+    public async Task CaioPedeOCodigoMaster(string caminho)
+    {
+        var caio = await CaioCom("U");
+        await mundo.Traduzir("usr-ebfga-master");
+        await Executar(caio, "POST", await mundo.Traduzir(caminho), Conferencia(null, "Gustavo Boaz de Moura Souza"));
+    }
+
+    [When(@"^a resposta é 201 com o código de liberação$")]
+    public void ComOCodigoDeLiberacao()
+    {
+        Respostas.Confere(mundo.Ultima, 201);
+        Assert.Matches(@"^\d{6}$", Texto(mundo.Ultima, "codigoLiberacao"));
+    }
+
+    [Then(@"^o ""INICIADO"" da ação ""(\w+)"" vai com ""(usr-dboaz-caio)"" e a ""(conta-ebfga)"", sem alvo$")]
+    public async Task IniciadoDoCaio(string acao, string quem, string conta)
+    {
+        registro = await execucoes.Etapa("INICIADO", acao);
+        Assert.Equal(await mundo.Traduzir(quem), Auditoria.Texto(registro, "quem"));
+        Assert.Equal(await mundo.Traduzir(conta), Auditoria.Texto(registro, "contaId"));
+        Assert.True(Auditoria.Texto(registro, "alvo") is null, $"o INICIADO não devia trazer alvo: {registro.ToJson()}");
+        execucoes.NaHoraDoPedido(registro);
+        Auditoria.GuardadoCincoAnos(registro);
+    }
+
+    [Then(@"^o ""CONCLUIDO"", com o mesmo traceId, repete os dois e vai com o alvo ""(usr-ebfga-master)""$")]
+    public async Task ConcluidoComAMaster(string exemploAlvo)
+    {
+        Assert.NotNull(registro);
+        var concluido = await execucoes.Etapa("CONCLUIDO", Auditoria.Texto(registro, "acao")!);
+        Assert.Equal(Auditoria.TraceId(registro), Auditoria.TraceId(concluido));
+        Assert.Equal(Auditoria.Texto(registro, "quem"), Auditoria.Texto(concluido, "quem"));
+        Assert.Equal(Auditoria.Texto(registro, "contaId"), Auditoria.Texto(concluido, "contaId"));
+        Assert.Equal(await mundo.Traduzir(exemploAlvo), Auditoria.Texto(concluido, "alvo"));
+    }
+
+    // o tempo do time pede a aba Configuração (MOD-03 · C), como na RF-152
+    [When(@"^o Caio envia PUT /time/tempo-sessao e a resposta é 200$")]
+    public async Task CaioSalvaOTempoDoTime()
+    {
+        var caio = await CaioCom("CU");
+        Respostas.Confere(await Executar(caio, "PUT", "/time/tempo-sessao", TempoDoTime("PT8H")), 200);
+    }
+
+    // "conta-dboaz" é o contaId do time (suporte/ContasIniciais.cs), sem apelido
+    [Then(@"^os dois vão com ""(usr-dboaz-caio)"", a ""(conta-dboaz)"", a conta de quem pede, e o alvo ""(\w+)""$")]
+    public async Task OsDoisDoCaio(string quem, string conta, string alvoEsperado)
+    {
+        var id = await mundo.Traduzir(quem);
+        var novos = await execucoes.Novos(Auditoria.Registros);
+        Assert.Equal(2, novos.Count);
+        Assert.All(novos, d =>
+        {
+            Assert.Equal(id, Auditoria.Texto(d, "quem"));
+            Assert.Equal(conta, Auditoria.Texto(d, "contaId"));
+            Assert.Equal(alvoEsperado, Auditoria.Texto(d, "alvo"));
+        });
+    }
+
+    // ── recusa prevista de cada caso de uso (RN-270) ───────────────────────
+    // quem pede, com o módulo e a sessão já prontos, e o que o pedido cita
+    // existem antes da marca: só o pedido recusado cai entre o antes e o depois
+    [When(@"^chega (o CNPJ de um AUTONOMO em POST /contas|o nome curto ""maria"" no POST /usuarios|a matrícula da Maria no PATCH da Ana|o código ""111111"" em gerar-senha|o código de 73 h em gerar-senha|a nova geração do Rui, pedida pelo João|a nova geração do participante Lucas|o novo código de acesso da staff Maria|o reativar do Paulo já ativo|o João dando à Ana mais do que ele tem|as permissões da Maria com If-Match ""6""|a EBFGA encerrada de volta a ""ATIVA""|o pagamento errado no codigo-master|""PT30H"" no tempo do time|a master da EBFGA no tempo do time)$")]
+    public async Task ChegaARecusaPrevista(string pedido)
+    {
+        switch (pedido)
+        {
+            case "o CNPJ de um AUTONOMO em POST /contas":
+                await Executar(null, "POST", "/contas", ContaNova("AUTONOMO", "Pedro Reis", Cnpj(20000003), "pedro_reis", "PREIS"));
+                break;
+            case "o nome curto \"maria\" no POST /usuarios":
+                {
+                    await mundo.Maria();
+                    var master = await MasterPronta();
+                    await Executar(master, "POST", "/usuarios", new JsonObject
+                    {
+                        ["tipo"] = "STAFF",
+                        ["nome"] = "Maria Oliveira",
+                        ["nomeCurto"] = "maria",
+                        ["matricula"] = "20260199",
+                    }.ToJsonString());
+                    break;
+                }
+            case "a matrícula da Maria no PATCH da Ana":
+                {
+                    await mundo.Maria();
+                    var ana = await mundo.Ana();
+                    var master = await MasterPronta();
+                    await Executar(master, "PATCH", $"/usuarios/{ana.Id}", """
+                        {
+                          "matricula": "20260087"
+                        }
+                        """);
+                    break;
+                }
+            case "o código \"111111\" em gerar-senha":
+                {
+                    var (gustavo, _) = await mundo.Gustavo();
+                    await Executar(null, "POST", "/usuarios/gerar-senha", GeracaoDeSenha(gustavo.Entrada, "111111"));
+                    break;
+                }
+            case "o código de 73 h em gerar-senha":
+                {
+                    var (maria, codigo) = await mundo.Pendente("Maria Souza", "maria", "20260087");
+                    await Estado.PedidoHa(maria.Id, TimeSpan.FromHours(73));
+                    await Executar(null, "POST", "/usuarios/gerar-senha", GeracaoDeSenha(maria.Entrada, codigo));
+                    break;
+                }
+            case "a nova geração do Rui, pedida pelo João":
+                {
+                    var rui = await mundo.Rui();
+                    var joao = await JoaoPronto();
+                    await Executar(joao, "POST", $"/usuarios/{rui.Id}/nova-geracao-senha", null);
+                    break;
+                }
+            case "a nova geração do participante Lucas":
+                {
+                    var lucas = await mundo.Lucas();
+                    await Executar(await MasterPronta(), "POST", $"/usuarios/{lucas.Id}/nova-geracao-senha", null);
+                    break;
+                }
+            case "o novo código de acesso da staff Maria":
+                {
+                    var maria = await mundo.Maria();
+                    await Executar(await MasterPronta(), "POST", $"/usuarios/{maria.Id}/novo-codigo-acesso", null);
+                    break;
+                }
+            case "o reativar do Paulo já ativo":
+                {
+                    var paulo = await mundo.Paulo();
+                    await Executar(await MasterPronta(), "POST", $"/usuarios/{paulo.Id}/reativar", null);
+                    break;
+                }
+            case "o João dando à Ana mais do que ele tem":
+                {
+                    // o João só tem Administrar usuários; a Sugestão (MOD-04) passa do que ele tem
+                    var ana = await mundo.Ana();
+                    var joao = await JoaoPronto();
+                    var atuais = await mundo.Permissoes(ana);
+                    var mods = (JsonObject)atuais["mods"]!.DeepClone();
+                    mods["MOD-04"] = "U";
+                    await Executar(joao, "PUT", $"/usuarios/{ana.Id}/permissoes",
+                        new JsonObject { ["mods"] = mods }.ToJsonString(), atuais["versao"]!.GetValue<int>().ToString());
+                    break;
+                }
+            case "as permissões da Maria com If-Match \"6\"":
+                {
+                    // a Maria está na versão 7 (17 exemplo-entidades): a 6 já passou
+                    var maria = await mundo.Maria();
+                    var mods = (JsonObject)(await mundo.Permissoes(maria))["mods"]!.DeepClone();
+                    await Executar(await MasterPronta(), "PUT", $"/usuarios/{maria.Id}/permissoes",
+                        new JsonObject { ["mods"] = mods }.ToJsonString(), "6");
+                    break;
+                }
+            case "a EBFGA encerrada de volta a \"ATIVA\"":
+                {
+                    var conta = await mundo.Conta();
+                    var admin = mundo.Admin();
+                    Exigir(await mundo.EnviarComo(admin, "POST", $"/contas/{conta}/estado", new JsonObject { ["estado"] = "ENCERRADA" }.ToJsonString()),
+                        200, "POST /contas/{id}/estado ENCERRADA");
+                    await Executar(admin, "POST", $"/contas/{conta}/estado", new JsonObject { ["estado"] = "ATIVA" }.ToJsonString());
+                    break;
+                }
+            case "o pagamento errado no codigo-master":
+                {
+                    // CNPJ e telefone certos, sem o responsável, e a data do último pagamento errada
+                    var conta = await mundo.Conta();
+                    var caio = await CaioCom("U");
+                    await Executar(caio, "POST", $"/contas/{conta}/codigo-master", Conferencia("2020-01-01", null));
+                    break;
+                }
+            case "\"PT30H\" no tempo do time":
+                {
+                    var admin = mundo.Admin();
+                    await mundo.TokenDe(admin);
+                    await Executar(admin, "PUT", "/time/tempo-sessao", TempoDoTime("PT30H"));
+                    break;
+                }
+            default:
+                await Executar(await MasterPronta(), "PUT", "/time/tempo-sessao", TempoDoTime("PT8H"));
+                break;
+        }
+    }
+
+    // ── sem o módulo, antes do caso de uso (RN-270) ────────────────────────
+    // a Ana sem nenhum módulo, salva pela conta master; o Paulo existe e o
+    // login dela sai antes da marca
+    [Given(@"^o token da staff Ana sem ""(MOD-\d+)"" com ""(\w+)""$")]
+    public async Task AnaSemOModulo(string mod, string aba)
+    {
+        var ana = await mundo.Ana();
+        var atuais = (await mundo.Permissoes(ana))["mods"]!.AsObject()
+            .ToDictionary(m => m.Key, m => m.Value!.GetValue<string>());
+        if (atuais.TryGetValue(mod, out var abas) && abas.Contains(aba, StringComparison.Ordinal))
+        {
+            var sem = abas.Replace(aba, "", StringComparison.Ordinal);
+            if (sem.Length == 0) atuais.Remove(mod);
+            else atuais[mod] = sem;
+            await mundo.Definir(ana, atuais);
+        }
+        await mundo.Paulo();
+        await mundo.TokenDe(ana);
+        mundo.Sujeito = ana;
+    }
+
+    [When(@"^ela envia POST (/usuarios/usr-ebfga-paulo/desativar)$")]
+    public async Task ElaDesativa(string caminho)
+    {
+        var real = await mundo.Traduzir(caminho);
+        await Executar(mundo.Sujeito!, "POST", real, null);
+    }
+
+    // ── apoio da RN-178 e da RN-270 ────────────────────────────────────────
+    // o Lucas criado pela Maria antes da marca, para ficar abaixo dela (17-b RN-252)
+    async Task<string> LucasDaMaria(Pessoa maria)
+    {
+        if (!mundo.Apelidos.ContainsKey("lucas-da-maria"))
+        {
+            var r = Exigir(await mundo.EnviarComo(maria, "POST", "/usuarios", Participante("Lucas")), 201, "POST /usuarios do Lucas, pela Maria");
+            var id = Texto(r, "id");
+            mundo.Apelidos["lucas-da-maria"] = () => Task.FromResult(id);
+            mundo.Apelidos["usr-ebfga-lucas"] = () => Task.FromResult(id);
+        }
+        return await mundo.Apelidos["lucas-da-maria"]();
+    }
+
+    // a conta master com a sessão já aberta e renovada antes da marca
+    async Task<Pessoa> MasterPronta()
+    {
+        var master = await mundo.Master();
+        await mundo.EnviarComo(master, "GET", "/usuarios?tipo=STAFF");
+        return master;
+    }
+
+    // o João com Administrar usuários (MOD-03 · CU) e a sessão já renovada
+    async Task<Pessoa> JoaoPronto()
+    {
+        var joao = await mundo.Joao();
+        await mundo.Conceder(joao, new() { ["MOD-03"] = "CU" });
+        await mundo.EnviarComo(joao, "GET", "/usuarios?tipo=STAFF");
+        return joao;
+    }
+
+    // o Caio com as abas do MOD-03 pedidas, salvas pelo administrador antes do login dele
+    async Task<Pessoa> CaioCom(string abas)
+    {
+        var caio = await mundo.Caio();
+        await mundo.Conceder(caio, new() { ["MOD-03"] = abas });
+        await mundo.EnviarComo(caio, "GET", "/contas?estado=ATIVA");
+        return caio;
+    }
+
+    static string GeracaoDeSenha(string entrada, string codigo) =>
+        new JsonObject { ["entrada"] = entrada, ["codigoLiberacao"] = codigo }.ToJsonString();
+
+    // a conferência da conta EBFGA (RN-172): o CNPJ e o telefone certos, com o
+    // responsável e a data do último pagamento pedidos
+    static string Conferencia(string? ultimoPagamento, string? responsavel) => new JsonObject
+    {
+        ["documento"] = "12.345.678/0001-90",
+        ["responsavel"] = responsavel,
+        ["telefone"] = "(51) 99999-0000",
+        ["ultimoPagamento"] = ultimoPagamento,
+    }.ToJsonString();
+
+    static string TempoDoTime(string mastersNavegador) => new JsonObject
+    {
+        ["membrosNavegador"] = "PT8H",
+        ["membrosApp"] = "PT8H",
+        ["mastersNavegador"] = mastersNavegador,
+        ["mastersApp"] = "PT8H",
+    }.ToJsonString();
 
     // ── apoio ──────────────────────────────────────────────────────────────
     // a Maria com Administrar usuários (MOD-03, abas C e U) e a sessão já

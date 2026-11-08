@@ -31,6 +31,10 @@ public sealed class PassosDeAuditoria(Mundo mundo, Execucoes execucoes)
         Auditoria.TraceIdDoCabecalho(mundo.Ultima);
     }
 
+    // o 403 sem o módulo (RN-270): a recusa sai antes do caso de uso
+    [Then(@"^a resposta é (\d{3}) ([A-Z_]+), recusada antes do caso de uso$")]
+    public void RecusadaAntesDoCasoDeUso(int status, string codigo) => Respostas.Confere(mundo.Ultima, status, codigo);
+
     [Then(@"^a resposta não traz o cabeçalho X-Trace-Id$")]
     public void SemTraceId() =>
         Assert.True(string.IsNullOrEmpty(mundo.Ultima.Cabecalho("X-Trace-Id")),
@@ -57,6 +61,7 @@ public sealed class PassosDeAuditoria(Mundo mundo, Execucoes execucoes)
     // a leitura não auditada (RN-271 do 17) e o pedido recusado antes do caso de uso (RN-273)
     [Then(@"^as coleções ""auditoria"" e ""auditoriaErros"" não ganham registro$")]
     [Then(@"^""auditoria"" e ""auditoriaErros"" não ganham registro, como o 422 da RN-271 do 17$")]
+    [Then(@"^as coleções ""auditoria"" e ""auditoriaErros"" não ganham registro, como o 422 da RN-271$")]
     public async Task NadaGravado()
     {
         var registros = await execucoes.Novos(Auditoria.Registros);

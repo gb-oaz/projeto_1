@@ -654,6 +654,7 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
     [When(@"^ela envia POST /usuarios/gerar-senha com o código$")]
     public async Task ElaGeraASenha() => await GerarSenha((await mundo.Maria()).Entrada, codigo);
 
+    [When(@"^a resposta é 200 com a senha$")]
     [Then(@"^a resposta é 200 com a senha$")]
     public void ComASenha()
     {
