@@ -58,20 +58,22 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
             """, versao);
     }
 
-    // a conta master salva as permissões do João na versão em que estão: grava
-    // em "auditoria" e em "registrosPermissao" (RN-178, RN-256)
+    // a conta master concede ao João a Utilização do Quiz (MOD-05, contratado
+    // pela EBFGA e de staff, RN-166, RN-241, RN-252), ou a tira se ele já a
+    // tem: só com mudança há versão nova em "registrosPermissao" (RN-254,
+    // RN-256), além da "auditoria" (RN-178)
     [When(@"^a conta master envia PUT (/usuarios/usr-ebfga-joao/permissoes)$")]
     public async Task MasterEditaPermissoes(string caminho)
     {
         var master = await mundo.Master();
         var joao = await mundo.StaffCriadoPor("joao", master);
         alvo = joao.Id;
-        versaoAntes = (await mundo.Permissoes(joao))["versao"]!.GetValue<int>();
-        await Executar(master, "PUT", await mundo.Traduzir(caminho), """
-            {
-              "mods": {}
-            }
-            """, versaoAntes.ToString());
+        var atuais = await mundo.Permissoes(joao);
+        versaoAntes = atuais["versao"]!.GetValue<int>();
+        var mods = (JsonObject)atuais["mods"]!.DeepClone();
+        if (!mods.Remove("MOD-05")) mods["MOD-05"] = "U";
+        await Executar(master, "PUT", await mundo.Traduzir(caminho),
+            new JsonObject { ["mods"] = mods }.ToJsonString(), versaoAntes.ToString());
     }
 
     [When(@"^envia POST /contas, sem login, com a sigla ""(\w+)""$")]
