@@ -17,12 +17,12 @@ public class ConfirmarSenhaTests
             estado: EstadoUsuario.Pendente);
         var comprovante = c.Mock.NovaGeracao("usr-ebfga-paulo");
 
-        var sessao = await c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante));
+        var sessao = await c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante), Trace);
 
         Assert.Equal(("usr-ebfga-paulo", "hub"), (Claims(sessao).Sub, Claims(sessao).Aud));
         Assert.Equal(Aparelho.Navegador, sessao.Aparelho);
         Assert.Equal(EstadoUsuario.Ativo, c.Mock.Usuario("usr-ebfga-paulo").Estado);
-        await Falha("COMPROVANTE_INVALIDO", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante)));
+        await Falha("COMPROVANTE_INVALIDO", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante), Trace));
     }
 
     [Fact]
@@ -30,13 +30,13 @@ public class ConfirmarSenhaTests
     {
         var comprovante = c.Mock.NovaGeracao("usr-ebfga-maria");
         c.Mock.Relogio.Avancar(TimeSpan.FromHours(72));
-        await Falha("COMPROVANTE_INVALIDO", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante, "APP")));
+        await Falha("COMPROVANTE_INVALIDO", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante, "APP"), Trace));
     }
 
     [Fact]
     public async Task Comprovante_desconhecido()
     {
-        await Falha("COMPROVANTE_INVALIDO", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto("c7e1")));
+        await Falha("COMPROVANTE_INVALIDO", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto("c7e1"), Trace));
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public class ConfirmarSenhaTests
         var comprovante = c.Mock.NovaGeracao("usr-ebfga-maria");
         c.Mock.NovoUsuario("usr-sem-entrada", "conta-ebfga", TipoUsuario.Staff);
         var outro = c.Mock.NovaGeracao("usr-apagado");
-        await Falha("COMPROVANTE_INVALIDO", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(outro)));
-        await c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante));
+        await Falha("COMPROVANTE_INVALIDO", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(outro), Trace));
+        await c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante), Trace);
     }
 
     [Fact]
@@ -54,9 +54,9 @@ public class ConfirmarSenhaTests
     {
         var comprovante = c.Mock.NovaGeracao("usr-ebfga-maria");
         c.Mock.MudarUsuario("usr-ebfga-maria", EstadoUsuario.Desativado);
-        await Falha("ACESSO_INDISPONIVEL", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante)));
+        await Falha("ACESSO_INDISPONIVEL", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante), Trace));
 
         c.Mock.MudarUsuario("usr-ebfga-maria", EstadoUsuario.Ativo);
-        await c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante));
+        await c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante), Trace);
     }
 }

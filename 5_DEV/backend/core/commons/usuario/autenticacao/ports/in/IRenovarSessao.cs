@@ -1,4 +1,5 @@
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
+using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 
@@ -7,5 +8,6 @@ public interface IRenovarSessao
 {
     /// <summary>Renova a sessão, com as permissões recalculadas.</summary>
     /// <exception cref="Domain.FalhaDeAutenticacao">SESSAO_TERMINADA.</exception>
-    Task<SessaoAbertaDto> Executar(RenovacaoDto pedido, CancellationToken ct = default);
+    /// <remarks>Auditado com o traceId da execução, devolvido no X-Trace-Id (RN-272, RN-273).</remarks>
+    Task<SessaoAbertaDto> Executar(RenovacaoDto pedido, TraceId traceId, CancellationToken ct = default);
 }

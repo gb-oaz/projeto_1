@@ -16,7 +16,7 @@ public class SessoesTests
         var navegador = await c.MariaEntra();
         var app = await c.MariaEntra("APP");
 
-        await c.Mock.SairDoAparelho.Executar(new ConferenciaDeAcessoDto(navegador.TokenAcesso, Frente.Hub));
+        await c.Mock.SairDoAparelho.Executar(await c.Conferido(navegador), Trace);
 
         Assert.Equal(MotivoFim.Sair, c.Mock.Encerradas[Claims(navegador).Sid]);
         await Falha("SESSAO_TERMINADA", () => c.PedidoAoHub(navegador));
@@ -47,7 +47,7 @@ public class SessoesTests
         var navegador = await c.MariaEntra();
         var app = await c.MariaEntra("APP");
 
-        await c.Mock.EncerrarSessao.Executar(new ConferenciaDeAcessoDto(app.TokenAcesso, Frente.Hub), Claims(navegador).Sid);
+        await c.Mock.EncerrarSessao.Executar(await c.Conferido(app), Claims(navegador).Sid, Trace);
 
         await Falha("SESSAO_TERMINADA", () => c.PedidoAoHub(navegador));
         await c.PedidoAoHub(app);
@@ -59,11 +59,11 @@ public class SessoesTests
     public async Task RF_157_sessao_de_outra_pessoa_ou_inexistente(bool doJoao)
     {
         var maria = await c.MariaEntra();
-        var joao = await c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto("joao.eejsa@deboaz.com", "Xu@Xa182482", "APP"));
+        var joao = await c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto("joao.eejsa@deboaz.com", "Xu@Xa182482", "APP"), Trace);
         var sid = doJoao ? Claims(joao).Sid : "naoexiste";
 
-        await Falha("SESSAO_NAO_ENCONTRADA",
-            () => c.Mock.EncerrarSessao.Executar(new ConferenciaDeAcessoDto(maria.TokenAcesso, Frente.Hub), sid));
+        var acesso = await c.Conferido(maria);
+        await Falha("SESSAO_NAO_ENCONTRADA", () => c.Mock.EncerrarSessao.Executar(acesso, sid, Trace));
         await c.PedidoAoHub(joao);
     }
 
@@ -72,9 +72,9 @@ public class SessoesTests
     {
         var navegador = await c.MariaEntra();
         var app = await c.MariaEntra("APP");
-        var joao = await c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto("joao.eejsa@deboaz.com", "Xu@Xa182482", "APP"));
+        var joao = await c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto("joao.eejsa@deboaz.com", "Xu@Xa182482", "APP"), Trace);
 
-        await c.Mock.EncerrarTodasAsSessoes.Executar(new ConferenciaDeAcessoDto(app.TokenAcesso, Frente.Hub));
+        await c.Mock.EncerrarTodasAsSessoes.Executar(await c.Conferido(app), Trace);
 
         Assert.All([navegador, app], s => Assert.Equal(MotivoFim.SairDeTodos, c.Mock.Encerradas[Claims(s).Sid]));
         await Falha("SESSAO_TERMINADA", () => c.Renovar(navegador));

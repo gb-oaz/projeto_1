@@ -73,7 +73,7 @@ public class EntrarNoQuestENaSalaTests
     {
         c.Mock.AbrirSala("482107", "conta-ebfga", "MOD-05");
 
-        var sessao = await c.Mock.EntrarNaSala.Executar(new EntradaNaSalaDto("482107"));
+        var sessao = await c.Mock.EntrarNaSala.Executar(new EntradaNaSalaDto("482107"), Trace);
 
         var claims = Claims(sessao);
         Assert.Equal(("quest", "ANONIMO", "ANONIMO", "482107"), (claims.Aud, claims.Tipo, claims.Papel, claims.Sala));
@@ -91,7 +91,7 @@ public class EntrarNoQuestENaSalaTests
     public async Task RN_231_sessao_anonima_sem_tempo_sem_uso()
     {
         c.Mock.AbrirSala("482107", "conta-ebfga", "MOD-05");
-        var sessao = await c.Mock.EntrarNaSala.Executar(new EntradaNaSalaDto("482107"));
+        var sessao = await c.Mock.EntrarNaSala.Executar(new EntradaNaSalaDto("482107"), Trace);
 
         c.Mock.Relogio.Avancar(TimeSpan.FromHours(2));
 
@@ -102,6 +102,6 @@ public class EntrarNoQuestENaSalaTests
     [Fact]
     public async Task RF_136_sala_fechada()
     {
-        await Falha("SALA_FECHADA", () => c.Mock.EntrarNaSala.Executar(new EntradaNaSalaDto("000000")));
+        await Falha("SALA_FECHADA", () => c.Mock.EntrarNaSala.Executar(new EntradaNaSalaDto("000000"), Trace));
     }
 }

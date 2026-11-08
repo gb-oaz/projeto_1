@@ -1,4 +1,5 @@
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
+using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 
@@ -7,5 +8,6 @@ public interface IEntrarNaSala
 {
     /// <summary>Abre a sessão anônima e devolve os tokens.</summary>
     /// <exception cref="Domain.FalhaDeAutenticacao">DADOS_INVALIDOS ou SALA_FECHADA.</exception>
-    Task<SessaoAbertaDto> Executar(EntradaNaSalaDto pedido, CancellationToken ct = default);
+    /// <remarks>Auditado com o traceId da execução, devolvido no X-Trace-Id (RN-272, RN-273).</remarks>
+    Task<SessaoAbertaDto> Executar(EntradaNaSalaDto pedido, TraceId traceId, CancellationToken ct = default);
 }

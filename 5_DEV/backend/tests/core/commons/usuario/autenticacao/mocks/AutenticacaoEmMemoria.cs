@@ -3,6 +3,12 @@ using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.Out;
 using Boaz.Core.Commons.Usuario.Autenticacao.UseCases;
+using EtapaDaExecucao = Boaz.Core.Commons.Usuario.Usuarios.Domain.EtapaDaExecucao;
+using IAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoria;
+using IAuditoriaDeErros = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoriaDeErros;
+using NivelDoErro = Boaz.Core.Commons.Usuario.Usuarios.Domain.NivelDoErro;
+using RegistroDeAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Domain.RegistroDeAuditoria;
+using RegistroDeErro = Boaz.Core.Commons.Usuario.Usuarios.Domain.RegistroDeErro;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 
@@ -13,7 +19,7 @@ namespace Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 /// como no Redis.
 /// </summary>
 public sealed class AutenticacaoEmMemoria :
-    IUsuarios, IContas, IGeracoesDeSenha, ISessoes, ITentativas, IAssinador, IPermissoes, ISalas
+    IUsuarios, IContas, IGeracoesDeSenha, ISessoes, ITentativas, IAssinador, IPermissoes, ISalas, IAuditoria, IAuditoriaDeErros
 {
     /// <summary>Iterações baixas, só para os testes não demorarem.</summary>
     public const int Iteracoes = 1_000;
@@ -39,16 +45,16 @@ public sealed class AutenticacaoEmMemoria :
         NovaConta(ContaDoTime, "DBOAZ");
         TrocarChave("deboaz-2026-11");
 
-        EntrarNoHub = new EntrarNoHub(this, this, this, this, this, this, Relogio);
-        EntrarNoQuest = new EntrarNoQuest(this, this, this, this, this, this, Relogio);
-        EntrarNaSala = new EntrarNaSala(this, this, this, this, Relogio);
-        ConfirmarSenha = new ConfirmarSenha(this, this, this, this, this, this, Relogio);
-        RenovarSessao = new RenovarSessao(this, this, this, this, this, this, Relogio);
+        EntrarNoHub = new EntrarNoHub(this, this, this, this, this, this, this, this, Relogio);
+        EntrarNoQuest = new EntrarNoQuest(this, this, this, this, this, this, this, this, Relogio);
+        EntrarNaSala = new EntrarNaSala(this, this, this, this, this, this, Relogio);
+        ConfirmarSenha = new ConfirmarSenha(this, this, this, this, this, this, this, this, Relogio);
+        RenovarSessao = new RenovarSessao(this, this, this, this, this, this, this, this, Relogio);
         ConferirAcesso = new ConferirAcesso(this, this, Relogio);
-        SairDoAparelho = new SairDoAparelho(ConferirAcesso, this);
+        SairDoAparelho = new SairDoAparelho(this, this, this, Relogio);
         ListarSessoes = new ListarSessoes(ConferirAcesso, this, Relogio);
-        EncerrarSessao = new EncerrarSessao(ConferirAcesso, this);
-        EncerrarTodasAsSessoes = new EncerrarTodasAsSessoes(ConferirAcesso, this);
+        EncerrarSessao = new EncerrarSessao(this, this, this, Relogio);
+        EncerrarTodasAsSessoes = new EncerrarTodasAsSessoes(this, this, this, Relogio);
         EncerrarSessoesDoUsuario = new EncerrarSessoesDoUsuario(this);
         AvisarPermissoesNovas = new AvisarPermissoesNovas(this);
         LerChavesPublicas = new LerChavesPublicas(this);
@@ -153,6 +159,18 @@ public sealed class AutenticacaoEmMemoria :
     /// <summary>Por que cada sessão apagada terminou.</summary>
     public Dictionary<string, MotivoFim> Encerradas { get; } = [];
 
+    /// <summary>Os registros de "auditoria" (RN-272), na ordem em que foram gravados.</summary>
+    public List<RegistroDeAuditoria> Auditoria { get; } = [];
+
+    /// <summary>Os registros de "auditoriaErros" (RN-273).</summary>
+    public List<RegistroDeErro> Erros { get; } = [];
+
+    /// <summary>O que foi gravado, em ordem: INICIADO, CONCLUIDO ou "nivel codigo" do erro.</summary>
+    public List<string> Gravacoes { get; } = [];
+
+    /// <summary>Simula o Redis fora do ar: as sessões e as tentativas falham com ela.</summary>
+    public Exception? FalhaDoRedis { get; set; }
+
     /// <summary>As sessões que ainda existem.</summary>
     public IReadOnlyList<Sessao> Sessoes => sessoes.Values.Where(Viva).Select(Copia).ToList();
 
@@ -202,10 +220,13 @@ public sealed class AutenticacaoEmMemoria :
     // ── ISessoes ───────────────────────────────────────────────────────────────
 
     Task<Sessao?> ISessoes.Buscar(string sid, CancellationToken ct) =>
-        Task.FromResult(sessoes.TryGetValue(sid, out var s) && Viva(s) ? Copia(s) : null);
+        FalhaDoRedis is { } falha
+            ? Task.FromException<Sessao?>(falha)
+            : Task.FromResult(sessoes.TryGetValue(sid, out var s) && Viva(s) ? Copia(s) : null);
 
     Task ISessoes.Gravar(Sessao sessao, CancellationToken ct)
     {
+        if (FalhaDoRedis is { } falha) return Task.FromException(falha);
         sessoes[sessao.Sid] = Copia(sessao);
         return Task.CompletedTask;
     }
@@ -228,7 +249,7 @@ public sealed class AutenticacaoEmMemoria :
     // ── ITentativas ────────────────────────────────────────────────────────────
 
     Task<TentativasDeEntrada?> ITentativas.Buscar(AlvoTentativa alvo, string chave, CancellationToken ct) =>
-        Task.FromResult(Tentativas(alvo, chave) is { } t
+        FalhaDoRedis is { } falha ? Task.FromException<TentativasDeEntrada?>(falha) : Task.FromResult(Tentativas(alvo, chave) is { } t
             ? new TentativasDeEntrada(t.Alvo, t.Chave, t.ErrosSeguidos, t.BloqueiosSeguidos, t.BloqueadoAte, t.UltimoErro)
             : null);
 
@@ -246,6 +267,22 @@ public sealed class AutenticacaoEmMemoria :
     }
 
     static string Chave(AlvoTentativa alvo, string chave) => $"tentativas:{alvo.Texto()}:{chave}";
+
+    // ── IAuditoria e IAuditoriaDeErros ─────────────────────────────────────────
+
+    Task IAuditoria.Registrar(RegistroDeAuditoria registro, CancellationToken ct)
+    {
+        Auditoria.Add(registro);
+        Gravacoes.Add(registro.Etapa == EtapaDaExecucao.Iniciado ? "INICIADO" : "CONCLUIDO");
+        return Task.CompletedTask;
+    }
+
+    Task IAuditoriaDeErros.Registrar(RegistroDeErro registro, CancellationToken ct)
+    {
+        Erros.Add(registro);
+        Gravacoes.Add($"{(registro.Nivel == NivelDoErro.Alerta ? "ALERTA" : "ERRO")} {registro.Codigo}");
+        return Task.CompletedTask;
+    }
 
     // ── IAssinador ─────────────────────────────────────────────────────────────
 

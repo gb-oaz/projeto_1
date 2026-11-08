@@ -99,7 +99,7 @@ public class RenovarSessaoTests
     [InlineData("naoexiste.segredo")]
     public async Task Renovacao_desconhecida(string? token)
     {
-        await Falha("SESSAO_TERMINADA", () => c.Mock.RenovarSessao.Executar(new RenovacaoDto(token)));
+        await Falha("SESSAO_TERMINADA", () => c.Mock.RenovarSessao.Executar(new RenovacaoDto(token), Trace));
     }
 
     [Fact]

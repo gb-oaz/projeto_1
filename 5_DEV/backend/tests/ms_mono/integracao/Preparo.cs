@@ -69,14 +69,15 @@ public sealed class Preparo(Backend backend)
     // Confirma a senha anotada e sai, para a sessão do primeiro acesso não contar.
     async Task Confirmar(string comprovante)
     {
-        var sessao = await Caso<IConfirmarSenha>().Executar(new ConfirmacaoDeSenhaDto(comprovante));
-        await Caso<ISairDoAparelho>().Executar(new ConferenciaDeAcessoDto(sessao.TokenAcesso, Frente.Hub));
+        var sessao = await Caso<IConfirmarSenha>().Executar(new ConfirmacaoDeSenhaDto(comprovante), TraceId.Novo());
+        var acesso = await Caso<IConferirAcesso>().Executar(new ConferenciaDeAcessoDto(sessao.TokenAcesso, Frente.Hub));
+        await Caso<ISairDoAparelho>().Executar(acesso, TraceId.Novo());
     }
 
     // Uma sessão nova no app: o token de acesso e o de renovação no corpo.
     public async Task<Pessoa> Entrar(string id, string entrada, string senha)
     {
-        var sessao = await Caso<IEntrarNoHub>().Executar(new EntradaNoHubDto(entrada, senha, "APP"));
+        var sessao = await Caso<IEntrarNoHub>().Executar(new EntradaNoHubDto(entrada, senha, "APP"), TraceId.Novo());
         return new Pessoa(id, entrada, senha, sessao.TokenAcesso, sessao.TokenRenovacao);
     }
 }

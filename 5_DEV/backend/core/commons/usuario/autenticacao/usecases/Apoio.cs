@@ -8,11 +8,16 @@ namespace Boaz.Core.Commons.Usuario.Autenticacao.UseCases;
 // Peças internas que mais de um caso de uso usa. Não são casos de uso: não têm
 // porta de entrada e não aparecem fora do core.
 
+/// <summary>A sessão gravada e a resposta com os tokens dela; o sid é o alvo da auditoria (RN-272).</summary>
+/// <param name="Sessao">A sessão gravada.</param>
+/// <param name="Resposta">A resposta com os dois tokens.</param>
+sealed record SessaoEmitida(Sessao Sessao, SessaoAbertaDto Resposta);
+
 /// <summary>Grava a sessão e assina o token de acesso dela.</summary>
 sealed class EmissorDeTokens(ISessoes sessoes, IAssinador assinador)
 {
     /// <summary>Grava a sessão e devolve a resposta com os dois tokens.</summary>
-    public async Task<SessaoAbertaDto> Emitir(Sessao sessao, TokenDeRenovacao renovacao, string tipo,
+    public async Task<SessaoEmitida> Emitir(Sessao sessao, TokenDeRenovacao renovacao, string tipo,
         PermissoesNoToken permissoes, DateTimeOffset agora, CancellationToken ct)
     {
         await sessoes.Gravar(sessao, ct);
@@ -20,8 +25,8 @@ sealed class EmissorDeTokens(ISessoes sessoes, IAssinador assinador)
         var kid = await assinador.KidAtual(ct);
         var paraAssinar = TokenDeAcesso.ParaAssinar(kid, claims);
         var assinatura = await assinador.Assinar(kid, Encoding.ASCII.GetBytes(paraAssinar), ct);
-        return new SessaoAbertaDto(TokenDeAcesso.Completar(paraAssinar, assinatura), "Bearer",
-            (int)ClaimsDeAcesso.Validade.TotalSeconds, renovacao.ToString(), sessao.Aparelho);
+        return new SessaoEmitida(sessao, new SessaoAbertaDto(TokenDeAcesso.Completar(paraAssinar, assinatura), "Bearer",
+            (int)ClaimsDeAcesso.Validade.TotalSeconds, renovacao.ToString(), sessao.Aparelho));
     }
 }
 
@@ -47,7 +52,7 @@ sealed class AberturaDeSessao(IUsuarios usuarios, IContas contas, ISessoes sesso
     /// Abre a sessão: tempo sem uso da pessoa (RN-226), limite do hub (RN-247),
     /// permissões da autorização e o último acesso do usuário.
     /// </summary>
-    public async Task<SessaoAbertaDto> Abrir(UsuarioDaEntrada usuario, ContaDaEntrada conta, Frente frente,
+    public async Task<SessaoEmitida> Abrir(UsuarioDaEntrada usuario, ContaDaEntrada conta, Frente frente,
         Aparelho aparelho, QuemEntrou? quem, CancellationToken ct)
     {
         var agora = relogio.GetUtcNow();
@@ -64,9 +69,9 @@ sealed class AberturaDeSessao(IUsuarios usuarios, IContas contas, ISessoes sesso
         var doUsuario = await permissoes.DoUsuario(usuario, ct);
         var (sessao, renovacao) = Sessao.Abrir(usuario.Id, conta.Id, conta.Sigla, frente, aparelho, quem, null,
             doUsuario.Pv, tempo, agora);
-        var resposta = await emissor.Emitir(sessao, renovacao, usuario.Tipo.Texto(), doUsuario, agora, ct);
+        var emitida = await emissor.Emitir(sessao, renovacao, usuario.Tipo.Texto(), doUsuario, agora, ct);
         await usuarios.RegistrarUltimoAcesso(usuario.Id, agora, quem?.Rotulo, ct);
-        return resposta;
+        return emitida;
     }
 }
 

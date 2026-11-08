@@ -55,7 +55,7 @@ public class EntrarNoHubTests
     [Fact]
     public async Task RN_180_entrada_sem_diferenca_de_maiusculas()
     {
-        var sessao = await c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto("Maria.EBFGA@Deboaz.com", SenhaDaMaria, "APP"));
+        var sessao = await c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto("Maria.EBFGA@Deboaz.com", SenhaDaMaria, "APP"), Trace);
         Assert.Equal("usr-ebfga-maria", Claims(sessao).Sub);
     }
 
@@ -65,7 +65,7 @@ public class EntrarNoHubTests
     public async Task RF_139_mesma_resposta_para_senha_errada_e_entrada_inexistente(string entrada, string senha)
     {
         var falha = await Falha("ENTRADA_INVALIDA",
-            () => c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto(entrada, senha, "NAVEGADOR")));
+            () => c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto(entrada, senha, "NAVEGADOR"), Trace));
 
         Assert.Equal("Entrada ou senha incorretas.", falha.Message);
         Assert.Equal(1, c.Mock.Tentativas(AlvoTentativa.Entrada, entrada)!.ErrosSeguidos);
@@ -77,7 +77,7 @@ public class EntrarNoHubTests
     {
         c.Mock.NovoUsuario("usr-ebfga-ana", "conta-ebfga", TipoUsuario.Participante, "ana.ebfga@deboaz.com", SenhaDaMaria);
         await Falha("ENTRADA_INVALIDA",
-            () => c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto("ana.ebfga@deboaz.com", SenhaDaMaria, "APP")));
+            () => c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto("ana.ebfga@deboaz.com", SenhaDaMaria, "APP"), Trace));
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class EntrarNoHubTests
         var tempoDoTime = TempoDeSessao.Padrao with { MastersNavegador = TimeSpan.FromHours(2) };
         c.Mock.NovaConta(AutenticacaoEmMemoria.ContaDoTime, "DBOAZ", tempo: tempoDoTime);
 
-        await c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto("master.ebfga@deboaz.com", "Xu@Xa182482", "NAVEGADOR"));
+        await c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto("master.ebfga@deboaz.com", "Xu@Xa182482", "NAVEGADOR"), Trace);
 
         Assert.Equal(TimeSpan.FromHours(2), Assert.Single(c.Mock.Sessoes).TempoSemUso);
     }
@@ -160,7 +160,7 @@ public class EntrarNoHubTests
     public async Task Pedido_sem_aparelho_e_dado_invalido()
     {
         var falha = await Falha("DADOS_INVALIDOS",
-            () => c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto(EntradaDaMaria, SenhaDaMaria, null)));
+            () => c.Mock.EntrarNoHub.Executar(new EntradaNoHubDto(EntradaDaMaria, SenhaDaMaria, null), Trace));
         Assert.Equal("aparelho", falha.Campo);
     }
 }

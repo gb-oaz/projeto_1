@@ -2,19 +2,40 @@ using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.Out;
+using AcaoAuditada = Boaz.Core.Commons.Usuario.Usuarios.Domain.AcaoAuditada;
+using AuditoriaDaExecucao = Boaz.Core.Commons.Usuario.Usuarios.UseCases.AuditoriaDaExecucao;
+using Execucao = Boaz.Core.Commons.Usuario.Usuarios.UseCases.Execucao;
+using IAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoria;
+using IAuditoriaDeErros = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoriaDeErros;
+using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Usuario.Autenticacao.UseCases;
 
-/// <summary>Sair de todos os aparelhos (RF-157), inclusive deste.</summary>
-public sealed class EncerrarTodasAsSessoes(IConferirAcesso conferir, ISessoes sessoes) : IEncerrarTodasAsSessoes
+/// <summary>
+/// Sair de todos os aparelhos (RF-157), inclusive deste. O token chega já
+/// conferido; auditado com o traceId recebido, ação ENCERRAR_SESSOES:
+/// "INICIADO" e "CONCLUIDO" com quem, a conta e o próprio usuário como alvo
+/// (RN-272).
+/// </summary>
+public sealed class EncerrarTodasAsSessoes(ISessoes sessoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio)
+    : IEncerrarTodasAsSessoes
 {
+    readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
+
     /// <inheritdoc />
-    public async Task Executar(ConferenciaDeAcessoDto pedido, CancellationToken ct = default)
+    public Task Executar(AcessoConferido acesso, TraceId traceId, CancellationToken ct = default)
     {
-        var acesso = await conferir.Executar(pedido, ct);
+        var execucao = new Execucao(traceId, AcaoAuditada.EncerrarSessoes, acesso.ContaId, acesso.Sub, acesso.Sub);
+        return auditada.Auditar(execucao, () => Encerrar(acesso, execucao, ct), ct);
+    }
+
+    /// <summary>Apaga cada sessão de quem pede e grava o "CONCLUIDO".</summary>
+    async Task Encerrar(AcessoConferido acesso, Execucao execucao, CancellationToken ct)
+    {
         foreach (var sessao in await sessoes.DoUsuario(acesso.Sub, ct))
         {
             await sessoes.Apagar(sessao, MotivoFim.SairDeTodos, ct);
         }
+        await auditada.Concluir(execucao, ct);
     }
 }

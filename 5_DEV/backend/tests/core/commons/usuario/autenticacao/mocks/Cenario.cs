@@ -1,5 +1,6 @@
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
+using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 
@@ -37,11 +38,11 @@ public sealed class Cenario
 
     /// <summary>A Maria entra no hub.</summary>
     public Task<SessaoAbertaDto> MariaEntra(string aparelho = "NAVEGADOR", string senha = SenhaDaMaria) =>
-        Mock.EntrarNoHub.Executar(new EntradaNoHubDto(EntradaDaMaria, senha, aparelho));
+        Mock.EntrarNoHub.Executar(new EntradaNoHubDto(EntradaDaMaria, senha, aparelho), Trace);
 
     /// <summary>Alguém entra no quest com o código do Lucas.</summary>
     public Task<SessaoAbertaDto> LucasEntra(string codigo = CodigoDoLucas, string tipo = "PARTICIPANTE", string? parentesco = null) =>
-        Mock.EntrarNoQuest.Executar(new EntradaNoQuestDto(codigo, "APP", new QuemEntrouDto(tipo, parentesco)));
+        Mock.EntrarNoQuest.Executar(new EntradaNoQuestDto(codigo, "APP", new QuemEntrouDto(tipo, parentesco)), Trace);
 
     /// <summary>Um pedido ao hub com o token.</summary>
     public Task<AcessoConferido> PedidoAoHub(SessaoAbertaDto sessao) =>
@@ -49,7 +50,14 @@ public sealed class Cenario
 
     /// <summary>Renova com o token de renovação.</summary>
     public Task<SessaoAbertaDto> Renovar(SessaoAbertaDto sessao) =>
-        Mock.RenovarSessao.Executar(new RenovacaoDto(sessao.TokenRenovacao));
+        Mock.RenovarSessao.Executar(new RenovacaoDto(sessao.TokenRenovacao), Trace);
+
+    /// <summary>O traceId de toda execução dos testes.</summary>
+    public static readonly TraceId Trace = new("trc-7f3a9c21");
+
+    /// <summary>O token conferido, como o endereço entrega ao caso de uso.</summary>
+    public Task<AcessoConferido> Conferido(SessaoAbertaDto sessao, Frente frente = Frente.Hub) =>
+        Mock.ConferirAcesso.Executar(new ConferenciaDeAcessoDto(sessao.TokenAcesso, frente));
 
     /// <summary>As claims do token de acesso.</summary>
     public static ClaimsDeAcesso Claims(SessaoAbertaDto sessao) => TokenDeAcesso.Ler(sessao.TokenAcesso).Claims;

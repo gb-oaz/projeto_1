@@ -17,6 +17,21 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 readonly record struct Execucao(TraceId TraceId, AcaoAuditada Acao, string? ContaId, string? Quem, string? Alvo);
 
 /// <summary>
+/// A execução enquanto a regra corre: começa como o "INICIADO" e ganha quem e a
+/// conta quando a pessoa é identificada, para a recusa seguinte já ir com eles
+/// (RN-273).
+/// </summary>
+/// <param name="inicio">A execução do "INICIADO".</param>
+sealed class ExecucaoEmAndamento(Execucao inicio)
+{
+    /// <summary>A execução como está agora.</summary>
+    public Execucao Atual { get; private set; } = inicio;
+
+    /// <summary>A pessoa foi identificada: o registro de erro daqui em diante vai com ela e a conta.</summary>
+    public void Identificar(string contaId, string quem) => Atual = Atual with { ContaId = contaId, Quem = quem };
+}
+
+/// <summary>
 /// O que os casos de uso auditados repetem (RN-178, RN-270, RN-271): o
 /// "INICIADO" ao chegar, a regra, e, na recusa ou na falha, o registro de erro
 /// antes de a exceção sair; o "CONCLUIDO" a regra grava antes de responder.
@@ -25,16 +40,25 @@ readonly record struct Execucao(TraceId TraceId, AcaoAuditada Acao, string? Cont
 sealed class AuditoriaDaExecucao(IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio)
 {
     /// <summary>Executa a regra entre o "INICIADO" e o registro de erro, se ela recusar ou falhar.</summary>
-    public async Task<T> Auditar<T>(Execucao execucao, Func<Task<T>> regra, CancellationToken ct)
+    public Task<T> Auditar<T>(Execucao execucao, Func<Task<T>> regra, CancellationToken ct) =>
+        Auditar(execucao, _ => regra(), ct);
+
+    /// <summary>
+    /// A regra que identifica a pessoa no meio do caminho, como a entrada depois
+    /// da senha conferida (RN-273): a recusa dali em diante já vai com quem e a
+    /// conta que ela registrou no andamento.
+    /// </summary>
+    public async Task<T> Auditar<T>(Execucao execucao, Func<ExecucaoEmAndamento, Task<T>> regra, CancellationToken ct)
     {
+        var andamento = new ExecucaoEmAndamento(execucao);
         await Iniciar(execucao, ct);
         try
         {
-            return await regra();
+            return await regra(andamento);
         }
         catch (Exception falha) when (falha is not OperationCanceledException)
         {
-            await RegistrarErro(execucao, falha, ct);
+            await RegistrarErro(andamento.Atual, falha, ct);
             throw;
         }
     }
