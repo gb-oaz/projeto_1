@@ -170,13 +170,14 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^a coleção ""auditoria"" ganha ""(\w+)"" e ""(\w+)"" da ação ""(\w+)""$")]
     public async Task GanhaAsDuasEtapas(string primeira, string segunda, string acao)
     {
-        var master = await mundo.Master();
+        // a Pessoa da conta master não guarda o id: ele vem do sub do token dela
+        var master = await mundo.Traduzir("usr-ebfga-master");
         var novos = await execucoes.Novos(Auditoria.Registros);
         Assert.Equal(new[] { primeira, segunda }, novos.Select(d => Auditoria.Texto(d, "etapa")).ToArray());
         Auditoria.MesmoTraceId(novos);
         Assert.All(novos, d =>
         {
-            Assert.Equal(master.Id, Auditoria.Texto(d, "quem"));
+            Assert.Equal(master, Auditoria.Texto(d, "quem"));
             Assert.Equal(acao, Auditoria.Texto(d, "acao"));
             Assert.Equal(alvo, Auditoria.Texto(d, "alvo"));
             execucoes.NaHoraDoPedido(d);

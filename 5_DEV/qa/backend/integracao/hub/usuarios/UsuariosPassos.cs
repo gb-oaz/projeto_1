@@ -1257,12 +1257,17 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
         Assert.True(DateTimeOffset.TryParse(item?["ultimoAcessoMaster"]?.GetValue<string>(), out _), $"sem ultimoAcessoMaster: {mundo.Ultima}");
     }
 
-    // ultimoPagamento vem da cobrança, que a API ainda não registra: fica fora da comparação
+    // ultimoPagamento vem da cobrança, que a API ainda não registra: fica fora da comparação.
+    // A sessão do time e o caminho saem antes da marca: só o GET fica entre o
+    // antes e o depois da execução, que a leitura recusada confere (RN-270)
     [When(@"^o time deboaz envia GET (/contas/\S+)$")]
     public async Task TimeLeAConta(string caminho)
     {
         mundo.CamposSemConferir.Add("ultimoPagamento");
-        await mundo.EnviarComo(mundo.Admin(), "GET", await mundo.Traduzir(caminho));
+        var admin = mundo.Admin();
+        await mundo.TokenDe(admin);
+        var real = await mundo.Traduzir(caminho);
+        await execucoes.Executar(() => mundo.EnviarComo(admin, "GET", real));
     }
 
     [Then(@"^a resposta não traz usuários, turmas nem conteúdos da escola$")]
