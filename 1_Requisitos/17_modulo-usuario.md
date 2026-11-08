@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v84"
-data: "2026-11-08 11:35"
+versao: "v85"
+data: "2026-11-08 11:53"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v84** · 2026-11-08 11:35 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v85** · 2026-11-08 11:53 · **Em revisão**
 
 # Módulo Usuários
 
@@ -1414,12 +1414,27 @@ Esquema do Cenário: recusa prevista de cada caso de uso vira ALERTA
     | "PT30H" no tempo do time                | 422 FORA_DOS_LIMITES       | SALVAR_TEMPO_SESSAO |
     | a master da EBFGA no tempo do time      | 403 ACESSO_NEGADO          | SALVAR_TEMPO_SESSAO |
 
-Cenário: sem o módulo, recusada antes do caso de uso
+Esquema do Cenário: sem o módulo, recusa auditada
+  Dado o token da staff Ana sem "MOD-03" com "<aba>"
+  Quando ela envia <pedido>
+  Então a resposta é 403 ACESSO_NEGADO, com o cabeçalho X-Trace-Id
+  E "auditoria" fica só com o "INICIADO" da ação "<acao>", com esse traceId
+  E "auditoriaErros" ganha "ACESSO_NEGADO" com o nivel "ALERTA", com esse traceId
+  E os dois vão com "usr-ebfga-ana", a "conta-ebfga" e <alvo>
+  E o 401 do token vencido continua sem registro, como na RN-273 do 17-a
+
+  Exemplos:
+    | aba | pedido                                   | acao                | alvo                     |
+    | U   | POST /usuarios                           | CRIAR_USUARIO       | sem alvo                 |
+    | U   | POST /usuarios/usr-ebfga-paulo/desativar | DESATIVAR_USUARIO   | o alvo "usr-ebfga-paulo" |
+    | C   | PUT /contas/conta-ebfga/tempo-sessao     | SALVAR_TEMPO_SESSAO | o alvo "conta-ebfga"     |
+    | U   | PUT /usuarios/usr-ebfga-joao/permissoes  | EDITAR_PERMISSOES   | o alvo "usr-ebfga-joao"  |
+
+Cenário: leitura sem o módulo não é auditada
   Dado o token da staff Ana sem "MOD-03" com "U"
-  Quando ela envia POST /usuarios/usr-ebfga-paulo/desativar
-  Então a resposta é 403 ACESSO_NEGADO, recusada antes do caso de uso
-  E a resposta não traz o cabeçalho X-Trace-Id
-  E as coleções "auditoria" e "auditoriaErros" não ganham registro, como o 422 da RN-271
+  Quando ela envia GET /usuarios?tipo=PARTICIPANTE
+  Então a resposta é 403 ACESSO_NEGADO, sem o cabeçalho X-Trace-Id
+  E as coleções "auditoria" e "auditoriaErros" não ganham registro, como a leitura da RN-178
 
 Cenário: guardado e imutável como a auditoria
   Dado o registro "auderr-000031" da sigla "EBFGA" repetida, gravado em 2026-11-08
@@ -1465,7 +1480,7 @@ Cenário: corpo que não é JSON não chega ao caso de uso
   E a mensagem é "O campo "corpo" está faltando ou é inválido."
   E a resposta não traz o cabeçalho X-Trace-Id
   E as coleções "auditoria" e "auditoriaErros" não ganham registro
-  E o X-Trace-Id vale só para as respostas que passam pelo caso de uso
+  E o X-Trace-Id vale só para as respostas auditadas, com o 403 sem o módulo da RN-270
 ```
 
 <a id="RN-274"></a>
@@ -1488,6 +1503,44 @@ Cenário: quarto pedido do dia
   Então a resposta é 429 LIMITE_ATENDIMENTO, com o cabeçalho X-Trace-Id
   E "auditoria" fica só com o "INICIADO" da ação "ESQUECI_SENHA_MASTER"
   E "auditoriaErros" ganha o código "LIMITE_ATENDIMENTO" e o nivel "ALERTA", com o mesmo traceId
+```
+
+<a id="RN-275"></a>
+
+### `RN-275` Casos de uso internos auditados
+
+> Sessões e permissões: [17_modulo-usuario-a-autenticacao `RN-230`](17_modulo-usuario-a-autenticacao.md#RN-230) e [17_modulo-usuario-b-autorizacao `RN-238`](17_modulo-usuario-b-autorizacao.md#RN-238)
+
+```gherkin
+Esquema do Cenário: chamado de dentro de outra execução, com o traceId dela
+  Quando a Maria envia <pedido>
+  E a resposta é de sucesso
+  Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "<interna>"
+  E os dois com o traceId da execução do pedido, entre o "INICIADO" e o "CONCLUIDO" dela
+  E os dois com quem e contaId da execução do pedido e o alvo, o usuário do pedido
+
+  Exemplos:
+    | pedido                                            | interna                     |
+    | POST /usuarios/usr-ebfga-paulo/desativar          | ENCERRAR_SESSOES_DO_USUARIO |
+    | POST /usuarios/usr-ebfga-ana/nova-geracao-senha   | ENCERRAR_SESSOES_DO_USUARIO |
+    | POST /usuarios/usr-ebfga-lucas/novo-codigo-acesso | ENCERRAR_SESSOES_DO_USUARIO |
+    | PUT /usuarios/usr-ebfga-joao/permissoes           | AVISAR_PERMISSOES_NOVAS     |
+
+Cenário: contratação mudou, avisada pelo Catálogo
+  Dado a execução do Catálogo com o traceId "trc-5b81e0d4", em que o Caio descontrata a Presença
+  Quando o Catálogo avisa que a contratação da EBFGA mudou
+  Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "AVISAR_CONTRATACAO_MUDOU"
+  E os dois com o traceId "trc-5b81e0d4", "usr-dboaz-caio", a "conta-ebfga" e o alvo "conta-ebfga"
+  E cada usuário da EBFGA ganha "INICIADO" e "CONCLUIDO" de "AVISAR_PERMISSOES_NOVAS"
+  E esses vão com o mesmo traceId, o Caio, a "conta-ebfga" e o usuário como alvo
+
+Cenário: falha na execução interna
+  Quando a Maria envia POST /usuarios/usr-ebfga-paulo/desativar
+  E a gravação falha ao encerrar as sessões do Paulo
+  Então a resposta é 500 ERRO_INESPERADO, com o cabeçalho X-Trace-Id
+  E "auditoriaErros" ganha 2 registros "ERRO_INESPERADO" com o nivel "ERRO" e esse traceId
+  E um da ação "ENCERRAR_SESSOES_DO_USUARIO", o outro de "DESATIVAR_USUARIO"
+  E nenhuma das duas ações ganha "CONCLUIDO"
 ```
 
 <a id="RN-179-api"></a>
@@ -2400,7 +2453,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v84** | 2026-11-08 11:35 | Diagrama (`RN-270`): contrato de API v09 → v10 (403 ACESSO_NEGADO sem o módulo, MOD-03 · U, recusado antes do caso de uso, sem traceId, registros nem X-Trace-Id, como o 422 do corpo que não é JSON) |
+| **v85** | 2026-11-08 11:53 | `RN-270`: o 403 ACESSO_NEGADO sem o módulo passa a ser auditado nos endereços que mudam estado (INICIADO só, auditoriaErros ALERTA com quem, contaId e alvo, X-Trace-Id); leitura sem o módulo e 401 de token seguem sem registro; `RN-271`: X-Trace-Id em toda resposta auditada; `RN-275` novo: ENCERRAR_SESSOES_DO_USUARIO, AVISAR_PERMISSOES_NOVAS e AVISAR_CONTRATACAO_MUDOU auditados com o traceId, quem e contaId de quem chama, falha como ERRO |
+| v84 | 2026-11-08 11:35 | Diagrama (`RN-270`): contrato de API v09 → v10 (403 ACESSO_NEGADO sem o módulo, MOD-03 · U, recusado antes do caso de uso, sem traceId, registros nem X-Trace-Id, como o 422 do corpo que não é JSON) |
 | v83 | 2026-11-08 11:31 | Auditoria em todos os casos de uso: `RN-178` com REATIVAR_USUARIO, EDITAR_USUARIO, NOVO_CODIGO_ACESSO e SALVAR_TEMPO_SESSAO da conta nos Exemplos e cenários de GERAR_SENHA sem login, CODIGO_MASTER e SALVAR_TEMPO_SESSAO do time (quem, contaId e alvo por etapa); `RN-270` com a recusa prevista de cada caso de uso como ALERTA e o 403 sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registro |
 | v82 | 2026-11-08 10:13 | `RN-178`: POST /contas/{id}/estado com o mesmo estado responde 200 e grava INICIADO e CONCLUIDO de MUDAR_ESTADO_CONTA, com contaId e alvo da conta pedida, como no contrato v09 |
 | v81 | 2026-11-08 09:50 | Diagramas da auditoria (`RN-178`): contrato de API v08 → v09 (quem, contaId e alvo de GERAR_SENHA sem login, MUDAR_ESTADO_CONTA, SALVAR_TEMPO_SESSAO da conta e do time, CODIGO_MASTER e EDITAR_PERMISSOES; o mesmo estado da conta responde 200 e grava INICIADO e CONCLUIDO), sequência v05 → v06 (quem, contaId e alvo de GERAR_SENHA, CODIGO_MASTER e MUDAR_ESTADO_CONTA) |
@@ -2410,8 +2464,7 @@ Cenário: o que este documento não trata
 | v77 | 2026-11-08 02:08 | `RN-178`: CRIAR_USUARIO sem alvo no INICIADO e na recusa (409 MATRICULA_EM_USO), alvo só no CONCLUIDO; quem e contaId desde o INICIADO; `RN-271`: corpo que não é JSON recebe 422 antes do caso de uso, sem X-Trace-Id nem registros |
 | v76 | 2026-11-08 02:05 | `RN-274`: POST /contas/esqueci-senha-master auditado com a ação ESQUECI_SENHA_MASTER, sem quem nem contaId, X-Trace-Id e 429 LIMITE_ATENDIMENTO como ALERTA; entradas e sessões no 17-a (`RN-272`, `RN-273`); Em aberto resolvido e removido |
 | v75 | 2026-11-08 02:04 | Diagramas da v74 (`RN-178`, `RN-270`, `RN-271`): sequência v03 → v04 (422 com X-Trace-Id só o da regra; corpo que não é JSON recusado antes do endpoint, sem traceId, registros nem X-Trace-Id), contrato de API v06 → v07 (500 ERRO_INESPERADO confirmado, PUT permissões entre os auditados), classes v04 → v05 (EDITAR_PERMISSOES em AcaoAuditada) |
-| v74 | 2026-11-08 02:00 | `RN-270`: 500 ERRO_INESPERADO com "Algo deu errado. Tente de novo mais tarde.", nivel ERRO; Paulo já desativado com 409 ESTADO_IGUAL; leitura recusada pelo time deboaz (GET /contas); `RN-178`: PUT permissões grava "auditoria" com EDITAR_PERMISSOES além de "registrosPermissao"; `RNF-227` e `RNF-227-api`: índices de "auditoria" e "auditoriaErros", 7 coleções; Em aberto: auditoria de esqueci-senha-master e /auth/* |
 
 ---
 
-<sub>boaz · v84 · 2026-11-08 11:35 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v85 · 2026-11-08 11:53 · `1_Requisitos/17_modulo-usuario.md`</sub>
