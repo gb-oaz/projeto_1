@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.md (v24), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.md (v26), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Autenticação
   1_Requisitos/17_modulo-usuario-a-autenticacao.md · Cenários de API
@@ -336,10 +336,11 @@ Funcionalidade: Autenticação
     E esse registro vai com quem "<quem>" e contaId "conta-ebfga"
 
     Exemplos:
-      | situação       | método | endereço         | resposta                  | quem            |
-      | EBFGA suspensa | POST   | hub/entrar       | 403 ACESSO_INDISPONIVEL   | usr-ebfga-maria |
-      | EBFGA suspensa | POST   | quest/entrar     | 403 ACESSO_INDISPONIVEL   | usr-ebfga-lucas |
-      | sessão do João | DELETE | sessoes/9d41b0c3 | 404 SESSAO_NAO_ENCONTRADA | usr-ebfga-maria |
+      | situação       | método | endereço            | resposta                  | quem            |
+      | EBFGA suspensa | POST   | hub/entrar          | 403 ACESSO_INDISPONIVEL   | usr-ebfga-maria |
+      | EBFGA suspensa | POST   | quest/entrar        | 403 ACESSO_INDISPONIVEL   | usr-ebfga-lucas |
+      | EBFGA suspensa | POST   | hub/confirmar-senha | 403 ACESSO_INDISPONIVEL   | usr-ebfga-maria |
+      | sessão do João | DELETE | sessoes/9d41b0c3    | 404 SESSAO_NAO_ENCONTRADA | usr-ebfga-maria |
 
   @RN-273
   Esquema do Cenário: token inválido recusado antes do caso de uso

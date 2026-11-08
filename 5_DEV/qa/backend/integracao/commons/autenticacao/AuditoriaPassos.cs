@@ -18,7 +18,7 @@ namespace Boaz.Qa.Integracao.Commons.Autenticacao;
 // /auth/renovar são os de AutenticacaoPassos.cs e AutorizacaoPassos.cs,
 // também auditados.
 [Binding]
-public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
+public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes, ScenarioContext cenario)
 {
     const string SenhaErrada = "Senha#Errada1";
     const string SemSala = "abrir uma sala não está no contrato da Autenticação: a sala 482107 aberta não dá para preparar";
@@ -178,10 +178,17 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         }
     }
 
-    // a recusa depois de identificar a pessoa: o preparo vem antes do pedido
+    // comprovante da Maria pendente, obtido antes da escola sair do ar
+    string? comprovanteDaMaria;
+
+    // a recusa depois de identificar a pessoa: o preparo vem antes do pedido;
+    // no confirmar-senha a Maria fica só com a senha gerada e o comprovante
+    // (a conta suspensa não deixa gerá-lo depois)
     [Given(@"^(EBFGA suspensa|sessão do João)$")]
     public async Task Situacao(string situacao)
     {
+        if (cenario.ScenarioInfo.Arguments["endereço"] as string == "hub/confirmar-senha")
+            comprovanteDaMaria = await mundo.MariaPendente();
         var maria = await mundo.Maria();
         if (situacao == "sessão do João")
         {
@@ -197,11 +204,21 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
             200, "POST /contas/{id}/estado");
     }
 
-    [When(@"^chega (POST|DELETE) /auth/(hub/entrar|quest/entrar|sessoes/9d41b0c3)$")]
+    [When(@"^chega (POST|DELETE) /auth/(hub/entrar|quest/entrar|hub/confirmar-senha|sessoes/9d41b0c3)$")]
     public async Task ChegaDeQuemFoiIdentificado(string metodo, string endereco)
     {
         switch (endereco)
         {
+            case "hub/confirmar-senha":
+                {
+                    var corpo = new JsonObject
+                    {
+                        ["comprovante"] = comprovanteDaMaria
+                            ?? throw new InvalidOperationException("o comprovante da Maria vem do preparo da situação"),
+                    }.ToJsonString();
+                    await execucoes.Executar(() => mundo.Enviar(metodo, "/auth/hub/confirmar-senha", corpo));
+                    break;
+                }
             case "hub/entrar":
                 await MariaEntra();
                 break;

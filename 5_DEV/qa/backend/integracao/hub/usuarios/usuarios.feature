@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v80), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v82), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -506,6 +506,14 @@ Funcionalidade: Usuários
     Então a resposta é 409 MATRICULA_EM_USO
     E "auditoria" fica só com o "INICIADO" da ação "CRIAR_USUARIO", sem alvo
     E o registro de "auditoriaErros" vai com a Maria e a "conta-ebfga", sem alvo
+
+  @RN-178
+  Cenário: conta já no estado pedido
+    Dado a conta da EBFGA com o estado "ATIVA"
+    Quando o Caio, do time deboaz, envia POST /contas/conta-ebfga/estado com "ATIVA"
+    Então a resposta é 200 com o estado "ATIVA", sem mudar nada na conta
+    E "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "MUDAR_ESTADO_CONTA", com o mesmo traceId
+    E os dois vão com contaId "conta-ebfga" e alvo "conta-ebfga"
 
   @RN-178
   Cenário: permissões auditadas nas duas coleções

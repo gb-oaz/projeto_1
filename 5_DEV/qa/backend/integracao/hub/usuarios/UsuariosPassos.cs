@@ -240,6 +240,56 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
         Assert.Equal(estado, Texto(mundo.Ultima, "estado"));
     }
 
+    // ── conta já no estado pedido (RN-178) ─────────────────────────────────
+    // a conta como a API a mostra antes do pedido, para conferir que nada muda
+    string contaAntes = "";
+
+    [Given(@"^a conta da EBFGA com o estado ""(\w+)""$")]
+    public async Task ContaNoEstado(string estado)
+    {
+        var lida = await LerAConta();
+        Assert.Equal(estado, Texto(lida, "estado"));
+        contaAntes = lida.Corpo!.ToJsonString();
+    }
+
+    // o Caio com o MOD-03 em "U"; só o pedido passa por Execucoes
+    [When(@"^o Caio, do time deboaz, envia POST (/contas/\S+/estado) com ""(\w+)""$")]
+    public async Task CaioMandaOEstado(string caminho, string estado)
+    {
+        var caio = await CaioComUsuarios();
+        var conta = await mundo.Traduzir(caminho);
+        acao = await execucoes.Executar(() =>
+            mundo.EnviarComo(caio, "POST", conta, new JsonObject { ["estado"] = estado }.ToJsonString()));
+    }
+
+    [Then(@"^a resposta é 200 com o estado ""(\w+)"", sem mudar nada na conta$")]
+    public async Task MesmoEstadoSemMudanca(string estado)
+    {
+        Respostas.Confere(acao, 200);
+        Assert.Equal(estado, Texto(acao, "estado"));
+        Assert.Equal(contaAntes, (await LerAConta()).Corpo!.ToJsonString());
+    }
+
+    [Then(@"^os dois vão com contaId ""(.+)"" e alvo ""(.+)""$")]
+    public async Task OsDoisComContaEAlvo(string conta, string alvoEsperado)
+    {
+        var novos = await execucoes.Novos(Auditoria.Registros);
+        var id = await mundo.Traduzir(conta);
+        var esperado = await mundo.Traduzir(alvoEsperado);
+        Assert.Equal(2, novos.Count);
+        Assert.All(novos, d =>
+        {
+            Assert.Equal(id, Auditoria.Texto(d, "contaId"));
+            Assert.Equal(esperado, Auditoria.Texto(d, "alvo"));
+        });
+    }
+
+    async Task<Resposta> LerAConta()
+    {
+        var id = await mundo.Conta();
+        return Exigir(await mundo.EnviarComo(mundo.Admin(), "GET", $"/contas/{id}"), 200, $"GET /contas/{id}");
+    }
+
     // ── login (RN-180) ─────────────────────────────────────────────────────
     [When(@"^envia POST /auth/hub/entrar com a entrada ""(.+)""$")]
     public async Task EntradaEmMaiusculas(string entrada) =>
