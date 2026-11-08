@@ -3,19 +3,19 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v70"
-data: "2026-11-07 16:40"
-status: "Aprovado"
+versao: "v71"
+data: "2026-11-08 01:10"
+status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v70** · 2026-11-07 16:40 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v71** · 2026-11-08 01:10 · **Em revisão**
 
 # Módulo Usuários
 
 **Objetivo:** definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.
 
-**Sumário:** [Cenários de tela](#cenarios-tela) · [Cenários de API](#cenarios-api) · [Telas](#telas) · [Diagramas](#diagramas) · [Histórico](#historico)
+**Sumário:** [Cenários de tela](#cenarios-tela) · [Cenários de API](#cenarios-api) · [Telas](#telas) · [Diagramas](#diagramas) · [Em aberto](#em-aberto) · [Histórico](#historico)
 
 ---
 
@@ -1275,19 +1275,83 @@ Esquema do Cenário: quem não entra
 
 <a id="RN-178"></a>
 
-### `RN-178` Auditoria
+### `RN-178` Auditoria do que muda estado
 
 ```gherkin
-Esquema do Cenário: ação auditada
+Esquema do Cenário: execução auditada do começo ao fim
   Quando a Maria envia <pedido>
-  Então a auditoria guarda a Maria, a ação, o alvo e a hora, até 5 anos depois
+  E a resposta é de sucesso
+  Então a coleção "auditoria" ganha 2 registros com o mesmo traceId
+  E o primeiro com a etapa "INICIADO", o segundo com a etapa "CONCLUIDO"
+  E os dois com a Maria, a ação "<acao>", o alvo e a hora, guardados até 5 anos depois
 
   Exemplos:
-    | pedido                                          |
-    | POST /usuarios do participante Lucas            |
-    | POST /usuarios/usr-ebfga-ana/nova-geracao-senha |
-    | PUT /usuarios/usr-ebfga-joao/permissoes         |
-    | POST /usuarios/usr-ebfga-paulo/desativar        |
+    | pedido                                          | acao               |
+    | POST /usuarios do participante Lucas            | CRIAR_USUARIO      |
+    | POST /usuarios/usr-ebfga-ana/nova-geracao-senha | NOVA_GERACAO_SENHA |
+    | PUT /usuarios/usr-ebfga-joao/permissoes         | EDITAR_PERMISSOES  |
+    | POST /usuarios/usr-ebfga-paulo/desativar        | DESATIVAR_USUARIO  |
+
+Cenário: conta criada sem login
+  Quando envia POST /contas, sem login, com a sigla "COLSA"
+  E a resposta é 201 com o contaId "conta-colsa"
+  Então a coleção "auditoria" ganha o registro "INICIADO" da ação "CRIAR_CONTA"
+  E esse registro vai sem quem, sem contaId e sem alvo
+  E o registro "CONCLUIDO", com o mesmo traceId, vai com contaId e alvo "conta-colsa", sem quem
+
+Esquema do Cenário: leitura não é auditada
+  Quando a Maria envia <pedido>
+  Então a resposta é 200
+  E as coleções "auditoria" e "auditoriaErros" não ganham registro
+
+  Exemplos:
+    | pedido                                                       |
+    | GET /usuarios?tipo=PARTICIPANTE                              |
+    | GET /usuarios/usr-ebfga-lucas                                |
+    | GET /contas/sigla-sugerida?nome=Colégio Santo Antônio        |
+```
+
+<a id="RN-270"></a>
+
+### `RN-270` Auditoria de erros e alertas
+
+```gherkin
+Cenário: recusa no meio da execução
+  Dado uma conta com a sigla "EBFGA"
+  Quando envia POST /contas, sem login, com a sigla "EBFGA"
+  E a resposta é 409 SIGLA_EM_USO
+  Então a coleção "auditoria" fica só com o registro "INICIADO" da ação "CRIAR_CONTA"
+  E a coleção "auditoriaErros" ganha 1 registro com o código "SIGLA_EM_USO"
+  E os dois registros têm o mesmo traceId
+  E nenhum registro "CONCLUIDO" é gravado com esse traceId
+
+Cenário: registro antes da recusa
+  Quando a Maria envia POST /usuarios/usr-ebfga-paulo/desativar e é recusada
+  Então o registro em "auditoriaErros" é gravado antes de a recusa sair do caso de uso
+  E a resposta só chega depois que o registro foi gravado
+
+Cenário: leitura recusada não é auditada
+  Quando a Maria envia GET /contas/conta-zzzzz
+  Então a resposta é 404 CONTA_INEXISTENTE
+  E as coleções "auditoria" e "auditoriaErros" não ganham registro
+```
+
+<a id="RN-271"></a>
+
+### `RN-271` Um traceId por execução
+
+```gherkin
+Cenário: duas execuções, dois traceIds
+  Quando a Maria envia POST /usuarios do participante Lucas
+  E depois envia POST /usuarios do participante Pedro
+  Então cada execução tem um traceId próprio, diferente do da outra
+  E os registros "INICIADO" e "CONCLUIDO" de cada uma repetem o traceId dela
+
+Cenário: acompanhamento só pela auditoria
+  Dado o traceId "trc-7f3a9c21" de uma execução de POST /contas recusada com 409 SIGLA_EM_USO
+  Quando o time deboaz procura o que aconteceu nessa execução
+  Então encontra tudo nas coleções "auditoria" e "auditoriaErros" pelo traceId "trc-7f3a9c21"
+  E o caso de uso não escreve nada em log
 ```
 
 <a id="RN-179-api"></a>
@@ -2028,7 +2092,7 @@ Cenário: escola EBFGA cadastrada
     }
     """
 
-Cenário: geração de senha, acesso anônimo e auditoria
+Cenário: geração de senha, acesso anônimo, auditoria e erro
   Então a geração de senha da Maria é:
     """
     {
@@ -2060,8 +2124,23 @@ Cenário: geração de senha, acesso anônimo e auditoria
       "quem": "usr-ebfga-maria",
       "acao": "CRIAR_USUARIO",
       "alvo": "usr-ebfga-lucas",
+      "traceId": "trc-1b8e4d02",
+      "etapa": "CONCLUIDO",
       "quando": "2026-03-20T15:00:00Z",
       "guardarAte": "2031-03-20T15:00:00Z"
+    }
+    """
+  E o registro de erro da sigla repetida é:
+    """
+    {
+      "_id": "auderr-000031",
+      "traceId": "trc-7f3a9c21",
+      "contaId": null,
+      "quem": null,
+      "acao": "CRIAR_CONTA",
+      "alvo": null,
+      "codigo": "SIGLA_EM_USO",
+      "quando": "2026-11-08T01:10:00Z"
     }
     """
 ```
@@ -2176,13 +2255,26 @@ Cenário: o que este documento não trata
 
 ---
 
+<a id="em-aberto"></a>
+
+## Em aberto
+
+- O que é alerta e o que é erro em "auditoriaErros"? Proposta: alerta = recusa prevista por regra (4xx, como SIGLA_EM_USO); erro = falha inesperada (5xx); e o registro ganha o campo "nivel" — **Produto**
+- Por quanto tempo "auditoriaErros" guarda cada registro, e ele é imutável como a `RNF-206`? — **Produto**
+- O traceId aparece na resposta (corpo ou cabeçalho) para a pessoa informar ao suporte, ou fica só interno? — **Produto**
+- "Sem log" vale também para a partida da aplicação, que hoje escreve no log em `RNF-226` e `RNF-227`? — **Produto**
+- Índices de "auditoriaErros" e do traceId em "auditoria" para entrar na `RNF-227` — **Arquitetura**
+
+---
+
 <a id="historico"></a>
 
 ## Histórico
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v70** | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
+| **v71** | 2026-11-08 01:10 | `RN-178`: auditoria só do que muda estado, com registros "INICIADO" e "CONCLUIDO" ligados pelo traceId; leitura não é auditada; `RN-270`: coleção "auditoriaErros", gravada antes da recusa; `RN-271`: um traceId por execução, sem log; exemplo de entidades com traceId e registro de erro; status → Em revisão |
+| v70 | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
 | v69 | 2026-11-07 15:52 | `RN-188` e `RN-188-api`: exemplo de dois participantes sem matrícula no educador autônomo, aceitos (201, sem 409 MATRICULA_EM_USO), porque a matrícula só é única quando existe; diagramas: modelo de documentos v11 → v12, sem partição pela sigla |
 | v68 | 2026-11-07 14:53 | `RN-179` e `RN-179-api`: exemplo da sigla "colsa", aceita e gravada como "COLSA" (201, conta "conta-colsa"); diagramas: modelo de documentos v10 → v11 |
 | v67 | 2026-11-07 14:52 | `RNF-227`: exemplo do índice único já existente na mesma chave com outro nome, que o banco recusa; a partida para, como nos outros índices únicos |
@@ -2191,8 +2283,7 @@ Cenário: o que este documento não trata
 | v64 | 2026-11-07 14:12 | `RNF-227`: passo "Então antes de aceitar o primeiro pedido…" sem vírgula após a palavra-chave, igual ao .feature do qa |
 | v63 | 2026-11-07 14:06 | Coleções e índices do modelo de documentos prontos na partida, antes do primeiro pedido, sem duplicar a cada partida; índice que não pode ser criado vira aviso no log e a partida segue (`RNF-227`); status → Em revisão |
 | v62 | 2026-11-07 14:05 | Diagrama: modelo de documentos v08 — índices criados na partida, contratacoes com _id e sigla e ainda sem índice, partição pela sigla por coleção; cenários sem mudança |
-| v61 | 2026-11-07 13:36 | Status → Aprovado, com autorização do usuário; cenários sem mudança |
 
 ---
 
-<sub>boaz · v70 · 2026-11-07 16:40 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v71 · 2026-11-08 01:10 · `1_Requisitos/17_modulo-usuario.md`</sub>
