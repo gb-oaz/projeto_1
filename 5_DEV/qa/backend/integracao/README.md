@@ -69,6 +69,7 @@ integracao/
 │   ├── ContasIniciais.cs           administrador e contas qa: ids e variáveis do Key Vault
 │   ├── Partida.cs                  sobe uma instância própria do backend (cenários de inicialização)
 │   ├── BancoDaPartida.cs           coleções e índices do banco dessa instância (RNF-227)
+│   ├── Auditoria.cs                leitura das coleções "auditoria" e "auditoriaErros" (RN-178, RN-270, RN-271)
 │   └── Ganchos.cs                  antes de cada cenário: limpa tudo
 ├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.md
 │   ├── autenticacao.feature
@@ -80,6 +81,7 @@ integracao/
     ├── usuarios.feature
     ├── UsuariosPassos.cs
     ├── ContasIniciaisPassos.cs     contas iniciais (RN-179, RN-190, RN-265 a RN-268, RNF-225, RNF-226)
+    ├── AuditoriaPassos.cs          auditoria do que muda estado, erros e alertas, traceId (RN-178, RN-270, RN-271)
     └── IndicesPassos.cs            coleções e índices prontos na partida e GET /health (RNF-227, RNF-227-api)
 ```
 
@@ -126,7 +128,7 @@ requisito.
 **Passo que ainda não dá para testar**: `throw new PendingStepException("motivo")`.
 O cenário sai como pulado, com o motivo na saída. Os casos de hoje: o
 contrato ainda não tem o endereço (sala ao vivo, troca de chave, os pedidos
-da Presença e do Quiz, a caixa do SAC, a auditoria), é tela (fica no qa do
+da Presença e do Quiz, a caixa do SAC), é tela (fica no qa do
 frontend), só o banco mostra (fica nos testes do backend), é segredo do Key
 Vault ou é fora de escopo.
 
@@ -243,6 +245,12 @@ ela.
   passos leem só os metadados (coleções, chave e opções dos índices) e os `_id`
   do banco da instância de Partida (`PARTIDA_Mongo__Banco`, sem ela ficam
   pendentes), nunca o conteúdo nem os nomes internos dos índices.
+  Segunda exceção: a auditoria (RN-178, RN-270, RN-271) promete os registros
+  das coleções "auditoria" e "auditoriaErros", sem endereço na API. Os passos
+  (`suporte/Auditoria.cs`) só leem essas duas coleções do `MONGO_BANCO`, pelos
+  campos do modelo de documentos do requisito, e contam como "ganho" só o que
+  apareceu depois do preparo do cenário. O traceId também é conferido no
+  cabeçalho `X-Trace-Id` da resposta.
 - **Valores dos exemplos**: `usr-ebfga-maria`, `3f9c2a71` (sessão da Maria no
   navegador) e `EBFGA-LUCAS-0412` são trocados pelos valores reais na hora do
   pedido (`Mundo.Apelidos`); a pessoa é criada pela API na primeira vez que

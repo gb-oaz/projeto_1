@@ -1329,21 +1329,7 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida)
         }
     }
 
-    // ── auditoria, senha guardada e o que não é da API ────────────────────
-    [When(@"^a Maria envia (POST|PUT) (/usuarios\S*)(?: do participante Lucas)?$")]
-    public async Task MariaAge(string metodo, string caminho)
-    {
-        var maria = await mundo.Maria();
-        await mundo.Conceder(maria, new() { ["MOD-03"] = "CU" });
-        var alvo = await mundo.Traduzir(caminho);
-        if (caminho == "/usuarios") await mundo.EnviarComo(maria, "POST", alvo, Participante("Lucas Andrade", "lucas"));
-        else if (metodo == "PUT") await mundo.EnviarComo(maria, "PUT", alvo, """{ "mods": {} }""", "1");
-        else await mundo.EnviarComo(maria, "POST", alvo);
-    }
-
-    [Then(@"^a auditoria guarda a Maria, a ação, o alvo e a hora, até 5 anos depois$")]
-    public static void Auditoria() => throw new PendingStepException("a auditoria não tem endereço no contrato: conferida nos testes do backend");
-
+    // ── senha guardada e o que não é da API (auditoria: AuditoriaPassos.cs) ──
     [Given(@"^a senha da Maria guardada$")]
     public Task SenhaGuardada() => mundo.Maria();
 
@@ -1414,7 +1400,7 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida)
     [Then(@"^nenhum endereço da API faz isso$")]
     public static void RegistroDeAuditoria() => throw new PendingStepException("a auditoria não tem endereço no contrato: conferida nos testes do backend");
 
-    [Then(@"^(?:a conta|a conta master|a staff|o participante|a geração de senha da Maria|o acesso anônimo da sala 482107|o registro de auditoria) é:$")]
+    [Then(@"^(?:a conta|a conta master|a staff|o participante|a geração de senha da Maria|o acesso anônimo da sala 482107|o registro de auditoria|o registro de erro da sigla repetida) é:$")]
     public static void Documento(string _) => Documentos();
 
     [Given(@"^a Escola Bento Freitas, a conta master, a Maria e o Lucas, com datas em UTC$")]

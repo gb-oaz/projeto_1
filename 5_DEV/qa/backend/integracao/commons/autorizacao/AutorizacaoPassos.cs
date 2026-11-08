@@ -172,7 +172,8 @@ public sealed partial class AutorizacaoPassos(Mundo mundo)
     [When(@"^envia GET (\S+), de (?:a Ana, que ele criou|o Rui, criado pela conta master como ele)$")]
     public async Task SujeitoPede(string caminho) => await mundo.EnviarComo(await mundo.SujeitoOu(caminho), "GET", await mundo.Traduzir(caminho));
 
-    [When(@"^a Maria envia GET (\S+)$")]
+    // os outros GET da Maria são da auditoria (hub/usuarios/AuditoriaPassos.cs)
+    [When(@"^a Maria envia GET (/usuarios/\S+/permissoes/historico)$")]
     public async Task MariaPede(string caminho) => await mundo.EnviarComo(await mundo.Maria(), "GET", await mundo.Traduzir(caminho));
 
     [When(@"^o João envia GET (\S+), de um par dele$")]

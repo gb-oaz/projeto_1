@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v69), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v72), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -478,16 +478,98 @@ Funcionalidade: Usuários
       | o Paulo desativado | o Paulo               | /auth/hub/entrar   |
 
   @RN-178
-  Esquema do Cenário: ação auditada
+  Esquema do Cenário: execução auditada do começo ao fim
     Quando a Maria envia <pedido>
-    Então a auditoria guarda a Maria, a ação, o alvo e a hora, até 5 anos depois
+    E a resposta é de sucesso
+    Então a coleção "auditoria" ganha 2 registros com o mesmo traceId
+    E o primeiro com a etapa "INICIADO", o segundo com a etapa "CONCLUIDO"
+    E os dois com a Maria, a ação "<acao>", o alvo e a hora, guardados até 5 anos depois
 
     Exemplos:
-      | pedido                                          |
-      | POST /usuarios do participante Lucas            |
-      | POST /usuarios/usr-ebfga-ana/nova-geracao-senha |
-      | PUT /usuarios/usr-ebfga-joao/permissoes         |
-      | POST /usuarios/usr-ebfga-paulo/desativar        |
+      | pedido                                          | acao               |
+      | POST /usuarios do participante Lucas            | CRIAR_USUARIO      |
+      | POST /usuarios/usr-ebfga-ana/nova-geracao-senha | NOVA_GERACAO_SENHA |
+      | PUT /usuarios/usr-ebfga-joao/permissoes         | EDITAR_PERMISSOES  |
+      | POST /usuarios/usr-ebfga-paulo/desativar        | DESATIVAR_USUARIO  |
+
+  @RN-178
+  Cenário: conta criada sem login
+    Quando envia POST /contas, sem login, com a sigla "COLSA"
+    E a resposta é 201 com o contaId "conta-colsa"
+    Então a coleção "auditoria" ganha o registro "INICIADO" da ação "CRIAR_CONTA"
+    E esse registro vai sem quem, sem contaId e sem alvo
+    E o registro "CONCLUIDO", com o mesmo traceId, vai com contaId e alvo "conta-colsa", sem quem
+
+  @RN-178
+  Esquema do Cenário: leitura não é auditada
+    Quando a Maria envia <pedido>
+    Então a resposta é 200
+    E as coleções "auditoria" e "auditoriaErros" não ganham registro
+
+    Exemplos:
+      | pedido                                                       |
+      | GET /usuarios?tipo=PARTICIPANTE                              |
+      | GET /usuarios/usr-ebfga-lucas                                |
+      | GET /contas/sigla-sugerida?nome=Colégio Santo Antônio        |
+
+  @RN-270
+  Cenário: recusa no meio da execução
+    Dado uma conta com a sigla "EBFGA"
+    Quando envia POST /contas, sem login, com a sigla "EBFGA"
+    E a resposta é 409 SIGLA_EM_USO
+    Então a coleção "auditoria" fica só com o registro "INICIADO" da ação "CRIAR_CONTA"
+    E a coleção "auditoriaErros" ganha 1 registro com o código "SIGLA_EM_USO" e o nivel "ALERTA"
+    E os dois registros têm o mesmo traceId
+    E nenhum registro "CONCLUIDO" é gravado com esse traceId
+
+  @RN-270
+  Esquema do Cenário: alerta ou erro, gravado antes da recusa
+    Quando a Maria envia POST /usuarios/usr-ebfga-paulo/desativar
+    E <situação>
+    Então a resposta é <resposta>
+    E "auditoriaErros" ganha o registro com o nivel "<nivel>" antes de a recusa sair do caso de uso
+
+    Exemplos:
+      | situação                              | resposta                  | nivel  |
+      | o Paulo já está desativado            | 409, uma recusa prevista  | ALERTA |
+      | o banco cai no meio da gravação       | 500, uma falha inesperada | ERRO   |
+
+  @RN-270
+  Cenário: guardado e imutável como a auditoria
+    Dado o registro "auderr-000031" da sigla "EBFGA" repetida, gravado em 2026-11-08
+    Então ele fica guardado até 2031-11-08, 5 anos depois, como na RN-178
+    E não pode ser alterado nem apagado, como na RNF-206
+
+  @RN-270
+  Cenário: leitura recusada não é auditada
+    Quando a Maria envia GET /contas/conta-zzzzz
+    Então a resposta é 404 CONTA_INEXISTENTE
+    E as coleções "auditoria" e "auditoriaErros" não ganham registro
+
+  @RN-271
+  Cenário: duas execuções, dois traceIds
+    Quando a Maria envia POST /usuarios do participante Lucas
+    E depois envia POST /usuarios do participante Pedro
+    Então cada execução tem um traceId próprio, diferente do da outra
+    E os registros "INICIADO" e "CONCLUIDO" de cada uma repetem o traceId dela
+
+  @RN-271
+  Esquema do Cenário: traceId no cabeçalho da resposta
+    Quando a Maria envia <pedido>
+    Então a resposta é <resposta> com o cabeçalho X-Trace-Id
+    E o valor de X-Trace-Id é o traceId gravado em <registros>
+
+    Exemplos:
+      | pedido                               | resposta         | registros                    |
+      | POST /usuarios do participante Lucas | 201              | "INICIADO" e "CONCLUIDO"     |
+      | POST /contas com a sigla "EBFGA"     | 409 SIGLA_EM_USO | "INICIADO" e "auditoriaErros" |
+
+  @RN-271
+  Cenário: acompanhamento só pela auditoria
+    Dado o traceId "trc-7f3a9c21" de uma execução de POST /contas recusada com 409 SIGLA_EM_USO
+    Quando o time deboaz procura o que aconteceu nessa execução
+    Então encontra tudo nas coleções "auditoria" e "auditoriaErros" pelo traceId "trc-7f3a9c21"
+    E o caso de uso não escreve nada em log; o log da partida, da RNF-226 e da RNF-227, continua
 
   @RN-179
   Cenário: sigla sugerida
@@ -1104,7 +1186,7 @@ Funcionalidade: Usuários
       """
 
   @exemplo-entidades
-  Cenário: geração de senha, acesso anônimo e auditoria
+  Cenário: geração de senha, acesso anônimo, auditoria e erro
     Então a geração de senha da Maria é:
       """
       {
@@ -1136,8 +1218,25 @@ Funcionalidade: Usuários
         "quem": "usr-ebfga-maria",
         "acao": "CRIAR_USUARIO",
         "alvo": "usr-ebfga-lucas",
+        "traceId": "trc-1b8e4d02",
+        "etapa": "CONCLUIDO",
         "quando": "2026-03-20T15:00:00Z",
         "guardarAte": "2031-03-20T15:00:00Z"
+      }
+      """
+    E o registro de erro da sigla repetida é:
+      """
+      {
+        "_id": "auderr-000031",
+        "traceId": "trc-7f3a9c21",
+        "contaId": null,
+        "quem": null,
+        "acao": "CRIAR_CONTA",
+        "alvo": null,
+        "codigo": "SIGLA_EM_USO",
+        "nivel": "ALERTA",
+        "quando": "2026-11-08T01:10:00Z",
+        "guardarAte": "2031-11-08T01:10:00Z"
       }
       """
 

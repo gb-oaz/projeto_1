@@ -4,8 +4,13 @@ using System.Text.Json.Nodes;
 
 namespace Boaz.Qa.Integracao.Suporte;
 
-public sealed record Resposta(int Status, string Texto, IReadOnlyList<string> Cookies)
+public sealed record Resposta(int Status, string Texto, IReadOnlyList<string> Cookies,
+    IReadOnlyDictionary<string, string>? Cabecalhos = null)
 {
+    // um cabeçalho da resposta, sem diferença de maiúsculas (X-Trace-Id, 17 RN-271)
+    public string? Cabecalho(string nome) =>
+        Cabecalhos?.FirstOrDefault(c => string.Equals(c.Key, nome, StringComparison.OrdinalIgnoreCase)).Value;
+
     // o corpo em JSON; null se vazio ou se não for JSON (um 404 sem corpo, por exemplo)
     public JsonNode? Corpo
     {
@@ -51,7 +56,10 @@ public sealed class Api : IDisposable
         if (ifMatch is not null) pedido.Headers.TryAddWithoutValidation("If-Match", $"\"{ifMatch}\"");
         using var resposta = await http.SendAsync(pedido);
         var cookies = resposta.Headers.TryGetValues("Set-Cookie", out var v) ? v.ToList() : [];
-        return new Resposta((int)resposta.StatusCode, await resposta.Content.ReadAsStringAsync(), cookies);
+        var cabecalhos = resposta.Headers.Concat(resposta.Content.Headers)
+            .GroupBy(c => c.Key, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => string.Join(",", g.SelectMany(c => c.Value)), StringComparer.OrdinalIgnoreCase);
+        return new Resposta((int)resposta.StatusCode, await resposta.Content.ReadAsStringAsync(), cookies, cabecalhos);
     }
 
     public void Dispose() => http.Dispose();

@@ -290,6 +290,18 @@ public sealed partial class Mundo
         return ana;
     }
 
+    // staff dos exemplos criado por quem o cenário diz: quem age só alcança quem
+    // está abaixo dele (17-b RN-252). Usado pela auditoria (RN-178), em que a
+    // Maria age sobre o João, a Ana e o Paulo
+    public async Task<Pessoa> StaffCriadoPor(string chave, Pessoa criador) =>
+        pessoas.GetValueOrDefault(chave) ?? chave switch
+        {
+            "joao" => await Staff("joao", "João Lima", "20260088", criador),
+            "ana" => await Staff("ana", "Ana Costa", "20260089", criador),
+            "paulo" => await Staff("paulo", "Paulo Martins", "20260091", criador),
+            _ => throw new ArgumentException($"staff sem exemplo: {chave}", nameof(chave)),
+        };
+
     // o professor Paulo, criado pela conta master ou por um superior dele
     public async Task<Pessoa> Paulo(Pessoa? criador = null) =>
         pessoas.GetValueOrDefault("paulo") ?? await Staff("paulo", "Paulo Martins", "20260091", criador ?? await Master());
