@@ -30,6 +30,20 @@ public interface IUsuarios
     /// <summary>Grava as mudanças de um usuário.</summary>
     Task Atualizar(UsuarioCadastrado usuario, CancellationToken ct = default);
 
+    /// <summary>
+    /// Garante um usuário inicial pelo id (RN-267): grava o cadastro só se ele
+    /// não existir e, sempre, a entrada (ou o código), o resumo da senha e o
+    /// estado. Devolve true se ele nasceu agora.
+    /// </summary>
+    Task<bool> Garantir(UsuarioCadastrado usuario, CancellationToken ct = default);
+
+    /// <summary>
+    /// Volta as permissões de um usuário qa aos módulos e abas da lista (RN-267,
+    /// RN-268): os mods ficam iguais aos da lista e, se mudaram, a versão e o pv
+    /// sobem, para os tokens antigos serem refeitos.
+    /// </summary>
+    Task ReporModulos(string usuarioId, IReadOnlyDictionary<string, string> mods, CancellationToken ct = default);
+
     /// <summary>Uma página da lista, de A a Z pelo nome, com o total (RN-185).</summary>
     Task<PaginaDe<UsuarioCadastrado>> Listar(FiltroDeUsuarios filtro, CancellationToken ct = default);
 }

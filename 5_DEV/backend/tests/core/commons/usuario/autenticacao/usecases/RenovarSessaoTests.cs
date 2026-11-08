@@ -83,7 +83,7 @@ public class RenovarSessaoTests
     {
         var sessao = await c.MariaEntra();
         c.Mock.DefinirPermissoes("usr-ebfga-maria", new PermissoesNoToken("STAFF", new Dictionary<string, string>(), 8));
-        await c.Mock.AvisarPermissoesNovas.Executar("usr-ebfga-maria", 8);
+        await c.Mock.AvisarPermissoesNovas.Executar("usr-ebfga-maria", 8, Chamada);
 
         await Falha("PERMISSOES_DESATUALIZADAS", () => c.PedidoAoHub(sessao));
 
@@ -99,7 +99,7 @@ public class RenovarSessaoTests
     [InlineData("naoexiste.segredo")]
     public async Task Renovacao_desconhecida(string? token)
     {
-        await Falha("SESSAO_TERMINADA", () => c.Mock.RenovarSessao.Executar(new RenovacaoDto(token)));
+        await Falha("SESSAO_TERMINADA", () => c.Mock.RenovarSessao.Executar(new RenovacaoDto(token), Trace));
     }
 
     [Fact]

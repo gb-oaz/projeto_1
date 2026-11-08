@@ -1,8 +1,8 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.html (v16), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.md (v16), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Autorização
-  1_Requisitos/17_modulo-usuario-b-autorizacao.html · Cenários de API
+  1_Requisitos/17_modulo-usuario-b-autorizacao.md · Cenários de API
 
   @RF-144
   Cenário: staff com dois módulos

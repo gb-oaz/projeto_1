@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Usuario.Usuarios.Domain;
+
 namespace Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 
 /// <summary>
@@ -7,6 +9,9 @@ namespace Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 /// </summary>
 public interface IAvisarPermissoesNovas
 {
-    /// <summary>Grava a versão nova em todas as sessões do usuário.</summary>
-    Task Executar(string usuarioId, int pv, CancellationToken ct = default);
+    /// <summary>
+    /// Grava a versão nova em todas as sessões do usuário, auditado na execução
+    /// de quem chama, ação AVISAR_PERMISSOES_NOVAS e o usuário como alvo (RN-275).
+    /// </summary>
+    Task Executar(string usuarioId, int pv, ExecucaoDeQuemChama chamada, CancellationToken ct = default);
 }

@@ -23,7 +23,7 @@
 //   import temas from '../design/marca-temas.json';
 //   const c = temas[paleta][modo];            // modo: 'claro' | 'escuro'
 //   el.innerHTML = marca.logo(FRENTES.hub, c);
-// Regras de uso: 1_Requisitos/90_identidade-visual.html.
+// Regras de uso: 1_Requisitos/90_identidade-visual.md.
 // =============================================================================
 
 /** Variação do símbolo: onde a haste começa (0 = longa). */

@@ -7,6 +7,8 @@ description: Cria ou altera diagramas de arquitetura de alto nível como SVG ver
 
 Você é arquiteto de soluções. A saída é **sempre um novo arquivo `.svg`** em `3_Arquitetura/` — nunca apenas texto, Mermaid ou PlantUML.
 
+**Contexto isolado:** uma tarefa pontual por sessão (um diagrama por vez); leia só os trechos necessários (`grep` pelo ID/âncora, intervalo de linhas). Ao terminar, responda curto (caminhos, versões, IDs) e encerre: a próxima tarefa começa numa sessão limpa (`/clear`).
+
 ## Escopo
 
 Pertence aqui a **visão de alto nível**: contexto do sistema e atores, contêineres/serviços e suas tecnologias, provedores de cloud e serviços gerenciados, rede (região, rede privada, sub-redes), ambientes, topologia de deploy, filas e integrações externas.
@@ -82,12 +84,12 @@ Obtenha o caminho exato com:
 ```
 
 Se o `boaz.sh` não estiver disponível, calcule pela regra acima.
-**Nunca** sobrescreva, renomeie ou apague uma versão existente — cada alteração é um arquivo novo.
+Nunca sobrescreva nem renomeie uma versão: cada alteração gera um novo arquivo com a versão seguinte e, **na mesma tarefa**, a versão anterior é apagada (`git rm`; `rm` se nunca foi para o git) depois que todas as referências a ela (requisitos `.md` e outros arquivos) forem atualizadas para a nova. O histórico fica no git.
 
 ## Fluxo
 
 **Diagrama novo**
-1. Leia os documentos relevantes de `1_Requisitos/` (`.html`) e rode `./boaz.sh diagramas` para reaproveitar nomes e evitar duplicatas.
+1. Leia os documentos relevantes de `1_Requisitos/` (`.md`) e rode `./boaz.sh diagramas` para reaproveitar nomes e evitar duplicatas.
 2. Se a ambiguidade mudar o desenho, faça no máximo 1–2 perguntas; caso contrário, assuma e declare as premissas na resposta.
 3. Escolha a legenda, gere o caminho e escreva o SVG.
 
@@ -95,7 +97,8 @@ Se o `boaz.sh` não estiver disponível, calcule pela regra acima.
 1. Identifique a legenda e abra a **maior versão** (`ls 3_Arquitetura/<legenda>_v*`).
 2. Aplique só a mudança pedida, preservando layout, ids e o restante do desenho.
 3. Salve como a próxima versão (`./boaz.sh svg 3_Arquitetura <legenda>`).
-4. Rode `grep -rn "<legenda>_v" 1_Requisitos` e, se houver referências à versão anterior, pergunte se devem apontar para a nova. Não altere sem confirmação; confirmado, troque o caminho no `src`/`href` e na legenda da `<figure class="diagrama">`, e cada documento alterado ganha uma versão nova (marca d'água e histórico, como na skill `requisito`).
+4. Rode `grep -rn "<legenda>_v" --exclude-dir=node_modules 1_Requisitos 0_Assets .claude 4_CI_CD 5_DEV CLAUDE.md boaz.sh` e, se houver referências à versão anterior, pergunte se devem apontar para a nova. Não altere sem confirmação; confirmado, troque o caminho na legenda e nos dois links da imagem (`[![…](…)](…)`), e cada documento alterado ganha uma versão nova (front matter, carimbo, histórico e rodapé, como na skill `requisito`).
+5. Com nenhuma referência à versão anterior, apague-a (`git rm 3_Arquitetura/<legenda>_v<NN-1>_*.svg`). Se alguma referência não puder ser trocada agora (requisito de outro dono, cópia em `5_DEV/`), mantenha a anterior e diga na resposta o que falta trocar; `./boaz.sh antigas` lista as versões antigas que já podem sair.
 
 ## Assets (`0_Assets/`)
 
@@ -157,11 +160,10 @@ Se o arquivo não existir, rode `./boaz.sh init` para recriá-lo.
 
 ## Resposta
 
-Responda curto: caminho do arquivo criado, premissas assumidas (se houver) e o trecho para referenciar no requisito (`.html`, componente **Diagramas** de `0_Assets/requisitos/tema.html`):
+Responda curto: caminho do arquivo criado, premissas assumidas (se houver) e o trecho para referenciar no requisito (`.md`, componente **Diagramas e telas** de `0_Assets/requisitos/tema.md`):
 
-```html
-<figure class="diagrama">
-  <a href="../3_Arquitetura/<arquivo>.svg"><img src="../3_Arquitetura/<arquivo>.svg" alt="<o que o diagrama mostra>"></a>
-  <figcaption><strong><Título></strong><code>3_Arquitetura/<arquivo>.svg</code></figcaption>
-</figure>
+```markdown
+**<Título>** — `3_Arquitetura/<arquivo>.svg`
+
+[![<o que o diagrama mostra>](../3_Arquitetura/<arquivo>.svg)](../3_Arquitetura/<arquivo>.svg)
 ```

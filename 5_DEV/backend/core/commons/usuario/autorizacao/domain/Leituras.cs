@@ -1,7 +1,7 @@
 namespace Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 
 // O que a autorização lê de Usuários, do registro de módulos (15_modulos) e
-// das contratações (16_catalogo) pelas portas de saída.
+// das contratações (16_modulo-catalogo) pelas portas de saída.
 
 /// <summary>Uma pessoa, como a autorização a vê.</summary>
 /// <param name="Id">Id do usuário.</param>

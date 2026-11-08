@@ -1,5 +1,5 @@
 # =============================================================================
-# CI local — requisito 1_Requisitos/03_ci-qualidade.html (RNF-160 a RNF-166)
+# CI local — requisito 1_Requisitos/03_ci-qualidade.md (RNF-160 a RNF-166)
 # =============================================================================
 #
 # Não rode este arquivo direto: o ponto de partida é ./ci.sh, que descobre os
@@ -37,15 +37,28 @@ services:
   # ── dependências: as mesmas versões dos serviços do job backend (RNF-37) ──
   # Banco e cache em memória (tmpfs): cada execução começa vazia, como no
   # GitHub Actions, e nada fica para trás no Docker.
+  # Replica set de um nó (rs0): as transações do backend (17 RNF-223) só
+  # existem em replica set. O health check inicia o conjunto na primeira vez e
+  # só fica saudável com o nó primário pronto para escrita. O membro se anuncia
+  # como mongodb:27017, o nome do serviço, que o backend e as suítes resolvem
+  # na rede do projeto; as strings de conexão não mudam.
   mongodb:
     image: mongo:8.0
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     tmpfs: [/data/db, /data/configdb]
     # kernel 6.19 a 7.0.13 (SERVER-121912): o glibc fica com o rseq e o TCMalloc
     # do MongoDB usa cache por thread; tirar com kernel 7.0.14 ou mais novo
     environment:
       GLIBC_TUNABLES: glibc.pthread.rseq=1
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - >-
+          try { rs.status() } catch (e) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongodb:27017' }] }) };
+          if (!db.hello().isWritablePrimary) quit(1)
       interval: 5s
       timeout: 5s
       retries: 20

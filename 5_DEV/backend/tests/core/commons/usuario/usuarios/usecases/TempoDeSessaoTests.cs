@@ -14,7 +14,7 @@ public class TempoDeSessaoTests
     public async Task RF_114_ler_e_salvar_o_tempo_da_escola()
     {
         Assert.Equal(new TempoDaContaLidoDto("PT8H", "P7D", "P30D"), await mock.LerTempoDaConta.Executar(new("usr-ebfga-master", "conta-ebfga")));
-        var salvo = await mock.SalvarTempoDaConta.Executar(new("usr-ebfga-master", "conta-ebfga", "PT4H", "P14D", "P60D"));
+        var salvo = await mock.SalvarTempoDaConta.Executar(new("usr-ebfga-master", "conta-ebfga", "PT4H", "P14D", "P60D"), TraceId.Novo());
         Assert.Equal(new TempoDaContaLidoDto("PT4H", "P14D", "P60D"), salvo);
         Assert.Equal(salvo, await mock.LerTempoDaConta.Executar(new("usr-ebfga-maria", "conta-ebfga")));
         Assert.Contains(mock.Auditoria, a => a.Acao == AcaoAuditada.SalvarTempoSessao && a.Quem == "usr-ebfga-master");
@@ -25,7 +25,7 @@ public class TempoDeSessaoTests
     {
         await Falha("CONTA_INEXISTENTE", () => mock.LerTempoDaConta.Executar(new("usr-preis-pedro", "conta-ebfga")));
         await Falha("CONTA_INEXISTENTE", () => mock.LerTempoDaConta.Executar(new("usr-ebfga-lucas", "conta-ebfga")));
-        await Falha("CONTA_INEXISTENTE", () => mock.SalvarTempoDaConta.Executar(new("usr-dboaz-admin", "conta-dboaz", "PT8H", "P7D", "P30D")));
+        await Falha("CONTA_INEXISTENTE", () => mock.SalvarTempoDaConta.Executar(new("usr-dboaz-admin", "conta-dboaz", "PT8H", "P7D", "P30D"), TraceId.Novo()));
     }
 
     [Theory]
@@ -37,10 +37,10 @@ public class TempoDeSessaoTests
         TempoDaContaDto Com(string valor) => new("usr-ebfga-master", "conta-ebfga",
             campo == "staffNavegador" ? valor : "PT8H", campo == "staffApp" ? valor : "P7D", campo == "participante" ? valor : "P30D");
 
-        await mock.SalvarTempoDaConta.Executar(Com(minimo));
-        await mock.SalvarTempoDaConta.Executar(Com(maximo));
+        await mock.SalvarTempoDaConta.Executar(Com(minimo), TraceId.Novo());
+        await mock.SalvarTempoDaConta.Executar(Com(maximo), TraceId.Novo());
         var menor = Textos.Iso(Textos.IsoDe(minimo)!.Value - TimeSpan.FromMinutes(1));
-        var falha = await Falha("FORA_DOS_LIMITES", () => mock.SalvarTempoDaConta.Executar(Com(menor)));
+        var falha = await Falha("FORA_DOS_LIMITES", () => mock.SalvarTempoDaConta.Executar(Com(menor), TraceId.Novo()));
         Assert.Equal((campo, minimo, maximo), (falha.Campo, falha.Minimo, falha.Maximo));
     }
 
@@ -48,7 +48,7 @@ public class TempoDeSessaoTests
     public async Task RF_152_time_deboaz_muda_o_tempo_da_conta_master()
     {
         Assert.Equal(new TempoDoTimeLidoDto("PT8H", "PT8H", "PT8H", "PT8H"), await mock.LerTempoDoTime.Executar(new("usr-dboaz-caio")));
-        var salvo = await mock.SalvarTempoDoTime.Executar(new("usr-dboaz-admin", "PT8H", "PT8H", "PT4H", "PT8H"));
+        var salvo = await mock.SalvarTempoDoTime.Executar(new("usr-dboaz-admin", "PT8H", "PT8H", "PT4H", "PT8H"), TraceId.Novo());
         Assert.Equal(salvo, await mock.LerTempoDoTime.Executar(new("usr-dboaz-admin")));
         Assert.Equal("PT4H", salvo.MastersNavegador);
     }
@@ -56,7 +56,7 @@ public class TempoDeSessaoTests
     [Fact]
     public async Task RF_152_valor_fora_dos_limites()
     {
-        var falha = await Falha("FORA_DOS_LIMITES", () => mock.SalvarTempoDoTime.Executar(new("usr-dboaz-admin", "PT8H", "PT8H", "PT30H", "PT8H")));
+        var falha = await Falha("FORA_DOS_LIMITES", () => mock.SalvarTempoDoTime.Executar(new("usr-dboaz-admin", "PT8H", "PT8H", "PT30H", "PT8H"), TraceId.Novo()));
         Assert.Equal(("mastersNavegador", "PT15M", "PT24H"), (falha.Campo, falha.Minimo, falha.Maximo));
     }
 
@@ -69,15 +69,15 @@ public class TempoDeSessaoTests
             ? new("usr-dboaz-admin", valor, "PT8H", "PT8H", "PT8H")
             : new("usr-dboaz-admin", "PT8H", "PT8H", "PT8H", valor);
 
-        await mock.SalvarTempoDoTime.Executar(Com(minimo));
-        Assert.Equal(maximo, (await mock.SalvarTempoDoTime.Executar(Com(maximo))) is var lido && campo == "mastersApp" ? lido.MastersApp : lido.MembrosNavegador);
-        Assert.Equal(campo, (await Falha("FORA_DOS_LIMITES", () => mock.SalvarTempoDoTime.Executar(Com(fora)))).Campo);
+        await mock.SalvarTempoDoTime.Executar(Com(minimo), TraceId.Novo());
+        Assert.Equal(maximo, (await mock.SalvarTempoDoTime.Executar(Com(maximo), TraceId.Novo())) is var lido && campo == "mastersApp" ? lido.MastersApp : lido.MembrosNavegador);
+        Assert.Equal(campo, (await Falha("FORA_DOS_LIMITES", () => mock.SalvarTempoDoTime.Executar(Com(fora), TraceId.Novo()))).Campo);
     }
 
     [Fact]
     public async Task RN_243_escola_nao_muda_a_propria_conta_master()
     {
-        await Falha("ACESSO_NEGADO", () => mock.SalvarTempoDoTime.Executar(new("usr-ebfga-master", "PT8H", "PT8H", "PT8H", "PT8H")));
+        await Falha("ACESSO_NEGADO", () => mock.SalvarTempoDoTime.Executar(new("usr-ebfga-master", "PT8H", "PT8H", "PT8H", "PT8H"), TraceId.Novo()));
         await Falha("ACESSO_NEGADO", () => mock.LerTempoDoTime.Executar(new("usr-ebfga-master")));
     }
 }

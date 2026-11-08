@@ -2,6 +2,8 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using static Boaz.Core.Commons.Usuario.Autorizacao.Domain.FrenteDeUso;
 using static Boaz.Core.Commons.Usuario.Autorizacao.Domain.Perfil;
+using ExecucaoDeQuemChama = Boaz.Core.Commons.Usuario.Usuarios.Domain.ExecucaoDeQuemChama;
+using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
 
@@ -13,6 +15,9 @@ namespace Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
 /// </summary>
 public sealed class Cenario
 {
+    /// <summary>A execução do Catálogo em que o Caio descontrata um módulo da EBFGA (RN-275).</summary>
+    public static readonly ExecucaoDeQuemChama Catalogo = new(new TraceId("trc-5b81e0d4"), "usr-dboaz-caio", "conta-ebfga");
+
     /// <summary>Monta o mundo.</summary>
     public Cenario()
     {
@@ -60,7 +65,7 @@ public sealed class Cenario
 
     /// <summary>Salva as permissões do alvo, como quem pede, com a versão lida.</summary>
     public Task<PermissoesSalvasDto> Salvar(string quem, string alvo, string? ifMatch, params (string Mod, string? Abas)[] mods) =>
-        Mock.SalvarPermissoes.Executar(new SalvamentoDePermissoesDto(quem, alvo, ifMatch, Corpo(mods)));
+        Mock.SalvarPermissoes.Executar(new SalvamentoDePermissoesDto(quem, alvo, ifMatch, Corpo(mods)), TraceId.Novo());
 
     /// <summary>Salva com a versão atual, como a conta master (ou o administrador para o time).</summary>
     public async Task<PermissoesSalvasDto> Conceder(string alvo, params (string Mod, string? Abas)[] mods)

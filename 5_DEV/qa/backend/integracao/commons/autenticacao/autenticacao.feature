@@ -1,8 +1,8 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.html (v16), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.md (v26), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Autenticação
-  1_Requisitos/17_modulo-usuario-a-autenticacao.html · Cenários de API
+  1_Requisitos/17_modulo-usuario-a-autenticacao.md · Cenários de API
 
   @formas-de-entrar
   Esquema do Cenário: um endereço de entrada por frente
@@ -271,6 +271,100 @@ Funcionalidade: Autenticação
   Cenário: quest sem limite
     Dado o código do Lucas usado em POST /auth/quest/entrar de 6 aparelhos
     Então as 6 sessões continuam e cada POST /auth/renovar recebe 200
+
+  @RN-272
+  Esquema do Cenário: execução que muda a sessão, auditada do começo ao fim
+    Quando envia <método> /auth/<endereço>
+    E a resposta é de sucesso
+    Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "<acao>", com o mesmo traceId
+    E o "CONCLUIDO" vai com quem "<quem>", contaId "conta-ebfga" e alvo "<alvo>"
+    E a resposta traz o cabeçalho X-Trace-Id com esse traceId
+
+    Exemplos:
+      | método | endereço            | acao             | quem                    | alvo            |
+      | POST   | hub/entrar          | ENTRAR_HUB       | usr-ebfga-maria         | 3f9c2a71        |
+      | POST   | quest/entrar        | ENTRAR_QUEST     | usr-ebfga-lucas         | 7a20d5e4        |
+      | POST   | sala/entrar         | ENTRAR_SALA      | anon-ebfga-482107-13465 | 482107          |
+      | POST   | hub/confirmar-senha | CONFIRMAR_SENHA  | usr-ebfga-maria         | 3f9c2a71        |
+      | POST   | renovar             | RENOVAR_SESSAO   | usr-ebfga-maria         | 3f9c2a71        |
+      | POST   | sair                | SAIR             | usr-ebfga-maria         | 3f9c2a71        |
+      | DELETE | sessoes/3f9c2a71    | ENCERRAR_SESSAO  | usr-ebfga-maria         | 3f9c2a71        |
+      | DELETE | sessoes             | ENCERRAR_SESSOES | usr-ebfga-maria         | usr-ebfga-maria |
+
+  @RN-272
+  Esquema do Cenário: alvo conhecido desde o começo
+    Quando a Maria envia <método> /auth/<endereço> com o token da sessão 3f9c2a71
+    Então o "INICIADO" da ação "<acao>" já vai com a Maria, a "conta-ebfga" e o alvo "<alvo>"
+    E o "CONCLUIDO", com o mesmo traceId, repete quem, contaId e alvo
+
+    Exemplos:
+      | método | endereço         | acao             | alvo            |
+      | POST   | sair             | SAIR             | 3f9c2a71        |
+      | DELETE | sessoes/9d41b0c3 | ENCERRAR_SESSAO  | 9d41b0c3        |
+      | DELETE | sessoes          | ENCERRAR_SESSOES | usr-ebfga-maria |
+
+  @RN-272
+  Cenário: quem ainda não foi identificado
+    Quando a Maria envia POST /auth/hub/entrar com a entrada e a senha certas
+    Então o registro "INICIADO" da ação "ENTRAR_HUB" vai com quem, contaId e alvo null
+    E só o "CONCLUIDO", depois da senha conferida, vai com a Maria, a conta e a sessão
+
+  @RN-273
+  Esquema do Cenário: recusa vira alerta ou erro
+    Quando chega <pedido>
+    Então a resposta é <resposta>, com o cabeçalho X-Trace-Id
+    E "auditoria" fica só com o "INICIADO" da ação "<acao>", com esse traceId
+    E "auditoriaErros" ganha o código da resposta e o nivel "<nivel>", com esse traceId
+    E quem e contaId vão null, porque a pessoa não foi identificada
+
+    Exemplos:
+      | pedido                               | resposta                 | acao            | nivel  |
+      | senha errada em /auth/hub/entrar     | 401 ENTRADA_INVALIDA     | ENTRAR_HUB      | ALERTA |
+      | 5ª senha errada em /auth/hub/entrar  | 429 ENTRADA_BLOQUEADA    | ENTRAR_HUB      | ALERTA |
+      | código errado em /auth/quest/entrar  | 401 CODIGO_INVALIDO      | ENTRAR_QUEST    | ALERTA |
+      | comprovante repetido                 | 401 COMPROVANTE_INVALIDO | CONFIRMAR_SENHA | ALERTA |
+      | sessão sem uso há 9 h renovada       | 401 SESSAO_TERMINADA     | RENOVAR_SESSAO  | ALERTA |
+      | entrada na sala fechada              | 404 SALA_FECHADA         | ENTRAR_SALA     | ALERTA |
+      | Redis fora do ar em /auth/hub/entrar | 500 ERRO_INESPERADO      | ENTRAR_HUB      | ERRO   |
+
+  @RN-273
+  Esquema do Cenário: recusa depois de identificar a pessoa
+    Dado <situação>
+    Quando chega <método> /auth/<endereço>
+    Então a resposta é <resposta>, com o cabeçalho X-Trace-Id
+    E "auditoriaErros" ganha o código da resposta e o nivel "ALERTA", com esse traceId
+    E esse registro vai com quem "<quem>" e contaId "conta-ebfga"
+
+    Exemplos:
+      | situação       | método | endereço            | resposta                  | quem            |
+      | EBFGA suspensa | POST   | hub/entrar          | 403 ACESSO_INDISPONIVEL   | usr-ebfga-maria |
+      | EBFGA suspensa | POST   | quest/entrar        | 403 ACESSO_INDISPONIVEL   | usr-ebfga-lucas |
+      | EBFGA suspensa | POST   | hub/confirmar-senha | 403 ACESSO_INDISPONIVEL   | usr-ebfga-maria |
+      | sessão do João | DELETE | sessoes/9d41b0c3    | 404 SESSAO_NAO_ENCONTRADA | usr-ebfga-maria |
+
+  @RN-273
+  Esquema do Cenário: token inválido recusado antes do caso de uso
+    Quando chega <pedido> com um token de acesso vencido
+    Então a resposta é 401, recusada antes do caso de uso
+    E a resposta não traz o cabeçalho X-Trace-Id
+    E "auditoria" e "auditoriaErros" não ganham registro, como o 422 da RN-271 do 17
+
+    Exemplos:
+      | pedido            |
+      | POST /auth/sair   |
+      | GET /auth/sessoes |
+
+  @RN-273
+  Esquema do Cenário: nenhum segredo na auditoria
+    Quando envia <pedido>
+    Então nenhum registro de "auditoria" nem de "auditoriaErros" traz <segredo>
+
+    Exemplos:
+      | pedido                           | segredo                                    |
+      | POST /auth/hub/entrar da Maria   | a senha nem o token de acesso              |
+      | POST /auth/quest/entrar da Carla | o código "EBFGA-LUCAS-0412"                |
+      | POST /auth/hub/confirmar-senha   | o comprovante "c7e1…"                      |
+      | POST /auth/renovar da Maria      | o tokenRenovacao nem o cookie de renovação |
 
   @RNF-207
   Cenário: assinatura RS256

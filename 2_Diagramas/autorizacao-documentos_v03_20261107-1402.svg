@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1720 900" width="1720" height="900">
+  <title>Autorização · documentos</title>
+  <desc>Modelo de dados do requisito 17-b (Módulo Usuários · Autorização): as permissões embutidas em usuarios com versao e pv, o registro imutável das mudanças, o pv da sessão no Redis comparado em cada pedido, e as coleções modulos e contratacoes que limitam o que pode ser concedido. v01: criação. v02: fiel ao ms_mono — permissoes.suspensos não é gravado (RN-238 sai do cálculo), modulos traz quemUsa, tipo ADMINISTRADOR, índice de registrosPermissao por usuarioId + em, e salvar ainda grava em duas operações (RNF-223 pede uma). v03: índices como Indices.cs cria na partida — login único criado, registrosPermissao por usuarioId + em + versao; contratacoes com _id e sigla, ainda sem índice.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1720" height="900"/>
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="1720" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="1720" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · MODELO DE DOCUMENTOS</text>
+    <text class="title" x="40" y="72">Autorização · documentos</text>
+    <text class="subtitle" x="40" y="94">Permissões no usuário, registro de mudanças, a versão nas sessões e as coleções de módulos e contratações</text>
+    <text class="wm-meta-label" x="1432" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1432" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1456" y="71" text-anchor="middle">v03</text>
+    <line class="wm-sep" x1="1504" y1="32" x2="1504" y2="80"/>
+    <text class="wm-meta-label" x="1528" y="44">DATA</text>
+    <text class="wm-meta-value" x="1528" y="72">2026-11-07 · 14:02</text>
+  </g>
+  <g id="desenho" transform="translate(0,152)">
+    <path class="edge edge-async" d="M300,372 L300,324" marker-end="url(#seta-aberta)"/>
+    <path class="edge edge-async" d="M680,56 L560,56" marker-end="url(#seta-aberta)"/>
+    <path class="edge edge-async" d="M1140,288 L1180,288 L1180,448 L1140,448" marker-end="url(#seta-aberta)"/>
+    <g id="c-usuarios" filter="url(#sombra)"><rect class="node-green" x="40" y="0" width="520" height="324" rx="6"/></g>
+    <text class="label-strong" x="54" y="26">usuarios</text>
+    <rect class="chip" x="426" y="12" width="122" height="20" rx="10"/><text class="chip-text" x="487" y="26" text-anchor="middle">partição: sigla</text>
+    <line class="divider" x1="40" y1="40" x2="560" y2="40"/>
+    <text class="mono" x="54" y="60" xml:space="preserve">_id · sigla · contaId</text>
+    <text class="mono" x="54" y="78" xml:space="preserve">tipo: ADMINISTRADOR | MEMBRO_TIME | MASTER | …</text>
+    <text class="mono" x="54" y="96" xml:space="preserve">estado</text>
+    <rect class="node-blue" x="52" y="110" width="496" height="138" rx="4"/><text class="label" x="62" y="129">permissoes  · staff e membro do time</text>
+    <text class="mono" x="66" y="150" xml:space="preserve">versao: 7  (If-Match no PUT, RNF-222)</text>
+    <text class="mono" x="66" y="168" xml:space="preserve">pv: 7  (vai no token, RN-239)</text>
+    <text class="mono" x="66" y="186" xml:space="preserve">mods:</text>
+    <text class="mono" x="66" y="204" xml:space="preserve">  "MOD-03": "CU"</text>
+    <text class="mono" x="66" y="222" xml:space="preserve">  "MOD-06": "U"</text>
+    <text class="mono" x="66" y="240" xml:space="preserve">suspensos: só no requisito (RN-238)</text>
+    <line class="divider" x1="40" y1="266" x2="560" y2="266"/><text class="uml-keyword" x="54" y="286">índices</text>
+    <text class="mono" x="54" y="306">único: login (criado na partida)</text>
+    <g id="c-registros" filter="url(#sombra)"><rect class="node-green" x="40" y="372" width="520" height="220" rx="6"/></g>
+    <text class="label-strong" x="54" y="398">registrosPermissao</text>
+    <rect class="chip" x="426" y="384" width="122" height="20" rx="10"/><text class="chip-text" x="487" y="398" text-anchor="middle">partição: sigla</text>
+    <line class="divider" x1="40" y1="412" x2="560" y2="412"/>
+    <text class="mono" x="54" y="432" xml:space="preserve">_id · sigla</text>
+    <text class="mono" x="54" y="450" xml:space="preserve">usuarioId → usuarios</text>
+    <text class="mono" x="54" y="468" xml:space="preserve">por → usuarios · em</text>
+    <text class="mono" x="54" y="486" xml:space="preserve">versao</text>
+    <text class="mono" x="54" y="504" xml:space="preserve">antes · depois  (mapas MOD-NN → abas)</text>
+    <line class="divider" x1="40" y1="516" x2="560" y2="516"/><text class="uml-keyword" x="54" y="536">índices</text>
+    <text class="mono" x="54" y="556">usuarioId + em + versao (decrescentes)</text>
+    <text class="mono" x="54" y="574">só inclusão: nada muda nem é apagado (RN-256)</text>
+    <g id="c-sessao" filter="url(#sombra)"><rect class="node-purple" x="680" y="0" width="460" height="166" rx="6"/></g>
+    <text class="label-strong" x="694" y="26">sessao:&lt;sid&gt;</text>
+    <rect class="chip" x="1026" y="12" width="102" height="20" rx="10"/><text class="chip-text" x="1077" y="26" text-anchor="middle">Redis · hash</text>
+    <line class="divider" x1="680" y1="40" x2="1140" y2="40"/>
+    <text class="mono" x="694" y="60" xml:space="preserve">usuarioId → usuarios</text>
+    <text class="mono" x="694" y="78" xml:space="preserve">pv  (comparado em cada pedido)</text>
+    <line class="divider" x1="680" y1="90" x2="1140" y2="90"/><text class="uml-keyword" x="694" y="110">índices</text>
+    <text class="mono" x="694" y="130">pv antigo: 401 PERMISSOES_DESATUALIZADAS</text>
+    <text class="mono" x="694" y="148">o aparelho renova e monta a casca (RF-148)</text>
+    <g id="c-contratacoes" filter="url(#sombra)"><rect class="node-external" x="680" y="214" width="460" height="166" rx="6"/></g>
+    <text class="label-strong" x="694" y="240">contratacoes</text>
+    <rect class="chip" x="1033" y="226" width="95" height="20" rx="10"/><text class="chip-text" x="1081" y="240" text-anchor="middle">16_catalogo</text>
+    <line class="divider" x1="680" y1="254" x2="1140" y2="254"/>
+    <text class="mono" x="694" y="274" xml:space="preserve">_id · sigla · contaId → contas</text>
+    <text class="mono" x="694" y="292" xml:space="preserve">moduloId → modulos</text>
+    <text class="mono" x="694" y="310" xml:space="preserve">desde · ate</text>
+    <line class="divider" x1="680" y1="322" x2="1140" y2="322"/><text class="uml-keyword" x="694" y="342">índices</text>
+    <text class="mono" x="694" y="362">só módulo contratado é concedível (RN-166)</text>
+    <g id="c-modulos" filter="url(#sombra)"><rect class="node-external" x="680" y="428" width="460" height="148" rx="6"/></g>
+    <text class="label-strong" x="694" y="454">modulos</text>
+    <rect class="chip" x="1040" y="440" width="88" height="20" rx="10"/><text class="chip-text" x="1084" y="454" text-anchor="middle">15_modulos</text>
+    <line class="divider" x1="680" y1="468" x2="1140" y2="468"/>
+    <text class="mono" x="694" y="488" xml:space="preserve">_id  (MOD-NN)</text>
+    <text class="mono" x="694" y="506" xml:space="preserve">nome · tipo · quemUsa[ ]</text>
+    <line class="divider" x1="680" y1="518" x2="1140" y2="518"/><text class="uml-keyword" x="694" y="538">índices</text>
+    <text class="mono" x="694" y="558">as chaves de mods vêm daqui</text>
+    <g id="c-token" filter="url(#sombra)"><rect class="node-blue" x="1260" y="0" width="420" height="204" rx="6"/></g>
+    <text class="label-strong" x="1274" y="26">claims no token</text>
+    <rect class="chip" x="1553" y="12" width="115" height="20" rx="10"/><text class="chip-text" x="1610" y="26" text-anchor="middle">não é guardado</text>
+    <line class="divider" x1="1260" y1="40" x2="1680" y2="40"/>
+    <text class="mono" x="1274" y="60" xml:space="preserve">{</text>
+    <text class="mono" x="1274" y="78" xml:space="preserve">  "papel": "STAFF",</text>
+    <text class="mono" x="1274" y="96" xml:space="preserve">  "mods": {</text>
+    <text class="mono" x="1274" y="114" xml:space="preserve">    "MOD-03": "CU",</text>
+    <text class="mono" x="1274" y="132" xml:space="preserve">    "MOD-06": "U"</text>
+    <text class="mono" x="1274" y="150" xml:space="preserve">  },</text>
+    <text class="mono" x="1274" y="168" xml:space="preserve">  "pv": 7</text>
+    <text class="mono" x="1274" y="186" xml:space="preserve">}</text>
+    <g><path class="node-note" d="M1260,252 H1664 L1680,268 V332 H1260 Z"/><text class="muted" x="1276" y="278">Salvar grava permissoes pela versão lida</text><text class="muted" x="1276" y="298">e depois o registro (RNF-223: sem transação);</text><text class="muted" x="1276" y="318">o pv novo chega às sessões em até 1 s.</text></g>
+    <g><path class="node-note" d="M1260,380 H1664 L1680,396 V460 H1260 Z"/><text class="muted" x="1276" y="406">Concedíveis = mods de quem concede que</text><text class="muted" x="1276" y="426">a conta contratou; a conta master e o</text><text class="muted" x="1276" y="446">administrador concedem tudo (RN-167).</text></g>
+  </g>
+  <g id="marca-rodape" transform="translate(0,784)">
+    <rect class="wm-band" x="0" y="0" width="1720" height="116"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="1720" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-green" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">coleção</text>
+    <rect class="node-blue" x="137" y="47" width="14" height="14" rx="3"/><text class="label" x="159" y="58">embutido no documento ou token</text>
+    <rect class="node-purple" x="391" y="47" width="14" height="14" rx="3"/><text class="label" x="413" y="58">chave no Redis</text>
+    <rect class="node-external" x="536" y="47" width="14" height="14" rx="3"/><text class="label" x="558" y="58">coleção de outro requisito</text>
+    <rect class="node-note" x="762" y="47" width="14" height="14" rx="3"/><text class="label" x="784" y="58">nota</text>
+    <line class="edge edge-async" x1="839" y1="54" x2="881" y2="54" marker-end="url(#seta-aberta)"/><text class="label" x="895" y="58">referência por id</text>
+    <line class="divider" x1="40" y1="76" x2="1680" y2="76"/>
+    <text class="footer" x="40" y="100">v03 · índices como o ms_mono cria na partida (login, registrosPermissao com versao); contratacoes com _id e sigla, sem índice; transação ainda a fazer</text>
+    <text class="wm-file" x="1680" y="100" text-anchor="end">autorizacao-documentos_v03_20261107-1402.svg</text>
+  </g>
+</svg>

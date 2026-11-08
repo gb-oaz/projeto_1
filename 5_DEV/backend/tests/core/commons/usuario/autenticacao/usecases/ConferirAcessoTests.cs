@@ -58,7 +58,7 @@ public class ConferirAcessoTests
     {
         var sessao = await c.MariaEntra();
         c.Mock.Relogio.Avancar(TimeSpan.FromMinutes(5));
-        await c.Mock.EncerrarSessoesDoUsuario.Executar("usr-ebfga-maria", MotivoFim.UsuarioDesativado);
+        await c.Mock.EncerrarSessoesDoUsuario.Executar("usr-ebfga-maria", MotivoFim.UsuarioDesativado, Chamada);
         await Falha("SESSAO_TERMINADA", () => c.PedidoAoHub(sessao));
     }
 

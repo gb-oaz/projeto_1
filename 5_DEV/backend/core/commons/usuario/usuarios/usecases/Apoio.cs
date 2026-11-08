@@ -6,9 +6,9 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 
 /// <summary>
 /// O que os casos de uso de Usuários repetem: achar quem pede, o alvo na mesma
-/// conta, a cadeia de quem criou, ids e códigos únicos e o registro de auditoria.
+/// conta, a cadeia de quem criou, ids e códigos únicos e a execução auditada.
 /// </summary>
-sealed class Apoio(IUsuarios usuarios, IContas contas, IAuditoria auditoria, TimeProvider relogio)
+sealed class Apoio(IUsuarios usuarios, IContas contas, TimeProvider relogio)
 {
     /// <summary>Até onde a cadeia de quem criou é seguida.</summary>
     const int MaiorCadeia = 32;
@@ -92,7 +92,10 @@ sealed class Apoio(IUsuarios usuarios, IContas contas, IAuditoria auditoria, Tim
         throw new InvalidOperationException($"Nenhuma matrícula livre na conta {contaId}.");
     }
 
-    /// <summary>Guarda a ação na auditoria (RN-178).</summary>
-    public Task Auditar(string contaId, string quem, AcaoAuditada acao, string alvo, CancellationToken ct) =>
-        auditoria.Registrar(new RegistroDeAuditoria(contaId, quem, acao, alvo, Agora), ct);
+    /// <summary>
+    /// A execução auditada de quem pede (RN-178): quem e a conta dele vão desde
+    /// o "INICIADO". Sem cadastro, vai sem conta, e a recusa sai da regra.
+    /// </summary>
+    public async Task<Execucao> ExecucaoDe(TraceId traceId, AcaoAuditada acao, string quem, string? alvo, CancellationToken ct) =>
+        new(traceId, acao, (await usuarios.Buscar(quem, ct))?.ContaId, quem, alvo);
 }

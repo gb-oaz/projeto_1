@@ -10,7 +10,10 @@ resource "azurerm_cosmosdb_account" "cosmos" {
   offer_type                    = "Standard"
   kind                          = "MongoDB"
   mongo_server_version          = var.mongo_versao
-  public_network_access_enabled = false # RNF-62
+  # RNF-62: rede de dados fechada, só o private endpoint em snet-pe. O CD não
+  # abre a rede nem com filtro de IP: o esvaziamento de hml (RNF-227) apaga as
+  # coleções pelo plano de controle (ARM), em cd-ambiente.yml
+  public_network_access_enabled = false
   minimal_tls_version           = "Tls12"
   tags                          = local.tags
 
@@ -28,6 +31,19 @@ resource "azurerm_cosmosdb_account" "cosmos" {
   consistency_policy {
     consistency_level = "Session"
   }
+
+  # Backup periódico, fixado (RNF-227): com backup contínuo o Cosmos DB for
+  # MongoDB (RU) só aceita índice único na criação da coleção (customAction
+  # CreateCollection), e a partida cria os índices com createIndexes
+  backup {
+    type = "Periodic"
+  }
+
+  # As coleções nascem na partida, sem chave de partição (não particionadas):
+  # índice único em coleção particionada exige a chave de partição na frente,
+  # e transação só vale em coleção não particionada. Não criar coleções nem
+  # índices aqui: o bloco index do provedor não tem ordem decrescente nem filtro
+  # parcial, e um índice de outro nome na mesma chave para a partida (RNF-227)
 
   geo_location {
     location          = var.regiao

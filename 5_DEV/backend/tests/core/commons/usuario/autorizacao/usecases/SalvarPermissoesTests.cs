@@ -1,5 +1,6 @@
 using Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
 using static Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks.Cenario;
+using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autorizacao.UseCases;
 
@@ -100,7 +101,7 @@ public class SalvarPermissoesTests
     public async Task Dados_invalidos()
     {
         var corpo = await Falha("DADOS_INVALIDOS", () => mundo.Mock.SalvarPermissoes.Executar(
-            new("usr-ebfga-master", "usr-ebfga-maria", "\"7\"", null)));
+            new("usr-ebfga-master", "usr-ebfga-maria", "\"7\"", null), TraceId.Novo()));
         Assert.Equal("mods", corpo.Campo);
         Assert.Equal("If-Match", (await Falha("DADOS_INVALIDOS",
             () => mundo.Salvar("usr-ebfga-master", "usr-ebfga-maria", "\"sete\"", ("MOD-05", "U")))).Campo);

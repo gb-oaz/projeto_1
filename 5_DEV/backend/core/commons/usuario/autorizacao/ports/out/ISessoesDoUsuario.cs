@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Usuario.Usuarios.Domain;
+
 namespace Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 
 /// <summary>
@@ -7,6 +9,6 @@ namespace Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 /// </summary>
 public interface ISessoesDoUsuario
 {
-    /// <summary>Grava o pv novo nas sessões do usuário.</summary>
-    Task AvisarPv(string usuarioId, int pv, CancellationToken ct = default);
+    /// <summary>Grava o pv novo nas sessões do usuário, na execução de quem chama (RN-275).</summary>
+    Task AvisarPv(string usuarioId, int pv, ExecucaoDeQuemChama chamada, CancellationToken ct = default);
 }

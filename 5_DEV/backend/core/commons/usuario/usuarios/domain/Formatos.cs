@@ -28,6 +28,19 @@ public static partial class Sigla
         return texto;
     }
 
+    /// <summary>As siglas das contas qa, que só a partida de homologação cria (RN-179, RN-266).</summary>
+    public const string PrefixoQa = "QA";
+
+    /// <summary>
+    /// Confere a sigla de uma conta nova no ambiente (RN-179): fora de
+    /// homologação, as iniciadas por "QA" são reservadas ao time.
+    /// </summary>
+    /// <exception cref="FalhaDeUsuarios">SIGLA_INVALIDA.</exception>
+    public static string ValidarNoAmbiente(string sigla, AmbienteDaAplicacao ambiente) =>
+        !ambiente.EmHomologacao && sigla.StartsWith(PrefixoQa, StringComparison.OrdinalIgnoreCase)
+            ? throw FalhaDeUsuarios.SiglaQaReservada()
+            : sigla;
+
     /// <summary>
     /// A sigla sugerida pelo nome: as iniciais das palavras, sem conectores nem
     /// acentos ("Escola Bento Freitas Gonçalves Araújo" → EBFGA). Com mais de 5

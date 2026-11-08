@@ -4,7 +4,7 @@ Repete na sua máquina o CI do GitHub Actions
 ([`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)) antes do push e,
 depois, sobe as aplicações em contêiner e roda o qa contra elas. Se passar aqui,
 a mesma mudança deve passar no GitHub Actions. Requisito:
-[`03_ci-qualidade`](../../1_Requisitos/03_ci-qualidade.html) (RNF-160 a RNF-166,
+[`03_ci-qualidade`](../../1_Requisitos/03_ci-qualidade.md) (RNF-160 a RNF-166,
 RN-140 a RN-142).
 
 ```bash
@@ -51,8 +51,8 @@ Faltando algum deles, a plataforma é pulada com aviso dizendo o que falta.
 |---|---|---|
 | mudancas | backend, web, Android e iOS alterados desde a master, incluindo o que ainda não foi commitado; arquivo comum (`.github/`, `global.json`, `.xcode-version`, `.nvmrc`, compose, esta pasta) liga todos | job `mudancas` |
 | 1 · verificação | `backend-ci` na solution de `5_DEV/backend/`: format, build sem avisos, testes com MongoDB e Redis, cobertura ≥ 80 %. `web-ci` no projeto de `5_DEV/frontend/web/`: install, ESLint, Prettier, vue-tsc, Vitest com cobertura ≥ 80 % e o build de cada app (`APP`). Na máquina, a solution de `5_DEV/frontend/mobile/`: Android com format, build sem avisos, testes e cobertura medida sem mínimo; iOS com format e build do `net10.0-ios` de cada app | jobs `backend`, `web`, `android` e `ios` |
-| 2 · aplicações | sobe `backend` e `frontend-<app>` a partir dos Dockerfiles das imagens, com MongoDB e Redis, e espera `/health` responder 200 em cada um | — (o GitHub só gera a imagem para publicar) |
-| 3 · qa | cada suíte de `5_DEV/qa/<alvo>/<tipo>/` vira imagem pelo `Dockerfile` dela e roda na rede das aplicações; conforme `--qa`: **backend**, `backend/integracao/` com `API_URL`; **frontend**, `frontend/web/funcional/` uma vez por app, com `APP` e `APP_URL`; **todos**, as duas sobre a mesma pilha; **carga**, `backend/carga/`; **mobile**, `frontend/mobile/funcional/` na máquina, pelo `executar.sh` com Appium, uma vez por app e plataforma, com o backend publicado na porta 18080. O JUnit XML de cada uma fica em `.gerado/resultados/` | jobs `qa` (sem carga e mobile) e `qa-mobile` (Android, só PR e merge na master) |
+| 2 · aplicações | sobe `backend` (com `AMBIENTE=hml`) e `frontend-<app>` a partir dos Dockerfiles das imagens, com MongoDB (replica set `rs0` de um nó, para as transações) e Redis, e espera `/health` responder 200 em cada um. No lugar do Key Vault de homologação, gera a cada execução a chave do token e as contas iniciais (`USUARIO_ADMIN_*`, `USUARIO_QA_*`: entradas do requisito 17, senhas novas na RNF-202), e passa as mesmas ao backend e à suíte; nada fica no repositório e, no GitHub, as senhas saem mascaradas do log | — (o GitHub só gera a imagem para publicar) |
+| 3 · qa | cada suíte de `5_DEV/qa/<alvo>/<tipo>/` vira imagem pelo `Dockerfile` dela e roda na rede das aplicações; conforme `--qa`: **backend**, `backend/integracao/` com `API_URL`, as `USUARIO_*` e, para os cenários de inicialização, o backend publicado em `/api` da imagem da suíte (`API_COMANDO`) com as `PARTIDA_*` (as mesmas dependências, banco `boaz_partida` no MongoDB e banco lógico 1 no Redis); **frontend**, `frontend/web/funcional/` uma vez por app, com `APP` e `APP_URL`; **todos**, as duas sobre a mesma pilha; **carga**, `backend/carga/`; **mobile**, `frontend/mobile/funcional/` na máquina, pelo `executar.sh` com Appium, uma vez por app e plataforma, com o backend publicado na porta 18080. O JUnit XML de cada uma fica em `.gerado/resultados/` | jobs `qa` (sem carga e mobile) e `qa-mobile` (Android, só PR e merge na master) |
 | resultado | resumo por componente e um veredito único (código de saída 1 se algo falhou) | job `resultado` |
 
 As etapas 2 e 3 só rodam com a etapa 1 verde e só para backend e web (os apps
@@ -83,7 +83,7 @@ As mesmas do `ci.yml` (cabeçalho do arquivo), mais:
 - as imagens escutam na porta **8080** e respondem **200 em `/health`** (as
   mesmas da homologação e da produção, `terraform/infra/aplicacoes.tf`);
 - cada suíte de qa segue o contrato de
-  [`14_estrutura-projetos`](../../1_Requisitos/14_estrutura-projetos.html)
+  [`14_estrutura-projetos`](../../1_Requisitos/14_estrutura-projetos.md)
   (RNF-191): `Dockerfile` na raiz da pasta da suíte, alvo em `API_URL`,
   `APP_URL` e `APP`, JUnit XML em `/resultados` e código de saída 0 só se
   tudo passou; suíte sem `Dockerfile` é pulada com aviso; o funcional do

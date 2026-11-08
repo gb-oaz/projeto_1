@@ -27,9 +27,14 @@ public sealed class LerPermissoes : ILerPermissoes
         var (quem, modsDeQuem, alvo) = await concessao.Conferir(pedido.QuemPede, pedido.UsuarioId, ct);
         var modulos = await leitor.ModulosDe(alvo, ct);
         var permissoes = await leitor.Guardadas(alvo.Id, ct);
-        var concediveis = CalculoDePermissoes.Concediveis(quem, modsDeQuem, alvo, modulos)
-            .Select(c => new ConcedivelDto(c.Key, modulos.Registrado(c.Key)!.Nome, c.Value.ToString()))
-            .ToList();
+        var concediveis = Concediveis(quem, modsDeQuem, alvo, modulos);
         return new PermissoesLidasDto(alvo.Id, permissoes.Versao, Textos.Mods(permissoes.Visiveis(modulos.Disponiveis)), concediveis);
     }
+
+    /// <summary>O que quem pede pode conceder ao alvo, com o nome de cada módulo (RN-241).</summary>
+    static List<ConcedivelDto> Concediveis(UsuarioAutorizado quem, IReadOnlyDictionary<string, Abas> modsDeQuem, UsuarioAutorizado alvo,
+        ModulosDaConta modulos) =>
+        CalculoDePermissoes.Concediveis(quem, modsDeQuem, alvo, modulos)
+            .Select(c => new ConcedivelDto(c.Key, modulos.Registrado(c.Key)!.Nome, c.Value.ToString()))
+            .ToList();
 }

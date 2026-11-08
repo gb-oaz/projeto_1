@@ -12,7 +12,7 @@ Ferramentas: **Reqnroll** (Gherkin em português) sobre **xUnit** e o
 ## 1. Como o Reqnroll funciona, em 4 passos
 
 ```
-requisito (.html)  ──copiar-cenarios.py──►  autenticacao.feature   (Gherkin)
+requisito (.md)    ──copiar-cenarios.py──►  autenticacao.feature   (Gherkin)
                                                   │  dotnet build
                                                   ▼
                                           autenticacao.feature.cs  (gerado, não vai para o git)
@@ -65,17 +65,24 @@ integracao/
 │   ├── Respostas.cs                passos "a resposta é 401 ENTRADA_INVALIDA …"
 │   ├── Comparacao.cs               confere o JSON do cenário com o da resposta
 │   ├── Jwt.cs                      lê e assina tokens
-│   ├── Estado.cs                   limpa e prepara o banco e o cache
+│   ├── Estado.cs                   limpa e prepara o banco e o cache (menos as contas iniciais)
+│   ├── ContasIniciais.cs           administrador e contas qa: ids e variáveis do Key Vault
+│   ├── Partida.cs                  sobe uma instância própria do backend (cenários de inicialização)
+│   ├── BancoDaPartida.cs           coleções e índices do banco dessa instância (RNF-227)
+│   ├── Auditoria.cs                leitura das coleções "auditoria" e "auditoriaErros" (RN-178, RN-270, RN-271)
 │   └── Ganchos.cs                  antes de cada cenário: limpa tudo
-├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.html
+├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.md
 │   ├── autenticacao.feature
 │   └── AutenticacaoPassos.cs
-├── commons/autorizacao/            17_modulo-usuario-b-autorizacao.html
+├── commons/autorizacao/            17_modulo-usuario-b-autorizacao.md
 │   ├── autorizacao.feature
 │   └── AutorizacaoPassos.cs
-└── hub/usuarios/                   17_modulo-usuario.html (contas, staff, participantes, time)
+└── hub/usuarios/                   17_modulo-usuario.md (contas, staff, participantes, time)
     ├── usuarios.feature
-    └── UsuariosPassos.cs
+    ├── UsuariosPassos.cs
+    ├── ContasIniciaisPassos.cs     contas iniciais (RN-179, RN-190, RN-265 a RN-268, RNF-225, RNF-226)
+    ├── AuditoriaPassos.cs          auditoria do que muda estado, erros e alertas, traceId (RN-178, RN-270, RN-271)
+    └── IndicesPassos.cs            coleções e índices prontos na partida e GET /health (RNF-227, RNF-227-api)
 ```
 
 A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
@@ -87,7 +94,7 @@ A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
 
 ```bash
 python3 5_DEV/qa/backend/integracao/scripts/copiar-cenarios.py \
-  1_Requisitos/17_modulo-usuario-a-autenticacao.html \
+  1_Requisitos/17_modulo-usuario-a-autenticacao.md \
   5_DEV/qa/backend/integracao/commons/autenticacao/autenticacao.feature \
   Autenticação
 ```
@@ -99,9 +106,9 @@ Os outros requisitos, do mesmo jeito:
 
 | Requisito | `.feature` | Funcionalidade |
 |---|---|---|
-| `17_modulo-usuario-a-autenticacao.html` | `commons/autenticacao/autenticacao.feature` | `Autenticação` |
-| `17_modulo-usuario-b-autorizacao.html` | `commons/autorizacao/autorizacao.feature` | `Autorização` |
-| `17_modulo-usuario.html` | `hub/usuarios/usuarios.feature` | `Usuários` |
+| `17_modulo-usuario-a-autenticacao.md` | `commons/autenticacao/autenticacao.feature` | `Autenticação` |
+| `17_modulo-usuario-b-autorizacao.md` | `commons/autorizacao/autorizacao.feature` | `Autorização` |
+| `17_modulo-usuario.md` | `hub/usuarios/usuarios.feature` | `Usuários` |
 
 Dois cenários com o mesmo nome no requisito: o segundo ganha o ID no fim
 (`nome curto repetido · RF-153`), porque o Reqnroll não aceita nome repetido.
@@ -121,7 +128,7 @@ requisito.
 **Passo que ainda não dá para testar**: `throw new PendingStepException("motivo")`.
 O cenário sai como pulado, com o motivo na saída. Os casos de hoje: o
 contrato ainda não tem o endereço (sala ao vivo, troca de chave, os pedidos
-da Presença e do Quiz, a caixa do SAC, a auditoria), é tela (fica no qa do
+da Presença e do Quiz, a caixa do SAC), é tela (fica no qa do
 frontend), só o banco mostra (fica nos testes do backend), é segredo do Key
 Vault ou é fora de escopo.
 
@@ -143,7 +150,8 @@ um atributo para cada forma da frase, cada um no seu método.
 **No CI local**, tudo em contêiner (backend, banco, cache e esta suíte):
 
 ```bash
-./4_CI_CD/local/ci.sh --qa backend
+./4_CI_CD/local/ci.sh --qa backend           # build, testes e esta suíte
+./4_CI_CD/local/ci.sh --so-qa --qa backend   # só esta suíte
 ```
 
 **Na máquina**, contra o backend local e um banco e um cache **descartáveis**,
@@ -160,6 +168,12 @@ dotnet run --project 5_DEV/backend/ms_mono
 # 3. a suíte (em 5_DEV/qa/backend/integracao/)
 export API_URL=http://localhost:8080 MONGO_URL=mongodb://127.0.0.1:37017 \
        REDIS_URL=127.0.0.1:16379 QA_PODE_LIMPAR=sim
+# as mesmas USUARIO_* que o backend recebeu (Key Vault de homologação), e,
+# para os cenários de inicialização, o backend publicado e um banco próprio
+export USUARIO_ADMIN_ENTRADA=… USUARIO_ADMIN_SENHA=… USUARIO_QA_…=…
+export API_COMANDO="cd <pasta do publish> && exec dotnet Boaz.MsMono.dll" \
+       PARTIDA_ConnectionStrings__MongoDb=mongodb://127.0.0.1:37017 \
+       PARTIDA_ConnectionStrings__Redis=127.0.0.1:16379 PARTIDA_Mongo__Banco=boaz_partida
 dotnet test                                        # tudo
 dotnet test --filter "Category=RF-134"             # só os cenários de um ID
 dotnet test --filter "DisplayName~sair de todos"   # pelo nome do cenário
@@ -184,19 +198,62 @@ método. No TDD, enquanto o endpoint não existe, o vermelho esperado é o 404.
 | `MONGO_URL`, `REDIS_URL` | preparar o estado | `localhost` 27017 e 6379 |
 | `MONGO_BANCO` | o banco do backend dentro do Mongo (contratações, versão das permissões) | `boaz` |
 | `QA_PODE_LIMPAR=sim` | autoriza apagar o banco e o cache antes de cada cenário; sem ela, nada roda | — |
-| `ADMIN_ENTRADA`, `ADMIN_SENHA` | o administrador do deboaz (no lugar do Key Vault) | `admin.dboaz@deboaz.com`, vazia |
+| `USUARIO_ADMIN_ENTRADA`, `USUARIO_ADMIN_SENHA` | o administrador do deboaz: as mesmas variáveis que o backend recebe do Key Vault (RN-190, RNF-225). `ADMIN_ENTRADA` e `ADMIN_SENHA` (nomes antigos) são lidas só se faltarem as `USUARIO_ADMIN_*` | `admin.dboaz@deboaz.com`, vazia |
+| `USUARIO_QA_ADMIN_*`, `USUARIO_QA_MEMBRO_*`, `USUARIO_QA_MASTER_*`, `USUARIO_QA_AUTONOMO_*`, `USUARIO_QA_STAFF_*` (`_ENTRADA`, `_SENHA`), `USUARIO_QA_PARTICIPANTE_CODIGO`, `USUARIO_QA_MODULOS` (JSON `{"staff": {"mods": {…}}, "time": {"mods": {…}}}`, RN-268) | as contas qa de homologação (RN-265), as mesmas do backend; nunca valor fixo no repositório | entradas do requisito; senha sem padrão (o cenário falha dizendo a variável) |
+| — | os cenários usam o administrador qa (`USUARIO_QA_ADMIN_*`, RN-265) no lugar do administrador real; enquanto o CI não entrega `USUARIO_QA_ADMIN_SENHA`, a suíte usa as `USUARIO_ADMIN_*` | — |
+| `API_COMANDO` | comando (por `/bin/sh -c`) que sobe o backend publicado, para os cenários de inicialização: primeira partida, segunda partida, produção, segredo ausente (RN-190, RN-266, RN-267, RNF-225, RNF-226). Sem ele, esses cenários ficam pendentes | vazia |
+| `PARTIDA_*` | repassadas sem o prefixo à instância do `API_COMANDO` (conexões, chave e **um banco próprio**, diferente do `MONGO_BANCO`) | — |
 | `CHAVE_PRIVADA` | a chave do token (PKCS#8 em base64), para montar os tokens recusados de RNF-216 | vazia |
 
-No CI local, o `ci.sh` gera a chave e a senha do administrador a cada execução
-e passa os mesmos valores ao backend (`Autenticacao__ChavePrivada`,
-`Autenticacao__ChaveId`, `Administrador__Entrada`, `Administrador__Senha`) e a
-esta suíte.
+**Como o CI entrega as variáveis** (`4_CI_CD/local/ci.sh`), no lugar do Key
+Vault e novas a cada execução:
+
+- o backend sobe com `AMBIENTE=hml`;
+- o `ci.sh` gera a chave do token (`Autenticacao__ChaveId`,
+  `Autenticacao__ChavePrivada`, que vira `CHAVE_PRIVADA` aqui) e as
+  `USUARIO_*` (administrador e contas qa) e passa os mesmos valores ao backend
+  e a esta suíte;
+- a suíte roda numa imagem derivada (`qa-backend-integracao-api:ci`), com o
+  publish do backend em `/api` e `API_COMANDO="cd /api && exec dotnet
+  Boaz.MsMono.dll"`. As `PARTIDA_*` levam `ConnectionStrings__Mongo`,
+  `ConnectionStrings__MongoDb`, `ConnectionStrings__Redis` (o mesmo Redis, com
+  `defaultDatabase=1`), `Mongo__Banco=boaz_partida` e `Autenticacao__ChaveId`
+  e `Autenticacao__ChavePrivada`;
+- o Mongo do CI local é um replica set de um nó (`rs0`).
+
+**Contas iniciais e a limpeza**: o backend cria o administrador e, em
+homologação, as contas qa ao iniciar (RN-190, RN-265). Na primeira limpeza, a
+suíte guarda os documentos desses `_id` (`ContasIniciais.Ids`) e os devolve,
+como estavam, depois de cada limpeza: os cenários continuam começando do
+banco "recém-iniciado", sem depender de o backend recriá-los. A limpeza do
+Redis (`FlushAllDatabases`) também apaga o banco 1, o da instância de Partida,
+e é isso mesmo que se quer: cada cenário começa com o cache dela vazio.
+
+**Partida** (`suporte/Partida.cs`): os cenários que falam de iniciar a
+aplicação sobem uma instância nova com o `API_COMANDO`, numa porta livre
+(`ASPNETCORE_HTTP_PORTS`), com `AMBIENTE` (`hml` ou `prd`) e um Key Vault do
+próprio cenário (entradas do requisito e senhas geradas na hora, RNF-202). Lê
+só o HTTP, o código de saída e o log. As `USUARIO_*` da suíte não passam para
+ela.
 
 ## 6. Regras
 
 - **Caixa-preta**: nada de `5_DEV/backend/` é referenciado (RN-151).
 - **Banco e cache só preparam**, nunca conferem: o que só eles mostram fica
-  nos testes do backend.
+  nos testes do backend. Única exceção: a RNF-227 (coleções e índices prontos
+  na partida) promete o próprio esquema do banco, sem endereço na API; os
+  passos leem só os metadados (coleções, chave e opções dos índices) e os `_id`
+  do banco da instância de Partida (`PARTIDA_Mongo__Banco`, sem ela ficam
+  pendentes), nunca o conteúdo nem os nomes internos dos índices.
+  Segunda exceção: a auditoria (RN-178, RN-270, RN-271, RN-274 e, na
+  Autenticação, RN-272 e RN-273) promete os registros das coleções
+  "auditoria" e "auditoriaErros", sem endereço na API. Os passos
+  (`suporte/Auditoria.cs`, com as frases comuns em
+  `suporte/PassosDeAuditoria.cs` e os pedidos no `AuditoriaPassos.cs` de cada
+  pasta) só leem essas duas coleções do `MONGO_BANCO`, pelos
+  campos do modelo de documentos do requisito, e contam como "ganho" só o que
+  apareceu depois do preparo do cenário. O traceId também é conferido no
+  cabeçalho `X-Trace-Id` da resposta.
 - **Valores dos exemplos**: `usr-ebfga-maria`, `3f9c2a71` (sessão da Maria no
   navegador) e `EBFGA-LUCAS-0412` são trocados pelos valores reais na hora do
   pedido (`Mundo.Apelidos`); a pessoa é criada pela API na primeira vez que

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
 # Preparação única de um ambiente na Azure, antes do primeiro terraform apply
-# Requisito: 1_Requisitos/05_cd-implantacao.html (RNF-52, RNF-56, RNF-90)
+# Requisito: 1_Requisitos/05_cd-implantacao.md (RNF-52, RNF-56, RNF-90)
 #
 # Uso:   ./4_CI_CD/terraform/scripts/bootstrap.sh hml
 #        ./4_CI_CD/terraform/scripts/bootstrap.sh prd

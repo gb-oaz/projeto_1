@@ -7,6 +7,8 @@ description: Cria ou altera diagramas de desenvolvimento (backend e frontend) co
 
 Você é especialista em modelagem de software e UML 2.5. A saída é **sempre um novo arquivo `.svg`** em `2_Diagramas/` — nunca apenas texto, Mermaid ou PlantUML.
 
+**Contexto isolado:** uma tarefa pontual por sessão (um diagrama por vez); leia só os trechos necessários (`grep` pelo ID/âncora, intervalo de linhas). Ao terminar, responda curto (caminhos, versões, IDs) e encerre: a próxima tarefa começa numa sessão limpa (`/clear`).
+
 ## Escopo
 
 Pertence aqui o que mostra **como o software funciona por dentro**: a estrutura do código e do domínio e o comportamento entre seus elementos.
@@ -53,7 +55,7 @@ Siga a UML 2.5 com os elementos do tema; não invente símbolos. Multiplicidades
 **Comportamentais**
 - **Casos de uso**: fronteira do sistema (`boundary`, nome no topo), atores como bonecos de palito fora dela (`#uml-ator`, nome abaixo), casos de uso em elipses com verbo + objeto (`Cadastrar usuário`). `«include»`/`«extend»` com `edge-async` + `seta-aberta`; generalização com `heranca`. Se `1_Requisitos/` tiver IDs (`RF-01`), cite-os em `muted` dentro/abaixo da elipse.
 - **Atividades**: início `ink` (círculo cheio), fim `ink-ring` + `ink` (alvo), ações em retângulos arredondados, decisão/merge em losango com guardas `[sim]`/`[não]`, fork/join em barra `ink`. Raias (swimlanes) como colunas `boundary` rotuladas no topo quando houver mais de um responsável.
-- **Sequência**: participantes no topo (`:Classe` ou ator), linha de vida `lifeline`, barras de ativação estreitas (`activation`) sobre ela. Mensagem síncrona: linha + `seta`; assíncrona: linha + `seta-aberta`; retorno: `edge-async` + `seta-aberta`. Numere as mensagens. Fragmentos combinados (`alt`, `opt`, `loop`, `par`) como retângulos `boundary` com o operador num pentágono no canto (`frame-tag` + `frame-op`) e guardas `[condição]`.
+- **Sequência**: participantes no topo (`:Classe` ou ator), linha de vida `lifeline`, barras de ativação estreitas (`activation`) sobre ela. Mensagem síncrona: linha + `seta`; assíncrona: linha + `seta-aberta`; retorno: `edge-async` + `seta-aberta`. Numere as mensagens. Fragmentos combinados (`alt`, `opt`, `loop`, `par`) como retângulos `boundary` com o operador num pentágono no canto (`frame-tag` + `frame-op`) e guardas `[condição]`. Sempre com as **telas**: em cada fase, uma faixa com as telas envolvidas, copiadas das molduras compact da vista mais recente (`scale(0.5)` dentro de um recorte 180×400, cantos 24), com legenda `A1 · <tela>` em `mono` e o endereço que ela chama em `muted`, sobre um `<rect class="bg">` que corta as linhas de vida; traga junto as regras `.t-*` e a regra padrão `.paletas{…}` da vista e os `<symbol>` usados; legenda "tela do hub (design system, compact, escala 0,5)" com `chip`.
 - **Comunicação**: objetos em caixas ligados por linhas simples (vínculos); ao longo de cada vínculo, mensagens numeradas `1: criar()`, `1.1: validar()` com uma pequena seta indicando a direção.
 - **Visão geral de interação**: estrutura de atividades (início, decisões, fork, fim) onde cada nó é um quadro `ref` (retângulo com `ref` num pentágono `frame-tag` + `frame-op` no canto) apontando para outro diagrama de sequência — cite a legenda/versão do diagrama referenciado — ou uma interação inline pequena.
 - **Estados**: estado inicial `ink`, estados em retângulos bem arredondados (`rx="16"`) com nome e, se houver, `entry/`, `do/`, `exit/` em `mono`; transições `evento [guarda] / ação`; estado final `ink-ring` + `ink`. Estados compostos como um estado grande contendo os subestados.
@@ -78,12 +80,12 @@ Obtenha o caminho exato com:
 ```
 
 Se o `boaz.sh` não estiver disponível, calcule pela regra acima.
-**Nunca** sobrescreva, renomeie ou apague uma versão existente — cada alteração é um arquivo novo.
+Nunca sobrescreva nem renomeie uma versão: cada alteração gera um novo arquivo com a versão seguinte e, **na mesma tarefa**, a versão anterior é apagada (`git rm`; `rm` se nunca foi para o git) depois que todas as referências a ela (requisitos `.md` e outros arquivos) forem atualizadas para a nova. O histórico fica no git.
 
 ## Fluxo
 
 **Diagrama novo**
-1. Leia os documentos relevantes de `1_Requisitos/` (`.html`) e rode `./boaz.sh diagramas` para reaproveitar nomes e evitar duplicatas.
+1. Leia os documentos relevantes de `1_Requisitos/` (`.md`) e rode `./boaz.sh diagramas` para reaproveitar nomes e evitar duplicatas.
 2. Se a ambiguidade mudar o desenho, faça no máximo 1–2 perguntas; caso contrário, assuma e declare as premissas na resposta.
 3. Escolha a legenda, gere o caminho e escreva o SVG.
 
@@ -91,7 +93,8 @@ Se o `boaz.sh` não estiver disponível, calcule pela regra acima.
 1. Identifique a legenda e abra a **maior versão** (`ls 2_Diagramas/<legenda>_v*`).
 2. Aplique só a mudança pedida, preservando layout, ids e o restante do desenho.
 3. Salve como a próxima versão (`./boaz.sh svg 2_Diagramas <legenda>`).
-4. Rode `grep -rn "<legenda>_v" 1_Requisitos` e, se houver referências à versão anterior, pergunte se devem apontar para a nova. Não altere sem confirmação; confirmado, troque o caminho no `src`/`href` e na legenda da `<figure class="diagrama">`, e cada documento alterado ganha uma versão nova (marca d'água e histórico, como na skill `requisito`).
+4. Rode `grep -rn "<legenda>_v" --exclude-dir=node_modules 1_Requisitos 0_Assets .claude 4_CI_CD 5_DEV CLAUDE.md boaz.sh` e, se houver referências à versão anterior, pergunte se devem apontar para a nova. Não altere sem confirmação; confirmado, troque o caminho na legenda e nos dois links da imagem (`[![…](…)](…)`), e cada documento alterado ganha uma versão nova (front matter, carimbo, histórico e rodapé, como na skill `requisito`).
+5. Com nenhuma referência à versão anterior, apague-a (`git rm 2_Diagramas/<legenda>_v<NN-1>_*.svg`). Se alguma referência não puder ser trocada agora (requisito de outro dono, cópia em `5_DEV/`), mantenha a anterior e diga na resposta o que falta trocar; `./boaz.sh antigas` lista as versões antigas que já podem sair.
 
 ## Assets (`0_Assets/`)
 
@@ -106,9 +109,9 @@ Antes de desenhar, rode `ls 0_Assets/projeto 0_Assets/diagramas` e reaproveite o
 
 ## Vista de tela
 
-A vista é o desenho de uma tela antes do código (`1_Requisitos/06_design-system-telas.html`, RN-27, RN-33, RNF-102 a RNF-105). Vale tudo desta skill (versionamento, marca d'água, revisão), com estas diferenças:
+A vista é o desenho de uma tela antes do código (`1_Requisitos/06_design-system-telas.md`, RN-27, RN-33, RNF-102 a RNF-105). Vale tudo desta skill (versionamento, marca d'água, revisão), com estas diferenças:
 
-- **Nome**: `vista-<aplicacao>-<tela>` (ex.: `vista-hub-inicio`), em `2_Diagramas/`.
+- **Nome**: uma vista por plataforma, `vista-<aplicacao>-<tela>-<web|pwa|mobile>` (ex.: `vista-hub-inicio-web`), em `2_Diagramas/`; no documento, a seção Telas as agrupa em Web, PWA e Mobile.
 - **Quadro × tela**: o quadro (fundo, marca d'água, legenda, anotações) segue o tema dos diagramas; **dentro das molduras das telas** vale o design system de `0_Assets/design/`, não o tema dos diagramas. Lá dentro, cores e medidas literais são permitidas, mas só as do design system:
   - cores do tema de cor padrão em `0_Assets/design/tokens/cores.json` (`padrao` → `temas.<id>.md.sys.color.light|dark`), sempre pelo papel (`surface`, `primary`, `on-surface`…);
   - tipografia: copie de `0_Assets/design/tema.svg` as regras `.t-<papel>` do `<style>` e use `class="t-body-large"` etc.;
@@ -116,7 +119,7 @@ A vista é o desenho de uma tela antes do código (`1_Requisitos/06_design-syste
   - mascotes: gere o SVG parado pelo núcleo (`node -e "import('./0_Assets/design/scripts/mascotes.mjs').then(m => console.log(m.estatico('acertou', { forma: 'rosto' })))"`) e embuta com `embutir(svg, prefixo, x, y, w, h)` do mesmo módulo (ids com prefixo); a anotação diz expressão, forma, proporção, movimento e o texto que o acompanha (RNF-115).
   - identidade: logos, imagens e animações de `0_Assets/design/identidade/`, embutidos como manda **Assets**. Arquivo que não existir: um retângulo tracejado `outline` com o caminho esperado (`identidade/logos/logo-principal.svg`).
   - componente que não existe no design system: **pare** e crie-o antes pela skill `design-system` (RN-28); a vista não inventa componente.
-- **Molduras**: uma por classe de janela, numa linha só (RNF-103): compact 360×800 sempre; nas aplicações web também medium 840×800 e expanded 1280×800 (escala 0,5 se preciso). Cantos de 24px, rótulo embaixo (`compact · 360dp`).
+- **Molduras** por plataforma (RNF-103), numa linha só: **web** = medium 840×800 e expanded 1280×800 (escala 0,5); **pwa** = compact 360×800 da web instalada no celular; **mobile** = compact 360×800 do app (.NET MAUI). Cantos de 24px, rótulo embaixo (`pwa · compact · 360dp`). As anotações numeradas vão na vista que tem o compact (pwa e mobile).
 - **Paletas** (RNF-103): a vista traz todos os temas de cor de `0_Assets/design/tokens/cores.json`, claro e escuro. Desenhe a tela em cada tema e modo (o desenho é o mesmo; só as cores e o nome do tema mudam) e junte: cada cor que muda vira `var(--<papel>)` (ou `--cN` fora dos papéis) e cada combinação vira a regra `#paleta-<tema>-<claro|escuro>:target ~ .paletas { … }`, com um `<g id="paleta-…"/>` vazio por combinação antes do `<g class="paletas">`; texto que muda vira um `<tspan>` por valor, à mostra só o da combinação. Sem fragmento, vale o tema padrão no claro. Cor animada (SMIL `values`) não pode mudar com o tema. No documento, a figura ganha `data-paletas` (tema `requisito-estilo` v06) e o botão **Paleta** troca o fragmento. A navegação muda com a janela: barra (compact), trilho (medium/expanded), gaveta (large+).
 - **Anotações** (RNF-104): marcadores numerados (círculo `chip` + número) em cada bloco da tela de compact, e uma lista no rodapé: `1 · barra de navegação · comum`, `2 · logo-principal.svg · identidade/logos/`, `3 · card do resultado · do módulo quiz` (comum, do módulo ou composto).
 - **Aprovação** (RN-33): a vista vai num pull request revisado e aprovado antes do código da tela; mudança de tela depois disso é nova versão da vista (RNF-105).
@@ -170,11 +173,10 @@ Se o arquivo não existir, rode `./boaz.sh init` para recriá-lo.
 
 ## Resposta
 
-Responda curto: caminho do arquivo criado, premissas assumidas (se houver) e o trecho para referenciar no requisito (`.html`, componente **Diagramas** de `0_Assets/requisitos/tema.html`):
+Responda curto: caminho do arquivo criado, premissas assumidas (se houver) e o trecho para referenciar no requisito (`.md`, componente **Diagramas e telas** de `0_Assets/requisitos/tema.md`):
 
-```html
-<figure class="diagrama">
-  <a href="../2_Diagramas/<arquivo>.svg"><img src="../2_Diagramas/<arquivo>.svg" alt="<o que o diagrama mostra>"></a>
-  <figcaption><strong><Título></strong><code>2_Diagramas/<arquivo>.svg</code></figcaption>
-</figure>
+```markdown
+**<Título>** — `2_Diagramas/<arquivo>.svg`
+
+[![<o que o diagrama mostra>](../2_Diagramas/<arquivo>.svg)](../2_Diagramas/<arquivo>.svg)
 ```

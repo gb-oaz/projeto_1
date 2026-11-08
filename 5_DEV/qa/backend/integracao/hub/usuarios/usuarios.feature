@@ -1,8 +1,8 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.html (v44), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v87), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
-  1_Requisitos/17_modulo-usuario.html · Cenários de API
+  1_Requisitos/17_modulo-usuario.md · Cenários de API
 
   @RF-104
   Cenário: escola cria a conta
@@ -357,7 +357,23 @@ Funcionalidade: Usuários
       | o João, com Adm. usuários | a staff Ana               | 204               |
       | o João, com Adm. usuários | o Lucas                   | 204               |
       | o João, com Adm. usuários | o Rui, também com Adm.    | 403 ACESSO_NEGADO |
+      | o qaadmin                 | o admin                   | 403 ACESSO_NEGADO |
+      | o admin                   | o qaadmin                 | 403 ACESSO_NEGADO |
       | a staff Ana               | o João                    | 403 ACESSO_NEGADO |
+
+  @RN-169
+  Esquema do Cenário: administrador sobre outro administrador
+    Dado o token de "<quem>" em homologação
+    Quando envia POST /usuarios/{id}/<ação> de "<alvo>"
+    Então a resposta é 403 ACESSO_NEGADO
+    E "<alvo>" continua com o mesmo estado e a mesma senha
+
+    Exemplos:
+      | quem                     | ação               | alvo                     |
+      | qaadmin.dboaz@deboaz.com | reativar           | admin.dboaz@deboaz.com   |
+      | qaadmin.dboaz@deboaz.com | nova-geracao-senha | admin.dboaz@deboaz.com   |
+      | admin.dboaz@deboaz.com   | reativar           | qaadmin.dboaz@deboaz.com |
+      | admin.dboaz@deboaz.com   | nova-geracao-senha | qaadmin.dboaz@deboaz.com |
 
   @RN-169
   Cenário: time deboaz e a conta master
@@ -462,16 +478,269 @@ Funcionalidade: Usuários
       | o Paulo desativado | o Paulo               | /auth/hub/entrar   |
 
   @RN-178
-  Esquema do Cenário: ação auditada
+  Esquema do Cenário: execução auditada do começo ao fim
     Quando a Maria envia <pedido>
-    Então a auditoria guarda a Maria, a ação, o alvo e a hora, até 5 anos depois
+    E a resposta é de sucesso
+    Então a coleção "auditoria" ganha 2 registros da ação "<acao>" com o mesmo traceId
+    E o primeiro com a etapa "INICIADO", o segundo com a etapa "CONCLUIDO"
+    E os registros das ações internas da RN-275, quando há, vêm à parte, com o mesmo traceId
+    E os dois com a Maria, a ação "<acao>", o alvo e a hora, guardados até 5 anos depois
 
     Exemplos:
-      | pedido                                          |
-      | POST /usuarios do participante Lucas            |
-      | POST /usuarios/usr-ebfga-ana/nova-geracao-senha |
-      | PUT /usuarios/usr-ebfga-joao/permissoes         |
-      | POST /usuarios/usr-ebfga-paulo/desativar        |
+      | pedido                                            | acao                |
+      | POST /usuarios/usr-ebfga-ana/nova-geracao-senha   | NOVA_GERACAO_SENHA  |
+      | PUT /usuarios/usr-ebfga-joao/permissoes           | EDITAR_PERMISSOES   |
+      | POST /usuarios/usr-ebfga-paulo/desativar          | DESATIVAR_USUARIO   |
+      | POST /usuarios/usr-ebfga-paulo/reativar           | REATIVAR_USUARIO    |
+      | PATCH /usuarios/usr-ebfga-lucas                   | EDITAR_USUARIO      |
+      | POST /usuarios/usr-ebfga-lucas/novo-codigo-acesso | NOVO_CODIGO_ACESSO  |
+      | PUT /contas/conta-ebfga/tempo-sessao              | SALVAR_TEMPO_SESSAO |
+
+  @RN-178
+  Cenário: senha gerada sem login, conta e alvo só na conclusão
+    Quando envia POST /usuarios/gerar-senha, sem login, com o código de liberação da Maria
+    E a resposta é 200 com a senha
+    Então "auditoria" ganha o "INICIADO" da ação "GERAR_SENHA" sem quem, sem contaId e sem alvo
+    E o "CONCLUIDO", com o mesmo traceId, vai com a "conta-ebfga" e o alvo "usr-ebfga-maria", sem quem
+
+  @RN-178
+  Cenário: time deboaz, a conta pedida e a master só na conclusão
+    Quando o Caio, do time deboaz, envia POST /contas/conta-ebfga/codigo-master
+    E a resposta é 201 com o código de liberação
+    Então o "INICIADO" da ação "CODIGO_MASTER" vai com "usr-dboaz-caio" e a "conta-ebfga", sem alvo
+    E o "CONCLUIDO", com o mesmo traceId, repete os dois e vai com o alvo "usr-ebfga-master"
+
+  @RN-178
+  Cenário: tempo de sessão do time
+    Quando o Caio envia PUT /time/tempo-sessao e a resposta é 200
+    Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "SALVAR_TEMPO_SESSAO"
+    E os dois vão com "usr-dboaz-caio", a "conta-dboaz", a conta de quem pede, e o alvo "time"
+
+  @RN-178
+  Cenário: usuário criado, alvo só na conclusão
+    Quando a Maria envia POST /usuarios do participante Lucas
+    E a resposta é 201 com o id "usr-ebfga-lucas"
+    Então "auditoria" ganha o "INICIADO" da ação "CRIAR_USUARIO" com a Maria e a "conta-ebfga"
+    E esse registro vai sem alvo, porque o Lucas ainda não existe
+    E o "CONCLUIDO", com o mesmo traceId, vai com a Maria, a "conta-ebfga" e o alvo "usr-ebfga-lucas"
+
+  @RN-178
+  Cenário: criação de usuário recusada, sem alvo
+    Dado o participante "Rafael" com a matrícula "2026-0412" na EBFGA
+    Quando a Maria envia POST /usuarios do participante Lucas com a matrícula "2026-0412"
+    Então a resposta é 409 MATRICULA_EM_USO
+    E "auditoria" fica só com o "INICIADO" da ação "CRIAR_USUARIO", sem alvo
+    E o registro de "auditoriaErros" vai com a Maria e a "conta-ebfga", sem alvo
+
+  @RN-178
+  Cenário: conta já no estado pedido
+    Dado a conta da EBFGA com o estado "ATIVA"
+    Quando o Caio, do time deboaz, envia POST /contas/conta-ebfga/estado com "ATIVA"
+    Então a resposta é 200 com o estado "ATIVA", sem mudar nada na conta
+    E "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "MUDAR_ESTADO_CONTA", com o mesmo traceId
+    E os dois vão com contaId "conta-ebfga" e alvo "conta-ebfga"
+
+  @RN-178
+  Cenário: permissões auditadas nas duas coleções
+    Quando a conta master envia PUT /usuarios/usr-ebfga-joao/permissoes
+    E a resposta é de sucesso
+    Então a coleção "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "EDITAR_PERMISSOES"
+    E à parte, "INICIADO" e "CONCLUIDO" de "AVISAR_PERMISSOES_NOVAS", como na RN-275
+    E "registrosPermissao" ganha a versão nova das permissões do João, como na RN-256
+
+  @RN-178
+  Cenário: conta criada sem login
+    Quando envia POST /contas, sem login, com a sigla "COLSA"
+    E a resposta é 201 com o contaId "conta-colsa"
+    Então a coleção "auditoria" ganha o registro "INICIADO" da ação "CRIAR_CONTA"
+    E esse registro vai sem quem, sem contaId e sem alvo
+    E o registro "CONCLUIDO", com o mesmo traceId, vai com contaId e alvo "conta-colsa", sem quem
+
+  @RN-178
+  Esquema do Cenário: leitura não é auditada
+    Quando a Maria envia <pedido>
+    Então a resposta é 200
+    E as coleções "auditoria" e "auditoriaErros" não ganham registro
+
+    Exemplos:
+      | pedido                                                       |
+      | GET /usuarios?tipo=PARTICIPANTE                              |
+      | GET /usuarios/usr-ebfga-lucas                                |
+      | GET /contas/sigla-sugerida?nome=Colégio Santo Antônio        |
+
+  @RN-270
+  Cenário: recusa no meio da execução
+    Dado uma conta com a sigla "EBFGA"
+    Quando envia POST /contas, sem login, com a sigla "EBFGA"
+    E a resposta é 409 SIGLA_EM_USO
+    Então a coleção "auditoria" fica só com o registro "INICIADO" da ação "CRIAR_CONTA"
+    E a coleção "auditoriaErros" ganha 1 registro com o código "SIGLA_EM_USO" e o nivel "ALERTA"
+    E os dois registros têm o mesmo traceId
+    E nenhum registro "CONCLUIDO" é gravado com esse traceId
+
+  @RN-270
+  Esquema do Cenário: alerta ou erro, gravado antes da recusa
+    Quando a Maria envia POST /usuarios/usr-ebfga-paulo/desativar
+    E <situação>
+    Então a resposta é <resposta>
+    E "auditoriaErros" ganha o registro com o código "<codigo>" e o nivel "<nivel>"
+    E esse registro é gravado antes de a recusa sair do caso de uso
+
+    Exemplos:
+      | situação                        | resposta             | codigo           | nivel  |
+      | o Paulo já está desativado      | 409 ESTADO_IGUAL     | ESTADO_IGUAL     | ALERTA |
+      | o banco cai no meio da gravação | 500 ERRO_INESPERADO  | ERRO_INESPERADO  | ERRO   |
+
+  @RN-270
+  Cenário: falha inesperada
+    Quando a Maria envia POST /usuarios do participante Lucas
+    E o banco cai no meio da gravação
+    Então a resposta é 500 ERRO_INESPERADO com a mensagem "Algo deu errado. Tente de novo mais tarde."
+    E "auditoriaErros" ganha o registro com o código "ERRO_INESPERADO" e o nivel "ERRO"
+
+  @RN-270
+  Esquema do Cenário: recusa prevista de cada caso de uso vira ALERTA
+    Quando chega <pedido>
+    Então a resposta é <resposta>, com o cabeçalho X-Trace-Id
+    E "auditoria" fica só com o "INICIADO" da ação "<acao>", com esse traceId
+    E "auditoriaErros" ganha o código da resposta e o nivel "ALERTA", com esse traceId
+
+    Exemplos:
+      | pedido                                  | resposta                   | acao                |
+      | o CNPJ de um AUTONOMO em POST /contas   | 422 DADOS_INVALIDOS        | CRIAR_CONTA         |
+      | o nome curto "maria" no POST /usuarios  | 409 NOME_CURTO_EM_USO      | CRIAR_USUARIO       |
+      | a matrícula da Maria no PATCH da Ana    | 409 MATRICULA_EM_USO       | EDITAR_USUARIO      |
+      | o código "111111" em gerar-senha        | 401 CODIGO_INVALIDO        | GERAR_SENHA         |
+      | o código de 73 h em gerar-senha         | 410 CODIGO_VENCIDO         | GERAR_SENHA         |
+      | a nova geração do Rui, pedida pelo João | 403 ACESSO_NEGADO          | NOVA_GERACAO_SENHA  |
+      | a nova geração do participante Lucas    | 422 SEM_SENHA              | NOVA_GERACAO_SENHA  |
+      | o novo código de acesso da staff Maria  | 422 SO_PARTICIPANTE        | NOVO_CODIGO_ACESSO  |
+      | o reativar do Paulo já ativo            | 409 ESTADO_IGUAL           | REATIVAR_USUARIO    |
+      | o João dando à Ana mais do que ele tem  | 403 PERMISSAO_ACIMA        | EDITAR_PERMISSOES   |
+      | as permissões da Maria com If-Match "6" | 412 VERSAO_DESATUALIZADA   | EDITAR_PERMISSOES   |
+      | a EBFGA encerrada de volta a "ATIVA"    | 409 TRANSICAO_INVALIDA     | MUDAR_ESTADO_CONTA  |
+      | o pagamento errado no codigo-master     | 422 CONFERENCIA_INCOMPLETA | CODIGO_MASTER       |
+      | "PT30H" no tempo do time                | 422 FORA_DOS_LIMITES       | SALVAR_TEMPO_SESSAO |
+      | a master da EBFGA no tempo do time      | 403 ACESSO_NEGADO          | SALVAR_TEMPO_SESSAO |
+
+  @RN-270
+  Esquema do Cenário: sem o módulo, recusa auditada
+    Dado o token da staff Ana sem "MOD-03" com "<aba>"
+    Quando ela envia <pedido>
+    Então a resposta é 403 ACESSO_NEGADO, com o cabeçalho X-Trace-Id
+    E "auditoria" fica só com o "INICIADO" da ação "<acao>", com esse traceId
+    E "auditoriaErros" ganha "ACESSO_NEGADO" com o nivel "ALERTA", com esse traceId
+    E os dois vão com "usr-ebfga-ana", a "conta-ebfga" e o alvo <alvo>
+    E o 401 do token vencido continua sem registro, como na RN-273 do 17-a
+
+    Exemplos:
+      | aba | pedido                                   | acao                | alvo              |
+      | U   | POST /usuarios                           | CRIAR_USUARIO       | nenhum            |
+      | U   | POST /usuarios/usr-ebfga-paulo/desativar | DESATIVAR_USUARIO   | "usr-ebfga-paulo" |
+      | C   | PUT /contas/conta-ebfga/tempo-sessao     | SALVAR_TEMPO_SESSAO | "conta-ebfga"     |
+      | U   | PUT /usuarios/usr-ebfga-joao/permissoes  | EDITAR_PERMISSOES   | "usr-ebfga-joao"  |
+
+  @RN-270
+  Cenário: leitura sem o módulo não é auditada
+    Dado o token da staff Ana sem "MOD-03" com "U"
+    Quando ela envia GET /usuarios?tipo=PARTICIPANTE
+    Então a resposta é 403 ACESSO_NEGADO, sem o cabeçalho X-Trace-Id
+    E as coleções "auditoria" e "auditoriaErros" não ganham registro, como a leitura da RN-178
+
+  @RN-270
+  Cenário: guardado e imutável como a auditoria
+    Dado o registro "auderr-000031" da sigla "EBFGA" repetida, gravado em 2026-11-08
+    Então ele fica guardado até 2031-11-08, 5 anos depois, como na RN-178
+    E não pode ser alterado nem apagado, como na RNF-206
+
+  @RN-270
+  Cenário: leitura recusada não é auditada
+    Quando o time deboaz envia GET /contas/conta-zzzzz
+    Então a resposta é 404 CONTA_INEXISTENTE
+    E as coleções "auditoria" e "auditoriaErros" não ganham registro
+
+  @RN-271
+  Cenário: duas execuções, dois traceIds
+    Quando a Maria envia POST /usuarios do participante Lucas
+    E depois envia POST /usuarios do participante Pedro
+    Então cada execução tem um traceId próprio, diferente do da outra
+    E os registros "INICIADO" e "CONCLUIDO" de cada uma repetem o traceId dela
+
+  @RN-271
+  Esquema do Cenário: traceId no cabeçalho da resposta
+    Quando a Maria envia <pedido>
+    Então a resposta é <resposta> com o cabeçalho X-Trace-Id
+    E o valor de X-Trace-Id é o traceId gravado em <registros>
+
+    Exemplos:
+      | pedido                               | resposta         | registros                    |
+      | POST /usuarios do participante Lucas | 201              | "INICIADO" e "CONCLUIDO"     |
+      | POST /contas com a sigla "EBFGA"     | 409 SIGLA_EM_USO | "INICIADO" e "auditoriaErros" |
+
+  @RN-271
+  Cenário: acompanhamento só pela auditoria
+    Dado o traceId "trc-7f3a9c21" de uma execução de POST /contas recusada com 409 SIGLA_EM_USO
+    Quando o time deboaz procura o que aconteceu nessa execução
+    Então encontra tudo nas coleções "auditoria" e "auditoriaErros" pelo traceId "trc-7f3a9c21"
+    E o caso de uso não escreve nada em log; o log da partida, da RNF-226 e da RNF-227, continua
+
+  @RN-271
+  Cenário: corpo que não é JSON não chega ao caso de uso
+    Quando a Maria envia POST /usuarios com o corpo "nome=Lucas", que não é JSON
+    Então a resposta é 422 DADOS_INVALIDOS com o campo "corpo", recusada antes do caso de uso
+    E a mensagem é "O campo "corpo" está faltando ou é inválido."
+    E a resposta não traz o cabeçalho X-Trace-Id
+    E as coleções "auditoria" e "auditoriaErros" não ganham registro
+    E o X-Trace-Id vale só para as respostas auditadas, com o 403 sem o módulo da RN-270
+
+  @RN-274
+  Cenário: pedido de ajuda da conta master
+    Quando envia POST /contas/esqueci-senha-master, sem login, da "Escola Bento Freitas"
+    E a resposta é 202, com o cabeçalho X-Trace-Id
+    Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "ESQUECI_SENHA_MASTER"
+    E os dois com o traceId de X-Trace-Id, sem quem e sem contaId
+    E o "CONCLUIDO" vai com o alvo "ajuda-000087", o pedido gravado em "pedidosAjuda"
+
+  @RN-274
+  Cenário: quarto pedido do dia
+    Dado 3 pedidos POST /contas/esqueci-senha-master do mesmo aparelho nas últimas 24 h
+    Quando chega o quarto
+    Então a resposta é 429 LIMITE_ATENDIMENTO, com o cabeçalho X-Trace-Id
+    E "auditoria" fica só com o "INICIADO" da ação "ESQUECI_SENHA_MASTER"
+    E "auditoriaErros" ganha o código "LIMITE_ATENDIMENTO" e o nivel "ALERTA", com o mesmo traceId
+
+  @RN-275
+  Esquema do Cenário: chamado de dentro de outra execução, com o traceId dela
+    Quando a Maria envia <pedido>
+    E a resposta é de sucesso
+    Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "<interna>"
+    E os dois com o traceId da execução do pedido, entre o "INICIADO" e o "CONCLUIDO" dela
+    E os dois com quem e contaId da execução do pedido e o alvo, o usuário do pedido
+
+    Exemplos:
+      | pedido                                            | interna                     |
+      | POST /usuarios/usr-ebfga-paulo/desativar          | ENCERRAR_SESSOES_DO_USUARIO |
+      | POST /usuarios/usr-ebfga-ana/nova-geracao-senha   | ENCERRAR_SESSOES_DO_USUARIO |
+      | POST /usuarios/usr-ebfga-lucas/novo-codigo-acesso | ENCERRAR_SESSOES_DO_USUARIO |
+      | PUT /usuarios/usr-ebfga-joao/permissoes           | AVISAR_PERMISSOES_NOVAS     |
+
+  @RN-275
+  Cenário: contratação mudou, avisada pelo Catálogo
+    Dado a execução do Catálogo com o traceId "trc-5b81e0d4", em que o Caio descontrata a Presença
+    Quando o Catálogo avisa que a contratação da EBFGA mudou
+    Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "AVISAR_CONTRATACAO_MUDOU"
+    E os dois com o traceId "trc-5b81e0d4", "usr-dboaz-caio", a "conta-ebfga" e o alvo "conta-ebfga"
+    E cada usuário da EBFGA ganha "INICIADO" e "CONCLUIDO" de "AVISAR_PERMISSOES_NOVAS"
+    E esses vão com o mesmo traceId, o Caio, a "conta-ebfga" e o usuário como alvo
+
+  @RN-275
+  Cenário: falha na execução interna
+    Quando a Maria envia POST /usuarios/usr-ebfga-paulo/desativar
+    E a gravação falha ao encerrar as sessões do Paulo
+    Então a resposta é 500 ERRO_INESPERADO, com o cabeçalho X-Trace-Id
+    E "auditoriaErros" ganha 2 registros "ERRO_INESPERADO" com o nivel "ERRO" e esse traceId
+    E um da ação "ENCERRAR_SESSOES_DO_USUARIO", o outro de "DESATIVAR_USUARIO"
+    E nenhuma das duas ações ganha "CONCLUIDO"
 
   @RN-179
   Cenário: sigla sugerida
@@ -491,11 +760,13 @@ Funcionalidade: Usuários
     Então a resposta é <resposta>
 
     Exemplos:
-      | sigla | resposta                                |
-      | ebfga | 409 SIGLA_EM_USO                        |
-      | DBOAZ | 422 SIGLA_INVALIDA, reservada ao time   |
-      | EBF   | 422 SIGLA_INVALIDA, precisa de 5 letras |
-      | COLSA | 201                                     |
+      | sigla | resposta                                            |
+      | ebfga | 409 SIGLA_EM_USO                                    |
+      | DBOAZ | 422 SIGLA_INVALIDA, reservada ao time               |
+      | QAEDU | em produção, 422 SIGLA_INVALIDA, reservada ao time  |
+      | EBF   | 422 SIGLA_INVALIDA, precisa de 5 letras             |
+      | COLSA | 201                                                 |
+      | colsa | 201, conta "conta-colsa" com a sigla "COLSA"        |
 
   @RN-242
   Esquema do Cenário: documento de cada conta
@@ -670,6 +941,13 @@ Funcionalidade: Usuários
     Quando a conta master envia POST /usuarios da Maria com a matrícula "20260087"
     Então GET /usuarios/usr-ebfga-maria traz a matrícula "20260087"
 
+  @RN-188
+  Cenário: dois participantes sem matrícula no autônomo
+    Dado o token do educador autônomo Pedro, com o participante Lucas sem matrícula
+    Quando envia POST /usuarios da participante Bia, também sem matrícula
+    Então a resposta é 201, e não 409 MATRICULA_EM_USO
+    E o Lucas e a Bia ficam os dois sem matrícula
+
   @RN-189
   Cenário: dados do card
     Dado a conta master da EBFGA, com 37 staff e 298 participantes ativos
@@ -715,6 +993,137 @@ Funcionalidade: Usuários
     Quando o administrador envia POST /usuarios/usr-dboaz-caio/nova-geracao-senha
     Então a resposta é 201 com o código de liberação para entregar ao Caio
 
+  @RN-190
+  Cenário: única conta criada no início, em todo ambiente
+    Dado o Key Vault do ambiente com a entrada "admin.dboaz@deboaz.com"
+    E a senha do administrador
+    Quando a aplicação inicia pela primeira vez, em homologação ou em produção
+    Então o administrador do deboaz passa a existir, ativo, com essa entrada e essa senha
+    E POST /auth/hub/entrar com elas devolve 200 e o papel "ADMINISTRADOR"
+
+  @RN-265
+  Esquema do Cenário: papel de cada conta qa no hub
+    Dado a aplicação de homologação iniciada
+    Quando envia POST /auth/hub/entrar com a entrada "<entrada>" e a senha do Key Vault
+    Então a resposta é 200 e o token tem o papel "<papel>"
+
+    Exemplos:
+      | entrada                   | papel         |
+      | qaadmin.dboaz@deboaz.com  | ADMINISTRADOR |
+      | qamembro.dboaz@deboaz.com | MEMBRO_TIME   |
+      | qa_instituicao@deboaz.com | MASTER        |
+      | qa_autonomo@deboaz.com    | AUTONOMO      |
+      | qastaff.qains@deboaz.com  | STAFF         |
+
+  @RN-265
+  Cenário: participante qa no quest
+    Dado a aplicação de homologação iniciada
+    Quando envia POST /auth/quest/entrar com o código "QAINS-QAPART-0001" do Key Vault
+    Então a resposta é 200 e o token tem o papel "PARTICIPANTE"
+
+  @RN-265
+  Esquema do Cenário: tipo de cada conta qa, lido por quem tem acesso
+    Dado o token de "<quem>"
+    Quando envia GET /usuarios/{id} de "<alvo>"
+    Então a resposta é 200 com o tipo "<tipo>"
+
+    Exemplos:
+      | quem                      | alvo                      | tipo         |
+      | qa_instituicao@deboaz.com | qa_instituicao@deboaz.com | MASTER       |
+      | qa_autonomo@deboaz.com    | qa_autonomo@deboaz.com    | MASTER       |
+      | qaadmin.dboaz@deboaz.com  | qamembro.dboaz@deboaz.com | MEMBRO_TIME  |
+      | qa_instituicao@deboaz.com | qastaff.qains@deboaz.com  | STAFF        |
+      | qa_instituicao@deboaz.com | QAINS-QAPART-0001         | PARTICIPANTE |
+
+  @RN-266
+  Esquema do Cenário: contas que a inicialização garante em cada ambiente
+    Quando a aplicação de <ambiente> inicia
+    Então existem <contas>
+
+    Exemplos:
+      | ambiente    | contas                                                        |
+      | homologação | o administrador, as 6 contas qa e as contas "QAINS" e "QAAUT" |
+      | produção    | só o administrador, na conta "DBOAZ"                          |
+
+  @RN-266
+  Cenário: segredo qa em produção por engano
+    Dado o Key Vault de produção com a entrada "qastaff.qains@deboaz.com" e uma senha
+    Quando a aplicação de produção inicia
+    Então nenhuma conta qa nem as contas "QAINS" e "QAAUT" são criadas
+    E POST /auth/hub/entrar com "qastaff.qains@deboaz.com" recebe 401 ENTRADA_INVALIDA
+
+  @RN-267
+  Cenário: segunda inicialização
+    Dado a staff "qastaff.qains@deboaz.com" criada na inicialização de 2026-11-05
+    Quando a aplicação de homologação inicia de novo em 2026-11-06
+    Então GET /usuarios?tipo=STAFF da "QAINS" traz uma só "qastaff.qains@deboaz.com"
+    E a auditoria não ganha um registro novo de criação dela
+
+  @RN-267
+  Cenário: senha trocada no Key Vault
+    Dado a senha de "qa_instituicao@deboaz.com" trocada no Key Vault
+    Quando a aplicação inicia
+    Então POST /auth/hub/entrar aceita só a senha nova
+    E a senha antiga recebe 401 ENTRADA_INVALIDA
+
+  @RN-267
+  Esquema do Cenário: conta qa mudada por um teste volta ao estado inicial
+    Dado <mudança> durante um teste
+    Quando a aplicação de homologação inicia de novo
+    Então <volta>
+    E só as contas qa voltam ao estado inicial
+    E "admin.dboaz@deboaz.com" fica como estava, sem volta nem mudança vinda do "qaadmin"
+
+    Exemplos:
+      | mudança                                     | volta                                         |
+      | a staff "qastaff.qains" desativada          | a staff fica ativa                            |
+      | a senha do "qamembro.dboaz" gerada de novo  | vale só a senha do Key Vault                  |
+      | "MOD-05" tirado das abas do "qastaff.qains" | o "qastaff" só com as abas da parte da staff  |
+      | "MOD-02" concedido ao "qamembro.dboaz"      | o "qamembro" só com as abas da parte do time  |
+
+  @RN-268
+  Cenário: permissões iniciais lidas do Key Vault
+    Dado o Key Vault de homologação com a lista de módulos iniciais:
+      """
+      {
+        "staff": {
+          "mods": {
+            "MOD-03": "CU",
+            "MOD-04": "U",
+            "MOD-05": "U"
+          }
+        },
+        "time": {
+          "mods": {
+            "MOD-03": "U",
+            "MOD-14": "U"
+          }
+        }
+      }
+      """
+    Quando a aplicação de homologação inicia
+    Então GET /usuarios/{id}/permissoes do "qastaff.qains@deboaz.com" traz os mods de "staff"
+    E GET /usuarios/{id}/permissoes do "qamembro.dboaz@deboaz.com" traz os mods de "time"
+
+  @RN-268
+  Cenário: contas qa com os módulos da lista contratados
+    Dado a mesma lista no Key Vault de homologação
+    Quando "qa_instituicao@deboaz.com" envia GET /usuarios/{id}/permissoes do "qastaff"
+    Então concediveis traz "MOD-03", "MOD-04" e "MOD-05", da parte "staff", com "CU"
+    E traz também os módulos da conta "MOD-08" Turmas e "MOD-09" Tarefas, que entram sozinhos
+
+  @RN-268
+  Cenário: parte do time não vira contratação
+    Dado a mesma lista no Key Vault de homologação
+    Quando a aplicação de homologação inicia
+    Então "QAINS" e "QAAUT" não contratam "MOD-14" nem nenhum módulo da parte "time"
+
+  @RN-268
+  Cenário: produção sem módulos da inicialização
+    Dado a aplicação de produção iniciada
+    Quando a conta master da EBFGA envia GET /usuarios/usr-ebfga-maria/permissoes
+    Então concediveis traz só os módulos contratados pela escola
+
   @RNF-201
   Cenário: ninguém lê a senha
     Dado a senha da Maria guardada
@@ -747,6 +1156,111 @@ Funcionalidade: Usuários
     Quando o time deboaz procura alterar ou apagar o registro
     Então nenhum endereço da API faz isso
     E o banco recusa a alteração e a remoção
+
+  @RNF-225
+  Cenário: entradas e senhas entregues na partida
+    Dado o Key Vault de homologação com a entrada e a senha de cada conta inicial
+    Quando a aplicação de homologação inicia
+    Então recebe cada entrada, senha e código como variável de ambiente lida do Key Vault
+    E nenhuma delas está no código, no repositório, na imagem nem no pipeline
+
+  @RNF-225
+  Cenário: senha fora de registros e respostas
+    Quando a aplicação cria ou confere uma conta inicial
+    Então nenhum log, registro de auditoria ou resposta traz a senha ou o código
+    E no banco fica só o resumo irreversível da senha, como na RNF-201
+
+  @RNF-226
+  Esquema do Cenário: aplicação não inicia sem o segredo
+    Dado a aplicação de <ambiente> sem <segredo>
+    Quando ela inicia
+    Então para antes de aceitar o primeiro pedido
+    E o log diz o nome da variável que falta, nunca um valor
+
+    Exemplos:
+      | ambiente    | segredo                                   |
+      | produção    | a senha do administrador                  |
+      | homologação | a entrada do administrador                |
+      | homologação | a senha do administrador qa "qaadmin"     |
+      | homologação | a senha da staff "qastaff.qains"          |
+      | homologação | o código do participante "QAINS-QAPART"   |
+      | homologação | a lista de módulos iniciais das contas qa |
+
+  @RNF-226
+  Cenário: senha fraca no Key Vault
+    Dado a senha "Gu#B5" no Key Vault para "qastaff.qains@deboaz.com"
+    Quando a aplicação de homologação inicia
+    Então para antes de aceitar o primeiro pedido, porque a senha não segue a RNF-202
+
+  @RNF-227
+  Esquema do Cenário: coleção pronta antes do primeiro pedido
+    Dado o banco de homologação vazio
+    Quando a aplicação inicia
+    Então antes de aceitar o primeiro pedido, a coleção "<colecao>" existe
+    E tem os índices <indices>
+
+    Exemplos:
+      | colecao            | indices                                                       |
+      | contas             | sigla único, dominio único, documentoNumeros                  |
+      | usuarios           | login único, contaId+nomeCurto único                          |
+      | usuarios           | contaId+matricula único só com matrícula                      |
+      | usuarios           | contaId+tipo+estado+nome                                      |
+      | auditoria          | contaId+quando, traceId, sem prazo de expiração               |
+      | auditoriaErros     | traceId, contaId+quando, sem prazo de expiração               |
+      | geracoesSenha      | usuarioId+pedidaEm↓, resumoComprovante, contaId+pedidaEm      |
+      | registrosPermissao | usuarioId+em↓+versao↓                                         |
+      | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205             |
+
+  @RNF-227
+  Cenário: segunda partida não duplica
+    Dado a aplicação de homologação iniciada em 2026-11-05, com as 7 coleções e seus índices
+    Quando ela inicia de novo em 2026-11-06
+    Então cada coleção continua uma só, com os mesmos índices, nenhum repetido
+    E nenhum documento das coleções é apagado nem duplicado
+
+  @RNF-227
+  Esquema do Cenário: índice que não pode ser criado
+    Dado <impedimento> na coleção "<colecao>"
+    Quando a aplicação inicia
+    Então o índice <indice> não é criado
+    E o log cita o nome do índice e da coleção, nunca o valor que impediu
+    E a aplicação <resultado>
+
+    Exemplos:
+      | colecao       | indice            | impedimento                | resultado                 |
+      | contas        | sigla único       | duas contas com "EBFGA"    | para antes do 1º pedido   |
+      | usuarios      | login único       | dois usuários com um login | para antes do 1º pedido   |
+      | contas        | sigla único       | índice único de outro nome | para antes do 1º pedido   |
+      | geracoesSenha | resumoComprovante | o banco recusa o índice    | aceita pedidos, com aviso |
+
+  @RNF-227
+  Cenário: pronta depois da partida
+    Dado a partida de homologação concluída, com as 7 coleções e seus índices prontos
+    E os módulos gravados e as contas iniciais garantidas
+    Quando envia GET /health, sem login, sem corpo nem cabeçalho
+    Então a resposta é 200, sem corpo
+
+  @RNF-227
+  Esquema do Cenário: sem resposta antes ou sem a partida
+    Dado a aplicação de homologação <situacao>
+    Quando envia GET /health, sem login
+    Então não há resposta, a conexão é recusada
+    E o processo <processo>
+
+    Exemplos:
+      | situacao                                         | processo             |
+      | ainda na partida                                 | segue na partida     |
+      | sem o índice único de sigla em "contas"          | termina com código 1 |
+      | sem a senha do administrador, como na RNF-226    | termina com código 1 |
+      | com a senha fraca "Gu#B5" de "qastaff.qains"     | termina com código 1 |
+      | com o banco fora do ar                           | termina com código 1 |
+
+  @RNF-227
+  Cenário: índice não único que não pode ser criado
+    Dado o banco recusa o índice resumoComprovante em "geracoesSenha" na partida
+    Quando envia GET /health, sem login
+    Então a resposta é 200, sem corpo
+    E o log traz um aviso com o nome do índice e da coleção, nunca o valor
 
   @exemplo-entidades
   Cenário: escola EBFGA cadastrada
@@ -844,7 +1358,7 @@ Funcionalidade: Usuários
       """
 
   @exemplo-entidades
-  Cenário: geração de senha, acesso anônimo e auditoria
+  Cenário: geração de senha, acesso anônimo, auditoria e erro
     Então a geração de senha da Maria é:
       """
       {
@@ -876,8 +1390,25 @@ Funcionalidade: Usuários
         "quem": "usr-ebfga-maria",
         "acao": "CRIAR_USUARIO",
         "alvo": "usr-ebfga-lucas",
+        "traceId": "trc-1b8e4d02",
+        "etapa": "CONCLUIDO",
         "quando": "2026-03-20T15:00:00Z",
         "guardarAte": "2031-03-20T15:00:00Z"
+      }
+      """
+    E o registro de erro da sigla repetida é:
+      """
+      {
+        "_id": "auderr-000031",
+        "traceId": "trc-7f3a9c21",
+        "contaId": null,
+        "quem": null,
+        "acao": "CRIAR_CONTA",
+        "alvo": null,
+        "codigo": "SIGLA_EM_USO",
+        "nivel": "ALERTA",
+        "quando": "2026-11-08T01:10:00Z",
+        "guardarAte": "2031-11-08T01:10:00Z"
       }
       """
 

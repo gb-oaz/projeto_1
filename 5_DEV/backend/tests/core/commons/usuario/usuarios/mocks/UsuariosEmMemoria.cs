@@ -1,5 +1,6 @@
 using Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
+using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
@@ -13,7 +14,7 @@ namespace Boaz.Core.Commons.Tests.Usuario.Usuarios.Mocks;
 /// conferências do SAC, pedidos de ajuda e contas apagadas.
 /// </summary>
 public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, ITentativasDeLiberacao, ISessoesDosUsuarios,
-    IAuditoria, IPedidosDeAjuda, IPagamentos, IIndicadores
+    IAuditoria, IAuditoriaDeErros, IPedidosDeAjuda, IPagamentos, IIndicadores
 {
     readonly Dictionary<string, UsuarioCadastrado> usuarios = [];
     readonly Dictionary<string, ContaAssinante> contas = [];
@@ -24,29 +25,31 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     TempoDoTime? tempoDoTime;
 
     /// <summary>Cria o mock e liga os casos de uso.</summary>
-    public UsuariosEmMemoria()
+    /// <param name="ambiente">O AMBIENTE da aplicação (hml ou prd).</param>
+    public UsuariosEmMemoria(string ambiente = "prd")
     {
-        ListarUsuarios = new ListarUsuarios(this, this, this, Relogio);
-        LerUsuario = new LerUsuario(this, this, this, Relogio);
-        CriarUsuario = new CriarUsuario(this, this, this, this, Relogio);
-        EditarUsuario = new EditarUsuario(this, this, this, this, Relogio);
-        GerarSenha = new GerarSenha(this, this, this, this, this, Relogio);
-        PedirNovaGeracaoDeSenha = new PedirNovaGeracaoDeSenha(this, this, this, this, this, Relogio);
-        GerarNovoCodigoDeAcesso = new GerarNovoCodigoDeAcesso(this, this, this, this, Relogio);
-        DesativarUsuario = new DesativarUsuario(this, this, this, this, Relogio);
-        ReativarUsuario = new ReativarUsuario(this, this, this, Relogio);
-        LerCardDeUsuarios = new LerCardDeUsuarios(this, this, this, this, Relogio);
-        CriarConta = new CriarConta(this, this, this, Relogio);
+        ListarUsuarios = new ListarUsuarios(this, this, Relogio);
+        LerUsuario = new LerUsuario(this, this, Relogio);
+        CriarUsuario = new CriarUsuario(this, this, this, this, this, Relogio);
+        EditarUsuario = new EditarUsuario(this, this, this, this, this, Relogio);
+        GerarSenha = new GerarSenha(this, this, this, this, this, this, Relogio);
+        PedirNovaGeracaoDeSenha = new PedirNovaGeracaoDeSenha(this, this, this, this, this, this, Relogio);
+        GerarNovoCodigoDeAcesso = new GerarNovoCodigoDeAcesso(this, this, this, this, this, Relogio);
+        DesativarUsuario = new DesativarUsuario(this, this, this, this, this, Relogio);
+        ReativarUsuario = new ReativarUsuario(this, this, this, this, Relogio);
+        LerCardDeUsuarios = new LerCardDeUsuarios(this, this, this, Relogio);
+        CriarConta = new CriarConta(this, this, this, Relogio, new AmbienteDaAplicacao(ambiente));
         SugerirSigla = new SugerirSigla(this);
-        PedirAjudaDaMaster = new PedirAjudaDaMaster(this, Relogio);
-        ListarContas = new ListarContas(this, this, this, Relogio);
-        LerConta = new LerConta(this, this, this, this, Relogio);
-        MudarEstadoDaConta = new MudarEstadoDaConta(this, this, this, this, Relogio);
-        GerarCodigoDaMaster = new GerarCodigoDaMaster(this, this, this, this, this, this, Relogio);
-        LerTempoDaConta = new LerTempoDaConta(this, this, this, Relogio);
-        SalvarTempoDaConta = new SalvarTempoDaConta(this, this, this, Relogio);
-        LerTempoDoTime = new LerTempoDoTime(this, this, this, Relogio);
-        SalvarTempoDoTime = new SalvarTempoDoTime(this, this, this, Relogio);
+        PedirAjudaDaMaster = new PedirAjudaDaMaster(this, this, this, Relogio);
+        ListarContas = new ListarContas(this, this, Relogio);
+        LerConta = new LerConta(this, this, this, Relogio);
+        MudarEstadoDaConta = new MudarEstadoDaConta(this, this, this, this, this, Relogio);
+        GerarCodigoDaMaster = new GerarCodigoDaMaster(this, this, this, this, this, this, this, Relogio);
+        LerTempoDaConta = new LerTempoDaConta(this, this, Relogio);
+        SalvarTempoDaConta = new SalvarTempoDaConta(this, this, this, this, Relogio);
+        LerTempoDoTime = new LerTempoDoTime(this, this, Relogio);
+        SalvarTempoDoTime = new SalvarTempoDoTime(this, this, this, this, Relogio);
+        InicializarContas = new InicializarContas(this, this, Relogio);
     }
 
     /// <summary>O relógio dos casos de uso.</summary>
@@ -94,6 +97,8 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     public ILerTempoDoTime LerTempoDoTime { get; }
     /// <summary>PUT /time/tempo-sessao.</summary>
     public ISalvarTempoDoTime SalvarTempoDoTime { get; }
+    /// <summary>A partida da aplicação.</summary>
+    public IInicializarContas InicializarContas { get; }
 
     // ── preparo do cenário ─────────────────────────────────────────────────────
 
@@ -123,6 +128,12 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     /// <summary>Um usuário como está guardado.</summary>
     public UsuarioCadastrado? Usuario(string id) => usuarios.GetValueOrDefault(id);
 
+    /// <summary>Os módulos e abas que a partida repôs em cada usuário qa (RN-268).</summary>
+    public Dictionary<string, Dictionary<string, string>> ModulosRepostos { get; } = [];
+
+    /// <summary>Os módulos em vigor que a partida deixou em cada conta qa (RN-268).</summary>
+    public Dictionary<string, List<string>> Contratacoes { get; } = [];
+
     /// <summary>Uma conta como está guardada.</summary>
     public ContaAssinante? Conta(string id) => contas.GetValueOrDefault(id);
 
@@ -141,14 +152,44 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     /// <summary>Sessões encerradas por conta, com o motivo.</summary>
     public List<(string ContaId, MotivoFim Motivo)> ContasSemSessao { get; } = [];
 
+    /// <summary>A execução de quem chama, em cada pedido de encerrar sessões (RN-275).</summary>
+    public List<ExecucaoDeQuemChama> Chamadas { get; } = [];
+
+    /// <summary>
+    /// Se não for null, o encerramento por usuário chega a este caso de uso da
+    /// Autenticação, como o adaptador real (RN-275).
+    /// </summary>
+    public IEncerrarSessoesDoUsuario? Autenticacao { get; set; }
+
     /// <summary>A auditoria inteira.</summary>
     public List<RegistroDeAuditoria> Auditoria { get; } = [];
+
+    /// <summary>Os registros de erro (auditoriaErros).</summary>
+    public List<RegistroDeErro> Erros { get; } = [];
+
+    /// <summary>
+    /// Auditoria e erros na ordem em que foram gravados, como "INICIADO",
+    /// "CONCLUIDO" ou "ALERTA SIGLA_EM_USO"; a recusa só sai do caso de uso depois.
+    /// </summary>
+    public List<string> Gravacoes { get; } = [];
+
+    /// <summary>Se não for null, IContas.Criar lança esta falha (o banco que cai no meio da gravação).</summary>
+    public Exception? FalhaAoCriarConta { get; set; }
+
+    /// <summary>Se não for null, IUsuarios.Inserir e IUsuarios.Atualizar lançam esta falha (o banco que cai no meio da gravação).</summary>
+    public Exception? FalhaAoGravarUsuario { get; set; }
 
     /// <summary>As conferências do SAC.</summary>
     public List<(string ContaId, string Quem, bool Conferiu)> Conferencias { get; } = [];
 
-    /// <summary>Os pedidos que chegaram ao SAC.</summary>
-    public List<(string Aparelho, string Instituicao, string Contato, DateTimeOffset Quando)> PedidosDeAjuda { get; } = [];
+    /// <summary>Os pedidos que chegaram ao SAC, com o id gravado em "pedidosAjuda".</summary>
+    public List<(string Id, string Aparelho, string Instituicao, string Contato, DateTimeOffset Quando)> PedidosDeAjuda { get; } = [];
+
+    /// <summary>Se não for null, IPedidosDeAjuda.Enviar lança esta falha (o banco que cai no meio da gravação).</summary>
+    public Exception? FalhaAoPedirAjuda { get; set; }
+
+    /// <summary>Se não for null, IContas.Atualizar, SalvarTempoDaConta e SalvarTempoDoTime lançam esta falha (o banco que cai).</summary>
+    public Exception? FalhaAoGravarConta { get; set; }
 
     /// <summary>As contas encerradas, com os dados apagados.</summary>
     public List<string> ContasApagadas { get; } = [];
@@ -174,13 +215,35 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     Task IUsuarios.Inserir(UsuarioCadastrado usuario, CancellationToken ct)
     {
+        if (FalhaAoGravarUsuario is { } falha) return Task.FromException(falha);
         usuarios.Add(usuario.Id, usuario);
         return Task.CompletedTask;
     }
 
     Task IUsuarios.Atualizar(UsuarioCadastrado usuario, CancellationToken ct)
     {
+        if (FalhaAoGravarUsuario is { } falha) return Task.FromException(falha);
         usuarios[usuario.Id] = usuario;
+        return Task.CompletedTask;
+    }
+
+    // upsert pelo id: o cadastro fica; a entrada, o resumo e o estado vêm de novo
+    Task<bool> IUsuarios.Garantir(UsuarioCadastrado usuario, CancellationToken ct)
+    {
+        if (usuarios.GetValueOrDefault(usuario.Id) is not { } guardado)
+        {
+            usuarios.Add(usuario.Id, usuario);
+            return Task.FromResult(true);
+        }
+        usuarios[usuario.Id] = new UsuarioCadastrado(guardado.Id, guardado.ContaId, guardado.Sigla, guardado.Tipo, guardado.Nome,
+            guardado.NomeCurto, usuario.Login, guardado.Matricula, usuario.Estado, usuario.ResumoSenha, guardado.Responsaveis,
+            guardado.CriadoPor, guardado.CriadoEm, guardado.CodigoGeradoEm, guardado.UltimoAcesso, guardado.UltimoAcessoQuem);
+        return Task.FromResult(false);
+    }
+
+    Task IUsuarios.ReporModulos(string usuarioId, IReadOnlyDictionary<string, string> mods, CancellationToken ct)
+    {
+        ModulosRepostos[usuarioId] = new Dictionary<string, string>(mods);
         return Task.CompletedTask;
     }
 
@@ -204,6 +267,7 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     Task IContas.Criar(ContaAssinante conta, UsuarioCadastrado master, GeracaoDeSenhaPedida geracao, TempoDaConta tempo, CancellationToken ct)
     {
+        if (FalhaAoCriarConta is { } falha) return Task.FromException(falha);
         contas.Add(conta.Id, conta);
         usuarios.Add(master.Id, master);
         geracoes.Add(geracao);
@@ -211,8 +275,22 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
         return Task.CompletedTask;
     }
 
+    Task<bool> IContas.Garantir(ContaAssinante conta, TempoDaConta? tempo, CancellationToken ct)
+    {
+        if (!contas.TryAdd(conta.Id, conta)) return Task.FromResult(false);
+        if (tempo is not null) temposDasContas[conta.Id] = tempo;
+        return Task.FromResult(true);
+    }
+
+    Task IContas.ReporContratacoes(ContaAssinante conta, IReadOnlySet<string> modulos, DateTimeOffset agora, CancellationToken ct)
+    {
+        Contratacoes[conta.Id] = [.. modulos.Order(StringComparer.Ordinal)];
+        return Task.CompletedTask;
+    }
+
     Task IContas.Atualizar(ContaAssinante conta, CancellationToken ct)
     {
+        if (FalhaAoGravarConta is { } falha) return Task.FromException(falha);
         contas[conta.Id] = conta;
         return Task.CompletedTask;
     }
@@ -238,6 +316,7 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     Task IContas.SalvarTempoDaConta(string contaId, TempoDaConta tempo, CancellationToken ct)
     {
+        if (FalhaAoGravarConta is { } falha) return Task.FromException(falha);
         temposDasContas[contaId] = tempo;
         return Task.CompletedTask;
     }
@@ -246,6 +325,7 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     Task IContas.SalvarTempoDoTime(TempoDoTime tempo, CancellationToken ct)
     {
+        if (FalhaAoGravarConta is { } falha) return Task.FromException(falha);
         tempoDoTime = tempo;
         return Task.CompletedTask;
     }
@@ -288,21 +368,31 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     // ── ISessoesDosUsuarios e IAuditoria ───────────────────────────────────────
 
-    Task ISessoesDosUsuarios.EncerrarDoUsuario(string usuarioId, MotivoFim motivo, CancellationToken ct)
+    Task ISessoesDosUsuarios.EncerrarDoUsuario(string usuarioId, MotivoFim motivo, ExecucaoDeQuemChama chamada, CancellationToken ct)
     {
         SessoesEncerradas.Add((usuarioId, motivo));
-        return Task.CompletedTask;
+        Chamadas.Add(chamada);
+        return Autenticacao?.Executar(usuarioId, motivo, chamada, ct) ?? Task.CompletedTask;
     }
 
-    Task ISessoesDosUsuarios.EncerrarDaConta(string contaId, MotivoFim motivo, CancellationToken ct)
+    Task ISessoesDosUsuarios.EncerrarDaConta(string contaId, MotivoFim motivo, ExecucaoDeQuemChama chamada, CancellationToken ct)
     {
         ContasSemSessao.Add((contaId, motivo));
+        Chamadas.Add(chamada);
         return Task.CompletedTask;
     }
 
     Task IAuditoria.Registrar(RegistroDeAuditoria registro, CancellationToken ct)
     {
         Auditoria.Add(registro);
+        Gravacoes.Add(registro.Etapa.Texto());
+        return Task.CompletedTask;
+    }
+
+    Task IAuditoriaDeErros.Registrar(RegistroDeErro registro, CancellationToken ct)
+    {
+        Erros.Add(registro);
+        Gravacoes.Add($"{registro.Nivel.Texto()} {registro.Codigo}");
         return Task.CompletedTask;
     }
 
@@ -311,10 +401,12 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     Task<IReadOnlyList<DateTimeOffset>> IPedidosDeAjuda.EnviosDoAparelho(string aparelho, DateTimeOffset desde, CancellationToken ct) =>
         Task.FromResult<IReadOnlyList<DateTimeOffset>>([.. PedidosDeAjuda.Where(p => p.Aparelho == aparelho && p.Quando > desde).Select(p => p.Quando)]);
 
-    Task IPedidosDeAjuda.Enviar(string aparelho, string instituicao, string contato, DateTimeOffset quando, CancellationToken ct)
+    Task<string> IPedidosDeAjuda.Enviar(string aparelho, string instituicao, string contato, DateTimeOffset quando, CancellationToken ct)
     {
-        PedidosDeAjuda.Add((aparelho, instituicao, contato, quando));
-        return Task.CompletedTask;
+        if (FalhaAoPedirAjuda is { } falha) return Task.FromException<string>(falha);
+        var id = $"ajuda-{PedidosDeAjuda.Count + 1:000000}";
+        PedidosDeAjuda.Add((id, aparelho, instituicao, contato, quando));
+        return Task.FromResult(id);
     }
 
     Task<DateOnly?> IPagamentos.UltimoPagamento(string contaId, CancellationToken ct) =>

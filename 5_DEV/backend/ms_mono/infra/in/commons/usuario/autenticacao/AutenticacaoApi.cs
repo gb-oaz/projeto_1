@@ -13,6 +13,9 @@ public sealed record SessaoAbertaNoAppCorpo(string TokenAcesso, string Tipo, int
 
 // Endereços da Autenticação (17_modulo-usuario-a-autenticacao): entrar no hub,
 // no quest e na sala, confirmar a senha, renovar, sair e os aparelhos conectados.
+// Os 8 que mudam a sessão são auditados com um traceId novo, no X-Trace-Id do
+// sucesso e da recusa (RN-272, RN-273); o token de sair e dos aparelhos é
+// conferido antes do caso de uso: recusado, sai sem traceId nem registro.
 public static class AutenticacaoApi
 {
     public const string Tag = "Autenticação";
@@ -31,7 +34,7 @@ public static class AutenticacaoApi
         var api = rotas.MapGroup("/auth").WithTags(Tag).WithGroupName(Documento);
 
         api.MapPost("/hub/entrar", async (EntradaNoHubDto? corpo, HttpContext http, IEntrarNoHub entrar, CancellationToken ct) =>
-                Aberta(http, await entrar.Executar(corpo ?? new(null, null, null), ct)))
+                Aberta(http, await entrar.Executar(corpo ?? new(null, null, null), http.NovoTraceId(), ct)))
             .WithSummary("Abrir uma sessão no hub com a entrada e a senha")
             .WithDescription("Endereço público (RF-134, RF-139, RF-140, RN-247, RNF-204). aparelho NAVEGADOR ou APP; a 5ª tentativa errada " +
                 "seguida bloqueia, e o bloqueio dobra a cada vez.")
@@ -42,7 +45,7 @@ public static class AutenticacaoApi
             .Produces<Erro>(StatusCodes.Status429TooManyRequests);
 
         api.MapPost("/quest/entrar", async (EntradaNoQuestDto? corpo, HttpContext http, IEntrarNoQuest entrar, CancellationToken ct) =>
-                Aberta(http, await entrar.Executar(corpo ?? new(null, null, null), ct)))
+                Aberta(http, await entrar.Executar(corpo ?? new(null, null, null), http.NovoTraceId(), ct)))
             .WithSummary("Abrir uma sessão no quest com o código de acesso")
             .WithDescription("Endereço público (RF-135, RF-139, RF-140, RN-228): o participante, ou o responsável com o código dele.")
             .Produces<SessaoAbertaNoAppCorpo>()
@@ -52,7 +55,7 @@ public static class AutenticacaoApi
             .Produces<Erro>(StatusCodes.Status429TooManyRequests);
 
         api.MapPost("/hub/confirmar-senha", async (ConfirmacaoDeSenhaDto? corpo, HttpContext http, IConfirmarSenha confirmar, CancellationToken ct) =>
-                Aberta(http, await confirmar.Executar(corpo ?? new(null), ct)))
+                Aberta(http, await confirmar.Executar(corpo ?? new(null), http.NovoTraceId(), ct)))
             .WithSummary("Confirmar que a senha gerada foi anotada e já entrar no hub")
             .WithDescription("Endereço público (RF-143): o comprovante entregue com a senha vale uma vez, por 72 h.")
             .Produces<SessaoAbertaNoAppCorpo>()
@@ -60,7 +63,7 @@ public static class AutenticacaoApi
             .Produces<Erro>(StatusCodes.Status422UnprocessableEntity);
 
         api.MapPost("/sala/entrar", async (EntradaNaSalaDto? corpo, HttpContext http, IEntrarNaSala entrar, CancellationToken ct) =>
-                Aberta(http, await entrar.Executar(corpo ?? new(null), ct)))
+                Aberta(http, await entrar.Executar(corpo ?? new(null), http.NovoTraceId(), ct)))
             .WithSummary("Participar de uma sala ao vivo sem código de acesso")
             .WithDescription("Endereço público (RF-136, RN-231): papel ANONIMO, só com o módulo e o id da sala no token.")
             .Produces<SessaoAbertaCorpo>()
@@ -68,16 +71,20 @@ public static class AutenticacaoApi
             .Produces<Erro>(StatusCodes.Status422UnprocessableEntity);
 
         api.MapPost("/renovar", async (HttpContext http, IRenovarSessao renovar, CancellationToken ct) =>
-                Aberta(http, await renovar.Executar(new RenovacaoDto(await TokenDeRenovacao(http, ct)), ct)))
+            {
+                var pedido = new RenovacaoDto(await TokenDeRenovacao(http, ct));
+                return Aberta(http, await renovar.Executar(pedido, http.NovoTraceId(), ct));
+            })
             .WithSummary("Trocar o token de acesso vencido por um novo")
             .WithDescription("Com o token de renovação, não o de acesso (RF-137, RF-148, RNF-213, RNF-214): o cookie deboaz_renovacao na " +
                 "web, \"tokenRenovacao\" no corpo no app. A renovação anterior deixa de valer; usá-la de novo encerra a sessão.")
             .Produces<SessaoAbertaNoAppCorpo>()
             .Produces<Erro>(StatusCodes.Status401Unauthorized);
 
-        api.MapPost("/sair", async (HttpContext http, ISairDoAparelho sair, CancellationToken ct) =>
+        api.MapPost("/sair", async (HttpContext http, IConferirAcesso conferir, ISairDoAparelho sair, CancellationToken ct) =>
             {
-                await sair.Executar(Conferencia(http), ct);
+                var acesso = await conferir.Executar(Conferencia(http), ct);
+                await sair.Executar(acesso, http.NovoTraceId(), ct);
                 http.Response.Cookies.Delete(Cookie, OpcoesDoCookie());
                 return Results.NoContent();
             })
@@ -94,9 +101,11 @@ public static class AutenticacaoApi
             .Produces<IReadOnlyList<SessaoListadaDto>>()
             .Produces<Erro>(StatusCodes.Status401Unauthorized);
 
-        api.MapDelete("/sessoes/{sid}", async (string sid, HttpContext http, IEncerrarSessao encerrar, CancellationToken ct) =>
+        api.MapDelete("/sessoes/{sid}", async (string sid, HttpContext http, IConferirAcesso conferir, IEncerrarSessao encerrar,
+                CancellationToken ct) =>
             {
-                await encerrar.Executar(DoHub(http), sid, ct);
+                var acesso = await conferir.Executar(DoHub(http), ct);
+                await encerrar.Executar(acesso, sid, http.NovoTraceId(), ct);
                 return Results.NoContent();
             })
             .ComLogin()
@@ -106,9 +115,10 @@ public static class AutenticacaoApi
             .Produces<Erro>(StatusCodes.Status401Unauthorized)
             .Produces<Erro>(StatusCodes.Status404NotFound);
 
-        api.MapDelete("/sessoes", async (HttpContext http, IEncerrarTodasAsSessoes encerrar, CancellationToken ct) =>
+        api.MapDelete("/sessoes", async (HttpContext http, IConferirAcesso conferir, IEncerrarTodasAsSessoes encerrar, CancellationToken ct) =>
             {
-                await encerrar.Executar(DoHub(http), ct);
+                var acesso = await conferir.Executar(DoHub(http), ct);
+                await encerrar.Executar(acesso, http.NovoTraceId(), ct);
                 return Results.NoContent();
             })
             .ComLogin()

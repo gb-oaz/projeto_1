@@ -1,4 +1,4 @@
-O que cada pessoa pode fazer no hub: módulos e abas. Requisito: `1_Requisitos/17_modulo-usuario-b-autorizacao.html` · contrato: `autorizacao-contrato-api`.
+O que cada pessoa pode fazer no hub: módulos e abas. Requisito: `1_Requisitos/17_modulo-usuario-b-autorizacao.md` · contrato: `autorizacao-contrato-api`.
 
 ## Permissões
 

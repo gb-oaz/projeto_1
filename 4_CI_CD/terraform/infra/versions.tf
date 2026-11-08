@@ -1,5 +1,5 @@
 # =============================================================================
-# Versões e provider — requisito 1_Requisitos/05_cd-implantacao.html
+# Versões e provider — requisito 1_Requisitos/05_cd-implantacao.md
 #   RNF-55  um módulo raiz, sem módulos próprios; ambientes só nos .tfvars
 #   RNF-56  estado na storage account do grupo de recursos de cada ambiente
 #   RNF-57  versões fixadas (Stack de desenvolvimento RN-01)

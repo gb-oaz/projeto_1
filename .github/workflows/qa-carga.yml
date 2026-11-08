@@ -1,6 +1,6 @@
 # =============================================================================
-# QA · carga em homologação — requisito 1_Requisitos/03_ci-qualidade.html
-# (RNF-195) e 1_Requisitos/14_estrutura-projetos.html (RN-155, RN-156)
+# QA · carga em homologação — requisito 1_Requisitos/03_ci-qualidade.md
+# (RNF-195) e 1_Requisitos/14_estrutura-projetos.md (RN-155, RN-156)
 # =============================================================================
 #
 # Disparo manual (Actions → QA · carga → Run workflow), só na master: gera a

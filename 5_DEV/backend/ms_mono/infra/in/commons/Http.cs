@@ -49,12 +49,18 @@ public static class Http
             writer.WriteStringValue(value.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture));
     }
 
-    // JSON das APIs: camelCase (padrão da web) e datas em UTC.
-    public static IServiceCollection AddJsonDasApis(this IServiceCollection servicos) =>
-        servicos.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new DataHoraUtc()));
+    // JSON das APIs: camelCase (padrão da web) e datas em UTC. O corpo JSON
+    // quebrado lança BadHttpRequestException em todo ambiente — fora do Development o padrão é responder 400 vazio, sem passar
+    // pelo UseRespostasDeErro —, e vira o 422 DADOS_INVALIDOS do contrato (RN-271).
+    public static IServiceCollection AddJsonDasApis(this IServiceCollection servicos) => servicos
+        .ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new DataHoraUtc()))
+        .Configure<RouteHandlerOptions>(o => o.ThrowOnBadRequest = true);
 
     // Falhas dos casos de uso viram a resposta de erro do contrato; corpo que não
-    // é JSON (ou com o tipo errado num campo) responde 422 DADOS_INVALIDOS.
+    // é JSON, com outro content-type (o 415 da ligação do corpo) ou com o tipo
+    // errado num campo, responde 422 DADOS_INVALIDOS; a falha
+    // inesperada responde 500 ERRO_INESPERADO, sem detalhe da exceção, com o
+    // X-Trace-Id da execução quando o pedido já o tinha (RN-270, RN-271).
     public static WebApplication UseRespostasDeErro(this WebApplication app)
     {
         app.Use(async (contexto, proximo) =>
@@ -62,10 +68,17 @@ public static class Http
             try
             {
                 await proximo(contexto);
+                if (contexto.Response.StatusCode == StatusCodes.Status415UnsupportedMediaType && !contexto.Response.HasStarted)
+                {
+                    contexto.Response.Clear();
+                    contexto.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+                    await contexto.Response.WriteAsJsonAsync(CorpoInvalido);
+                }
             }
             catch (Exception falha) when (Traduzir(falha) is { } traduzida && !contexto.Response.HasStarted)
             {
                 contexto.Response.Clear();
+                ManterTraceId(contexto);
                 contexto.Response.StatusCode = traduzida.Status;
                 await contexto.Response.WriteAsJsonAsync(traduzida.Erro);
             }
@@ -73,14 +86,46 @@ public static class Http
         return app;
     }
 
+    // A resposta do corpo que não é JSON (RN-271). Com outro content-type, a
+    // ligação do corpo responde 415 sem lançar exceção nem chegar ao caso de uso:
+    // o UseRespostasDeErro troca esse 415 por 422 DADOS_INVALIDOS no campo
+    // "corpo", sem X-Trace-Id, porque nenhuma execução começou.
+    static readonly Erro CorpoInvalido = new("DADOS_INVALIDOS", "O campo \"corpo\" está faltando ou é inválido.", "corpo");
+
+    // O cabeçalho com o traceId de cada execução auditada (RN-271).
+    public const string CabecalhoDoTraceId = "X-Trace-Id";
+
+    // Um traceId novo para a execução auditada (RN-271), já no cabeçalho
+    // X-Trace-Id da resposta; a recusa o mantém (UseRespostasDeErro). Se a
+    // execução já começou no filtro da rota (ComAcesso auditado, RN-270), é o
+    // mesmo traceId: um por execução.
+    public static TraceId NovoTraceId(this HttpContext contexto)
+    {
+        if (contexto.Items[typeof(TraceId)] is TraceId atual) return atual;
+        var traceId = TraceId.Novo();
+        contexto.Items[typeof(TraceId)] = traceId;
+        contexto.Response.Headers[CabecalhoDoTraceId] = traceId.Valor;
+        return traceId;
+    }
+
+    // Response.Clear() apaga os cabeçalhos: a recusa repõe o X-Trace-Id da execução.
+    static void ManterTraceId(HttpContext contexto)
+    {
+        if (contexto.Items[typeof(TraceId)] is TraceId traceId) contexto.Response.Headers[CabecalhoDoTraceId] = traceId.Valor;
+    }
+
+    // A resposta da falha inesperada (RN-270): nada da exceção sai para fora.
+    public static readonly Erro ErroInesperado = new(RegistroDeErro.ErroInesperado, "Algo deu errado. Tente de novo mais tarde.");
+
+    // O status e o corpo de cada falha; null só para o pedido cancelado, que não tem a quem responder.
     public static (int Status, Erro Erro)? Traduzir(Exception falha) => falha switch
     {
         FalhaDeUsuarios f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, f.TentarEm, f.Minimo, f.Maximo)),
         FalhaDeAutenticacao f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, f.TentarEm)),
         FalhaDeAutorizacao f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Mod: f.Mod, Abas: f.Abas, Versao: f.Versao)),
-        BadHttpRequestException => (StatusCodes.Status422UnprocessableEntity,
-            new Erro("DADOS_INVALIDOS", "O campo \"corpo\" está faltando ou é inválido.", "corpo")),
-        _ => null,
+        BadHttpRequestException => (StatusCodes.Status422UnprocessableEntity, CorpoInvalido),
+        OperationCanceledException => null,
+        _ => (StatusCodes.Status500InternalServerError, ErroInesperado),
     };
 
     static int Status(GrupoUsuarios grupo) => grupo switch
@@ -145,16 +190,42 @@ public static class Http
         rota.AddEndpointFilter(async (contexto, proximo) =>
         {
             var http = contexto.HttpContext;
-            var servicos = http.RequestServices;
-            var acesso = await servicos.GetRequiredService<IConferirAcesso>()
-                .Executar(new ConferenciaDeAcessoDto(Token(http), frente), http.RequestAborted);
-            servicos.GetRequiredService<IAutorizarPedido>().Executar(exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods));
+            var acesso = await Conferir(http, frente);
+            http.RequestServices.GetRequiredService<IAutorizarPedido>().Executar(exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods));
             http.Items[typeof(AcessoConferido)] = acesso;
             return await proximo(contexto);
         })
         .ComLogin()
         .Produces<Erro>(StatusCodes.Status401Unauthorized)
         .Produces<Erro>(StatusCodes.Status403Forbidden);
+
+    // O endereço que muda estado (RN-270): o token é conferido como em ComAcesso,
+    // e o 401 sai sem registro; o 403 por faltar o módulo grava o "INICIADO" da
+    // ação e o ALERTA ACESSO_NEGADO, com quem e a conta do token, o alvo do
+    // endereço e o traceId do X-Trace-Id, que o caso de uso reaproveita quando a
+    // rota atende (RN-271).
+    public static RouteHandlerBuilder ComAcesso(this RouteHandlerBuilder rota, ExigenciaDaRota exigencia, AcaoAuditada acao,
+        Func<HttpContext, string?> alvo, Frente frente = Frente.Hub) =>
+        rota.AddEndpointFilter(async (contexto, proximo) =>
+        {
+            var http = contexto.HttpContext;
+            var acesso = await Conferir(http, frente);
+            var execucao = new ExecucaoDaRotaDto(http.NovoTraceId(), acao, acesso.ContaId, acesso.Sub, alvo(http));
+            await http.RequestServices.GetRequiredService<IAutorizarPedidoAuditado>()
+                .Executar(exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods), execucao, http.RequestAborted);
+            http.Items[typeof(AcessoConferido)] = acesso;
+            return await proximo(contexto);
+        })
+        .ComLogin()
+        .Produces<Erro>(StatusCodes.Status401Unauthorized)
+        .Produces<Erro>(StatusCodes.Status403Forbidden);
+
+    // O alvo do endereço: o {id} da rota.
+    public static string? IdDaRota(HttpContext contexto) => contexto.Request.RouteValues["id"]?.ToString();
+
+    // O token do pedido, conferido pela Autenticação (assinatura, sessão viva e pv atual).
+    static Task<AcessoConferido> Conferir(HttpContext http, Frente frente) =>
+        http.RequestServices.GetRequiredService<IConferirAcesso>().Executar(new ConferenciaDeAcessoDto(Token(http), frente), http.RequestAborted);
 
     // Marca a rota como "com login": a documentação põe o cadeado do Bearer nela
     // (DocumentacaoApi). Quem confere o token é o filtro ou o caso de uso.

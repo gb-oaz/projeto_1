@@ -5,7 +5,7 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 
 namespace Boaz.Qa.Integracao.Commons.Autenticacao;
 
-// Passos dos Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.html.
+// Passos dos Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.md.
 //
 // Como funciona: cada linha Dado/Quando/Então/E do autenticacao.feature procura
 // aqui um método cujo atributo [Given]/[When]/[Then] tenha uma expressão
@@ -26,7 +26,7 @@ namespace Boaz.Qa.Integracao.Commons.Autenticacao;
 // O estado do cenário (pessoas, sessões, última resposta) fica no Mundo, que o
 // Reqnroll cria e injeta pelo construtor a cada cenário.
 [Binding]
-public sealed class AutenticacaoPassos(Mundo mundo)
+public sealed class AutenticacaoPassos(Mundo mundo, Execucoes execucoes)
 {
     const string SenhaErrada = "Senha#Errada1";
     const string SoNoBackend = "conferido nos testes do backend: o qa não olha o banco nem o cache";
@@ -237,10 +237,12 @@ public sealed class AutenticacaoPassos(Mundo mundo)
     [When(@"^a Maria entra no hub pelo navegador, com o tempo de 8 h da escola$")]
     public Task MariaEntraNoNavegador() => MariaEntra(Navegador);
 
+    // auditado (RN-272, RN-273): a Maria é criada antes da marca
     async Task MariaEntra(string aparelho)
     {
         var maria = await mundo.Maria();
-        if (mundo.Registrar(maria, aparelho, await mundo.Enviar("POST", "/auth/hub/entrar", Entrada(maria, maria.Senha, aparelho))) is { } sessao)
+        var r = await execucoes.Executar(() => mundo.Enviar("POST", "/auth/hub/entrar", Entrada(maria, maria.Senha, aparelho)));
+        if (mundo.Registrar(maria, aparelho, r) is { } sessao)
         {
             mundo.Atual = sessao;
         }
@@ -507,11 +509,12 @@ public sealed class AutenticacaoPassos(Mundo mundo)
 
     // ── renovar ─────────────────────────────────────────────────────────────
     [When(@"^envia POST /auth/renovar(?: com o cookie)?$")]
+    // sem sessão citada no Dado, é a da Maria no navegador (RN-272); auditado
     public async Task Renova()
     {
-        var sessao = mundo.Atual!;
+        var sessao = mundo.Atual ??= await mundo.SessaoDe(await mundo.Maria(), Navegador);
         (acessoAnterior, renovacaoAnterior) = (sessao.Acesso, sessao.Renovacao);
-        await mundo.RenovarEGuardar(sessao);
+        await execucoes.Executar(() => mundo.RenovarEGuardar(sessao));
     }
 
     [Then(@"^a resposta é 200 com um tokenAcesso novo e um cookie de renovação novo$")]

@@ -20,7 +20,7 @@
 //   const svg = animado('acertou', { forma: 'quadrado', cor: temas[paleta].cor ?? undefined });
 //   img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 // Com movimento reduzido, use estatico(...) no lugar de animado(...).
-// Regras de uso: 1_Requisitos/06_design-system-telas.html e o catálogo design-system.html#mascotes.
+// Regras de uso: 1_Requisitos/06_design-system-telas.md e o catálogo design-system.html#mascotes.
 // =============================================================================
 const W = 256;
 

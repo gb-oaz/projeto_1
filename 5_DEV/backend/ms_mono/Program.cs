@@ -15,6 +15,7 @@ using Boaz.MsMono.Infra.Out.Commons.Usuario.Autenticacao;
 using Boaz.MsMono.Infra.Out.Commons.Usuario.Autorizacao;
 using Boaz.MsMono.Infra.Out.Commons.Usuario.Usuarios;
 using Boaz.MsMono.Sistema;
+using Microsoft.Extensions.Options;
 using Autenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Ports.Out;
 using Autorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 
@@ -27,10 +28,13 @@ servicos.AddConfiguracoes();
 servicos.AddDocumentacaoApi();
 servicos.AddJsonDasApis();
 servicos.AddSingleton(TimeProvider.System);
+// AMBIENTE (hml ou prd): só homologação tem as contas qa (17 RN-179, RN-266)
+servicos.AddSingleton(new Boaz.Core.Commons.Usuario.Usuarios.Domain.AmbienteDaAplicacao(
+    builder.Configuration[Boaz.Core.Commons.Usuario.Usuarios.Domain.ContasIniciais.VariavelDoAmbiente]));
 
-// ── infra/out: banco, cache e o time deboaz ──────────────────────────────────
+// ── infra/out: banco, cache, índices e o registro de módulos ─────────────────
 servicos.AddSingleton<Armazenamento>();
-servicos.AddSingleton<TimeDeboaz>();
+servicos.AddSingleton<Indices>();
 servicos.AddSingleton<RegistroDeModulos>();
 
 // commons/usuario/usuarios
@@ -39,6 +43,7 @@ servicos.AddSingleton<IContas, ContasNoBanco>();
 servicos.AddSingleton<IGeracoesDeSenha, GeracoesNoBanco>();
 servicos.AddSingleton<RegistrosNoBanco>();
 servicos.AddSingleton<IAuditoria>(s => s.GetRequiredService<RegistrosNoBanco>());
+servicos.AddSingleton<IAuditoriaDeErros>(s => s.GetRequiredService<RegistrosNoBanco>());
 servicos.AddSingleton<IPedidosDeAjuda>(s => s.GetRequiredService<RegistrosNoBanco>());
 servicos.AddSingleton<IPagamentos>(s => s.GetRequiredService<RegistrosNoBanco>());
 servicos.AddSingleton<IIndicadores, IndicadoresNoBanco>();
@@ -103,15 +108,20 @@ servicos.AddSingleton<IMudarEstadoDaConta, MudarEstadoDaConta>();
 servicos.AddSingleton<IGerarCodigoDaMaster, GerarCodigoDaMaster>();
 servicos.AddSingleton<ILerTempoDoTime, LerTempoDoTime>();
 servicos.AddSingleton<ISalvarTempoDoTime, SalvarTempoDoTime>();
+servicos.AddSingleton<IInicializarContas, InicializarContas>();
 
 // commons/usuario/autorizacao
 servicos.AddSingleton<ICalcularPermissoes, CalcularPermissoes>();
 servicos.AddSingleton<ICalcularPermissoesDoAnonimo, CalcularPermissoesDoAnonimo>();
 servicos.AddSingleton<IAutorizarPedido, AutorizarPedido>();
+servicos.AddSingleton<IAutorizarPedidoAuditado, AutorizarPedidoAuditado>();
 servicos.AddSingleton<ILerPermissoes, LerPermissoes>();
 servicos.AddSingleton<ISalvarPermissoes, SalvarPermissoes>();
 servicos.AddSingleton<ILerHistoricoDePermissoes, LerHistoricoDePermissoes>();
 servicos.AddSingleton<IAvisarContratacaoMudou, AvisarContratacaoMudou>();
+
+// ── infra/in: a partida, antes do primeiro pedido ────────────────────────────
+servicos.AddSingleton<Partida>();
 
 var app = builder.Build();
 
@@ -130,22 +140,31 @@ app.MapAutenticacao();
 app.MapUsuarios();
 app.MapAutorizacao();
 
-// o registro de módulos e o time deboaz ficam no banco desde a partida; sem
-// banco no ar, o backend sobe assim mesmo e o primeiro uso tenta de novo
-app.Lifetime.ApplicationStarted.Register(() => _ = Task.Run(async () =>
+// A partida, antes de aceitar pedidos (usuario-inicializacao-sequencia): a
+// configuração conferida, o registro de módulos, os índices e as contas
+// iniciais do Key Vault (RN-190, RN-265 a RN-267). Segredo ausente ou senha
+// fraca (RNF-226), índice único que não pôde ser criado (RNF-227) ou banco
+// fora do ar: termina com código 1, sem /health.
+app.Services.GetService<IStartupValidator>()?.Validate();
+bool pronta;
+try
 {
-    try
-    {
-        await app.Services.GetRequiredService<RegistroDeModulos>().Gravar();
-        await app.Services.GetRequiredService<TimeDeboaz>().Garantir();
-    }
-    catch (Exception erro) when (erro is MongoDB.Driver.MongoException or TimeoutException)
-    {
-        app.Logger.LogWarning(erro, "Banco fora do ar na partida: o registro de módulos e o time deboaz ficam para o primeiro uso");
-    }
-}));
+    pronta = await app.Services.GetRequiredService<Partida>().Executar();
+}
+catch (Exception erro) when (erro is MongoDB.Driver.MongoException or TimeoutException)
+{
+    app.Logger.LogCritical("A aplicação não inicia: o banco não respondeu na partida ({Erro})", erro.GetType().Name);
+    pronta = false;
+}
+if (!pronta)
+{
+    // o log do console é assíncrono: descartar a aplicação o esvazia
+    await app.DisposeAsync();
+    return 1;
+}
 
 app.Run();
+return 0;
 
 // Para os testes de integração (WebApplicationFactory<Program>)
 public partial class Program;

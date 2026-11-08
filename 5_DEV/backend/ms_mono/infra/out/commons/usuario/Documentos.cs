@@ -11,8 +11,18 @@ namespace Boaz.MsMono.Infra.Out.Commons.Usuario;
 // Autorização o subdocumento "permissoes".
 public static class Documentos
 {
-    // Campos do cadastro, os que o módulo Usuários grava.
-    public static BsonDocument DoCadastro(UsuarioCadastrado u) => new()
+    // Campos do cadastro, os que o módulo Usuários grava. Sem matrícula (o
+    // autônomo e o time, RN-188), o campo fica ausente, não null: o índice
+    // único contaId+matricula só vale com o campo presente, e o Cosmos DB conta
+    // dois null como repetidos (identidade-acesso-documentos v12).
+    public static BsonDocument DoCadastro(UsuarioCadastrado u)
+    {
+        var d = Cadastro(u);
+        if (u.Matricula is not null) d.InsertAt(d.IndexOfName("login") + 1, new BsonElement("matricula", u.Matricula));
+        return d;
+    }
+
+    static BsonDocument Cadastro(UsuarioCadastrado u) => new()
     {
         ["contaId"] = u.ContaId,
         ["sigla"] = u.Sigla,
@@ -20,7 +30,6 @@ public static class Documentos
         ["nome"] = u.Nome,
         ["nomeCurto"] = u.NomeCurto,
         ["login"] = u.Login,
-        ["matricula"] = Bson.Valor(u.Matricula),
         ["estado"] = u.Estado.Texto(),
         ["resumoSenha"] = Bson.Valor(u.ResumoSenha),
         ["responsaveis"] = new BsonArray(u.Responsaveis.Select(r => new BsonDocument { ["nome"] = r.Nome, ["parentesco"] = r.Parentesco })),

@@ -1,4 +1,5 @@
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
+using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 
@@ -9,5 +10,6 @@ public interface IConfirmarSenha
     /// <exception cref="Domain.FalhaDeAutenticacao">
     /// DADOS_INVALIDOS, COMPROVANTE_INVALIDO ou ACESSO_INDISPONIVEL.
     /// </exception>
-    Task<SessaoAbertaDto> Executar(ConfirmacaoDeSenhaDto pedido, CancellationToken ct = default);
+    /// <remarks>Auditado com o traceId da execução, devolvido no X-Trace-Id (RN-272, RN-273).</remarks>
+    Task<SessaoAbertaDto> Executar(ConfirmacaoDeSenhaDto pedido, TraceId traceId, CancellationToken ct = default);
 }

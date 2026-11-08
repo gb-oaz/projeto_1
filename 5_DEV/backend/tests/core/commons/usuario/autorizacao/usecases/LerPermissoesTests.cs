@@ -57,7 +57,7 @@ public class LerPermissoesTests
         await mundo.Conceder("usr-ebfga-maria", ("MOD-06", "U"));
 
         mundo.Mock.Descontratar("conta-ebfga", "MOD-06");
-        await mundo.Mock.AvisarContratacaoMudou.Executar("conta-ebfga");
+        await mundo.Mock.AvisarContratacaoMudou.Executar("conta-ebfga", Catalogo);
 
         Assert.DoesNotContain("MOD-06", (await mundo.Ler("usr-ebfga-master", "usr-ebfga-maria")).Mods.Keys);
         var token = await mundo.Token("usr-ebfga-maria");

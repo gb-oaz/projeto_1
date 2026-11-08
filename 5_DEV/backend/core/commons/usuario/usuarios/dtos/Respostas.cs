@@ -163,3 +163,12 @@ public sealed record TempoDoTimeLidoDto(string MembrosNavegador, string MembrosA
     public static TempoDoTimeLidoDto De(TempoDoTime t) =>
         new(Textos.IsoEmHoras(t.MembrosNavegador), Textos.IsoEmHoras(t.MembrosApp), Textos.IsoEmHoras(t.MastersNavegador), Textos.IsoEmHoras(t.MastersApp));
 }
+
+/// <summary>
+/// O que a inicialização garantiu (RN-267): os ids, sem entrada, senha nem
+/// código (RNF-225).
+/// </summary>
+/// <param name="Contas">Ids das contas garantidas.</param>
+/// <param name="Usuarios">Ids dos usuários garantidos.</param>
+/// <param name="Criados">Os ids que nasceram agora; os outros já existiam.</param>
+public sealed record ContasGarantidasDto(IReadOnlyList<string> Contas, IReadOnlyList<string> Usuarios, IReadOnlyList<string> Criados);

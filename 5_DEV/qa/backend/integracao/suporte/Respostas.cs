@@ -14,12 +14,16 @@ public sealed class Respostas(Mundo mundo)
     [Then(@"^a resposta é (\d{3}) ([A-Z_]+)$")]
     public void StatusECodigo(int status, string codigo) => Confere(mundo.Ultima, status, codigo);
 
-    [Then(@"^a resposta é (\d{3}) ([A-Z_]+) com ""(.*)""$")]
+    [Then(@"^a resposta é (\d{3}) ([A-Z_]+) com (?:a mensagem )?""(.*)""$")]
     public void StatusCodigoEMensagem(int status, string codigo, string mensagem)
     {
         Confere(mundo.Ultima, status, codigo);
         Assert.Equal(mensagem, mundo.Ultima.Corpo?["mensagem"]?.GetValue<string>());
     }
+
+    [Then(@"^a mensagem é ""(.*)""$")]
+    public void Mensagem(string mensagem) =>
+        Assert.True(mundo.Ultima.Corpo?["mensagem"]?.GetValue<string>() == mensagem, $"esperava a mensagem \"{mensagem}\", veio {mundo.Ultima}");
 
     [Then(@"^a resposta é (\d{3}) com:$")]
     public async Task StatusEJson(int status, string json)

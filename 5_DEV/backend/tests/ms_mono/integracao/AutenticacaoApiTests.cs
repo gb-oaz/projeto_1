@@ -10,7 +10,7 @@ public class AutenticacaoApiTests(Backend backend) : IClassFixture<Backend>
 {
     readonly Preparo preparo = new(backend);
 
-    static string Sigla() => string.Concat(Guid.NewGuid().ToByteArray().Take(5).Select(b => (char)('A' + b % 26)));
+    static string Sigla() => Preparo.SiglaSorteada();
 
     [Fact]
     public async Task RF_134_entra_no_navegador_com_o_cookie_e_renova()
@@ -153,17 +153,13 @@ public class AutenticacaoApiTests(Backend backend) : IClassFixture<Backend>
     }
 
     [Fact]
-    public async Task Administrador_volta_mesmo_com_o_banco_vazio()
+    public async Task RN_190_time_e_administrador_nascem_na_partida()
     {
-        // o banco desta fixture pode já ter o time; sem ele, a entrada o cria
-        await backend.Banco.DropCollectionAsync("usuarios");
-        await backend.Banco.DropCollectionAsync("contas");
-
         var admin = await preparo.Admin();
         using var api = backend.Cliente();
 
         Assert.Equal(HttpStatusCode.OK, (await api.Enviar("GET", "/time/tempo-sessao", token: admin.Token)).Status);
-        // o time e o administrador nascem com os parâmetros da configuração
+        // o time nasce com a configuração; o administrador, com o Key Vault
         var conta = await backend.Banco.GetCollection<BsonDocument>("contas").Find(Builders<BsonDocument>.Filter.Eq("_id", "conta-dboaz")).FirstAsync();
         var usuario = await backend.Banco.GetCollection<BsonDocument>("usuarios").Find(Builders<BsonDocument>.Filter.Eq("_id", admin.Id)).FirstAsync();
         Assert.Equal((Backend.NomeDoTime, "Administrador do deboaz", "admin"), (conta["nome"].AsString, usuario["nome"].AsString, usuario["nomeCurto"].AsString));

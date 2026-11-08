@@ -31,7 +31,7 @@ public sealed class Sessao
 //   Maria, João, Rui                 staff criados pela conta master (Rui com Administrar usuários)
 //   Ana                              staff criada pelo João, abaixo dele
 //   Lucas                            participante, com a mãe Carla e o pai Paulo
-//   Caio                             membro do time, criado pelo administrador
+//   Caio                             membro do time, criado pelo administrador (o qaadmin, RN-265)
 //   Bruno                            staff da escola COLSA, outra conta
 //   Pedro                            educador autônomo
 //   Paulo                            staff, professor (Usuários: desativar, nova geração de senha)
@@ -227,11 +227,32 @@ public sealed partial class Mundo
     public async Task<Pessoa> Pedro() { await ContaDe("PREIS"); return contas["PREIS"].Master; }
 
     // ── pessoas ─────────────────────────────────────────────────────────────
-    public Pessoa Admin() => admin ??= new Pessoa
+    // o administrador dos cenários é o qaadmin, conta qa com o papel
+    // ADMINISTRADOR (17 RN-265), nunca o administrador real. Enquanto o CI não
+    // entrega USUARIO_QA_ADMIN_SENHA, vale o administrador real (transição)
+    public Pessoa Admin() => admin ??= Ambiente.Segredo(ContasIniciais.QaAdmin.VariavelSenha!) is { Length: > 0 }
+        ? new Pessoa
+        {
+            Nome = "administrador qa do deboaz",
+            Entrada = ContasIniciais.QaAdmin.Entrada,
+            Senha = ContasIniciais.QaAdmin.Senha,
+        }
+        : new Pessoa
+        {
+            Nome = "administrador do deboaz",
+            Entrada = Ambiente.AdminEntrada,
+            Senha = Ambiente.AdminSenha,
+        };
+
+    // os dois administradores pelo nome, para os cenários de um sobre o outro (RN-169)
+    public Pessoa AdminReal() => PessoaDe(ContasIniciais.Admin);
+    public Pessoa QaAdmin() => PessoaDe(ContasIniciais.QaAdmin);
+    public static Pessoa PessoaDe(ContaInicial conta) => new()
     {
-        Nome = "administrador do deboaz",
-        Entrada = Ambiente.AdminEntrada,
-        Senha = Ambiente.AdminSenha,
+        Nome = conta.Nome,
+        Entrada = conta.Entrada,
+        Senha = conta.Senha,
+        Id = conta.Id,
     };
 
     // a Maria dos exemplos está na versão 7 das permissões (17 exemplo-entidades)
@@ -268,6 +289,18 @@ public sealed partial class Mundo
         if (antes.TryGetValue("MOD-03", out var abas) && abas != "CU") await Definir(joao, antes);
         return ana;
     }
+
+    // staff dos exemplos criado por quem o cenário diz: quem age só alcança quem
+    // está abaixo dele (17-b RN-252). Usado pela auditoria (RN-178), em que a
+    // Maria age sobre o João, a Ana e o Paulo
+    public async Task<Pessoa> StaffCriadoPor(string chave, Pessoa criador) =>
+        pessoas.GetValueOrDefault(chave) ?? chave switch
+        {
+            "joao" => await Staff("joao", "João Lima", "20260088", criador),
+            "ana" => await Staff("ana", "Ana Costa", "20260089", criador),
+            "paulo" => await Staff("paulo", "Paulo Martins", "20260091", criador),
+            _ => throw new ArgumentException($"staff sem exemplo: {chave}", nameof(chave)),
+        };
 
     // o professor Paulo, criado pela conta master ou por um superior dele
     public async Task<Pessoa> Paulo(Pessoa? criador = null) =>
@@ -384,7 +417,7 @@ public sealed partial class Mundo
         "maria.ebfga@deboaz.com" => await Maria(),
         "joao.ebfga@deboaz.com" => await Joao(),
         "objetivo_unidade1@deboaz.com" => await Master(),
-        _ when entrada == Ambiente.AdminEntrada => Admin(),
+        _ when entrada == Ambiente.AdminEntrada || entrada == ContasIniciais.QaAdmin.Entrada => Admin(),
         _ => null,
     };
 

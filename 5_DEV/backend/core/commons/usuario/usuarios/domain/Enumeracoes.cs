@@ -40,6 +40,32 @@ public enum AcaoAuditada
     CodigoMaster,
     /// <summary>PUT /contas/{id}/tempo-sessao ou PUT /time/tempo-sessao.</summary>
     SalvarTempoSessao,
+    /// <summary>PUT /usuarios/{id}/permissoes.</summary>
+    EditarPermissoes,
+    /// <summary>POST /auth/hub/entrar.</summary>
+    EntrarHub,
+    /// <summary>POST /auth/quest/entrar.</summary>
+    EntrarQuest,
+    /// <summary>POST /auth/sala/entrar.</summary>
+    EntrarSala,
+    /// <summary>POST /auth/hub/confirmar-senha.</summary>
+    ConfirmarSenha,
+    /// <summary>POST /auth/renovar.</summary>
+    RenovarSessao,
+    /// <summary>POST /auth/sair.</summary>
+    Sair,
+    /// <summary>DELETE /auth/sessoes/{sid}.</summary>
+    EncerrarSessao,
+    /// <summary>DELETE /auth/sessoes.</summary>
+    EncerrarSessoes,
+    /// <summary>POST /contas/esqueci-senha-master, sem login.</summary>
+    EsqueciSenhaMaster,
+    /// <summary>Interna: encerrar as sessões de um usuário, de dentro de outra execução (RN-275).</summary>
+    EncerrarSessoesDoUsuario,
+    /// <summary>Interna: o pv novo nas sessões de um usuário, de dentro de outra execução (RN-275).</summary>
+    AvisarPermissoesNovas,
+    /// <summary>Interna: a contratação de uma conta mudou, avisada pelo Catálogo (RN-275).</summary>
+    AvisarContratacaoMudou,
 }
 
 /// <summary>Os textos do contrato de API para os tipos e estados.</summary>
@@ -98,7 +124,20 @@ public static class Textos
         AcaoAuditada.ReativarUsuario => "REATIVAR_USUARIO",
         AcaoAuditada.MudarEstadoConta => "MUDAR_ESTADO_CONTA",
         AcaoAuditada.CodigoMaster => "CODIGO_MASTER",
-        _ => "SALVAR_TEMPO_SESSAO",
+        AcaoAuditada.SalvarTempoSessao => "SALVAR_TEMPO_SESSAO",
+        AcaoAuditada.EditarPermissoes => "EDITAR_PERMISSOES",
+        AcaoAuditada.EntrarHub => "ENTRAR_HUB",
+        AcaoAuditada.EntrarQuest => "ENTRAR_QUEST",
+        AcaoAuditada.EntrarSala => "ENTRAR_SALA",
+        AcaoAuditada.ConfirmarSenha => "CONFIRMAR_SENHA",
+        AcaoAuditada.RenovarSessao => "RENOVAR_SESSAO",
+        AcaoAuditada.Sair => "SAIR",
+        AcaoAuditada.EncerrarSessao => "ENCERRAR_SESSAO",
+        AcaoAuditada.EncerrarSessoes => "ENCERRAR_SESSOES",
+        AcaoAuditada.EncerrarSessoesDoUsuario => "ENCERRAR_SESSOES_DO_USUARIO",
+        AcaoAuditada.AvisarPermissoesNovas => "AVISAR_PERMISSOES_NOVAS",
+        AcaoAuditada.AvisarContratacaoMudou => "AVISAR_CONTRATACAO_MUDOU",
+        _ => "ESQUECI_SENHA_MASTER",
     };
 
     /// <summary>Uma duração no formato ISO 8601 do contrato (PT8H, P7D).</summary>

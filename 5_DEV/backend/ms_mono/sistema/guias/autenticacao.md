@@ -1,4 +1,4 @@
-Quem é a pessoa e por quanto tempo ela fica conectada. Requisito: `1_Requisitos/17_modulo-usuario-a-autenticacao.html` · contrato: `autenticacao-contrato-api`.
+Quem é a pessoa e por quanto tempo ela fica conectada. Requisito: `1_Requisitos/17_modulo-usuario-a-autenticacao.md` · contrato: `autenticacao-contrato-api`.
 
 ## Como usar
 

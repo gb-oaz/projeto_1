@@ -1,4 +1,8 @@
 using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json.Nodes;
+using Microsoft.AspNetCore.Hosting;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -11,7 +15,7 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
     readonly Preparo preparo = new(backend);
 
     // 5 letras novas a cada teste, para as contas não se encontrarem
-    static string Sigla() => string.Concat(Guid.NewGuid().ToByteArray().Take(5).Select(b => (char)('A' + b % 26)));
+    static string Sigla() => Preparo.SiglaSorteada();
 
     [Fact]
     public async Task RF_104_cria_a_conta_e_recusa_a_sigla_repetida()
@@ -38,12 +42,103 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
         Assert.Equal((HttpStatusCode.Conflict, "SIGLA_EM_USO"), (repetida.Status, repetida.Codigo));
     }
 
+    // RN-178, RN-270, RN-271: o X-Trace-Id no sucesso e na recusa, e os registros gravados com ele
+    [Fact]
+    public async Task RN_178_RN_270_RN_271_criar_conta_auditada_pelo_traceId()
+    {
+        using var api = backend.Cliente();
+        var sigla = Sigla();
+        var corpo = new
+        {
+            tipo = "INSTITUICAO",
+            nome = "Escola Bento Freitas",
+            documento = "12.345.678/0001-90",
+            responsavel = "Gustavo Boaz de Moura Souza",
+            telefone = "(51) 99999-0000",
+            dominio = sigla.ToLowerInvariant(),
+            sigla,
+        };
+
+        var criada = await api.Enviar("POST", "/contas", corpo);
+        var repetida = await api.Enviar("POST", "/contas", corpo);
+
+        Assert.Matches("^trc-[0-9a-f]{8}$", criada.TraceId);
+        Assert.Matches("^trc-[0-9a-f]{8}$", repetida.TraceId);
+        Assert.NotEqual(criada.TraceId, repetida.TraceId);
+        var etapas = (await Registros("auditoria", criada.TraceId!)).ToDictionary(d => d["etapa"].AsString);
+        Assert.Equal(new[] { "CONCLUIDO", "INICIADO" }, etapas.Keys.Order().ToArray());
+        Assert.True(etapas["INICIADO"]["contaId"].IsBsonNull && etapas["INICIADO"]["quem"].IsBsonNull && etapas["INICIADO"]["alvo"].IsBsonNull);
+        Assert.Equal($"conta-{sigla.ToLowerInvariant()}", etapas["CONCLUIDO"]["alvo"].AsString);
+        Assert.Equal("INICIADO", Assert.Single(await Registros("auditoria", repetida.TraceId!))["etapa"].AsString);
+        var erro = Assert.Single(await Registros("auditoriaErros", repetida.TraceId!));
+        Assert.Equal(("CRIAR_CONTA", "SIGLA_EM_USO", "ALERTA"), (erro["acao"].AsString, erro["codigo"].AsString, erro["nivel"].AsString));
+        Assert.Equal(erro["quando"].ToUniversalTime().AddYears(5), erro["guardarAte"].ToUniversalTime());
+    }
+
+    // RN-270, RN-271: o 403 por faltar o módulo num endereço que muda estado é
+    // auditado — "INICIADO" da ação, ALERTA ACESSO_NEGADO e o X-Trace-Id —; o da
+    // leitura sai sem cabeçalho e sem registro
+    [Fact]
+    public async Task RN_270_sem_o_modulo_o_403_que_muda_estado_e_auditado()
+    {
+        var (contaId, master) = await preparo.Conta(Sigla());
+        var maria = await preparo.Usuario(master, "maria");
+        var paulo = await preparo.Usuario(master, "paulo");
+        using var api = backend.Cliente();
+
+        var desativar = await api.Enviar("POST", $"/usuarios/{paulo.Id}/desativar", token: maria.Token);
+        var leitura = await api.Enviar("GET", "/usuarios?tipo=STAFF", token: maria.Token);
+
+        Assert.Equal((HttpStatusCode.Forbidden, "ACESSO_NEGADO"), (desativar.Status, desativar.Codigo));
+        Assert.Matches("^trc-[0-9a-f]{8}$", desativar.TraceId);
+        var iniciado = Assert.Single(await Registros("auditoria", desativar.TraceId!));
+        Assert.Equal(("INICIADO", "DESATIVAR_USUARIO", maria.Id, contaId, paulo.Id),
+            (iniciado["etapa"].AsString, iniciado["acao"].AsString, iniciado["quem"].AsString, iniciado["contaId"].AsString, iniciado["alvo"].AsString));
+        var erro = Assert.Single(await Registros("auditoriaErros", desativar.TraceId!));
+        Assert.Equal(("DESATIVAR_USUARIO", "ACESSO_NEGADO", "ALERTA", paulo.Id),
+            (erro["acao"].AsString, erro["codigo"].AsString, erro["nivel"].AsString, erro["alvo"].AsString));
+        Assert.Equal((HttpStatusCode.Forbidden, (string?)null), (leitura.Status, leitura.TraceId));
+    }
+
+    // os registros de uma execução
+    Task<List<BsonDocument>> Registros(string colecao, string traceId) =>
+        backend.Banco.GetCollection<BsonDocument>(colecao).Find(Builders<BsonDocument>.Filter.Eq("traceId", traceId)).ToListAsync();
+
     [Fact]
     public async Task Corpo_que_nao_e_json_responde_422()
     {
         using var api = backend.Cliente();
         var resposta = await api.Enviar("POST", "/contas", "{ não é json");
         Assert.Equal((HttpStatusCode.UnprocessableEntity, "DADOS_INVALIDOS"), (resposta.Status, resposta.Codigo));
+    }
+
+    // RN-271: fora do Development (como no contêiner do qa), o corpo que não é
+    // JSON, com qualquer content-type, responde 422 DADOS_INVALIDOS no campo
+    // "corpo", sem X-Trace-Id e sem registro em "auditoria" ou "auditoriaErros".
+    [Theory]
+    [InlineData("nome=Lucas", "application/json")]
+    [InlineData("nome=Lucas", "application/x-www-form-urlencoded")]
+    [InlineData("nome=Lucas", "text/plain")]
+    [InlineData("{ \"tipo\": \"STAFF\", \"nome\": ", "application/json")]
+    public async Task RN_271_corpo_que_nao_e_json_nao_chega_ao_caso_de_uso(string corpo, string tipo)
+    {
+        using var producao = backend.WithWebHostBuilder(b => b.UseEnvironment("Production"));
+        using var http = producao.CreateClient();
+        var auditoria = await backend.Banco.GetCollection<BsonDocument>("auditoria").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty);
+        var erros = await backend.Banco.GetCollection<BsonDocument>("auditoriaErros").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty);
+
+        using var conteudo = new StringContent(corpo, Encoding.UTF8);
+        conteudo.Headers.ContentType = new MediaTypeHeaderValue(tipo) { CharSet = "utf-8" };
+        using var resposta = await http.PostAsync("/usuarios", conteudo);
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, resposta.StatusCode);
+        var json = JsonNode.Parse(await resposta.Content.ReadAsStringAsync())!;
+        Assert.Equal("DADOS_INVALIDOS", json["codigo"]!.GetValue<string>());
+        Assert.Equal("O campo \"corpo\" está faltando ou é inválido.", json["mensagem"]!.GetValue<string>());
+        Assert.Equal("corpo", json["campo"]!.GetValue<string>());
+        Assert.False(resposta.Headers.Contains("X-Trace-Id"));
+        Assert.Equal(auditoria, await backend.Banco.GetCollection<BsonDocument>("auditoria").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty));
+        Assert.Equal(erros, await backend.Banco.GetCollection<BsonDocument>("auditoriaErros").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty));
     }
 
     [Fact]
@@ -224,6 +319,17 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
 
         Assert.All(respostas.Take(3), r => Assert.Equal(HttpStatusCode.Accepted, r.Status));
         Assert.Equal((HttpStatusCode.TooManyRequests, "LIMITE_ATENDIMENTO"), (respostas[3].Status, respostas[3].Codigo));
+
+        // RN-274: auditado sem quem nem contaId; o alvo do CONCLUIDO é o pedido gravado em "pedidosAjuda"
+        Assert.All(respostas, r => Assert.Matches("^trc-[0-9a-f]{8}$", r.TraceId));
+        var etapas = (await Registros("auditoria", respostas[0].TraceId!)).ToDictionary(d => d["etapa"].AsString);
+        Assert.All(etapas.Values, d => Assert.True(d["acao"].AsString == "ESQUECI_SENHA_MASTER" && d["quem"].IsBsonNull && d["contaId"].IsBsonNull));
+        Assert.True(etapas["INICIADO"]["alvo"].IsBsonNull);
+        var pedido = etapas["CONCLUIDO"]["alvo"].AsString;
+        Assert.Equal(1, await backend.Banco.GetCollection<BsonDocument>("pedidosAjuda").CountDocumentsAsync(Builders<BsonDocument>.Filter.Eq("_id", pedido)));
+        Assert.Equal("INICIADO", Assert.Single(await Registros("auditoria", respostas[3].TraceId!))["etapa"].AsString);
+        var erro = Assert.Single(await Registros("auditoriaErros", respostas[3].TraceId!));
+        Assert.Equal(("LIMITE_ATENDIMENTO", "ALERTA"), (erro["codigo"].AsString, erro["nivel"].AsString));
     }
 
     [Fact]

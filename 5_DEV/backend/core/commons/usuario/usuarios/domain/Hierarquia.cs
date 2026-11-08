@@ -76,21 +76,3 @@ public static class LimiteDeAtendimento
         return naJanela.Count >= Envios ? naJanela[^Envios] + Janela : null;
     }
 }
-
-/// <summary>
-/// Um registro de auditoria (RN-178): quem, a ação, o alvo e a hora, guardado 5
-/// anos e nunca alterado nem apagado (RNF-206).
-/// </summary>
-/// <param name="ContaId">Conta do alvo.</param>
-/// <param name="Quem">Quem fez.</param>
-/// <param name="Acao">O que fez.</param>
-/// <param name="Alvo">Sobre quem ou o quê.</param>
-/// <param name="Quando">Quando.</param>
-public sealed record RegistroDeAuditoria(string ContaId, string Quem, AcaoAuditada Acao, string Alvo, DateTimeOffset Quando)
-{
-    /// <summary>Por quanto tempo fica guardado.</summary>
-    public static readonly int Anos = 5;
-
-    /// <summary>Até quando fica guardado.</summary>
-    public DateTimeOffset GuardarAte => Quando.AddYears(Anos);
-}

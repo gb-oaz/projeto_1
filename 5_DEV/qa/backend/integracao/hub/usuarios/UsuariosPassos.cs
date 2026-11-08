@@ -7,7 +7,7 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 
 namespace Boaz.Qa.Integracao.Hub.Usuarios;
 
-// Passos dos Cenários de API de 1_Requisitos/17_modulo-usuario.html (contas,
+// Passos dos Cenários de API de 1_Requisitos/17_modulo-usuario.md (contas,
 // staff, participantes e membros do time). Como os passos casam com as frases:
 // comentário no topo de AutenticacaoPassos.cs e README.
 //
@@ -20,7 +20,7 @@ namespace Boaz.Qa.Integracao.Hub.Usuarios;
 // /usuarios com:" criar a Maria, "usr-ebfga-maria" é ela. Valores gerados
 // (senha, código de liberação, comprovante) valem pelo formato.
 [Binding]
-public sealed partial class UsuariosPassos(Mundo mundo)
+public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execucoes execucoes)
 {
     const string SoNoBackend = "conferido nos testes do backend: o qa não olha o banco";
     const string SemSala = "abrir e fechar uma sala não está no contrato";
@@ -33,6 +33,8 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     string alvo = "";
     JsonObject? antes;
     string loginAntes = "", codigo = "";
+    // a sigla do último POST /contas do cenário (RN-179)
+    string siglaEnviada = "";
     Pessoa? leitor;
     Dictionary<string, string> modsAntes = [];
     readonly List<string> senhas = [];
@@ -68,6 +70,7 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     [When(@"^envia POST /contas com a sigla ""(\w+)""$")]
     public async Task ContaComSigla(string sigla)
     {
+        siglaEnviada = sigla;
         await mundo.Conta();
         await NovaConta("INSTITUICAO", sigla, $"dominio_{sigla.ToLowerInvariant()}", Cnpj(20000001));
     }
@@ -88,6 +91,16 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     async Task NovaConta(string tipo, string sigla, string dominio, string documento) =>
         acao = await mundo.Enviar("POST", "/contas", ContaNova(tipo, tipo == "AUTONOMO" ? "Pedro Reis" : "Escola Nova", documento, dominio, sigla));
 
+    // a sigla em minúsculas é gravada em maiúsculas (RN-179): conferida pela
+    // leitura da conta na API, nunca pelo banco
+    [Then(@"^a resposta é 201, conta ""(.+)"" com a sigla ""(\w+)""$")]
+    public async Task ContaCriadaComASigla(string id, string sigla)
+    {
+        Respostas.Confere(mundo.Ultima, 201);
+        var r = Exigir(await mundo.EnviarComo(mundo.Admin(), "GET", $"/contas/{id}"), 200, $"GET /contas/{id}");
+        Assert.Equal(sigla, r.Corpo?["sigla"]?.GetValue<string>());
+    }
+
     [Then(@"^a resposta é 409 SIGLA_EM_USO e nenhuma conta é criada$")]
     public async Task NenhumaConta()
     {
@@ -98,6 +111,8 @@ public sealed partial class UsuariosPassos(Mundo mundo)
 
     [Then(@"^a resposta é (\d{3}) ([A-Z_]+) com o campo ""(\w+)""$")]
     [Then(@"^a resposta é (\d{3}) ([A-Z_]+), campo ""(\w+)""$")]
+    // RN-271: o corpo que não é JSON é recusado antes do caso de uso (sem X-Trace-Id nem auditoria)
+    [Then(@"^a resposta é (\d{3}) ([A-Z_]+) com o campo ""(\w+)"", recusada antes do caso de uso$")]
     public void ComOCampo(int status, string codigo, string campo)
     {
         Respostas.Confere(mundo.Ultima, status, codigo);
@@ -107,6 +122,18 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     // o motivo da tabela é para quem lê; a resposta é o status e o código
     [Then(@"^a resposta é (\d{3}) ([A-Z_]+), (?:reservada ao time|precisa de 5 letras)$")]
     public void SiglaInvalida(int status, string codigo) => Respostas.Confere(mundo.Ultima, status, codigo);
+
+    // as siglas "QA…" são das contas qa de homologação: a recusa é em produção,
+    // numa instância própria (suporte/Partida.cs), com o mesmo pedido
+    [Then(@"^a resposta é em produção, (\d{3}) ([A-Z_]+), reservada ao time$")]
+    public async Task SiglaQaEmProducao(int status, string codigo)
+    {
+        partida.KeyVaultCompleto("prd");
+        await partida.IniciarPronta("produção");
+        var r = await partida.Api.Enviar("POST", "/contas",
+            ContaNova("INSTITUICAO", "Escola Nova", Cnpj(20000001), $"dominio_{siglaEnviada.ToLowerInvariant()}", siglaEnviada));
+        Respostas.Confere(r, status, codigo);
+    }
 
     [When(@"^envia GET /contas/sigla-sugerida\?nome=(.+)$")]
     public Task SiglaSugerida(string nome) =>
@@ -211,6 +238,58 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     {
         Respostas.Confere(mundo.Ultima, 200);
         Assert.Equal(estado, Texto(mundo.Ultima, "estado"));
+    }
+
+    // ── conta já no estado pedido (RN-178) ─────────────────────────────────
+    // a conta como a API a mostra antes do pedido, para conferir que nada muda
+    string contaAntes = "";
+
+    [Given(@"^a conta da EBFGA com o estado ""(\w+)""$")]
+    public async Task ContaNoEstado(string estado)
+    {
+        var lida = await LerAConta();
+        Assert.Equal(estado, Texto(lida, "estado"));
+        contaAntes = lida.Corpo!.ToJsonString();
+    }
+
+    // o Caio com o MOD-03 em "U" e a sessão dele saem antes da marca: o login
+    // (ENTRAR_HUB, RN-272) não cai entre o antes e o depois, só o POST
+    [When(@"^o Caio, do time deboaz, envia POST (/contas/\S+/estado) com ""(\w+)""$")]
+    public async Task CaioMandaOEstado(string caminho, string estado)
+    {
+        var caio = await CaioComUsuarios();
+        await mundo.TokenDe(caio);
+        var conta = await mundo.Traduzir(caminho);
+        acao = await execucoes.Executar(() =>
+            mundo.EnviarComo(caio, "POST", conta, new JsonObject { ["estado"] = estado }.ToJsonString()));
+    }
+
+    [Then(@"^a resposta é 200 com o estado ""(\w+)"", sem mudar nada na conta$")]
+    public async Task MesmoEstadoSemMudanca(string estado)
+    {
+        Respostas.Confere(acao, 200);
+        Assert.Equal(estado, Texto(acao, "estado"));
+        Assert.Equal(contaAntes, (await LerAConta()).Corpo!.ToJsonString());
+    }
+
+    [Then(@"^os dois vão com contaId ""(.+)"" e alvo ""(.+)""$")]
+    public async Task OsDoisComContaEAlvo(string conta, string alvoEsperado)
+    {
+        var novos = await execucoes.Novos(Auditoria.Registros);
+        var id = await mundo.Traduzir(conta);
+        var esperado = await mundo.Traduzir(alvoEsperado);
+        Assert.Equal(2, novos.Count);
+        Assert.All(novos, d =>
+        {
+            Assert.Equal(id, Auditoria.Texto(d, "contaId"));
+            Assert.Equal(esperado, Auditoria.Texto(d, "alvo"));
+        });
+    }
+
+    async Task<Resposta> LerAConta()
+    {
+        var id = await mundo.Conta();
+        return Exigir(await mundo.EnviarComo(mundo.Admin(), "GET", $"/contas/{id}"), 200, $"GET /contas/{id}");
     }
 
     // ── login (RN-180) ─────────────────────────────────────────────────────
@@ -328,6 +407,50 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     [Then(@"^GET (/usuarios/\S+) traz a matrícula ""(\d+)""$")]
     public async Task ComAMatricula(string caminho, string matricula) =>
         Assert.Equal(matricula, Texto(await Ler(caminho), "matricula"));
+
+    // ── autônomo sem matrícula (RN-188): o participante vai sem o campo, e a
+    // ausência de matrícula vale vinda sem o campo ou com null
+    readonly List<string> semMatricula = [];
+
+    [Given(@"^o token do educador autônomo Pedro, com o participante Lucas sem matrícula$")]
+    public async Task PedroComOLucas()
+    {
+        mundo.Sujeito = await mundo.Pedro();
+        var r = Exigir(await mundo.EnviarComo(mundo.Sujeito, "POST", "/usuarios", ParticipanteSemMatricula("Lucas Andrade", "lucas")),
+            201, "preparo: POST /usuarios do Lucas pelo Pedro");
+        semMatricula.Add(Texto(r, "id"));
+    }
+
+    [When(@"^envia POST /usuarios da participante Bia, também sem matrícula$")]
+    public async Task BiaSemMatricula()
+    {
+        var r = await mundo.EnviarComo(mundo.Sujeito!, "POST", "/usuarios", ParticipanteSemMatricula("Bia Lima", "bia"));
+        if (r.Status == 201) semMatricula.Add(Texto(r, "id"));
+    }
+
+    [Then(@"^a resposta é 201, e não 409 MATRICULA_EM_USO$")]
+    public void CriadaSemMatricula() => Respostas.Confere(mundo.Ultima, 201);
+
+    [Then(@"^o Lucas e a Bia ficam os dois sem matrícula$")]
+    public async Task OsDoisSemMatricula()
+    {
+        Assert.Equal(2, semMatricula.Count);
+        foreach (var id in semMatricula)
+        {
+            var r = Exigir(await mundo.EnviarComo(mundo.Sujeito!, "GET", $"/usuarios/{id}"), 200, $"GET /usuarios/{id}");
+            var matricula = r.Corpo?["matricula"];
+            Assert.True(matricula is null || (matricula is JsonValue v && v.TryGetValue<string>(out var t) && t.Length == 0),
+                $"{id} devia ficar sem matrícula; veio \"{matricula?.ToJsonString()}\"");
+        }
+    }
+
+    static string ParticipanteSemMatricula(string nome, string nomeCurto) => new JsonObject
+    {
+        ["tipo"] = "PARTICIPANTE",
+        ["nome"] = nome,
+        ["nomeCurto"] = nomeCurto,
+        ["responsaveis"] = new JsonArray(),
+    }.ToJsonString();
 
     [When(@"^o administrador envia POST /usuarios com o tipo ""MEMBRO_TIME"" para o Caio Reis$")]
     public Task CriaOCaio() => mundo.EnviarComo(mundo.Admin(), "POST", "/usuarios", new JsonObject
@@ -531,6 +654,7 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     [When(@"^ela envia POST /usuarios/gerar-senha com o código$")]
     public async Task ElaGeraASenha() => await GerarSenha((await mundo.Maria()).Entrada, codigo);
 
+    [When(@"^a resposta é 200 com a senha$")]
     [Then(@"^a resposta é 200 com a senha$")]
     public void ComASenha()
     {
@@ -583,7 +707,8 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     public async Task ContinuaNaLista(string caminho, string estado) => Assert.Equal(estado, Texto(await Ler(caminho), "estado"));
 
     // quem age sobre quem (RN-169): o João tem Administrar usuários; a Ana foi criada por ele
-    [When(@"^(o administrador|a conta master|o João, com Adm\. usuários|a staff Ana) envia POST /usuarios/\{id\}/desativar de (o membro Caio|o João, com Adm\. usuários|a staff Ana|o Lucas|o Rui, também com Adm\.|o João)$")]
+    // o qaadmin e o admin: os dois administradores, um sobre o outro (RN-169)
+    [When(@"^(o administrador|a conta master|o João, com Adm\. usuários|a staff Ana|o qaadmin|o admin) envia POST /usuarios/\{id\}/desativar de (o membro Caio|o João, com Adm\. usuários|a staff Ana|o Lucas|o Rui, também com Adm\.|o João|o qaadmin|o admin)$")]
     public async Task Desativa(string quem, string de)
     {
         var joao = await mundo.Joao();
@@ -593,6 +718,8 @@ public sealed partial class UsuariosPassos(Mundo mundo)
             "o administrador" => mundo.Admin(),
             "a conta master" => await mundo.Master(),
             "a staff Ana" => await mundo.Ana(),
+            "o qaadmin" => mundo.QaAdmin(),
+            "o admin" => mundo.AdminReal(),
             _ => joao,
         };
         var alvoDe = de switch
@@ -601,9 +728,50 @@ public sealed partial class UsuariosPassos(Mundo mundo)
             "a staff Ana" => await mundo.Ana(),
             "o Lucas" => await mundo.Lucas(),
             "o Rui, também com Adm." => await mundo.Rui(),
+            "o qaadmin" => mundo.QaAdmin(),
+            "o admin" => mundo.AdminReal(),
             _ => joao,
         };
         await mundo.EnviarComo(por, "POST", $"/usuarios/{alvoDe.Id}/desativar");
+    }
+
+    // administrador sobre outro administrador (RN-169): o backend de API_URL,
+    // em homologação, com as entradas e senhas das USUARIO_*
+    Pessoa? quemAge;
+    string estadoAntes = "";
+
+    [Given(@"^o token de ""(.+)"" em homologação$")]
+    public async Task TokenEmHomologacao(string entrada)
+    {
+        quemAge = PessoaDe(ContasIniciais.PorEntrada(entrada));
+        await mundo.SessaoDe(quemAge, Navegador);
+    }
+
+    [When(@"^envia POST /usuarios/\{id\}/(reativar|nova-geracao-senha) de ""(.+)""$")]
+    public async Task AdminSobreAdmin(string acaoNoAlvo, string entrada)
+    {
+        var alvoDe = ContasIniciais.PorEntrada(entrada);
+        estadoAntes = await EstadoPeloProprio(alvoDe, "preparo: ");
+        alvo = alvoDe.Id;
+        acao = await mundo.EnviarComo(quemAge!, "POST", $"/usuarios/{alvoDe.Id}/{acaoNoAlvo}");
+    }
+
+    [Then(@"^""(.+)"" continua com o mesmo estado e a mesma senha$")]
+    public async Task MesmoEstadoEMesmaSenha(string entrada)
+    {
+        Assert.Equal(estadoAntes, await EstadoPeloProprio(ContasIniciais.PorEntrada(entrada), ""));
+    }
+
+    // o estado do alvo lido com o token dele mesmo, entrando com a senha do Key
+    // Vault: quem age não lê o outro administrador (RN-169, 403 ACESSO_NEGADO)
+    async Task<string> EstadoPeloProprio(ContaInicial conta, string prefixo)
+    {
+        var alvoDe = PessoaDe(conta);
+        var entrou = await mundo.Enviar("POST", "/auth/hub/entrar", Partida.CorpoDoHub(alvoDe.Entrada, alvoDe.Senha));
+        Assert.True(entrou.Status == 200, $"{prefixo}{alvoDe.Nome} não entra com a senha do Key Vault: {entrou}");
+        var token = Texto(entrou, "tokenAcesso");
+        return Texto(Exigir(await mundo.Enviar("GET", $"/usuarios/{conta.Id}", token: token), 200,
+            $"{prefixo}GET /usuarios/{{id}} de {alvoDe.Nome}, com o token dele"), "estado");
     }
 
     // ── edição (RF-153, RN-244) ────────────────────────────────────────────
@@ -829,7 +997,7 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     }
 
     // "concediveis traz só ""MOD-03"" com ""CU"" e ""MOD-05"" com ""U"""
-    [Then(@"^concediveis traz só (""MOD-.+)$")]
+    [Then(@"^concediveis traz só (""MOD-\d+"" com .+)$")]
     public void SoEstesConcediveis(string pares)
     {
         Respostas.Confere(mundo.Ultima, 200);
@@ -1142,12 +1310,17 @@ public sealed partial class UsuariosPassos(Mundo mundo)
         Assert.True(DateTimeOffset.TryParse(item?["ultimoAcessoMaster"]?.GetValue<string>(), out _), $"sem ultimoAcessoMaster: {mundo.Ultima}");
     }
 
-    // ultimoPagamento vem da cobrança, que a API ainda não registra: fica fora da comparação
+    // ultimoPagamento vem da cobrança, que a API ainda não registra: fica fora da comparação.
+    // A sessão do time e o caminho saem antes da marca: só o GET fica entre o
+    // antes e o depois da execução, que a leitura recusada confere (RN-270)
     [When(@"^o time deboaz envia GET (/contas/\S+)$")]
     public async Task TimeLeAConta(string caminho)
     {
         mundo.CamposSemConferir.Add("ultimoPagamento");
-        await mundo.EnviarComo(mundo.Admin(), "GET", await mundo.Traduzir(caminho));
+        var admin = mundo.Admin();
+        await mundo.TokenDe(admin);
+        var real = await mundo.Traduzir(caminho);
+        await execucoes.Executar(() => mundo.EnviarComo(admin, "GET", real));
     }
 
     [Then(@"^a resposta não traz usuários, turmas nem conteúdos da escola$")]
@@ -1184,7 +1357,11 @@ public sealed partial class UsuariosPassos(Mundo mundo)
             default:
                 por = mundo.Admin();
                 await mundo.Conta();
-                for (var i = 1; i < 112; i++)
+                // as contas que a inicialização criou (QAINS e QAAUT em homologação,
+                // RN-265) também contam: completa até 112 ativas
+                var ativas = Exigir(await mundo.EnviarComo(por, "GET", "/contas?estado=ATIVA"), 200, "GET /contas?estado=ATIVA")
+                    .Corpo?["total"]?.GetValue<int>() ?? 1;
+                for (var i = 1; i <= 112 - ativas; i++)
                 {
                     var sigla = $"CT{Letras(i)}".ToUpperInvariant();
                     await mundo.NovaConta(sigla, ContaNova("INSTITUICAO", $"Escola {sigla}", Cnpj(30000000 + i), $"conta_{i}", sigla));
@@ -1212,21 +1389,7 @@ public sealed partial class UsuariosPassos(Mundo mundo)
         }
     }
 
-    // ── auditoria, senha guardada e o que não é da API ────────────────────
-    [When(@"^a Maria envia (POST|PUT) (/usuarios\S*)(?: do participante Lucas)?$")]
-    public async Task MariaAge(string metodo, string caminho)
-    {
-        var maria = await mundo.Maria();
-        await mundo.Conceder(maria, new() { ["MOD-03"] = "CU" });
-        var alvo = await mundo.Traduzir(caminho);
-        if (caminho == "/usuarios") await mundo.EnviarComo(maria, "POST", alvo, Participante("Lucas Andrade", "lucas"));
-        else if (metodo == "PUT") await mundo.EnviarComo(maria, "PUT", alvo, """{ "mods": {} }""", "1");
-        else await mundo.EnviarComo(maria, "POST", alvo);
-    }
-
-    [Then(@"^a auditoria guarda a Maria, a ação, o alvo e a hora, até 5 anos depois$")]
-    public static void Auditoria() => throw new PendingStepException("a auditoria não tem endereço no contrato: conferida nos testes do backend");
-
+    // ── senha guardada e o que não é da API (auditoria: AuditoriaPassos.cs) ──
     [Given(@"^a senha da Maria guardada$")]
     public Task SenhaGuardada() => mundo.Maria();
 
@@ -1274,8 +1437,9 @@ public sealed partial class UsuariosPassos(Mundo mundo)
         }
     }
 
+    // auditado: o quarto vira ALERTA em "auditoriaErros" (RN-274)
     [When(@"^chega o quarto$")]
-    public Task Quarto() => PedirAjuda();
+    public Task Quarto() => execucoes.Executar(PedirAjuda);
 
     [Then(@"^a resposta é 429 LIMITE_ATENDIMENTO com tentarEm, 24 h depois do primeiro$")]
     public void LimiteDoDia()
@@ -1297,7 +1461,7 @@ public sealed partial class UsuariosPassos(Mundo mundo)
     [Then(@"^nenhum endereço da API faz isso$")]
     public static void RegistroDeAuditoria() => throw new PendingStepException("a auditoria não tem endereço no contrato: conferida nos testes do backend");
 
-    [Then(@"^(?:a conta|a conta master|a staff|o participante|a geração de senha da Maria|o acesso anônimo da sala 482107|o registro de auditoria) é:$")]
+    [Then(@"^(?:a conta|a conta master|a staff|o participante|a geração de senha da Maria|o acesso anônimo da sala 482107|o registro de auditoria|o registro de erro da sigla repetida) é:$")]
     public static void Documento(string _) => Documentos();
 
     [Given(@"^a Escola Bento Freitas, a conta master, a Maria e o Lucas, com datas em UTC$")]

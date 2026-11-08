@@ -1,5 +1,6 @@
 using System.Net;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
+using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -12,7 +13,7 @@ public class AutorizacaoApiTests(Backend backend) : IClassFixture<Backend>
 {
     readonly Preparo preparo = new(backend);
 
-    static string Sigla() => string.Concat(Guid.NewGuid().ToByteArray().Take(5).Select(b => (char)('A' + b % 26)));
+    static string Sigla() => Preparo.SiglaSorteada();
 
     [Fact]
     public async Task RF_160_RF_161_le_salva_e_o_token_antigo_pede_renovacao()
@@ -51,6 +52,22 @@ public class AutorizacaoApiTests(Backend backend) : IClassFixture<Backend>
         Assert.Equal((HttpStatusCode.PreconditionRequired, "VERSAO_AUSENTE"), (semVersao.Status, semVersao.Codigo));
         Assert.Equal(HttpStatusCode.OK, primeira.Status);
         Assert.Equal((HttpStatusCode.PreconditionFailed, 2), (antiga.Status, antiga.Corpo!["versao"]!.GetValue<int>()));
+
+        // RN-178, RN-270, RN-271: EDITAR_PERMISSOES com X-Trace-Id; a recusa grava ALERTA
+        var auditoria = backend.Banco.GetCollection<BsonDocument>("auditoria");
+        var erros = backend.Banco.GetCollection<BsonDocument>("auditoriaErros");
+        var registros = await auditoria.Find(Builders<BsonDocument>.Filter.Eq("traceId", primeira.TraceId)).ToListAsync();
+        foreach (var acao in new[] { "EDITAR_PERMISSOES", "AVISAR_PERMISSOES_NOVAS" })
+        {
+            // RN-275: o aviso interno das permissões novas vai no mesmo traceId do PUT
+            var etapas = registros.Where(d => d["acao"].AsString == acao).ToList();
+            Assert.Equal(new[] { "CONCLUIDO", "INICIADO" }, etapas.Select(d => d["etapa"].AsString).Order().ToArray());
+            Assert.All(etapas, d => Assert.Equal(maria.Id, d["alvo"].AsString));
+        }
+        Assert.Equal(4, registros.Count);
+        var erro = Assert.Single(await erros.Find(Builders<BsonDocument>.Filter.Eq("traceId", antiga.TraceId)).ToListAsync());
+        Assert.Equal(("VERSAO_DESATUALIZADA", "ALERTA"), (erro["codigo"].AsString, erro["nivel"].AsString));
+        Assert.NotNull(semVersao.TraceId);
     }
 
     [Fact]
@@ -108,7 +125,8 @@ public class AutorizacaoApiTests(Backend backend) : IClassFixture<Backend>
         var maria = await preparo.Usuario(master, "maria");
         using var api = backend.Cliente();
 
-        await backend.Services.GetRequiredService<IAvisarContratacaoMudou>().Executar(contaId);
+        await backend.Services.GetRequiredService<IAvisarContratacaoMudou>()
+            .Executar(contaId, new ExecucaoDeQuemChama(TraceId.Novo(), "usr-dboaz-admin", contaId));
 
         Assert.Equal("PERMISSOES_DESATUALIZADAS", (await api.Enviar("GET", "/auth/sessoes", token: maria.Token)).Codigo);
         var usuario = await backend.Banco.GetCollection<BsonDocument>("usuarios").Find(Builders<BsonDocument>.Filter.Eq("_id", maria.Id)).FirstAsync();

@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 3146" width="1392" height="3146">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 3644" width="1392" height="3644">
   <title>Autenticação · contrato de API</title>
-  <desc>Contrato dos endereços de autenticação do ms_mono, dos requisitos 17-a (Módulo Usuários · Autenticação) e 17-b (Autorização): entrar no hub, no quest e na sala, confirmar a senha anotada, renovar, sair, listar e encerrar sessões e publicar as chaves públicas do token. v01: criação. v02: uso, quem usa, login com selo e JSON expandido.</desc>
+  <desc>Contrato dos endereços de autenticação do ms_mono, dos requisitos 17-a (Módulo Usuários · Autenticação) e 17-b (Autorização): entrar no hub, no quest e na sala, confirmar a senha anotada, renovar, sair, listar e encerrar sessões e publicar as chaves públicas do token. v01: criação. v02: uso, quem usa, login com selo e JSON expandido. v03: requisito 17-a v22 — auditoria (RN-272, RN-273; RN-178, RN-270, RN-271): os 8 endereços que mudam a sessão gravam INICIADO e CONCLUIDO em "auditoria" com o mesmo traceId e respondem o cabeçalho X-Trace-Id; INICIADO das entradas com quem, contaId e alvo null até a credencial ser conferida; alvo do CONCLUIDO: a sessão, a sala em ENTRAR_SALA e o usuário em ENCERRAR_SESSOES; recusas 4xx em "auditoriaErros" com nivel ALERTA (403 ACESSO_INDISPONIVEL já com quem e contaId); 500 ERRO_INESPERADO com nivel ERRO; nenhum segredo nos registros. v04: POST /auth/hub/confirmar-senha responde 403 ACESSO_INDISPONIVEL e grava o ALERTA já com quem e contaId, porque o comprovante válido identifica a pessoa, como no hub e no quest (RN-273).</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -82,20 +82,20 @@
       <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <rect class="bg" x="0" y="0" width="1392" height="3146"/>
+  <rect class="bg" x="0" y="0" width="1392" height="3644"/>
   <g id="marca-topo">
     <rect class="wm-band" x="0" y="0" width="1392" height="112"/>
     <rect class="wm-accent" x="0" y="110" width="1392" height="2"/>
     <text class="wm-eyebrow" x="40" y="40">BOAZ · CONTRATO DE API</text>
     <text class="title" x="40" y="72">Autenticação · endereços /auth</text>
-    <text class="subtitle" x="40" y="94">Entrar, confirmar a senha, renovar, sair, aparelhos conectados e chaves públicas do token</text>
+    <text class="subtitle" x="40" y="94">Entrar, confirmar a senha, renovar, sair, aparelhos conectados e chaves do token; auditoria e X-Trace-Id</text>
     <text class="wm-meta-label" x="1104" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v02</text>
+    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v04</text>
     <line class="wm-sep" x1="1176" y1="32" x2="1176" y2="80"/>
     <text class="wm-meta-label" x="1200" y="44">DATA</text>
-    <text class="wm-meta-value" x="1200" y="72">2026-11-01 · 22:06</text>
+    <text class="wm-meta-value" x="1200" y="72">2026-11-08 · 09:49</text>
   </g>
-  <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V356 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
+  <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V604 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
     <text class="mono" x="64" y="204">Toda resposta de erro:</text>
     <text class="mono" x="64" y="224">{</text>
     <text class="mono" x="64" y="244" xml:space="preserve">  "codigo": "ENTRADA_INVALIDA",</text>
@@ -104,18 +104,30 @@
     <text class="mono" x="64" y="304">Renovação na web: Set-Cookie deboaz_renovacao=&lt;sid&gt;.&lt;256 bits&gt;; HttpOnly; Secure; SameSite=Strict; Path=/auth/renovar</text>
     <text class="mono" x="64" y="324">Renovação no app: campo "tokenRenovacao" no corpo, guardado no Keychain (iOS) ou no Keystore (Android)</text>
     <text class="mono" x="64" y="344">Pedido com token inválido, vencido ou com pv antigo: 401; a web e o mobile renovam uma vez antes de levar a Entrar (RNF-216)</text>
+    <line class="divider" x1="40" y1="372" x2="1352" y2="372"/>
+    <text class="boundary-label" x="64" y="400">AUDITORIA E X-TRACE-ID · RN-272, RN-273 · USUÁRIOS RN-178, RN-270, RN-271</text>
+    <text class="mono" x="64" y="424">Auditados (mudam a sessão): POST hub/entrar (ENTRAR_HUB), quest/entrar (ENTRAR_QUEST), sala/entrar (ENTRAR_SALA), hub/confirmar-senha (CONFIRMAR_SENHA),</text>
+    <text class="mono" x="64" y="444" xml:space="preserve">  renovar (RENOVAR_SESSAO), sair (SAIR), DELETE sessoes/{sid} (ENCERRAR_SESSAO) e DELETE sessoes (ENCERRAR_SESSOES); GET sessoes e GET chaves não são auditados</text>
+    <text class="mono" x="64" y="464">Auditado grava INICIADO e CONCLUIDO em "auditoria" com o mesmo traceId; na recusa, só o INICIADO e o registro em "auditoriaErros"</text>
+    <text class="mono" x="64" y="484">Entradas, confirmar-senha e renovar: INICIADO com quem, contaId e alvo null; eles só entram depois que a credencial é conferida</text>
+    <text class="mono" x="64" y="504">Alvo do CONCLUIDO: a sessão (sid "3f9c2a71"); em ENTRAR_SALA, a sala ("482107"); em ENCERRAR_SESSOES, o usuário ("usr-ebfga-maria")</text>
+    <text class="mono" x="64" y="524">X-Trace-Id: trc-7f3a9c21 (o traceId gravado) em toda resposta que passa pelo caso de uso, no sucesso e na recusa</text>
+    <text class="mono" x="64" y="544">Recusa prevista (4xx) grava nivel ALERTA, com quem e contaId null; o 403 ACESSO_INDISPONIVEL (hub, quest e confirmar-senha) já grava com quem e contaId</text>
+    <text class="mono" x="64" y="564">Falha inesperada: 500 ERRO_INESPERADO, "Algo deu errado. Tente de novo mais tarde.", grava nivel ERRO antes de sair</text>
+    <text class="mono" x="64" y="584">Nenhum segredo nos registros: senha, token de acesso, código de acesso, comprovante, tokenRenovacao e cookie de renovação ficam de fora</text>
   </g>
+  <g id="enderecos" transform="translate(0,248)">
   <g id="ep-post-auth-hub-entrar">
-    <g filter="url(#sombra)"><rect class="node" x="40" y="404" width="632" height="634" rx="10"/></g>
+    <g filter="url(#sombra)"><rect class="node" x="40" y="404" width="632" height="682" rx="10"/></g>
     <rect class="node-blue" x="56" y="420" width="48" height="24" rx="6"/><text class="label-strong" x="80.0" y="437" text-anchor="middle">POST</text>
     <text class="label-strong" x="116" y="437">/auth/hub/entrar</text>
-    <rect class="node-note" x="572" y="420" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="436" text-anchor="middle">SEM LOGIN</text>
+    <rect class="node-note" x="572" y="420" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="436" text-anchor="middle">SEM LOGIN</text><rect class="node-purple" x="470" y="420" width="90" height="24" rx="12"/><text class="chip-text" x="515.0" y="436" text-anchor="middle">X-Trace-Id</text>
     <line class="divider" x1="40" y1="460" x2="672" y2="460"/><text class="boundary-label" x="56" y="482">USO</text>
     <text class="label" x="56" y="506">Para quê: abrir uma sessão no hub com a entrada e a senha</text>
     <text class="label" x="56" y="524">Quem usa: conta master, autônomo, staff, membro do time e administrador, na tela</text>
     <text class="label" x="56" y="542" xml:space="preserve">   Entrar do hub</text>
     <text class="label" x="56" y="560">Login: não, endereço público</text>
-    <text class="muted" x="56" y="578">Requisitos: RF-134 · RF-139 · RF-140 · RN-247 · RNF-204</text>
+    <text class="muted" x="56" y="578">Requisitos: RF-134 · RF-139 · RF-140 · RN-247 · RNF-204 · RN-272 · RN-273</text>
     <line class="divider" x1="40" y1="598" x2="672" y2="598"/><text class="boundary-label" x="56" y="620">PEDIDO</text>
     <text class="mono" x="56" y="644">{</text>
     <text class="mono" x="56" y="662" xml:space="preserve">  "entrada": "maria.ebfga@deboaz.com",</text>
@@ -132,25 +144,27 @@
     <text class="mono" x="108" y="872">}</text>
     <text class="muted" x="108" y="890">+ renovação: cookie na web, "tokenRenovacao" no app</text>
     <rect class="node-red" x="56" y="902" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="916" text-anchor="middle">401</text>
-    <text class="mono" x="108" y="916">ENTRADA_INVALIDA · "Entrada ou senha incorretas."</text>
+    <text class="mono" x="108" y="916">ENTRADA_INVALIDA · "Entrada ou senha incorretas." · grava ALERTA</text>
     <rect class="node-red" x="56" y="928" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="942" text-anchor="middle">403</text>
-    <text class="mono" x="108" y="942">ACESSO_INDISPONIVEL · usuário desativado ou conta suspensa</text>
+    <text class="mono" x="108" y="942">ACESSO_INDISPONIVEL · desativado ou suspensa · ALERTA com quem e contaId</text>
     <rect class="node-red" x="56" y="954" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="968" text-anchor="middle">429</text>
-    <text class="mono" x="108" y="968">ENTRADA_BLOQUEADA</text>
+    <text class="mono" x="108" y="968">ENTRADA_BLOQUEADA · grava ALERTA</text>
     <text class="mono" x="108" y="986">{</text>
     <text class="mono" x="108" y="1004" xml:space="preserve">  "tentarEm": "2026-11-01T09:15:00Z"</text>
     <text class="mono" x="108" y="1022">}</text>
+    <rect class="node-red" x="56" y="1034" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1048" text-anchor="middle">500</text><text class="mono" x="108" y="1048">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
+    <text class="muted" x="108" y="1070">auditoria: ENTRAR_HUB · alvo do CONCLUIDO: a sessão (sid)</text>
   </g>
   <g id="ep-post-auth-quest-entrar">
-    <g filter="url(#sombra)"><rect class="node" x="720" y="404" width="632" height="652" rx="10"/></g>
+    <g filter="url(#sombra)"><rect class="node" x="720" y="404" width="632" height="700" rx="10"/></g>
     <rect class="node-blue" x="736" y="420" width="48" height="24" rx="6"/><text class="label-strong" x="760.0" y="437" text-anchor="middle">POST</text>
     <text class="label-strong" x="796" y="437">/auth/quest/entrar</text>
-    <rect class="node-note" x="1252" y="420" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="436" text-anchor="middle">SEM LOGIN</text>
+    <rect class="node-note" x="1252" y="420" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="436" text-anchor="middle">SEM LOGIN</text><rect class="node-purple" x="1150" y="420" width="90" height="24" rx="12"/><text class="chip-text" x="1195.0" y="436" text-anchor="middle">X-Trace-Id</text>
     <line class="divider" x1="720" y1="460" x2="1352" y2="460"/><text class="boundary-label" x="736" y="482">USO</text>
     <text class="label" x="736" y="506">Para quê: abrir uma sessão no quest com o código de acesso</text>
     <text class="label" x="736" y="524">Quem usa: o participante, ou o responsável com o código dele, no acesso do quest</text>
     <text class="label" x="736" y="542">Login: não, endereço público</text>
-    <text class="muted" x="736" y="560">Requisitos: RF-135 · RF-139 · RF-140 · RN-228</text>
+    <text class="muted" x="736" y="560">Requisitos: RF-135 · RF-139 · RF-140 · RN-228 · RN-272 · RN-273</text>
     <line class="divider" x1="720" y1="580" x2="1352" y2="580"/><text class="boundary-label" x="736" y="602">PEDIDO</text>
     <text class="mono" x="736" y="626">{</text>
     <text class="mono" x="736" y="644" xml:space="preserve">  "codigo": "EBFGA-LUCAS-0412",</text>
@@ -169,25 +183,27 @@
     <text class="mono" x="788" y="890">}</text>
     <text class="muted" x="788" y="908">+ renovação</text>
     <rect class="node-red" x="736" y="920" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="934" text-anchor="middle">401</text>
-    <text class="mono" x="788" y="934">CODIGO_INVALIDO · "Código de acesso inválido."</text>
+    <text class="mono" x="788" y="934">CODIGO_INVALIDO · "Código de acesso inválido." · grava ALERTA</text>
     <rect class="node-red" x="736" y="946" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="960" text-anchor="middle">403</text>
-    <text class="mono" x="788" y="960">ACESSO_INDISPONIVEL</text>
+    <text class="mono" x="788" y="960">ACESSO_INDISPONIVEL · ALERTA com quem e contaId</text>
     <rect class="node-red" x="736" y="972" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="986" text-anchor="middle">429</text>
-    <text class="mono" x="788" y="986">ENTRADA_BLOQUEADA</text>
+    <text class="mono" x="788" y="986">ENTRADA_BLOQUEADA · grava ALERTA</text>
     <text class="mono" x="788" y="1004">{</text>
     <text class="mono" x="788" y="1022" xml:space="preserve">  "tentarEm": "2026-11-01T09:15:00Z"</text>
     <text class="mono" x="788" y="1040">}</text>
+    <rect class="node-red" x="736" y="1052" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1066" text-anchor="middle">500</text><text class="mono" x="788" y="1066">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
+    <text class="muted" x="788" y="1088">auditoria: ENTRAR_QUEST · alvo do CONCLUIDO: a sessão (sid)</text>
   </g>
-  <g id="ep-post-auth-hub-confirmar-senha">
-    <g filter="url(#sombra)"><rect class="node" x="40" y="1070" width="632" height="474" rx="10"/></g>
+  <g id="ep-post-auth-hub-confirmar-senha" transform="translate(0,48)">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="1070" width="632" height="548" rx="10"/></g>
     <rect class="node-blue" x="56" y="1086" width="48" height="24" rx="6"/><text class="label-strong" x="80.0" y="1103" text-anchor="middle">POST</text>
     <text class="label-strong" x="116" y="1103">/auth/hub/confirmar-senha</text>
-    <rect class="node-note" x="572" y="1086" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="1102" text-anchor="middle">SEM LOGIN</text>
+    <rect class="node-note" x="572" y="1086" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="1102" text-anchor="middle">SEM LOGIN</text><rect class="node-purple" x="470" y="1086" width="90" height="24" rx="12"/><text class="chip-text" x="515.0" y="1102" text-anchor="middle">X-Trace-Id</text>
     <line class="divider" x1="40" y1="1126" x2="672" y2="1126"/><text class="boundary-label" x="56" y="1148">USO</text>
     <text class="label" x="56" y="1172">Para quê: confirmar que a senha gerada foi anotada e já entrar no hub</text>
     <text class="label" x="56" y="1190">Quem usa: quem acabou de criar a conta ou de ver a senha gerada; vale o comprovante</text>
     <text class="label" x="56" y="1208">Login: não, endereço público</text>
-    <text class="muted" x="56" y="1226">Requisitos: RF-143 · Usuários RF-109</text>
+    <text class="muted" x="56" y="1226">Requisitos: RF-143 · Usuários RF-109 · RN-272 · RN-273</text>
     <line class="divider" x1="40" y1="1246" x2="672" y2="1246"/><text class="boundary-label" x="56" y="1268">PEDIDO</text>
     <text class="mono" x="56" y="1292">{</text>
     <text class="mono" x="56" y="1310" xml:space="preserve">  "comprovante": "c7e1…"</text>
@@ -202,18 +218,22 @@
     <text class="mono" x="108" y="1484">}</text>
     <text class="muted" x="108" y="1502">+ renovação</text>
     <rect class="node-red" x="56" y="1514" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1528" text-anchor="middle">401</text>
-    <text class="mono" x="108" y="1528">COMPROVANTE_INVALIDO · vencido ou já usado</text>
+    <text class="mono" x="108" y="1528">COMPROVANTE_INVALIDO · vencido ou já usado · grava ALERTA</text>
+    <rect class="node-red" x="56" y="1540" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1554" text-anchor="middle">403</text>
+    <text class="mono" x="108" y="1554">ACESSO_INDISPONIVEL · ALERTA com quem e contaId (o comprovante identifica)</text>
+    <rect class="node-red" x="56" y="1566" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1580" text-anchor="middle">500</text><text class="mono" x="108" y="1580">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
+    <text class="muted" x="108" y="1602">auditoria: CONFIRMAR_SENHA · alvo do CONCLUIDO: a sessão (sid)</text>
   </g>
-  <g id="ep-post-auth-sala-entrar">
-    <g filter="url(#sombra)"><rect class="node" x="720" y="1088" width="632" height="456" rx="10"/></g>
+  <g id="ep-post-auth-sala-entrar" transform="translate(0,48)">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="1088" width="632" height="504" rx="10"/></g>
     <rect class="node-blue" x="736" y="1104" width="48" height="24" rx="6"/><text class="label-strong" x="760.0" y="1121" text-anchor="middle">POST</text>
     <text class="label-strong" x="796" y="1121">/auth/sala/entrar</text>
-    <rect class="node-note" x="1252" y="1104" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="1120" text-anchor="middle">SEM LOGIN</text>
+    <rect class="node-note" x="1252" y="1104" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="1120" text-anchor="middle">SEM LOGIN</text><rect class="node-purple" x="1150" y="1104" width="90" height="24" rx="12"/><text class="chip-text" x="1195.0" y="1120" text-anchor="middle">X-Trace-Id</text>
     <line class="divider" x1="720" y1="1144" x2="1352" y2="1144"/><text class="boundary-label" x="736" y="1166">USO</text>
     <text class="label" x="736" y="1190">Para quê: participar de uma sala ao vivo sem código de acesso</text>
     <text class="label" x="736" y="1208">Quem usa: o visitante anônimo, pelo código da sala</text>
     <text class="label" x="736" y="1226">Login: não, endereço público</text>
-    <text class="muted" x="736" y="1244">Requisitos: RF-136 · RN-231 · Autorização RF-151</text>
+    <text class="muted" x="736" y="1244">Requisitos: RF-136 · RN-231 · Autorização RF-151 · RN-272 · RN-273</text>
     <line class="divider" x1="720" y1="1264" x2="1352" y2="1264"/><text class="boundary-label" x="736" y="1286">PEDIDO</text>
     <text class="mono" x="736" y="1310">{</text>
     <text class="mono" x="736" y="1328" xml:space="preserve">  "sala": "482107"</text>
@@ -227,18 +247,20 @@
     <text class="mono" x="788" y="1484">}</text>
     <text class="muted" x="788" y="1502">+ renovação; papel ANONIMO, só o módulo e o id da sala no token</text>
     <rect class="node-red" x="736" y="1514" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1528" text-anchor="middle">404</text>
-    <text class="mono" x="788" y="1528">SALA_FECHADA · sala inexistente ou já fechada</text>
+    <text class="mono" x="788" y="1528">SALA_FECHADA · sala inexistente ou já fechada · grava ALERTA</text>
+    <rect class="node-red" x="736" y="1540" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1554" text-anchor="middle">500</text><text class="mono" x="788" y="1554">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
+    <text class="muted" x="788" y="1576">auditoria: ENTRAR_SALA · alvo do CONCLUIDO: a sala ("482107")</text>
   </g>
-  <g id="ep-post-auth-renovar">
-    <g filter="url(#sombra)"><rect class="node" x="40" y="1576" width="632" height="492" rx="10"/></g>
+  <g id="ep-post-auth-renovar" transform="translate(0,128)">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="1576" width="632" height="540" rx="10"/></g>
     <rect class="node-blue" x="56" y="1592" width="48" height="24" rx="6"/><text class="label-strong" x="80.0" y="1609" text-anchor="middle">POST</text>
     <text class="label-strong" x="116" y="1609">/auth/renovar</text>
-    <rect class="node-external" x="572" y="1592" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="1608" text-anchor="middle">COM LOGIN</text>
+    <rect class="node-external" x="572" y="1592" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="1608" text-anchor="middle">COM LOGIN</text><rect class="node-purple" x="470" y="1592" width="90" height="24" rx="12"/><text class="chip-text" x="515.0" y="1608" text-anchor="middle">X-Trace-Id</text>
     <line class="divider" x1="40" y1="1632" x2="672" y2="1632"/><text class="boundary-label" x="56" y="1654">USO</text>
     <text class="label" x="56" y="1678">Para quê: trocar o token de acesso vencido por um novo sem pedir a senha de novo</text>
     <text class="label" x="56" y="1696">Quem usa: a web e o app, sozinhos, para qualquer pessoa conectada</text>
     <text class="label" x="56" y="1714">Login: sim, token de renovação (cookie na web, corpo no app), não o de acesso</text>
-    <text class="muted" x="56" y="1732">Requisitos: RF-137 · RF-148 · RNF-213 · RNF-214</text>
+    <text class="muted" x="56" y="1732">Requisitos: RF-137 · RF-148 · RNF-213 · RNF-214 · RN-272 · RN-273</text>
     <line class="divider" x1="40" y1="1752" x2="672" y2="1752"/><text class="boundary-label" x="56" y="1774">PEDIDO</text>
     <text class="muted" x="56" y="1798">web: cookie deboaz_renovacao, enviado só a este endereço</text>
     <text class="muted" x="56" y="1816">app:</text>
@@ -254,18 +276,20 @@
     <text class="mono" x="108" y="2008">}</text>
     <text class="muted" x="108" y="2026">+ renovação nova; a anterior deixa de valer</text>
     <rect class="node-red" x="56" y="2038" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2052" text-anchor="middle">401</text>
-    <text class="mono" x="108" y="2052">SESSAO_TERMINADA · "Sua sessão terminou. Entre de novo."</text>
+    <text class="mono" x="108" y="2052">SESSAO_TERMINADA · "Sua sessão terminou. Entre de novo." · grava ALERTA</text>
+    <rect class="node-red" x="56" y="2064" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2078" text-anchor="middle">500</text><text class="mono" x="108" y="2078">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
+    <text class="muted" x="108" y="2100">auditoria: RENOVAR_SESSAO · alvo do CONCLUIDO: a sessão (sid)</text>
   </g>
-  <g id="ep-post-auth-sair">
-    <g filter="url(#sombra)"><rect class="node" x="720" y="1576" width="632" height="330" rx="10"/></g>
+  <g id="ep-post-auth-sair" transform="translate(0,128)">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="1576" width="632" height="378" rx="10"/></g>
     <rect class="node-blue" x="736" y="1592" width="48" height="24" rx="6"/><text class="label-strong" x="760.0" y="1609" text-anchor="middle">POST</text>
     <text class="label-strong" x="796" y="1609">/auth/sair</text>
-    <rect class="node-external" x="1252" y="1592" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="1608" text-anchor="middle">COM LOGIN</text>
+    <rect class="node-external" x="1252" y="1592" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="1608" text-anchor="middle">COM LOGIN</text><rect class="node-purple" x="1150" y="1592" width="90" height="24" rx="12"/><text class="chip-text" x="1195.0" y="1608" text-anchor="middle">X-Trace-Id</text>
     <line class="divider" x1="720" y1="1632" x2="1352" y2="1632"/><text class="boundary-label" x="736" y="1654">USO</text>
     <text class="label" x="736" y="1678">Para quê: encerrar a sessão deste aparelho</text>
     <text class="label" x="736" y="1696">Quem usa: qualquer pessoa conectada, em Sair</text>
     <text class="label" x="736" y="1714">Login: sim, token de acesso</text>
-    <text class="muted" x="736" y="1732">Requisitos: RF-138</text>
+    <text class="muted" x="736" y="1732">Requisitos: RF-138 · RN-272 · RN-273</text>
     <line class="divider" x1="720" y1="1752" x2="1352" y2="1752"/><text class="boundary-label" x="736" y="1774">PEDIDO</text>
     <text class="mono" x="736" y="1798">Authorization: Bearer &lt;token de acesso&gt;</text>
     <line class="divider" x1="720" y1="1818" x2="1352" y2="1818"/><text class="boundary-label" x="736" y="1840">RESPOSTAS</text>
@@ -273,8 +297,10 @@
     <text class="muted" x="788" y="1864">sessão do aparelho encerrada; o cookie é apagado</text>
     <rect class="node-red" x="736" y="1876" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1890" text-anchor="middle">401</text>
     <text class="mono" x="788" y="1890">token inválido</text>
+    <rect class="node-red" x="736" y="1902" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1916" text-anchor="middle">500</text><text class="mono" x="788" y="1916">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
+    <text class="muted" x="788" y="1938">auditoria: SAIR · alvo do CONCLUIDO: a sessão (sid)</text>
   </g>
-  <g id="ep-get-auth-sessoes">
+  <g id="ep-get-auth-sessoes" transform="translate(0,176)">
     <g filter="url(#sombra)"><rect class="node" x="720" y="1938" width="632" height="456" rx="10"/></g>
     <rect class="node-green" x="736" y="1954" width="40" height="24" rx="6"/><text class="label-strong" x="756.0" y="1971" text-anchor="middle">GET</text>
     <text class="label-strong" x="788" y="1971">/auth/sessoes</text>
@@ -299,41 +325,45 @@
     <rect class="node-red" x="736" y="2364" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2378" text-anchor="middle">401</text>
     <text class="mono" x="788" y="2378">token inválido</text>
   </g>
-  <g id="ep-delete-auth-sessoes-sid">
-    <g filter="url(#sombra)"><rect class="node" x="40" y="2100" width="632" height="330" rx="10"/></g>
+  <g id="ep-delete-auth-sessoes-sid" transform="translate(0,176)">
+    <g filter="url(#sombra)"><rect class="node" x="40" y="2100" width="632" height="378" rx="10"/></g>
     <rect class="node-orange" x="56" y="2116" width="64" height="24" rx="6"/><text class="label-strong" x="88.0" y="2133" text-anchor="middle">DELETE</text>
     <text class="label-strong" x="132" y="2133">/auth/sessoes/{sid}</text>
-    <rect class="node-external" x="572" y="2116" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="2132" text-anchor="middle">COM LOGIN</text>
+    <rect class="node-external" x="572" y="2116" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="2132" text-anchor="middle">COM LOGIN</text><rect class="node-purple" x="470" y="2116" width="90" height="24" rx="12"/><text class="chip-text" x="515.0" y="2132" text-anchor="middle">X-Trace-Id</text>
     <line class="divider" x1="40" y1="2156" x2="672" y2="2156"/><text class="boundary-label" x="56" y="2178">USO</text>
     <text class="label" x="56" y="2202">Para quê: sair de um aparelho escolhido na lista</text>
     <text class="label" x="56" y="2220">Quem usa: quem está no hub, em Aparelhos conectados</text>
     <text class="label" x="56" y="2238">Login: sim, token de acesso; só as próprias sessões</text>
-    <text class="muted" x="56" y="2256">Requisitos: RF-157 · Sair deste aparelho</text>
+    <text class="muted" x="56" y="2256">Requisitos: RF-157 · Sair deste aparelho · RN-272 · RN-273</text>
     <line class="divider" x1="40" y1="2276" x2="672" y2="2276"/><text class="boundary-label" x="56" y="2298">PEDIDO</text>
     <text class="mono" x="56" y="2322">Authorization: Bearer &lt;token de acesso&gt;</text>
     <line class="divider" x1="40" y1="2342" x2="672" y2="2342"/><text class="boundary-label" x="56" y="2364">RESPOSTAS</text>
     <rect class="chip" x="56" y="2374" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2388" text-anchor="middle">204</text>
     <text class="muted" x="108" y="2388">sessão encerrada; o aparelho vai a Entrar na próxima ação</text>
     <rect class="node-red" x="56" y="2400" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2414" text-anchor="middle">404</text>
-    <text class="mono" x="108" y="2414">SESSAO_NAO_ENCONTRADA · inclusive a de outro usuário</text>
+    <text class="mono" x="108" y="2414">SESSAO_NAO_ENCONTRADA · inclusive a de outro usuário · grava ALERTA</text>
+    <rect class="node-red" x="56" y="2426" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2440" text-anchor="middle">500</text><text class="mono" x="108" y="2440">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
+    <text class="muted" x="108" y="2462">auditoria: ENCERRAR_SESSAO · alvo do CONCLUIDO: a sessão (sid)</text>
   </g>
-  <g id="ep-delete-auth-sessoes">
-    <g filter="url(#sombra)"><rect class="node" x="720" y="2426" width="632" height="304" rx="10"/></g>
+  <g id="ep-delete-auth-sessoes" transform="translate(0,176)">
+    <g filter="url(#sombra)"><rect class="node" x="720" y="2426" width="632" height="352" rx="10"/></g>
     <rect class="node-orange" x="736" y="2442" width="64" height="24" rx="6"/><text class="label-strong" x="768.0" y="2459" text-anchor="middle">DELETE</text>
     <text class="label-strong" x="812" y="2459">/auth/sessoes</text>
-    <rect class="node-external" x="1252" y="2442" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="2458" text-anchor="middle">COM LOGIN</text>
+    <rect class="node-external" x="1252" y="2442" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="2458" text-anchor="middle">COM LOGIN</text><rect class="node-purple" x="1150" y="2442" width="90" height="24" rx="12"/><text class="chip-text" x="1195.0" y="2458" text-anchor="middle">X-Trace-Id</text>
     <line class="divider" x1="720" y1="2482" x2="1352" y2="2482"/><text class="boundary-label" x="736" y="2504">USO</text>
     <text class="label" x="736" y="2528">Para quê: sair de todos os aparelhos de uma vez, inclusive este</text>
     <text class="label" x="736" y="2546">Quem usa: quem está no hub, em Aparelhos conectados</text>
     <text class="label" x="736" y="2564">Login: sim, token de acesso</text>
-    <text class="muted" x="736" y="2582">Requisitos: RF-157 · Sair de todos os aparelhos</text>
+    <text class="muted" x="736" y="2582">Requisitos: RF-157 · Sair de todos os aparelhos · RN-272 · RN-273</text>
     <line class="divider" x1="720" y1="2602" x2="1352" y2="2602"/><text class="boundary-label" x="736" y="2624">PEDIDO</text>
     <text class="mono" x="736" y="2648">Authorization: Bearer &lt;token de acesso&gt;</text>
     <line class="divider" x1="720" y1="2668" x2="1352" y2="2668"/><text class="boundary-label" x="736" y="2690">RESPOSTAS</text>
     <rect class="chip" x="736" y="2700" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2714" text-anchor="middle">204</text>
     <text class="muted" x="788" y="2714">todas as sessões do usuário encerradas, inclusive esta</text>
+    <rect class="node-red" x="736" y="2726" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2740" text-anchor="middle">500</text><text class="mono" x="788" y="2740">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
+    <text class="muted" x="788" y="2762">auditoria: ENCERRAR_SESSOES · alvo do CONCLUIDO: o usuário ("usr-ebfga-maria")</text>
   </g>
-  <g id="ep-get-auth-chaves">
+  <g id="ep-get-auth-chaves" transform="translate(0,224)">
     <g filter="url(#sombra)"><rect class="node" x="40" y="2462" width="632" height="502" rx="10"/></g>
     <rect class="node-green" x="56" y="2478" width="40" height="24" rx="6"/><text class="label-strong" x="76.0" y="2495" text-anchor="middle">GET</text>
     <text class="label-strong" x="108" y="2495">/auth/chaves</text>
@@ -360,8 +390,9 @@
     <text class="mono" x="108" y="2930" xml:space="preserve">  ]</text>
     <text class="mono" x="108" y="2948">}</text>
   </g>
-  <g id="marca-rodape" transform="translate(0,3004)">
-    <rect class="wm-band" x="0" y="0" width="1392" height="142"/>
+  </g>
+  <g id="marca-rodape" transform="translate(0,3476)">
+    <rect class="wm-band" x="0" y="0" width="1392" height="168"/>
     <line class="wm-sep" x1="0" y1="0.5" x2="1392" y2="0.5"/>
     <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
     <rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">POST</text>
@@ -369,11 +400,12 @@
     <rect class="node-orange" x="185" y="47" width="14" height="14" rx="3"/><text class="label" x="207" y="58">DELETE</text>
     <rect class="node-note" x="274" y="47" width="14" height="14" rx="3"/><text class="label" x="296" y="58">sem login: público</text>
     <rect class="node-external" x="442" y="47" width="14" height="14" rx="3"/><text class="label" x="464" y="58">com login: token de acesso</text>
-    <rect class="node-red" x="663" y="47" width="14" height="14" rx="3"/><text class="label" x="685" y="58">resposta de erro (4xx)</text>
-    <rect class="chip" x="858" y="47" width="14" height="14" rx="3"/><text class="label" x="880" y="58">resposta de sucesso</text>
-    <rect class="node" x="1033" y="47" width="14" height="14" rx="3"/><text class="label" x="1055" y="58">endereço e regra comum</text>
-    <line class="divider" x1="40" y1="88" x2="1352" y2="88"/>
-    <text class="footer" x="40" y="116">v02 · uso, quem usa e login de cada endereço, com selo SEM LOGIN ou COM LOGIN; JSON expandido</text>
-    <text class="wm-file" x="1352" y="116" text-anchor="end">autenticacao-contrato-api_v02_20261101-2206.svg</text>
+    <rect class="node-red" x="663" y="47" width="14" height="14" rx="3"/><text class="label" x="685" y="58">resposta de erro (4xx, 5xx)</text>
+    <rect class="chip" x="884" y="47" width="14" height="14" rx="3"/><text class="label" x="906" y="58">resposta de sucesso</text>
+    <rect class="node" x="1059" y="47" width="14" height="14" rx="3"/><text class="label" x="1081" y="58">endereço e regra comum</text>
+    <rect class="node-purple" x="40" y="73" width="14" height="14" rx="3"/><text class="label" x="62" y="84">auditado: grava INICIADO e CONCLUIDO e responde o cabeçalho X-Trace-Id</text>
+    <line class="divider" x1="40" y1="114" x2="1352" y2="114"/>
+    <text class="footer" x="40" y="142">v04 · confirmar-senha: 403 ACESSO_INDISPONIVEL com ALERTA, quem e contaId, como no hub e no quest (RN-273)</text>
+    <text class="wm-file" x="1352" y="142" text-anchor="end">autenticacao-contrato-api_v04_20261108-0949.svg</text>
   </g>
 </svg>
