@@ -49,9 +49,13 @@ public static class Http
             writer.WriteStringValue(value.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture));
     }
 
-    // JSON das APIs: camelCase (padrão da web) e datas em UTC.
-    public static IServiceCollection AddJsonDasApis(this IServiceCollection servicos) =>
-        servicos.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new DataHoraUtc()));
+    // JSON das APIs: camelCase (padrão da web) e datas em UTC. O corpo que não
+    // é JSON (ou com outro content-type) lança BadHttpRequestException em todo
+    // ambiente — fora do Development o padrão é responder 400 vazio, sem passar
+    // pelo UseRespostasDeErro —, e vira o 422 DADOS_INVALIDOS do contrato (RN-271).
+    public static IServiceCollection AddJsonDasApis(this IServiceCollection servicos) => servicos
+        .ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new DataHoraUtc()))
+        .Configure<RouteHandlerOptions>(o => o.ThrowOnBadRequest = true);
 
     // Falhas dos casos de uso viram a resposta de erro do contrato; corpo que não
     // é JSON (ou com o tipo errado num campo) responde 422 DADOS_INVALIDOS; a

@@ -1,4 +1,8 @@
 using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json.Nodes;
+using Microsoft.AspNetCore.Hosting;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -81,6 +85,35 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
         using var api = backend.Cliente();
         var resposta = await api.Enviar("POST", "/contas", "{ não é json");
         Assert.Equal((HttpStatusCode.UnprocessableEntity, "DADOS_INVALIDOS"), (resposta.Status, resposta.Codigo));
+    }
+
+    // RN-271: fora do Development (como no contêiner do qa), o corpo que não é
+    // JSON, com qualquer content-type, responde 422 DADOS_INVALIDOS no campo
+    // "corpo", sem X-Trace-Id e sem registro em "auditoria" ou "auditoriaErros".
+    [Theory]
+    [InlineData("nome=Lucas", "application/json")]
+    [InlineData("nome=Lucas", "application/x-www-form-urlencoded")]
+    [InlineData("nome=Lucas", "text/plain")]
+    [InlineData("{ \"tipo\": \"STAFF\", \"nome\": ", "application/json")]
+    public async Task RN_271_corpo_que_nao_e_json_nao_chega_ao_caso_de_uso(string corpo, string tipo)
+    {
+        using var producao = backend.WithWebHostBuilder(b => b.UseEnvironment("Production"));
+        using var http = producao.CreateClient();
+        var auditoria = await backend.Banco.GetCollection<BsonDocument>("auditoria").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty);
+        var erros = await backend.Banco.GetCollection<BsonDocument>("auditoriaErros").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty);
+
+        using var conteudo = new StringContent(corpo, Encoding.UTF8);
+        conteudo.Headers.ContentType = new MediaTypeHeaderValue(tipo) { CharSet = "utf-8" };
+        using var resposta = await http.PostAsync("/usuarios", conteudo);
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, resposta.StatusCode);
+        var json = JsonNode.Parse(await resposta.Content.ReadAsStringAsync())!;
+        Assert.Equal("DADOS_INVALIDOS", json["codigo"]!.GetValue<string>());
+        Assert.Equal("O campo \"corpo\" está faltando ou é inválido.", json["mensagem"]!.GetValue<string>());
+        Assert.Equal("corpo", json["campo"]!.GetValue<string>());
+        Assert.False(resposta.Headers.Contains("X-Trace-Id"));
+        Assert.Equal(auditoria, await backend.Banco.GetCollection<BsonDocument>("auditoria").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty));
+        Assert.Equal(erros, await backend.Banco.GetCollection<BsonDocument>("auditoriaErros").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty));
     }
 
     [Fact]
