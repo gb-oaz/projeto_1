@@ -252,11 +252,13 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
         contaAntes = lida.Corpo!.ToJsonString();
     }
 
-    // o Caio com o MOD-03 em "U"; só o pedido passa por Execucoes
+    // o Caio com o MOD-03 em "U" e a sessão dele saem antes da marca: o login
+    // (ENTRAR_HUB, RN-272) não cai entre o antes e o depois, só o POST
     [When(@"^o Caio, do time deboaz, envia POST (/contas/\S+/estado) com ""(\w+)""$")]
     public async Task CaioMandaOEstado(string caminho, string estado)
     {
         var caio = await CaioComUsuarios();
+        await mundo.TokenDe(caio);
         var conta = await mundo.Traduzir(caminho);
         acao = await execucoes.Executar(() =>
             mundo.EnviarComo(caio, "POST", conta, new JsonObject { ["estado"] = estado }.ToJsonString()));
