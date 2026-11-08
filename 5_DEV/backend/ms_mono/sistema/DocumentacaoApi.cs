@@ -12,7 +12,9 @@ namespace Boaz.MsMono.Sistema;
 // em wwwroot/doc/api/swagger.css). A primeira página é a capa do catálogo; o
 // seletor do topo abre cada módulo como uma API própria, cada uma com o guia de
 // uso de sistema/guias/<documento>.md e os diagramas de wwwroot/doc/api/diagramas/
-// (cópia de 2_Diagramas/ feita por scripts/diagramas-da-doc.sh). Liga só com
+// (cópia de 2_Diagramas/ feita por scripts/diagramas-da-doc.sh). Dentro de cada
+// API, um grupo (tag) por controller; o resumo, a descrição, os parâmetros e as
+// respostas de cada endpoint vêm dos comentários XML das ações. Liga só com
 // Swagger:Habilitado, que o Terraform define como true em homologação e false
 // em produção.
 public static class DocumentacaoApi
@@ -20,25 +22,42 @@ public static class DocumentacaoApi
     public const string Caminho = "doc/api";
     public const string Catalogo = "catalogo";
     public const string DocumentoSistema = "sistema";
+    public const string DocumentoAutenticacao = "autenticacao";
+    public const string DocumentoUsuarios = "usuarios";
+    public const string DocumentoAutorizacao = "autorizacao";
     public const string Versao = "v1";
     public const string Titulo = "deboaz · catálogo de APIs";
-    public const string TagSistema = "Sistema";
     public const string EsquemaBearer = "Bearer";
 
+    // Um grupo de endpoints dentro de uma API: a tag de um controller e a frase dela.
+    public sealed record Grupo(string Tag, string Descricao);
+
     // Uma API do seletor: o documento (/doc/api/<documento>.json), o rótulo no
-    // seletor, o grupo (tag) dos endpoints e a frase do grupo.
-    public sealed record Api(string Documento, string Rotulo, string Tag, string DescricaoDoGrupo)
+    // seletor e os grupos (um por controller), na ordem em que aparecem.
+    public sealed record Api(string Documento, string Rotulo, IReadOnlyList<Grupo> Grupos)
     {
         public string Titulo => $"deboaz · {Rotulo}";
     }
 
-    // Na ordem do seletor, depois da capa. Módulo novo entra aqui, com o guia.
+    // Na ordem do seletor, depois da capa. Módulo novo entra aqui, com o guia;
+    // controller novo, no grupo da API dele (ApiExplorerSettings.GroupName).
     public static readonly IReadOnlyList<Api> Apis =
     [
-        new(DocumentoSistema, "Sistema", TagSistema, "Endpoints do próprio runtime, sem módulo: a prontidão"),
-        new(AutenticacaoApi.Documento, AutenticacaoApi.Tag, AutenticacaoApi.Tag, AutenticacaoApi.Descricao),
-        new(UsuariosApi.Documento, UsuariosApi.Tag, UsuariosApi.Tag, UsuariosApi.Descricao),
-        new(AutorizacaoApi.Documento, AutorizacaoApi.Tag, AutorizacaoApi.Tag, AutorizacaoApi.Descricao),
+        new(DocumentoSistema, "Sistema", [new(SaudeController.Tag, SaudeController.Descricao)]),
+        new(DocumentoAutenticacao, "Autenticação",
+        [
+            new(EntradaController.Tag, EntradaController.Descricao),
+            new(SessaoController.Tag, SessaoController.Descricao),
+            new(AparelhosController.Tag, AparelhosController.Descricao),
+            new(ChavesController.Tag, ChavesController.Descricao),
+        ]),
+        new(DocumentoUsuarios, "Usuários",
+        [
+            new(ContasController.Tag, ContasController.Descricao),
+            new(UsuariosController.Tag, UsuariosController.Descricao),
+            new(TempoDeSessaoController.Tag, TempoDeSessaoController.Descricao),
+        ]),
+        new(DocumentoAutorizacao, "Autorização", [new(PermissoesController.Tag, PermissoesController.Descricao)]),
     ];
 
     public static bool Habilitada(IConfiguration configuracao) => configuracao.GetValue<bool>("Swagger:Habilitado");
@@ -78,7 +97,7 @@ public static class DocumentacaoApi
                     // sem servers: o Swagger UI chama a origem da própria página (atrás do
                     // HTTPS da Azure o backend vê http e o endereço gerado sairia errado)
                     documento.Servers = [];
-                    documento.Tags = new HashSet<OpenApiTag> { new() { Name = api.Tag, Description = api.DescricaoDoGrupo } };
+                    documento.Tags = new HashSet<OpenApiTag>(api.Grupos.Select(g => new OpenApiTag { Name = g.Tag, Description = g.Descricao }));
                     documento.Components ??= new OpenApiComponents();
                     documento.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
                     documento.Components.SecuritySchemes[EsquemaBearer] = new OpenApiSecurityScheme
@@ -90,10 +109,10 @@ public static class DocumentacaoApi
                     };
                     return Task.CompletedTask;
                 });
-                // cadeado só nos endpoints marcados com ComLogin()
+                // cadeado só nas ações com login ([ComLogin], [ComAcesso], [ComAcessoAuditado])
                 opcoes.AddOperationTransformer((operacao, contexto, _) =>
                 {
-                    if (contexto.Description.ActionDescriptor.EndpointMetadata.OfType<MarcaDeLogin>().Any())
+                    if (contexto.Description.ActionDescriptor.EndpointMetadata.OfType<IMarcaDeLogin>().Any())
                     {
                         operacao.Security = [new OpenApiSecurityRequirement { [new OpenApiSecuritySchemeReference(EsquemaBearer, contexto.Document)] = [] }];
                     }

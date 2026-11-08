@@ -18,15 +18,15 @@
   </ItemGroup>
 
   <!--
-    Os textos da documentação vêm de WithSummary/WithDescription, não de
-    comentários XML: o gerador de comentários do OpenApi sai do build, e com
-    ele o código gerado que contaria na cobertura (RNF-25).
+    Os textos da documentação de cada endpoint vêm dos comentários XML das ações
+    dos controllers, lidos pelo gerador do Microsoft.AspNetCore.OpenApi
+    (sistema/DocumentacaoApi.cs). Só as ações e os corpos são documentados: o
+    aviso de membro público sem comentário (CS1591) fica de fora.
   -->
-  <Target Name="BoazSemGeradorXmlOpenApi" BeforeTargets="CoreCompile">
-    <ItemGroup>
-      <Analyzer Remove="@(Analyzer)" Condition="'%(Filename)' == 'Microsoft.AspNetCore.OpenApi.SourceGenerators'" />
-    </ItemGroup>
-  </Target>
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
 
   <ItemGroup>
     <!-- Guias de uso de cada API do Swagger (sistema/DocumentacaoApi.cs) -->

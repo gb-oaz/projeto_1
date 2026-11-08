@@ -2,7 +2,8 @@
 <!--
   Cobertura dos testes de ms_mono/ (RNF-25). O core/commons tem o projeto de
   testes dele (tests/core/commons/); medido aqui também, entraria com as linhas
-  que estes testes não exercitam e baixaria a soma do CI.
+  que estes testes não exercitam e baixaria a soma do CI. O código gerado
+  ([GeneratedCode]: os comentários XML do OpenApi, as Regex) também fica de fora.
 -->
 <RunSettings>
   <DataCollectionRunSettings>
@@ -10,6 +11,7 @@
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
           <Exclude>[Boaz.Core.Commons]*</Exclude>
+          <ExcludeByAttribute>GeneratedCodeAttribute</ExcludeByAttribute>
         </Configuration>
       </DataCollector>
     </DataCollectors>
