@@ -172,39 +172,75 @@ public sealed partial class IndicesPassos(Partida partida)
         var agora = DateTime.UtcNow;
         yield return ("contas", new BsonDocument
         {
-            ["_id"] = conta, ["sigla"] = "MARCA", ["dominio"] = "marca_rnf227", ["documentoNumeros"] = "00000000000191",
-            ["nome"] = "Marca RNF-227", ["tipo"] = "INSTITUICAO", ["estado"] = "ATIVA", ["criadaEm"] = agora,
+            ["_id"] = conta,
+            ["sigla"] = "MARCA",
+            ["dominio"] = "marca_rnf227",
+            ["documentoNumeros"] = "00000000000191",
+            ["nome"] = "Marca RNF-227",
+            ["tipo"] = "INSTITUICAO",
+            ["estado"] = "ATIVA",
+            ["criadaEm"] = agora,
         });
         yield return ("usuarios", new BsonDocument
         {
-            ["_id"] = "usr-marca-rnf227", ["contaId"] = conta, ["sigla"] = "MARCA", ["tipo"] = "STAFF", ["estado"] = "ATIVO",
-            ["nome"] = "Marca RNF-227", ["nomeCurto"] = "rnf227", ["login"] = "rnf227.marca@deboaz.com", ["criadoEm"] = agora,
+            ["_id"] = "usr-marca-rnf227",
+            ["contaId"] = conta,
+            ["sigla"] = "MARCA",
+            ["tipo"] = "STAFF",
+            ["estado"] = "ATIVO",
+            ["nome"] = "Marca RNF-227",
+            ["nomeCurto"] = "rnf227",
+            ["login"] = "rnf227.marca@deboaz.com",
+            ["criadoEm"] = agora,
         });
         yield return ("auditoria", new BsonDocument
         {
-            ["_id"] = "qa-rnf227-auditoria", ["traceId"] = "trc-qa-rnf227", ["etapa"] = "CONCLUIDO", ["contaId"] = conta,
-            ["quem"] = "usr-marca-rnf227", ["acao"] = "CRIAR_USUARIO", ["alvo"] = "usr-marca-rnf227", ["quando"] = agora,
+            ["_id"] = "qa-rnf227-auditoria",
+            ["traceId"] = "trc-qa-rnf227",
+            ["etapa"] = "CONCLUIDO",
+            ["contaId"] = conta,
+            ["quem"] = "usr-marca-rnf227",
+            ["acao"] = "CRIAR_USUARIO",
+            ["alvo"] = "usr-marca-rnf227",
+            ["quando"] = agora,
             ["guardarAte"] = agora.AddYears(5),
         });
         yield return ("auditoriaErros", new BsonDocument
         {
-            ["_id"] = "qa-rnf227-erro", ["traceId"] = "trc-qa-rnf227", ["contaId"] = conta, ["quem"] = "usr-marca-rnf227",
-            ["acao"] = "CRIAR_USUARIO", ["codigo"] = "NOME_CURTO_EM_USO", ["nivel"] = "ALERTA", ["quando"] = agora,
+            ["_id"] = "qa-rnf227-erro",
+            ["traceId"] = "trc-qa-rnf227",
+            ["contaId"] = conta,
+            ["quem"] = "usr-marca-rnf227",
+            ["acao"] = "CRIAR_USUARIO",
+            ["codigo"] = "NOME_CURTO_EM_USO",
+            ["nivel"] = "ALERTA",
+            ["quando"] = agora,
             ["guardarAte"] = agora.AddYears(5),
         });
         yield return ("geracoesSenha", new BsonDocument
         {
-            ["_id"] = "qa-rnf227-geracao", ["sigla"] = "MARCA", ["contaId"] = conta, ["usuarioId"] = "usr-marca-rnf227",
-            ["pedidaPor"] = "usr-marca-rnf227", ["pedidaEm"] = agora,
+            ["_id"] = "qa-rnf227-geracao",
+            ["sigla"] = "MARCA",
+            ["contaId"] = conta,
+            ["usuarioId"] = "usr-marca-rnf227",
+            ["pedidaPor"] = "usr-marca-rnf227",
+            ["pedidaEm"] = agora,
         });
         yield return ("registrosPermissao", new BsonDocument
         {
-            ["_id"] = "qa-rnf227-registro", ["sigla"] = "MARCA", ["usuarioId"] = "usr-marca-rnf227", ["por"] = "usr-marca-rnf227",
-            ["em"] = agora, ["versao"] = 1,
+            ["_id"] = "qa-rnf227-registro",
+            ["sigla"] = "MARCA",
+            ["usuarioId"] = "usr-marca-rnf227",
+            ["por"] = "usr-marca-rnf227",
+            ["em"] = agora,
+            ["versao"] = 1,
         });
         yield return ("pedidosAjuda", new BsonDocument
         {
-            ["_id"] = "qa-rnf227-pedido", ["aparelho"] = "qa-rnf227", ["instituicao"] = "Marca RNF-227", ["quando"] = agora,
+            ["_id"] = "qa-rnf227-pedido",
+            ["aparelho"] = "qa-rnf227",
+            ["instituicao"] = "Marca RNF-227",
+            ["quando"] = agora,
         });
     }
 
@@ -222,8 +258,14 @@ public sealed partial class IndicesPassos(Partida partida)
             var dominio = $"{sigla.ToLowerInvariant()}_rnf227_{n}";
             await BancoDaPartida.Colecao(nome).InsertOneAsync(new BsonDocument
             {
-                ["_id"] = id, ["sigla"] = sigla, ["dominio"] = dominio, ["documentoNumeros"] = $"1234567800019{n}",
-                ["nome"] = $"Escola Repetida {n}", ["tipo"] = "INSTITUICAO", ["estado"] = "ATIVA", ["criadaEm"] = DateTime.UtcNow,
+                ["_id"] = id,
+                ["sigla"] = sigla,
+                ["dominio"] = dominio,
+                ["documentoNumeros"] = $"1234567800019{n}",
+                ["nome"] = $"Escola Repetida {n}",
+                ["tipo"] = "INSTITUICAO",
+                ["estado"] = "ATIVA",
+                ["criadaEm"] = DateTime.UtcNow,
             });
             valoresGravados.AddRange([id, dominio]);
         }
@@ -240,8 +282,15 @@ public sealed partial class IndicesPassos(Partida partida)
             var id = $"usr-rnf227-repetido{n}";
             await BancoDaPartida.Colecao(nome).InsertOneAsync(new BsonDocument
             {
-                ["_id"] = id, ["contaId"] = $"conta-rnf227-{n}", ["sigla"] = "RPTDO", ["tipo"] = "STAFF", ["estado"] = "ATIVO",
-                ["nome"] = $"Repetido {n}", ["nomeCurto"] = $"repetido{n}", ["login"] = login, ["criadoEm"] = DateTime.UtcNow,
+                ["_id"] = id,
+                ["contaId"] = $"conta-rnf227-{n}",
+                ["sigla"] = "RPTDO",
+                ["tipo"] = "STAFF",
+                ["estado"] = "ATIVO",
+                ["nome"] = $"Repetido {n}",
+                ["nomeCurto"] = $"repetido{n}",
+                ["login"] = login,
+                ["criadoEm"] = DateTime.UtcNow,
             });
             valoresGravados.Add(id);
         }
