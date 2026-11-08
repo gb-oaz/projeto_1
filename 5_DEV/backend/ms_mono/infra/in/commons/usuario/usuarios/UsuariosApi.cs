@@ -108,7 +108,7 @@ public static class UsuariosApi
 
         api.MapPost("/usuarios", async (NovoUsuarioCorpo? corpo, HttpContext http, ICriarUsuario criar, CancellationToken ct) =>
                 Results.Json(await criar.Executar(new NovoUsuarioDto(http.QuemPede(), corpo?.Tipo, corpo?.Nome, corpo?.NomeCurto, corpo?.Matricula,
-                    corpo?.Responsaveis), ct), statusCode: StatusCodes.Status201Created))
+                    corpo?.Responsaveis), http.NovoTraceId(), ct), statusCode: StatusCodes.Status201Created))
             .ComAcesso(uso)
             .WithSummary("Cadastrar um staff, um participante ou um membro do time")
             .WithDescription("Exige MOD-03 · U (RF-106, RF-108, RN-164, RN-165, RN-188, RN-246). O participante recebe o código de acesso " +
@@ -129,7 +129,7 @@ public static class UsuariosApi
             .Produces<Erro>(StatusCodes.Status422UnprocessableEntity);
 
         api.MapPost("/usuarios/{id}/nova-geracao-senha", async (string id, HttpContext http, IPedirNovaGeracaoDeSenha pedir, CancellationToken ct) =>
-                Results.Json(await pedir.Executar(new PedidoDeUsuarioDto(http.QuemPede(), id), ct), statusCode: StatusCodes.Status201Created))
+                Results.Json(await pedir.Executar(new PedidoDeUsuarioDto(http.QuemPede(), id), http.NovoTraceId(), ct), statusCode: StatusCodes.Status201Created))
             .ComAcesso(uso)
             .WithSummary("Gerar o código de liberação para quem esqueceu a senha")
             .WithDescription("Exige MOD-03 · U e ser superior (RF-110, RN-169, RN-190, RNF-203). A senha antiga e as sessões terminam.")
@@ -148,7 +148,7 @@ public static class UsuariosApi
 
         api.MapPost("/usuarios/{id}/desativar", async (string id, HttpContext http, IDesativarUsuario desativar, CancellationToken ct) =>
             {
-                await desativar.Executar(new PedidoDeUsuarioDto(http.QuemPede(), id), ct);
+                await desativar.Executar(new PedidoDeUsuarioDto(http.QuemPede(), id), http.NovoTraceId(), ct);
                 return Results.NoContent();
             })
             .ComAcesso(uso)

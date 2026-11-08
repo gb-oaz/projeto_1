@@ -15,7 +15,7 @@ public class GeracaoDeSenhaTests
     const string Entrada = "gustavo.ebfga@deboaz.com";
 
     async Task<string> GustavoPendente() =>
-        (await mock.CriarUsuario.Executar(new("usr-ebfga-master", "STAFF", "Gustavo Boaz de Moura Souza", "gustavo"))).CodigoLiberacao!;
+        (await mock.CriarUsuario.Executar(new("usr-ebfga-master", "STAFF", "Gustavo Boaz de Moura Souza", "gustavo"), TraceId.Novo())).CodigoLiberacao!;
 
     [Fact]
     public async Task RF_109_primeiro_acesso_do_staff()
@@ -79,7 +79,7 @@ public class GeracaoDeSenhaTests
     public async Task RF_109_desativado_nao_gera()
     {
         var codigo = await GustavoPendente();
-        await mock.DesativarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-gustavo"));
+        await mock.DesativarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-gustavo"), TraceId.Novo());
         await Falha("CODIGO_INVALIDO", () => mock.GerarSenha.Executar(new(Entrada, codigo)));
     }
 
@@ -100,7 +100,7 @@ public class GeracaoDeSenhaTests
         var senhas = new List<string>();
         for (var i = 0; i < 2; i++)
         {
-            var codigo = (await mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"))).CodigoLiberacao;
+            var codigo = (await mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"), TraceId.Novo())).CodigoLiberacao;
             senhas.Add((await mock.GerarSenha.Executar(new("paulo.ebfga@deboaz.com", codigo))).Senha);
         }
         Assert.All(senhas, s => Assert.Matches(@"^Pa[!@#$%&*]Mendes\d{6}$", s));
@@ -110,8 +110,8 @@ public class GeracaoDeSenhaTests
     [Fact]
     public async Task RF_110_professor_esqueceu_a_senha()
     {
-        var antiga = await mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"));
-        var nova = await mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"));
+        var antiga = await mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"), TraceId.Novo());
+        var nova = await mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"), TraceId.Novo());
 
         Assert.Matches(@"^\d{6}$", nova.CodigoLiberacao);
         Assert.Equal(mock.Relogio.Agora.AddHours(72), nova.VenceEm);
@@ -125,15 +125,15 @@ public class GeracaoDeSenhaTests
 
     [Fact]
     public async Task RF_110_par_nao_pede_a_geracao() =>
-        await Falha("ACESSO_NEGADO", () => mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-joao", "usr-ebfga-rui")));
+        await Falha("ACESSO_NEGADO", () => mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-joao", "usr-ebfga-rui"), TraceId.Novo()));
 
     [Fact]
     public async Task RF_110_participante_nao_tem_senha() =>
-        await Falha("SEM_SENHA", () => mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-master", "usr-ebfga-lucas")));
+        await Falha("SEM_SENHA", () => mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-master", "usr-ebfga-lucas"), TraceId.Novo()));
 
     [Fact]
     public async Task RN_190_membro_esqueceu_a_senha() =>
-        Assert.Matches(@"^\d{6}$", (await mock.PedirNovaGeracaoDeSenha.Executar(new("usr-dboaz-admin", "usr-dboaz-caio"))).CodigoLiberacao);
+        Assert.Matches(@"^\d{6}$", (await mock.PedirNovaGeracaoDeSenha.Executar(new("usr-dboaz-admin", "usr-dboaz-caio"), TraceId.Novo())).CodigoLiberacao);
 
     [Fact]
     public async Task RN_181_codigo_so_na_criacao()

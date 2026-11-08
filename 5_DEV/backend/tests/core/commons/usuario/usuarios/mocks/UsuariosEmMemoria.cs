@@ -29,12 +29,12 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     {
         ListarUsuarios = new ListarUsuarios(this, this, this, Relogio);
         LerUsuario = new LerUsuario(this, this, this, Relogio);
-        CriarUsuario = new CriarUsuario(this, this, this, this, Relogio);
+        CriarUsuario = new CriarUsuario(this, this, this, this, this, Relogio);
         EditarUsuario = new EditarUsuario(this, this, this, this, Relogio);
         GerarSenha = new GerarSenha(this, this, this, this, this, Relogio);
-        PedirNovaGeracaoDeSenha = new PedirNovaGeracaoDeSenha(this, this, this, this, this, Relogio);
+        PedirNovaGeracaoDeSenha = new PedirNovaGeracaoDeSenha(this, this, this, this, this, this, Relogio);
         GerarNovoCodigoDeAcesso = new GerarNovoCodigoDeAcesso(this, this, this, this, Relogio);
-        DesativarUsuario = new DesativarUsuario(this, this, this, this, Relogio);
+        DesativarUsuario = new DesativarUsuario(this, this, this, this, this, Relogio);
         ReativarUsuario = new ReativarUsuario(this, this, this, Relogio);
         LerCardDeUsuarios = new LerCardDeUsuarios(this, this, this, this, Relogio);
         CriarConta = new CriarConta(this, this, this, Relogio, new AmbienteDaAplicacao(ambiente));
@@ -166,6 +166,9 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     /// <summary>Se não for null, IContas.Criar lança esta falha (o banco que cai no meio da gravação).</summary>
     public Exception? FalhaAoCriarConta { get; set; }
 
+    /// <summary>Se não for null, IUsuarios.Inserir e IUsuarios.Atualizar lançam esta falha (o banco que cai no meio da gravação).</summary>
+    public Exception? FalhaAoGravarUsuario { get; set; }
+
     /// <summary>As conferências do SAC.</summary>
     public List<(string ContaId, string Quem, bool Conferiu)> Conferencias { get; } = [];
 
@@ -196,12 +199,14 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     Task IUsuarios.Inserir(UsuarioCadastrado usuario, CancellationToken ct)
     {
+        if (FalhaAoGravarUsuario is { } falha) return Task.FromException(falha);
         usuarios.Add(usuario.Id, usuario);
         return Task.CompletedTask;
     }
 
     Task IUsuarios.Atualizar(UsuarioCadastrado usuario, CancellationToken ct)
     {
+        if (FalhaAoGravarUsuario is { } falha) return Task.FromException(falha);
         usuarios[usuario.Id] = usuario;
         return Task.CompletedTask;
     }

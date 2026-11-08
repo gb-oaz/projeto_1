@@ -93,9 +93,16 @@ sealed class Apoio(IUsuarios usuarios, IContas contas, IAuditoria auditoria, Tim
     }
 
     /// <summary>
+    /// A execução auditada de quem pede (RN-178): quem e a conta dele vão desde
+    /// o "INICIADO". Sem cadastro, vai sem conta, e a recusa sai da regra.
+    /// </summary>
+    public async Task<Execucao> ExecucaoDe(TraceId traceId, AcaoAuditada acao, string quem, string? alvo, CancellationToken ct) =>
+        new(traceId, acao, (await usuarios.Buscar(quem, ct))?.ContaId, quem, alvo);
+
+    /// <summary>
     /// Guarda a ação na auditoria (RN-178), por ora num só registro "CONCLUIDO"
     /// com um traceId próprio: o "INICIADO", o registro de erro e o traceId do
-    /// endereço (RN-270, RN-271) chegam caso a caso, como no CriarConta.
+    /// endereço (RN-270, RN-271) chegam caso a caso, como no CriarUsuario.
     /// </summary>
     public Task Auditar(string contaId, string quem, AcaoAuditada acao, string alvo, CancellationToken ct) =>
         auditoria.Registrar(new RegistroDeAuditoria(TraceId.Novo(), EtapaDaExecucao.Concluido, contaId, quem, acao, alvo, Agora), ct);

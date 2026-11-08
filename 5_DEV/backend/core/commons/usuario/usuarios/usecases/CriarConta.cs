@@ -20,23 +20,17 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 public sealed class CriarConta(IContas contas, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio, AmbienteDaAplicacao ambiente)
     : ICriarConta
 {
+    readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
+
     /// <inheritdoc />
-    public async Task<ContaCriadaDto> Executar(NovaContaDto pedido, TraceId traceId, CancellationToken ct = default)
+    public Task<ContaCriadaDto> Executar(NovaContaDto pedido, TraceId traceId, CancellationToken ct = default)
     {
-        await RegistrarInicio(traceId, ct);
-        try
-        {
-            return await Criar(pedido, traceId, ct);
-        }
-        catch (Exception falha) when (falha is not OperationCanceledException)
-        {
-            await RegistrarErro(traceId, falha, ct);
-            throw;
-        }
+        var execucao = new Execucao(traceId, AcaoAuditada.CriarConta, null, null, null);
+        return auditada.Auditar(execucao, () => Criar(pedido, execucao, ct), ct);
     }
 
     /// <summary>A regra do POST /contas, do formulário ao "CONCLUIDO".</summary>
-    async Task<ContaCriadaDto> Criar(NovaContaDto pedido, TraceId traceId, CancellationToken ct)
+    async Task<ContaCriadaDto> Criar(NovaContaDto pedido, Execucao execucao, CancellationToken ct)
     {
         var dados = ValidarPedido(pedido);
         await GarantirSiglaLivre(dados.Sigla, ct);
@@ -49,7 +43,7 @@ public sealed class CriarConta(IContas contas, IAuditoria auditoria, IAuditoriaD
         var master = MontarMaster(conta, senha, agora);
 
         await Gravar(conta, master, comprovante, agora, ct);
-        await RegistrarConclusao(traceId, conta, ct);
+        await RegistrarConclusao(execucao, conta, ct);
         return new(conta.Id, master.Login, senha, comprovante);
     }
 
@@ -93,25 +87,10 @@ public sealed class CriarConta(IContas contas, IAuditoria auditoria, IAuditoriaD
         return contas.Criar(conta, master, geracao, TempoDaConta.Padrao, ct);
     }
 
-    /// <summary>O "INICIADO" ao chegar: sem login, sem conta e sem alvo, que ainda não existem (RN-178).</summary>
-    Task RegistrarInicio(TraceId traceId, CancellationToken ct) =>
-        auditoria.Registrar(new RegistroDeAuditoria(traceId, EtapaDaExecucao.Iniciado, null, null, AcaoAuditada.CriarConta, null,
-            relogio.GetUtcNow()), ct);
-
-    /// <summary>O "CONCLUIDO" antes de responder, com a conta criada como conta e alvo, sem quem (RN-178).</summary>
-    Task RegistrarConclusao(TraceId traceId, ContaAssinante conta, CancellationToken ct) =>
-        auditoria.Registrar(new RegistroDeAuditoria(traceId, EtapaDaExecucao.Concluido, conta.Id, null, AcaoAuditada.CriarConta, conta.Id,
-            relogio.GetUtcNow()), ct);
-
-    /// <summary>A recusa ou a falha em auditoriaErros, com o traceId do "INICIADO" (RN-270).</summary>
-    Task RegistrarErro(TraceId traceId, Exception falha, CancellationToken ct)
-    {
-        var (codigo, nivel) = Classificar(falha);
-        return erros.Registrar(new RegistroDeErro(traceId, null, null, AcaoAuditada.CriarConta, null, codigo, nivel, relogio.GetUtcNow()), ct);
-    }
-
-    /// <summary>Recusa prevista (FalhaDeUsuarios) é ALERTA com o código dela; o resto é ERRO_INESPERADO, nivel ERRO (RN-270).</summary>
-    static (string Codigo, NivelDoErro Nivel) Classificar(Exception falha) => falha is FalhaDeUsuarios recusa
-        ? (recusa.Codigo, NivelDoErro.Alerta)
-        : (RegistroDeErro.ErroInesperado, NivelDoErro.Erro);
+    /// <summary>
+    /// O "CONCLUIDO" antes de responder, com a conta criada como conta e alvo, sem quem; o "INICIADO"
+    /// foi sem login, sem conta e sem alvo, que ainda não existiam (RN-178).
+    /// </summary>
+    Task RegistrarConclusao(Execucao execucao, ContaAssinante conta, CancellationToken ct) =>
+        auditada.Concluir(execucao with { ContaId = conta.Id, Alvo = conta.Id }, ct);
 }

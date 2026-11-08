@@ -4,6 +4,7 @@ using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Dtos;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Microsoft.Extensions.DependencyInjection;
+using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.MsMono.Tests.Integracao;
 
@@ -39,7 +40,7 @@ public sealed class Preparo(Backend backend)
         var documento = tipo == "INSTITUICAO" ? "12.345.678/0001-90" : "123.456.789-09";
         var criada = await Caso<ICriarConta>().Executar(new NovaContaDto(tipo, $"Escola {sigla}", documento,
             "Gustavo Boaz de Moura Souza", "(51) 99999-0000", sigla.ToLowerInvariant(), sigla),
-            Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId.Novo());
+            TraceId.Novo());
         await Confirmar(criada.Comprovante);
         return (criada.ContaId, await Entrar($"usr-{sigla.ToLowerInvariant()}-master", criada.Login, criada.Senha));
     }
@@ -50,7 +51,8 @@ public sealed class Preparo(Backend backend)
     // Staff (ou membro do time) criado por quem pede, com a senha gerada e confirmada.
     public async Task<Pessoa> Usuario(Pessoa criador, string nomeCurto, string tipo = "STAFF")
     {
-        var criado = await Caso<ICriarUsuario>().Executar(new NovoUsuarioDto(criador.Id, tipo, $"Pessoa {nomeCurto}", nomeCurto));
+        var criado = await Caso<ICriarUsuario>().Executar(new NovoUsuarioDto(criador.Id, tipo, $"Pessoa {nomeCurto}", nomeCurto),
+            TraceId.Novo());
         var senha = await Caso<IGerarSenha>().Executar(new GeracaoDeSenhaDto(criado.Login, criado.CodigoLiberacao));
         await Confirmar(senha.Comprovante);
         return await Entrar(criado.Id, criado.Login, senha.Senha);
@@ -60,7 +62,7 @@ public sealed class Preparo(Backend backend)
     public async Task<(string Id, string Codigo)> Participante(Pessoa criador, string nomeCurto)
     {
         var criado = await Caso<ICriarUsuario>().Executar(new NovoUsuarioDto(criador.Id, "PARTICIPANTE", $"Participante {nomeCurto}", nomeCurto,
-            Responsaveis: [new ResponsavelDto("Carla Andrade", "MAE")]));
+            Responsaveis: [new ResponsavelDto("Carla Andrade", "MAE")]), TraceId.Novo());
         return (criado.Id, criado.Login);
     }
 
