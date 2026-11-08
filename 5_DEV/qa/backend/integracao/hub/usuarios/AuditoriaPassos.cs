@@ -175,12 +175,36 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public void Recusa(int status, string codigo) => Respostas.Confere(mundo.Ultima, status, codigo);
 
     // ── auditoria (RN-178) ─────────────────────────────────────────────────
-    [Then(@"^a coleção ""auditoria"" ganha 2 registros com o mesmo traceId$")]
-    public async Task DoisRegistros()
+    // os 2 da ação do pedido; os das ações internas (RN-275) vêm à parte
+    [Then(@"^a coleção ""auditoria"" ganha 2 registros da ação ""(\w+)"" com o mesmo traceId$")]
+    public async Task DoisRegistros(string acao)
     {
-        var novos = await execucoes.Proprios();
-        Assert.True(novos.Count == 2, $"esperava 2 registros novos em \"auditoria\", vieram {novos.Count}: {Auditoria.Resumo(novos)}");
+        var todos = await execucoes.Novos(Auditoria.Registros);
+        var novos = todos.Where(d => Auditoria.Texto(d, "acao") == acao).ToList();
+        Assert.True(novos.Count == 2, $"esperava 2 registros de {acao} em \"auditoria\", vieram {Auditoria.Resumo(todos)}");
+        Assert.True(todos.All(d => Auditoria.Texto(d, "acao") == acao || Auditoria.Interna(d)),
+            $"além de {acao}, só as ações internas da RN-275: {Auditoria.Resumo(todos)}");
         Auditoria.MesmoTraceId(novos);
+    }
+
+    [Then(@"^os registros das ações internas da RN-275, quando há, vêm à parte, com o mesmo traceId$")]
+    public async Task InternasAParte()
+    {
+        var todos = await execucoes.Novos(Auditoria.Registros);
+        var traceId = Auditoria.MesmoTraceId(await execucoes.Proprios());
+        Assert.All(todos.Where(Auditoria.Interna), d => Assert.Equal(traceId, Auditoria.TraceId(d)));
+    }
+
+    // o aviso das permissões novas do João (RN-275), na execução do PUT
+    [Then(@"^,? ?à parte, ""INICIADO"" e ""CONCLUIDO"" de ""(\w+)"", como na RN-275$")]
+    public async Task InternaDoPut(string interna)
+    {
+        var todos = await execucoes.Novos(Auditoria.Registros);
+        var dela = todos.Where(d => Auditoria.Texto(d, "acao") == interna).ToList();
+        Assert.True(dela.Select(d => Auditoria.Texto(d, "etapa")).SequenceEqual(["INICIADO", "CONCLUIDO"]),
+            $"esperava INICIADO e CONCLUIDO de {interna} em \"auditoria\", vieram {Auditoria.Resumo(todos)}");
+        var traceId = Auditoria.MesmoTraceId(await execucoes.Proprios());
+        Assert.All(dela, d => Assert.Equal(traceId, Auditoria.TraceId(d)));
     }
 
     [Then(@"^o primeiro com a etapa ""(\w+)"", o segundo com a etapa ""(\w+)""$")]
