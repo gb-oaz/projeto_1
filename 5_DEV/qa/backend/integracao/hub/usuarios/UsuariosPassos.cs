@@ -20,7 +20,7 @@ namespace Boaz.Qa.Integracao.Hub.Usuarios;
 // /usuarios com:" criar a Maria, "usr-ebfga-maria" é ela. Valores gerados
 // (senha, código de liberação, comprovante) valem pelo formato.
 [Binding]
-public sealed partial class UsuariosPassos(Mundo mundo, Partida partida)
+public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execucoes execucoes)
 {
     const string SoNoBackend = "conferido nos testes do backend: o qa não olha o banco";
     const string SemSala = "abrir e fechar uma sala não está no contrato";
@@ -1377,8 +1377,9 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida)
         }
     }
 
+    // auditado: o quarto vira ALERTA em "auditoriaErros" (RN-274)
     [When(@"^chega o quarto$")]
-    public Task Quarto() => PedirAjuda();
+    public Task Quarto() => execucoes.Executar(PedirAjuda);
 
     [Then(@"^a resposta é 429 LIMITE_ATENDIMENTO com tentarEm, 24 h depois do primeiro$")]
     public void LimiteDoDia()

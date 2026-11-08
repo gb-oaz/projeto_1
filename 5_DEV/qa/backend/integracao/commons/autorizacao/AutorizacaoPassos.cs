@@ -17,7 +17,7 @@ namespace Boaz.Qa.Integracao.Commons.Autorizacao;
 // ("na versão 6"). O "Sujeito" é de quem o Dado fala: "Dado o João …" e depois
 // "Quando envia …" é o João quem envia.
 [Binding]
-public sealed partial class AutorizacaoPassos(Mundo mundo)
+public sealed partial class AutorizacaoPassos(Mundo mundo, Execucoes execucoes)
 {
     const string SemSala = "abrir e fechar uma sala não está no contrato da Autenticação";
     const string SemEndereco = "o contrato ainda não tem endereço deste módulo";
@@ -150,8 +150,19 @@ public sealed partial class AutorizacaoPassos(Mundo mundo)
     }
 
     // ── entrar e pedir ─────────────────────────────────────────────────────
+    // sem sujeito no Dado, é a Maria dos exemplos (17-a RN-272); auditado
     [When(@"^envia POST /auth/hub/entrar(?: com a entrada e a senha dela)?$")]
-    public async Task SujeitoEntra() => mundo.Atual = await mundo.Entrar(mundo.Sujeito!, Navegador);
+    public async Task SujeitoEntra()
+    {
+        var quem = mundo.Sujeito ?? await mundo.Maria();
+        Sessao? sessao = null;
+        await execucoes.Executar(async () =>
+        {
+            sessao = await mundo.Entrar(quem, Navegador);
+            return mundo.Ultima;
+        });
+        mundo.Atual = sessao;
+    }
 
     [When(@"^envia POST /usuarios para criar um staff$")]
     public Task CriaStaff() => mundo.EnviarComo(mundo.Sujeito!, "POST", "/usuarios", new JsonObject

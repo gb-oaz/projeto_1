@@ -245,9 +245,12 @@ ela.
   passos leem só os metadados (coleções, chave e opções dos índices) e os `_id`
   do banco da instância de Partida (`PARTIDA_Mongo__Banco`, sem ela ficam
   pendentes), nunca o conteúdo nem os nomes internos dos índices.
-  Segunda exceção: a auditoria (RN-178, RN-270, RN-271) promete os registros
-  das coleções "auditoria" e "auditoriaErros", sem endereço na API. Os passos
-  (`suporte/Auditoria.cs`) só leem essas duas coleções do `MONGO_BANCO`, pelos
+  Segunda exceção: a auditoria (RN-178, RN-270, RN-271, RN-274 e, na
+  Autenticação, RN-272 e RN-273) promete os registros das coleções
+  "auditoria" e "auditoriaErros", sem endereço na API. Os passos
+  (`suporte/Auditoria.cs`, com as frases comuns em
+  `suporte/PassosDeAuditoria.cs` e os pedidos no `AuditoriaPassos.cs` de cada
+  pasta) só leem essas duas coleções do `MONGO_BANCO`, pelos
   campos do modelo de documentos do requisito, e contam como "ganho" só o que
   apareceu depois do preparo do cenário. O traceId também é conferido no
   cabeçalho `X-Trace-Id` da resposta.

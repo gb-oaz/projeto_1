@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v74), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v77), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -487,10 +487,25 @@ Funcionalidade: Usuários
 
     Exemplos:
       | pedido                                          | acao               |
-      | POST /usuarios do participante Lucas            | CRIAR_USUARIO      |
       | POST /usuarios/usr-ebfga-ana/nova-geracao-senha | NOVA_GERACAO_SENHA |
       | PUT /usuarios/usr-ebfga-joao/permissoes         | EDITAR_PERMISSOES  |
       | POST /usuarios/usr-ebfga-paulo/desativar        | DESATIVAR_USUARIO  |
+
+  @RN-178
+  Cenário: usuário criado, alvo só na conclusão
+    Quando a Maria envia POST /usuarios do participante Lucas
+    E a resposta é 201 com o id "usr-ebfga-lucas"
+    Então "auditoria" ganha o "INICIADO" da ação "CRIAR_USUARIO" com a Maria e a "conta-ebfga"
+    E esse registro vai sem alvo, porque o Lucas ainda não existe
+    E o "CONCLUIDO", com o mesmo traceId, vai com a Maria, a "conta-ebfga" e o alvo "usr-ebfga-lucas"
+
+  @RN-178
+  Cenário: criação de usuário recusada, sem alvo
+    Dado o participante "Rafael" com a matrícula "2026-0412" na EBFGA
+    Quando a Maria envia POST /usuarios do participante Lucas com a matrícula "2026-0412"
+    Então a resposta é 409 MATRICULA_EM_USO
+    E "auditoria" fica só com o "INICIADO" da ação "CRIAR_USUARIO", sem alvo
+    E o registro de "auditoriaErros" vai com a Maria e a "conta-ebfga", sem alvo
 
   @RN-178
   Cenário: permissões auditadas nas duas coleções
@@ -585,6 +600,30 @@ Funcionalidade: Usuários
     Quando o time deboaz procura o que aconteceu nessa execução
     Então encontra tudo nas coleções "auditoria" e "auditoriaErros" pelo traceId "trc-7f3a9c21"
     E o caso de uso não escreve nada em log; o log da partida, da RNF-226 e da RNF-227, continua
+
+  @RN-271
+  Cenário: corpo que não é JSON não chega ao caso de uso
+    Quando a Maria envia POST /usuarios com o corpo "nome=Lucas", que não é JSON
+    Então a resposta é 422, recusada antes do caso de uso
+    E a resposta não traz o cabeçalho X-Trace-Id
+    E as coleções "auditoria" e "auditoriaErros" não ganham registro
+    E o X-Trace-Id vale só para as respostas que passam pelo caso de uso
+
+  @RN-274
+  Cenário: pedido de ajuda da conta master
+    Quando envia POST /contas/esqueci-senha-master, sem login, da "Escola Bento Freitas"
+    E a resposta é 202, com o cabeçalho X-Trace-Id
+    Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "ESQUECI_SENHA_MASTER"
+    E os dois com o traceId de X-Trace-Id, sem quem e sem contaId
+    E o "CONCLUIDO" vai com o alvo "ajuda-000087", o pedido gravado em "pedidosAjuda"
+
+  @RN-274
+  Cenário: quarto pedido do dia
+    Dado 3 pedidos POST /contas/esqueci-senha-master do mesmo aparelho nas últimas 24 h
+    Quando chega o quarto
+    Então a resposta é 429 LIMITE_ATENDIMENTO, com o cabeçalho X-Trace-Id
+    E "auditoria" fica só com o "INICIADO" da ação "ESQUECI_SENHA_MASTER"
+    E "auditoriaErros" ganha o código "LIMITE_ATENDIMENTO" e o nivel "ALERTA", com o mesmo traceId
 
   @RN-179
   Cenário: sigla sugerida
