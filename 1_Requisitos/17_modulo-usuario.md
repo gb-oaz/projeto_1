@@ -1420,15 +1420,15 @@ Esquema do Cenário: sem o módulo, recusa auditada
   Então a resposta é 403 ACESSO_NEGADO, com o cabeçalho X-Trace-Id
   E "auditoria" fica só com o "INICIADO" da ação "<acao>", com esse traceId
   E "auditoriaErros" ganha "ACESSO_NEGADO" com o nivel "ALERTA", com esse traceId
-  E os dois vão com "usr-ebfga-ana", a "conta-ebfga" e <alvo>
+  E os dois vão com "usr-ebfga-ana", a "conta-ebfga" e o alvo <alvo>
   E o 401 do token vencido continua sem registro, como na RN-273 do 17-a
 
   Exemplos:
-    | aba | pedido                                   | acao                | alvo                     |
-    | U   | POST /usuarios                           | CRIAR_USUARIO       | sem alvo                 |
-    | U   | POST /usuarios/usr-ebfga-paulo/desativar | DESATIVAR_USUARIO   | o alvo "usr-ebfga-paulo" |
-    | C   | PUT /contas/conta-ebfga/tempo-sessao     | SALVAR_TEMPO_SESSAO | o alvo "conta-ebfga"     |
-    | U   | PUT /usuarios/usr-ebfga-joao/permissoes  | EDITAR_PERMISSOES   | o alvo "usr-ebfga-joao"  |
+    | aba | pedido                                   | acao                | alvo              |
+    | U   | POST /usuarios                           | CRIAR_USUARIO       | nenhum            |
+    | U   | POST /usuarios/usr-ebfga-paulo/desativar | DESATIVAR_USUARIO   | "usr-ebfga-paulo" |
+    | C   | PUT /contas/conta-ebfga/tempo-sessao     | SALVAR_TEMPO_SESSAO | "conta-ebfga"     |
+    | U   | PUT /usuarios/usr-ebfga-joao/permissoes  | EDITAR_PERMISSOES   | "usr-ebfga-joao"  |
 
 Cenário: leitura sem o módulo não é auditada
   Dado o token da staff Ana sem "MOD-03" com "U"
