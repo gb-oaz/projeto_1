@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.md (v22), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario-a-autenticacao.md (v24), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Autenticação
   1_Requisitos/17_modulo-usuario-a-autenticacao.md · Cenários de API
@@ -292,6 +292,18 @@ Funcionalidade: Autenticação
       | DELETE | sessoes             | ENCERRAR_SESSOES | usr-ebfga-maria         | usr-ebfga-maria |
 
   @RN-272
+  Esquema do Cenário: alvo conhecido desde o começo
+    Quando a Maria envia <método> /auth/<endereço> com o token da sessão 3f9c2a71
+    Então o "INICIADO" da ação "<acao>" já vai com a Maria, a "conta-ebfga" e o alvo "<alvo>"
+    E o "CONCLUIDO", com o mesmo traceId, repete quem, contaId e alvo
+
+    Exemplos:
+      | método | endereço         | acao             | alvo            |
+      | POST   | sair             | SAIR             | 3f9c2a71        |
+      | DELETE | sessoes/9d41b0c3 | ENCERRAR_SESSAO  | 9d41b0c3        |
+      | DELETE | sessoes          | ENCERRAR_SESSOES | usr-ebfga-maria |
+
+  @RN-272
   Cenário: quem ainda não foi identificado
     Quando a Maria envia POST /auth/hub/entrar com a entrada e a senha certas
     Então o registro "INICIADO" da ação "ENTRAR_HUB" vai com quem, contaId e alvo null
@@ -309,18 +321,37 @@ Funcionalidade: Autenticação
       | pedido                               | resposta                 | acao            | nivel  |
       | senha errada em /auth/hub/entrar     | 401 ENTRADA_INVALIDA     | ENTRAR_HUB      | ALERTA |
       | 5ª senha errada em /auth/hub/entrar  | 429 ENTRADA_BLOQUEADA    | ENTRAR_HUB      | ALERTA |
+      | código errado em /auth/quest/entrar  | 401 CODIGO_INVALIDO      | ENTRAR_QUEST    | ALERTA |
       | comprovante repetido                 | 401 COMPROVANTE_INVALIDO | CONFIRMAR_SENHA | ALERTA |
       | sessão sem uso há 9 h renovada       | 401 SESSAO_TERMINADA     | RENOVAR_SESSAO  | ALERTA |
       | entrada na sala fechada              | 404 SALA_FECHADA         | ENTRAR_SALA     | ALERTA |
       | Redis fora do ar em /auth/hub/entrar | 500 ERRO_INESPERADO      | ENTRAR_HUB      | ERRO   |
 
   @RN-273
-  Cenário: recusa depois de identificar a pessoa
-    Dado a EBFGA suspensa
-    Quando a Maria envia POST /auth/hub/entrar com a entrada e a senha certas
-    Então a resposta é 403 ACESSO_INDISPONIVEL
-    E "auditoriaErros" ganha o código "ACESSO_INDISPONIVEL" e o nivel "ALERTA"
-    E esse registro vai com quem "usr-ebfga-maria" e contaId "conta-ebfga"
+  Esquema do Cenário: recusa depois de identificar a pessoa
+    Dado <situação>
+    Quando chega <método> /auth/<endereço>
+    Então a resposta é <resposta>, com o cabeçalho X-Trace-Id
+    E "auditoriaErros" ganha o código da resposta e o nivel "ALERTA", com esse traceId
+    E esse registro vai com quem "<quem>" e contaId "conta-ebfga"
+
+    Exemplos:
+      | situação       | método | endereço         | resposta                  | quem            |
+      | EBFGA suspensa | POST   | hub/entrar       | 403 ACESSO_INDISPONIVEL   | usr-ebfga-maria |
+      | EBFGA suspensa | POST   | quest/entrar     | 403 ACESSO_INDISPONIVEL   | usr-ebfga-lucas |
+      | sessão do João | DELETE | sessoes/9d41b0c3 | 404 SESSAO_NAO_ENCONTRADA | usr-ebfga-maria |
+
+  @RN-273
+  Esquema do Cenário: token inválido recusado antes do caso de uso
+    Quando chega <pedido> com um token de acesso vencido
+    Então a resposta é 401, recusada antes do caso de uso
+    E a resposta não traz o cabeçalho X-Trace-Id
+    E "auditoria" e "auditoriaErros" não ganham registro, como o 422 da RN-271 do 17
+
+    Exemplos:
+      | pedido            |
+      | POST /auth/sair   |
+      | GET /auth/sessoes |
 
   @RN-273
   Esquema do Cenário: nenhum segredo na auditoria

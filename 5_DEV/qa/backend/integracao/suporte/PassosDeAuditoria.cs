@@ -54,6 +54,17 @@ public sealed class PassosDeAuditoria(Mundo mundo, Execucoes execucoes)
         execucoes.Registro = novos[0];
     }
 
+    // a leitura não auditada (RN-271 do 17) e o pedido recusado antes do caso de uso (RN-273)
+    [Then(@"^as coleções ""auditoria"" e ""auditoriaErros"" não ganham registro$")]
+    [Then(@"^""auditoria"" e ""auditoriaErros"" não ganham registro, como o 422 da RN-271 do 17$")]
+    public async Task NadaGravado()
+    {
+        var registros = await execucoes.Novos(Auditoria.Registros);
+        var erros = await execucoes.Novos(Auditoria.Erros);
+        Assert.True(registros.Count == 0 && erros.Count == 0,
+            $"o pedido gravou {Auditoria.Resumo(registros)} em \"auditoria\" e {Auditoria.Resumo(erros)} em \"auditoriaErros\"");
+    }
+
     // a execução recusada: só o INICIADO, sem CONCLUIDO
     [Then(@"^""auditoria"" fica só com o ""INICIADO"" da ação ""(\w+)""$")]
     public async Task SoOIniciado(string acao)

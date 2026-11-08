@@ -229,15 +229,6 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         Assert.Null(Auditoria.Texto(concluido, "quem"));
     }
 
-    [Then(@"^as coleções ""auditoria"" e ""auditoriaErros"" não ganham registro$")]
-    public async Task NadaGravado()
-    {
-        var registros = await execucoes.Novos(Auditoria.Registros);
-        var erros = await execucoes.Novos(Auditoria.Erros);
-        Assert.True(registros.Count == 0 && erros.Count == 0,
-            $"a leitura gravou {Auditoria.Resumo(registros)} em \"auditoria\" e {Auditoria.Resumo(erros)} em \"auditoriaErros\"");
-    }
-
     // ── erros e alertas (RN-270) ───────────────────────────────────────────
     [Then(@"^a coleção ""auditoria"" fica só com o registro ""(\w+)"" da ação ""(\w+)""$")]
     public async Task SoORegistro(string etapa, string acao)

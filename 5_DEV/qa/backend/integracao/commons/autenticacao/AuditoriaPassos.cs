@@ -131,7 +131,7 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     }
 
     // ── recusas (RN-273) ───────────────────────────────────────────────────
-    [When(@"^chega (senha errada em /auth/hub/entrar|5ª senha errada em /auth/hub/entrar|comprovante repetido|sessão sem uso há 9 h renovada|entrada na sala fechada|Redis fora do ar em /auth/hub/entrar)$")]
+    [When(@"^chega (senha errada em /auth/hub/entrar|5ª senha errada em /auth/hub/entrar|código errado em /auth/quest/entrar|comprovante repetido|sessão sem uso há 9 h renovada|entrada na sala fechada|Redis fora do ar em /auth/hub/entrar)$")]
     public async Task Chega(string pedido)
     {
         switch (pedido)
@@ -146,6 +146,14 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
                 }
                 await SenhaErradaDaMaria();
                 break;
+            case "código errado em /auth/quest/entrar":
+                {
+                    // o código do Lucas com os números trocados
+                    var codigo = await mundo.CodigoDoLucas();
+                    var errado = codigo[..^4] + (codigo[^4..] == "0000" ? "1111" : "0000");
+                    await execucoes.Executar(() => mundo.TentarQuest(App, codigo: errado));
+                    break;
+                }
             case "comprovante repetido":
                 {
                     var comprovante = new JsonObject { ["comprovante"] = await mundo.MariaPendente() }.ToJsonString();
@@ -167,6 +175,97 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
                 throw new PendingStepException(
                     "derrubar o Redis no meio de um pedido não dá para provocar de fora, numa suíte caixa-preta: " +
                     "o 500 ERRO_INESPERADO com nivel ERRO fica nos testes do backend, como o do banco caindo");
+        }
+    }
+
+    // a recusa depois de identificar a pessoa: o preparo vem antes do pedido
+    [Given(@"^(EBFGA suspensa|sessão do João)$")]
+    public async Task Situacao(string situacao)
+    {
+        var maria = await mundo.Maria();
+        if (situacao == "sessão do João")
+        {
+            await mundo.SessaoDe(maria, Navegador);
+            var doJoao = await mundo.SessaoDe(await mundo.Joao(), Navegador);
+            mundo.Apelidos["9d41b0c3"] = () => Task.FromResult(doJoao.Sid);
+            return;
+        }
+        // o Lucas e o código dele existem antes da escola sair do ar
+        await mundo.CodigoDoLucas();
+        Exigir(await mundo.Enviar("POST", $"/contas/{await mundo.Conta()}/estado",
+            new JsonObject { ["estado"] = "SUSPENSA" }.ToJsonString(), await mundo.TokenDe(mundo.Admin())),
+            200, "POST /contas/{id}/estado");
+    }
+
+    [When(@"^chega (POST|DELETE) /auth/(hub/entrar|quest/entrar|sessoes/9d41b0c3)$")]
+    public async Task ChegaDeQuemFoiIdentificado(string metodo, string endereco)
+    {
+        switch (endereco)
+        {
+            case "hub/entrar":
+                await MariaEntra();
+                break;
+            case "quest/entrar":
+                await execucoes.Executar(() => mundo.TentarQuest(App));
+                break;
+            default:
+                {
+                    var token = (await mundo.SessaoDe(await mundo.Maria(), Navegador)).Acesso;
+                    var caminho = await mundo.Traduzir("/auth/sessoes/9d41b0c3");
+                    await execucoes.Executar(() => mundo.Enviar(metodo, caminho, token: token));
+                    break;
+                }
+        }
+    }
+
+    // ── token inválido recusado antes do caso de uso (RN-273) ──────────────
+    [When(@"^chega (POST /auth/sair|GET /auth/sessoes) com um token de acesso vencido$")]
+    public async Task ChegaComTokenVencido(string pedido)
+    {
+        var sessao = await mundo.SessaoDe(await mundo.Maria(), Navegador);
+        var carga = Jwt.Carga(sessao.Acesso);
+        var agora = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        carga["iat"] = agora - 960;
+        carga["exp"] = agora - 60;
+        var vencido = Jwt.Assinar(Jwt.Cabecalho(sessao.Acesso), carga);
+        var partes = pedido.Split(' ');
+        await execucoes.Executar(() => mundo.Enviar(partes[0], partes[1], token: vencido));
+    }
+
+    [Then(@"^a resposta é 401, recusada antes do caso de uso$")]
+    public void RecusadaAntesDoCasoDeUso() => Respostas.Confere(mundo.Ultima, 401);
+
+    // ── alvo conhecido desde o começo (RN-272) ─────────────────────────────
+    // 3f9c2a71 é a sessão do navegador e 9d41b0c3 a do app, as duas da Maria
+    [When(@"^a Maria envia (POST|DELETE) /auth/(sair|sessoes/9d41b0c3|sessoes) com o token da sessão 3f9c2a71$")]
+    public async Task EnviaComASessao(string metodo, string endereco)
+    {
+        var maria = await mundo.Maria();
+        var navegador = await mundo.SessaoDe(maria, Navegador);
+        var app = await mundo.SessaoDe(maria, App);
+        mundo.Apelidos["9d41b0c3"] = () => Task.FromResult(app.Sid);
+        var caminho = await mundo.Traduzir($"/auth/{endereco}");
+        await execucoes.Executar(() => mundo.Enviar(metodo, caminho, token: navegador.Acesso));
+    }
+
+    [Then(@"^o ""INICIADO"" da ação ""(\w+)"" já vai com a Maria, a ""(.+)"" e o alvo ""(.+)""$")]
+    public async Task IniciadoComOAlvo(string acao, string conta, string alvo)
+    {
+        var iniciado = execucoes.Registro = await execucoes.Etapa("INICIADO", acao);
+        Assert.Equal((await mundo.Maria()).Id, Auditoria.Texto(iniciado, "quem"));
+        Assert.Equal(await mundo.Traduzir(conta), Auditoria.Texto(iniciado, "contaId"));
+        Assert.Equal(await mundo.Traduzir(alvo), Auditoria.Texto(iniciado, "alvo"));
+    }
+
+    [Then(@"^o ""CONCLUIDO"", com o mesmo traceId, repete quem, contaId e alvo$")]
+    public async Task ConcluidoRepete()
+    {
+        Assert.NotNull(execucoes.Registro);
+        var concluido = await Concluido();
+        Assert.Equal(Auditoria.TraceId(execucoes.Registro), Auditoria.TraceId(concluido));
+        foreach (var campo in new[] { "quem", "contaId", "alvo" })
+        {
+            Assert.Equal(Auditoria.Texto(execucoes.Registro, campo), Auditoria.Texto(concluido, campo));
         }
     }
 
