@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v21"
-data: "2026-11-07 14:05"
+versao: "v22"
+data: "2026-11-08 02:14"
 status: "Aprovado"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v21** · 2026-11-07 14:05 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v22** · 2026-11-08 02:14 · **Aprovado**
 
 # Módulo Usuários · Autorização
 
@@ -875,9 +875,9 @@ Cenário: o que este documento não trata
 
 [![Sequência de conceder permissões: o administrador do deboaz concede o SAC ao membro do time e a conta master concede a Presença ao staff, com as concedíveis, o salvamento com a versão, as recusas, a nova versão nas sessões e a renovação que leva o módulo à casca, com as telas de exemplo de cada passo](../2_Diagramas/autorizacao-sequencia_v02_20261102-1400.svg)](../2_Diagramas/autorizacao-sequencia_v02_20261102-1400.svg)
 
-**Autorização · contrato de API** — `2_Diagramas/autorizacao-contrato-api_v05_20261102-1724.svg`
+**Autorização · contrato de API** — `2_Diagramas/autorizacao-contrato-api_v06_20261108-0212.svg`
 
-[![Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, com os códigos de erro](../2_Diagramas/autorizacao-contrato-api_v05_20261102-1724.svg)](../2_Diagramas/autorizacao-contrato-api_v05_20261102-1724.svg)
+[![Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, com os códigos de erro](../2_Diagramas/autorizacao-contrato-api_v06_20261108-0212.svg)](../2_Diagramas/autorizacao-contrato-api_v06_20261108-0212.svg)
 
 **Autorização · classes** — `2_Diagramas/autorizacao-classes_v01_20261101-1502.svg`
 
@@ -895,7 +895,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v21** | 2026-11-07 14:05 | Diagrama autorizacao-documentos v03: índices como o ms_mono cria na partida (login, registrosPermissao com versao); contratacoes com _id e sigla, ainda sem índice; cenários sem mudança |
+| **v22** | 2026-11-08 02:14 | Contrato de API v06 (17 `RN-178`, `RN-270`, `RN-271`): PUT /usuarios/{id}/permissoes grava INICIADO e CONCLUIDO de EDITAR_PERMISSOES em "auditoria" e a versão em "registrosPermissao"; recusas 4xx em "auditoriaErros" (ALERTA); 500 ERRO_INESPERADO (ERRO); X-Trace-Id em toda resposta do caso de uso; cenários sem mudança |
+| v21 | 2026-11-07 14:05 | Diagrama autorizacao-documentos v03: índices como o ms_mono cria na partida (login, registrosPermissao com versao); contratacoes com _id e sigla, ainda sem índice; cenários sem mudança |
 | v20 | 2026-11-06 23:23 | Diagrama autorizacao-documentos v02, fiel ao código: suspensos só no requisito, modulos com quemUsa, tipo ADMINISTRADOR |
 | v19 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v18 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
@@ -910,4 +911,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v21 · 2026-11-07 14:05 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v22 · 2026-11-08 02:14 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
