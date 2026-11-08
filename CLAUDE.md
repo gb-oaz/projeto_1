@@ -26,12 +26,14 @@ O time é formado por agentes especialistas em `.claude/agents/`. Cada um é don
 
 | Agente | Responsável por | Skills |
 |---|---|---|
-| `deboaz-po` | requisitos em Gherkin em `1_Requisitos/` (cenários de tela e de API, PDF) | `requisito`, `requisito-estilo` |
-| `deboaz-uxui` | vistas de tela (`vista-<app>-<tela>-web\|pwa\|mobile`) e design system em `0_Assets/design/` | `design-system`, `diagrama-dev` |
-| `deboaz-arc` | diagramas UML em `2_Diagramas/` (menos as vistas), arquitetura em `3_Arquitetura/`, CI/CD em `4_CI_CD/` e `.github/workflows/` | `diagrama-dev`, `diagrama-arquitetura` |
-| `deboaz-qa` | testes de integração, funcionais (web e mobile) e carga em `5_DEV/qa/`, a partir do Gherkin | `desenvolvimento` |
-| `deboaz-backend` | `5_DEV/backend/`: domínio, casos de uso, API, banco e cache, a partir dos diagramas | `desenvolvimento` |
-| `deboaz-frontend` | `5_DEV/frontend/` web e mobile, a partir das vistas e do design system | `desenvolvimento`, `design-system` |
+| `deboaz-po` | requisitos em Gherkin em `1_Requisitos/` (cenários de tela e de API, PDF) | `requisito`, `requisito-estilo`, `gherkin-bdd`, `engenharia-requisitos`, `engenharia-software` |
+| `deboaz-uxui` | vistas de tela (`vista-<app>-<tela>-web\|pwa\|mobile`) e design system em `0_Assets/design/` | `design-system`, `diagrama-dev`, `gherkin-bdd`, `ux-usabilidade` |
+| `deboaz-arc` | diagramas UML em `2_Diagramas/` (menos as vistas), arquitetura em `3_Arquitetura/`, CI/CD em `4_CI_CD/` e `.github/workflows/` | `diagrama-dev`, `diagrama-arquitetura`, `gherkin-bdd`, `engenharia-software`, `arquitetura-software`, `devops-cloud` |
+| `deboaz-qa` | testes de integração, funcionais (web e mobile) e carga em `5_DEV/qa/`, a partir do Gherkin | `desenvolvimento`, `gherkin-bdd`, `engenharia-software`, `estrategia-qa` |
+| `deboaz-backend` | `5_DEV/backend/`: domínio, casos de uso, API, banco e cache, a partir dos diagramas | `desenvolvimento`, `gherkin-bdd`, `engenharia-software` |
+| `deboaz-frontend` | `5_DEV/frontend/` web e mobile, a partir das vistas e do design system | `desenvolvimento`, `design-system`, `gherkin-bdd`, `engenharia-software`, `frontend-vue` |
+
+Skills de conhecimento: `gherkin-bdd` é a base comum (ler requisito em Gherkin dentro do `.md`, achar lacuna, rastrear ID → teste → código, relatar atendidos/pendentes); `engenharia-software` é compartilhada pelos que modelam ou constroem; as especializadas (`engenharia-requisitos`, `arquitetura-software`, `devops-cloud`, `ux-usabilidade`, `frontend-vue`, `estrategia-qa`) guardam o detalhe técnico em `referencias/`, lido sob demanda. Só o `deboaz-po` escreve requisito; os demais propõem o cenário na resposta.
 
 Ordem de uma funcionalidade: `deboaz-po` (Gherkin) → `deboaz-uxui` (vistas) → `deboaz-arc` (diagramas) → `deboaz-qa` (testes vermelhos) → `deboaz-backend` / `deboaz-frontend` (verde). Lacuna ou divergência volta ao dono da etapa anterior em vez de virar decisão silenciosa.
 
