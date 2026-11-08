@@ -18,6 +18,13 @@ public static class Auditoria
 {
     public const string Registros = "auditoria", Erros = "auditoriaErros";
 
+    // os casos de uso internos (RN-275 do 17): chamados de dentro de outra
+    // execução, gravam com o traceId dela. As frases que contam os registros
+    // "da execução do pedido" (RN-178) os deixam de fora
+    public static readonly HashSet<string> Internas = ["ENCERRAR_SESSOES_DO_USUARIO", "AVISAR_PERMISSOES_NOVAS", "AVISAR_CONTRATACAO_MUDOU"];
+
+    public static bool Interna(BsonDocument d) => Internas.Contains(Texto(d, "acao") ?? "");
+
     static readonly Lazy<MongoClient> mongo = new(() => new MongoClient(Ambiente.MongoUrl));
 
     static IMongoCollection<BsonDocument> Colecao(string nome) =>
@@ -134,6 +141,10 @@ public sealed class Execucoes(Mundo mundo)
         Assert.True(marcas.Count > i && i >= 0, "nenhum pedido auditado marcado neste cenário");
         return Auditoria.Novos(colecao, marcas[i].Antes, i + 1 < marcas.Count ? marcas[i].Depois : null);
     }
+
+    // os registros de "auditoria" do próprio pedido, sem os dos casos de uso internos (RN-275)
+    public async Task<List<BsonDocument>> Proprios() =>
+        [.. (await Novos(Auditoria.Registros)).Where(d => !Auditoria.Interna(d))];
 
     public async Task<BsonDocument> UmNovoErro()
     {

@@ -178,7 +178,7 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^a coleção ""auditoria"" ganha 2 registros com o mesmo traceId$")]
     public async Task DoisRegistros()
     {
-        var novos = await execucoes.Novos(Auditoria.Registros);
+        var novos = await execucoes.Proprios();
         Assert.True(novos.Count == 2, $"esperava 2 registros novos em \"auditoria\", vieram {novos.Count}: {Auditoria.Resumo(novos)}");
         Auditoria.MesmoTraceId(novos);
     }
@@ -186,7 +186,7 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^o primeiro com a etapa ""(\w+)"", o segundo com a etapa ""(\w+)""$")]
     public async Task Etapas(string primeira, string segunda)
     {
-        var novos = await execucoes.Novos(Auditoria.Registros);
+        var novos = await execucoes.Proprios();
         Assert.Equal(new[] { primeira, segunda }, novos.Select(d => Auditoria.Texto(d, "etapa")).ToArray());
     }
 
@@ -197,7 +197,7 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         // o alvo já existe antes do pedido (RN-178): o CRIAR_USUARIO, sem
         // alvo no INICIADO, tem cenário próprio
         Assert.False(string.IsNullOrEmpty(alvo), "o pedido não guardou o alvo");
-        var novos = await execucoes.Novos(Auditoria.Registros);
+        var novos = await execucoes.Proprios();
         Assert.NotEmpty(novos);
         Assert.All(novos, d =>
         {
@@ -215,7 +215,7 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     {
         // a Pessoa da conta master não guarda o id: ele vem do sub do token dela
         var master = await mundo.Traduzir("usr-ebfga-master");
-        var novos = await execucoes.Novos(Auditoria.Registros);
+        var novos = await execucoes.Proprios();
         Assert.Equal(new[] { primeira, segunda }, novos.Select(d => Auditoria.Texto(d, "etapa")).ToArray());
         Auditoria.MesmoTraceId(novos);
         Assert.All(novos, d =>
@@ -471,13 +471,18 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public async Task CorpoQueNaoEJson(string corpo) =>
         await Executar(await MariaPronta(), "POST", "/usuarios", corpo);
 
-    // o mesmo endereço, com um corpo válido, passa pelo caso de uso e traz o cabeçalho
-    [Then(@"^o X-Trace-Id vale só para as respostas que passam pelo caso de uso$")]
-    public async Task SoQuemPassaPeloCasoDeUso()
+    // o mesmo endereço é auditado com um corpo válido (201) e sem o módulo
+    // (403 da RN-270): as duas respostas trazem o cabeçalho
+    [Then(@"^o X-Trace-Id vale só para as respostas auditadas, com o 403 sem o módulo da RN-270$")]
+    public async Task SoAsAuditadas()
     {
         var r = await mundo.EnviarComo(await mundo.Maria(), "POST", "/usuarios", Participante("Pedro"));
         Respostas.Confere(r, 201);
         Auditoria.TraceIdDoCabecalho(r);
+        await AnaSemOModulo("MOD-03", "U");
+        var semModulo = await mundo.EnviarComo(mundo.Sujeito!, "POST", "/usuarios", Participante("Rafael"));
+        Respostas.Confere(semModulo, 403, "ACESSO_NEGADO");
+        Auditoria.TraceIdDoCabecalho(semModulo);
     }
 
     // ── pedido de ajuda da conta master (RN-274) ───────────────────────────
@@ -739,32 +744,197 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         }
     }
 
-    // ── sem o módulo, antes do caso de uso (RN-270) ────────────────────────
-    // a Ana sem nenhum módulo, salva pela conta master; o Paulo existe e o
-    // login dela sai antes da marca
+    // ── sem o módulo (RN-270) ──────────────────────────────────────────────
+    // a Ana sem a aba pedida do módulo, salva pela conta master: sem "U", fica
+    // sem o módulo; sem "C", fica só com "U", para faltar só a Configuração.
+    // O Paulo e o João existem e o login dela sai antes da marca
     [Given(@"^o token da staff Ana sem ""(MOD-\d+)"" com ""(\w+)""$")]
     public async Task AnaSemOModulo(string mod, string aba)
     {
         var ana = await mundo.Ana();
         var atuais = (await mundo.Permissoes(ana))["mods"]!.AsObject()
             .ToDictionary(m => m.Key, m => m.Value!.GetValue<string>());
-        if (atuais.TryGetValue(mod, out var abas) && abas.Contains(aba, StringComparison.Ordinal))
+        var antes = atuais.GetValueOrDefault(mod);
+        var depois = aba == "U" ? "" : "U";
+        if (antes != (depois.Length == 0 ? null : depois))
         {
-            var sem = abas.Replace(aba, "", StringComparison.Ordinal);
-            if (sem.Length == 0) atuais.Remove(mod);
-            else atuais[mod] = sem;
+            if (depois.Length == 0) atuais.Remove(mod);
+            else atuais[mod] = depois;
             await mundo.Definir(ana, atuais);
         }
         await mundo.Paulo();
+        await mundo.Conta();
         await mundo.TokenDe(ana);
         mundo.Sujeito = ana;
     }
 
-    [When(@"^ela envia POST (/usuarios/usr-ebfga-paulo/desativar)$")]
-    public async Task ElaDesativa(string caminho)
+    // o corpo de cada pedido é válido: a única falta é a do módulo. A versão
+    // das permissões do João é lida antes da marca, para o If-Match
+    [When(@"^ela envia (POST|PUT|GET) (\S+)$")]
+    public async Task ElaEnvia(string metodo, string caminho)
     {
         var real = await mundo.Traduzir(caminho);
-        await Executar(mundo.Sujeito!, "POST", real, null);
+        string? corpo = null, ifMatch = null;
+        if (real == "/usuarios" && metodo == "POST")
+        {
+            corpo = Participante("Pedro");
+        }
+        else if (real.EndsWith("/tempo-sessao", StringComparison.Ordinal))
+        {
+            corpo = """
+                {
+                  "staffNavegador": "PT4H",
+                  "staffApp": "P7D",
+                  "participante": "P30D"
+                }
+                """;
+        }
+        else if (real.EndsWith("/permissoes", StringComparison.Ordinal))
+        {
+            ifMatch = (await mundo.Permissoes(await mundo.Joao()))["versao"]!.GetValue<int>().ToString();
+            corpo = """
+                {
+                  "mods": {}
+                }
+                """;
+        }
+        await Executar(mundo.Sujeito!, metodo, real, corpo, ifMatch);
+    }
+
+    [Then(@"^""auditoriaErros"" ganha ""([A-Z_]+)"" com o nivel ""(\w+)"", com esse traceId$")]
+    public async Task ErroDoCodigoComOTraceId(string codigo, string nivel)
+    {
+        erro = await execucoes.UmNovoErro();
+        Assert.Equal(codigo, Auditoria.Texto(erro, "codigo"));
+        Assert.Equal(nivel, Auditoria.Texto(erro, "nivel"));
+        Assert.Equal(Auditoria.TraceIdDoCabecalho(mundo.Ultima), Auditoria.TraceId(erro));
+        execucoes.NaHoraDoPedido(erro);
+    }
+
+    // "os dois": o INICIADO da frase anterior e o registro de "auditoriaErros"
+    [Then(@"^os dois vão com ""(usr-ebfga-ana)"", a ""(conta-ebfga)"" e o alvo (nenhum|""[^""]+"")$")]
+    public async Task OsDoisDaAna(string quem, string conta, string alvoDoExemplo)
+    {
+        Assert.NotNull(registro);
+        Assert.NotNull(erro);
+        var id = await mundo.Traduzir(quem);
+        var contaId = await mundo.Traduzir(conta);
+        var esperado = alvoDoExemplo == "nenhum" ? null : await mundo.Traduzir(alvoDoExemplo.Trim('"'));
+        foreach (var d in new[] { registro, erro })
+        {
+            Assert.Equal(id, Auditoria.Texto(d, "quem"));
+            Assert.Equal(contaId, Auditoria.Texto(d, "contaId"));
+            Assert.True(Auditoria.Texto(d, "alvo") == esperado, $"esperava o alvo {esperado ?? "null"}: {d.ToJson()}");
+        }
+    }
+
+    // o mesmo pedido com o token da Ana vencido (assinado de novo, com exp no
+    // passado): 401 antes do caso de uso, sem registro nas duas coleções
+    [Then(@"^o 401 do token vencido continua sem registro, como na RN-273 do 17-a$")]
+    public async Task TokenVencidoSemRegistro()
+    {
+        var token = await mundo.TokenDe(mundo.Sujeito!);
+        var carga = Jwt.Carga(token);
+        var agora = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        carga["iat"] = agora - 960;
+        carga["exp"] = agora - 60;
+        var vencido = Jwt.Assinar(Jwt.Cabecalho(token), carga);
+        var (metodo, caminho, corpo) = pedido;
+        var r = await execucoes.Executar(() => mundo.Enviar(metodo, caminho, corpo, vencido));
+        Respostas.Confere(r, 401);
+        var registros = await execucoes.Novos(Auditoria.Registros);
+        var erros = await execucoes.Novos(Auditoria.Erros);
+        Assert.True(registros.Count == 0 && erros.Count == 0,
+            $"o 401 gravou {Auditoria.Resumo(registros)} em \"auditoria\" e {Auditoria.Resumo(erros)} em \"auditoriaErros\"");
+    }
+
+    // ── casos de uso internos (RN-275) ─────────────────────────────────────
+    // o registro em conferência é o INICIADO da ação interna; o pedido é o
+    // INICIADO e o CONCLUIDO das outras ações da mesma execução
+    [Then(@"^os dois com o traceId da execução do pedido, entre o ""INICIADO"" e o ""CONCLUIDO"" dela$")]
+    public async Task InternaDentroDaExecucao()
+    {
+        var (iniciado, concluido, internas) = await PedidoEInternas();
+        var traceId = Auditoria.TraceId(iniciado);
+        Assert.Equal(traceId, Auditoria.TraceId(concluido));
+        Assert.All(internas, d =>
+        {
+            Assert.Equal(traceId, Auditoria.TraceId(d));
+            var quando = Auditoria.Data(d, "quando");
+            Assert.True(quando >= Auditoria.Data(iniciado, "quando") && quando <= Auditoria.Data(concluido, "quando"),
+                $"a ação interna devia ficar entre o INICIADO e o CONCLUIDO do pedido: {d.ToJson()}, pedido {Auditoria.Resumo([iniciado, concluido])}");
+        });
+    }
+
+    [Then(@"^os dois com quem e contaId da execução do pedido e o alvo, o usuário do pedido$")]
+    public async Task InternaComQuemContaEAlvo()
+    {
+        Assert.False(string.IsNullOrEmpty(alvo), "o pedido não guardou o alvo");
+        var (iniciado, _, internas) = await PedidoEInternas();
+        Assert.All(internas, d =>
+        {
+            Assert.Equal(Auditoria.Texto(iniciado, "quem"), Auditoria.Texto(d, "quem"));
+            Assert.Equal(Auditoria.Texto(iniciado, "contaId"), Auditoria.Texto(d, "contaId"));
+            Assert.Equal(alvo, Auditoria.Texto(d, "alvo"));
+        });
+    }
+
+    async Task<(BsonDocument Iniciado, BsonDocument Concluido, List<BsonDocument> Internas)> PedidoEInternas()
+    {
+        Assert.NotNull(registro);
+        var acao = Auditoria.Texto(registro, "acao");
+        var novos = await execucoes.Novos(Auditoria.Registros);
+        var internas = novos.Where(d => Auditoria.Texto(d, "acao") == acao).ToList();
+        var proprios = await execucoes.Proprios();
+        Assert.True(proprios.Count == 2 && Auditoria.Texto(proprios[0], "etapa") == "INICIADO" && Auditoria.Texto(proprios[1], "etapa") == "CONCLUIDO",
+            $"esperava o INICIADO e o CONCLUIDO do pedido, vieram {Auditoria.Resumo(proprios)}");
+        return (proprios[0], proprios[1], internas);
+    }
+
+    // o Catálogo é outro contexto: o contrato de API não tem endereço para
+    // descontratar nem para o aviso, e a suíte não injeta o traceId de outra execução
+    [Given(@"^a execução do Catálogo com o traceId ""trc-5b81e0d4"", em que o Caio descontrata a Presença$")]
+    [When(@"^o Catálogo avisa que a contratação da EBFGA mudou$")]
+    [Then(@"^os dois com o traceId ""trc-5b81e0d4"", ""usr-dboaz-caio"", a ""conta-ebfga"" e o alvo ""conta-ebfga""$")]
+    [Then(@"^cada usuário da EBFGA ganha ""INICIADO"" e ""CONCLUIDO"" de ""AVISAR_PERMISSOES_NOVAS""$")]
+    [Then(@"^esses vão com o mesmo traceId, o Caio, a ""conta-ebfga"" e o usuário como alvo$")]
+    public static void AvisoDoCatalogo() => throw new PendingStepException(
+        "o aviso do Catálogo (AVISAR_CONTRATACAO_MUDOU) não tem endereço no contrato nem é provocável de fora, numa suíte caixa-preta: " +
+        "fica nos testes do backend, chamando o caso de uso com o traceId, o Caio e a conta da execução do Catálogo");
+
+    // a falha da gravação no meio da execução interna não é provocável de fora,
+    // como o "banco cai" da RN-270; as frases seguintes conferem o que ela grava
+    [When(@"^a gravação falha ao encerrar as sessões do Paulo$")]
+    public static void FalhaNaInterna() => throw new PendingStepException(
+        "derrubar a gravação no meio de ENCERRAR_SESSOES_DO_USUARIO não dá para provocar de fora, numa suíte caixa-preta: " +
+        "os 2 registros ERRO_INESPERADO com nivel ERRO ficam nos testes do backend, com a porta de saída falhando");
+
+    [Then(@"^""auditoriaErros"" ganha (\d+) registros ""([A-Z_]+)"" com o nivel ""(\w+)"" e esse traceId$")]
+    public async Task ErrosDaExecucao(int quantos, string codigo, string nivel)
+    {
+        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var erros = await execucoes.Novos(Auditoria.Erros);
+        Assert.True(erros.Count == quantos, $"esperava {quantos} registros em \"auditoriaErros\", vieram {Auditoria.Resumo(erros)}");
+        Assert.All(erros, d =>
+        {
+            Assert.Equal(codigo, Auditoria.Texto(d, "codigo"));
+            Assert.Equal(nivel, Auditoria.Texto(d, "nivel"));
+            Assert.Equal(traceId, Auditoria.TraceId(d));
+        });
+    }
+
+    [Then(@"^um da ação ""(\w+)"", o outro de ""(\w+)""$")]
+    public async Task UmDeCadaAcao(string interna, string doPedido)
+    {
+        var acoes = (await execucoes.Novos(Auditoria.Erros)).Select(d => Auditoria.Texto(d, "acao")).Order().ToArray();
+        Assert.Equal(new[] { interna, doPedido }.Order().ToArray(), acoes);
+    }
+
+    [Then(@"^nenhuma das duas ações ganha ""CONCLUIDO""$")]
+    public async Task NenhumConcluido()
+    {
+        var concluidos = (await execucoes.Novos(Auditoria.Registros)).Where(d => Auditoria.Texto(d, "etapa") == "CONCLUIDO").ToList();
+        Assert.True(concluidos.Count == 0, $"a execução que falhou gravou {Auditoria.Resumo(concluidos)}");
     }
 
     // ── apoio da RN-178 e da RN-270 ────────────────────────────────────────

@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v83), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v85), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -622,12 +622,28 @@ Funcionalidade: Usuários
       | a master da EBFGA no tempo do time      | 403 ACESSO_NEGADO          | SALVAR_TEMPO_SESSAO |
 
   @RN-270
-  Cenário: sem o módulo, recusada antes do caso de uso
+  Esquema do Cenário: sem o módulo, recusa auditada
+    Dado o token da staff Ana sem "MOD-03" com "<aba>"
+    Quando ela envia <pedido>
+    Então a resposta é 403 ACESSO_NEGADO, com o cabeçalho X-Trace-Id
+    E "auditoria" fica só com o "INICIADO" da ação "<acao>", com esse traceId
+    E "auditoriaErros" ganha "ACESSO_NEGADO" com o nivel "ALERTA", com esse traceId
+    E os dois vão com "usr-ebfga-ana", a "conta-ebfga" e o alvo <alvo>
+    E o 401 do token vencido continua sem registro, como na RN-273 do 17-a
+
+    Exemplos:
+      | aba | pedido                                   | acao                | alvo              |
+      | U   | POST /usuarios                           | CRIAR_USUARIO       | nenhum            |
+      | U   | POST /usuarios/usr-ebfga-paulo/desativar | DESATIVAR_USUARIO   | "usr-ebfga-paulo" |
+      | C   | PUT /contas/conta-ebfga/tempo-sessao     | SALVAR_TEMPO_SESSAO | "conta-ebfga"     |
+      | U   | PUT /usuarios/usr-ebfga-joao/permissoes  | EDITAR_PERMISSOES   | "usr-ebfga-joao"  |
+
+  @RN-270
+  Cenário: leitura sem o módulo não é auditada
     Dado o token da staff Ana sem "MOD-03" com "U"
-    Quando ela envia POST /usuarios/usr-ebfga-paulo/desativar
-    Então a resposta é 403 ACESSO_NEGADO, recusada antes do caso de uso
-    E a resposta não traz o cabeçalho X-Trace-Id
-    E as coleções "auditoria" e "auditoriaErros" não ganham registro, como o 422 da RN-271
+    Quando ela envia GET /usuarios?tipo=PARTICIPANTE
+    Então a resposta é 403 ACESSO_NEGADO, sem o cabeçalho X-Trace-Id
+    E as coleções "auditoria" e "auditoriaErros" não ganham registro, como a leitura da RN-178
 
   @RN-270
   Cenário: guardado e imutável como a auditoria
@@ -673,7 +689,7 @@ Funcionalidade: Usuários
     E a mensagem é "O campo "corpo" está faltando ou é inválido."
     E a resposta não traz o cabeçalho X-Trace-Id
     E as coleções "auditoria" e "auditoriaErros" não ganham registro
-    E o X-Trace-Id vale só para as respostas que passam pelo caso de uso
+    E o X-Trace-Id vale só para as respostas auditadas, com o 403 sem o módulo da RN-270
 
   @RN-274
   Cenário: pedido de ajuda da conta master
@@ -690,6 +706,39 @@ Funcionalidade: Usuários
     Então a resposta é 429 LIMITE_ATENDIMENTO, com o cabeçalho X-Trace-Id
     E "auditoria" fica só com o "INICIADO" da ação "ESQUECI_SENHA_MASTER"
     E "auditoriaErros" ganha o código "LIMITE_ATENDIMENTO" e o nivel "ALERTA", com o mesmo traceId
+
+  @RN-275
+  Esquema do Cenário: chamado de dentro de outra execução, com o traceId dela
+    Quando a Maria envia <pedido>
+    E a resposta é de sucesso
+    Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "<interna>"
+    E os dois com o traceId da execução do pedido, entre o "INICIADO" e o "CONCLUIDO" dela
+    E os dois com quem e contaId da execução do pedido e o alvo, o usuário do pedido
+
+    Exemplos:
+      | pedido                                            | interna                     |
+      | POST /usuarios/usr-ebfga-paulo/desativar          | ENCERRAR_SESSOES_DO_USUARIO |
+      | POST /usuarios/usr-ebfga-ana/nova-geracao-senha   | ENCERRAR_SESSOES_DO_USUARIO |
+      | POST /usuarios/usr-ebfga-lucas/novo-codigo-acesso | ENCERRAR_SESSOES_DO_USUARIO |
+      | PUT /usuarios/usr-ebfga-joao/permissoes           | AVISAR_PERMISSOES_NOVAS     |
+
+  @RN-275
+  Cenário: contratação mudou, avisada pelo Catálogo
+    Dado a execução do Catálogo com o traceId "trc-5b81e0d4", em que o Caio descontrata a Presença
+    Quando o Catálogo avisa que a contratação da EBFGA mudou
+    Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "AVISAR_CONTRATACAO_MUDOU"
+    E os dois com o traceId "trc-5b81e0d4", "usr-dboaz-caio", a "conta-ebfga" e o alvo "conta-ebfga"
+    E cada usuário da EBFGA ganha "INICIADO" e "CONCLUIDO" de "AVISAR_PERMISSOES_NOVAS"
+    E esses vão com o mesmo traceId, o Caio, a "conta-ebfga" e o usuário como alvo
+
+  @RN-275
+  Cenário: falha na execução interna
+    Quando a Maria envia POST /usuarios/usr-ebfga-paulo/desativar
+    E a gravação falha ao encerrar as sessões do Paulo
+    Então a resposta é 500 ERRO_INESPERADO, com o cabeçalho X-Trace-Id
+    E "auditoriaErros" ganha 2 registros "ERRO_INESPERADO" com o nivel "ERRO" e esse traceId
+    E um da ação "ENCERRAR_SESSOES_DO_USUARIO", o outro de "DESATIVAR_USUARIO"
+    E nenhuma das duas ações ganha "CONCLUIDO"
 
   @RN-179
   Cenário: sigla sugerida

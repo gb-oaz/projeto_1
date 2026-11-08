@@ -31,9 +31,13 @@ public sealed class PassosDeAuditoria(Mundo mundo, Execucoes execucoes)
         Auditoria.TraceIdDoCabecalho(mundo.Ultima);
     }
 
-    // o 403 sem o módulo (RN-270): a recusa sai antes do caso de uso
-    [Then(@"^a resposta é (\d{3}) ([A-Z_]+), recusada antes do caso de uso$")]
-    public void RecusadaAntesDoCasoDeUso(int status, string codigo) => Respostas.Confere(mundo.Ultima, status, codigo);
+    // a leitura sem o módulo (RN-270): recusada sem passar pelo caso de uso
+    [Then(@"^a resposta é (\d{3}) ([A-Z_]+), sem o cabeçalho X-Trace-Id$")]
+    public void RecusaSemTraceId(int status, string codigo)
+    {
+        Respostas.Confere(mundo.Ultima, status, codigo);
+        SemTraceId();
+    }
 
     [Then(@"^a resposta não traz o cabeçalho X-Trace-Id$")]
     public void SemTraceId() =>
@@ -45,7 +49,8 @@ public sealed class PassosDeAuditoria(Mundo mundo, Execucoes execucoes)
     [Then(@"^""auditoria"" ganha ""INICIADO"" e ""CONCLUIDO"" da ação ""(\w+)""(?:, com o mesmo traceId)?$")]
     public async Task IniciadoEConcluido(string acao)
     {
-        var novos = await execucoes.Novos(Auditoria.Registros);
+        // só os da ação: o pedido e os casos de uso internos que ele chama (RN-275) gravam juntos
+        var novos = (await execucoes.Novos(Auditoria.Registros)).Where(d => Auditoria.Texto(d, "acao") == acao).ToList();
         Assert.True(novos.Select(d => Auditoria.Texto(d, "etapa")).SequenceEqual(["INICIADO", "CONCLUIDO"]),
             $"esperava INICIADO e CONCLUIDO de {acao} em \"auditoria\", vieram {Auditoria.Resumo(novos)}");
         Assert.All(novos, d =>
@@ -61,7 +66,7 @@ public sealed class PassosDeAuditoria(Mundo mundo, Execucoes execucoes)
     // a leitura não auditada (RN-271 do 17) e o pedido recusado antes do caso de uso (RN-273)
     [Then(@"^as coleções ""auditoria"" e ""auditoriaErros"" não ganham registro$")]
     [Then(@"^""auditoria"" e ""auditoriaErros"" não ganham registro, como o 422 da RN-271 do 17$")]
-    [Then(@"^as coleções ""auditoria"" e ""auditoriaErros"" não ganham registro, como o 422 da RN-271$")]
+    [Then(@"^as coleções ""auditoria"" e ""auditoriaErros"" não ganham registro, como a leitura da RN-178$")]
     public async Task NadaGravado()
     {
         var registros = await execucoes.Novos(Auditoria.Registros);
