@@ -46,9 +46,18 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
     /// <inheritdoc />
     public async Task<PermissoesSalvasDto> Executar(SalvamentoDePermissoesDto pedido, TraceId traceId, CancellationToken ct = default)
     {
-        var contaId = (await leitor.Usuario(pedido.QuemPede, ct))?.ContaId;
-        var execucao = new Execucao(traceId, AcaoAuditada.EditarPermissoes, contaId, pedido.QuemPede, pedido.UsuarioId);
+        var execucao = await ExecucaoDe(pedido, traceId, ct);
         return await auditada.Auditar(execucao, () => Salvar(pedido, execucao, ct), ct);
+    }
+
+    /// <summary>
+    /// A execução auditada: quem pede, a conta dele e o alvo já no "INICIADO"; sem
+    /// cadastro, vai sem conta, e a recusa sai da regra (RN-178).
+    /// </summary>
+    async Task<Execucao> ExecucaoDe(SalvamentoDePermissoesDto pedido, TraceId traceId, CancellationToken ct)
+    {
+        var contaId = (await leitor.Usuario(pedido.QuemPede, ct))?.ContaId;
+        return new Execucao(traceId, AcaoAuditada.EditarPermissoes, contaId, pedido.QuemPede, pedido.UsuarioId);
     }
 
     /// <summary>A regra do PUT, de quem pede ao "CONCLUIDO".</summary>
@@ -58,15 +67,21 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
         var versaoLida = pedido.VersaoLida();
         var novos = pedido.ModsLidos();
 
-        var permissoes = await leitor.Guardadas(alvo.Id, ct);
-        if (permissoes.Versao != versaoLida) throw FalhaDeAutorizacao.VersaoDesatualizada(permissoes.Versao, alvo.Nome);
-
+        var permissoes = await PermissoesNaVersao(alvo, versaoLida, ct);
         var modulos = await leitor.ModulosDe(alvo, ct);
         GarantirQuePodeMudar(alvo, permissoes.Visiveis(modulos.Disponiveis), novos, modulos,
             CalculoDePermissoes.Concediveis(quem, modsDeQuem, alvo, modulos));
         await Gravar(alvo, permissoes, novos, modulos, quem.Id, versaoLida, ct);
         await auditada.Concluir(execucao, ct);
         return new PermissoesSalvasDto(permissoes.Versao, Textos.Mods(permissoes.Visiveis(modulos.Disponiveis)));
+    }
+
+    /// <summary>As permissões guardadas do alvo, se ainda estão na versão lida (RF-162).</summary>
+    /// <exception cref="FalhaDeAutorizacao">VERSAO_DESATUALIZADA.</exception>
+    async Task<PermissoesDoUsuario> PermissoesNaVersao(UsuarioAutorizado alvo, int versaoLida, CancellationToken ct)
+    {
+        var permissoes = await leitor.Guardadas(alvo.Id, ct);
+        return permissoes.Versao == versaoLida ? permissoes : throw FalhaDeAutorizacao.VersaoDesatualizada(permissoes.Versao, alvo.Nome);
     }
 
     /// <summary>Cada módulo que muda existe, está contratado, o alvo usa e quem concede tem as abas (RN-166, RN-241).</summary>

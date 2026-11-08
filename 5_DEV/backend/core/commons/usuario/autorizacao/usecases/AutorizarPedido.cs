@@ -15,10 +15,14 @@ public sealed class AutorizarPedido : IAutorizarPedido
     public void Executar(ExigenciaDaRota? exigencia, PedidoAutorizavelDto pedido)
     {
         var papel = Papeis.De(pedido.Papel);
-        var mods = pedido.Mods
+        var mods = ModsDoToken(pedido);
+        if (exigencia is null || papel is null || !exigencia.Atende(papel.Value, mods)) throw FalhaDeAutorizacao.AcessoNegado();
+    }
+
+    /// <summary>Os módulos do token com abas do contrato; o resto não conta (RNF-220).</summary>
+    static Dictionary<string, Abas> ModsDoToken(PedidoAutorizavelDto pedido) =>
+        pedido.Mods
             .Select(m => (m.Key, Abas: Abas.De(m.Value)))
             .Where(m => m.Abas is not null)
             .ToDictionary(m => m.Key, m => m.Abas!.Value);
-        if (exigencia is null || papel is null || !exigencia.Atende(papel.Value, mods)) throw FalhaDeAutorizacao.AcessoNegado();
-    }
 }
