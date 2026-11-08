@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v76"
-data: "2026-11-08 02:05"
+versao: "v77"
+data: "2026-11-08 02:08"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v76** · 2026-11-08 02:05 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v77** · 2026-11-08 02:08 · **Em revisão**
 
 # Módulo Usuários
 
@@ -1287,10 +1287,23 @@ Esquema do Cenário: execução auditada do começo ao fim
 
   Exemplos:
     | pedido                                          | acao               |
-    | POST /usuarios do participante Lucas            | CRIAR_USUARIO      |
     | POST /usuarios/usr-ebfga-ana/nova-geracao-senha | NOVA_GERACAO_SENHA |
     | PUT /usuarios/usr-ebfga-joao/permissoes         | EDITAR_PERMISSOES  |
     | POST /usuarios/usr-ebfga-paulo/desativar        | DESATIVAR_USUARIO  |
+
+Cenário: usuário criado, alvo só na conclusão
+  Quando a Maria envia POST /usuarios do participante Lucas
+  E a resposta é 201 com o id "usr-ebfga-lucas"
+  Então "auditoria" ganha o "INICIADO" da ação "CRIAR_USUARIO" com a Maria e a "conta-ebfga"
+  E esse registro vai sem alvo, porque o Lucas ainda não existe
+  E o "CONCLUIDO", com o mesmo traceId, vai com a Maria, a "conta-ebfga" e o alvo "usr-ebfga-lucas"
+
+Cenário: criação de usuário recusada, sem alvo
+  Dado o participante "Rafael" com a matrícula "2026-0412" na EBFGA
+  Quando a Maria envia POST /usuarios do participante Lucas com a matrícula "2026-0412"
+  Então a resposta é 409 MATRICULA_EM_USO
+  E "auditoria" fica só com o "INICIADO" da ação "CRIAR_USUARIO", sem alvo
+  E o registro de "auditoriaErros" vai com a Maria e a "conta-ebfga", sem alvo
 
 Cenário: permissões auditadas nas duas coleções
   Quando a conta master envia PUT /usuarios/usr-ebfga-joao/permissoes
@@ -1386,6 +1399,13 @@ Cenário: acompanhamento só pela auditoria
   Quando o time deboaz procura o que aconteceu nessa execução
   Então encontra tudo nas coleções "auditoria" e "auditoriaErros" pelo traceId "trc-7f3a9c21"
   E o caso de uso não escreve nada em log; o log da partida, da RNF-226 e da RNF-227, continua
+
+Cenário: corpo que não é JSON não chega ao caso de uso
+  Quando a Maria envia POST /usuarios com o corpo "nome=Lucas", que não é JSON
+  Então a resposta é 422, recusada antes do caso de uso
+  E a resposta não traz o cabeçalho X-Trace-Id
+  E as coleções "auditoria" e "auditoriaErros" não ganham registro
+  E o X-Trace-Id vale só para as respostas que passam pelo caso de uso
 ```
 
 <a id="RN-274"></a>
@@ -2320,7 +2340,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v76** | 2026-11-08 02:05 | `RN-274`: POST /contas/esqueci-senha-master auditado com a ação ESQUECI_SENHA_MASTER, sem quem nem contaId, X-Trace-Id e 429 LIMITE_ATENDIMENTO como ALERTA; entradas e sessões no 17-a (`RN-272`, `RN-273`); Em aberto resolvido e removido |
+| **v77** | 2026-11-08 02:08 | `RN-178`: CRIAR_USUARIO sem alvo no INICIADO e na recusa (409 MATRICULA_EM_USO), alvo só no CONCLUIDO; quem e contaId desde o INICIADO; `RN-271`: corpo que não é JSON recebe 422 antes do caso de uso, sem X-Trace-Id nem registros |
+| v76 | 2026-11-08 02:05 | `RN-274`: POST /contas/esqueci-senha-master auditado com a ação ESQUECI_SENHA_MASTER, sem quem nem contaId, X-Trace-Id e 429 LIMITE_ATENDIMENTO como ALERTA; entradas e sessões no 17-a (`RN-272`, `RN-273`); Em aberto resolvido e removido |
 | v75 | 2026-11-08 02:04 | Diagramas da v74 (`RN-178`, `RN-270`, `RN-271`): sequência v03 → v04 (422 com X-Trace-Id só o da regra; corpo que não é JSON recusado antes do endpoint, sem traceId, registros nem X-Trace-Id), contrato de API v06 → v07 (500 ERRO_INESPERADO confirmado, PUT permissões entre os auditados), classes v04 → v05 (EDITAR_PERMISSOES em AcaoAuditada) |
 | v74 | 2026-11-08 02:00 | `RN-270`: 500 ERRO_INESPERADO com "Algo deu errado. Tente de novo mais tarde.", nivel ERRO; Paulo já desativado com 409 ESTADO_IGUAL; leitura recusada pelo time deboaz (GET /contas); `RN-178`: PUT permissões grava "auditoria" com EDITAR_PERMISSOES além de "registrosPermissao"; `RNF-227` e `RNF-227-api`: índices de "auditoria" e "auditoriaErros", 7 coleções; Em aberto: auditoria de esqueci-senha-master e /auth/* |
 | v73 | 2026-11-08 01:26 | Diagramas da auditoria (`RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (INICIADO, CONCLUIDO, auditoriaErros e X-Trace-Id; gravações no MongoDB e no Redis destacadas), contrato de API v05 → v06 (X-Trace-Id nos auditados, 500), classes v03 → v04 (traceId, etapa, RegistroDeErro, IAuditoriaDeErros), modelo de documentos v12 → v13 (auditoriaErros e índices) |
@@ -2329,8 +2350,7 @@ Cenário: o que este documento não trata
 | v70 | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
 | v69 | 2026-11-07 15:52 | `RN-188` e `RN-188-api`: exemplo de dois participantes sem matrícula no educador autônomo, aceitos (201, sem 409 MATRICULA_EM_USO), porque a matrícula só é única quando existe; diagramas: modelo de documentos v11 → v12, sem partição pela sigla |
 | v68 | 2026-11-07 14:53 | `RN-179` e `RN-179-api`: exemplo da sigla "colsa", aceita e gravada como "COLSA" (201, conta "conta-colsa"); diagramas: modelo de documentos v10 → v11 |
-| v67 | 2026-11-07 14:52 | `RNF-227`: exemplo do índice único já existente na mesma chave com outro nome, que o banco recusa; a partida para, como nos outros índices únicos |
 
 ---
 
-<sub>boaz · v76 · 2026-11-08 02:05 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v77 · 2026-11-08 02:08 · `1_Requisitos/17_modulo-usuario.md`</sub>
