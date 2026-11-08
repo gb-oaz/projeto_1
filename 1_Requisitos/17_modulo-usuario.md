@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v86"
-data: "2026-11-08 11:58"
+versao: "v87"
+data: "2026-11-08 11:59"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v86** · 2026-11-08 11:58 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v87** · 2026-11-08 11:59 · **Em revisão**
 
 # Módulo Usuários
 
@@ -1338,7 +1338,7 @@ Cenário: permissões auditadas nas duas coleções
   Quando a conta master envia PUT /usuarios/usr-ebfga-joao/permissoes
   E a resposta é de sucesso
   Então a coleção "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "EDITAR_PERMISSOES"
-  E, à parte, "INICIADO" e "CONCLUIDO" de "AVISAR_PERMISSOES_NOVAS", como na RN-275
+  E à parte, "INICIADO" e "CONCLUIDO" de "AVISAR_PERMISSOES_NOVAS", como na RN-275
   E "registrosPermissao" ganha a versão nova das permissões do João, como na RN-256
 
 Cenário: conta criada sem login
@@ -2455,7 +2455,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v86** | 2026-11-08 11:58 | `RN-178`: "2 registros da ação <acao>" no Esquema, com os registros das ações internas da `RN-275` à parte e com o mesmo traceId; permissões com o "INICIADO" e o "CONCLUIDO" de AVISAR_PERMISSOES_NOVAS; comportamento sem mudança |
+| **v87** | 2026-11-08 11:59 | `RN-178`: "E à parte" no cenário das permissões, Gherkin válido; comportamento sem mudança |
+| v86 | 2026-11-08 11:58 | `RN-178`: "2 registros da ação <acao>" no Esquema, com os registros das ações internas da `RN-275` à parte e com o mesmo traceId; permissões com o "INICIADO" e o "CONCLUIDO" de AVISAR_PERMISSOES_NOVAS; comportamento sem mudança |
 | v85 | 2026-11-08 11:53 | `RN-270`: o 403 ACESSO_NEGADO sem o módulo passa a ser auditado nos endereços que mudam estado (INICIADO só, auditoriaErros ALERTA com quem, contaId e alvo, X-Trace-Id); leitura sem o módulo e 401 de token seguem sem registro; `RN-271`: X-Trace-Id em toda resposta auditada; `RN-275` novo: ENCERRAR_SESSOES_DO_USUARIO, AVISAR_PERMISSOES_NOVAS e AVISAR_CONTRATACAO_MUDOU auditados com o traceId, quem e contaId de quem chama, falha como ERRO |
 | v84 | 2026-11-08 11:35 | Diagrama (`RN-270`): contrato de API v09 → v10 (403 ACESSO_NEGADO sem o módulo, MOD-03 · U, recusado antes do caso de uso, sem traceId, registros nem X-Trace-Id, como o 422 do corpo que não é JSON) |
 | v83 | 2026-11-08 11:31 | Auditoria em todos os casos de uso: `RN-178` com REATIVAR_USUARIO, EDITAR_USUARIO, NOVO_CODIGO_ACESSO e SALVAR_TEMPO_SESSAO da conta nos Exemplos e cenários de GERAR_SENHA sem login, CODIGO_MASTER e SALVAR_TEMPO_SESSAO do time (quem, contaId e alvo por etapa); `RN-270` com a recusa prevista de cada caso de uso como ALERTA e o 403 sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registro |
@@ -2465,8 +2466,7 @@ Cenário: o que este documento não trata
 | v79 | 2026-11-08 02:14 | Diagramas da v76–v78 (`RN-178`, `RN-271`, `RN-274`): contrato de API v07 → v08 (POST /contas/esqueci-senha-master auditado com ESQUECI_SENHA_MASTER, X-Trace-Id, 429 LIMITE_ATENDIMENTO como ALERTA e 500 ERRO_INESPERADO; 422 de corpo que não é JSON com DADOS_INVALIDOS e campo "corpo", sem X-Trace-Id), sequência v04 → v05 (INICIADO de CRIAR_USUARIO sem alvo, alvo só no CONCLUIDO) |
 | v78 | 2026-11-08 02:11 | `RN-178`, `RN-272`, `RN-274`: AcaoAuditada com 21 ações (EDITAR_PERMISSOES, ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO, ENCERRAR_SESSOES, ESQUECI_SENHA_MASTER e as 11 anteriores), auditoria e auditoriaErros gravadas também pela Autenticação; diagramas: classes v05 → v06, modelo de documentos v13 → v14 |
 | v77 | 2026-11-08 02:08 | `RN-178`: CRIAR_USUARIO sem alvo no INICIADO e na recusa (409 MATRICULA_EM_USO), alvo só no CONCLUIDO; quem e contaId desde o INICIADO; `RN-271`: corpo que não é JSON recebe 422 antes do caso de uso, sem X-Trace-Id nem registros |
-| v76 | 2026-11-08 02:05 | `RN-274`: POST /contas/esqueci-senha-master auditado com a ação ESQUECI_SENHA_MASTER, sem quem nem contaId, X-Trace-Id e 429 LIMITE_ATENDIMENTO como ALERTA; entradas e sessões no 17-a (`RN-272`, `RN-273`); Em aberto resolvido e removido |
 
 ---
 
-<sub>boaz · v86 · 2026-11-08 11:58 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v87 · 2026-11-08 11:59 · `1_Requisitos/17_modulo-usuario.md`</sub>
