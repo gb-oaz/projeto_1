@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v72"
-data: "2026-11-08 01:14"
+versao: "v73"
+data: "2026-11-08 01:26"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v72** · 2026-11-08 01:14 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v73** · 2026-11-08 01:26 · **Em revisão**
 
 # Módulo Usuários
 
@@ -2252,29 +2252,29 @@ Cenário: o que este documento não trata
 
 [![Casos de uso de identidade e acesso: conta master, staff, participantes, permissões, senhas, edição de staff e participante, novo código de acesso, SAC, contas e tempo de sessão cuidados pelo time deboaz no módulo Usuários e entradas no quest](../2_Diagramas/identidade-acesso_v04_20261101-0351.svg)](../2_Diagramas/identidade-acesso_v04_20261101-0351.svg)
 
-**Usuários · sequência** — `2_Diagramas/usuarios-sequencia_v02_20261103-1143.svg`
+**Usuários · sequência** — `2_Diagramas/usuarios-sequencia_v03_20261108-0118.svg`
 
-[![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v02_20261103-1143.svg)](../2_Diagramas/usuarios-sequencia_v02_20261103-1143.svg)
+[![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v03_20261108-0118.svg)](../2_Diagramas/usuarios-sequencia_v03_20261108-0118.svg)
 
 **Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg`
 
 [![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)
 
-**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v05_20261107-1414.svg`
+**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v06_20261108-0118.svg`
 
-[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v05_20261107-1414.svg)](../2_Diagramas/usuarios-contrato-api_v05_20261107-1414.svg)
+[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v06_20261108-0118.svg)](../2_Diagramas/usuarios-contrato-api_v06_20261108-0118.svg)
 
-**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v03_20261101-1500.svg`
+**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v04_20261108-0118.svg`
 
-[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável e AcessoAnônimo; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v03_20261101-1500.svg)](../2_Diagramas/identidade-acesso-classes_v03_20261101-1500.svg)
+[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v04_20261108-0118.svg)](../2_Diagramas/identidade-acesso-classes_v04_20261108-0118.svg)
 
 **Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg`
 
 [![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)
 
-**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v12_20261107-1542.svg`
+**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v13_20261108-0118.svg`
 
-[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos e auditoria; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v12_20261107-1542.svg)](../2_Diagramas/identidade-acesso-documentos_v12_20261107-1542.svg)
+[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos, auditoria com traceId e etapa e auditoriaErros; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v13_20261108-0118.svg)](../2_Diagramas/identidade-acesso-documentos_v13_20261108-0118.svg)
 
 ---
 
@@ -2293,7 +2293,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v72** | 2026-11-08 01:14 | `RN-270`: nivel "ALERTA" (recusa prevista, 4xx) ou "ERRO" (falha inesperada, 5xx), guarda de 5 anos e imutável como a auditoria; `RN-271`: cabeçalho X-Trace-Id em toda resposta dos endpoints auditados, igual ao traceId gravado; "sem log" só nos casos de uso; exemplo do registro de erro com nivel e guardarAte; pendências de Produto respondidas |
+| **v73** | 2026-11-08 01:26 | Diagramas da auditoria (`RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (INICIADO, CONCLUIDO, auditoriaErros e X-Trace-Id; gravações no MongoDB e no Redis destacadas), contrato de API v05 → v06 (X-Trace-Id nos auditados, 500), classes v03 → v04 (traceId, etapa, RegistroDeErro, IAuditoriaDeErros), modelo de documentos v12 → v13 (auditoriaErros e índices) |
+| v72 | 2026-11-08 01:14 | `RN-270`: nivel "ALERTA" (recusa prevista, 4xx) ou "ERRO" (falha inesperada, 5xx), guarda de 5 anos e imutável como a auditoria; `RN-271`: cabeçalho X-Trace-Id em toda resposta dos endpoints auditados, igual ao traceId gravado; "sem log" só nos casos de uso; exemplo do registro de erro com nivel e guardarAte; pendências de Produto respondidas |
 | v71 | 2026-11-08 01:10 | `RN-178`: auditoria só do que muda estado, com registros "INICIADO" e "CONCLUIDO" ligados pelo traceId; leitura não é auditada; `RN-270`: coleção "auditoriaErros", gravada antes da recusa; `RN-271`: um traceId por execução, sem log; exemplo de entidades com traceId e registro de erro; status → Em revisão |
 | v70 | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
 | v69 | 2026-11-07 15:52 | `RN-188` e `RN-188-api`: exemplo de dois participantes sem matrícula no educador autônomo, aceitos (201, sem 409 MATRICULA_EM_USO), porque a matrícula só é única quando existe; diagramas: modelo de documentos v11 → v12, sem partição pela sigla |
@@ -2306,4 +2307,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v72 · 2026-11-08 01:14 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v73 · 2026-11-08 01:26 · `1_Requisitos/17_modulo-usuario.md`</sub>
