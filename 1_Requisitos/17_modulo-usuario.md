@@ -3,19 +3,19 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v74"
-data: "2026-11-08 02:00"
+versao: "v76"
+data: "2026-11-08 02:05"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v74** · 2026-11-08 02:00 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v76** · 2026-11-08 02:05 · **Em revisão**
 
 # Módulo Usuários
 
 **Objetivo:** definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest.
 
-**Sumário:** [Cenários de tela](#cenarios-tela) · [Cenários de API](#cenarios-api) · [Telas](#telas) · [Diagramas](#diagramas) · [Em aberto](#em-aberto) · [Histórico](#historico)
+**Sumário:** [Cenários de tela](#cenarios-tela) · [Cenários de API](#cenarios-api) · [Telas](#telas) · [Diagramas](#diagramas) · [Histórico](#historico)
 
 ---
 
@@ -1388,6 +1388,28 @@ Cenário: acompanhamento só pela auditoria
   E o caso de uso não escreve nada em log; o log da partida, da RNF-226 e da RNF-227, continua
 ```
 
+<a id="RN-274"></a>
+
+### `RN-274` Atendimento sem login auditado
+
+> Entradas e sessões: [17_modulo-usuario-a-autenticacao `RN-272`](17_modulo-usuario-a-autenticacao.md#RN-272) e [`RN-273`](17_modulo-usuario-a-autenticacao.md#RN-273)
+
+```gherkin
+Cenário: pedido de ajuda da conta master
+  Quando envia POST /contas/esqueci-senha-master, sem login, da "Escola Bento Freitas"
+  E a resposta é 202, com o cabeçalho X-Trace-Id
+  Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "ESQUECI_SENHA_MASTER"
+  E os dois com o traceId de X-Trace-Id, sem quem e sem contaId
+  E o "CONCLUIDO" vai com o alvo "ajuda-000087", o pedido gravado em "pedidosAjuda"
+
+Cenário: quarto pedido do dia
+  Dado 3 pedidos POST /contas/esqueci-senha-master do mesmo aparelho nas últimas 24 h
+  Quando chega o quarto
+  Então a resposta é 429 LIMITE_ATENDIMENTO, com o cabeçalho X-Trace-Id
+  E "auditoria" fica só com o "INICIADO" da ação "ESQUECI_SENHA_MASTER"
+  E "auditoriaErros" ganha o código "LIMITE_ATENDIMENTO" e o nivel "ALERTA", com o mesmo traceId
+```
+
 <a id="RN-179-api"></a>
 
 ### `RN-179` Sigla
@@ -2266,21 +2288,21 @@ Cenário: o que este documento não trata
 
 [![Casos de uso de identidade e acesso: conta master, staff, participantes, permissões, senhas, edição de staff e participante, novo código de acesso, SAC, contas e tempo de sessão cuidados pelo time deboaz no módulo Usuários e entradas no quest](../2_Diagramas/identidade-acesso_v04_20261101-0351.svg)](../2_Diagramas/identidade-acesso_v04_20261101-0351.svg)
 
-**Usuários · sequência** — `2_Diagramas/usuarios-sequencia_v03_20261108-0118.svg`
+**Usuários · sequência** — `2_Diagramas/usuarios-sequencia_v04_20261108-0203.svg`
 
-[![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v03_20261108-0118.svg)](../2_Diagramas/usuarios-sequencia_v03_20261108-0118.svg)
+[![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v04_20261108-0203.svg)](../2_Diagramas/usuarios-sequencia_v04_20261108-0203.svg)
 
 **Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg`
 
 [![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)
 
-**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v06_20261108-0118.svg`
+**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v07_20261108-0203.svg`
 
-[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v06_20261108-0118.svg)](../2_Diagramas/usuarios-contrato-api_v06_20261108-0118.svg)
+[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v07_20261108-0203.svg)](../2_Diagramas/usuarios-contrato-api_v07_20261108-0203.svg)
 
-**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v04_20261108-0118.svg`
+**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v05_20261108-0203.svg`
 
-[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v04_20261108-0118.svg)](../2_Diagramas/identidade-acesso-classes_v04_20261108-0118.svg)
+[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v05_20261108-0203.svg)](../2_Diagramas/identidade-acesso-classes_v05_20261108-0203.svg)
 
 **Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg`
 
@@ -2292,21 +2314,15 @@ Cenário: o que este documento não trata
 
 ---
 
-<a id="em-aberto"></a>
-
-## Em aberto
-
-- `POST /contas/esqueci-senha-master` (grava "pedidosAjuda") e os endereços `/auth/*` do 17-a (gravam sessão e tentativas) passam a ser auditados em "auditoria" e "auditoriaErros"? — **Produto**
-
----
-
 <a id="historico"></a>
 
 ## Histórico
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v74** | 2026-11-08 02:00 | `RN-270`: 500 ERRO_INESPERADO com "Algo deu errado. Tente de novo mais tarde.", nivel ERRO; Paulo já desativado com 409 ESTADO_IGUAL; leitura recusada pelo time deboaz (GET /contas); `RN-178`: PUT permissões grava "auditoria" com EDITAR_PERMISSOES além de "registrosPermissao"; `RNF-227` e `RNF-227-api`: índices de "auditoria" e "auditoriaErros", 7 coleções; Em aberto: auditoria de esqueci-senha-master e /auth/* |
+| **v76** | 2026-11-08 02:05 | `RN-274`: POST /contas/esqueci-senha-master auditado com a ação ESQUECI_SENHA_MASTER, sem quem nem contaId, X-Trace-Id e 429 LIMITE_ATENDIMENTO como ALERTA; entradas e sessões no 17-a (`RN-272`, `RN-273`); Em aberto resolvido e removido |
+| v75 | 2026-11-08 02:04 | Diagramas da v74 (`RN-178`, `RN-270`, `RN-271`): sequência v03 → v04 (422 com X-Trace-Id só o da regra; corpo que não é JSON recusado antes do endpoint, sem traceId, registros nem X-Trace-Id), contrato de API v06 → v07 (500 ERRO_INESPERADO confirmado, PUT permissões entre os auditados), classes v04 → v05 (EDITAR_PERMISSOES em AcaoAuditada) |
+| v74 | 2026-11-08 02:00 | `RN-270`: 500 ERRO_INESPERADO com "Algo deu errado. Tente de novo mais tarde.", nivel ERRO; Paulo já desativado com 409 ESTADO_IGUAL; leitura recusada pelo time deboaz (GET /contas); `RN-178`: PUT permissões grava "auditoria" com EDITAR_PERMISSOES além de "registrosPermissao"; `RNF-227` e `RNF-227-api`: índices de "auditoria" e "auditoriaErros", 7 coleções; Em aberto: auditoria de esqueci-senha-master e /auth/* |
 | v73 | 2026-11-08 01:26 | Diagramas da auditoria (`RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (INICIADO, CONCLUIDO, auditoriaErros e X-Trace-Id; gravações no MongoDB e no Redis destacadas), contrato de API v05 → v06 (X-Trace-Id nos auditados, 500), classes v03 → v04 (traceId, etapa, RegistroDeErro, IAuditoriaDeErros), modelo de documentos v12 → v13 (auditoriaErros e índices) |
 | v72 | 2026-11-08 01:14 | `RN-270`: nivel "ALERTA" (recusa prevista, 4xx) ou "ERRO" (falha inesperada, 5xx), guarda de 5 anos e imutável como a auditoria; `RN-271`: cabeçalho X-Trace-Id em toda resposta dos endpoints auditados, igual ao traceId gravado; "sem log" só nos casos de uso; exemplo do registro de erro com nivel e guardarAte; pendências de Produto respondidas |
 | v71 | 2026-11-08 01:10 | `RN-178`: auditoria só do que muda estado, com registros "INICIADO" e "CONCLUIDO" ligados pelo traceId; leitura não é auditada; `RN-270`: coleção "auditoriaErros", gravada antes da recusa; `RN-271`: um traceId por execução, sem log; exemplo de entidades com traceId e registro de erro; status → Em revisão |
@@ -2314,10 +2330,7 @@ Cenário: o que este documento não trata
 | v69 | 2026-11-07 15:52 | `RN-188` e `RN-188-api`: exemplo de dois participantes sem matrícula no educador autônomo, aceitos (201, sem 409 MATRICULA_EM_USO), porque a matrícula só é única quando existe; diagramas: modelo de documentos v11 → v12, sem partição pela sigla |
 | v68 | 2026-11-07 14:53 | `RN-179` e `RN-179-api`: exemplo da sigla "colsa", aceita e gravada como "COLSA" (201, conta "conta-colsa"); diagramas: modelo de documentos v10 → v11 |
 | v67 | 2026-11-07 14:52 | `RNF-227`: exemplo do índice único já existente na mesma chave com outro nome, que o banco recusa; a partida para, como nos outros índices únicos |
-| v66 | 2026-11-07 14:17 | `RNF-227-api`: GET /health responde 200 sem corpo só depois da partida, sem resposta enquanto ela roda ou quando para (índice único, `RNF-226`, banco fora do ar), e 200 com aviso no log quando falha um índice não único; diagramas: contrato v05 e modelo de documentos v09 |
-| v65 | 2026-11-07 14:13 | `RNF-227`: índice único que não pode ser criado impede a partida, como no `RNF-226`; índice não único que falha fica só no aviso do log e a partida segue; o log cita índice e coleção, nunca o valor |
-| v64 | 2026-11-07 14:12 | `RNF-227`: passo "Então antes de aceitar o primeiro pedido…" sem vírgula após a palavra-chave, igual ao .feature do qa |
 
 ---
 
-<sub>boaz · v74 · 2026-11-08 02:00 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v76 · 2026-11-08 02:05 · `1_Requisitos/17_modulo-usuario.md`</sub>

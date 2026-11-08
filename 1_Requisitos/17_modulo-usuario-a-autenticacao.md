@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-a-autenticacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autenticação"
-versao: "v21"
-data: "2026-11-07 14:05"
-status: "Aprovado"
+versao: "v22"
+data: "2026-11-08 02:05"
+status: "Em revisão"
 objetivo: "definir como cada pessoa prova quem é no hub e no quest, que sessão e que tokens recebe, quanto tempo valem e quando deixam de valer."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v21** · 2026-11-07 14:05 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario-a-autenticacao` · **v22** · 2026-11-08 02:05 · **Em revisão**
 
 # Módulo Usuários · Autenticação
 
@@ -632,6 +632,77 @@ Cenário: quest sem limite
   Então as 6 sessões continuam e cada POST /auth/renovar recebe 200
 ```
 
+<a id="RN-272"></a>
+
+### `RN-272` Entradas e sessões auditadas
+
+> Regras da auditoria: [17_modulo-usuario `RN-178`](17_modulo-usuario.md#RN-178), [`RN-270`](17_modulo-usuario.md#RN-270) e [`RN-271`](17_modulo-usuario.md#RN-271)
+
+```gherkin
+Esquema do Cenário: execução que muda a sessão, auditada do começo ao fim
+  Quando envia <método> /auth/<endereço>
+  E a resposta é de sucesso
+  Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "<acao>", com o mesmo traceId
+  E o "CONCLUIDO" vai com quem "<quem>", contaId "conta-ebfga" e alvo "<alvo>"
+  E a resposta traz o cabeçalho X-Trace-Id com esse traceId
+
+  Exemplos:
+    | método | endereço            | acao             | quem                    | alvo            |
+    | POST   | hub/entrar          | ENTRAR_HUB       | usr-ebfga-maria         | 3f9c2a71        |
+    | POST   | quest/entrar        | ENTRAR_QUEST     | usr-ebfga-lucas         | 7a20d5e4        |
+    | POST   | sala/entrar         | ENTRAR_SALA      | anon-ebfga-482107-13465 | 482107          |
+    | POST   | hub/confirmar-senha | CONFIRMAR_SENHA  | usr-ebfga-maria         | 3f9c2a71        |
+    | POST   | renovar             | RENOVAR_SESSAO   | usr-ebfga-maria         | 3f9c2a71        |
+    | POST   | sair                | SAIR             | usr-ebfga-maria         | 3f9c2a71        |
+    | DELETE | sessoes/3f9c2a71    | ENCERRAR_SESSAO  | usr-ebfga-maria         | 3f9c2a71        |
+    | DELETE | sessoes             | ENCERRAR_SESSOES | usr-ebfga-maria         | usr-ebfga-maria |
+
+Cenário: quem ainda não foi identificado
+  Quando a Maria envia POST /auth/hub/entrar com a entrada e a senha certas
+  Então o registro "INICIADO" da ação "ENTRAR_HUB" vai com quem, contaId e alvo null
+  E só o "CONCLUIDO", depois da senha conferida, vai com a Maria, a conta e a sessão
+```
+
+<a id="RN-273"></a>
+
+### `RN-273` Recusas da autenticação auditadas
+
+```gherkin
+Esquema do Cenário: recusa vira alerta ou erro
+  Quando chega <pedido>
+  Então a resposta é <resposta>, com o cabeçalho X-Trace-Id
+  E "auditoria" fica só com o "INICIADO" da ação "<acao>", com esse traceId
+  E "auditoriaErros" ganha o código da resposta e o nivel "<nivel>", com esse traceId
+  E quem e contaId vão null, porque a pessoa não foi identificada
+
+  Exemplos:
+    | pedido                               | resposta                 | acao            | nivel  |
+    | senha errada em /auth/hub/entrar     | 401 ENTRADA_INVALIDA     | ENTRAR_HUB      | ALERTA |
+    | 5ª senha errada em /auth/hub/entrar  | 429 ENTRADA_BLOQUEADA    | ENTRAR_HUB      | ALERTA |
+    | comprovante repetido                 | 401 COMPROVANTE_INVALIDO | CONFIRMAR_SENHA | ALERTA |
+    | sessão sem uso há 9 h renovada       | 401 SESSAO_TERMINADA     | RENOVAR_SESSAO  | ALERTA |
+    | entrada na sala fechada              | 404 SALA_FECHADA         | ENTRAR_SALA     | ALERTA |
+    | Redis fora do ar em /auth/hub/entrar | 500 ERRO_INESPERADO      | ENTRAR_HUB      | ERRO   |
+
+Cenário: recusa depois de identificar a pessoa
+  Dado a EBFGA suspensa
+  Quando a Maria envia POST /auth/hub/entrar com a entrada e a senha certas
+  Então a resposta é 403 ACESSO_INDISPONIVEL
+  E "auditoriaErros" ganha o código "ACESSO_INDISPONIVEL" e o nivel "ALERTA"
+  E esse registro vai com quem "usr-ebfga-maria" e contaId "conta-ebfga"
+
+Esquema do Cenário: nenhum segredo na auditoria
+  Quando envia <pedido>
+  Então nenhum registro de "auditoria" nem de "auditoriaErros" traz <segredo>
+
+  Exemplos:
+    | pedido                           | segredo                                    |
+    | POST /auth/hub/entrar da Maria   | a senha nem o token de acesso              |
+    | POST /auth/quest/entrar da Carla | o código "EBFGA-LUCAS-0412"                |
+    | POST /auth/hub/confirmar-senha   | o comprovante "c7e1…"                      |
+    | POST /auth/renovar da Maria      | o tokenRenovacao nem o cookie de renovação |
+```
+
 <a id="RNF-207"></a>
 
 ### `RNF-207` Token assinado
@@ -923,7 +994,8 @@ Cenário: sem aparelhos conectados no quest
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v21** | 2026-11-07 14:05 | Diagrama autenticacao-documentos v03: índices como o ms_mono cria na partida (login, sigla e domínio únicos, resumoComprovante); cenários sem mudança |
+| **v22** | 2026-11-08 02:05 | `RN-272`: entradas, confirmação da senha, renovação, saída e encerramento de sessões auditados com INICIADO e CONCLUIDO, ações ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO e ENCERRAR_SESSOES, e X-Trace-Id; quem, contaId e alvo null até a pessoa ser identificada; `RN-273`: recusas em "auditoriaErros" (4xx ALERTA, 500 ERRO_INESPERADO) e nenhum segredo nos registros; status → Em revisão |
+| v21 | 2026-11-07 14:05 | Diagrama autenticacao-documentos v03: índices como o ms_mono cria na partida (login, sigla e domínio únicos, resumoComprovante); cenários sem mudança |
 | v20 | 2026-11-06 23:23 | Diagrama autenticacao-documentos v02, fiel ao código: tempoDoTime na conta do time, tempoSemUso e ultimoErro no Redis, tipo ADMINISTRADOR |
 | v19 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v18 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
@@ -932,10 +1004,7 @@ Cenário: sem aparelhos conectados no quest
 | v15 | 2026-11-01 23:41 | Diagramas de casos de uso e de documentos da autenticação v01 |
 | v14 | 2026-11-01 22:01 | JSON do token e da sessão expandidos (RNF-215, RNF-217); contrato de API v02, com JSON expandido |
 | v13 | 2026-11-01 17:59 | Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão |
-| v12 | 2026-11-01 15:28 | Aprovado |
-| v11 | 2026-11-01 15:04 | Diagrama autenticacao-classes v01: sessão, índice de sessões, tokens, chave de assinatura e tentativas de entrada |
-| v10 | 2026-11-01 13:15 | Aprovado |
 
 ---
 
-<sub>boaz · v21 · 2026-11-07 14:05 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>
+<sub>boaz · v22 · 2026-11-08 02:05 · `1_Requisitos/17_modulo-usuario-a-autenticacao.md`</sub>

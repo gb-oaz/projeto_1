@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 8230" width="1392" height="8230">
   <title>Usuários · contrato de API</title>
-  <desc>Contrato dos endereços do módulo Usuários do ms_mono, do requisito 17 (Módulo Usuários): criar a conta, gerar a senha com o código de liberação, atendimento sem login, listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar, tempo de sessão, card do módulo e, no time deboaz, contas e código da conta master. v01: criação. v02: regras do core no quadro comum, mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam em cada endereço. v03: GET /usuarios com tipo opcional (sem tipo, busca em todos os tipos que quem pede pode listar) e o tipo em cada item. v04: POST /contas responde 422 SIGLA_INVALIDA para siglas iniciadas por QA em produção (RN-179); desativar, reativar e nova-geracao-senha respondem 403 ACESSO_NEGADO quando um administrador age sobre outro, como qaadmin e admin (RN-169). v05: GET /health (sistema, sem login): 200 sem corpo só depois da partida, com coleções e índices prontos (RNF-227); antes disso, ou se a partida parou (índice único não criado, segredo ausente, banco fora do ar), não há resposta. v06: requisito 17 v72 — quadro comum com a auditoria (RN-178, RN-270, RN-271): endereços auditados respondem o cabeçalho X-Trace-Id no sucesso e na recusa; GET não é auditado; 500 ERRO_INESPERADO (proposto, a confirmar no requisito) para a falha inesperada, que grava nivel ERRO; desativar com 409 ESTADO_IGUAL (ALERTA) e 500 (ERRO).</desc>
+  <desc>Contrato dos endereços do módulo Usuários do ms_mono, do requisito 17 (Módulo Usuários): criar a conta, gerar a senha com o código de liberação, atendimento sem login, listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar, tempo de sessão, card do módulo e, no time deboaz, contas e código da conta master. v01: criação. v02: regras do core no quadro comum, mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam em cada endereço. v03: GET /usuarios com tipo opcional (sem tipo, busca em todos os tipos que quem pede pode listar) e o tipo em cada item. v04: POST /contas responde 422 SIGLA_INVALIDA para siglas iniciadas por QA em produção (RN-179); desativar, reativar e nova-geracao-senha respondem 403 ACESSO_NEGADO quando um administrador age sobre outro, como qaadmin e admin (RN-169). v05: GET /health (sistema, sem login): 200 sem corpo só depois da partida, com coleções e índices prontos (RNF-227); antes disso, ou se a partida parou (índice único não criado, segredo ausente, banco fora do ar), não há resposta. v06: requisito 17 v72 — quadro comum com a auditoria (RN-178, RN-270, RN-271): endereços auditados respondem o cabeçalho X-Trace-Id no sucesso e na recusa; GET não é auditado; 500 ERRO_INESPERADO para a falha inesperada, que grava nivel ERRO; desativar com 409 ESTADO_IGUAL (ALERTA) e 500 (ERRO). v07: requisito 17 v74 — 500 ERRO_INESPERADO confirmado ("Algo deu errado. Tente de novo mais tarde.", nivel ERRO); PUT /usuarios/{id}/permissoes entra nos auditados (EDITAR_PERMISSOES; o endereço fica no contrato de autorização); X-Trace-Id em toda resposta que passa pelo caso de uso; corpo que não é JSON é recusado com 422 antes do endpoint, sem traceId, registros nem X-Trace-Id.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -90,10 +90,10 @@
     <text class="title" x="40" y="72">Usuários · contas, staff, participantes e membros</text>
     <text class="subtitle" x="40" y="94">Criar conta, primeiro acesso, cadastro e ações sobre cada usuário, tempo de sessão, card, time deboaz e /health</text>
     <text class="wm-meta-label" x="1104" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v06</text>
+    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v07</text>
     <line class="wm-sep" x1="1176" y1="32" x2="1176" y2="80"/>
     <text class="wm-meta-label" x="1200" y="44">DATA</text>
-    <text class="wm-meta-value" x="1200" y="72">2026-11-08 · 01:18</text>
+    <text class="wm-meta-value" x="1200" y="72">2026-11-08 · 02:03</text>
   </g>
   <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V1202 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
     <text class="mono" x="64" y="204">Toda resposta de erro:</text>
@@ -112,10 +112,10 @@
     <text class="mono" x="64" y="464">Tempos em ISO 8601: em horas nos do time e no staffNavegador (PT24H, nunca P1D); em dias no staffApp e no participante (P7D)</text>
     <text class="mono" x="64" y="484">A conta do time deboaz (conta-dboaz) não aparece para ninguém: lista e leitura respondem CONTA_INEXISTENTE</text>
     <text class="boundary-label" x="64" y="524">AUDITORIA E X-TRACE-ID · RN-178, RN-270, RN-271</text>
-    <text class="mono" x="64" y="548">Auditados (mudam estado no banco): POST /contas, POST /usuarios/gerar-senha, POST e PATCH /usuarios, nova-geracao-senha,</text>
-    <text class="mono" x="64" y="568" xml:space="preserve">  novo-codigo-acesso, desativar, reativar, POST /contas/{id}/estado e codigo-master, PUT tempo-sessao; GET não é auditado</text>
-    <text class="mono" x="64" y="588">Auditado grava INICIADO e CONCLUIDO com o mesmo traceId; na recusa, só o INICIADO e o registro em auditoriaErros</text>
-    <text class="mono" x="64" y="608">Toda resposta de auditado, de sucesso ou de recusa, traz o cabeçalho X-Trace-Id: trc-7f3a9c21, o traceId gravado</text>
+    <text class="mono" x="64" y="548">Auditados (mudam estado no banco): POST /contas, POST /usuarios/gerar-senha, POST e PATCH /usuarios, nova-geracao-senha, novo-codigo-acesso,</text>
+    <text class="mono" x="64" y="568" xml:space="preserve">  desativar, reativar, POST /contas/{id}/estado e codigo-master, PUT tempo-sessao e PUT /usuarios/{id}/permissoes (EDITAR_PERMISSOES)</text>
+    <text class="mono" x="64" y="588">GET não é auditado. Auditado grava INICIADO e CONCLUIDO com o mesmo traceId; na recusa, só o INICIADO e o registro em auditoriaErros</text>
+    <text class="mono" x="64" y="608">X-Trace-Id: trc-7f3a9c21 (o traceId gravado) em toda resposta do caso de uso; corpo que não é JSON: 422 antes do endpoint, sem traceId nem X-Trace-Id</text>
     <text class="mono" x="64" y="628">Recusa prevista (4xx) grava nivel ALERTA; falha inesperada responde 500 e grava nivel ERRO, antes de a resposta sair</text>
     <line class="divider" x1="40" y1="500" x2="1352" y2="500"/>
     <line class="divider" x1="40" y1="640" x2="1352" y2="640"/><text class="boundary-label" x="64" y="664">MENSAGENS DE ERRO · CAMPO "mensagem", TEXTO EXATO</text>
@@ -158,7 +158,7 @@
     <rect class="node-red" x="64" y="1146" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="1160" text-anchor="middle">429</text>
     <text class="mono" x="116" y="1160">LIMITE_ATENDIMENTO</text><text class="mono" x="332" y="1160">"Você já enviou 3 pedidos em 24 h. Tente de novo mais tarde."</text>
     <rect class="node-red" x="64" y="1172" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="1186" text-anchor="middle">500</text>
-    <text class="mono" x="116" y="1186">ERRO_INESPERADO</text><text class="mono" x="332" y="1186">"Algo deu errado. Tente de novo mais tarde." · proposto, a confirmar no requisito</text>
+    <text class="mono" x="116" y="1186">ERRO_INESPERADO</text><text class="mono" x="332" y="1186">"Algo deu errado. Tente de novo mais tarde." · nivel ERRO</text>
   </g>
   <g id="enderecos" transform="translate(0,830)">
   <g id="grupo-sem-login"><text class="section" x="40" y="428">SEM LOGIN</text><line class="divider" x1="40" y1="440" x2="1352" y2="440"/></g>
@@ -796,7 +796,7 @@
     <rect class="chip" x="980" y="47" width="14" height="14" rx="3"/><text class="label" x="1002" y="58">resposta de sucesso</text>
     <rect class="node" x="40" y="73" width="14" height="14" rx="3"/><text class="label" x="62" y="84">endereço e regra comum</text><rect class="node-purple" x="246" y="73" width="14" height="14" rx="3"/><text class="label" x="268" y="84">auditado: responde o cabeçalho X-Trace-Id</text>
     <line class="divider" x1="40" y1="114" x2="1352" y2="114"/>
-    <text class="footer" x="40" y="142">v06 · auditoria (RN-178, RN-270, RN-271): X-Trace-Id nos auditados, 500 ERRO_INESPERADO proposto, desativar com 409 ESTADO_IGUAL (ALERTA) e 500 (ERRO)</text>
-    <text class="wm-file" x="1352" y="142" text-anchor="end">usuarios-contrato-api_v06_20261108-0118.svg</text>
+    <text class="footer" x="40" y="142">v07 · 500 ERRO_INESPERADO confirmado, PUT permissoes auditado (EDITAR_PERMISSOES), corpo que não é JSON: 422 sem X-Trace-Id (requisito 17 v74)</text>
+    <text class="wm-file" x="1352" y="142" text-anchor="end">usuarios-contrato-api_v07_20261108-0203.svg</text>
   </g>
 </svg>
