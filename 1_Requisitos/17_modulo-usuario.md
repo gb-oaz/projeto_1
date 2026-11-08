@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v83"
-data: "2026-11-08 11:31"
+versao: "v84"
+data: "2026-11-08 11:35"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v83** · 2026-11-08 11:31 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v84** · 2026-11-08 11:35 · **Em revisão**
 
 # Módulo Usuários
 
@@ -2376,9 +2376,9 @@ Cenário: o que este documento não trata
 
 [![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)
 
-**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v09_20261108-0949.svg`
+**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v10_20261108-1133.svg`
 
-[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v09_20261108-0949.svg)](../2_Diagramas/usuarios-contrato-api_v09_20261108-0949.svg)
+[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v10_20261108-1133.svg)](../2_Diagramas/usuarios-contrato-api_v10_20261108-1133.svg)
 
 **Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v06_20261108-0209.svg`
 
@@ -2400,7 +2400,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v83** | 2026-11-08 11:31 | Auditoria em todos os casos de uso: `RN-178` com REATIVAR_USUARIO, EDITAR_USUARIO, NOVO_CODIGO_ACESSO e SALVAR_TEMPO_SESSAO da conta nos Exemplos e cenários de GERAR_SENHA sem login, CODIGO_MASTER e SALVAR_TEMPO_SESSAO do time (quem, contaId e alvo por etapa); `RN-270` com a recusa prevista de cada caso de uso como ALERTA e o 403 sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registro |
+| **v84** | 2026-11-08 11:35 | Diagrama (`RN-270`): contrato de API v09 → v10 (403 ACESSO_NEGADO sem o módulo, MOD-03 · U, recusado antes do caso de uso, sem traceId, registros nem X-Trace-Id, como o 422 do corpo que não é JSON) |
+| v83 | 2026-11-08 11:31 | Auditoria em todos os casos de uso: `RN-178` com REATIVAR_USUARIO, EDITAR_USUARIO, NOVO_CODIGO_ACESSO e SALVAR_TEMPO_SESSAO da conta nos Exemplos e cenários de GERAR_SENHA sem login, CODIGO_MASTER e SALVAR_TEMPO_SESSAO do time (quem, contaId e alvo por etapa); `RN-270` com a recusa prevista de cada caso de uso como ALERTA e o 403 sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registro |
 | v82 | 2026-11-08 10:13 | `RN-178`: POST /contas/{id}/estado com o mesmo estado responde 200 e grava INICIADO e CONCLUIDO de MUDAR_ESTADO_CONTA, com contaId e alvo da conta pedida, como no contrato v09 |
 | v81 | 2026-11-08 09:50 | Diagramas da auditoria (`RN-178`): contrato de API v08 → v09 (quem, contaId e alvo de GERAR_SENHA sem login, MUDAR_ESTADO_CONTA, SALVAR_TEMPO_SESSAO da conta e do time, CODIGO_MASTER e EDITAR_PERMISSOES; o mesmo estado da conta responde 200 e grava INICIADO e CONCLUIDO), sequência v05 → v06 (quem, contaId e alvo de GERAR_SENHA, CODIGO_MASTER e MUDAR_ESTADO_CONTA) |
 | v80 | 2026-11-08 02:15 | `RN-271`: corpo que não é JSON recebe 422 DADOS_INVALIDOS com "O campo "corpo" está faltando ou é inválido." e o campo "corpo", como no contrato v08; segue sem X-Trace-Id e sem registros |
@@ -2413,4 +2414,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v83 · 2026-11-08 11:31 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v84 · 2026-11-08 11:35 · `1_Requisitos/17_modulo-usuario.md`</sub>

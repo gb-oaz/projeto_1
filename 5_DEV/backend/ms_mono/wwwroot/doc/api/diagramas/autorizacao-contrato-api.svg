@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 2376" width="1392" height="2376">
   <title>Autorização · contrato de API</title>
-  <desc>Contrato dos endereços de permissões do ms_mono, do requisito 17-b (Módulo Usuários · Autorização): ler as permissões e as concedíveis de uma pessoa, salvar o conjunto com a versão, e o histórico das mudanças. v01: criação. v02: uso, quem usa, login com selo e JSON expandido. v03: mensagem neutra no PERMISSAO_ACIMA. v04: mensagens de todos os erros, DADOS_INVALIDOS no PUT e quem está abaixo. v05: staff com Administrar usuários repassa o MOD-03, só com as abas que tem. v06: PUT /usuarios/{id}/permissoes auditado (EDITAR_PERMISSOES em auditoria e registrosPermissao, recusas em auditoriaErros, 500 ERRO_INESPERADO, X-Trace-Id). v07: EDITAR_PERMISSOES com contaId da conta de quem pede e alvo a pessoa, desde o INICIADO (RN-178).</desc>
+  <desc>Contrato dos endereços de permissões do ms_mono, do requisito 17-b (Módulo Usuários · Autorização): ler as permissões e as concedíveis de uma pessoa, salvar o conjunto com a versão, e o histórico das mudanças. v01: criação. v02: uso, quem usa, login com selo e JSON expandido. v03: mensagem neutra no PERMISSAO_ACIMA. v04: mensagens de todos os erros, DADOS_INVALIDOS no PUT e quem está abaixo. v05: staff com Administrar usuários repassa o MOD-03, só com as abas que tem. v06: PUT /usuarios/{id}/permissoes auditado (EDITAR_PERMISSOES em auditoria e registrosPermissao, recusas em auditoriaErros, 500 ERRO_INESPERADO, X-Trace-Id). v07: EDITAR_PERMISSOES com contaId da conta de quem pede e alvo a pessoa, desde o INICIADO (RN-178). v08: 403 ACESSO_NEGADO sem MOD-03 · U recusado antes do caso de uso, como o 422 do corpo que não é JSON: sem X-Trace-Id nem registros (requisito 17 v83, RN-270).</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -90,10 +90,10 @@
     <text class="title" x="40" y="72">Autorização · conceder permissões</text>
     <text class="subtitle" x="40" y="94">Ler e salvar as permissões de uma pessoa e o histórico das mudanças</text>
     <text class="wm-meta-label" x="1104" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v07</text>
+    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v08</text>
     <line class="wm-sep" x1="1176" y1="32" x2="1176" y2="80"/>
     <text class="wm-meta-label" x="1200" y="44">DATA</text>
-    <text class="wm-meta-value" x="1200" y="72">2026-11-08 · 09:49</text>
+    <text class="wm-meta-value" x="1200" y="72">2026-11-08 · 11:33</text>
   </g>
   <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V770 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
     <text class="mono" x="64" y="204">Toda resposta de erro:</text>
@@ -111,7 +111,7 @@
     <text class="mono" x="64" y="448">Auditado: PUT /usuarios/{id}/permissoes, ação EDITAR_PERMISSOES; os GET (permissões e histórico) não são auditados</text>
     <text class="mono" x="64" y="468">Sucesso: auditoria ganha INICIADO e CONCLUIDO com o mesmo traceId e registrosPermissao ganha a versão nova (RN-256)</text>
     <text class="mono" x="64" y="488">Recusa prevista (4xx): só o INICIADO e auditoriaErros com nivel ALERTA; falha inesperada: 500 e nivel ERRO, antes de a resposta sair</text>
-    <text class="mono" x="64" y="508">X-Trace-Id: trc-7f3a9c21 (o traceId gravado) em toda resposta do caso de uso; corpo que não é JSON: 422 antes, sem X-Trace-Id</text>
+    <text class="mono" x="64" y="508">X-Trace-Id: trc-7f3a9c21 em toda resposta do caso de uso; antes dele, sem X-Trace-Id nem registros: 403 sem MOD-03 · U, 422 não JSON</text>
     <line class="divider" x1="40" y1="520" x2="1352" y2="520"/>
     <rect class="node-red" x="64" y="558" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="572" text-anchor="middle">403</text>
     <text class="mono" x="116" y="572">ACESSO_NEGADO</text><text class="mono" x="332" y="572">"Você não tem permissão para esta ação."</text>
@@ -281,7 +281,7 @@
     <rect class="chip" x="762" y="47" width="14" height="14" rx="3"/><text class="label" x="784" y="58">resposta de sucesso</text>
     <rect class="node" x="40" y="73" width="14" height="14" rx="3"/><text class="label" x="62" y="84">endereço e regra comum</text><rect class="node-purple" x="246" y="73" width="14" height="14" rx="3"/><text class="label" x="268" y="84">auditado: responde o cabeçalho X-Trace-Id</text>
     <line class="divider" x1="40" y1="114" x2="1352" y2="114"/>
-    <text class="footer" x="40" y="142">v07 · PUT permissões: contaId da auditoria é a conta de quem pede; alvo, a pessoa (RN-178)</text>
-    <text class="wm-file" x="1352" y="142" text-anchor="end">autorizacao-contrato-api_v07_20261108-0949.svg</text>
+    <text class="footer" x="40" y="142">v08 · 403 ACESSO_NEGADO sem MOD-03 · U recusado antes do caso de uso, sem X-Trace-Id nem registros (RN-270)</text>
+    <text class="wm-file" x="1352" y="142" text-anchor="end">autorizacao-contrato-api_v08_20261108-1133.svg</text>
   </g>
 </svg>
