@@ -10,11 +10,11 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// GET /usuarios (RN-165, RN-185). Sem tipo, a busca percorre todos os tipos
 /// que quem pede pode listar; nenhum, ACESSO_NEGADO.
 /// </summary>
-public sealed class ListarUsuarios(IUsuarios usuarios, IContas contas, IAuditoria auditoria, TimeProvider relogio) : IListarUsuarios
+public sealed class ListarUsuarios(IUsuarios usuarios, IContas contas, TimeProvider relogio) : IListarUsuarios
 {
     static readonly TipoUsuario[] Listaveis = [TipoUsuario.Staff, TipoUsuario.Participante, TipoUsuario.MembroTime];
 
-    readonly Apoio apoio = new(usuarios, contas, auditoria, relogio);
+    readonly Apoio apoio = new(usuarios, contas, relogio);
 
     /// <inheritdoc />
     public async Task<PaginaDto<UsuarioNaListaDto>> Executar(ListaDeUsuariosDto pedido, CancellationToken ct = default)

@@ -7,10 +7,10 @@ using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 
 /// <summary>GET /contas/{id} (RN-187): só o cadastro, para o time deboaz.</summary>
-public sealed class LerConta(IUsuarios usuarios, IContas contas, IPagamentos pagamentos, IAuditoria auditoria, TimeProvider relogio)
+public sealed class LerConta(IUsuarios usuarios, IContas contas, IPagamentos pagamentos, TimeProvider relogio)
     : ILerConta
 {
-    readonly Apoio apoio = new(usuarios, contas, auditoria, relogio);
+    readonly Apoio apoio = new(usuarios, contas, relogio);
 
     /// <inheritdoc />
     public async Task<ContaLidaDto> Executar(PedidoDeContaDto pedido, CancellationToken ct = default)

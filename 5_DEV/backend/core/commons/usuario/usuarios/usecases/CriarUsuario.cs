@@ -13,22 +13,21 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// POST /usuarios (RF-106, RF-108, RN-181, RN-184, RN-188): o staff e o membro
 /// nascem PENDENTE com um código de liberação; o participante, ATIVO com o
 /// código de acesso. Auditado com o traceId recebido: "INICIADO" ao chegar com
-/// quem, a conta e o id que o usuário vai ter, "CONCLUIDO" antes de responder e,
-/// na recusa ou na falha, o registro de erro antes de a exceção sair (RN-178,
-/// RN-270, RN-271).
+/// quem e a conta, sem alvo (o usuário ainda não existe); "CONCLUIDO" antes de
+/// responder, já com o id criado; na recusa ou na falha, o registro de erro sem
+/// alvo antes de a exceção sair (RN-178, RN-270, RN-271).
 /// </summary>
 public sealed class CriarUsuario(
     IUsuarios usuarios, IContas contas, IGeracoesDeSenha geracoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio)
     : ICriarUsuario
 {
-    readonly Apoio apoio = new(usuarios, contas, auditoria, relogio);
+    readonly Apoio apoio = new(usuarios, contas, relogio);
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
 
     /// <inheritdoc />
     public async Task<UsuarioCriadoDto> Executar(NovoUsuarioDto pedido, TraceId traceId, CancellationToken ct = default)
     {
         var execucao = await apoio.ExecucaoDe(traceId, AcaoAuditada.CriarUsuario, pedido.QuemPede, null, ct);
-        execucao = execucao with { Alvo = await IdPrevisto(execucao.ContaId, pedido.NomeCurto, ct) };
         return await auditada.Auditar(execucao, () => Criar(pedido, execucao, ct), ct);
     }
 
@@ -41,22 +40,12 @@ public sealed class CriarUsuario(
         GarantirQuePodeCriar(quem, conta, dados);
         await GarantirNomeCurtoEMatriculaLivres(conta, dados, ct);
 
-        var novo = await Montar(quem, conta, dados, execucao.Alvo, ct);
+        var novo = await Montar(quem, conta, dados, ct);
         await usuarios.Inserir(novo, ct);
         var (codigo, venceEm) = await PedirGeracao(novo, quem, ct);
         await auditada.Concluir(execucao with { Alvo = novo.Id }, ct);
         return new(novo.Id, novo.Login, novo.Estado.Texto(), codigo, venceEm);
     }
-
-    /// <summary>
-    /// O id que o usuário vai ter, já no "INICIADO" (RN-178): só leitura, sem
-    /// recusar; null se quem pede, a conta ou o nome curto não servem, e a
-    /// recusa sai da regra.
-    /// </summary>
-    async Task<string?> IdPrevisto(string? contaId, string? nomeCurto, CancellationToken ct) =>
-        contaId is not null && Logins.NomeCurtoValido(nomeCurto) is { } curto && await contas.Buscar(contaId, ct) is { } conta
-            ? await apoio.NovoId(conta.Sigla, curto, ct)
-            : null;
 
     /// <summary>Quem pede pode criar esse tipo, e o autônomo não manda matrícula (RN-164, RN-188).</summary>
     /// <exception cref="FalhaDeUsuarios">ACESSO_NEGADO ou DADOS_INVALIDOS.</exception>
@@ -78,17 +67,16 @@ public sealed class CriarUsuario(
     }
 
     /// <summary>
-    /// O usuário novo, com o id do "INICIADO": o participante ATIVO com o
-    /// código de acesso; o staff e o membro PENDENTE com a entrada do nome curto.
+    /// O usuário novo: o participante ATIVO com o código de acesso; o staff e o
+    /// membro PENDENTE com a entrada do nome curto.
     /// </summary>
-    async Task<UsuarioCadastrado> Montar(
-        UsuarioCadastrado quem, ContaAssinante conta, DadosDoUsuario dados, string? idPrevisto, CancellationToken ct)
+    async Task<UsuarioCadastrado> Montar(UsuarioCadastrado quem, ContaAssinante conta, DadosDoUsuario dados, CancellationToken ct)
     {
         var agora = apoio.Agora;
         var participante = dados.Tipo == TipoUsuario.Participante;
         var matricula = dados.Matricula ?? (conta.DeAutonomo || quem.Tipo.DoTime() ? null : await apoio.NovaMatricula(conta.Id, ct));
         var login = participante ? await apoio.NovoCodigo(conta.Sigla, dados.NomeCurto, ct) : Logins.DoNomeCurto(dados.NomeCurto, conta.Sigla);
-        var id = idPrevisto ?? await apoio.NovoId(conta.Sigla, dados.NomeCurto, ct);
+        var id = await apoio.NovoId(conta.Sigla, dados.NomeCurto, ct);
         return new UsuarioCadastrado(
             id, conta.Id, conta.Sigla, dados.Tipo, dados.Nome, dados.NomeCurto, login, matricula,
             participante ? EstadoUsuario.Ativo : EstadoUsuario.Pendente, null, dados.Responsaveis, quem.Id, agora,

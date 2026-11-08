@@ -51,6 +51,16 @@ public class AutorizacaoApiTests(Backend backend) : IClassFixture<Backend>
         Assert.Equal((HttpStatusCode.PreconditionRequired, "VERSAO_AUSENTE"), (semVersao.Status, semVersao.Codigo));
         Assert.Equal(HttpStatusCode.OK, primeira.Status);
         Assert.Equal((HttpStatusCode.PreconditionFailed, 2), (antiga.Status, antiga.Corpo!["versao"]!.GetValue<int>()));
+
+        // RN-178, RN-270, RN-271: EDITAR_PERMISSOES com X-Trace-Id; a recusa grava ALERTA
+        var auditoria = backend.Banco.GetCollection<BsonDocument>("auditoria");
+        var erros = backend.Banco.GetCollection<BsonDocument>("auditoriaErros");
+        var etapas = await auditoria.Find(Builders<BsonDocument>.Filter.Eq("traceId", primeira.TraceId)).ToListAsync();
+        Assert.Equal(new[] { "CONCLUIDO", "INICIADO" }, etapas.Select(d => d["etapa"].AsString).Order().ToArray());
+        Assert.All(etapas, d => Assert.Equal(("EDITAR_PERMISSOES", maria.Id), (d["acao"].AsString, d["alvo"].AsString)));
+        var erro = Assert.Single(await erros.Find(Builders<BsonDocument>.Filter.Eq("traceId", antiga.TraceId)).ToListAsync());
+        Assert.Equal(("VERSAO_DESATUALIZADA", "ALERTA"), (erro["codigo"].AsString, erro["nivel"].AsString));
+        Assert.NotNull(semVersao.TraceId);
     }
 
     [Fact]

@@ -53,7 +53,7 @@ public sealed class Preparo(Backend backend)
     {
         var criado = await Caso<ICriarUsuario>().Executar(new NovoUsuarioDto(criador.Id, tipo, $"Pessoa {nomeCurto}", nomeCurto),
             TraceId.Novo());
-        var senha = await Caso<IGerarSenha>().Executar(new GeracaoDeSenhaDto(criado.Login, criado.CodigoLiberacao));
+        var senha = await Caso<IGerarSenha>().Executar(new GeracaoDeSenhaDto(criado.Login, criado.CodigoLiberacao), TraceId.Novo());
         await Confirmar(senha.Comprovante);
         return await Entrar(criado.Id, criado.Login, senha.Senha);
     }

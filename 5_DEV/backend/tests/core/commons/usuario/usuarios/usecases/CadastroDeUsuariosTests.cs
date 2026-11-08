@@ -76,7 +76,7 @@ public class CadastroDeUsuariosTests
             () => mock.CriarUsuario.Executar(Staff("usr-ebfga-master", "bia"), TraceId.Novo())));
 
         Assert.Equal(new[] { "INICIADO", "ERRO ERRO_INESPERADO" }, mock.Gravacoes);
-        Assert.Equal((RegistroDeErro.ErroInesperado, "usr-ebfga-bia"), (mock.Erros[0].Codigo, mock.Erros[0].Alvo));
+        Assert.Equal((RegistroDeErro.ErroInesperado, (string?)null), (mock.Erros[0].Codigo, mock.Erros[0].Alvo));
     }
 
     [Fact]

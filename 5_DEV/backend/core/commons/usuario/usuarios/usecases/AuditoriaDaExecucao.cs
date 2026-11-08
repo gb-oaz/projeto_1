@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
+using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 
@@ -64,8 +66,15 @@ sealed class AuditoriaDaExecucao(IAuditoria auditoria, IAuditoriaDeErros erros, 
             relogio.GetUtcNow()), ct);
     }
 
-    /// <summary>Recusa prevista (FalhaDeUsuarios) é ALERTA com o código dela; o resto é ERRO_INESPERADO, nivel ERRO (RN-270).</summary>
-    static (string Codigo, NivelDoErro Nivel) Classificar(Exception falha) => falha is FalhaDeUsuarios recusa
-        ? (recusa.Codigo, NivelDoErro.Alerta)
-        : (RegistroDeErro.ErroInesperado, NivelDoErro.Erro);
+    /// <summary>
+    /// Recusa prevista (de Usuários, da Autorização ou da Autenticação) é ALERTA
+    /// com o código dela; o resto é ERRO_INESPERADO, nivel ERRO (RN-270).
+    /// </summary>
+    static (string Codigo, NivelDoErro Nivel) Classificar(Exception falha) => falha switch
+    {
+        FalhaDeUsuarios recusa => (recusa.Codigo, NivelDoErro.Alerta),
+        FalhaDeAutorizacao recusa => (recusa.Codigo, NivelDoErro.Alerta),
+        FalhaDeAutenticacao recusa => (recusa.Codigo, NivelDoErro.Alerta),
+        _ => (RegistroDeErro.ErroInesperado, NivelDoErro.Erro),
+    };
 }

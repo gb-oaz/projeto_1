@@ -54,7 +54,9 @@ public static class Http
         servicos.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new DataHoraUtc()));
 
     // Falhas dos casos de uso viram a resposta de erro do contrato; corpo que não
-    // é JSON (ou com o tipo errado num campo) responde 422 DADOS_INVALIDOS.
+    // é JSON (ou com o tipo errado num campo) responde 422 DADOS_INVALIDOS; a
+    // falha inesperada responde 500 ERRO_INESPERADO, sem detalhe da exceção, com
+    // o X-Trace-Id da execução quando o pedido já o tinha (RN-270, RN-271).
     public static WebApplication UseRespostasDeErro(this WebApplication app)
     {
         app.Use(async (contexto, proximo) =>
@@ -93,6 +95,10 @@ public static class Http
         if (contexto.Items[typeof(TraceId)] is TraceId traceId) contexto.Response.Headers[CabecalhoDoTraceId] = traceId.Valor;
     }
 
+    // A resposta da falha inesperada (RN-270): nada da exceção sai para fora.
+    public static readonly Erro ErroInesperado = new(RegistroDeErro.ErroInesperado, "Algo deu errado. Tente de novo mais tarde.");
+
+    // O status e o corpo de cada falha; null só para o pedido cancelado, que não tem a quem responder.
     public static (int Status, Erro Erro)? Traduzir(Exception falha) => falha switch
     {
         FalhaDeUsuarios f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, f.TentarEm, f.Minimo, f.Maximo)),
@@ -100,7 +106,8 @@ public static class Http
         FalhaDeAutorizacao f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Mod: f.Mod, Abas: f.Abas, Versao: f.Versao)),
         BadHttpRequestException => (StatusCodes.Status422UnprocessableEntity,
             new Erro("DADOS_INVALIDOS", "O campo \"corpo\" está faltando ou é inválido.", "corpo")),
-        _ => null,
+        OperationCanceledException => null,
+        _ => (StatusCodes.Status500InternalServerError, ErroInesperado),
     };
 
     static int Status(GrupoUsuarios grupo) => grupo switch

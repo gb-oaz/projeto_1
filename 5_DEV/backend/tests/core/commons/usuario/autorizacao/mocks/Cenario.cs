@@ -2,6 +2,7 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using static Boaz.Core.Commons.Usuario.Autorizacao.Domain.FrenteDeUso;
 using static Boaz.Core.Commons.Usuario.Autorizacao.Domain.Perfil;
+using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
 
@@ -60,7 +61,7 @@ public sealed class Cenario
 
     /// <summary>Salva as permissões do alvo, como quem pede, com a versão lida.</summary>
     public Task<PermissoesSalvasDto> Salvar(string quem, string alvo, string? ifMatch, params (string Mod, string? Abas)[] mods) =>
-        Mock.SalvarPermissoes.Executar(new SalvamentoDePermissoesDto(quem, alvo, ifMatch, Corpo(mods)));
+        Mock.SalvarPermissoes.Executar(new SalvamentoDePermissoesDto(quem, alvo, ifMatch, Corpo(mods)), TraceId.Novo());
 
     /// <summary>Salva com a versão atual, como a conta master (ou o administrador para o time).</summary>
     public async Task<PermissoesSalvasDto> Conceder(string alvo, params (string Mod, string? Abas)[] mods)

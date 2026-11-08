@@ -37,7 +37,7 @@ public static class AutorizacaoApi
 
         api.MapPut("", (string id, PermissoesCorpo? corpo, HttpContext http, ISalvarPermissoes salvar, CancellationToken ct) =>
                 salvar.Executar(new SalvamentoDePermissoesDto(http.QuemPede(), id, http.Request.Headers.IfMatch.ToString() is { Length: > 0 } v ? v : null,
-                    corpo?.Mods), ct))
+                    corpo?.Mods), http.NovoTraceId(), ct))
             .ComAcesso(uso)
             .WithSummary("Salvar o conjunto inteiro de permissões da pessoa")
             .WithDescription("Exige MOD-03 · U, ser superior e o If-Match com a versão lida (RF-161, RF-162, RN-241, RN-254, RN-255). " +

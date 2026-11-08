@@ -17,7 +17,7 @@ public sealed class PedirNovaGeracaoDeSenha(
     IUsuarios usuarios, IContas contas, IGeracoesDeSenha geracoes, ISessoesDosUsuarios sessoes, IAuditoria auditoria,
     IAuditoriaDeErros erros, TimeProvider relogio) : IPedirNovaGeracaoDeSenha
 {
-    readonly Apoio apoio = new(usuarios, contas, auditoria, relogio);
+    readonly Apoio apoio = new(usuarios, contas, relogio);
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
 
     /// <inheritdoc />

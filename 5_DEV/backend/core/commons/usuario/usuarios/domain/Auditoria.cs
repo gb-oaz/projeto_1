@@ -88,7 +88,7 @@ public sealed record RegistroDeAuditoria(
 public sealed record RegistroDeErro(
     TraceId TraceId, string? ContaId, string? Quem, AcaoAuditada Acao, string? Alvo, string Codigo, NivelDoErro Nivel, DateTimeOffset Quando)
 {
-    /// <summary>O código da falha inesperada (proposto no contrato v06, a confirmar no requisito).</summary>
+    /// <summary>O código da falha inesperada, que responde 500 "Algo deu errado. Tente de novo mais tarde." (RN-270).</summary>
     public const string ErroInesperado = "ERRO_INESPERADO";
 
     /// <summary>Até quando fica guardado: 5 anos, como a auditoria (RN-178).</summary>

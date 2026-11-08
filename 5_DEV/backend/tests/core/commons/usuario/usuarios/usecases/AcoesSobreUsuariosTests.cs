@@ -24,7 +24,7 @@ public class AcoesSobreUsuariosTests
     public async Task RF_112_reativar()
     {
         await mock.DesativarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"), TraceId.Novo());
-        await mock.ReativarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"));
+        await mock.ReativarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"), TraceId.Novo());
         Assert.Equal(EstadoUsuario.Ativo, mock.Usuario("usr-ebfga-paulo")!.Estado);
         Assert.Contains(mock.Auditoria, a => a.Acao == AcaoAuditada.ReativarUsuario);
     }
@@ -35,7 +35,7 @@ public class AcoesSobreUsuariosTests
         await mock.DesativarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"), TraceId.Novo());
         var falha = await Falha("ESTADO_IGUAL", () => mock.DesativarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"), TraceId.Novo()));
         Assert.Equal(GrupoDeFalha.Conflito, falha.Grupo);
-        await Falha("ESTADO_IGUAL", () => mock.ReativarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-maria")));
+        await Falha("ESTADO_IGUAL", () => mock.ReativarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-maria"), TraceId.Novo()));
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class AcoesSobreUsuariosTests
     {
         var criada = await mock.CriarUsuario.Executar(new("usr-ebfga-master", "STAFF", "Bia Lima", "bia"), TraceId.Novo());
         await mock.DesativarUsuario.Executar(new("usr-ebfga-master", criada.Id), TraceId.Novo());
-        await mock.ReativarUsuario.Executar(new("usr-ebfga-master", criada.Id));
+        await mock.ReativarUsuario.Executar(new("usr-ebfga-master", criada.Id), TraceId.Novo());
         Assert.Equal(EstadoUsuario.Pendente, mock.Usuario(criada.Id)!.Estado);
     }
 
@@ -66,7 +66,7 @@ public class AcoesSobreUsuariosTests
     [Fact]
     public async Task RF_153_nome_curto_do_staff()
     {
-        var editada = await mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-maria", "Maria Souza Lima", "mariasouza"));
+        var editada = await mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-maria", "Maria Souza Lima", "mariasouza"), TraceId.Novo());
         Assert.Equal(new UsuarioEditadoDto("usr-ebfga-maria", "mariasouza.ebfga@deboaz.com"), editada);
         Assert.Contains(("usr-ebfga-maria", MotivoFim.NovoNomeCurto), mock.SessoesEncerradas);
         var maria = mock.Usuario("usr-ebfga-maria")!;
@@ -77,7 +77,7 @@ public class AcoesSobreUsuariosTests
     [Fact]
     public async Task RF_153_so_o_nome_nao_encerra_sessoes()
     {
-        await mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-maria", "Maria S.", "maria"));
+        await mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-maria", "Maria S.", "maria"), TraceId.Novo());
         Assert.Empty(mock.SessoesEncerradas);
         Assert.Contains(mock.Auditoria, a => a.Acao == AcaoAuditada.EditarUsuario);
     }
@@ -86,24 +86,24 @@ public class AcoesSobreUsuariosTests
     public async Task RF_153_responsavel_novo()
     {
         await mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-lucas",
-            Responsaveis: [new("Carla Andrade", "MAE"), new("Paulo Andrade", "PAI")]));
+            Responsaveis: [new("Carla Andrade", "MAE"), new("Paulo Andrade", "PAI")]), TraceId.Novo());
         Assert.Equal(2, mock.Usuario("usr-ebfga-lucas")!.Responsaveis.Count);
         Assert.Equal("EBFGA-LUCAS-0412", mock.Usuario("usr-ebfga-lucas")!.Login);
         Assert.Equal("responsaveis", (await Falha("DADOS_INVALIDOS", () => mock.EditarUsuario.Executar(
-            new("usr-ebfga-master", "usr-ebfga-maria", Responsaveis: [new("Carla", "MAE")])))).Campo);
+            new("usr-ebfga-master", "usr-ebfga-maria", Responsaveis: [new("Carla", "MAE")]), TraceId.Novo()))).Campo);
     }
 
     [Fact]
     public async Task RF_153_nome_curto_repetido()
     {
-        await Falha("NOME_CURTO_EM_USO", () => mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-ana", NomeCurto: "maria")));
+        await Falha("NOME_CURTO_EM_USO", () => mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-ana", NomeCurto: "maria"), TraceId.Novo()));
         Assert.Equal("ana.ebfga@deboaz.com", mock.Usuario("usr-ebfga-ana")!.Login);
     }
 
     [Fact]
     public async Task RN_244_nome_curto_do_participante()
     {
-        var editado = await mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-lucas", NomeCurto: "lucasa"));
+        var editado = await mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-lucas", NomeCurto: "lucasa"), TraceId.Novo());
         Assert.Matches(@"^EBFGA-LUCASA-\d{4}$", editado.Login);
         Assert.Contains(("usr-ebfga-lucas", MotivoFim.NovoCodigo), mock.SessoesEncerradas);
         Assert.Equal(mock.Relogio.Agora, mock.Usuario("usr-ebfga-lucas")!.CodigoGeradoEm);
@@ -112,22 +112,22 @@ public class AcoesSobreUsuariosTests
     [Fact]
     public async Task RN_244_matricula_repetida()
     {
-        await Falha("MATRICULA_EM_USO", () => mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-ana", Matricula: "20260087")));
+        await Falha("MATRICULA_EM_USO", () => mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-ana", Matricula: "20260087"), TraceId.Novo()));
         Assert.Equal("20260013", mock.Usuario("usr-ebfga-ana")!.Matricula);
-        await mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-ana", Matricula: "20260013"));
+        await mock.EditarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-ana", Matricula: "20260013"), TraceId.Novo());
     }
 
     [Fact]
     public async Task RN_188_autonomo_nao_edita_matricula()
     {
         var bia = await mock.CriarUsuario.Executar(new("usr-preis-pedro", "PARTICIPANTE", "Bia", "bia"), TraceId.Novo());
-        await Falha("DADOS_INVALIDOS", () => mock.EditarUsuario.Executar(new("usr-preis-pedro", bia.Id, Matricula: "12345678")));
+        await Falha("DADOS_INVALIDOS", () => mock.EditarUsuario.Executar(new("usr-preis-pedro", bia.Id, Matricula: "12345678"), TraceId.Novo()));
     }
 
     [Fact]
     public async Task RF_154_familia_perdeu_o_codigo()
     {
-        var novo = await mock.GerarNovoCodigoDeAcesso.Executar(new("usr-ebfga-master", "usr-ebfga-lucas"));
+        var novo = await mock.GerarNovoCodigoDeAcesso.Executar(new("usr-ebfga-master", "usr-ebfga-lucas"), TraceId.Novo());
         Assert.Matches(@"^EBFGA-LUCAS-\d{4}$", novo.Login);
         Assert.Equal(mock.Relogio.Agora, novo.CodigoGeradoEm);
         Assert.Contains(("usr-ebfga-lucas", MotivoFim.NovoCodigo), mock.SessoesEncerradas);
@@ -136,7 +136,7 @@ public class AcoesSobreUsuariosTests
 
     [Fact]
     public async Task RF_154_so_participante() =>
-        await Falha("SO_PARTICIPANTE", () => mock.GerarNovoCodigoDeAcesso.Executar(new("usr-ebfga-master", "usr-ebfga-maria")));
+        await Falha("SO_PARTICIPANTE", () => mock.GerarNovoCodigoDeAcesso.Executar(new("usr-ebfga-master", "usr-ebfga-maria"), TraceId.Novo()));
 
     [Fact]
     public async Task RN_178_acao_auditada()
@@ -145,7 +145,7 @@ public class AcoesSobreUsuariosTests
         await mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-master", "usr-ebfga-ana"), TraceId.Novo());
         await mock.DesativarUsuario.Executar(new("usr-ebfga-master", "usr-ebfga-paulo"), TraceId.Novo());
 
-        var registro = mock.Auditoria[0];
+        var registro = mock.Auditoria[1];
         Assert.Equal(("conta-ebfga", "usr-ebfga-maria", AcaoAuditada.CriarUsuario, "usr-ebfga-lia"),
             (registro.ContaId, registro.Quem, registro.Acao, registro.Alvo));
         Assert.Equal(registro.Quando.AddYears(5), registro.GuardarAte);

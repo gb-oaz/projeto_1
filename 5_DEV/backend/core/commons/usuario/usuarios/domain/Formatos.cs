@@ -96,14 +96,10 @@ public static partial class Logins
 
     /// <summary>Confere o nome curto: letras minúsculas, números e sublinhado.</summary>
     /// <exception cref="FalhaDeUsuarios">DADOS_INVALIDOS com o campo.</exception>
-    public static string NomeCurto(string? nomeCurto, string campo = "nomeCurto") =>
-        NomeCurtoValido(nomeCurto) ?? throw FalhaDeUsuarios.DadosInvalidos(campo);
-
-    /// <summary>O nome curto conferido, ou null se não serve, sem recusar.</summary>
-    public static string? NomeCurtoValido(string? nomeCurto)
+    public static string NomeCurto(string? nomeCurto, string campo = "nomeCurto")
     {
         var texto = (nomeCurto ?? "").Trim().ToLowerInvariant();
-        return Simples().IsMatch(texto) ? texto : null;
+        return Simples().IsMatch(texto) ? texto : throw FalhaDeUsuarios.DadosInvalidos(campo);
     }
 
     /// <summary>Entrada da conta master: o domínio escolhido (objetivo_unidade1@deboaz.com).</summary>

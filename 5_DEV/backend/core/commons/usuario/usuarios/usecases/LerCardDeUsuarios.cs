@@ -12,12 +12,12 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// os códigos de liberação que vencem hoje (UTC).
 /// </summary>
 public sealed class LerCardDeUsuarios(
-    IUsuarios usuarios, IContas contas, IIndicadores indicadores, IAuditoria auditoria, TimeProvider relogio) : ILerCardDeUsuarios
+    IUsuarios usuarios, IContas contas, IIndicadores indicadores, TimeProvider relogio) : ILerCardDeUsuarios
 {
     /// <summary>Quantos meses o gráfico mostra.</summary>
     public const int Meses = 5;
 
-    readonly Apoio apoio = new(usuarios, contas, auditoria, relogio);
+    readonly Apoio apoio = new(usuarios, contas, relogio);
 
     /// <inheritdoc />
     public async Task<CardDeUsuariosDto> Executar(QuemPedeDto pedido, CancellationToken ct = default)

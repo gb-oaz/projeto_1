@@ -315,15 +315,20 @@ public sealed class RegistrosNoBanco(Armazenamento armazenamento) : IAuditoria, 
         return lidos.Select(d => d.Data("quando")).OfType<DateTimeOffset>().ToList();
     }
 
-    public Task Enviar(string aparelho, string instituicao, string contato, DateTimeOffset quando, CancellationToken ct = default) =>
-        armazenamento.Colecao(Colecoes.PedidosAjuda).InsertOneAsync(new BsonDocument
+    // o id do pedido é o alvo do "CONCLUIDO" do ESQUECI_SENHA_MASTER (RN-274)
+    public async Task<string> Enviar(string aparelho, string instituicao, string contato, DateTimeOffset quando, CancellationToken ct = default)
+    {
+        var id = Guid.NewGuid().ToString("N");
+        await armazenamento.Colecao(Colecoes.PedidosAjuda).InsertOneAsync(new BsonDocument
         {
-            ["_id"] = Guid.NewGuid().ToString("N"),
+            ["_id"] = id,
             ["aparelho"] = aparelho,
             ["instituicao"] = instituicao,
             ["contato"] = contato,
             ["quando"] = Bson.Valor(quando),
         }, cancellationToken: ct);
+        return id;
+    }
 
     // a cobrança ainda não existe: nenhuma conta tem pagamento registrado
     public Task<DateOnly?> UltimoPagamento(string contaId, CancellationToken ct = default) => Task.FromResult<DateOnly?>(null);

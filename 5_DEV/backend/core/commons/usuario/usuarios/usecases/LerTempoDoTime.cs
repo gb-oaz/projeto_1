@@ -7,9 +7,9 @@ using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 
 /// <summary>GET /time/tempo-sessao (RF-152, RN-243): só o time deboaz.</summary>
-public sealed class LerTempoDoTime(IUsuarios usuarios, IContas contas, IAuditoria auditoria, TimeProvider relogio) : ILerTempoDoTime
+public sealed class LerTempoDoTime(IUsuarios usuarios, IContas contas, TimeProvider relogio) : ILerTempoDoTime
 {
-    readonly Apoio apoio = new(usuarios, contas, auditoria, relogio);
+    readonly Apoio apoio = new(usuarios, contas, relogio);
 
     /// <inheritdoc />
     public async Task<TempoDoTimeLidoDto> Executar(QuemPedeDto pedido, CancellationToken ct = default)

@@ -3,6 +3,9 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 using Boaz.Core.Commons.Usuario.Autorizacao.UseCases;
+using Boaz.Core.Commons.Usuario.Usuarios.Domain;
+using IAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoria;
+using IAuditoriaDeErros = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoriaDeErros;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
 
@@ -10,8 +13,10 @@ namespace Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
 /// Mock de todas as portas de saída da autorização, em memória, já ligado aos
 /// casos de uso. Guarda cópias das permissões (o que não for gravado não muda)
 /// e grava permissões e registro juntos, só se a versão não mudou (RNF-223).
+/// Guarda também a auditoria e os erros do PUT (RN-178, RN-270).
 /// </summary>
-public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IModulos, IContratacoes, ISessoesDoUsuario
+public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IModulos, IContratacoes, ISessoesDoUsuario, IAuditoria,
+    IAuditoriaDeErros
 {
     readonly Dictionary<string, UsuarioAutorizado> usuarios = [];
     readonly Dictionary<string, PermissoesDoUsuario> permissoes = [];
@@ -25,7 +30,7 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
         CalcularPermissoes = new CalcularPermissoes(this, this, this, this, Relogio);
         CalcularPermissoesDoAnonimo = new CalcularPermissoesDoAnonimo();
         LerPermissoes = new LerPermissoes(this, this, this, this, Relogio);
-        SalvarPermissoes = new SalvarPermissoes(this, this, this, this, this, Relogio);
+        SalvarPermissoes = new SalvarPermissoes(this, this, this, this, this, this, this, Relogio);
         LerHistoricoDePermissoes = new LerHistoricoDePermissoes(this, this, this, this, Relogio);
         AvisarContratacaoMudou = new AvisarContratacaoMudou(this, this);
         AutorizarPedido = new AutorizarPedido();
@@ -75,6 +80,9 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
     /// <summary>Outra pessoa salva entre a leitura e a gravação: a próxima gravação perde a corrida.</summary>
     public bool PerderAProximaCorrida { get; set; }
 
+    /// <summary>Se não for null, IPermissoesGuardadas.Salvar lança esta falha (o banco que cai no meio da gravação).</summary>
+    public Exception? FalhaAoSalvar { get; set; }
+
     // ── o que os testes conferem ───────────────────────────────────────────────
 
     /// <summary>O pv avisado a cada sessão, na ordem.</summary>
@@ -86,6 +94,15 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
     /// <summary>O registro de mudanças inteiro.</summary>
     public IReadOnlyList<MudancaDePermissao> Registro => registro;
 
+    /// <summary>A auditoria inteira.</summary>
+    public List<RegistroDeAuditoria> Auditoria { get; } = [];
+
+    /// <summary>Os registros de erro (auditoriaErros).</summary>
+    public List<RegistroDeErro> Erros { get; } = [];
+
+    /// <summary>Auditoria e erros na ordem em que foram gravados, como "INICIADO" ou "ALERTA PERMISSAO_ACIMA".</summary>
+    public List<string> Gravacoes { get; } = [];
+
     // ── portas ─────────────────────────────────────────────────────────────────
 
     Task<UsuarioAutorizado?> IUsuarios.Buscar(string id, CancellationToken ct) => Task.FromResult(usuarios.GetValueOrDefault(id));
@@ -94,6 +111,7 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
 
     Task<bool> IPermissoesGuardadas.Salvar(PermissoesDoUsuario novas, MudancaDePermissao mudanca, int versaoLida, CancellationToken ct)
     {
+        if (FalhaAoSalvar is { } falha) return Task.FromException<bool>(falha);
         var atual = permissoes.GetValueOrDefault(novas.UsuarioId)?.Versao ?? 1;
         if (PerderAProximaCorrida)
         {
@@ -133,6 +151,20 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
     Task ISessoesDoUsuario.AvisarPv(string usuarioId, int pv, CancellationToken ct)
     {
         Avisos.Add((usuarioId, pv));
+        return Task.CompletedTask;
+    }
+
+    Task IAuditoria.Registrar(RegistroDeAuditoria registro, CancellationToken ct)
+    {
+        Auditoria.Add(registro);
+        Gravacoes.Add(registro.Etapa.Texto());
+        return Task.CompletedTask;
+    }
+
+    Task IAuditoriaDeErros.Registrar(RegistroDeErro registro, CancellationToken ct)
+    {
+        Erros.Add(registro);
+        Gravacoes.Add($"{registro.Nivel.Texto()} {registro.Codigo}");
         return Task.CompletedTask;
     }
 

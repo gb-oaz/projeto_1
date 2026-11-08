@@ -7,9 +7,9 @@ using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 
 /// <summary>GET /contas/{id}/tempo-sessao (RF-114, RN-183): a conta master ou o staff da própria conta.</summary>
-public sealed class LerTempoDaConta(IUsuarios usuarios, IContas contas, IAuditoria auditoria, TimeProvider relogio) : ILerTempoDaConta
+public sealed class LerTempoDaConta(IUsuarios usuarios, IContas contas, TimeProvider relogio) : ILerTempoDaConta
 {
-    readonly Apoio apoio = new(usuarios, contas, auditoria, relogio);
+    readonly Apoio apoio = new(usuarios, contas, relogio);
 
     /// <inheritdoc />
     public async Task<TempoDaContaLidoDto> Executar(PedidoDeContaDto pedido, CancellationToken ct = default)

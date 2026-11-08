@@ -261,6 +261,17 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
 
         Assert.All(respostas.Take(3), r => Assert.Equal(HttpStatusCode.Accepted, r.Status));
         Assert.Equal((HttpStatusCode.TooManyRequests, "LIMITE_ATENDIMENTO"), (respostas[3].Status, respostas[3].Codigo));
+
+        // RN-274: auditado sem quem nem contaId; o alvo do CONCLUIDO é o pedido gravado em "pedidosAjuda"
+        Assert.All(respostas, r => Assert.Matches("^trc-[0-9a-f]{8}$", r.TraceId));
+        var etapas = (await Registros("auditoria", respostas[0].TraceId!)).ToDictionary(d => d["etapa"].AsString);
+        Assert.All(etapas.Values, d => Assert.True(d["acao"].AsString == "ESQUECI_SENHA_MASTER" && d["quem"].IsBsonNull && d["contaId"].IsBsonNull));
+        Assert.True(etapas["INICIADO"]["alvo"].IsBsonNull);
+        var pedido = etapas["CONCLUIDO"]["alvo"].AsString;
+        Assert.Equal(1, await backend.Banco.GetCollection<BsonDocument>("pedidosAjuda").CountDocumentsAsync(Builders<BsonDocument>.Filter.Eq("_id", pedido)));
+        Assert.Equal("INICIADO", Assert.Single(await Registros("auditoria", respostas[3].TraceId!))["etapa"].AsString);
+        var erro = Assert.Single(await Registros("auditoriaErros", respostas[3].TraceId!));
+        Assert.Equal(("LIMITE_ATENDIMENTO", "ALERTA"), (erro["codigo"].AsString, erro["nivel"].AsString));
     }
 
     [Fact]
