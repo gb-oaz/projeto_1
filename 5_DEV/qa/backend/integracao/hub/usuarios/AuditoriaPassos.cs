@@ -28,6 +28,10 @@ public sealed class AuditoriaPassos(Mundo mundo)
     string alvo = "";
     (string Metodo, string Caminho, string? Corpo) pedido;
     BsonDocument? registro;
+    // a versão das permissões do João antes do PUT da conta master (RN-178)
+    int versaoAntes;
+    // o registro de "auditoriaErros" da recusa (RN-270)
+    BsonDocument? erro;
 
     // ── pedidos auditados ──────────────────────────────────────────────────
     [When(@"^a Maria envia POST /usuarios do participante (Lucas|Pedro)$")]
@@ -56,6 +60,22 @@ public sealed class AuditoriaPassos(Mundo mundo)
               "mods": {}
             }
             """, versao);
+    }
+
+    // a conta master salva as permissões do João na versão em que estão: grava
+    // em "auditoria" e em "registrosPermissao" (RN-178, RN-256)
+    [When(@"^a conta master envia PUT (/usuarios/usr-ebfga-joao/permissoes)$")]
+    public async Task MasterEditaPermissoes(string caminho)
+    {
+        var master = await mundo.Master();
+        var joao = await mundo.StaffCriadoPor("joao", master);
+        alvo = joao.Id;
+        versaoAntes = (await mundo.Permissoes(joao))["versao"]!.GetValue<int>();
+        await Executar(master, "PUT", await mundo.Traduzir(caminho), """
+            {
+              "mods": {}
+            }
+            """, versaoAntes.ToString());
     }
 
     [When(@"^envia POST /contas, sem login, com a sigla ""(\w+)""$")]
@@ -97,10 +117,11 @@ public sealed class AuditoriaPassos(Mundo mundo)
         await Executar(await mundo.Maria(), pedido.Metodo, pedido.Caminho, pedido.Corpo);
     }
 
+    // vale para o desativar e para a "falha inesperada" do POST /usuarios do Lucas
     [When(@"^o banco cai no meio da gravação$")]
     public static void BancoCai() => throw new PendingStepException(
         "derrubar o banco no meio de um pedido não dá para provocar de fora, numa suíte caixa-preta: " +
-        "o 500 com nivel ERRO fica nos testes do backend, com a porta de saída falhando");
+        "o 500 ERRO_INESPERADO com nivel ERRO fica nos testes do backend, com a porta de saída falhando");
 
     // ── respostas ──────────────────────────────────────────────────────────
     [When(@"^a resposta é de sucesso$")]
@@ -117,10 +138,6 @@ public sealed class AuditoriaPassos(Mundo mundo)
 
     [When(@"^a resposta é (\d{3}) ([A-Z_]+)$")]
     public void Recusa(int status, string codigo) => Respostas.Confere(mundo.Ultima, status, codigo);
-
-    // o código do 409 do "já desativado" ainda não está no requisito: só o status
-    [Then(@"^a resposta é (\d{3}), uma (?:recusa prevista|falha inesperada)$")]
-    public void StatusDaSituacao(int status) => Respostas.Confere(mundo.Ultima, status);
 
     [Then(@"^a resposta é (\d{3}) com o cabeçalho X-Trace-Id$")]
     public void ComTraceId(int status)
@@ -167,6 +184,36 @@ public sealed class AuditoriaPassos(Mundo mundo)
             NaHoraDoPedido(d);
             GuardadoCincoAnos(d);
         });
+    }
+
+    // as duas etapas da mesma execução, com a conta master, a ação e o alvo
+    [Then(@"^a coleção ""auditoria"" ganha ""(\w+)"" e ""(\w+)"" da ação ""(\w+)""$")]
+    public async Task GanhaAsDuasEtapas(string primeira, string segunda, string acao)
+    {
+        var master = await mundo.Master();
+        var novos = await Novos(Auditoria.Registros);
+        Assert.Equal(new[] { primeira, segunda }, novos.Select(d => Auditoria.Texto(d, "etapa")).ToArray());
+        MesmoTraceId(novos);
+        Assert.All(novos, d =>
+        {
+            Assert.Equal(master.Id, Auditoria.Texto(d, "quem"));
+            Assert.Equal(acao, Auditoria.Texto(d, "acao"));
+            Assert.Equal(alvo, Auditoria.Texto(d, "alvo"));
+            NaHoraDoPedido(d);
+            GuardadoCincoAnos(d);
+        });
+    }
+
+    // "registrosPermissao" é lido pelo histórico do contrato (RN-256): a versão
+    // nova, a seguinte à de antes do PUT, é a primeira do histórico do João
+    [Then(@"^""registrosPermissao"" ganha a versão nova das permissões do João, como na RN-256$")]
+    public async Task RegistroDaVersaoNova()
+    {
+        Respostas.Confere(mundo.Ultima, 200);
+        var versao = mundo.Ultima.Corpo!["versao"]!.GetValue<int>();
+        Assert.Equal(versaoAntes + 1, versao);
+        var historico = Exigir(await mundo.EnviarComo(await mundo.Master(), "GET", $"/usuarios/{alvo}/permissoes/historico"), 200, "GET …/historico do João");
+        Assert.Equal(versao, historico.Corpo![0]?["versao"]?.GetValue<int>());
     }
 
     [Then(@"^a coleção ""auditoria"" ganha o registro ""(\w+)"" da ação ""(\w+)""$")]
@@ -247,13 +294,20 @@ public sealed class AuditoriaPassos(Mundo mundo)
         Assert.True(concluidos.Count == 0, $"a execução recusada gravou {Auditoria.Resumo(concluidos)}");
     }
 
+    [Then(@"^""auditoriaErros"" ganha o registro com o código ""(\w+)"" e o nivel ""(\w+)""$")]
+    public async Task ErroComCodigoENivel(string codigo, string nivel)
+    {
+        erro = await UmNovoErro();
+        Assert.Equal(codigo, Auditoria.Texto(erro, "codigo"));
+        Assert.Equal(nivel, Auditoria.Texto(erro, "nivel"));
+    }
+
     // "antes de a recusa sair do caso de uso": o registro já está gravado
     // quando a resposta chega, com a hora do pedido
-    [Then(@"^""auditoriaErros"" ganha o registro com o nivel ""(\w+)"" antes de a recusa sair do caso de uso$")]
-    public async Task ErroComNivel(string nivel)
+    [Then(@"^esse registro é gravado antes de a recusa sair do caso de uso$")]
+    public void GravadoAntesDaRecusa()
     {
-        var erro = await UmNovoErro();
-        Assert.Equal(nivel, Auditoria.Texto(erro, "nivel"));
+        Assert.NotNull(erro);
         NaHoraDoPedido(erro);
     }
 

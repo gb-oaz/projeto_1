@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v72), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v74), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -493,6 +493,13 @@ Funcionalidade: Usuários
       | POST /usuarios/usr-ebfga-paulo/desativar        | DESATIVAR_USUARIO  |
 
   @RN-178
+  Cenário: permissões auditadas nas duas coleções
+    Quando a conta master envia PUT /usuarios/usr-ebfga-joao/permissoes
+    E a resposta é de sucesso
+    Então a coleção "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "EDITAR_PERMISSOES"
+    E "registrosPermissao" ganha a versão nova das permissões do João, como na RN-256
+
+  @RN-178
   Cenário: conta criada sem login
     Quando envia POST /contas, sem login, com a sigla "COLSA"
     E a resposta é 201 com o contaId "conta-colsa"
@@ -527,12 +534,20 @@ Funcionalidade: Usuários
     Quando a Maria envia POST /usuarios/usr-ebfga-paulo/desativar
     E <situação>
     Então a resposta é <resposta>
-    E "auditoriaErros" ganha o registro com o nivel "<nivel>" antes de a recusa sair do caso de uso
+    E "auditoriaErros" ganha o registro com o código "<codigo>" e o nivel "<nivel>"
+    E esse registro é gravado antes de a recusa sair do caso de uso
 
     Exemplos:
-      | situação                              | resposta                  | nivel  |
-      | o Paulo já está desativado            | 409, uma recusa prevista  | ALERTA |
-      | o banco cai no meio da gravação       | 500, uma falha inesperada | ERRO   |
+      | situação                        | resposta             | codigo           | nivel  |
+      | o Paulo já está desativado      | 409 ESTADO_IGUAL     | ESTADO_IGUAL     | ALERTA |
+      | o banco cai no meio da gravação | 500 ERRO_INESPERADO  | ERRO_INESPERADO  | ERRO   |
+
+  @RN-270
+  Cenário: falha inesperada
+    Quando a Maria envia POST /usuarios do participante Lucas
+    E o banco cai no meio da gravação
+    Então a resposta é 500 ERRO_INESPERADO com a mensagem "Algo deu errado. Tente de novo mais tarde."
+    E "auditoriaErros" ganha o registro com o código "ERRO_INESPERADO" e o nivel "ERRO"
 
   @RN-270
   Cenário: guardado e imutável como a auditoria
@@ -542,7 +557,7 @@ Funcionalidade: Usuários
 
   @RN-270
   Cenário: leitura recusada não é auditada
-    Quando a Maria envia GET /contas/conta-zzzzz
+    Quando o time deboaz envia GET /contas/conta-zzzzz
     Então a resposta é 404 CONTA_INEXISTENTE
     E as coleções "auditoria" e "auditoriaErros" não ganham registro
 
@@ -1034,14 +1049,15 @@ Funcionalidade: Usuários
       | usuarios           | login único, contaId+nomeCurto único                          |
       | usuarios           | contaId+matricula único só com matrícula                      |
       | usuarios           | contaId+tipo+estado+nome                                      |
-      | auditoria          | contaId+quando, sem prazo de expiração                        |
+      | auditoria          | contaId+quando, traceId, sem prazo de expiração               |
+      | auditoriaErros     | traceId, contaId+quando, sem prazo de expiração               |
       | geracoesSenha      | usuarioId+pedidaEm↓, resumoComprovante, contaId+pedidaEm      |
       | registrosPermissao | usuarioId+em↓+versao↓                                         |
       | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205             |
 
   @RNF-227
   Cenário: segunda partida não duplica
-    Dado a aplicação de homologação iniciada em 2026-11-05, com as 6 coleções e seus índices
+    Dado a aplicação de homologação iniciada em 2026-11-05, com as 7 coleções e seus índices
     Quando ela inicia de novo em 2026-11-06
     Então cada coleção continua uma só, com os mesmos índices, nenhum repetido
     E nenhum documento das coleções é apagado nem duplicado
@@ -1063,7 +1079,7 @@ Funcionalidade: Usuários
 
   @RNF-227
   Cenário: pronta depois da partida
-    Dado a partida de homologação concluída, com as 6 coleções e seus índices prontos
+    Dado a partida de homologação concluída, com as 7 coleções e seus índices prontos
     E os módulos gravados e as contas iniciais garantidas
     Quando envia GET /health, sem login, sem corpo nem cabeçalho
     Então a resposta é 200, sem corpo

@@ -103,7 +103,7 @@ public sealed partial class IndicesPassos(Partida partida)
 
     // ── segunda partida não duplica ────────────────────────────────────────
     // a data do exemplo é só a ordem das partidas: a suíte não muda o relógio
-    [Given(@"^a aplicação de homologação iniciada em \d{4}-\d{2}-\d{2}, com as 6 coleções e seus índices$")]
+    [Given(@"^a aplicação de homologação iniciada em \d{4}-\d{2}-\d{2}, com as 7 coleções e seus índices$")]
     public async Task IniciadaComAsColecoes()
     {
         partida.KeyVaultCompleto("hml");
@@ -182,8 +182,15 @@ public sealed partial class IndicesPassos(Partida partida)
         });
         yield return ("auditoria", new BsonDocument
         {
-            ["_id"] = "qa-rnf227-auditoria", ["contaId"] = conta, ["quem"] = "usr-marca-rnf227", ["acao"] = "CRIAR_USUARIO",
-            ["alvo"] = "usr-marca-rnf227", ["quando"] = agora, ["guardarAte"] = agora.AddYears(5),
+            ["_id"] = "qa-rnf227-auditoria", ["traceId"] = "trc-qa-rnf227", ["etapa"] = "CONCLUIDO", ["contaId"] = conta,
+            ["quem"] = "usr-marca-rnf227", ["acao"] = "CRIAR_USUARIO", ["alvo"] = "usr-marca-rnf227", ["quando"] = agora,
+            ["guardarAte"] = agora.AddYears(5),
+        });
+        yield return ("auditoriaErros", new BsonDocument
+        {
+            ["_id"] = "qa-rnf227-erro", ["traceId"] = "trc-qa-rnf227", ["contaId"] = conta, ["quem"] = "usr-marca-rnf227",
+            ["acao"] = "CRIAR_USUARIO", ["codigo"] = "NOME_CURTO_EM_USO", ["nivel"] = "ALERTA", ["quando"] = agora,
+            ["guardarAte"] = agora.AddYears(5),
         });
         yield return ("geracoesSenha", new BsonDocument
         {
@@ -293,7 +300,7 @@ public sealed partial class IndicesPassos(Partida partida)
     }
 
     // ── GET /health (RNF-227-api, contrato usuarios-contrato-api v05, SISTEMA) ─
-    [Given(@"^a partida de homologação concluída, com as 6 coleções e seus índices prontos$")]
+    [Given(@"^a partida de homologação concluída, com as 7 coleções e seus índices prontos$")]
     public async Task PartidaConcluida()
     {
         partida.KeyVaultCompleto("hml");

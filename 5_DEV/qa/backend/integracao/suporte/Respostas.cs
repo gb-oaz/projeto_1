@@ -14,7 +14,7 @@ public sealed class Respostas(Mundo mundo)
     [Then(@"^a resposta é (\d{3}) ([A-Z_]+)$")]
     public void StatusECodigo(int status, string codigo) => Confere(mundo.Ultima, status, codigo);
 
-    [Then(@"^a resposta é (\d{3}) ([A-Z_]+) com ""(.*)""$")]
+    [Then(@"^a resposta é (\d{3}) ([A-Z_]+) com (?:a mensagem )?""(.*)""$")]
     public void StatusCodigoEMensagem(int status, string codigo, string mensagem)
     {
         Confere(mundo.Ultima, status, codigo);
