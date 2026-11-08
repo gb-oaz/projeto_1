@@ -58,16 +58,19 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
             """, versao);
     }
 
-    // a conta master concede ao João a Utilização do Quiz (MOD-05, contratado
-    // pela EBFGA e de staff, RN-166, RN-241, RN-252), ou a tira se ele já a
-    // tem: só com mudança há versão nova em "registrosPermissao" (RN-254,
-    // RN-256), além da "auditoria" (RN-178)
+    // a conta master concede ao João a Utilização do Quiz (MOD-05, de staff,
+    // RN-166, RN-241, RN-252), ou a tira se ele já a tem: só com mudança há
+    // versão nova em "registrosPermissao" (RN-254, RN-256), além da
+    // "auditoria" (RN-178). Nesta feature a EBFGA não tem o MOD-05: o passo
+    // o contrata antes, como o Mundo.Definir faz, e fora do Executar, para
+    // não cair entre o antes e o depois da auditoria
     [When(@"^a conta master envia PUT (/usuarios/usr-ebfga-joao/permissoes)$")]
     public async Task MasterEditaPermissoes(string caminho)
     {
         var master = await mundo.Master();
         var joao = await mundo.StaffCriadoPor("joao", master);
         alvo = joao.Id;
+        await mundo.Contratar("MOD-05");
         var atuais = await mundo.Permissoes(joao);
         versaoAntes = atuais["versao"]!.GetValue<int>();
         var mods = (JsonObject)atuais["mods"]!.DeepClone();
