@@ -8,8 +8,6 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http.Metadata;
 using GrupoAutenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Domain.GrupoDeFalha;
 using GrupoAutorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Domain.GrupoDeFalha;
 using GrupoUsuarios = Boaz.Core.Commons.Usuario.Usuarios.Domain.GrupoDeFalha;
@@ -51,31 +49,31 @@ public static class Http
             writer.WriteStringValue(value.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture));
     }
 
-    // JSON das APIs: camelCase (padrão da web) e datas em UTC. O corpo que não
-    // é JSON (ou com outro content-type) lança BadHttpRequestException em todo
-    // ambiente — fora do Development o padrão é responder 400 vazio, sem passar
+    // JSON das APIs: camelCase (padrão da web) e datas em UTC. O corpo JSON
+    // quebrado lança BadHttpRequestException em todo ambiente — fora do Development o padrão é responder 400 vazio, sem passar
     // pelo UseRespostasDeErro —, e vira o 422 DADOS_INVALIDOS do contrato (RN-271).
     public static IServiceCollection AddJsonDasApis(this IServiceCollection servicos) => servicos
         .ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new DataHoraUtc()))
         .Configure<RouteHandlerOptions>(o => o.ThrowOnBadRequest = true);
 
     // Falhas dos casos de uso viram a resposta de erro do contrato; corpo que não
-    // é JSON (ou com o tipo errado num campo) responde 422 DADOS_INVALIDOS; a
-    // falha inesperada responde 500 ERRO_INESPERADO, sem detalhe da exceção, com
-    // o X-Trace-Id da execução quando o pedido já o tinha (RN-270, RN-271).
+    // é JSON, com outro content-type (o 415 da ligação do corpo) ou com o tipo
+    // errado num campo, responde 422 DADOS_INVALIDOS; a falha
+    // inesperada responde 500 ERRO_INESPERADO, sem detalhe da exceção, com o
+    // X-Trace-Id da execução quando o pedido já o tinha (RN-270, RN-271).
     public static WebApplication UseRespostasDeErro(this WebApplication app)
     {
         app.Use(async (contexto, proximo) =>
         {
             try
             {
-                if (CorpoQueNaoEJson(contexto))
+                await proximo(contexto);
+                if (contexto.Response.StatusCode == StatusCodes.Status415UnsupportedMediaType && !contexto.Response.HasStarted)
                 {
+                    contexto.Response.Clear();
                     contexto.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
                     await contexto.Response.WriteAsJsonAsync(CorpoInvalido);
-                    return;
                 }
-                await proximo(contexto);
             }
             catch (Exception falha) when (Traduzir(falha) is { } traduzida && !contexto.Response.HasStarted)
             {
@@ -88,18 +86,11 @@ public static class Http
         return app;
     }
 
-    // A resposta do corpo que não é JSON (RN-271).
+    // A resposta do corpo que não é JSON (RN-271). Com outro content-type, a
+    // ligação do corpo responde 415 sem lançar exceção nem chegar ao caso de uso:
+    // o UseRespostasDeErro troca esse 415 por 422 DADOS_INVALIDOS no campo
+    // "corpo", sem X-Trace-Id, porque nenhuma execução começou.
     static readonly Erro CorpoInvalido = new("DADOS_INVALIDOS", "O campo \"corpo\" está faltando ou é inválido.", "corpo");
-
-    // O endereço espera um corpo JSON e chegou um corpo com outro content-type:
-    // o padrão do ASP.NET responderia 415 sem passar pelo caso de uso; o contrato
-    // pede 422 DADOS_INVALIDOS no campo "corpo", sem X-Trace-Id (RN-271). A mesma
-    // conta da ligação do corpo: só quando o pedido pode ter corpo.
-    static bool CorpoQueNaoEJson(HttpContext contexto) =>
-        contexto.GetEndpoint()?.Metadata.GetMetadata<IAcceptsMetadata>() is { } aceita
-        && aceita.ContentTypes.Any(tipo => tipo.Contains("json", StringComparison.OrdinalIgnoreCase))
-        && contexto.Features.Get<IHttpRequestBodyDetectionFeature>()?.CanHaveBody == true
-        && !contexto.Request.HasJsonContentType();
 
     // O cabeçalho com o traceId de cada execução auditada (RN-271).
     public const string CabecalhoDoTraceId = "X-Trace-Id";
