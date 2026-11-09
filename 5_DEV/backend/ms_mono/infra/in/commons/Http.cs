@@ -27,20 +27,10 @@ public sealed record Erro(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Abas = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? Versao = null);
 
-// A marca que ComLogin() deixa no endpoint.
-public sealed class MarcaDeLogin
-{
-    public static readonly MarcaDeLogin Instancia = new();
-
-    MarcaDeLogin()
-    {
-    }
-}
-
 public static class Http
 {
     // Data e hora sempre em UTC, sem frações: 2026-11-01T09:15:00Z.
-    sealed class DataHoraUtc : JsonConverter<DateTimeOffset>
+    internal sealed class DataHoraUtc : JsonConverter<DateTimeOffset>
     {
         public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
             DateTimeOffset.Parse(reader.GetString()!, CultureInfo.InvariantCulture);
@@ -49,16 +39,15 @@ public static class Http
             writer.WriteStringValue(value.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture));
     }
 
-    // JSON das APIs: camelCase (padrão da web) e datas em UTC. O corpo JSON
-    // quebrado lança BadHttpRequestException em todo ambiente — fora do Development o padrão é responder 400 vazio, sem passar
-    // pelo UseRespostasDeErro —, e vira o 422 DADOS_INVALIDOS do contrato (RN-271).
+    // JSON das APIs: camelCase (padrão da web) e datas em UTC, igual nas respostas
+    // de erro (UseRespostasDeErro, HttpJsonOptions) e nos controllers (MVC,
+    // Controladores.AddControladoresDasApis).
     public static IServiceCollection AddJsonDasApis(this IServiceCollection servicos) => servicos
-        .ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new DataHoraUtc()))
-        .Configure<RouteHandlerOptions>(o => o.ThrowOnBadRequest = true);
+        .ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new DataHoraUtc()));
 
     // Falhas dos casos de uso viram a resposta de erro do contrato; corpo que não
-    // é JSON, com outro content-type (o 415 da ligação do corpo) ou com o tipo
-    // errado num campo, responde 422 DADOS_INVALIDOS; a falha
+    // é JSON, com outro content-type ou com o tipo errado num campo (a ligação
+    // recusada, Controladores.CorpoInvalido) responde 422 DADOS_INVALIDOS; a falha
     // inesperada responde 500 ERRO_INESPERADO, sem detalhe da exceção, com o
     // X-Trace-Id da execução quando o pedido já o tinha (RN-270, RN-271).
     public static WebApplication UseRespostasDeErro(this WebApplication app)
@@ -86,10 +75,10 @@ public static class Http
         return app;
     }
 
-    // A resposta do corpo que não é JSON (RN-271). Com outro content-type, a
-    // ligação do corpo responde 415 sem lançar exceção nem chegar ao caso de uso:
-    // o UseRespostasDeErro troca esse 415 por 422 DADOS_INVALIDOS no campo
-    // "corpo", sem X-Trace-Id, porque nenhuma execução começou.
+    // A resposta do corpo que não é JSON (RN-271). A ligação recusada não chega
+    // ao filtro de acesso nem ao caso de uso (Controladores.CorpoInvalido lança
+    // BadHttpRequestException; um 415 que escape vira o mesmo 422): 422
+    // DADOS_INVALIDOS no campo "corpo", sem X-Trace-Id, porque nenhuma execução começou.
     static readonly Erro CorpoInvalido = new("DADOS_INVALIDOS", "O campo \"corpo\" está faltando ou é inválido.", "corpo");
 
     // O cabeçalho com o traceId de cada execução auditada (RN-271).
@@ -97,7 +86,7 @@ public static class Http
 
     // Um traceId novo para a execução auditada (RN-271), já no cabeçalho
     // X-Trace-Id da resposta; a recusa o mantém (UseRespostasDeErro). Se a
-    // execução já começou no filtro da rota (ComAcesso auditado, RN-270), é o
+    // execução já começou no filtro da rota ([ComAcessoAuditado], RN-270), é o
     // mesmo traceId: um por execução.
     public static TraceId NovoTraceId(this HttpContext contexto)
     {
@@ -177,60 +166,9 @@ public static class Http
         }
     }
 
-    // A pedido conferido por ComAcesso.
+    // O pedido conferido por [ComAcesso] (Controladores.cs).
     public static AcessoConferido Acesso(this HttpContext contexto) => (AcessoConferido)contexto.Items[typeof(AcessoConferido)]!;
 
     // Quem pede: o sub do token.
     public static string QuemPede(this HttpContext contexto) => contexto.Acesso().Sub;
-
-    // Toda rota com login declara o que exige (RNF-220): o token é conferido
-    // (assinatura, sessão viva e pv atual) e depois o módulo e a aba pedidos,
-    // com as permissões que o token carrega (RN-241).
-    public static RouteHandlerBuilder ComAcesso(this RouteHandlerBuilder rota, ExigenciaDaRota exigencia, Frente frente = Frente.Hub) =>
-        rota.AddEndpointFilter(async (contexto, proximo) =>
-        {
-            var http = contexto.HttpContext;
-            var acesso = await Conferir(http, frente);
-            http.RequestServices.GetRequiredService<IAutorizarPedido>().Executar(exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods));
-            http.Items[typeof(AcessoConferido)] = acesso;
-            return await proximo(contexto);
-        })
-        .ComLogin()
-        .Produces<Erro>(StatusCodes.Status401Unauthorized)
-        .Produces<Erro>(StatusCodes.Status403Forbidden);
-
-    // O endereço que muda estado (RN-270): o token é conferido como em ComAcesso,
-    // e o 401 sai sem registro; o 403 por faltar o módulo grava o "INICIADO" da
-    // ação e o ALERTA ACESSO_NEGADO, com quem e a conta do token, o alvo do
-    // endereço e o traceId do X-Trace-Id, que o caso de uso reaproveita quando a
-    // rota atende (RN-271).
-    public static RouteHandlerBuilder ComAcesso(this RouteHandlerBuilder rota, ExigenciaDaRota exigencia, AcaoAuditada acao,
-        Func<HttpContext, string?> alvo, Frente frente = Frente.Hub) =>
-        rota.AddEndpointFilter(async (contexto, proximo) =>
-        {
-            var http = contexto.HttpContext;
-            var acesso = await Conferir(http, frente);
-            var execucao = new ExecucaoDaRotaDto(http.NovoTraceId(), acao, acesso.ContaId, acesso.Sub, alvo(http));
-            await http.RequestServices.GetRequiredService<IAutorizarPedidoAuditado>()
-                .Executar(exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods), execucao, http.RequestAborted);
-            http.Items[typeof(AcessoConferido)] = acesso;
-            return await proximo(contexto);
-        })
-        .ComLogin()
-        .Produces<Erro>(StatusCodes.Status401Unauthorized)
-        .Produces<Erro>(StatusCodes.Status403Forbidden);
-
-    // O alvo do endereço: o {id} da rota.
-    public static string? IdDaRota(HttpContext contexto) => contexto.Request.RouteValues["id"]?.ToString();
-
-    // O token do pedido, conferido pela Autenticação (assinatura, sessão viva e pv atual).
-    static Task<AcessoConferido> Conferir(HttpContext http, Frente frente) =>
-        http.RequestServices.GetRequiredService<IConferirAcesso>().Executar(new ConferenciaDeAcessoDto(Token(http), frente), http.RequestAborted);
-
-    // Marca a rota como "com login": a documentação põe o cadeado do Bearer nela
-    // (DocumentacaoApi). Quem confere o token é o filtro ou o caso de uso.
-    public static RouteHandlerBuilder ComLogin(this RouteHandlerBuilder rota) => rota.WithMetadata(MarcaDeLogin.Instancia);
-
-    // Exige o módulo Usuários (MOD-03) na aba pedida.
-    public static ExigenciaDaRota ExigeUsuarios(Abas aba) => new(CalculoDePermissoes.Usuarios, aba);
 }

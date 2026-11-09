@@ -6,8 +6,6 @@ using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 using Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 using Boaz.MsMono.Infra.In.Commons;
-using Boaz.MsMono.Infra.In.Commons.Usuario.Autenticacao;
-using Boaz.MsMono.Infra.In.Commons.Usuario.Autorizacao;
 using Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
 using Boaz.MsMono.Infra.Out.Commons;
 using Boaz.MsMono.Infra.Out.Commons.Usuario;
@@ -27,6 +25,7 @@ var servicos = builder.Services;
 servicos.AddConfiguracoes();
 servicos.AddDocumentacaoApi();
 servicos.AddJsonDasApis();
+servicos.AddControladoresDasApis();
 servicos.AddSingleton(TimeProvider.System);
 // AMBIENTE (hml ou prd): só homologação tem as contas qa (17 RN-179, RN-266)
 servicos.AddSingleton(new Boaz.Core.Commons.Usuario.Usuarios.Domain.AmbienteDaAplicacao(
@@ -134,11 +133,8 @@ if (DocumentacaoApi.Habilitada(app.Configuration))
     app.UseDocumentacaoApi();
 }
 
-// ── infra/in ─────────────────────────────────────────────────────────────────
-app.MapSaude();
-app.MapAutenticacao();
-app.MapUsuarios();
-app.MapAutorizacao();
+// ── infra/in: os controllers (sistema/ e infra/in/<contexto>/<feature>/) ─────
+app.MapControllers();
 
 // A partida, antes de aceitar pedidos (usuario-inicializacao-sequencia): a
 // configuração conferida, o registro de módulos, os índices e as contas

@@ -91,6 +91,32 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
         Assert.Equal(HttpStatusCode.OK, (await cliente.GetAsync($"/doc/api/diagramas/{diagrama}")).StatusCode);
     }
 
+    // cada guia mostra todos os diagramas do módulo em 2_Diagramas/ (menos as vistas),
+    // agrupados por tipo e na ordem: casos de uso, sequência, contrato, classes, documentos
+    [Theory]
+    [InlineData("autenticacao", "autenticacao-casos-de-uso", "autenticacao-sequencia", "autenticacao-contrato-api", "autenticacao-classes", "autenticacao-documentos")]
+    [InlineData("usuarios", "identidade-acesso", "usuarios-sequencia", "usuario-inicializacao-sequencia", "usuarios-contrato-api", "identidade-acesso-classes", "usuario-hexagonal", "identidade-acesso-documentos")]
+    [InlineData("autorizacao", "autorizacao-casos-de-uso", "autorizacao-sequencia", "autorizacao-contrato-api", "autorizacao-classes", "autorizacao-documentos")]
+    public async Task Guia_mostra_todos_os_diagramas_do_modulo_por_tipo(string api, params string[] legendas)
+    {
+        using var cliente = Cliente(true);
+
+        var documento = System.Text.Json.Nodes.JsonNode.Parse(await cliente.GetStringAsync($"/doc/api/{api}.json"))!;
+        var guia = documento["info"]!["description"]!.GetValue<string>();
+        var citados = System.Text.RegularExpressions.Regex.Matches(guia, @"\]\(/doc/api/diagramas/([a-z0-9-]+)\.svg\)")
+            .Select(m => m.Groups[1].Value).Distinct().ToList();
+
+        Assert.Equal(legendas, citados);
+        Assert.Contains("### Casos de uso", guia);
+        Assert.Contains("### Sequência", guia);
+        Assert.Contains("### Contrato de API", guia);
+        Assert.Contains("### Modelo de documentos", guia);
+        foreach (var legenda in legendas)
+        {
+            Assert.Equal(HttpStatusCode.OK, (await cliente.GetAsync($"/doc/api/diagramas/{legenda}.svg")).StatusCode);
+        }
+    }
+
     // Authorize: o cadeado do Bearer só nos endereços com login
     [Theory]
     [InlineData("autenticacao", "/auth/sessoes", "get", true)]

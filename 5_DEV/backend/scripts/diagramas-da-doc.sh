@@ -17,7 +17,7 @@ destino="$raiz/5_DEV/backend/ms_mono/wwwroot/doc/api/diagramas"
 # legenda → módulo que a mostra (o guia de cada módulo cita as dele)
 legendas=(
   autenticacao-casos-de-uso autenticacao-sequencia autenticacao-contrato-api autenticacao-classes autenticacao-documentos
-  usuarios-sequencia usuarios-contrato-api identidade-acesso-classes identidade-acesso-documentos
+  identidade-acesso usuarios-sequencia usuario-inicializacao-sequencia usuarios-contrato-api identidade-acesso-classes usuario-hexagonal identidade-acesso-documentos
   autorizacao-casos-de-uso autorizacao-sequencia autorizacao-contrato-api autorizacao-classes autorizacao-documentos
 )
 

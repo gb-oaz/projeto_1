@@ -16,12 +16,12 @@ Um único serviço, `ms_mono`, com a estrutura hexagonal de
 ├── ms_mono/                      Boaz.MsMono: ASP.NET Core, imagem backend-mono
 │   ├── Program.cs                ponto de composição (liga portas e adaptadores)
 │   ├── appsettings.json          padrões de configuração (sem segredos)
-│   ├── sistema/                  endpoints do runtime: /health e a documentação em /doc/api
+│   ├── sistema/                  do runtime: SaudeController (/health) e a documentação em /doc/api
 │   │   ├── guias/                guia de uso de cada API do Swagger (Markdown)
 │   │   └── exemplos/             exemplos de cada endpoint (gerados dos contratos, não edite)
 │   ├── wwwroot/doc/api/          swagger.css, design/ e diagramas/ (cópias geradas, não edite)
 │   └── infra/
-│       ├── in/<contexto>/<feature>/    endpoints HTTP (chamam ports/in)
+│       ├── in/<contexto>/<feature>/    controllers HTTP, finos (chamam ports/in)
 │       └── out/<contexto>/<feature>/   MongoDB e Redis (implementam ports/out)
 ├── tests/                        espelha core/ e ms_mono/, um xUnit por projeto
 ├── scripts/diagramas-da-doc.sh   copia de 2_Diagramas/ os diagramas que os guias mostram
@@ -129,7 +129,10 @@ erros e os diagramas do módulo, na largura toda) e tem o botão **Authorize**
 para o token; a raiz `/` leva ao catálogo (302). Os exemplos ficam dentro de
 cada endpoint: o pedido em **Request body** e cada resposta, com os erros e as
 mensagens exatas, em **Responses** (seletor **Examples**). O endereço da página
-abre o endpoint (`#/<Tag>/<operação>`), para compartilhar.
+abre o endpoint (`#/<Tag>/<operationId>`), para compartilhar. Dentro de cada API
+há um grupo (tag) por controller, e o resumo, a descrição, os parâmetros e as
+respostas de cada endpoint vêm dos comentários XML da ação (`<summary>`,
+`<remarks>`, `<param>`, `<response>`); o operationId é o `Name` da rota.
 Ela existe quando `Swagger:Habilitado` é `true`: no `dotnet run`
 (appsettings.Development.json), no CI local e em homologação. Em produção fica
 desligada (a raiz responde 404) e o WAF bloqueia `/doc/api`. O banner (animado
@@ -147,8 +150,9 @@ mais recente de cada módulo (o PEDIDO e as RESPOSTAS de cada caixa), com as
 mensagens das falhas do core. Depois de uma versão nova de um contrato, rode
 `./5_DEV/backend/scripts/exemplos-da-doc.py`; o teste
 `Todo_endpoint_traz_os_exemplos_do_contrato` falha se um endpoint ficar sem
-exemplo ou sobrar um. Módulo
-novo: `WithGroupName(<modulo>)` no grupo de endpoints, uma linha em
+exemplo ou sobrar um. Controller novo:
+`[ApiExplorerSettings(GroupName = <modulo>)]`, `[Tags]` e o grupo dele em
+`DocumentacaoApi.Apis`. Módulo novo: a constante do documento e uma linha em
 `DocumentacaoApi.Apis`, o guia em `sistema/guias/`, as legendas no script dos diagramas e o módulo em
 `MODULOS` do script dos exemplos.
 
