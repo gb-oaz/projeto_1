@@ -70,6 +70,7 @@ integracao/
 │   ├── Partida.cs                  sobe uma instância própria do backend (cenários de inicialização)
 │   ├── BancoDaPartida.cs           coleções e índices do banco dessa instância (RNF-227)
 │   ├── Auditoria.cs                leitura das coleções "auditoria" e "auditoriaErros" (RN-178, RN-270, RN-271)
+│   ├── AoVivo.cs                   conexão SSE de GET /<modulo>/card/ao-vivo: eventos "card", "encerrado" e ": ping"
 │   └── Ganchos.cs                  antes de cada cenário: limpa tudo
 ├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.md
 │   ├── autenticacao.feature
@@ -82,7 +83,11 @@ integracao/
     ├── UsuariosPassos.cs
     ├── ContasIniciaisPassos.cs     contas iniciais (RN-179, RN-190, RN-265 a RN-268, RNF-225, RNF-226)
     ├── AuditoriaPassos.cs          auditoria do que muda estado, erros e alertas, traceId (RN-178, RN-270, RN-271)
-    └── IndicesPassos.cs            coleções e índices prontos na partida e GET /health (RNF-227, RNF-227-api)
+    ├── IndicesPassos.cs            coleções e índices prontos na partida e GET /health (RNF-227, RNF-227-api)
+    ├── modulos.feature             15_modulos.md: card comum, pela instância do Usuários (RN-276, RN-278, RN-279)
+    ├── CardPassos.cs               GET /usuarios/card (RN-189, RN-280; 15 RN-276, RN-278)
+    ├── AoVivoPassos.cs             GET /usuarios/card/ao-vivo (RN-281; 15 RN-279)
+    └── PreferenciasPassos.cs       GET e PUT /usuarios/eu/preferencias (RN-283)
 ```
 
 A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
@@ -109,6 +114,7 @@ Os outros requisitos, do mesmo jeito:
 | `17_modulo-usuario-a-autenticacao.md` | `commons/autenticacao/autenticacao.feature` | `Autenticação` |
 | `17_modulo-usuario-b-autorizacao.md` | `commons/autorizacao/autorizacao.feature` | `Autorização` |
 | `17_modulo-usuario.md` | `hub/usuarios/usuarios.feature` | `Usuários` |
+| `15_modulos.md` | `hub/usuarios/modulos.feature` | `Módulos · card do Usuários` |
 
 Dois cenários com o mesmo nome no requisito: o segundo ganha o ID no fim
 (`nome curto repetido · RF-153`), porque o Reqnroll não aceita nome repetido.
@@ -266,14 +272,22 @@ ela.
   (a senha, o código de liberação `482913`, o comprovante `c7e1…`) valem pelo
   formato: o do exemplo é trocado pelo que veio, se o que veio tem a forma certa.
 - **Campos que a API não deixa reproduzir** saem da comparação, com o motivo
-  no passo (`Mundo.CamposSemConferir`): o histórico do card (`selo`, `noMes`,
-  `meses`) e o `ultimoPagamento` da conta, que vem da cobrança.
+  no passo (`Mundo.CamposSemConferir`): o `ultimoPagamento` da conta, que vem
+  da cobrança, e a `versao` do card do exemplo (418, o histórico da escola).
 - **O que vem do banco, porque a API não cria**: o módulo contratado pela
   escola (o catálogo ainda não tem o endereço de contratar e descontratar:
   `Estado.Contratar`/`Descontratar`), a versão das permissões dos exemplos
   ("na versão 6": `Estado.DefinirVersao`), a hora do pedido do código de
-  liberação ("pedido há 73 h": `Estado.PedidoHa`), o tempo sem uso da sessão e
-  os bloqueios seguidos.
+  liberação ("pedido há 73 h": `Estado.PedidoHa`; "vence hoje":
+  `Estado.CodigoVenceHoje`), o último acesso ("Sem acesso há 30 dias":
+  `Estado.UltimoAcesso`, `Estado.UltimoAcessoMaster`), os meses anteriores do
+  card guardado (`Estado.MesesAnterioresDoCard`), o tempo sem uso da sessão e
+  os bloqueios seguidos. O fechamento da 00:00 do card (15 RN-278) precisa do
+  relógio do backend e fica pendente.
+- **Card ao vivo** (`suporte/AoVivo.cs`): a conexão SSE fica aberta pela
+  suíte e fecha no fim do cenário; os tempos (intervalo, ping de 30 s) são
+  esperados de verdade, com 5 s de folga, por isso esses cenários levam até
+  ~40 s cada.
 - **Token desatualizado**: quem pede com um token de versão antiga recebe
   `401 PERMISSOES_DESATUALIZADAS`; no preparo, `Mundo.EnviarComo` renova e
   tenta de novo uma vez, como o cliente faz.

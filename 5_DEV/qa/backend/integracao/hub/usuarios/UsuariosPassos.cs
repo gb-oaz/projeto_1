@@ -1331,63 +1331,7 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
         Assert.DoesNotContain(corpo, c => c.Value is JsonArray);
     }
 
-    // ── card (RN-189) ──────────────────────────────────────────────────────
-    // selo, noMes e meses dependem do histórico de meses, que a API não cria: ficam
-    // fora da comparação; o dado, o rótulo e as contagens são conferidos
-    [Given(@"^a conta master da EBFGA, com (\d+) staff e (\d+) participantes ativos$")]
-    public async Task EscolaComUsuarios(int staff, int participantes)
-    {
-        await Povoar(await mundo.Master(), staff, participantes);
-        mundo.Sujeito = await mundo.Master();
-        foreach (var campo in new[] { "selo", "noMes", "meses" }) mundo.CamposSemConferir.Add(campo);
-    }
-
-    [When(@"^(a conta master da EBFGA|o educador autônomo Pedro|o administrador do deboaz) envia GET /usuarios/card$")]
-    public async Task PedeOCard(string quem)
-    {
-        Pessoa por;
-        switch (quem)
-        {
-            case "a conta master da EBFGA":
-                await Povoar(por = await mundo.Master(), 37, 298);
-                break;
-            case "o educador autônomo Pedro":
-                await Povoar(por = await mundo.Pedro(), 0, 32);
-                break;
-            default:
-                por = mundo.Admin();
-                await mundo.Conta();
-                // as contas que a inicialização criou (QAINS e QAAUT em homologação,
-                // RN-265) também contam: completa até 112 ativas
-                var ativas = Exigir(await mundo.EnviarComo(por, "GET", "/contas?estado=ATIVA"), 200, "GET /contas?estado=ATIVA")
-                    .Corpo?["total"]?.GetValue<int>() ?? 1;
-                for (var i = 1; i <= 112 - ativas; i++)
-                {
-                    var sigla = $"CT{Letras(i)}".ToUpperInvariant();
-                    await mundo.NovaConta(sigla, ContaNova("INSTITUICAO", $"Escola {sigla}", Cnpj(30000000 + i), $"conta_{i}", sigla));
-                }
-                break;
-        }
-        await mundo.EnviarComo(por, "GET", "/usuarios/card");
-    }
-
-    [Then(@"^dado e rotulo são (\d+) e ""(.+)""$")]
-    public void DadoERotulo(int dado, string rotulo)
-    {
-        Respostas.Confere(mundo.Ultima, 200);
-        Assert.Equal(dado, mundo.Ultima.Corpo?["dado"]?.GetValue<int>());
-        Assert.Equal(rotulo, mundo.Ultima.Corpo?["rotulo"]?.GetValue<string>());
-    }
-
-    async Task Povoar(Pessoa master, int staff, int participantes)
-    {
-        for (var i = 0; i < staff; i++) await mundo.NovoStaff($"staff{Letras(i)}", $"Staff {Letras(i)}", master);
-        for (var i = 0; i < participantes; i++)
-        {
-            Exigir(await mundo.EnviarComo(master, "POST", "/usuarios", Participante($"Participante {Letras(i)}", $"part{Letras(i)}")),
-                201, "POST /usuarios de participante");
-        }
-    }
+    // card (RN-189, RN-280, RN-281, RN-283): CardPassos.cs e AoVivoPassos.cs
 
     // ── senha guardada e o que não é da API (auditoria: AuditoriaPassos.cs) ──
     [Given(@"^a senha da Maria guardada$")]

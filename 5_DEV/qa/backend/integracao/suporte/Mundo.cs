@@ -421,6 +421,11 @@ public sealed partial class Mundo
         _ => null,
     };
 
+    // "um staff sem o Usuários" (17 RN-189, RN-281): staff da EBFGA criado pela
+    // conta master, sem nenhuma permissão salva
+    public async Task<Pessoa> StaffSemUsuarios() =>
+        pessoas.GetValueOrDefault("sara") ?? await NovoStaff("sara", "Sara Nunes", await Master());
+
     // staff com a senha confirmada, fora dos exemplos (o card conta os ativos)
     public Task<Pessoa> NovoStaff(string nomeCurto, string nome, Pessoa criador) => Staff(nomeCurto, nome, null, criador);
 
@@ -500,7 +505,7 @@ public sealed partial class Mundo
     // (401 PERMISSOES_DESATUALIZADAS), renova uma vez e repete, como a web faz (RNF-224)
     public async Task<Resposta> EnviarComo(Pessoa pessoa, string metodo, string caminho, string? corpo = null, string? ifMatch = null)
     {
-        var sessao = await SessaoDe(pessoa, Navegador);
+        var sessao = await SessaoParaPedido(pessoa);
         var r = await Enviar(metodo, caminho, corpo, sessao.Acesso, ifMatch: ifMatch);
         if (r.Status == 401 && r.Corpo?["codigo"]?.GetValue<string>() == "PERMISSOES_DESATUALIZADAS")
         {
@@ -511,6 +516,18 @@ public sealed partial class Mundo
     }
 
     public async Task<string> TokenDe(Pessoa pessoa) => (await SessaoDe(pessoa, Navegador)).Acesso;
+
+    // a sessão com que a pessoa faz um pedido: a do navegador no hub; o
+    // participante não entra no hub, usa a última sessão dele no quest (ou
+    // entra pelo código, no app). Preferências (17 RN-283) e o card (RN-189)
+    public async Task<Sessao> SessaoParaPedido(Pessoa pessoa)
+    {
+        if (pessoas.TryGetValue("lucas", out var lucas) && lucas == pessoa)
+        {
+            return Sessoes.LastOrDefault(s => s.Pessoa == pessoa) ?? await EntrarNoQuest(App);
+        }
+        return await SessaoDe(pessoa, Navegador);
+    }
 
     public async Task<Sessao> SessaoDe(Pessoa pessoa, string aparelho) =>
         Sessoes.LastOrDefault(s => s.Pessoa == pessoa && s.Aparelho == aparelho) ?? await Entrar(pessoa, aparelho);

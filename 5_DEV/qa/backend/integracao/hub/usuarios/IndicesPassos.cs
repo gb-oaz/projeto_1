@@ -103,7 +103,7 @@ public sealed partial class IndicesPassos(Partida partida)
 
     // ── segunda partida não duplica ────────────────────────────────────────
     // a data do exemplo é só a ordem das partidas: a suíte não muda o relógio
-    [Given(@"^a aplicação de homologação iniciada em \d{4}-\d{2}-\d{2}, com as 7 coleções e seus índices$")]
+    [Given(@"^a aplicação de homologação iniciada em \d{4}-\d{2}-\d{2}, com as 8 coleções e seus índices$")]
     public async Task IniciadaComAsColecoes()
     {
         partida.KeyVaultCompleto("hml");
@@ -235,6 +235,15 @@ public sealed partial class IndicesPassos(Partida partida)
             ["em"] = agora,
             ["versao"] = 1,
         });
+        yield return ("cardUsuarios", new BsonDocument
+        {
+            ["_id"] = "card-marca-INSTITUICAO",
+            ["contaId"] = conta,
+            ["perfil"] = "INSTITUICAO",
+            ["usuarioId"] = BsonNull.Value,
+            ["versao"] = 1,
+            ["atualizadoEm"] = agora,
+        });
         yield return ("pedidosAjuda", new BsonDocument
         {
             ["_id"] = "qa-rnf227-pedido",
@@ -349,7 +358,7 @@ public sealed partial class IndicesPassos(Partida partida)
     }
 
     // ── GET /health (RNF-227-api, contrato usuarios-contrato-api v05, SISTEMA) ─
-    [Given(@"^a partida de homologação concluída, com as 7 coleções e seus índices prontos$")]
+    [Given(@"^a partida de homologação concluída, com as 8 coleções e seus índices prontos$")]
     public async Task PartidaConcluida()
     {
         partida.KeyVaultCompleto("hml");

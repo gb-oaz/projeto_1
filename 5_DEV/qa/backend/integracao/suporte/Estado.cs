@@ -125,6 +125,48 @@ public static class Estado
             Builders<BsonDocument>.Filter.Eq("usuarioId", usuarioId),
             Builders<BsonDocument>.Update.Set("pedidaEm", DateTime.UtcNow - tempo));
 
+    // o código de liberação vence hoje, no horário de Brasília, e ainda não
+    // venceu (selo do card, 17 RN-280): vence no meio do que resta do dia
+    public static Task CodigoVenceHoje(string usuarioId)
+    {
+        var agora = DateTime.UtcNow;
+        var fimDoDia = agora.AddHours(-3).Date.AddDays(1).AddHours(3);
+        var vence = agora + (fimDoDia - agora) / 2;
+        return Banco.GetCollection<BsonDocument>("geracoesSenha").UpdateManyAsync(
+            Builders<BsonDocument>.Filter.Eq("usuarioId", usuarioId),
+            Builders<BsonDocument>.Update.Set("pedidaEm", vence - TimeSpan.FromHours(72)));
+    }
+
+    // último acesso dos usuários (17 RN-280, "Sem acesso há 30 dias"): a API só
+    // o grava quando a pessoa entra, e o cenário precisa dele no passado
+    public static Task UltimoAcesso(IEnumerable<string> usuarioIds, DateTime quando) =>
+        Banco.GetCollection<BsonDocument>("usuarios").UpdateManyAsync(
+            Builders<BsonDocument>.Filter.In("_id", usuarioIds),
+            Builders<BsonDocument>.Update.Set("ultimoAcesso", quando));
+
+    // último acesso da conta master (17 RN-280, "Master sem acesso há 30 dias")
+    public static Task UltimoAcessoMaster(string contaId, DateTime quando) =>
+        Banco.GetCollection<BsonDocument>("contas").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", contaId),
+            Builders<BsonDocument>.Update.Set("ultimoAcessoMaster", quando));
+
+    // meses anteriores do card guardado (17 RN-280, 15 RN-278): o histórico só
+    // nasce com o tempo. Entram antes do mês atual, que o backend já gravou;
+    // sem o card guardado, nada muda (o cenário falha pela resposta)
+    public static Task MesesAnterioresDoCard(string contaId, string perfil, IReadOnlyList<int> valores)
+    {
+        var mesAtual = DateTime.UtcNow.AddHours(-3);
+        var meses = new BsonArray(valores.Select((valor, i) => new BsonDocument
+        {
+            ["mes"] = mesAtual.AddMonths(i - valores.Count).ToString("yyyy-MM"),
+            ["valor"] = valor,
+        }));
+        return Banco.GetCollection<BsonDocument>("cardUsuarios").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("contaId", contaId) & Builders<BsonDocument>.Filter.Eq("perfil", perfil)
+                & Builders<BsonDocument>.Filter.Eq("usuarioId", BsonNull.Value),
+            Builders<BsonDocument>.Update.PushEach("meses", meses, position: 0));
+    }
+
     // a sessão passou do tempo sem uso: a chave expira (RN-226, RNF-217)
     public static Task ExpirarSessao(string sid) => redis.Value.GetDatabase().KeyDeleteAsync($"sessao:{sid}");
 
