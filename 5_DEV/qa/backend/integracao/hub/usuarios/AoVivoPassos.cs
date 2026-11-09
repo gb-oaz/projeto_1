@@ -7,7 +7,7 @@ namespace Boaz.Qa.Integracao.Hub.Usuarios;
 
 // Passos do card ao vivo: RN-281 de 1_Requisitos/17_modulo-usuario.md e, pela
 // instância do Usuários, RN-279-api de 1_Requisitos/15_modulos.md
-// (modulos.feature). Contrato: usuarios-contrato-api v13, GET
+// (modulos.feature). Contrato: usuarios-contrato-api v14, GET
 // /usuarios/card/ao-vivo por SSE (eventos "card" e "encerrado", ": ping").
 //
 // A conexão fica aberta pela suíte (suporte/AoVivo.cs) e é fechada no fim do
@@ -43,18 +43,22 @@ public sealed class AoVivoPassos(Mundo mundo, AoVivo aoVivo)
     }
 
     // ── RN-281 · sessão termina com a conexão aberta ───────────────────────
-    // o Dado não diz o intervalo: com 5 s, o menor da lista, a conferência da
-    // sessão (a cada intervalo, contrato v13) chega logo
-    [Given(@"^a staff Maria conectada ao vivo, no navegador, com a sessão de 8 h$")]
-    public async Task MariaConectada()
+    [Given(@"^a staff Maria conectada por GET (/usuarios/card/ao-vivo\?intervalo=\d+), no navegador$")]
+    public async Task MariaConectada(string caminho)
     {
         var maria = await mundo.Maria();
         await mundo.Conceder(maria, new() { ["MOD-03"] = "U" });
-        await Conectada(maria, $"{Caminho}?intervalo=5", "Maria");
+        await Conectada(maria, caminho, "Maria");
     }
 
-    [When(@"^a sessão dela termina$")]
-    public async Task SessaoTermina() => await Estado.ExpirarSessao((await mundo.SessaoDe(await mundo.Maria(), Navegador)).Sid);
+    // as 8 h sem uso são a chave sessao:<sid> que expira no Redis (RNF-217):
+    // o Quando a apaga, o que o backend vê quando o tempo passa. A duração em
+    // si não muda o que se confere
+    [Given(@"^a sessão dela de 8 h no navegador$")]
+    public static void SessaoDeOitoHoras() { }
+
+    [When(@"^a sessão expira por 8 h sem uso, com a conexão ao vivo aberta$")]
+    public async Task SessaoExpira() => await Estado.ExpirarSessao((await mundo.SessaoDe(await mundo.Maria(), Navegador)).Sid);
 
     [Then(@"^ela recebe o evento ""encerrado"" com o código ""(\w+)"" e a conexão fecha$")]
     public async Task Encerrada(string codigo)

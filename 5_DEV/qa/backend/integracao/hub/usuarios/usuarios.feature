@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v97), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v98), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -1046,8 +1046,7 @@ Funcionalidade: Usuários
   Esquema do Cenário: números das contas, lidos de "usuarios" e "geracoesSenha"
     Dado o perfil INSTITUICAO ou AUTONOMO contando os usuarios do contaId da conta
     E o perfil STAFF contando os usuarios com criadoPor igual à staff
-    # requisito: "E," não é palavra-chave do Gherkin (o Reqnroll não compila); vírgula tirada aqui até o deboaz-po corrigir
-    E no STAFF, o selo só com as geracoesSenha de pedidaPor igual à staff
+    E o selo do STAFF conta só as geracoesSenha com pedidaPor igual à staff
     Quando o card conta <numero>
     Então lê <consulta>
 
@@ -1059,7 +1058,7 @@ Funcionalidade: Usuários
       | participantes         | PARTICIPANTE ATIVO, na INSTITUICAO e no STAFF                |
       | pendentes             | estado PENDENTE                                              |
       | criados no mês        | criadoEm no mês atual, no AUTONOMO                           |
-      | Sem acesso há 30 dias | ATIVO com ultimoAcesso há mais de 30 dias                    |
+      | Sem acesso há 30 dias | ATIVO com ultimoAcesso há mais de 30 dias ou nulo            |
       | Desativados           | estado DESATIVADO                                            |
       | Códigos vencidos      | PENDENTE com a última geracoesSenha vencida                  |
 
@@ -1067,10 +1066,24 @@ Funcionalidade: Usuários
   Cenário: criar participante atualiza os cards guardados
     Dado o card da EBFGA com 298 participantes e o card da staff Maria com 38
     Quando a Maria envia POST /usuarios e cria o participante Lucas Andrade com 201
-    # requisito: "Então," não é palavra-chave do Gherkin (o Reqnroll não compila); vírgula tirada aqui até o deboaz-po corrigir
-    Então na mesma execução, o Lucas é gravado com criadoPor "usr-ebfga-maria"
+    Então o Lucas é gravado com criadoPor "usr-ebfga-maria" na mesma execução
     E "cardUsuarios" passa a 299 no card da EBFGA e a 39 no card da Maria, e a versao sobe
     E o selo, "Sem acesso há 30 dias" e "Códigos vencidos" não sobem a versao: são refeitos na leitura
+
+  @RN-280
+  Cenário: quem nunca entrou conta como sem acesso
+    Dado o participante Davi Rocha da EBFGA, ATIVO desde 2026-09-01, sem nenhum acesso
+    E o ultimoAcesso dele nulo
+    Quando a conta master envia GET /usuarios/card em 2026-11-08
+    Então o Davi conta em "Sem acesso há 30 dias"
+
+  # antecipado da 17 v100 (deboaz-po): o texto deve vir igual no requisito
+  @RN-280
+  Cenário: quem foi criado há menos de 30 dias não conta como sem acesso
+    Dado o participante Igor Alves da EBFGA, ATIVO desde 2026-11-03, sem nenhum acesso
+    E o ultimoAcesso dele nulo
+    Quando a conta master envia GET /usuarios/card em 2026-11-08
+    Então o Igor não conta em "Sem acesso há 30 dias"
 
   @RN-281
   Esquema do Cenário: quem não conecta
@@ -1084,8 +1097,9 @@ Funcionalidade: Usuários
 
   @RN-281
   Cenário: sessão termina com a conexão aberta
-    Dado a staff Maria conectada ao vivo, no navegador, com a sessão de 8 h
-    Quando a sessão dela termina
+    Dado a staff Maria conectada por GET /usuarios/card/ao-vivo?intervalo=5, no navegador
+    E a sessão dela de 8 h no navegador
+    Quando a sessão expira por 8 h sem uso, com a conexão ao vivo aberta
     Então ela recebe o evento "encerrado" com o código "SESSAO_TERMINADA" e a conexão fecha
 
   @RN-281

@@ -144,6 +144,25 @@ public static class Estado
             Builders<BsonDocument>.Filter.In("_id", usuarioIds),
             Builders<BsonDocument>.Update.Set("ultimoAcesso", quando));
 
+    // quem nunca entrou: ultimoAcesso nulo (17 RN-280, conta em "Sem acesso há 30 dias")
+    public static Task UltimoAcessoNulo(string usuarioId) =>
+        Banco.GetCollection<BsonDocument>("usuarios").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", usuarioId),
+            Builders<BsonDocument>.Update.Set("ultimoAcesso", BsonNull.Value));
+
+    // usuários criados há algum tempo ("ATIVO desde 2026-09-01"): "Sem acesso
+    // há 30 dias" só conta quem existe há mais de 30 dias (17 RN-280)
+    public static Task CriadoEm(IEnumerable<string> usuarioIds, DateTime quando) =>
+        Banco.GetCollection<BsonDocument>("usuarios").UpdateManyAsync(
+            Builders<BsonDocument>.Filter.In("_id", usuarioIds),
+            Builders<BsonDocument>.Update.Set("criadoEm", quando));
+
+    // conta criada há algum tempo ("Master sem acesso há 30 dias", 17 RN-280)
+    public static Task CriadaEm(string contaId, DateTime quando) =>
+        Banco.GetCollection<BsonDocument>("contas").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", contaId),
+            Builders<BsonDocument>.Update.Set("criadaEm", quando));
+
     // último acesso da conta master (17 RN-280, "Master sem acesso há 30 dias")
     public static Task UltimoAcessoMaster(string contaId, DateTime quando) =>
         Banco.GetCollection<BsonDocument>("contas").UpdateOneAsync(

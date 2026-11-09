@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/15_modulos.md (v29), copiados do requisito:
+# Cenários de API de 1_Requisitos/15_modulos.md (v30), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Módulos · card do Usuários
   1_Requisitos/15_modulos.md · Cenários de API
@@ -39,8 +39,7 @@ Funcionalidade: Módulos · card do Usuários
   Cenário: atualizado na mesma execução da mudança
     Dado o card do Usuários da EBFGA na versao 418, com 298 participantes ativos
     Quando o staff João envia POST /usuarios e cria o participante Lucas Andrade com 201
-    # requisito: "Então," não é palavra-chave do Gherkin (o Reqnroll não compila); vírgula tirada aqui até o deboaz-po corrigir
-    Então na mesma execução, o card guardado passa à versao 419 com 299 participantes
+    Então o card guardado passa à versao 419 com 299 participantes na mesma execução
     E o próximo GET /usuarios/card traz 299, lido do card guardado
 
   @RN-278

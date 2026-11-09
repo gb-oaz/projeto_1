@@ -7,7 +7,7 @@ namespace Boaz.Qa.Integracao.Hub.Usuarios;
 
 // Passos do card do Usuários: RN-189-api e RN-280 de 1_Requisitos/17_modulo-usuario.md
 // e, pela instância do Usuários, RN-276-api e RN-278 de 1_Requisitos/15_modulos.md
-// (modulos.feature). Contrato: usuarios-contrato-api v13, GET /usuarios/card.
+// (modulos.feature). Contrato: usuarios-contrato-api v14, GET /usuarios/card.
 //
 // Os números vêm do que a API cria (contas, staff, participantes, pendentes,
 // desativados). O que só nasce com o tempo é preparado pelo banco
@@ -20,10 +20,8 @@ namespace Boaz.Qa.Integracao.Hub.Usuarios;
 // provada pelo efeito: o card lido antes e depois de criar o que o filtro conta
 // e o que ele não conta, e a diferença de cada número.
 [Binding]
-public sealed class CardPassos(Mundo mundo)
+public sealed class CardPassos(Mundo mundo, Relogio relogio)
 {
-    const string SemRelogio = "a suíte não controla o relógio do backend: o fechamento da 00:00 de Brasília fica nos testes do backend";
-    const string SoNoBanco = "documento do banco: conferido nos testes do backend";
 
     // o número da linha de Exemplos (RN-280) e os cards de antes
     string numero = "";
@@ -33,7 +31,17 @@ public sealed class CardPassos(Mundo mundo)
     string pendenteHoje = "", pendenteVencido = "";
     // o intervalo entre o último acesso do Lucas e o GET do exemplo (15 RN-278)
     DateOnly ultimoAcessoDoLucas;
+    // quem nunca entrou (RN-280) e desde quando está ATIVO
+    string nuncaEntrou = "";
+    DateOnly nuncaEntrouDesde;
+    // um participante da Maria, com acesso hoje, que o Então deixa sem acesso
+    string umDaMaria = "";
     int criados;
+    // fechamento (15 RN-278): tamanhos guardados, histórico semeado, data e o card de antes
+    (int Dias, int Semanas, int Meses) guardados;
+    (List<string> Dias, List<string> Semanas, List<string> Meses) semeado;
+    DateOnly diaDoFechamento;
+    JsonObject? documento;
 
     // ── RN-189-api · card da instituição ───────────────────────────────────
     // 37 staff e 298 participantes ativos; 4 pendentes: 2 com o código que vence
@@ -48,6 +56,7 @@ public sealed class CardPassos(Mundo mundo)
         var agora = DateTime.UtcNow;
         await Estado.UltimoAcesso([.. staffIds, .. participanteIds.Skip(14)], agora);
         await Estado.UltimoAcesso(participanteIds.Take(14), agora.AddDays(-31));
+        await Estado.CriadoEm(participanteIds.Take(14), agora.AddDays(-60));
         for (var i = 0; i < pendentes; i++)
         {
             var id = await NovoPendente(master, $"pend{Letras(i)}");
@@ -165,6 +174,8 @@ public sealed class CardPassos(Mundo mundo)
         await Estado.UltimoAcessoMaster(a, agora.AddDays(-31));
         await Estado.UltimoAcessoMaster(b, agora);
         await Estado.UltimoAcessoMaster(c, agora.AddDays(-31));
+        // só conta a conta criada há mais de 30 dias (17 RN-280)
+        foreach (var conta in new[] { a, b, c }) await Estado.CriadaEm(conta, agora.AddDays(-60));
         var cardDepois = await Card(admin);
         var esperados = numero switch
         {
@@ -183,7 +194,7 @@ public sealed class CardPassos(Mundo mundo)
     // os Dado descrevem a consulta; o Então a prova pelo que cada card mostra
     [Given(@"^o perfil INSTITUICAO ou AUTONOMO contando os usuarios do contaId da conta$")]
     [Given(@"^o perfil STAFF contando os usuarios com criadoPor igual à staff$")]
-    [Given(@"^no STAFF, o selo só com as geracoesSenha de pedidaPor igual à staff$")]
+    [Given(@"^o selo do STAFF conta só as geracoesSenha com pedidaPor igual à staff$")]
     public static void ConsultaDoCard() { }
 
     [When(@"^o card conta (.+)$")]
@@ -234,6 +245,7 @@ public sealed class CardPassos(Mundo mundo)
         await Desativar(pedro, await NovoParticipante(pedro, "ptadesat"));
         await Estado.UltimoAcesso(comAcesso, DateTime.UtcNow);
         await Estado.UltimoAcesso(semAcesso, DateTime.UtcNow.AddDays(-31));
+        await Estado.CriadoEm(semAcesso, DateTime.UtcNow.AddDays(-60));
 
         foreach (var (perfil, diferenca) in esperados)
         {
@@ -254,6 +266,7 @@ public sealed class CardPassos(Mundo mundo)
         var (_, dela) = await Povoar(maria, 0, daMaria, "s");
         var (_, outros) = await Povoar(master, 0, daEscola - daMaria, "m");
         await Estado.UltimoAcesso([.. dela, .. outros], DateTime.UtcNow);
+        umDaMaria = dela[0];
         pendenteHoje = await NovoPendente(master, "pendhoje");
         pendenteVencido = await NovoPendente(master, "pendvenc");
         antes["INSTITUICAO"] = await Card(master);
@@ -265,9 +278,9 @@ public sealed class CardPassos(Mundo mundo)
     [When(@"^a Maria envia POST /usuarios e cria o participante Lucas Andrade com 201$")]
     public Task MariaCriaOLucas() => CriaOLucas(mundo.Maria());
 
-    // criadoPor não sai na API (contrato v13): a gravação aparece no card da
+    // criadoPor não sai na API (contrato v14): a gravação aparece no card da
     // Maria, que conta só os usuários com criadoPor igual a ela, já no GET seguinte
-    [Then(@"^na mesma execução, o Lucas é gravado com criadoPor ""usr-ebfga-maria""$")]
+    [Then(@"^o Lucas é gravado com criadoPor ""usr-ebfga-maria"" na mesma execução$")]
     public async Task LucasDaMaria() =>
         AssertDiferenca(antes["STAFF"], await Card(await mundo.Maria()), "participantes", 1, "card da Maria, criadoPor dela");
 
@@ -285,20 +298,22 @@ public sealed class CardPassos(Mundo mundo)
         }
     }
 
-    // o tempo passa só no banco (último acesso do Lucas e hora do pedido dos
-    // códigos): nenhuma execução da aplicação muda os números guardados
+    // o tempo passa só no banco (último acesso de um participante da Maria e
+    // hora do pedido dos códigos): nenhuma execução da aplicação muda os números
+    // guardados. O Lucas recém-criado não conta: existe há menos de 30 dias
     [Then(@"^o selo, ""Sem acesso há 30 dias"" e ""Códigos vencidos"" não sobem a versao: são refeitos na leitura$")]
     public async Task RefeitosNaLeitura()
     {
         var master = await mundo.Master();
         var guardado = depois["INSTITUICAO"];
-        await Estado.UltimoAcesso([(await mundo.Lucas()).Id], DateTime.UtcNow.AddDays(-31));
+        await Estado.UltimoAcesso([umDaMaria], DateTime.UtcNow.AddDays(-31));
+        await Estado.CriadoEm([umDaMaria], DateTime.UtcNow.AddDays(-60));
         await Estado.CodigoVenceHoje(pendenteHoje);
         await Estado.PedidoHa(pendenteVencido, TimeSpan.FromHours(73));
         var lido = await Card(master);
         Assert.True(Versao(lido) == Versao(guardado), $"a versao não devia subir de {Versao(guardado)}: {lido.ToJsonString()}");
         AssertDiferenca(guardado, lido, "o selo", 1, "código que vence hoje");
-        AssertDiferenca(guardado, lido, "Sem acesso há 30 dias", 1, "Lucas sem acesso há 31 dias");
+        AssertDiferenca(guardado, lido, "Sem acesso há 30 dias", 1, "participante da Maria sem acesso há 31 dias");
         AssertDiferenca(guardado, lido, "Códigos vencidos", 1, "código pedido há 73 h");
     }
 
@@ -406,7 +421,7 @@ public sealed class CardPassos(Mundo mundo)
     [When(@"^o staff João envia POST /usuarios e cria o participante Lucas Andrade com 201$")]
     public Task JoaoCriaOLucas() => CriaOLucas(mundo.Joao());
 
-    [Then(@"^na mesma execução, o card guardado passa à versao \d+ com (\d+) participantes$")]
+    [Then(@"^o card guardado passa à versao \d+ com (\d+) participantes na mesma execução$")]
     public async Task VersaoSeguinte(int participantes)
     {
         depois["INSTITUICAO"] = await Card(await mundo.Master());
@@ -425,11 +440,70 @@ public sealed class CardPassos(Mundo mundo)
     }
 
     // ── 15 RN-278 · fechamento do dia, da semana e do mês ──────────────────
-    [Given(@"^o card do Usuários da EBFGA com 400 dias, 106 semanas e 24 meses guardados$")]
-    [When(@"^chega 00:00 de \d{4}-\d{2}-\d{2}, .+, no horário de Brasília$")]
-    [Then(@"^o card guardado abre o dia .+$")]
-    [Then(@"^sai o dia, a semana e o mês mais antigos, para manter 400, 106 e 24$")]
-    public static void Fechamento() => throw new PendingStepException(SemRelogio);
+    // pelo relógio de teste do backend (suporte/Relogio.cs). O Dado guarda os
+    // tamanhos; o Quando, que tem a data, faz o resto: o relógio vai para 10 min
+    // antes da 00:00, a EBFGA e um participante nascem nessa hora (o card
+    // guardado existe), o histórico é semeado inteiro até o dia anterior, o
+    // relógio chega à 00:00 e o fechamento roda
+    [Given(@"^o card do Usuários da EBFGA com (\d+) dias, (\d+) semanas e (\d+) meses guardados$")]
+    public void HistoricoCheio(int dias, int semanas, int meses) => guardados = (dias, semanas, meses);
+
+    [When(@"^chega 00:00 de (\d{4}-\d{2}-\d{2}), .+, no horário de Brasília$")]
+    public async Task ChegaAMeiaNoite(string data)
+    {
+        diaDoFechamento = DateOnly.Parse(data);
+        var meiaNoite = new DateTimeOffset(diaDoFechamento.ToDateTime(TimeOnly.MinValue), TimeSpan.FromHours(-3));
+        await relogio.Definir(meiaNoite.AddMinutes(-10));
+        var master = await mundo.Master();
+        await NovoParticipante(master, "fechaaaa");
+        semeado = await CardGuardado.Semear(await mundo.Conta(), "INSTITUICAO", diaDoFechamento.AddDays(-1),
+            guardados.Dias, guardados.Semanas, guardados.Meses);
+        await relogio.Definir(meiaNoite);
+        await relogio.Fechamento();
+    }
+
+    // no documento, o último dia, semana e mês são os novos; na API, a série
+    // andou um ponto: os 10 primeiros são os do histórico, um à frente
+    [Then(@"^o card guardado abre o dia (\d{4}-\d{2}-\d{2}), a semana dele e o mês (\d{4}-\d{2})$")]
+    public async Task AbreOsPeriodos(string dia, string mes)
+    {
+        documento = await CardGuardado.Ler(await mundo.Conta(), "INSTITUICAO");
+        foreach (var (lista, campo, esperado) in new[]
+        {
+            ("dias", "dia", dia),
+            ("semanas", "semana", CardGuardado.Semana(DateOnly.Parse(dia))),
+            ("meses", "mes", mes),
+        })
+        {
+            var ultimo = documento[lista]?.AsArray().LastOrDefault()?[campo]?.GetValue<string>();
+            Assert.True(ultimo == esperado, $"\"cardUsuarios\".{lista} devia terminar em {esperado}, termina em {ultimo}: {documento[lista]?.ToJsonString()}");
+        }
+        var card = await Card(await mundo.Master());
+        foreach (var (recorte, campo, chaves) in new[] { ("dia", "dia", semeado.Dias), ("semana", "semana", semeado.Semanas), ("mes", "mes", semeado.Meses) })
+        {
+            var serie = card["series"]?[recorte]?.AsArray().Select(n => n!.GetValue<int>()).ToList() ?? [];
+            var esperado = Enumerable.Range(chaves.Count - 11, 10).Select(i => CardGuardado.Valor(campo, i)).ToList();
+            Assert.True(serie.Count == 12 && serie.Take(10).SequenceEqual(esperado),
+                $"series.{recorte} devia começar em [{string.Join(", ", esperado)}] depois do fechamento, veio [{string.Join(", ", serie)}]");
+        }
+    }
+
+    [Then(@"^sai o dia, a semana e o mês mais antigos, para manter (\d+), (\d+) e (\d+)$")]
+    public void SaiOMaisAntigo(int dias, int semanas, int meses)
+    {
+        foreach (var (lista, campo, total, chaves) in new[]
+        {
+            ("dias", "dia", dias, semeado.Dias),
+            ("semanas", "semana", semanas, semeado.Semanas),
+            ("meses", "mes", meses, semeado.Meses),
+        })
+        {
+            var itens = documento![lista]?.AsArray() ?? [];
+            var primeiro = itens.FirstOrDefault()?[campo]?.GetValue<string>();
+            Assert.True(itens.Count == total && primeiro == chaves[1],
+                $"\"cardUsuarios\".{lista} devia ter {total}, a partir de {chaves[1]} ({chaves[0]} sai); tem {itens.Count}, a partir de {primeiro}");
+        }
+    }
 
     // ── 15 RN-278 · números que mudam só com o tempo ───────────────────────
     // o Lucas é criado com acesso hoje e o card é lido; o Quando faz o tempo
@@ -447,23 +521,64 @@ public sealed class CardPassos(Mundo mundo)
         antes["INSTITUICAO"] = await Card(master);
     }
 
+    // ── 17 RN-280 · quem nunca entrou ──────────────────────────────────────
+    // o card é lido antes de o participante existir; ele nasce pela API e fica
+    // ATIVO "desde" a data do exemplo (criadoEm, pelo banco, no Quando, à mesma
+    // distância do GET: 2026-09-01 → 2026-11-08 conta; 5 dias antes, não)
+    [Given(@"^o participante (\w+ \w+) da EBFGA, ATIVO desde (\d{4}-\d{2}-\d{2}), sem nenhum acesso$")]
+    public async Task NuncaEntrou(string nome, string desde)
+    {
+        nuncaEntrouDesde = DateOnly.Parse(desde);
+        var master = await mundo.Master();
+        antes["INSTITUICAO"] = await Card(master);
+        var nomeCurto = nome.Split(' ')[0].ToLowerInvariant();
+        nuncaEntrou = Texto(Exigir(await mundo.EnviarComo(master, "POST", "/usuarios", new JsonObject
+        {
+            ["tipo"] = "PARTICIPANTE",
+            ["nome"] = nome,
+            ["nomeCurto"] = nomeCurto,
+            ["matricula"] = null,
+            ["responsaveis"] = new JsonArray(),
+        }.ToJsonString()), 201, $"POST /usuarios de {nome}"), "id");
+    }
+
+    [Given(@"^o ultimoAcesso dele nulo$")]
+    public Task UltimoAcessoNulo() => Estado.UltimoAcessoNulo(nuncaEntrou);
+
+    // o tempo passa só no banco, à distância do exemplo: o último acesso do
+    // Lucas (15 RN-278) ou o criadoEm do Davi (17 RN-280)
     [When(@"^a conta master envia GET /usuarios/card em (\d{4}-\d{2}-\d{2})$")]
     public async Task MasterLeDepois(string data)
     {
-        var dias = DateOnly.Parse(data).DayNumber - ultimoAcessoDoLucas.DayNumber;
-        await Estado.UltimoAcesso([(await mundo.Lucas()).Id], DateTime.UtcNow.AddDays(-dias));
+        var dia = DateOnly.Parse(data);
+        if (nuncaEntrou.Length > 0)
+        {
+            await Estado.CriadoEm([nuncaEntrou], DateTime.UtcNow.AddDays(nuncaEntrouDesde.DayNumber - dia.DayNumber));
+        }
+        else
+        {
+            // o Lucas existe desde antes do último acesso dele (mais de 30 dias)
+            var lucas = (await mundo.Lucas()).Id;
+            var dias = ultimoAcessoDoLucas.DayNumber - dia.DayNumber;
+            await Estado.UltimoAcesso([lucas], DateTime.UtcNow.AddDays(dias));
+            await Estado.CriadoEm([lucas], DateTime.UtcNow.AddDays(dias - 30));
+        }
         await mundo.EnviarComo(await mundo.Master(), "GET", "/usuarios/card");
         Respostas.Confere(mundo.Ultima, 200);
         depois["INSTITUICAO"] = mundo.Ultima.Corpo!;
     }
 
-    [Then(@"^o Lucas conta em ""Sem acesso há 30 dias""$")]
-    public void LucasSemAcesso() =>
-        AssertDiferenca(antes["INSTITUICAO"], depois["INSTITUICAO"], "Sem acesso há 30 dias", 1, "Lucas sem acesso");
+    [Then(@"^o (\w+) conta em ""Sem acesso há 30 dias""$")]
+    public void ContaSemAcesso(string quem) =>
+        AssertDiferenca(antes["INSTITUICAO"], depois["INSTITUICAO"], "Sem acesso há 30 dias", 1, $"{quem} sem acesso");
+
+    [Then(@"^o (\w+) não conta em ""Sem acesso há 30 dias""$")]
+    public void NaoContaSemAcesso(string quem) =>
+        AssertDiferenca(antes["INSTITUICAO"], depois["INSTITUICAO"], "Sem acesso há 30 dias", 0, $"{quem} criado há menos de 30 dias");
 
     // a parte da leitura: os códigos passam a vencer hoje e a estar vencidos só
-    // no banco, e o card lido os mostra. O fechamento do dia fica com o relógio
-    // (cenário anterior), fora do alcance da suíte
+    // no banco, e o card lido os mostra. O fechamento do dia é o cenário
+    // anterior, com o relógio de teste
     [Then(@"^essa contagem, o selo e ""Códigos vencidos"" são refeitos na leitura e no fechamento do dia$")]
     public async Task RefeitosNaLeituraEnoFechamento()
     {
@@ -482,11 +597,50 @@ public sealed class CardPassos(Mundo mundo)
             $"a versao não devia subir de {Versao(antes["INSTITUICAO"])}: {depois["INSTITUICAO"].ToJsonString()}");
 
     // ── exemplo-entidades · card guardado ──────────────────────────────────
+    // a EBFGA do card da instituição (RN-189-api), lida em "cardUsuarios".
+    // Fora da comparação: versao e atualizadoEm (histórico da escola); selo,
+    // semAcesso30Dias e codigosVencidos, refeitos na leitura sem gravar
+    // (RN-280); de dias, semanas e meses, só o último, que é o de hoje com o
+    // valor do exemplo (os anteriores são o histórico da escola)
     [Then(@"^o card da EBFGA em ""cardUsuarios"", com dias, semanas e meses só nos 2 últimos, é:$")]
-    public static void CardGuardado(string _) => throw new PendingStepException(SoNoBanco);
+    public async Task CardGuardadoComo(string json)
+    {
+        await InstituicaoCompleta(37, 298, 4);
+        documento = await CardGuardado.Ler(await mundo.Conta(), "INSTITUICAO");
+        var esperado = JsonNode.Parse(await mundo.Traduzir(json))!.AsObject();
+        esperado.Remove("versao");
+        esperado.Remove("atualizadoEm");
+        var atual = esperado["atual"]!.AsObject();
+        atual.Remove("selo");
+        atual["lista"]!.AsObject().Remove("semAcesso30Dias");
+        atual["lista"]!.AsObject().Remove("codigosVencidos");
+        var hoje = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(-3));
+        foreach (var (lista, campo, chave) in new[]
+        {
+            ("dias", "dia", hoje.ToString("yyyy-MM-dd")),
+            ("semanas", "semana", CardGuardado.Semana(hoje)),
+            ("meses", "mes", hoje.ToString("yyyy-MM")),
+        })
+        {
+            var valor = esperado[lista]!.AsArray().Last()!["valor"]!.GetValue<int>();
+            esperado.Remove(lista);
+            var ultimo = documento[lista]?.AsArray().LastOrDefault();
+            Assert.True(ultimo?[campo]?.GetValue<string>() == chave && ultimo["valor"]?.GetValue<int>() == valor,
+                $"\"cardUsuarios\".{lista} devia terminar em {chave} com {valor}: {documento[lista]?.ToJsonString()}");
+        }
+        Comparacao.Confere(esperado, documento);
+    }
 
-    [Then(@"^dias guarda até 400, semanas até 106 e meses até 24, como na RN-278 de 15_modulos$")]
-    public static void LimitesGuardados() => throw new PendingStepException(SemRelogio);
+    // os limites guardados; o corte quando passam é o fechamento (15 RN-278)
+    [Then(@"^dias guarda até (\d+), semanas até (\d+) e meses até (\d+), como na RN-278 de 15_modulos$")]
+    public void LimitesGuardados(int dias, int semanas, int meses)
+    {
+        foreach (var (lista, limite) in new[] { ("dias", dias), ("semanas", semanas), ("meses", meses) })
+        {
+            var total = documento![lista]?.AsArray().Count ?? -1;
+            Assert.True(total is >= 1 && total <= limite, $"\"cardUsuarios\".{lista} com {total} itens, devia ter de 1 a {limite}");
+        }
+    }
 
     // ── apoio ───────────────────────────────────────────────────────────────
     async Task<JsonNode> Card(Pessoa pessoa) =>

@@ -6,7 +6,7 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 namespace Boaz.Qa.Integracao.Hub.Usuarios;
 
 // Passos da RN-283 de 1_Requisitos/17_modulo-usuario.md: GET e PUT
-// /usuarios/eu/preferencias (contrato usuarios-contrato-api v13), sem módulo
+// /usuarios/eu/preferencias (contrato usuarios-contrato-api v14), sem módulo
 // exigido, sem X-Trace-Id e sem auditoria. Os pedidos do Quando são os
 // genéricos "envia GET …" (AutorizacaoPassos) e "envia PUT … com:"
 // (AutenticacaoPassos), com o token de quem o Dado citou (Mundo.Sujeito).

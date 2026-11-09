@@ -70,6 +70,8 @@ integracao/
 │   ├── Partida.cs                  sobe uma instância própria do backend (cenários de inicialização)
 │   ├── BancoDaPartida.cs           coleções e índices do banco dessa instância (RNF-227)
 │   ├── Auditoria.cs                leitura das coleções "auditoria" e "auditoriaErros" (RN-178, RN-270, RN-271)
+│   ├── Relogio.cs                  relógio de teste do backend e fechamento sob demanda (15 RN-278)
+│   ├── CardGuardado.cs             leitura e histórico do card em "cardUsuarios" (17 RN-280, 15 RN-278)
 │   ├── AoVivo.cs                   conexão SSE de GET /<modulo>/card/ao-vivo: eventos "card", "encerrado" e ": ping"
 │   └── Ganchos.cs                  antes de cada cenário: limpa tudo
 ├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.md
@@ -260,6 +262,10 @@ ela.
   campos do modelo de documentos do requisito, e contam como "ganho" só o que
   apareceu depois do preparo do cenário. O traceId também é conferido no
   cabeçalho `X-Trace-Id` da resposta.
+  Terceira exceção: o card guardado (17 exemplo "card guardado", 15 RN-278
+  fechamento) promete o próprio documento de "cardUsuarios";
+  `suporte/CardGuardado.cs` o lê pelo contaId e o perfil, pelos campos do
+  modelo de documentos.
 - **Valores dos exemplos**: `usr-ebfga-maria`, `3f9c2a71` (sessão da Maria no
   navegador) e `EBFGA-LUCAS-0412` são trocados pelos valores reais na hora do
   pedido (`Mundo.Apelidos`); a pessoa é criada pela API na primeira vez que
@@ -282,8 +288,13 @@ ela.
   `Estado.CodigoVenceHoje`), o último acesso ("Sem acesso há 30 dias":
   `Estado.UltimoAcesso`, `Estado.UltimoAcessoMaster`), os meses anteriores do
   card guardado (`Estado.MesesAnterioresDoCard`), o tempo sem uso da sessão e
-  os bloqueios seguidos. O fechamento da 00:00 do card (15 RN-278) precisa do
-  relógio do backend e fica pendente.
+  os bloqueios seguidos.
+- **Relógio do backend** (`suporte/Relogio.cs`, 15 RN-278): só com
+  `AMBIENTE=hml` e `Teste__Relogio=sim`, o backend expõe `PUT /_teste/relogio`
+  (`{"agora": "2027-02-28T23:50:00-03:00"}`, 204; o relógio anda a partir
+  daí), `DELETE /_teste/relogio` (volta ao real) e `POST /_teste/fechamento`
+  (roda o fechamento da 00:00 de Brasília na hora, 204). Sem eles, 404. O
+  relógio volta ao real no fim do cenário que o mudou.
 - **Card ao vivo** (`suporte/AoVivo.cs`): a conexão SSE fica aberta pela
   suíte e fecha no fim do cenário; os tempos (intervalo, ping de 30 s) são
   esperados de verdade, com 5 s de folga, por isso esses cenários levam até
