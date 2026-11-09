@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "15_modulos"
 tipo: "Funcionalidade"
 titulo: "Módulos"
-versao: "v26"
-data: "2026-11-08 23:16"
+versao: "v27"
+data: "2026-11-09 00:44"
 status: "Em revisão"
 objetivo: "definir como um módulo do deboaz é construído, para que todo módulo siga o mesmo molde antes de entrar no catálogo."
 ---
 
-> **boaz · Funcionalidade** · `15_modulos` · **v26** · 2026-11-08 23:16 · **Em revisão**
+> **boaz · Funcionalidade** · `15_modulos` · **v27** · 2026-11-09 00:44 · **Em revisão**
 
 # Módulos
 
@@ -155,6 +155,8 @@ Cenário: outro aparelho
 <a id="RF-133"></a>
 
 ### `RF-133` Atualização dos números
+
+> Escolha salva para a pessoa: [17_modulo-usuario `RN-283`](17_modulo-usuario.md#RN-283)
 
 ```gherkin
 Cenário: na abertura, o padrão
@@ -494,31 +496,39 @@ Cenário: mesmo ícone em todo perfil e tamanho
 
 ### `RN-277` Recortes dia, semana e mês
 
+> Toque no card fora do seletor abre o módulo: [`RF-128`](#RF-128)
+
 ```gherkin
 Esquema do Cenário: série de cada tamanho
-  Dado o card do Usuários da EBFGA com o recorte "<recorte>" escolhido
+  Dado o card do Usuários da EBFGA em 2026-11-08 com o recorte "<recorte>"
   Quando o card está na <tamanho>
-  Então a série mostra <pontos>, o atual por último
+  Então a série mostra <pontos>, o atual por último, com os rótulos <rotulos>
 
   Exemplos:
-    | recorte | tamanho   | pontos                 |
-    | Mês     | normal    | os 5 últimos meses     |
-    | Mês     | expandida | os 12 últimos meses    |
-    | Semana  | normal    | as 5 últimas semanas   |
-    | Semana  | expandida | as 12 últimas semanas  |
-    | Dia     | normal    | os 5 últimos dias      |
-    | Dia     | expandida | os 12 últimos dias     |
+    | recorte | tamanho   | pontos                | rotulos                |
+    | Mês     | normal    | os 5 últimos meses    | "jul" a "nov"          |
+    | Mês     | expandida | os 12 últimos meses   | "dez" a "nov"          |
+    | Semana  | normal    | as 5 últimas semanas  | "S8" a "S12"           |
+    | Semana  | expandida | as 12 últimas semanas | "S1" a "S12"           |
+    | Dia     | normal    | os 5 últimos dias     | "4" a "8"              |
+    | Dia     | expandida | os 12 últimos dias    | "28" a "8"             |
 
-Cenário: tendência do recorte
-  Dado o card do Usuários da EBFGA com 323 no fim de outubro e 335 agora
-  Quando a conta master escolhe "Mês" no card
-  Então a tendência mostra "+12 no mês"
+Esquema do Cenário: tendência do recorte
+  Dado o card do Usuários da EBFGA com 335 agora e <antes> no fim do <periodo> anterior
+  Quando a conta master escolhe "<recorte>" no card
+  Então a tendência mostra "<tendencia>"
 
-Cenário: escolha guardada no aparelho
-  Dado a conta master com "Semana" escolhido no card do Usuários no celular
-  Quando ela abre Módulos no computador
-  Então o card começa em "Mês", o padrão
-  E no celular continua em "Semana"
+  Exemplos:
+    | recorte | periodo | antes | tendencia    |
+    | Mês     | mês     | 323   | +12 no mês   |
+    | Semana  | semana  | 333   | +2 na semana |
+    | Dia     | dia     | 334   | +1 no dia    |
+
+Cenário: trocar o recorte sem abrir o módulo
+  Dado a conta master com o card do Usuários na normal, em "Mês", no celular
+  Quando toca em "Semana" no seletor Dia, Semana e Mês do card
+  Então a série e a tendência passam à semana e o módulo não abre
+  E no computador o card continua em "Mês", o padrão, porque a escolha fica no aparelho
 ```
 
 <a id="RN-279"></a>
@@ -553,6 +563,31 @@ Cenário: desligar o ao vivo para economizar dados
   Quando marca "Na abertura"
   Então a conexão ao vivo fecha
   E os números só se atualizam ao tocar em Módulos, como no padrão
+```
+
+<a id="RN-282"></a>
+
+### `RN-282` Ao vivo encerrado e queda de rede
+
+```gherkin
+Esquema do Cenário: encerrado pelo deboaz
+  Dado a conta master com "Ao vivo" salvo e Módulos aberto no tablet
+  Quando o tablet recebe o evento "encerrado" com o código "<codigo>"
+  Então o tablet mostra o aviso "<aviso>"
+  E o tablet volta a "Na abertura", sem mudar o "Ao vivo" salvo para ela
+  E o tablet não reconecta sozinho
+
+  Exemplos:
+    | codigo          | aviso                                         |
+    | LIMITE_CONEXOES | Ao vivo pausado: aberto em outros 3 aparelhos |
+    | ACESSO_NEGADO   | Ao vivo pausado: sem acesso a este módulo     |
+
+Cenário: queda de rede
+  Dado a conta master com "Ao vivo" e Módulos aberto no celular
+  Quando a rede cai
+  Então o celular tenta reconectar depois de 1, 2, 4, 8, 16, 32 e 60 s
+  E depois a cada 60 s, até a rede voltar ou Módulos fechar
+  E, ao reconectar, o card mostra os números atuais
 ```
 
 <a id="MOD-01"></a>
@@ -897,11 +932,12 @@ Cenário: fechamento do dia, da semana e do mês
   Então o card guardado abre o dia 2027-03-01, a semana dele e o mês 2027-03
   E sai o dia, a semana e o mês mais antigos, para manter 400, 106 e 24
 
-Cenário: número que muda só com o tempo
+Cenário: números que mudam só com o tempo
   Dado o Lucas Andrade com o último acesso em 2026-10-01, sem mudança desde então
   Quando a conta master envia GET /usuarios/card em 2026-11-08
   Então o Lucas conta em "Sem acesso há 30 dias"
-  E essa contagem é refeita na leitura e no fechamento do dia
+  E essa contagem, o selo e "Códigos vencidos" são refeitos na leitura e no fechamento do dia
+  E a versao não sobe por eles
 ```
 
 <a id="RN-279-api"></a>
@@ -914,19 +950,20 @@ Cenário: conectar com o intervalo
   Quando envia GET /usuarios/card/ao-vivo?intervalo=30 com Accept "text/event-stream"
   Então a resposta é 200 e a conexão fica aberta
   E o primeiro evento "card" traz o mesmo corpo de GET /usuarios/card, com id igual à versao
-  E a cada 30 s chega um evento "card", se a versao mudou, ou um ": ping", se não mudou
+  E a cada 30 s chega um evento "card", se a versao mudou
+  E um ": ping" chega a cada 30 s, qualquer que seja o intervalo, para manter a conexão
 
 Esquema do Cenário: intervalo pedido
   Quando a conta master envia GET /usuarios/card/ao-vivo <pedido>
   Então <resposta>
 
   Exemplos:
-    | pedido          | resposta                                         |
-    | ?intervalo=5    | é 200, com um evento a cada 5 s                  |
-    | ?intervalo=300  | é 200, com um evento a cada 300 s                |
-    | sem o parâmetro | é 200, com um evento a cada 300 s, o padrão      |
-    | ?intervalo=10   | é 422 DADOS_INVALIDOS com o campo "intervalo"    |
-    | ?intervalo=0    | é 422 DADOS_INVALIDOS com o campo "intervalo"    |
+    | pedido          | resposta                                                     |
+    | ?intervalo=5    | é 200, com um "card" a cada 5 s, se a versao mudou           |
+    | ?intervalo=300  | é 200, com um "card" a cada 300 s e um ": ping" a cada 30 s  |
+    | sem o parâmetro | é 200, como ?intervalo=300, o padrão                         |
+    | ?intervalo=10   | é 422 DADOS_INVALIDOS com o campo "intervalo"                |
+    | ?intervalo=0    | é 422 DADOS_INVALIDOS com o campo "intervalo"                |
 
 Cenário: quarta conexão do mesmo usuário
   Dado a conta master com 3 conexões ao vivo abertas: celular, tablet e computador
@@ -937,13 +974,22 @@ Cenário: quarta conexão do mesmo usuário
 
 ---
 
+<a id="em-aberto"></a>
+
+## Em aberto
+
+- Depois do "encerrado" (`RN-282`), quando o aparelho volta ao ao vivo: ao abrir o app de novo ou só quando a pessoa marca "Ao vivo" outra vez? — **Produto**
+
+---
+
 <a id="historico"></a>
 
 ## Histórico
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v26** | 2026-11-08 23:16 | Card comum de todo módulo: `RN-276` (perfis da ficha, o participante pode ser um; ícone do Catálogo; GET /<modulo>/card com todos os tamanhos), `RN-277` recortes dia, semana e mês, `RN-278` números guardados prontos, `RN-279` na abertura e ao vivo (GET /<modulo>/card/ao-vivo, 5 a 300 s, até 3 conexões); `RF-128` quatro tamanhos; `RF-133`, `RN-218`, `RN-220` e a ficha do módulo ajustados; seção Cenários vira Cenários de tela e ganha Cenários de API; status → Em revisão |
+| **v27** | 2026-11-09 00:44 | `RN-277` com os rótulos dos pontos (nov, S1 a S12, dia do mês), a tendência por recorte ("+12 no mês", "+2 na semana", "+1 no dia") e o seletor que não abre o módulo; `RN-278` selo e Códigos vencidos refeitos na leitura, sem subir a versao; `RN-279-api` ping a cada 30 s; `RN-282` novo (aviso do encerrado, aparelho volta a Na abertura, reconexão até 60 s); `RF-133` cita a preferência salva (17 `RN-283`); Em aberto: volta ao ao vivo |
+| v26 | 2026-11-08 23:16 | Card comum de todo módulo: `RN-276` (perfis da ficha, o participante pode ser um; ícone do Catálogo; GET /<modulo>/card com todos os tamanhos), `RN-277` recortes dia, semana e mês, `RN-278` números guardados prontos, `RN-279` na abertura e ao vivo (GET /<modulo>/card/ao-vivo, 5 a 300 s, até 3 conexões); `RF-128` quatro tamanhos; `RF-133`, `RN-218`, `RN-220` e a ficha do módulo ajustados; seção Cenários vira Cenários de tela e ganha Cenários de API; status → Em revisão |
 | v25 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md`; a [porta de entrada](#porta-de-entrada) cita os documentos em `.md` |
 | v24 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v23 | 2026-11-03 22:01 | Imagem enviada em SVG: toda imagem é convertida em SVG no hub ou no quest e enviada como texto (`RN-260`) |
@@ -952,8 +998,7 @@ Cenário: quarta conexão do mesmo usuário
 | v20 | 2026-11-01 03:57 | Aprovado |
 | v19 | 2026-11-01 03:38 | `MOD-15` Painel de administração retirado: juntado ao `MOD-03` Usuários, que no time deboaz cuida também das contas de instituição e de educador autônomo |
 | v18 | 2026-11-01 02:08 | Registro do Usuários (`MOD-03`) aponta também para 17-a (autenticação) e 17-b (autorização) |
-| v17 | 2026-11-01 01:20 | Aprovação |
 
 ---
 
-<sub>boaz · v26 · 2026-11-08 23:16 · `1_Requisitos/15_modulos.md`</sub>
+<sub>boaz · v27 · 2026-11-09 00:44 · `1_Requisitos/15_modulos.md`</sub>

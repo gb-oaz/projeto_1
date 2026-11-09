@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "12_hub-ui"
 tipo: "Funcionalidade"
 titulo: "Hub · UI"
-versao: "v39"
-data: "2026-11-08 23:35"
+versao: "v40"
+data: "2026-11-09 00:44"
 status: "Em revisão"
 objetivo: "definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco."
 ---
 
-> **boaz · Funcionalidade** · `12_hub-ui` · **v39** · 2026-11-08 23:35 · **Em revisão**
+> **boaz · Funcionalidade** · `12_hub-ui` · **v40** · 2026-11-09 00:44 · **Em revisão**
 
 # Hub · UI
 
@@ -315,6 +315,24 @@ Cenário: fundo das telas
   E o Halo da entrada e as Ondas do vão do catálogo ficam por cima
 ```
 
+<a id="RN-284"></a>
+
+### `RN-284` Abas de Módulos por perfil
+
+> Card do Usuários de cada perfil: [17_modulo-usuario `RN-189`](17_modulo-usuario.md#RN-189)
+
+```gherkin
+Esquema do Cenário: abas de cada perfil
+  Quando <quem> abre Módulos
+  Então vê <abas>
+
+  Exemplos:
+    | quem                      | abas                                      |
+    | a conta master da EBFGA   | "Contratados", "Da conta" e "A contratar" |
+    | o educador autônomo Pedro | "Contratados", "Da conta" e "A contratar" |
+    | a staff Maria             | só "Contratados"                          |
+```
+
 <a id="RNF-151"></a>
 
 ### `RNF-151` Títulos
@@ -481,7 +499,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v39** | 2026-11-08 23:35 | Diagrama: contrato de API dos usuários do 17 v11 → v12 (card no formato comum e card ao vivo por SSE) |
+| **v40** | 2026-11-09 00:44 | `RN-284` novo: abas de Módulos por perfil (o autônomo, dono da conta, vê as três abas como a conta master; o staff vê só Contratados) |
+| v39 | 2026-11-08 23:35 | Diagrama: contrato de API dos usuários do 17 v11 → v12 (card no formato comum e card ao vivo por SSE) |
 | v38 | 2026-11-08 12:02 | Diagrama: contrato de API dos usuários do 17 v10 → v11 (403 sem o módulo auditado com INICIADO e ALERTA, X-Trace-Id; ações internas no traceId de quem chama; 17 `RN-270`, `RN-275`) |
 | v37 | 2026-11-08 11:35 | Diagrama: contrato de API dos usuários do 17 v09 → v10 (403 ACESSO_NEGADO sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registros, `RN-270`) |
 | v36 | 2026-11-08 09:50 | Diagramas: contrato de API da autenticação do 17-a v03 → v04 (403 ACESSO_INDISPONIVEL no confirmar-senha com quem e contaId) e dos usuários do 17 v08 → v09 (quem, contaId e alvo da auditoria por endereço) |
@@ -490,15 +509,7 @@ Cenário: o que este documento não trata
 | v33 | 2026-11-08 02:04 | Diagrama: contrato de API dos usuários do 17 v06 → v07 (500 ERRO_INESPERADO confirmado, PUT permissões auditado) |
 | v32 | 2026-11-08 02:00 | Diagrama: contrato de API dos usuários do 17 v05 → v06 (auditoria, X-Trace-Id); status → Em revisão |
 | v31 | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
-| v30 | 2026-11-07 14:52 | Diagramas: contrato de API dos usuários (17_modulo-usuario) v04 → v05; status → Em revisão |
-| v29 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
-| v28 | 2026-11-03 22:11 | Vista de Módulos pwa e mobile v02, com o Feed definido no documento do módulo Feed; aprovado, sem pendências em aberto |
-| v27 | 2026-11-03 22:05 | Em aberto respondido: conteúdo e contrato de cada card no documento do módulo (`RN-210`); Feed como espaço reservado do futuro módulo Feed (`RF-85`); conta identificada pelo nome da instituição e pela foto ou inicial (`RN-125`); foto enviada em SVG (`RF-86`, [15 RN-260](15_modulos.md#RN-260)); Atualização dos cards guardada na conta (`RF-81`); casos de uso e sequência v02 |
-| v26 | 2026-11-03 14:39 | Telas separadas em Web, PWA e Mobile (vistas entrada, módulos, a contratar e módulo aberto v01); Diagramas: casos de uso e sequência com as telas da carcaça do hub, com a entrada e o sair do [17-a RF-134](17_modulo-usuario-a-autenticacao.md#RF-134), a criação da conta do [17 RF-104](17_modulo-usuario.md#RF-104) e a vitrine do 16 como referência; Em aberto: os contratos ainda não definidos dos cards de Módulos, do Feed, da conta, da foto e da Atualização dos cards |
-| v25 | 2026-11-03 13:54 | A contratar e detalhe do módulo só com a carcaça (`RF-82`, `RF-83`, vista-hub-catalogo v09 e vista-hub-meus-modulos v13, sem desenhar outros módulos, nem no código do time): cards, carrossel, descrição, como funciona, quem usa, calculadora e Incluir na conta passam para o Catálogo ([16_modulo-catalogo `RF-164` a `RF-168`](16_modulo-catalogo.md#RF-164)) |
-| v24 | 2026-11-01 18:21 | Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão |
-| v23 | 2026-11-01 03:57 | Aprovado |
 
 ---
 
-<sub>boaz · v39 · 2026-11-08 23:35 · `1_Requisitos/12_hub-ui.md`</sub>
+<sub>boaz · v40 · 2026-11-09 00:44 · `1_Requisitos/12_hub-ui.md`</sub>

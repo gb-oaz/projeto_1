@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v92"
-data: "2026-11-08 23:45"
+versao: "v93"
+data: "2026-11-09 00:44"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v92** · 2026-11-08 23:45 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v93** · 2026-11-09 00:44 · **Em revisão**
 
 # Módulo Usuários
 
@@ -572,28 +572,36 @@ Cenário: dois participantes sem matrícula no autônomo
 
 ```gherkin
 Esquema do Cenário: dados do card por perfil e tamanho
-  Dado o card Usuários do perfil <perfil>
+  Dado o card Usuários do perfil <perfil>, no recorte que as vistas mostram
   Quando está na <tamanho>
   Então mostra <dados>
+  E, na normal, a série de 5 pontos do recorte
 
   Exemplos:
-    | perfil      | tamanho   | dados                                                           |
-    | deboaz      | mínima    | o ícone e o selo: contas com a master sem acesso há 30 dias     |
-    | deboaz      | reduzida  | 112 · contas ativas                                             |
-    | deboaz      | normal    | 112, a tendência, 5 pontos, instituições, autônomos, suspensas  |
-    | deboaz      | expandida | 12 pontos, Master sem acesso há 30 dias, Desativadas, Encerradas |
-    | instituição | mínima    | o ícone e o selo "2": códigos de liberação que vencem hoje      |
-    | instituição | reduzida  | 335 · usuários ativos                                           |
-    | instituição | normal    | 335, +12 no mês, 5 pontos, 37 staff, 298 part., 4 pendentes     |
-    | instituição | expandida | 12 pontos, Sem acesso há 30 dias, Desativados, Códigos vencidos |
-    | staff       | mínima    | o ícone e o selo: códigos que ela pediu e vencem hoje           |
-    | staff       | reduzida  | 41 · usuários ativos, só os criados por ela                     |
-    | staff       | normal    | 41, a tendência, 5 pontos, staff, participantes e pendentes     |
-    | staff       | expandida | 12 pontos, Sem acesso há 30 dias, Desativados, Códigos vencidos |
-    | autônomo    | mínima    | o ícone e o selo: códigos de liberação que vencem hoje          |
-    | autônomo    | reduzida  | 32 · participantes ativos                                       |
-    | autônomo    | normal    | 32, a tendência, 5 pontos, criados no mês e pendentes           |
-    | autônomo    | expandida | 12 pontos, Sem acesso há 30 dias, Desativados, Códigos vencidos |
+    | perfil      | tamanho  | dados                                                        |
+    | deboaz      | mínima   | o ícone e o selo "7", igual a Master sem acesso há 30 dias   |
+    | deboaz      | reduzida | 112 · contas ativas                                          |
+    | deboaz      | normal   | 112, "+4 no mês", 82 instituições, 30 autônomos, 4 suspensas |
+    | instituição | mínima   | o ícone e o selo "2": códigos de liberação que vencem hoje   |
+    | instituição | reduzida | 335 · usuários ativos                                        |
+    | instituição | normal   | 335, "+12 no mês", 37 staff, 298 participantes, 4 pendentes  |
+    | staff       | mínima   | o ícone e o selo "1": códigos que ela pediu e vencem hoje    |
+    | staff       | reduzida | 41 · usuários ativos, só os criados por ela                  |
+    | staff       | normal   | 41, "+2 na semana", 3 staff, 38 participantes, 2 pendentes   |
+    | autônomo    | mínima   | o ícone e o selo "1": códigos de liberação que vencem hoje   |
+    | autônomo    | reduzida | 32 · participantes ativos                                    |
+    | autônomo    | normal   | 32, "+1 no dia", 4 criados no mês, 1 pendente                |
+
+Esquema do Cenário: lista da expandida de cada perfil
+  Dado o card Usuários do perfil <perfil> na expandida, com a série de 12 pontos
+  Então a lista mostra "<primeira>", "<segunda>" e "<terceira>"
+
+  Exemplos:
+    | perfil      | primeira                       | segunda       | terceira           |
+    | deboaz      | Master sem acesso há 30 dias 7 | Desativadas 3 | Encerradas 2       |
+    | instituição | Sem acesso há 30 dias 14       | Desativados 6 | Códigos vencidos 2 |
+    | staff       | Sem acesso há 30 dias 5        | Desativados 1 | Códigos vencidos 1 |
+    | autônomo    | Sem acesso há 30 dias 3        | Desativados 2 | Códigos vencidos 0 |
 
 Esquema do Cenário: quem vê o card
   Quando <quem> abre Módulos
@@ -1887,7 +1895,7 @@ Cenário: card da instituição
           },
           {
             "nome": "Códigos vencidos",
-            "valor": 3
+            "valor": 2
           }
         ]
       }
@@ -1959,10 +1967,11 @@ Esquema do Cenário: números das contas, lidos de "usuarios" e "geracoesSenha"
     | Códigos vencidos      | PENDENTE com a última geracoesSenha vencida                  |
 
 Cenário: criar participante atualiza os cards guardados
-  Dado o card da EBFGA com 298 participantes e o card da staff Maria com 30
+  Dado o card da EBFGA com 298 participantes e o card da staff Maria com 38
   Quando a Maria envia POST /usuarios e cria o participante Lucas Andrade com 201
   Então, na mesma execução, o Lucas é gravado com criadoPor "usr-ebfga-maria"
-  E "cardUsuarios" passa a 299 no card da EBFGA e a 31 no card da Maria
+  E "cardUsuarios" passa a 299 no card da EBFGA e a 39 no card da Maria, e a versao sobe
+  E o selo, "Sem acesso há 30 dias" e "Códigos vencidos" não sobem a versao: são refeitos na leitura
 ```
 
 <a id="RN-281"></a>
@@ -1991,6 +2000,47 @@ Cenário: Usuários retirado com a conexão aberta
   Quando a conta master retira dela o "MOD-03"
   Então em até 30 s ela recebe "encerrado" com o código "ACESSO_NEGADO"
   E a conexão fecha
+```
+
+<a id="RN-283"></a>
+
+### `RN-283` Preferência de atualização dos cards
+
+> Escolha na tela: [15_modulos `RF-133`](15_modulos.md#RF-133) e [`RN-279`](15_modulos.md#RN-279)
+
+```gherkin
+Cenário: sem escolha feita
+  Dado o participante Lucas Andrade com o token de acesso, sem escolha salva
+  Quando envia GET /usuarios/eu/preferencias
+  Então a resposta é 200 com:
+    """
+    {
+      "atualizacaoCards": "NA_ABERTURA",
+      "intervaloAoVivo": 300
+    }
+    """
+
+Cenário: ligar o ao vivo
+  Dado a conta master da EBFGA com o token de acesso, sem nenhum módulo exigido
+  Quando envia PUT /usuarios/eu/preferencias com:
+    """
+    {
+      "atualizacaoCards": "AO_VIVO",
+      "intervaloAoVivo": 15
+    }
+    """
+  Então a resposta é 200 com o mesmo corpo
+  E o GET /usuarios/eu/preferencias de outro aparelho dela traz "AO_VIVO" e 15
+  E as coleções "auditoria" e "auditoriaErros" não ganham registro
+
+Esquema do Cenário: valor inválido
+  Quando a conta master envia PUT /usuarios/eu/preferencias com <campo> igual a <valor>
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "<campo>"
+
+  Exemplos:
+    | campo            | valor     |
+    | intervaloAoVivo  | 10        |
+    | atualizacaoCards | "SEMPRE"  |
 ```
 
 <a id="RN-190"></a>
@@ -2501,13 +2551,13 @@ Cenário: card guardado
         "lista": {
           "semAcesso30Dias": 14,
           "desativados": 6,
-          "codigosVencidos": 3
+          "codigosVencidos": 2
         }
       },
       "dias": [
         {
           "dia": "2026-11-07",
-          "valor": 333
+          "valor": 334
         },
         {
           "dia": "2026-11-08",
@@ -2517,7 +2567,7 @@ Cenário: card guardado
       "semanas": [
         {
           "semana": "2026-W44",
-          "valor": 325
+          "valor": 333
         },
         {
           "semana": "2026-W45",
@@ -2655,7 +2705,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v92** | 2026-11-08 23:45 | Telas (`RN-189`; 15_modulos `RN-276`, `RN-277`): vistas hub-usuarios web, pwa e mobile v01 → v02 (alternância Dia, Semana e Mês no card, 12 pontos na expandida, cards dos perfis staff e autônomo) e hub-time-deboaz v01 → v02 (card do perfil deboaz com 112 contas ativas, recortes e 12 pontos); cenários sem mudança |
+| **v93** | 2026-11-09 00:44 | `RN-189` com os números de exemplo de cada perfil (deboaz 112, +4 no mês, selo 7 igual a Master sem acesso; staff 41 na semana; autônomo 32 no dia) e a lista da expandida; Códigos vencidos da EBFGA 3 → 2 (`RN-189-api` e exemplo do card); `RN-280` selo e contagens por tempo sem subir a versao; `RN-283` novo: GET e PUT /usuarios/eu/preferencias |
+| v92 | 2026-11-08 23:45 | Telas (`RN-189`; 15_modulos `RN-276`, `RN-277`): vistas hub-usuarios web, pwa e mobile v01 → v02 (alternância Dia, Semana e Mês no card, 12 pontos na expandida, cards dos perfis staff e autônomo) e hub-time-deboaz v01 → v02 (card do perfil deboaz com 112 contas ativas, recortes e 12 pontos); cenários sem mudança |
 | v91 | 2026-11-08 23:35 | Diagramas do card (`RN-189`, `RN-280`, `RN-281`, 15_modulos `RN-276` a `RN-279`): contrato de API v11 → v12 (GET /usuarios/card no formato comum, GET /usuarios/card/ao-vivo por SSE, proposta pendente de preferências), sequência v07 → v08 (fase do card, telas pendentes), classes v07 → v08 (CardUsuarios e portas) e documentos v16 → v17 (cardUsuarios, criadoPor, aoVivo no Redis) |
 | v90 | 2026-11-08 23:16 | Card no formato comum de 15_modulos (`RN-276`): `RN-189` com 4 perfis (deboaz, também para o membro do time; instituição; staff, só com os dela; autônomo), participante sem card, 12 pontos e recortes; `RN-189-api` com o corpo novo; `RN-280` números guardados em "cardUsuarios", com a consulta de cada número e `usuarios.criadoPor`; `RN-281` card ao vivo; `RNF-227` com 8 coleções; exemplo do card guardado |
 | v89 | 2026-11-08 12:21 | Diagrama (`RN-270`, `RN-275`): modelo de documentos v15 → v16 (auditoriaErros em verde, coleção já no código) |
@@ -2664,10 +2715,7 @@ Cenário: o que este documento não trata
 | v86 | 2026-11-08 11:58 | `RN-178`: "2 registros da ação <acao>" no Esquema, com os registros das ações internas da `RN-275` à parte e com o mesmo traceId; permissões com o "INICIADO" e o "CONCLUIDO" de AVISAR_PERMISSOES_NOVAS; comportamento sem mudança |
 | v85 | 2026-11-08 11:53 | `RN-270`: o 403 ACESSO_NEGADO sem o módulo passa a ser auditado nos endereços que mudam estado (INICIADO só, auditoriaErros ALERTA com quem, contaId e alvo, X-Trace-Id); leitura sem o módulo e 401 de token seguem sem registro; `RN-271`: X-Trace-Id em toda resposta auditada; `RN-275` novo: ENCERRAR_SESSOES_DO_USUARIO, AVISAR_PERMISSOES_NOVAS e AVISAR_CONTRATACAO_MUDOU auditados com o traceId, quem e contaId de quem chama, falha como ERRO |
 | v84 | 2026-11-08 11:35 | Diagrama (`RN-270`): contrato de API v09 → v10 (403 ACESSO_NEGADO sem o módulo, MOD-03 · U, recusado antes do caso de uso, sem traceId, registros nem X-Trace-Id, como o 422 do corpo que não é JSON) |
-| v83 | 2026-11-08 11:31 | Auditoria em todos os casos de uso: `RN-178` com REATIVAR_USUARIO, EDITAR_USUARIO, NOVO_CODIGO_ACESSO e SALVAR_TEMPO_SESSAO da conta nos Exemplos e cenários de GERAR_SENHA sem login, CODIGO_MASTER e SALVAR_TEMPO_SESSAO do time (quem, contaId e alvo por etapa); `RN-270` com a recusa prevista de cada caso de uso como ALERTA e o 403 sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registro |
-| v82 | 2026-11-08 10:13 | `RN-178`: POST /contas/{id}/estado com o mesmo estado responde 200 e grava INICIADO e CONCLUIDO de MUDAR_ESTADO_CONTA, com contaId e alvo da conta pedida, como no contrato v09 |
-| v81 | 2026-11-08 09:50 | Diagramas da auditoria (`RN-178`): contrato de API v08 → v09 (quem, contaId e alvo de GERAR_SENHA sem login, MUDAR_ESTADO_CONTA, SALVAR_TEMPO_SESSAO da conta e do time, CODIGO_MASTER e EDITAR_PERMISSOES; o mesmo estado da conta responde 200 e grava INICIADO e CONCLUIDO), sequência v05 → v06 (quem, contaId e alvo de GERAR_SENHA, CODIGO_MASTER e MUDAR_ESTADO_CONTA) |
 
 ---
 
-<sub>boaz · v92 · 2026-11-08 23:45 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v93 · 2026-11-09 00:44 · `1_Requisitos/17_modulo-usuario.md`</sub>
