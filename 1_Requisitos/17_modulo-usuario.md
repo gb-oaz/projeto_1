@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v96"
-data: "2026-11-09 01:17"
+versao: "v97"
+data: "2026-11-09 03:21"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v96** · 2026-11-09 01:17 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v97** · 2026-11-09 03:21 · **Em revisão**
 
 # Módulo Usuários
 
@@ -2012,7 +2012,7 @@ Cenário: Usuários retirado com a conexão aberta
 Cenário: sem escolha feita
   Dado o participante Lucas Andrade com o token de acesso, sem escolha salva
   Quando envia GET /usuarios/eu/preferencias
-  Então a resposta é 200 com:
+  Então a resposta é 200, sem o cabeçalho X-Trace-Id, com:
     """
     {
       "atualizacaoCards": "NA_ABERTURA",
@@ -2029,9 +2029,9 @@ Cenário: ligar o ao vivo
       "intervaloAoVivo": 15
     }
     """
-  Então a resposta é 200 com o mesmo corpo
+  Então a resposta é 200 com o mesmo corpo, sem o cabeçalho X-Trace-Id
   E o GET /usuarios/eu/preferencias de outro aparelho dela traz "AO_VIVO" e 15
-  E as coleções "auditoria" e "auditoriaErros" não ganham registro
+  E as coleções "auditoria" e "auditoriaErros" não ganham registro, nem no GET nem no PUT
 
 Esquema do Cenário: valor inválido
   Quando a conta master envia PUT /usuarios/eu/preferencias com <campo> igual a <valor>
@@ -2705,7 +2705,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v96** | 2026-11-09 01:17 | Diagrama: usuarios-sequencia v09 com as telas das vistas hub-usuarios, hub-time-deboaz e hub-meus-modulos pwa v03; card real, troca de recorte sem chamada (15 `RN-277`), PUT /usuarios/eu/preferencias (`RN-283`), ping de 30 s, pausa só no aparelho e reconexão (15 `RN-282`) |
+| **v97** | 2026-11-09 03:21 | `RN-283`: GET e PUT /usuarios/eu/preferencias sem o cabeçalho X-Trace-Id e sem auditoria, como no contrato v13 |
+| v96 | 2026-11-09 01:17 | Diagrama: usuarios-sequencia v09 com as telas das vistas hub-usuarios, hub-time-deboaz e hub-meus-modulos pwa v03; card real, troca de recorte sem chamada (15 `RN-277`), PUT /usuarios/eu/preferencias (`RN-283`), ping de 30 s, pausa só no aparelho e reconexão (15 `RN-282`) |
 | v95 | 2026-11-09 01:03 | Diagramas de `RN-283` e da v28 de 15_modulos: contrato de API v12 → v13 (GET e PUT /usuarios/eu/preferencias definitivo, sem auditoria; ping a cada 30 s; sem reconectar depois do encerrado; Códigos vencidos 2), documentos v17 → v18 (usuarios.preferencias embutido) e classes v08 → v09 (PreferenciasDeCards) |
 | v94 | 2026-11-09 00:58 | Telas (`RN-189`; 15_modulos `RN-277`; 12_hub-ui `RN-284`): vistas hub-usuarios e hub-time-deboaz web, pwa e mobile v02 → v03 (números de exemplo de cada perfil, rótulos dos pontos e tendências do recorte, staff só com a aba Contratados); cenários sem mudança |
 | v93 | 2026-11-09 00:44 | `RN-189` com os números de exemplo de cada perfil (deboaz 112, +4 no mês, selo 7 igual a Master sem acesso; staff 41 na semana; autônomo 32 no dia) e a lista da expandida; Códigos vencidos da EBFGA 3 → 2 (`RN-189-api` e exemplo do card); `RN-280` selo e contagens por tempo sem subir a versao; `RN-283` novo: GET e PUT /usuarios/eu/preferencias |
@@ -2714,11 +2715,7 @@ Cenário: o que este documento não trata
 | v90 | 2026-11-08 23:16 | Card no formato comum de 15_modulos (`RN-276`): `RN-189` com 4 perfis (deboaz, também para o membro do time; instituição; staff, só com os dela; autônomo), participante sem card, 12 pontos e recortes; `RN-189-api` com o corpo novo; `RN-280` números guardados em "cardUsuarios", com a consulta de cada número e `usuarios.criadoPor`; `RN-281` card ao vivo; `RNF-227` com 8 coleções; exemplo do card guardado |
 | v89 | 2026-11-08 12:21 | Diagrama (`RN-270`, `RN-275`): modelo de documentos v15 → v16 (auditoriaErros em verde, coleção já no código) |
 | v88 | 2026-11-08 12:02 | Diagramas da v85 (`RN-270`, `RN-271`, `RN-275`): contrato de API v10 → v11 (403 sem o módulo com INICIADO e ALERTA ACESSO_NEGADO e X-Trace-Id; GET sem o módulo sem registro; ações internas), sequência v06 → v07 (ENCERRAR_SESSOES_DO_USUARIO na nova geração e no desativar, falha com 2 ERRO), classes v06 → v07 e documentos v14 → v15 (AcaoAuditada com 24 ações) |
-| v87 | 2026-11-08 11:59 | `RN-178`: "E à parte" no cenário das permissões, Gherkin válido; comportamento sem mudança |
-| v86 | 2026-11-08 11:58 | `RN-178`: "2 registros da ação <acao>" no Esquema, com os registros das ações internas da `RN-275` à parte e com o mesmo traceId; permissões com o "INICIADO" e o "CONCLUIDO" de AVISAR_PERMISSOES_NOVAS; comportamento sem mudança |
-| v85 | 2026-11-08 11:53 | `RN-270`: o 403 ACESSO_NEGADO sem o módulo passa a ser auditado nos endereços que mudam estado (INICIADO só, auditoriaErros ALERTA com quem, contaId e alvo, X-Trace-Id); leitura sem o módulo e 401 de token seguem sem registro; `RN-271`: X-Trace-Id em toda resposta auditada; `RN-275` novo: ENCERRAR_SESSOES_DO_USUARIO, AVISAR_PERMISSOES_NOVAS e AVISAR_CONTRATACAO_MUDOU auditados com o traceId, quem e contaId de quem chama, falha como ERRO |
-| v84 | 2026-11-08 11:35 | Diagrama (`RN-270`): contrato de API v09 → v10 (403 ACESSO_NEGADO sem o módulo, MOD-03 · U, recusado antes do caso de uso, sem traceId, registros nem X-Trace-Id, como o 422 do corpo que não é JSON) |
 
 ---
 
-<sub>boaz · v96 · 2026-11-09 01:17 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v97 · 2026-11-09 03:21 · `1_Requisitos/17_modulo-usuario.md`</sub>
