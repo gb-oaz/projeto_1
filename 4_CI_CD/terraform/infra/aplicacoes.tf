@@ -163,10 +163,13 @@ resource "azurerm_container_app" "app" {
         }
       }
 
+      # Teste__Relogio fica sempre "nao" no Azure (hml e prd): os endereços
+      # /_teste/* (contrato usuarios v15) só ligam no backend do CI (ci.sh)
       dynamic "env" {
         for_each = each.key == "backend-mono" ? {
           "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.appi.connection_string
           "Swagger__Habilitado"                   = local.prd ? "false" : "true"
+          "Teste__Relogio"                        = "nao"
         } : {}
         content {
           name  = env.key

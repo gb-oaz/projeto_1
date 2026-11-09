@@ -322,6 +322,10 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
   # backend sobe com AMBIENTE=hml e o qa do backend recebe as mesmas
   # USUARIO_*; nenhum valor fica no repositório. No compose, os valores vão
   # entre aspas simples: o JSON da lista tem aspas duplas.
+  # Teste__Relogio=sim liga só neste backend, o que as suítes de qa usam, os
+  # endereços /_teste/relogio e /_teste/fechamento (contrato usuarios v15);
+  # eles só existem com AMBIENTE=hml e esse valor. O Azure (hml e prd) grava
+  # Teste__Relogio=nao no Terraform: produção nunca liga.
   # (o pkcs8 -topk8 garante PKCS#8: o OpenSSL 3 grava "genpkey -outform DER" em PKCS#1)
   CHAVE_PRIVADA=$(openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 2>/dev/null \
     | openssl pkcs8 -topk8 -nocrypt -outform DER | base64 | tr -d '\n')
@@ -371,6 +375,7 @@ $($QA_MOBILE && echo '    ports: ["127.0.0.1:18080:8080"]')
       ConnectionStrings__MongoDb: mongodb://mongodb:27017
       ConnectionStrings__Redis: redis:6379
       Swagger__Habilitado: "true"
+      Teste__Relogio: "sim"
       Autenticacao__ChaveId: deboaz-local
       Autenticacao__ChavePrivada: "$CHAVE_PRIVADA"
 $(for v in "${USUARIOS[@]}"; do printf "      %s: '%s'\\n" "${v%%=*}" "${v#*=}"; done)

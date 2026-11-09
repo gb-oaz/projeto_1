@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "12_hub-ui"
 tipo: "Funcionalidade"
 titulo: "Hub · UI"
-versao: "v44"
-data: "2026-11-09 09:09"
+versao: "v45"
+data: "2026-11-09 09:14"
 status: "Em revisão"
 objetivo: "definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco."
 ---
 
-> **boaz · Funcionalidade** · `12_hub-ui` · **v44** · 2026-11-09 09:09 · **Em revisão**
+> **boaz · Funcionalidade** · `12_hub-ui` · **v45** · 2026-11-09 09:14 · **Em revisão**
 
 # Hub · UI
 
@@ -487,9 +487,9 @@ Cenário: o que este documento não trata
 
 [![Contrato de API da autenticação do 17-a, com a entrada no hub e o sair](../2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg)](../2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg)
 
-**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v14_20261109-0907.svg`
+**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v15_20261109-0912.svg`
 
-[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v14_20261109-0907.svg)](../2_Diagramas/usuarios-contrato-api_v14_20261109-0907.svg)
+[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v15_20261109-0912.svg)](../2_Diagramas/usuarios-contrato-api_v15_20261109-0912.svg)
 
 ---
 
@@ -499,7 +499,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v44** | 2026-11-09 09:09 | Diagrama: contrato de API dos usuários do 17 v13 → v14 (nomes do apoio e da lista do card por perfil; Sem acesso há 30 dias só para quem existe há mais de 30 dias) |
+| **v45** | 2026-11-09 09:14 | Diagrama: contrato de API dos usuários do 17 v14 → v15 (endereços de teste PUT e DELETE /_teste/relogio e POST /_teste/fechamento, sem login, só com AMBIENTE=hml e Teste__Relogio=sim, ligado só no backend do CI; fora disso, 404) |
+| v44 | 2026-11-09 09:09 | Diagrama: contrato de API dos usuários do 17 v13 → v14 (nomes do apoio e da lista do card por perfil; Sem acesso há 30 dias só para quem existe há mais de 30 dias) |
 | v43 | 2026-11-09 01:17 | Diagrama: hub-sequencia v03 com as telas da vista hub-meus-modulos pwa v03 e a fase Atualização dos cards (15 `RF-133`, `RN-220`, `RN-279`, `RN-282`; 17 `RN-283`) |
 | v42 | 2026-11-09 01:03 | Diagrama: contrato de API dos usuários do 17 v12 → v13 (preferências de atualização dos cards e ping de 30 s) |
 | v41 | 2026-11-09 00:58 | Telas ([15 `RF-133`](15_modulos.md#RF-133), [`RN-279`](15_modulos.md#RN-279), [`RN-282`](15_modulos.md#RN-282)): vistas de Módulos web v01 → v02 e pwa e mobile v02 → v03, com a Conta em Ao vivo, o Intervalo (A cada 5 s a A cada 5 min) e os avisos de ao vivo pausado; cenários sem mudança |
@@ -516,4 +517,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v44 · 2026-11-09 09:09 · `1_Requisitos/12_hub-ui.md`</sub>
+<sub>boaz · v45 · 2026-11-09 09:14 · `1_Requisitos/12_hub-ui.md`</sub>
