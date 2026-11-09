@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "99_glossario"
 tipo: "Glossário"
 titulo: "Glossário"
-versao: "v45"
-data: "2026-11-07 02:55"
-status: "Aprovado"
+versao: "v46"
+data: "2026-11-08 23:33"
+status: "Em revisão"
 objetivo: "dar um significado único aos termos do domínio usados nos documentos de requisito."
 ---
 
-> **boaz · Glossário** · `99_glossario` · **v45** · 2026-11-07 02:55 · **Aprovado**
+> **boaz · Glossário** · `99_glossario` · **v46** · 2026-11-08 23:33 · **Em revisão**
 
 # Glossário
 
@@ -27,6 +27,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="administrador-do-deboaz"></a>**Administrador do deboaz** | dono da conta master do time deboaz, no topo da ordem de superior; a entrada e a senha dele ficam no Key Vault e só são trocadas ali; cria os membros do time e pede a nova geração de senha deles ([Módulo Usuários RN-190](17_modulo-usuario.md#RN-190)) |
 | <a id="aparelho-conectado"></a>**Aparelho conectado** | navegador ou app com uma sessão ativa da pessoa no hub; ela vê os dela em Conta e pode sair de um ou de todos, até 5 ao mesmo tempo ([Autenticação `RF-156`](17_modulo-usuario-a-autenticacao.md#RF-156), [RN-247 `RN-247`](17_modulo-usuario-a-autenticacao.md#RN-247)) |
 | <a id="blueprint"></a>**Blueprint** | desenho de baixa fidelidade de uma tela, feito no documento de UX, que mostra só a distribuição dos blocos, as ações e os espaços reservados aos módulos, no celular e na web; vem antes da vista |
+| <a id="card-ao-vivo"></a>**Card ao vivo** | atualização dos cards de Módulos com a tela aberta, a cada 5, 15, 30, 60 ou 300 s, escolhida pela pessoa e válida em todos os aparelhos dela; desligado, o padrão é **na abertura**: os números só se atualizam ao abrir Módulos, sem conexão aberta ([Módulos `RN-279`](15_modulos.md#RN-279)) |
 | <a id="cartao-do-mascote"></a>**Cartão do mascote** | forma de mascote em que o fundo colorido ocupa um cartão vertical ou horizontal e só o rosto se move |
 | <a id="carteira"></a>**Carteira** | destino do quest com os módulos sempre disponíveis ao participante, em grade, até a instituição revogar; antes chamado Fixos |
 | <a id="catalogo-de-modulos"></a>**Catálogo de módulos** | lista dos módulos que uma escola ou empresa pode contratar, cada um com preço próprio controlado no hub; aparece na aba A contratar de Módulos |
@@ -69,6 +70,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="proporcao"></a>**Proporção** | variação do corpo do mascote (normal, alto, baixo, gordo ou magro); o rosto se ajusta para continuar cabendo |
 | <a id="quest"></a>**Quest** | frente do produto onde o participante entra numa sala pelo código e responde aos quizzes |
 | <a id="ranking"></a>**Ranking** | classificação dos participantes de uma sala pela pontuação |
+| <a id="recorte"></a>**Recorte** | período de cada ponto da série do card: dia, semana ou mês, com Mês como padrão; a normal mostra os 5 últimos e a expandida os 12 últimos, e a escolha fica guardada em cada aparelho ([Módulos `RN-277`](15_modulos.md#RN-277)) |
 | <a id="registro-de-modulos"></a>**Registro de módulos** | tabela em que todo módulo entra, com um ID `MOD-NN`, antes de ter documento próprio: nome, tipo, cobrança, estado e, para cada perfil, a frente e o objetivo ([Módulos RN-202](15_modulos.md#RN-202)) |
 | <a id="sac"></a>**SAC** | módulo da conta que toda conta do hub tem para falar com o time deboaz (a conversa com pais e alunos é do [Mensagens](#mensagens)); o time atende pelo mesmo módulo, onde também chegam as mensagens enviadas sem login pela tela Entrar do hub, como o pedido de senha da conta master |
 | <a id="sala"></a>**Sala** | sessão de um quiz aberta por um educador, em tempo real ou no ritmo de cada participante |
@@ -96,7 +98,8 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v45** | 2026-11-07 02:55 | Status → Aprovado, junto com o Módulo Usuários v57; termos sem mudança |
+| **v46** | 2026-11-08 23:33 | Termos Card ao vivo (com na abertura, Módulos `RN-279`) e Recorte (dia, semana e mês do card, Módulos `RN-277`); status → Em revisão |
+| v45 | 2026-11-07 02:55 | Status → Aprovado, junto com o Módulo Usuários v57; termos sem mudança |
 | v44 | 2026-11-07 02:38 | Termo Conta qa: administrador qa próprio, lista de módulos iniciais do Key Vault, dados fictícios, volta ao estado inicial a cada inicialização e siglas “QA” reservadas em produção (Módulo Usuários v56 `RN-265`, `RN-267`, `RN-268`, `RN-269`, `RN-179`) |
 | v43 | 2026-11-06 23:15 | Termo Conta qa (Módulo Usuários `RN-265`); status → Em revisão |
 | v42 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
@@ -105,8 +108,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | v39 | 2026-11-01 12:35 | Aprovado |
 | v38 | 2026-11-01 12:19 | Termos da autenticação e da autorização: aparelho conectado, papel, sessão, token de acesso, token de renovação e versão das permissões |
 | v37 | 2026-11-01 03:57 | Aprovado |
-| v36 | 2026-11-01 03:48 | Termo Painel de administração do deboaz retirado (Módulos `MOD-15`); Time deboaz e Módulo Usuários dizem que o time cuida das contas de instituição e de educador autônomo no módulo Usuários |
 
 ---
 
-<sub>boaz · v45 · 2026-11-07 02:55 · `1_Requisitos/99_glossario.md`</sub>
+<sub>boaz · v46 · 2026-11-08 23:33 · `1_Requisitos/99_glossario.md`</sub>
