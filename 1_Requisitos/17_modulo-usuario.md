@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v94"
-data: "2026-11-09 00:58"
+versao: "v95"
+data: "2026-11-09 01:03"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v94** · 2026-11-09 00:58 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v95** · 2026-11-09 01:03 · **Em revisão**
 
 # Módulo Usuários
 
@@ -2681,21 +2681,21 @@ Cenário: o que este documento não trata
 
 [![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)
 
-**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v12_20261108-2335.svg`
+**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v13_20261109-0103.svg`
 
-[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão, card no formato comum e card ao vivo por SSE, com a proposta pendente de preferências; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v12_20261108-2335.svg)](../2_Diagramas/usuarios-contrato-api_v12_20261108-2335.svg)
+[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão, card no formato comum e card ao vivo por SSE com ping a cada 30 s e preferências de atualização dos cards; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v13_20261109-0103.svg)](../2_Diagramas/usuarios-contrato-api_v13_20261109-0103.svg)
 
-**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v08_20261108-2335.svg`
+**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg`
 
-[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; CardUsuarios com NumerosDoCard e PontoDaSerie e as portas IRepositorioCardUsuarios, IContagemDoCard e IConexoesAoVivo; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v08_20261108-2335.svg)](../2_Diagramas/identidade-acesso-classes_v08_20261108-2335.svg)
+[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; CardUsuarios com NumerosDoCard e PontoDaSerie e as portas IRepositorioCardUsuarios, IContagemDoCard e IConexoesAoVivo; PreferenciasDeCards do Usuário; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg)](../2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg)
 
 **Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg`
 
 [![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)
 
-**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v17_20261108-2335.svg`
+**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v18_20261109-0103.svg`
 
-[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos, auditoria com traceId e etapa, auditoriaErros e cardUsuarios; usuarios.criadoPor no card da staff; no Redis, sessao, sessoes, tentativas e aoVivo; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v17_20261108-2335.svg)](../2_Diagramas/identidade-acesso-documentos_v17_20261108-2335.svg)
+[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos, auditoria com traceId e etapa, auditoriaErros e cardUsuarios; usuarios.criadoPor no card da staff e usuarios.preferencias; no Redis, sessao, sessoes, tentativas e aoVivo; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v18_20261109-0103.svg)](../2_Diagramas/identidade-acesso-documentos_v18_20261109-0103.svg)
 
 ---
 
@@ -2705,7 +2705,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v94** | 2026-11-09 00:58 | Telas (`RN-189`; 15_modulos `RN-277`; 12_hub-ui `RN-284`): vistas hub-usuarios e hub-time-deboaz web, pwa e mobile v02 → v03 (números de exemplo de cada perfil, rótulos dos pontos e tendências do recorte, staff só com a aba Contratados); cenários sem mudança |
+| **v95** | 2026-11-09 01:03 | Diagramas de `RN-283` e da v28 de 15_modulos: contrato de API v12 → v13 (GET e PUT /usuarios/eu/preferencias definitivo, sem auditoria; ping a cada 30 s; sem reconectar depois do encerrado; Códigos vencidos 2), documentos v17 → v18 (usuarios.preferencias embutido) e classes v08 → v09 (PreferenciasDeCards) |
+| v94 | 2026-11-09 00:58 | Telas (`RN-189`; 15_modulos `RN-277`; 12_hub-ui `RN-284`): vistas hub-usuarios e hub-time-deboaz web, pwa e mobile v02 → v03 (números de exemplo de cada perfil, rótulos dos pontos e tendências do recorte, staff só com a aba Contratados); cenários sem mudança |
 | v93 | 2026-11-09 00:44 | `RN-189` com os números de exemplo de cada perfil (deboaz 112, +4 no mês, selo 7 igual a Master sem acesso; staff 41 na semana; autônomo 32 no dia) e a lista da expandida; Códigos vencidos da EBFGA 3 → 2 (`RN-189-api` e exemplo do card); `RN-280` selo e contagens por tempo sem subir a versao; `RN-283` novo: GET e PUT /usuarios/eu/preferencias |
 | v92 | 2026-11-08 23:45 | Telas (`RN-189`; 15_modulos `RN-276`, `RN-277`): vistas hub-usuarios web, pwa e mobile v01 → v02 (alternância Dia, Semana e Mês no card, 12 pontos na expandida, cards dos perfis staff e autônomo) e hub-time-deboaz v01 → v02 (card do perfil deboaz com 112 contas ativas, recortes e 12 pontos); cenários sem mudança |
 | v91 | 2026-11-08 23:35 | Diagramas do card (`RN-189`, `RN-280`, `RN-281`, 15_modulos `RN-276` a `RN-279`): contrato de API v11 → v12 (GET /usuarios/card no formato comum, GET /usuarios/card/ao-vivo por SSE, proposta pendente de preferências), sequência v07 → v08 (fase do card, telas pendentes), classes v07 → v08 (CardUsuarios e portas) e documentos v16 → v17 (cardUsuarios, criadoPor, aoVivo no Redis) |
@@ -2719,4 +2720,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v94 · 2026-11-09 00:58 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v95 · 2026-11-09 01:03 · `1_Requisitos/17_modulo-usuario.md`</sub>

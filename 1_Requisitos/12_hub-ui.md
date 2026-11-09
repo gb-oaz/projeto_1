@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "12_hub-ui"
 tipo: "Funcionalidade"
 titulo: "Hub · UI"
-versao: "v41"
-data: "2026-11-09 00:58"
+versao: "v42"
+data: "2026-11-09 01:03"
 status: "Em revisão"
 objetivo: "definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco."
 ---
 
-> **boaz · Funcionalidade** · `12_hub-ui` · **v41** · 2026-11-09 00:58 · **Em revisão**
+> **boaz · Funcionalidade** · `12_hub-ui` · **v42** · 2026-11-09 01:03 · **Em revisão**
 
 # Hub · UI
 
@@ -487,9 +487,9 @@ Cenário: o que este documento não trata
 
 [![Contrato de API da autenticação do 17-a, com a entrada no hub e o sair](../2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg)](../2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg)
 
-**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v12_20261108-2335.svg`
+**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v13_20261109-0103.svg`
 
-[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v12_20261108-2335.svg)](../2_Diagramas/usuarios-contrato-api_v12_20261108-2335.svg)
+[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v13_20261109-0103.svg)](../2_Diagramas/usuarios-contrato-api_v13_20261109-0103.svg)
 
 ---
 
@@ -499,7 +499,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v41** | 2026-11-09 00:58 | Telas ([15 `RF-133`](15_modulos.md#RF-133), [`RN-279`](15_modulos.md#RN-279), [`RN-282`](15_modulos.md#RN-282)): vistas de Módulos web v01 → v02 e pwa e mobile v02 → v03, com a Conta em Ao vivo, o Intervalo (A cada 5 s a A cada 5 min) e os avisos de ao vivo pausado; cenários sem mudança |
+| **v42** | 2026-11-09 01:03 | Diagrama: contrato de API dos usuários do 17 v12 → v13 (preferências de atualização dos cards e ping de 30 s) |
+| v41 | 2026-11-09 00:58 | Telas ([15 `RF-133`](15_modulos.md#RF-133), [`RN-279`](15_modulos.md#RN-279), [`RN-282`](15_modulos.md#RN-282)): vistas de Módulos web v01 → v02 e pwa e mobile v02 → v03, com a Conta em Ao vivo, o Intervalo (A cada 5 s a A cada 5 min) e os avisos de ao vivo pausado; cenários sem mudança |
 | v40 | 2026-11-09 00:44 | `RN-284` novo: abas de Módulos por perfil (o autônomo, dono da conta, vê as três abas como a conta master; o staff vê só Contratados) |
 | v39 | 2026-11-08 23:35 | Diagrama: contrato de API dos usuários do 17 v11 → v12 (card no formato comum e card ao vivo por SSE) |
 | v38 | 2026-11-08 12:02 | Diagrama: contrato de API dos usuários do 17 v10 → v11 (403 sem o módulo auditado com INICIADO e ALERTA, X-Trace-Id; ações internas no traceId de quem chama; 17 `RN-270`, `RN-275`) |
@@ -513,4 +514,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v41 · 2026-11-09 00:58 · `1_Requisitos/12_hub-ui.md`</sub>
+<sub>boaz · v42 · 2026-11-09 01:03 · `1_Requisitos/12_hub-ui.md`</sub>
