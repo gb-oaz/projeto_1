@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v99"
-data: "2026-11-09 09:09"
+versao: "v100"
+data: "2026-11-09 09:10"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v99** · 2026-11-09 09:09 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v100** · 2026-11-09 09:10 · **Em revisão**
 
 # Módulo Usuários
 
@@ -1936,10 +1936,12 @@ Esquema do Cenário: sem o card
 Esquema do Cenário: números do perfil DEBOAZ, lidos de "contas"
   Quando o card do perfil DEBOAZ conta <numero>
   Então lê as contas de tipo INSTITUICAO ou AUTONOMO com <filtro>
+  E "sem acesso há 30 dias" pede a conta com criadaEm há mais de 30 dias
+  E o ultimoAcessoMaster nulo ou há mais de 30 dias
 
   Exemplos:
     | numero                                | filtro                                        |
-    | o selo e Master sem acesso há 30 dias | ATIVA e ultimoAcessoMaster há mais de 30 dias |
+    | o selo e Master sem acesso há 30 dias | ATIVA e sem acesso há 30 dias                 |
     | o dado macro                          | estado ATIVA                                  |
     | instituições                          | estado ATIVA e tipo INSTITUICAO               |
     | autônomos                             | estado ATIVA e tipo AUTONOMO                  |
@@ -1962,7 +1964,7 @@ Esquema do Cenário: números das contas, lidos de "usuarios" e "geracoesSenha"
     | participantes         | PARTICIPANTE ATIVO, na INSTITUICAO e no STAFF                |
     | pendentes             | estado PENDENTE                                              |
     | criados no mês        | criadoEm no mês atual, no AUTONOMO                           |
-    | Sem acesso há 30 dias | ATIVO com ultimoAcesso há mais de 30 dias ou nulo            |
+    | Sem acesso há 30 dias | ATIVO, criadoEm e ultimoAcesso (ou nulo) há mais de 30 dias  |
     | Desativados           | estado DESATIVADO                                            |
     | Códigos vencidos      | PENDENTE com a última geracoesSenha vencida                  |
 
@@ -1978,6 +1980,12 @@ Cenário: quem nunca entrou conta como sem acesso
   E o ultimoAcesso dele nulo
   Quando a conta master envia GET /usuarios/card em 2026-11-08
   Então o Davi conta em "Sem acesso há 30 dias"
+
+Cenário: recém-criado que nunca entrou não conta
+  Dado o participante Bruno Lima da EBFGA, ATIVO, criado em 2026-11-03, sem nenhum acesso
+  E o ultimoAcesso dele nulo
+  Quando a conta master envia GET /usuarios/card em 2026-11-08
+  Então o Bruno não conta em "Sem acesso há 30 dias", porque existe há só 5 dias
 ```
 
 <a id="RN-281"></a>
@@ -2712,7 +2720,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v99** | 2026-11-09 09:09 | Diagrama: contrato de API v13 → v14 (GET /usuarios/card com os nomes do apoio e da lista de DEBOAZ, INSTITUICAO, STAFF e AUTONOMO; Sem acesso há 30 dias com criadoEm há mais de 30 dias e ultimoAcesso há mais de 30 dias ou nulo, na conta criadaEm e ultimoAcessoMaster) |
+| **v100** | 2026-11-09 09:10 | `RN-280`: "Sem acesso há 30 dias" conta só quem existe há mais de 30 dias (criadoEm, e na conta criadaEm) e tem o último acesso há mais de 30 dias ou nulo, como no contrato v14; cenário do recém-criado que não conta |
+| v99 | 2026-11-09 09:09 | Diagrama: contrato de API v13 → v14 (GET /usuarios/card com os nomes do apoio e da lista de DEBOAZ, INSTITUICAO, STAFF e AUTONOMO; Sem acesso há 30 dias com criadoEm há mais de 30 dias e ultimoAcesso há mais de 30 dias ou nulo, na conta criadaEm e ultimoAcessoMaster) |
 | v98 | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Então ou E (`RF-155`, `RN-189`, `RN-280`); `RN-280`: "Sem acesso há 30 dias" conta também quem nunca entrou (ultimoAcesso nulo), com cenário; `RN-281`: sessão expirada por 8 h sem uso com ?intervalo=5 |
 | v97 | 2026-11-09 03:21 | `RN-283`: GET e PUT /usuarios/eu/preferencias sem o cabeçalho X-Trace-Id e sem auditoria, como no contrato v13 |
 | v96 | 2026-11-09 01:17 | Diagrama: usuarios-sequencia v09 com as telas das vistas hub-usuarios, hub-time-deboaz e hub-meus-modulos pwa v03; card real, troca de recorte sem chamada (15 `RN-277`), PUT /usuarios/eu/preferencias (`RN-283`), ping de 30 s, pausa só no aparelho e reconexão (15 `RN-282`) |
@@ -2721,9 +2730,7 @@ Cenário: o que este documento não trata
 | v93 | 2026-11-09 00:44 | `RN-189` com os números de exemplo de cada perfil (deboaz 112, +4 no mês, selo 7 igual a Master sem acesso; staff 41 na semana; autônomo 32 no dia) e a lista da expandida; Códigos vencidos da EBFGA 3 → 2 (`RN-189-api` e exemplo do card); `RN-280` selo e contagens por tempo sem subir a versao; `RN-283` novo: GET e PUT /usuarios/eu/preferencias |
 | v92 | 2026-11-08 23:45 | Telas (`RN-189`; 15_modulos `RN-276`, `RN-277`): vistas hub-usuarios web, pwa e mobile v01 → v02 (alternância Dia, Semana e Mês no card, 12 pontos na expandida, cards dos perfis staff e autônomo) e hub-time-deboaz v01 → v02 (card do perfil deboaz com 112 contas ativas, recortes e 12 pontos); cenários sem mudança |
 | v91 | 2026-11-08 23:35 | Diagramas do card (`RN-189`, `RN-280`, `RN-281`, 15_modulos `RN-276` a `RN-279`): contrato de API v11 → v12 (GET /usuarios/card no formato comum, GET /usuarios/card/ao-vivo por SSE, proposta pendente de preferências), sequência v07 → v08 (fase do card, telas pendentes), classes v07 → v08 (CardUsuarios e portas) e documentos v16 → v17 (cardUsuarios, criadoPor, aoVivo no Redis) |
-| v90 | 2026-11-08 23:16 | Card no formato comum de 15_modulos (`RN-276`): `RN-189` com 4 perfis (deboaz, também para o membro do time; instituição; staff, só com os dela; autônomo), participante sem card, 12 pontos e recortes; `RN-189-api` com o corpo novo; `RN-280` números guardados em "cardUsuarios", com a consulta de cada número e `usuarios.criadoPor`; `RN-281` card ao vivo; `RNF-227` com 8 coleções; exemplo do card guardado |
-| v89 | 2026-11-08 12:21 | Diagrama (`RN-270`, `RN-275`): modelo de documentos v15 → v16 (auditoriaErros em verde, coleção já no código) |
 
 ---
 
-<sub>boaz · v99 · 2026-11-09 09:09 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v100 · 2026-11-09 09:10 · `1_Requisitos/17_modulo-usuario.md`</sub>
