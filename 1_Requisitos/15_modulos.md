@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "15_modulos"
 tipo: "Funcionalidade"
 titulo: "Módulos"
-versao: "v27"
-data: "2026-11-09 00:44"
+versao: "v28"
+data: "2026-11-09 00:53"
 status: "Em revisão"
 objetivo: "definir como um módulo do deboaz é construído, para que todo módulo siga o mesmo molde antes de entrar no catálogo."
 ---
 
-> **boaz · Funcionalidade** · `15_modulos` · **v27** · 2026-11-09 00:44 · **Em revisão**
+> **boaz · Funcionalidade** · `15_modulos` · **v28** · 2026-11-09 00:53 · **Em revisão**
 
 # Módulos
 
@@ -574,7 +574,7 @@ Esquema do Cenário: encerrado pelo deboaz
   Dado a conta master com "Ao vivo" salvo e Módulos aberto no tablet
   Quando o tablet recebe o evento "encerrado" com o código "<codigo>"
   Então o tablet mostra o aviso "<aviso>"
-  E o tablet volta a "Na abertura", sem mudar o "Ao vivo" salvo para ela
+  E só o tablet fica pausado em "Na abertura"; o "Ao vivo" salvo para ela não muda
   E o tablet não reconecta sozinho
 
   Exemplos:
@@ -588,6 +588,13 @@ Cenário: queda de rede
   Então o celular tenta reconectar depois de 1, 2, 4, 8, 16, 32 e 60 s
   E depois a cada 60 s, até a rede voltar ou Módulos fechar
   E, ao reconectar, o card mostra os números atuais
+
+Cenário: reabrir o app não religa
+  Dado o tablet pausado em "Na abertura" depois do "encerrado", com "Ao vivo" salvo
+  Quando a conta master fecha e abre o app no tablet
+  Então o tablet continua pausado e os números só se atualizam ao tocar em Módulos
+  E quando ela marca "Ao vivo" de novo no tablet, a pausa sai e o tablet reconecta
+  E nada novo é salvo, porque a escolha dela já era "Ao vivo"
 ```
 
 <a id="MOD-01"></a>
@@ -974,21 +981,14 @@ Cenário: quarta conexão do mesmo usuário
 
 ---
 
-<a id="em-aberto"></a>
-
-## Em aberto
-
-- Depois do "encerrado" (`RN-282`), quando o aparelho volta ao ao vivo: ao abrir o app de novo ou só quando a pessoa marca "Ao vivo" outra vez? — **Produto**
-
----
-
 <a id="historico"></a>
 
 ## Histórico
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v27** | 2026-11-09 00:44 | `RN-277` com os rótulos dos pontos (nov, S1 a S12, dia do mês), a tendência por recorte ("+12 no mês", "+2 na semana", "+1 no dia") e o seletor que não abre o módulo; `RN-278` selo e Códigos vencidos refeitos na leitura, sem subir a versao; `RN-279-api` ping a cada 30 s; `RN-282` novo (aviso do encerrado, aparelho volta a Na abertura, reconexão até 60 s); `RF-133` cita a preferência salva (17 `RN-283`); Em aberto: volta ao ao vivo |
+| **v28** | 2026-11-09 00:53 | `RN-282`: a pausa depois do "encerrado" é só daquele aparelho e não muda o "Ao vivo" salvo; reabrir o app não religa, só marcar "Ao vivo" de novo no aparelho, sem salvar nada novo; Em aberto respondido e seção removida |
+| v27 | 2026-11-09 00:44 | `RN-277` com os rótulos dos pontos (nov, S1 a S12, dia do mês), a tendência por recorte ("+12 no mês", "+2 na semana", "+1 no dia") e o seletor que não abre o módulo; `RN-278` selo e Códigos vencidos refeitos na leitura, sem subir a versao; `RN-279-api` ping a cada 30 s; `RN-282` novo (aviso do encerrado, aparelho volta a Na abertura, reconexão até 60 s); `RF-133` cita a preferência salva (17 `RN-283`); Em aberto: volta ao ao vivo |
 | v26 | 2026-11-08 23:16 | Card comum de todo módulo: `RN-276` (perfis da ficha, o participante pode ser um; ícone do Catálogo; GET /<modulo>/card com todos os tamanhos), `RN-277` recortes dia, semana e mês, `RN-278` números guardados prontos, `RN-279` na abertura e ao vivo (GET /<modulo>/card/ao-vivo, 5 a 300 s, até 3 conexões); `RF-128` quatro tamanhos; `RF-133`, `RN-218`, `RN-220` e a ficha do módulo ajustados; seção Cenários vira Cenários de tela e ganha Cenários de API; status → Em revisão |
 | v25 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md`; a [porta de entrada](#porta-de-entrada) cita os documentos em `.md` |
 | v24 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
@@ -997,8 +997,7 @@ Cenário: quarta conexão do mesmo usuário
 | v21 | 2026-11-01 18:20 | Só Gherkin: contexto, RF, RN, registro de módulos (um cenário por MOD-NN, mesmo ID como âncora), quem usa cada módulo, ficha do módulo e fora de escopo viram cenários; status → Em revisão |
 | v20 | 2026-11-01 03:57 | Aprovado |
 | v19 | 2026-11-01 03:38 | `MOD-15` Painel de administração retirado: juntado ao `MOD-03` Usuários, que no time deboaz cuida também das contas de instituição e de educador autônomo |
-| v18 | 2026-11-01 02:08 | Registro do Usuários (`MOD-03`) aponta também para 17-a (autenticação) e 17-b (autorização) |
 
 ---
 
-<sub>boaz · v27 · 2026-11-09 00:44 · `1_Requisitos/15_modulos.md`</sub>
+<sub>boaz · v28 · 2026-11-09 00:53 · `1_Requisitos/15_modulos.md`</sub>
