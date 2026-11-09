@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v98), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v100), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -1031,10 +1031,12 @@ Funcionalidade: Usuários
   Esquema do Cenário: números do perfil DEBOAZ, lidos de "contas"
     Quando o card do perfil DEBOAZ conta <numero>
     Então lê as contas de tipo INSTITUICAO ou AUTONOMO com <filtro>
+    E "sem acesso há 30 dias" pede a conta com criadaEm há mais de 30 dias
+    E o ultimoAcessoMaster nulo ou há mais de 30 dias
 
     Exemplos:
       | numero                                | filtro                                        |
-      | o selo e Master sem acesso há 30 dias | ATIVA e ultimoAcessoMaster há mais de 30 dias |
+      | o selo e Master sem acesso há 30 dias | ATIVA e sem acesso há 30 dias                 |
       | o dado macro                          | estado ATIVA                                  |
       | instituições                          | estado ATIVA e tipo INSTITUICAO               |
       | autônomos                             | estado ATIVA e tipo AUTONOMO                  |
@@ -1058,7 +1060,7 @@ Funcionalidade: Usuários
       | participantes         | PARTICIPANTE ATIVO, na INSTITUICAO e no STAFF                |
       | pendentes             | estado PENDENTE                                              |
       | criados no mês        | criadoEm no mês atual, no AUTONOMO                           |
-      | Sem acesso há 30 dias | ATIVO com ultimoAcesso há mais de 30 dias ou nulo            |
+      | Sem acesso há 30 dias | ATIVO, criadoEm e ultimoAcesso (ou nulo) há mais de 30 dias  |
       | Desativados           | estado DESATIVADO                                            |
       | Códigos vencidos      | PENDENTE com a última geracoesSenha vencida                  |
 
@@ -1077,13 +1079,12 @@ Funcionalidade: Usuários
     Quando a conta master envia GET /usuarios/card em 2026-11-08
     Então o Davi conta em "Sem acesso há 30 dias"
 
-  # antecipado da 17 v100 (deboaz-po): o texto deve vir igual no requisito
   @RN-280
-  Cenário: quem foi criado há menos de 30 dias não conta como sem acesso
-    Dado o participante Igor Alves da EBFGA, ATIVO desde 2026-11-03, sem nenhum acesso
+  Cenário: recém-criado que nunca entrou não conta
+    Dado o participante Bruno Lima da EBFGA, ATIVO, criado em 2026-11-03, sem nenhum acesso
     E o ultimoAcesso dele nulo
     Quando a conta master envia GET /usuarios/card em 2026-11-08
-    Então o Igor não conta em "Sem acesso há 30 dias"
+    Então o Bruno não conta em "Sem acesso há 30 dias", porque existe há só 5 dias
 
   @RN-281
   Esquema do Cenário: quem não conecta

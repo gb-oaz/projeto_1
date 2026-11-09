@@ -157,6 +157,12 @@ public static class Estado
             Builders<BsonDocument>.Filter.In("_id", usuarioIds),
             Builders<BsonDocument>.Update.Set("criadoEm", quando));
 
+    // master que nunca entrou: ultimoAcessoMaster nulo (17 RN-280)
+    public static Task UltimoAcessoMasterNulo(string contaId) =>
+        Banco.GetCollection<BsonDocument>("contas").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", contaId),
+            Builders<BsonDocument>.Update.Set("ultimoAcessoMaster", BsonNull.Value));
+
     // conta criada há algum tempo ("Master sem acesso há 30 dias", 17 RN-280)
     public static Task CriadaEm(string contaId, DateTime quando) =>
         Banco.GetCollection<BsonDocument>("contas").UpdateOneAsync(

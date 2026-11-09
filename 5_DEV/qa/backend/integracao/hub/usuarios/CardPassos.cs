@@ -153,7 +153,8 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
     [When(@"^o card do perfil DEBOAZ conta (.+)$")]
     public void DeboazConta(string n) => numero = n;
 
-    // contas novas: A (instituição ativa, master sem acesso há 31 dias), B
+    // contas novas: A (instituição ativa, master sem acesso há 31 dias), F
+    // (instituição ativa, master nunca entrou), ambas criadas há 60 dias; B
     // (autônomo ativo, master com acesso hoje), C (instituição suspensa, master
     // sem acesso), D (instituição desativada) e E (autônomo encerrado). Cada
     // número tem de subir só pelo que o filtro conta
@@ -168,6 +169,7 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
         var c = await ContaQa(3, "INSTITUICAO");
         var d = await ContaQa(4, "INSTITUICAO");
         var e = await ContaQa(5, "AUTONOMO");
+        var f = await ContaQa(6, "INSTITUICAO");
         await MudarEstado(c, "SUSPENSA");
         await MudarEstado(d, "DESATIVADA");
         await MudarEstado(e, "ENCERRADA");
@@ -175,13 +177,16 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
         await Estado.UltimoAcessoMaster(b, agora);
         await Estado.UltimoAcessoMaster(c, agora.AddDays(-31));
         // só conta a conta criada há mais de 30 dias (17 RN-280)
-        foreach (var conta in new[] { a, b, c }) await Estado.CriadaEm(conta, agora.AddDays(-60));
+        // F: instituição ativa, antiga, cuja master nunca entrou (ultimoAcessoMaster nulo)
+        await Estado.UltimoAcessoMasterNulo(f);
+        foreach (var conta in new[] { a, b, c, f }) await Estado.CriadaEm(conta, agora.AddDays(-60));
         var cardDepois = await Card(admin);
         var esperados = numero switch
         {
-            "o selo e Master sem acesso há 30 dias" => new Dictionary<string, int> { ["o selo"] = 1, ["Master sem acesso há 30 dias"] = 1 },
-            "o dado macro" => new() { ["o dado macro"] = 2 },
-            "instituições" or "autônomos" or "suspensas" or "Desativadas" or "Encerradas" => new() { [numero] = 1 },
+            "o selo e Master sem acesso há 30 dias" => new Dictionary<string, int> { ["o selo"] = 2, ["Master sem acesso há 30 dias"] = 2 },
+            "o dado macro" => new() { ["o dado macro"] = 3 },
+            "instituições" => new() { [numero] = 2 },
+            "autônomos" or "suspensas" or "Desativadas" or "Encerradas" => new() { [numero] = 1 },
             _ => throw new InvalidOperationException($"número do perfil DEBOAZ sem exemplo: {numero}"),
         };
         foreach (var (nome, diferenca) in esperados)
@@ -189,6 +194,11 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
             AssertDiferenca(cardAntes, cardDepois, nome, diferenca, $"DEBOAZ, contas com {filtro}");
         }
     }
+
+    // o critério de "sem acesso" que o Então prepara nas contas A, C e F
+    [Then(@"^""sem acesso há 30 dias"" pede a conta com criadaEm há mais de 30 dias$")]
+    [Then(@"^o ultimoAcessoMaster nulo ou há mais de 30 dias$")]
+    public static void CriterioDaConta() { }
 
     // ── RN-280 · números das contas ────────────────────────────────────────
     // os Dado descrevem a consulta; o Então a prova pelo que cada card mostra
@@ -526,12 +536,14 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
     // ATIVO "desde" a data do exemplo (criadoEm, pelo banco, no Quando, à mesma
     // distância do GET: 2026-09-01 → 2026-11-08 conta; 5 dias antes, não)
     [Given(@"^o participante (\w+ \w+) da EBFGA, ATIVO desde (\d{4}-\d{2}-\d{2}), sem nenhum acesso$")]
+    [Given(@"^o participante (\w+ \w+) da EBFGA, ATIVO, criado em (\d{4}-\d{2}-\d{2}), sem nenhum acesso$")]
     public async Task NuncaEntrou(string nome, string desde)
     {
         nuncaEntrouDesde = DateOnly.Parse(desde);
         var master = await mundo.Master();
         antes["INSTITUICAO"] = await Card(master);
-        var nomeCurto = nome.Split(' ')[0].ToLowerInvariant();
+        // nome e sobrenome juntos: "bruno" já é o Bruno da COLSA no Mundo
+        var nomeCurto = nome.Replace(" ", "").ToLowerInvariant();
         nuncaEntrou = Texto(Exigir(await mundo.EnviarComo(master, "POST", "/usuarios", new JsonObject
         {
             ["tipo"] = "PARTICIPANTE",
@@ -572,7 +584,7 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
     public void ContaSemAcesso(string quem) =>
         AssertDiferenca(antes["INSTITUICAO"], depois["INSTITUICAO"], "Sem acesso há 30 dias", 1, $"{quem} sem acesso");
 
-    [Then(@"^o (\w+) não conta em ""Sem acesso há 30 dias""$")]
+    [Then(@"^o (\w+) não conta em ""Sem acesso há 30 dias"", porque existe há só \d+ dias$")]
     public void NaoContaSemAcesso(string quem) =>
         AssertDiferenca(antes["INSTITUICAO"], depois["INSTITUICAO"], "Sem acesso há 30 dias", 0, $"{quem} criado há menos de 30 dias");
 
