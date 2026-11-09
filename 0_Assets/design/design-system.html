@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v44</title>
+<title>Design system · boaz · v45</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v44">
-<meta name="design:data" content="2026-11-01 13:05">
+<meta name="design:versao" content="v45">
+<meta name="design:data" content="2026-11-09 01:10">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -25143,6 +25143,11 @@ window.dispatchEvent(new Event('boaz-splash'));
 .cx-grade-modulos .cx-card-modulo--reduzida { grid-column: span var(--md-comp-module-card-reduced-columns); grid-row: span var(--md-comp-module-card-reduced-rows); }
 .cx-grade-modulos .cx-card-modulo--reduzida .metrica { margin-top: auto; }
 .cx-grade-modulos .cx-card-modulo--expandida { grid-column: span var(--md-comp-module-card-expanded-columns); grid-row: span var(--md-comp-module-card-expanded-rows); }
+/* card com seletor do recorte (RN-277): o card abre o módulo por um botão que cobre o card; o seletor Dia | Semana | Mês fica por cima e não abre */
+.cx-card-modulo > .abrir { position: absolute; inset: 0; padding: 0; border: 0; border-radius: inherit; background: transparent; cursor: pointer; }
+.cx-card-modulo:has(> .abrir) > :not(.abrir, .recorte) { pointer-events: none; }
+.cx-card-modulo .recorte { position: relative; z-index: 1; }
+.cx-card-modulo .serie-longa { --altura: 6rem; gap: var(--md-sys-spacing-1); margin-top: var(--md-sys-spacing-4); }
 .cx-card-modulo .lista-modulo { display: grid; margin: 0; padding: 0; list-style: none; text-align: start; }
 .cx-card-modulo .lista-modulo li { display: flex; justify-content: space-between; padding: var(--md-sys-spacing-3) 0; border-top: 1px solid var(--md-sys-color-outline-variant); }
 .cx-card-modulo .lista-modulo b { color: var(--md-sys-color-primary); }
@@ -25528,8 +25533,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v44</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-11-01 13:05</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v45</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-11-09 01:10</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -26018,7 +26023,7 @@ el.innerHTML = splash.animada('quest', {
       <div class="palco">
         <span class="rotulo">Card de módulo · quatro tamanhos em células quadradas, como os blocos do Windows Phone (largura × altura em células): mínima 1x1 (ícone e selo), reduzida 2x2 (ícone, nome e dado macro), normal 4x4 (o padrão: números e gráfico) e expandida 4x8 (painel completo); células de 76dp ou mais, no mínimo 4 colunas, e mais colunas nas janelas largas; a pessoa escolhe ao ordenar, fica guardado no aparelho, e qualquer tamanho abre o módulo; sem métrica ainda, o estado Configurar ou Completar</span>
         <div class="cx-grade-caixa"><div class="cx-grade-modulos">
-          <button class="cx-card-modulo cx-card-modulo--expandida md-estado" aria-label="Presença: 94% de presença na semana, 2 pontos a mais; 12 turmas, 3 sem chamada hoje, 18 faltas seguidas"><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="md-badge" aria-hidden="true">3</span><span class="cx-texto-titulo">Presença</span><span class="linha-metrica"><span class="metrica">94%</span><span class="tendencia"><span class="material-symbols">arrow_upward</span>+2 pts</span></span><span class="cx-texto-apoio">presença na semana</span><span class="apoio-numeros"><span><b class="cx-cor-secondary">12</b><small>turmas</small></span><span><b class="cx-cor-tertiary">3</b><small>sem chamada hoje</small></span><span><b class="cx-cor-erro">18</b><small>faltas seguidas</small></span></span><span class="cx-texto-rotulo">Últimas semanas</span><span class="md-grafico md-grafico--mini" aria-hidden="true"><span class="barra" style="--v: .91"></span><span class="barra" style="--v: .94"></span><span class="barra" style="--v: .97"></span><span class="barra" style="--v: .96"></span><span class="barra" style="--v: .95"></span><span class="barra" style="--v: .98"></span><span class="barra barra--destaque" style="--v: 1"></span></span><ul class="lista-modulo"><li>7º A<b>98%</b></li><li>8º B<b>91%</b></li><li>9º C<b>87%</b></li></ul></button>
+          <div class="cx-card-modulo cx-card-modulo--expandida"><button class="abrir md-estado" aria-label="Abrir Presença: 94% de presença, 2 a mais na semana; 12 turmas, 3 sem chamada hoje, 18 faltas seguidas"></button><span class="cx-icone"><span class="material-symbols">fact_check</span></span><span class="md-badge" aria-hidden="true">3</span><span class="cx-texto-titulo">Presença</span><span class="linha-metrica"><span class="metrica">94%</span><span class="tendencia"><span class="material-symbols">arrow_upward</span>+2 na semana</span></span><span class="cx-texto-apoio">presença</span><div class="md-segmented md-segmented--cheio recorte" role="group" aria-label="Recorte da série"><button class="md-estado" aria-pressed="false">Dia</button><button class="md-estado" aria-pressed="true"><span class="material-symbols">check</span>Semana</button><button class="md-estado" aria-pressed="false">Mês</button></div><span class="apoio-numeros"><span><b class="cx-cor-secondary">12</b><small>turmas</small></span><span><b class="cx-cor-tertiary">3</b><small>sem chamada hoje</small></span><span><b class="cx-cor-erro">18</b><small>faltas seguidas</small></span></span><span class="cx-texto-rotulo">Últimas 12 semanas</span><span class="md-grafico serie-longa" aria-hidden="true"><span class="barra" style="--v: 0.90"><span class="valor">85</span><span class="rotulo-x">S1</span></span><span class="barra" style="--v: 0.93"><span class="valor">87</span><span class="rotulo-x">S2</span></span><span class="barra" style="--v: 0.91"><span class="valor">86</span><span class="rotulo-x">S3</span></span><span class="barra" style="--v: 0.94"><span class="valor">88</span><span class="rotulo-x">S4</span></span><span class="barra" style="--v: 0.97"><span class="valor">91</span><span class="rotulo-x">S5</span></span><span class="barra" style="--v: 0.96"><span class="valor">90</span><span class="rotulo-x">S6</span></span><span class="barra" style="--v: 0.95"><span class="valor">89</span><span class="rotulo-x">S7</span></span><span class="barra" style="--v: 0.94"><span class="valor">88</span><span class="rotulo-x">S8</span></span><span class="barra" style="--v: 0.97"><span class="valor">91</span><span class="rotulo-x">S9</span></span><span class="barra" style="--v: 0.96"><span class="valor">90</span><span class="rotulo-x">S10</span></span><span class="barra" style="--v: 0.98"><span class="valor">92</span><span class="rotulo-x">S11</span></span><span class="barra barra--destaque" style="--v: 1.00"><span class="valor">94</span><span class="rotulo-x">S12</span></span></span><ul class="lista-modulo"><li>7º A<b>98%</b></li><li>8º B<b>91%</b></li><li>9º C<b>87%</b></li></ul></div>
           <button class="cx-card-modulo md-estado" aria-label="Carteirinha: 312 de 340 prontas"><span class="cx-icone"><span class="material-symbols">badge</span></span><span class="cx-texto-titulo">Carteirinha</span><span class="metrica">312 de 340</span><span class="cx-texto-apoio">carteirinhas prontas</span><span class="apoio-numeros"><span><b class="cx-cor-tertiary">28</b><small>esperando a foto</small></span><span><b class="cx-cor-erro">4</b><small>vencendo</small></span></span></button>
           <button class="cx-card-modulo cx-card-modulo--reduzida md-estado" aria-label="Mensagens: 5 novas"><span class="cx-icone"><span class="material-symbols">chat</span></span><span class="md-badge" aria-hidden="true">5</span><span class="cx-texto-titulo">Mensagens</span><span class="metrica">5</span></button>
           <button class="cx-card-modulo cx-card-modulo--minima md-estado" aria-label="Flashcards: 2 novos"><span class="cx-icone"><span class="material-symbols">bookmark</span></span><span class="md-badge" aria-hidden="true">2</span><span class="cx-texto-titulo">Flashcards</span></button>
@@ -26351,6 +26356,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v45</td><td>2026-11-09 01:10</td><td>Card de módulo com o seletor do recorte Dia | Semana | Mês (botão segmentado cheio, <code>md.comp.segmented-button</code>) quando o módulo tem série: o toque no seletor troca a série e a tendência sem abrir o módulo (o card abre por um botão que o cobre, classe <code>abrir</code>, e o seletor <code>recorte</code> fica por cima); normal com os 5 últimos pontos e expandida com a série longa de 12 pontos rotulada (meses dez a nov, S1 a S12 ou dias), classe <code>serie-longa</code> (15 RN-277)</td></tr>
           <tr><td>v44</td><td>2026-11-01 13:05</td><td>Componente comum Aviso de ação (<code>md.comp.action-notice</code>, classe <code>cx-aviso-acao</code>): toda ação confirmada mostra o resultado, bom ou ruim, com o selo de status animado e a cor do tom — concluído (Voltou!), informação (Operacional), recusado (Instabilidade), indisponível (Fora do ar) e espera (Manutenção), na tela ou flutuante; selos e ilustrações de status sempre animados, parados só com movimento reduzido</td></tr>
           <tr><td>v43</td><td>2026-10-31 23:44</td><td>Ícones <code>pessoas</code> (Material group), do módulo Usuários, e <code>loja</code> (Material store), do módulo Catálogo, para a ficha do módulo (RN-217, RN-219)</td></tr>
           <tr><td>v42</td><td>2026-10-31 23:26</td><td>Grade dos cards de módulo com célula de lado mínimo (<code>md.comp.module-card.cell-min-size</code>, 76dp) e no mínimo 4 colunas (<code>grid-columns-min</code>), no lugar das colunas fixas por janela: a grade põe quantas colunas couberem, o card tem o mesmo tamanho em qualquer janela e as largas mostram mais cards lado a lado; a expandida (4x8) cabe na área visível com a barra do topo e as abas escondidas na rolagem</td></tr>
@@ -26363,7 +26369,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v35</td><td>2026-10-28 01:37</td><td>App (MAUI): ícone oficial (<code>plataformas/maui/icones/appicon.svg</code> + <code>appiconfg[_curto].svg</code>, para o <code>MauiIcon</code>) e ícone da splash nativa no claro (<code>plataformas/maui/splash/splash_&lt;frente&gt;.svg</code>, para o <code>MauiSplashScreen</code>), copiados para <code>core/commons/Resources/Styles/Design/</code> do mobile; em <code>Marca.xaml</code>, o nome passa a <code>FillRule="Nonzero"</code> (no EvenOdd, a sobreposição da barriga com a haste do d e do b virava um risco vazado)</td></tr>
 </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v44 · 2026-11-01 13:05</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v45 · 2026-11-09 01:10</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>

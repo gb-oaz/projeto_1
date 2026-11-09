@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v93"
-data: "2026-11-09 00:44"
+versao: "v94"
+data: "2026-11-09 00:58"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v93** · 2026-11-09 00:44 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v94** · 2026-11-09 00:58 · **Em revisão**
 
 # Módulo Usuários
 
@@ -2615,13 +2615,13 @@ Cenário: o que este documento não trata
 
 [![Web: vista do acesso ao hub: criar conta com domínio e sigla, igual para escola, empresa e autônomo, que só troca o CNPJ pelo CPF, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha](../2_Diagramas/vista-hub-acesso-web_v01_20261103-1229.svg)](../2_Diagramas/vista-hub-acesso-web_v01_20261103-1229.svg)
 
-**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v02_20261108-2340.svg`
+**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v03_20261109-0048.svg`
 
-[![Web: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-web_v02_20261108-2340.svg)](../2_Diagramas/vista-hub-usuarios-web_v02_20261108-2340.svg)
+[![Web: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-web_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-usuarios-web_v03_20261109-0048.svg)
 
-**Hub · time deboaz · usuários · web · vista** — `2_Diagramas/vista-hub-time-deboaz-web_v02_20261108-2340.svg`
+**Hub · time deboaz · usuários · web · vista** — `2_Diagramas/vista-hub-time-deboaz-web_v03_20261109-0048.svg`
 
-[![Web: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-web_v02_20261108-2340.svg)](../2_Diagramas/vista-hub-time-deboaz-web_v02_20261108-2340.svg)
+[![Web: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-web_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-time-deboaz-web_v03_20261109-0048.svg)
 
 **Quest · sala anônima · web · vista** — `2_Diagramas/vista-quest-sala-anonima-web_v01_20261103-1229.svg`
 
@@ -2633,13 +2633,13 @@ Cenário: o que este documento não trata
 
 [![PWA: vista do acesso ao hub: criar conta com domínio e sigla, igual para escola, empresa e autônomo, que só troca o CNPJ pelo CPF, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha](../2_Diagramas/vista-hub-acesso-pwa_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-acesso-pwa_v01_20261103-1139.svg)
 
-**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v02_20261108-2340.svg`
+**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v03_20261109-0048.svg`
 
-[![PWA: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v02_20261108-2340.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v02_20261108-2340.svg)
+[![PWA: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v03_20261109-0048.svg)
 
-**Hub · time deboaz · usuários · pwa · vista** — `2_Diagramas/vista-hub-time-deboaz-pwa_v02_20261108-2340.svg`
+**Hub · time deboaz · usuários · pwa · vista** — `2_Diagramas/vista-hub-time-deboaz-pwa_v03_20261109-0048.svg`
 
-[![PWA: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-pwa_v02_20261108-2340.svg)](../2_Diagramas/vista-hub-time-deboaz-pwa_v02_20261108-2340.svg)
+[![PWA: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-pwa_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-time-deboaz-pwa_v03_20261109-0048.svg)
 
 **Quest · sala anônima · pwa · vista** — `2_Diagramas/vista-quest-sala-anonima-pwa_v01_20261103-1139.svg`
 
@@ -2651,13 +2651,13 @@ Cenário: o que este documento não trata
 
 [![Mobile: vista do acesso ao hub: criar conta com domínio e sigla, igual para escola, empresa e autônomo, que só troca o CNPJ pelo CPF, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha](../2_Diagramas/vista-hub-acesso-mobile_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-acesso-mobile_v01_20261103-1139.svg)
 
-**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v02_20261108-2340.svg`
+**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v03_20261109-0048.svg`
 
-[![Mobile: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v02_20261108-2340.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v02_20261108-2340.svg)
+[![Mobile: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v03_20261109-0048.svg)
 
-**Hub · time deboaz · usuários · mobile · vista** — `2_Diagramas/vista-hub-time-deboaz-mobile_v02_20261108-2340.svg`
+**Hub · time deboaz · usuários · mobile · vista** — `2_Diagramas/vista-hub-time-deboaz-mobile_v03_20261109-0048.svg`
 
-[![Mobile: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-mobile_v02_20261108-2340.svg)](../2_Diagramas/vista-hub-time-deboaz-mobile_v02_20261108-2340.svg)
+[![Mobile: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-mobile_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-time-deboaz-mobile_v03_20261109-0048.svg)
 
 **Quest · sala anônima · mobile · vista** — `2_Diagramas/vista-quest-sala-anonima-mobile_v01_20261103-1139.svg`
 
@@ -2705,7 +2705,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v93** | 2026-11-09 00:44 | `RN-189` com os números de exemplo de cada perfil (deboaz 112, +4 no mês, selo 7 igual a Master sem acesso; staff 41 na semana; autônomo 32 no dia) e a lista da expandida; Códigos vencidos da EBFGA 3 → 2 (`RN-189-api` e exemplo do card); `RN-280` selo e contagens por tempo sem subir a versao; `RN-283` novo: GET e PUT /usuarios/eu/preferencias |
+| **v94** | 2026-11-09 00:58 | Telas (`RN-189`; 15_modulos `RN-277`; 12_hub-ui `RN-284`): vistas hub-usuarios e hub-time-deboaz web, pwa e mobile v02 → v03 (números de exemplo de cada perfil, rótulos dos pontos e tendências do recorte, staff só com a aba Contratados); cenários sem mudança |
+| v93 | 2026-11-09 00:44 | `RN-189` com os números de exemplo de cada perfil (deboaz 112, +4 no mês, selo 7 igual a Master sem acesso; staff 41 na semana; autônomo 32 no dia) e a lista da expandida; Códigos vencidos da EBFGA 3 → 2 (`RN-189-api` e exemplo do card); `RN-280` selo e contagens por tempo sem subir a versao; `RN-283` novo: GET e PUT /usuarios/eu/preferencias |
 | v92 | 2026-11-08 23:45 | Telas (`RN-189`; 15_modulos `RN-276`, `RN-277`): vistas hub-usuarios web, pwa e mobile v01 → v02 (alternância Dia, Semana e Mês no card, 12 pontos na expandida, cards dos perfis staff e autônomo) e hub-time-deboaz v01 → v02 (card do perfil deboaz com 112 contas ativas, recortes e 12 pontos); cenários sem mudança |
 | v91 | 2026-11-08 23:35 | Diagramas do card (`RN-189`, `RN-280`, `RN-281`, 15_modulos `RN-276` a `RN-279`): contrato de API v11 → v12 (GET /usuarios/card no formato comum, GET /usuarios/card/ao-vivo por SSE, proposta pendente de preferências), sequência v07 → v08 (fase do card, telas pendentes), classes v07 → v08 (CardUsuarios e portas) e documentos v16 → v17 (cardUsuarios, criadoPor, aoVivo no Redis) |
 | v90 | 2026-11-08 23:16 | Card no formato comum de 15_modulos (`RN-276`): `RN-189` com 4 perfis (deboaz, também para o membro do time; instituição; staff, só com os dela; autônomo), participante sem card, 12 pontos e recortes; `RN-189-api` com o corpo novo; `RN-280` números guardados em "cardUsuarios", com a consulta de cada número e `usuarios.criadoPor`; `RN-281` card ao vivo; `RNF-227` com 8 coleções; exemplo do card guardado |
@@ -2718,4 +2719,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v93 · 2026-11-09 00:44 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v94 · 2026-11-09 00:58 · `1_Requisitos/17_modulo-usuario.md`</sub>

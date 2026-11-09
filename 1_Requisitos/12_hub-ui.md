@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "12_hub-ui"
 tipo: "Funcionalidade"
 titulo: "Hub · UI"
-versao: "v40"
-data: "2026-11-09 00:44"
+versao: "v41"
+data: "2026-11-09 00:58"
 status: "Em revisão"
 objetivo: "definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco."
 ---
 
-> **boaz · Funcionalidade** · `12_hub-ui` · **v40** · 2026-11-09 00:44 · **Em revisão**
+> **boaz · Funcionalidade** · `12_hub-ui` · **v41** · 2026-11-09 00:58 · **Em revisão**
 
 # Hub · UI
 
@@ -417,9 +417,9 @@ Cenário: o que este documento não trata
 
 [![Web: entrada no medium e no expanded, primeira vez e com as contas acessadas, só com o logo sobre o fundo Halo](../2_Diagramas/vista-hub-entrada-web_v01_20261103-1435.svg)](../2_Diagramas/vista-hub-entrada-web_v01_20261103-1435.svg)
 
-**Hub · módulos · web · vista** — `2_Diagramas/vista-hub-meus-modulos-web_v01_20261103-1435.svg`
+**Hub · módulos · web · vista** — `2_Diagramas/vista-hub-meus-modulos-web_v02_20261109-0054.svg`
 
-[![Web: Módulos no medium e no expanded, com a barra lateral aberta e encolhida](../2_Diagramas/vista-hub-meus-modulos-web_v01_20261103-1435.svg)](../2_Diagramas/vista-hub-meus-modulos-web_v01_20261103-1435.svg)
+[![Web: Módulos no medium e no expanded, com a barra lateral aberta e encolhida, a Conta com Ao vivo e o Intervalo e o aviso de ao vivo pausado](../2_Diagramas/vista-hub-meus-modulos-web_v02_20261109-0054.svg)](../2_Diagramas/vista-hub-meus-modulos-web_v02_20261109-0054.svg)
 
 **Hub · módulos · a contratar · web · vista** — `2_Diagramas/vista-hub-catalogo-web_v01_20261103-1435.svg`
 
@@ -435,9 +435,9 @@ Cenário: o que este documento não trata
 
 [![PWA: primeiro acesso com Entrar e Criar conta, contas acessadas, outra conta e criar conta no compact](../2_Diagramas/vista-hub-entrada-pwa_v01_20261103-1435.svg)](../2_Diagramas/vista-hub-entrada-pwa_v01_20261103-1435.svg)
 
-**Hub · módulos · pwa · vista** — `2_Diagramas/vista-hub-meus-modulos-pwa_v02_20261103-2210.svg`
+**Hub · módulos · pwa · vista** — `2_Diagramas/vista-hub-meus-modulos-pwa_v03_20261109-0054.svg`
 
-[![PWA: Módulos com os cards em grade nos quatro tamanhos, rolagem, Da conta, A contratar, a ordenação com o menu do card, o Feed, a Conta e a Foto no compact](../2_Diagramas/vista-hub-meus-modulos-pwa_v02_20261103-2210.svg)](../2_Diagramas/vista-hub-meus-modulos-pwa_v02_20261103-2210.svg)
+[![PWA: Módulos com os cards em grade nos quatro tamanhos, rolagem, Da conta, A contratar, a ordenação com o menu do card, o Feed, a Conta com Na abertura, Ao vivo e o Intervalo, a Foto e os avisos de ao vivo pausado no compact](../2_Diagramas/vista-hub-meus-modulos-pwa_v03_20261109-0054.svg)](../2_Diagramas/vista-hub-meus-modulos-pwa_v03_20261109-0054.svg)
 
 **Hub · módulos · a contratar · pwa · vista** — `2_Diagramas/vista-hub-catalogo-pwa_v01_20261103-1435.svg`
 
@@ -453,9 +453,9 @@ Cenário: o que este documento não trata
 
 [![Mobile: primeiro acesso com Entrar e Criar conta, contas acessadas, outra conta e criar conta no compact](../2_Diagramas/vista-hub-entrada-mobile_v01_20261103-1435.svg)](../2_Diagramas/vista-hub-entrada-mobile_v01_20261103-1435.svg)
 
-**Hub · módulos · mobile · vista** — `2_Diagramas/vista-hub-meus-modulos-mobile_v02_20261103-2210.svg`
+**Hub · módulos · mobile · vista** — `2_Diagramas/vista-hub-meus-modulos-mobile_v03_20261109-0054.svg`
 
-[![Mobile: Módulos com os cards em grade nos quatro tamanhos, rolagem, Da conta, A contratar, a ordenação com o menu do card, o Feed, a Conta e a Foto no compact](../2_Diagramas/vista-hub-meus-modulos-mobile_v02_20261103-2210.svg)](../2_Diagramas/vista-hub-meus-modulos-mobile_v02_20261103-2210.svg)
+[![Mobile: Módulos com os cards em grade nos quatro tamanhos, rolagem, Da conta, A contratar, a ordenação com o menu do card, o Feed, a Conta com Na abertura, Ao vivo e o Intervalo, a Foto e os avisos de ao vivo pausado no compact](../2_Diagramas/vista-hub-meus-modulos-mobile_v03_20261109-0054.svg)](../2_Diagramas/vista-hub-meus-modulos-mobile_v03_20261109-0054.svg)
 
 **Hub · módulos · a contratar · mobile · vista** — `2_Diagramas/vista-hub-catalogo-mobile_v01_20261103-1435.svg`
 
@@ -499,7 +499,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v40** | 2026-11-09 00:44 | `RN-284` novo: abas de Módulos por perfil (o autônomo, dono da conta, vê as três abas como a conta master; o staff vê só Contratados) |
+| **v41** | 2026-11-09 00:58 | Telas ([15 `RF-133`](15_modulos.md#RF-133), [`RN-279`](15_modulos.md#RN-279), [`RN-282`](15_modulos.md#RN-282)): vistas de Módulos web v01 → v02 e pwa e mobile v02 → v03, com a Conta em Ao vivo, o Intervalo (A cada 5 s a A cada 5 min) e os avisos de ao vivo pausado; cenários sem mudança |
+| v40 | 2026-11-09 00:44 | `RN-284` novo: abas de Módulos por perfil (o autônomo, dono da conta, vê as três abas como a conta master; o staff vê só Contratados) |
 | v39 | 2026-11-08 23:35 | Diagrama: contrato de API dos usuários do 17 v11 → v12 (card no formato comum e card ao vivo por SSE) |
 | v38 | 2026-11-08 12:02 | Diagrama: contrato de API dos usuários do 17 v10 → v11 (403 sem o módulo auditado com INICIADO e ALERTA, X-Trace-Id; ações internas no traceId de quem chama; 17 `RN-270`, `RN-275`) |
 | v37 | 2026-11-08 11:35 | Diagrama: contrato de API dos usuários do 17 v09 → v10 (403 ACESSO_NEGADO sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registros, `RN-270`) |
@@ -512,4 +513,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v40 · 2026-11-09 00:44 · `1_Requisitos/12_hub-ui.md`</sub>
+<sub>boaz · v41 · 2026-11-09 00:58 · `1_Requisitos/12_hub-ui.md`</sub>
