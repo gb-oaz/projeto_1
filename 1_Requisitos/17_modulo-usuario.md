@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v97"
-data: "2026-11-09 03:21"
+versao: "v98"
+data: "2026-11-09 09:05"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v97** · 2026-11-09 03:21 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v98** · 2026-11-09 09:05 · **Em revisão**
 
 # Módulo Usuários
 
@@ -268,7 +268,7 @@ Cenário: família perdeu o código
 Cenário: membro só com o SAC
   Dado o membro do time Caio Lima, sem módulos
   Quando o administrador do deboaz marca para ele a Utilização do SAC e salva
-  Então, na próxima ação, o Caio vê só o card do SAC em Módulos
+  Então o Caio vê só o card do SAC em Módulos na próxima ação
   E não vê os cards de Usuários nem do Catálogo
 ```
 
@@ -575,7 +575,7 @@ Esquema do Cenário: dados do card por perfil e tamanho
   Dado o card Usuários do perfil <perfil>, no recorte que as vistas mostram
   Quando está na <tamanho>
   Então mostra <dados>
-  E, na normal, a série de 5 pontos do recorte
+  E a normal mostra a série de 5 pontos do recorte
 
   Exemplos:
     | perfil      | tamanho  | dados                                                        |
@@ -1950,7 +1950,7 @@ Esquema do Cenário: números do perfil DEBOAZ, lidos de "contas"
 Esquema do Cenário: números das contas, lidos de "usuarios" e "geracoesSenha"
   Dado o perfil INSTITUICAO ou AUTONOMO contando os usuarios do contaId da conta
   E o perfil STAFF contando os usuarios com criadoPor igual à staff
-  E, no STAFF, o selo só com as geracoesSenha de pedidaPor igual à staff
+  E o selo do STAFF conta só as geracoesSenha com pedidaPor igual à staff
   Quando o card conta <numero>
   Então lê <consulta>
 
@@ -1962,16 +1962,22 @@ Esquema do Cenário: números das contas, lidos de "usuarios" e "geracoesSenha"
     | participantes         | PARTICIPANTE ATIVO, na INSTITUICAO e no STAFF                |
     | pendentes             | estado PENDENTE                                              |
     | criados no mês        | criadoEm no mês atual, no AUTONOMO                           |
-    | Sem acesso há 30 dias | ATIVO com ultimoAcesso há mais de 30 dias                    |
+    | Sem acesso há 30 dias | ATIVO com ultimoAcesso há mais de 30 dias ou nulo            |
     | Desativados           | estado DESATIVADO                                            |
     | Códigos vencidos      | PENDENTE com a última geracoesSenha vencida                  |
 
 Cenário: criar participante atualiza os cards guardados
   Dado o card da EBFGA com 298 participantes e o card da staff Maria com 38
   Quando a Maria envia POST /usuarios e cria o participante Lucas Andrade com 201
-  Então, na mesma execução, o Lucas é gravado com criadoPor "usr-ebfga-maria"
+  Então o Lucas é gravado com criadoPor "usr-ebfga-maria" na mesma execução
   E "cardUsuarios" passa a 299 no card da EBFGA e a 39 no card da Maria, e a versao sobe
   E o selo, "Sem acesso há 30 dias" e "Códigos vencidos" não sobem a versao: são refeitos na leitura
+
+Cenário: quem nunca entrou conta como sem acesso
+  Dado o participante Davi Rocha da EBFGA, ATIVO desde 2026-09-01, sem nenhum acesso
+  E o ultimoAcesso dele nulo
+  Quando a conta master envia GET /usuarios/card em 2026-11-08
+  Então o Davi conta em "Sem acesso há 30 dias"
 ```
 
 <a id="RN-281"></a>
@@ -1991,8 +1997,9 @@ Esquema do Cenário: quem não conecta
     | um staff sem o Usuários      |
 
 Cenário: sessão termina com a conexão aberta
-  Dado a staff Maria conectada ao vivo, no navegador, com a sessão de 8 h
-  Quando a sessão dela termina
+  Dado a staff Maria conectada por GET /usuarios/card/ao-vivo?intervalo=5, no navegador
+  E a sessão dela de 8 h no navegador
+  Quando a sessão expira por 8 h sem uso, com a conexão ao vivo aberta
   Então ela recebe o evento "encerrado" com o código "SESSAO_TERMINADA" e a conexão fecha
 
 Cenário: Usuários retirado com a conexão aberta
@@ -2705,7 +2712,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v97** | 2026-11-09 03:21 | `RN-283`: GET e PUT /usuarios/eu/preferencias sem o cabeçalho X-Trace-Id e sem auditoria, como no contrato v13 |
+| **v98** | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Então ou E (`RF-155`, `RN-189`, `RN-280`); `RN-280`: "Sem acesso há 30 dias" conta também quem nunca entrou (ultimoAcesso nulo), com cenário; `RN-281`: sessão expirada por 8 h sem uso com ?intervalo=5 |
+| v97 | 2026-11-09 03:21 | `RN-283`: GET e PUT /usuarios/eu/preferencias sem o cabeçalho X-Trace-Id e sem auditoria, como no contrato v13 |
 | v96 | 2026-11-09 01:17 | Diagrama: usuarios-sequencia v09 com as telas das vistas hub-usuarios, hub-time-deboaz e hub-meus-modulos pwa v03; card real, troca de recorte sem chamada (15 `RN-277`), PUT /usuarios/eu/preferencias (`RN-283`), ping de 30 s, pausa só no aparelho e reconexão (15 `RN-282`) |
 | v95 | 2026-11-09 01:03 | Diagramas de `RN-283` e da v28 de 15_modulos: contrato de API v12 → v13 (GET e PUT /usuarios/eu/preferencias definitivo, sem auditoria; ping a cada 30 s; sem reconectar depois do encerrado; Códigos vencidos 2), documentos v17 → v18 (usuarios.preferencias embutido) e classes v08 → v09 (PreferenciasDeCards) |
 | v94 | 2026-11-09 00:58 | Telas (`RN-189`; 15_modulos `RN-277`; 12_hub-ui `RN-284`): vistas hub-usuarios e hub-time-deboaz web, pwa e mobile v02 → v03 (números de exemplo de cada perfil, rótulos dos pontos e tendências do recorte, staff só com a aba Contratados); cenários sem mudança |
@@ -2714,8 +2722,7 @@ Cenário: o que este documento não trata
 | v91 | 2026-11-08 23:35 | Diagramas do card (`RN-189`, `RN-280`, `RN-281`, 15_modulos `RN-276` a `RN-279`): contrato de API v11 → v12 (GET /usuarios/card no formato comum, GET /usuarios/card/ao-vivo por SSE, proposta pendente de preferências), sequência v07 → v08 (fase do card, telas pendentes), classes v07 → v08 (CardUsuarios e portas) e documentos v16 → v17 (cardUsuarios, criadoPor, aoVivo no Redis) |
 | v90 | 2026-11-08 23:16 | Card no formato comum de 15_modulos (`RN-276`): `RN-189` com 4 perfis (deboaz, também para o membro do time; instituição; staff, só com os dela; autônomo), participante sem card, 12 pontos e recortes; `RN-189-api` com o corpo novo; `RN-280` números guardados em "cardUsuarios", com a consulta de cada número e `usuarios.criadoPor`; `RN-281` card ao vivo; `RNF-227` com 8 coleções; exemplo do card guardado |
 | v89 | 2026-11-08 12:21 | Diagrama (`RN-270`, `RN-275`): modelo de documentos v15 → v16 (auditoriaErros em verde, coleção já no código) |
-| v88 | 2026-11-08 12:02 | Diagramas da v85 (`RN-270`, `RN-271`, `RN-275`): contrato de API v10 → v11 (403 sem o módulo com INICIADO e ALERTA ACESSO_NEGADO e X-Trace-Id; GET sem o módulo sem registro; ações internas), sequência v06 → v07 (ENCERRAR_SESSOES_DO_USUARIO na nova geração e no desativar, falha com 2 ERRO), classes v06 → v07 e documentos v14 → v15 (AcaoAuditada com 24 ações) |
 
 ---
 
-<sub>boaz · v97 · 2026-11-09 03:21 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v98 · 2026-11-09 09:05 · `1_Requisitos/17_modulo-usuario.md`</sub>

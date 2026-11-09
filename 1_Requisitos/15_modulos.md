@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "15_modulos"
 tipo: "Funcionalidade"
 titulo: "Módulos"
-versao: "v29"
-data: "2026-11-09 03:21"
+versao: "v30"
+data: "2026-11-09 09:05"
 status: "Em revisão"
 objetivo: "definir como um módulo do deboaz é construído, para que todo módulo siga o mesmo molde antes de entrar no catálogo."
 ---
 
-> **boaz · Funcionalidade** · `15_modulos` · **v29** · 2026-11-09 03:21 · **Em revisão**
+> **boaz · Funcionalidade** · `15_modulos` · **v30** · 2026-11-09 09:05 · **Em revisão**
 
 # Módulos
 
@@ -144,7 +144,7 @@ Cenário: mudar o tamanho
   Dado a conta master em Ordenar
   Quando toca no menu do card da Presença e escolhe "Expandida"
   Então o card da Presença ocupa a linha toda
-  E, no menu, "Expandida" aparece marcada
+  E no menu "Expandida" aparece marcada
 
 Cenário: outro aparelho
   Dado o Lucas Andrade com a Carteirinha na reduzida no celular
@@ -164,7 +164,7 @@ Cenário: na abertura, o padrão
   E o card de Usuários com "248" usuários ativos
   Quando um staff cria um participante em outro aparelho
   Então o card continua com "248"
-  E, ao sair de Módulos e voltar, mostra "249"
+  E ao sair de Módulos e voltar, mostra "249"
 
 Cenário: ao vivo
   Dado a mesma conta master com "Ao vivo" e "A cada 15 s" marcados na Conta
@@ -547,7 +547,7 @@ Cenário: padrão, sem conexão aberta
 Esquema do Cenário: ligar o ao vivo
   Dado a conta master com "Na abertura" marcado na Conta
   Quando marca "Ao vivo" e escolhe "<intervalo>"
-  Então, com Módulos aberto, os cards se atualizam a cada <segundos> s
+  Então os cards se atualizam a cada <segundos> s com Módulos aberto
   E a linha "Intervalo" aparece só com "Ao vivo" marcado
   E a escolha vale também nos outros aparelhos dela
 
@@ -589,9 +589,9 @@ Cenário: queda de rede
   Quando a rede cai
   Então o celular tenta reconectar depois de 1, 2, 4, 8, 16, 32 e 60 s
   E depois a cada 60 s, até a rede voltar ou Módulos fechar
-  E, enquanto tenta, cada card mantém os últimos números com a marca "reconectando…"
+  E enquanto tenta, cada card mantém os últimos números com a marca "reconectando…"
   E a tela segue livre para rolar e tocar
-  E, ao reconectar, o card mostra os números atuais
+  E o card mostra os números atuais ao reconectar
 
 Cenário: reabrir o app não religa
   Dado o tablet pausado em "Na abertura" depois do "encerrado", com "Ao vivo" salvo
@@ -940,7 +940,7 @@ Cenário: perfil fora da ficha
 Cenário: atualizado na mesma execução da mudança
   Dado o card do Usuários da EBFGA na versao 418, com 298 participantes ativos
   Quando o staff João envia POST /usuarios e cria o participante Lucas Andrade com 201
-  Então, na mesma execução, o card guardado passa à versao 419 com 299 participantes
+  Então o card guardado passa à versao 419 com 299 participantes na mesma execução
   E o próximo GET /usuarios/card traz 299, lido do card guardado
 
 Cenário: fechamento do dia, da semana e do mês
@@ -997,7 +997,8 @@ Cenário: quarta conexão do mesmo usuário
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v29** | 2026-11-09 03:21 | `RN-279`: a linha "Intervalo" só aparece com "Ao vivo" marcado; `RN-282`: aviso em snackbar sem ação que some sozinho, com "Na abertura" visível no seletor; "reconectando…" nos cards sem travar a tela; SESSAO_TERMINADA leva à tela de entrada, sem aviso de pausa |
+| **v30** | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Dado, Então ou E (`RF-129`, `RF-133`, `RN-278`, `RN-279`, `RN-282`), sem mudar o comportamento |
+| v29 | 2026-11-09 03:21 | `RN-279`: a linha "Intervalo" só aparece com "Ao vivo" marcado; `RN-282`: aviso em snackbar sem ação que some sozinho, com "Na abertura" visível no seletor; "reconectando…" nos cards sem travar a tela; SESSAO_TERMINADA leva à tela de entrada, sem aviso de pausa |
 | v28 | 2026-11-09 00:53 | `RN-282`: a pausa depois do "encerrado" é só daquele aparelho e não muda o "Ao vivo" salvo; reabrir o app não religa, só marcar "Ao vivo" de novo no aparelho, sem salvar nada novo; Em aberto respondido e seção removida |
 | v27 | 2026-11-09 00:44 | `RN-277` com os rótulos dos pontos (nov, S1 a S12, dia do mês), a tendência por recorte ("+12 no mês", "+2 na semana", "+1 no dia") e o seletor que não abre o módulo; `RN-278` selo e Códigos vencidos refeitos na leitura, sem subir a versao; `RN-279-api` ping a cada 30 s; `RN-282` novo (aviso do encerrado, aparelho volta a Na abertura, reconexão até 60 s); `RF-133` cita a preferência salva (17 `RN-283`); Em aberto: volta ao ao vivo |
 | v26 | 2026-11-08 23:16 | Card comum de todo módulo: `RN-276` (perfis da ficha, o participante pode ser um; ícone do Catálogo; GET /<modulo>/card com todos os tamanhos), `RN-277` recortes dia, semana e mês, `RN-278` números guardados prontos, `RN-279` na abertura e ao vivo (GET /<modulo>/card/ao-vivo, 5 a 300 s, até 3 conexões); `RF-128` quatro tamanhos; `RF-133`, `RN-218`, `RN-220` e a ficha do módulo ajustados; seção Cenários vira Cenários de tela e ganha Cenários de API; status → Em revisão |
@@ -1006,8 +1007,7 @@ Cenário: quarta conexão do mesmo usuário
 | v23 | 2026-11-03 22:01 | Imagem enviada em SVG: toda imagem é convertida em SVG no hub ou no quest e enviada como texto (`RN-260`) |
 | v22 | 2026-11-03 10:48 | Registro do Catálogo (`MOD-14`) aponta para o documento renomeado 16_modulo-catalogo |
 | v21 | 2026-11-01 18:20 | Só Gherkin: contexto, RF, RN, registro de módulos (um cenário por MOD-NN, mesmo ID como âncora), quem usa cada módulo, ficha do módulo e fora de escopo viram cenários; status → Em revisão |
-| v20 | 2026-11-01 03:57 | Aprovado |
 
 ---
 
-<sub>boaz · v29 · 2026-11-09 03:21 · `1_Requisitos/15_modulos.md`</sub>
+<sub>boaz · v30 · 2026-11-09 09:05 · `1_Requisitos/15_modulos.md`</sub>
