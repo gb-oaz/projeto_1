@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "13_quest-ui"
 tipo: "Funcionalidade"
 titulo: "Quest · UI"
-versao: "v24"
-data: "2026-11-09 00:58"
+versao: "v25"
+data: "2026-11-09 01:17"
 status: "Aprovado"
 objetivo: "definir como as telas do quest ficam no celular e na web — acesso, tarefas, feed, carteira, perfil e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco."
 ---
 
-> **boaz · Funcionalidade** · `13_quest-ui` · **v24** · 2026-11-09 00:58 · **Aprovado**
+> **boaz · Funcionalidade** · `13_quest-ui` · **v25** · 2026-11-09 01:17 · **Aprovado**
 
 # Quest · UI
 
@@ -386,9 +386,9 @@ Cenário: o que este documento não trata
 
 [![Casos de uso da carcaça do quest: o participante e o responsável escolhem o perfil do aparelho, inserem outro código, dizem quem está acessando, entram numa sala, veem Tarefas, Feed, Carteira e Perfil, ordenam a Carteira, abrem o módulo, trocam a foto ou o mascote e trocam de perfil; a entrada vem do 17-a e o conteúdo de cada módulo, do documento dele](../2_Diagramas/quest-casos-de-uso_v02_20261103-2204.svg)](../2_Diagramas/quest-casos-de-uso_v02_20261103-2204.svg)
 
-**Quest · carcaça · sequência com as telas** — `2_Diagramas/quest-sequencia_v02_20261103-2205.svg`
+**Quest · carcaça · sequência com as telas** — `2_Diagramas/quest-sequencia_v03_20261109-0110.svg`
 
-[![Sequência da carcaça do quest com as telas: entrar pelo perfil do aparelho ou por outro código (referência à entrada do 17-a), navegar por Tarefas, Feed e Carteira, ordenar a Carteira só no aparelho, abrir um módulo com aviso, ver o Perfil, adotar um mascote e trocar de perfil; os dados do perfil vêm do módulo Usuários (17) e a foto vai em SVG](../2_Diagramas/quest-sequencia_v02_20261103-2205.svg)](../2_Diagramas/quest-sequencia_v02_20261103-2205.svg)
+[![Sequência da carcaça do quest com as telas: entrar pelo perfil do aparelho ou por outro código (referência à entrada do 17-a), navegar por Tarefas, Feed e Carteira, ordenar a Carteira só no aparelho, abrir um módulo com aviso, ver o Perfil, adotar um mascote e trocar de perfil; os dados do perfil vêm do módulo Usuários (17) e a foto vai em SVG; atualização dos cards: preferência salva, ao vivo com ping de 30 s, pausa só no aparelho e reconexão](../2_Diagramas/quest-sequencia_v03_20261109-0110.svg)](../2_Diagramas/quest-sequencia_v03_20261109-0110.svg)
 
 **Entrada no quest · sequência (17_modulo-usuario-a)** — `2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg`
 
@@ -406,7 +406,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v24** | 2026-11-09 00:58 | Telas (15_modulos `RF-133`, `RN-279`, `RN-282`): vistas da casca web v01 → v02 e pwa e mobile v02 → v03, com o Perfil em Ao vivo, o Intervalo (A cada 5 s a A cada 5 min) e os avisos de ao vivo pausado na Carteira; cenários sem mudança |
+| **v25** | 2026-11-09 01:17 | Diagrama: quest-sequencia v03 com as telas da vista quest-casca pwa v03 e a fase Atualização dos cards (15 `RF-133`, `RN-220`, `RN-279`, `RN-282`; 17 `RN-283`) |
+| v24 | 2026-11-09 00:58 | Telas (15_modulos `RF-133`, `RN-279`, `RN-282`): vistas da casca web v01 → v02 e pwa e mobile v02 → v03, com o Perfil em Ao vivo, o Intervalo (A cada 5 s a A cada 5 min) e os avisos de ao vivo pausado na Carteira; cenários sem mudança |
 | v23 | 2026-11-08 09:50 | Diagrama: contrato de API da autenticação do 17-a v03 → v04 (403 ACESSO_INDISPONIVEL no confirmar-senha com quem e contaId); status → Aprovado |
 | v22 | 2026-11-08 02:20 | Diagramas da autenticação do 17-a: contrato de API v02 → v03 e sequência v03 → v04 (auditoria das entradas e sessões, X-Trace-Id, recusas como ALERTA, 500 ERRO_INESPERADO); status → Em revisão |
 | v21 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
@@ -422,4 +423,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v24 · 2026-11-09 00:58 · `1_Requisitos/13_quest-ui.md`</sub>
+<sub>boaz · v25 · 2026-11-09 01:17 · `1_Requisitos/13_quest-ui.md`</sub>
