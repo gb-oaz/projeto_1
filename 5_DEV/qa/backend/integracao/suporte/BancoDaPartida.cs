@@ -20,9 +20,9 @@ public static class BancoDaPartida
 {
     static readonly Lazy<MongoClient> mongo = new(() => new MongoClient(Ambiente.PartidaMongoUrl));
 
-    // as 7 coleções do modelo de documentos de 17_modulo-usuario.md (RNF-227)
+    // as 8 coleções do modelo de documentos de 17_modulo-usuario.md (RNF-227)
     public static readonly string[] Colecoes =
-        ["contas", "usuarios", "auditoria", "auditoriaErros", "geracoesSenha", "registrosPermissao", "pedidosAjuda"];
+        ["contas", "usuarios", "auditoria", "auditoriaErros", "geracoesSenha", "registrosPermissao", "cardUsuarios", "pedidosAjuda"];
 
     public static IMongoDatabase Banco
     {

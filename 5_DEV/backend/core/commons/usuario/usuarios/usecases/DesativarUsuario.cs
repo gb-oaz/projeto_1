@@ -14,7 +14,8 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// RN-270, RN-271).
 /// </summary>
 public sealed class DesativarUsuario(
-    IUsuarios usuarios, IContas contas, ISessoesDosUsuarios sessoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio)
+    IUsuarios usuarios, IContas contas, ISessoesDosUsuarios sessoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio,
+    IAtualizarCardUsuarios cardsDoModulo)
     : IDesativarUsuario
 {
     readonly Apoio apoio = new(usuarios, contas, relogio);
@@ -32,6 +33,7 @@ public sealed class DesativarUsuario(
     {
         var alvo = await AlvoAdministravel(pedido, ct);
         await Gravar(alvo, execucao, ct);
+        await cardsDoModulo.Executar(new MudancaNoCadastroDto(alvo.ContaId, alvo.Id), ct);
         await auditada.Concluir(execucao, ct);
     }
 

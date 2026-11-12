@@ -1,8 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <!--
     ms_mono: runtime do backend, gera a imagem backend-mono (RNF-177).
-    Adaptadores em infra/in/<contexto>/<feature>/ (endpoints HTTP) e
-    infra/out/<contexto>/<feature>/ (MongoDB e Redis); o Program.cs é o ponto
+    Adaptadores primários em primario/in/<contexto>/<feature>/ (controllers
+    HTTP, partida e agendamento: quem chama o core) e primario/out/ (o que eles
+    devolvem: fluxo SSE, sessão na resposta); secundários em
+    secundario/out/<contexto>/<feature>/ (MongoDB e Redis) e secundario/in/ (o
+    que volta deles, como o canal do Redis); o Program.cs é o ponto
     de composição que liga as portas do core aos adaptadores (RN-149).
   -->
   <ItemGroup>
@@ -12,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Adaptadores de saída (infra/out): banco e cache, nas versões do qa -->
+    <!-- Adaptadores de saída (secundario/out): banco e cache, nas versões do qa -->
     <PackageReference Include="MongoDB.Driver" Version="3.13.0" />
     <PackageReference Include="StackExchange.Redis" Version="3.4.29" />
   </ItemGroup>

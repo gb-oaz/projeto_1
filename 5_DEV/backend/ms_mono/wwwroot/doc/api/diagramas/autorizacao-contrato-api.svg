@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 2376" width="1392" height="2376">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 3200" width="1392" height="3200">
   <title>Autorização · contrato de API</title>
-  <desc>Contrato dos endereços de permissões do ms_mono, do requisito 17-b (Módulo Usuários · Autorização): ler as permissões e as concedíveis de uma pessoa, salvar o conjunto com a versão, e o histórico das mudanças. v01: criação. v02: uso, quem usa, login com selo e JSON expandido. v03: mensagem neutra no PERMISSAO_ACIMA. v04: mensagens de todos os erros, DADOS_INVALIDOS no PUT e quem está abaixo. v05: staff com Administrar usuários repassa o MOD-03, só com as abas que tem. v06: PUT /usuarios/{id}/permissoes auditado (EDITAR_PERMISSOES em auditoria e registrosPermissao, recusas em auditoriaErros, 500 ERRO_INESPERADO, X-Trace-Id). v07: EDITAR_PERMISSOES com contaId da conta de quem pede e alvo a pessoa, desde o INICIADO (RN-178). v08: 403 ACESSO_NEGADO sem MOD-03 · U recusado antes do caso de uso, como o 422 do corpo que não é JSON: sem X-Trace-Id nem registros (requisito 17 v83, RN-270). v09: 403 ACESSO_NEGADO sem MOD-03 · U no PUT grava o INICIADO de EDITAR_PERMISSOES e ALERTA, com X-Trace-Id (RN-270, RN-271); AVISAR_PERMISSOES_NOVAS auditada entre o INICIADO e o CONCLUIDO do PUT, falha nela com 2 ERRO (RN-275) (requisito 17 v85).</desc>
+  <desc>Contrato dos endereços de permissões do ms_mono, do requisito 17-b (Módulo Usuários · Autorização): ler as permissões e as concedíveis de uma pessoa, salvar o conjunto com a versão, e o histórico das mudanças. v01: criação. v02: uso, quem usa, login com selo e JSON expandido. v03: mensagem neutra no PERMISSAO_ACIMA. v04: mensagens de todos os erros, DADOS_INVALIDOS no PUT e quem está abaixo. v05: staff com Administrar usuários repassa o MOD-03, só com as abas que tem. v06: PUT /usuarios/{id}/permissoes auditado (EDITAR_PERMISSOES em auditoria e registrosPermissao, recusas em auditoriaErros, 500 ERRO_INESPERADO, X-Trace-Id). v07: EDITAR_PERMISSOES com contaId da conta de quem pede e alvo a pessoa, desde o INICIADO (RN-178). v08: 403 ACESSO_NEGADO sem MOD-03 · U recusado antes do caso de uso, como o 422 do corpo que não é JSON: sem X-Trace-Id nem registros (requisito 17 v83, RN-270). v09: 403 ACESSO_NEGADO sem MOD-03 · U no PUT grava o INICIADO de EDITAR_PERMISSOES e ALERTA, com X-Trace-Id (RN-270, RN-271); AVISAR_PERMISSOES_NOVAS auditada entre o INICIADO e o CONCLUIDO do PUT, falha nela com 2 ERRO (RN-275) (requisito 17 v85). v10: módulo suspenso (17-b v31, RN-285 a RN-287): seção comum com suspensos [{mod, abas}], só a contratação (AVISAR_CONTRATACAO_MUDOU) suspende e reativa subindo versao e pv; PUT com o suspenso é 422 MODULO_NAO_CONTRATADO e não apaga suspensos; histórico com "por" igual a quem descontratou. v11: grupo Teste (só com AMBIENTE=hml e Teste__Relogio=sim, senão 404, como o /_teste/relogio): POST /_teste/contratacao grava a contratação e roda o AVISAR_CONTRATACAO_MUDOU de 17 RN-275 com conta, mod, contratado e por; GET /_teste/modulo/{mod} exige {mod} · U para provar o 401 e o 403 de um módulo sem endereço (RN-285).</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -90,12 +90,12 @@
     <text class="title" x="40" y="72">Autorização · conceder permissões</text>
     <text class="subtitle" x="40" y="94">Ler e salvar as permissões de uma pessoa e o histórico das mudanças</text>
     <text class="wm-meta-label" x="1104" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v09</text>
+    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v11</text>
     <line class="wm-sep" x1="1176" y1="32" x2="1176" y2="80"/>
     <text class="wm-meta-label" x="1200" y="44">DATA</text>
-    <text class="wm-meta-value" x="1200" y="72">2026-11-08 · 11:59</text>
+    <text class="wm-meta-value" x="1200" y="72">2026-11-12 · 02:00</text>
   </g>
-  <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V770 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
+  <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V890 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
     <text class="mono" x="64" y="204">Toda resposta de erro:</text>
     <text class="mono" x="64" y="224">{</text>
     <text class="mono" x="64" y="244" xml:space="preserve">  "codigo": "PERMISSAO_ACIMA",</text>
@@ -106,31 +106,36 @@
     <text class="mono" x="64" y="344">Abaixo: quem a pessoa criou, direta ou indiretamente; a staff repassa o que tem, Administrar usuários (MOD-03) inclusive, só com as abas dela</text>
     <text class="mono" x="64" y="364">Toda rota declara o que exige (RNF-220): MOD-03 · U e a ordem de superior, conferidos no servidor com as permissões atuais (RN-241)</text>
     <text class="mono" x="64" y="384">Token com pv antigo: 401 PERMISSOES_DESATUALIZADAS; a web e o mobile renovam (POST /auth/renovar) e montam a casca de novo (RF-148)</text>
-    <line class="divider" x1="40" y1="400" x2="1352" y2="400"/><text class="boundary-label" x="64" y="544">MENSAGENS DE ERRO · CAMPO "mensagem", TEXTO EXATO</text>
-    <text class="boundary-label" x="64" y="424">AUDITORIA E X-TRACE-ID · RN-178, RN-270, RN-271, RN-275</text>
-    <text class="mono" x="64" y="448">Auditado: PUT /usuarios/{id}/permissoes, ação EDITAR_PERMISSOES; os GET (permissões e histórico) não são, nem sem o módulo</text>
-    <text class="mono" x="64" y="468">Sucesso: INICIADO e CONCLUIDO, mesmo traceId; registrosPermissao com a versão nova (RN-256); AVISAR_PERMISSOES_NOVAS entre os dois</text>
-    <text class="mono" x="64" y="488">Recusa 4xx, o 403 sem MOD-03 · U inclusive: só o INICIADO e ALERTA; falha: 500 e ERRO, 2 registros se for na interna (RN-275)</text>
-    <text class="mono" x="64" y="508">X-Trace-Id: trc-7f3a9c21 em toda resposta do PUT, o 403 sem o módulo inclusive; corpo que não é JSON: 422 antes, sem X-Trace-Id</text>
-    <line class="divider" x1="40" y1="520" x2="1352" y2="520"/>
-    <rect class="node-red" x="64" y="558" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="572" text-anchor="middle">403</text>
-    <text class="mono" x="116" y="572">ACESSO_NEGADO</text><text class="mono" x="332" y="572">"Você não tem permissão para esta ação."</text>
-    <rect class="node-red" x="64" y="584" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="598" text-anchor="middle">404</text>
-    <text class="mono" x="116" y="598">USUARIO_INEXISTENTE</text><text class="mono" x="332" y="598">"Usuário não encontrado."</text>
-    <rect class="node-red" x="64" y="610" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="624" text-anchor="middle">403</text>
-    <text class="mono" x="116" y="624">PERMISSAO_ACIMA</text><text class="mono" x="332" y="624">"Você não tem mais o módulo {nome} para conceder."</text>
-    <rect class="node-red" x="64" y="636" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="650" text-anchor="middle">412</text>
-    <text class="mono" x="116" y="650">VERSAO_DESATUALIZADA</text><text class="mono" x="332" y="650">"As permissões de {nome da pessoa} mudaram agora há pouco. Confira e salve."</text>
-    <rect class="node-red" x="64" y="662" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="676" text-anchor="middle">422</text>
-    <text class="mono" x="116" y="676">MODULO_NAO_CONTRATADO</text><text class="mono" x="332" y="676">"O módulo {nome} não está contratado."</text>
-    <rect class="node-red" x="64" y="688" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="702" text-anchor="middle">422</text>
-    <text class="mono" x="116" y="702">DADOS_INVALIDOS</text><text class="mono" x="332" y="702">"{nome da pessoa} não usa o módulo {nome}." · "O módulo {MOD-NN} não existe." · "O campo "{campo}" está faltando ou é inválido."</text>
-    <rect class="node-red" x="64" y="714" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="728" text-anchor="middle">428</text>
-    <text class="mono" x="116" y="728">VERSAO_AUSENTE</text><text class="mono" x="332" y="728">"Envie a versão lida das permissões no If-Match."</text>
-    <rect class="node-red" x="64" y="740" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="754" text-anchor="middle">500</text>
-    <text class="mono" x="116" y="754">ERRO_INESPERADO</text><text class="mono" x="332" y="754">"Algo deu errado. Tente de novo mais tarde." · nivel ERRO</text>
+    <line class="divider" x1="40" y1="400" x2="1352" y2="400"/><text class="boundary-label" x="64" y="424">MÓDULO SUSPENSO · RN-285, RN-286, RN-287</text>
+    <text class="mono" x="64" y="448">Suspenso: módulo descontratado sai de mods e fica em "suspensos": [{"mod", "abas"}]; recontratado volta a mods com as mesmas abas</text>
+    <text class="mono" x="64" y="468">Só a contratação suspende e reativa: o aviso do Catálogo (AVISAR_CONTRATACAO_MUDOU, 17 RN-275) move o módulo em cada usuário da conta</text>
+    <text class="mono" x="64" y="488">Suspender e reativar sobem versao e pv e gravam registrosPermissao com "por" = quem descontratou ou contratou (usr-dboaz-caio)</text>
+    <text class="mono" x="64" y="508">Token de pv antigo: 401 PERMISSOES_DESATUALIZADAS; renovado, sem o módulo, o pedido a ele é 403 ACESSO_NEGADO; o GET não o traz</text>
+    <line class="divider" x1="40" y1="520" x2="1352" y2="520"/><text class="boundary-label" x="64" y="664">MENSAGENS DE ERRO · CAMPO "mensagem", TEXTO EXATO</text>
+    <text class="boundary-label" x="64" y="544">AUDITORIA E X-TRACE-ID · RN-178, RN-270, RN-271, RN-275</text>
+    <text class="mono" x="64" y="568">Auditado: PUT /usuarios/{id}/permissoes, ação EDITAR_PERMISSOES; os GET (permissões e histórico) não são, nem sem o módulo</text>
+    <text class="mono" x="64" y="588">Sucesso: INICIADO e CONCLUIDO, mesmo traceId; registrosPermissao com a versão nova (RN-256); AVISAR_PERMISSOES_NOVAS entre os dois</text>
+    <text class="mono" x="64" y="608">Recusa 4xx, o 403 sem MOD-03 · U inclusive: só o INICIADO e ALERTA; falha: 500 e ERRO, 2 registros se for na interna (RN-275)</text>
+    <text class="mono" x="64" y="628">X-Trace-Id: trc-7f3a9c21 em toda resposta do PUT, o 403 sem o módulo inclusive; corpo que não é JSON: 422 antes, sem X-Trace-Id</text>
+    <line class="divider" x1="40" y1="640" x2="1352" y2="640"/>
+    <rect class="node-red" x="64" y="678" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="692" text-anchor="middle">403</text>
+    <text class="mono" x="116" y="692">ACESSO_NEGADO</text><text class="mono" x="332" y="692">"Você não tem permissão para esta ação."</text>
+    <rect class="node-red" x="64" y="704" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="718" text-anchor="middle">404</text>
+    <text class="mono" x="116" y="718">USUARIO_INEXISTENTE</text><text class="mono" x="332" y="718">"Usuário não encontrado."</text>
+    <rect class="node-red" x="64" y="730" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="744" text-anchor="middle">403</text>
+    <text class="mono" x="116" y="744">PERMISSAO_ACIMA</text><text class="mono" x="332" y="744">"Você não tem mais o módulo {nome} para conceder."</text>
+    <rect class="node-red" x="64" y="756" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="770" text-anchor="middle">412</text>
+    <text class="mono" x="116" y="770">VERSAO_DESATUALIZADA</text><text class="mono" x="332" y="770">"As permissões de {nome da pessoa} mudaram agora há pouco. Confira e salve."</text>
+    <rect class="node-red" x="64" y="782" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="796" text-anchor="middle">422</text>
+    <text class="mono" x="116" y="796">MODULO_NAO_CONTRATADO</text><text class="mono" x="332" y="796">"O módulo {nome} não está contratado."</text>
+    <rect class="node-red" x="64" y="808" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="822" text-anchor="middle">422</text>
+    <text class="mono" x="116" y="822">DADOS_INVALIDOS</text><text class="mono" x="332" y="822">"{nome da pessoa} não usa o módulo {nome}." · "O módulo {MOD-NN} não existe." · "O campo "{campo}" está faltando ou é inválido."</text>
+    <rect class="node-red" x="64" y="834" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="848" text-anchor="middle">428</text>
+    <text class="mono" x="116" y="848">VERSAO_AUSENTE</text><text class="mono" x="332" y="848">"Envie a versão lida das permissões no If-Match."</text>
+    <rect class="node-red" x="64" y="860" width="40" height="20" rx="4"/><text class="chip-text" x="84" y="874" text-anchor="middle">500</text>
+    <text class="mono" x="116" y="874">ERRO_INESPERADO</text><text class="mono" x="332" y="874">"Algo deu errado. Tente de novo mais tarde." · nivel ERRO</text>
   </g>
-  <g id="enderecos" transform="translate(0,394)">
+  <g id="enderecos" transform="translate(0,514)">
   <g id="ep-get-usuarios-id-permissoes">
     <g filter="url(#sombra)"><rect class="node" x="40" y="424" width="632" height="734" rx="10"/></g>
     <rect class="node-green" x="56" y="440" width="40" height="24" rx="6"/><text class="label-strong" x="76.0" y="457" text-anchor="middle">GET</text>
@@ -173,7 +178,7 @@
     <text class="mono" x="108" y="1142">USUARIO_INEXISTENTE · inclusive o de outra conta (RN-235)</text>
   </g>
   <g id="ep-put-usuarios-id-permissoes">
-    <g filter="url(#sombra)"><rect class="node" x="720" y="424" width="632" height="1128" rx="10"/></g>
+    <g filter="url(#sombra)"><rect class="node" x="720" y="424" width="632" height="1164" rx="10"/></g>
     <rect class="node-blue" x="736" y="440" width="40" height="24" rx="6"/><text class="label-strong" x="756.0" y="457" text-anchor="middle">PUT</text>
     <text class="label-strong" x="788" y="457">/usuarios/{id}/permissoes</text>
     <rect class="node-external" x="1252" y="440" width="84" height="24" rx="12"/><text class="chip-text" x="1294.0" y="456" text-anchor="middle">COM LOGIN</text><rect class="node-purple" x="1150" y="440" width="90" height="24" rx="12"/><text class="chip-text" x="1195.0" y="456" text-anchor="middle">X-Trace-Id</text>
@@ -207,37 +212,39 @@
     <text class="muted" x="788" y="1036">sem mudança: 200 com a mesma versão, sem subir o pv</text>
     <text class="mono" x="788" y="1054">X-Trace-Id: trc-7f3a9c21</text>
     <text class="muted" x="788" y="1072">auditoria: INICIADO e CONCLUIDO de EDITAR_PERMISSOES; registrosPermissao: a versão nova</text>
-    <rect class="node-red" x="736" y="1084" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1098" text-anchor="middle">403</text>
-    <text class="mono" x="788" y="1098">PERMISSAO_ACIMA · o que quem concede não tem</text>
-    <text class="mono" x="788" y="1116">{</text>
-    <text class="mono" x="788" y="1134" xml:space="preserve">  "mod": "MOD-06",</text>
-    <text class="mono" x="788" y="1152" xml:space="preserve">  "abas": "U"</text>
-    <text class="mono" x="788" y="1170">}</text>
-    <rect class="node-red" x="736" y="1182" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1196" text-anchor="middle">403</text>
-    <text class="mono" x="788" y="1196">ACESSO_NEGADO · a si mesmo, a um par ou a um superior</text>
-    <rect class="node-red" x="736" y="1208" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1222" text-anchor="middle">412</text>
-    <text class="mono" x="788" y="1222">VERSAO_DESATUALIZADA · outra pessoa salvou antes</text>
-    <text class="mono" x="788" y="1240">{</text>
-    <text class="mono" x="788" y="1258" xml:space="preserve">  "versao": 7</text>
-    <text class="mono" x="788" y="1276">}</text>
-    <rect class="node-red" x="736" y="1288" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1302" text-anchor="middle">422</text>
-    <text class="mono" x="788" y="1302">MODULO_NAO_CONTRATADO</text>
-    <text class="mono" x="788" y="1320">{</text>
-    <text class="mono" x="788" y="1338" xml:space="preserve">  "mod": "MOD-12"</text>
-    <text class="mono" x="788" y="1356">}</text>
-    <rect class="node-red" x="736" y="1368" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1382" text-anchor="middle">428</text>
-    <text class="mono" x="788" y="1382">VERSAO_AUSENTE · pedido sem If-Match</text>
-    <rect class="node-red" x="736" y="1394" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1408" text-anchor="middle">422</text>
-    <text class="mono" x="788" y="1408">DADOS_INVALIDOS · módulo que não existe ou que a pessoa não usa</text>
-    <text class="mono" x="788" y="1426">{</text>
-    <text class="mono" x="788" y="1444" xml:space="preserve">  "campo": "mods.MOD-13"</text>
-    <text class="mono" x="788" y="1462">}</text>
-    <rect class="node-red" x="736" y="1474" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1488" text-anchor="middle">500</text><text class="mono" x="788" y="1488">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
-    <text class="muted" x="736" y="1508">toda recusa: só o INICIADO e auditoriaErros (4xx ALERTA, 500 ERRO), com X-Trace-Id</text>
-    <text class="muted" x="736" y="1528">auditoria: quem pede, contaId (a conta de quem pede) e alvo (a pessoa) desde o INICIADO</text>
+    <text class="muted" x="788" y="1090">"suspensos" ficam como estão: o PUT só troca mods (RN-287)</text>
+    <rect class="node-red" x="736" y="1102" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1116" text-anchor="middle">403</text>
+    <text class="mono" x="788" y="1116">PERMISSAO_ACIMA · o que quem concede não tem</text>
+    <text class="mono" x="788" y="1134">{</text>
+    <text class="mono" x="788" y="1152" xml:space="preserve">  "mod": "MOD-06",</text>
+    <text class="mono" x="788" y="1170" xml:space="preserve">  "abas": "U"</text>
+    <text class="mono" x="788" y="1188">}</text>
+    <rect class="node-red" x="736" y="1200" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1214" text-anchor="middle">403</text>
+    <text class="mono" x="788" y="1214">ACESSO_NEGADO · a si mesmo, a um par ou a um superior</text>
+    <rect class="node-red" x="736" y="1226" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1240" text-anchor="middle">412</text>
+    <text class="mono" x="788" y="1240">VERSAO_DESATUALIZADA · outra pessoa salvou antes</text>
+    <text class="mono" x="788" y="1258">{</text>
+    <text class="mono" x="788" y="1276" xml:space="preserve">  "versao": 7</text>
+    <text class="mono" x="788" y="1294">}</text>
+    <rect class="node-red" x="736" y="1306" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1320" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="1320">MODULO_NAO_CONTRATADO · não contratado ou suspenso na pessoa</text>
+    <text class="mono" x="788" y="1338">{</text>
+    <text class="mono" x="788" y="1356" xml:space="preserve">  "mod": "MOD-06"</text>
+    <text class="mono" x="788" y="1374">}</text>
+    <text class="muted" x="788" y="1392">"O módulo Presença não está contratado."; segue a versão lida (RN-286)</text>
+    <rect class="node-red" x="736" y="1404" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1418" text-anchor="middle">428</text>
+    <text class="mono" x="788" y="1418">VERSAO_AUSENTE · pedido sem If-Match</text>
+    <rect class="node-red" x="736" y="1430" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1444" text-anchor="middle">422</text>
+    <text class="mono" x="788" y="1444">DADOS_INVALIDOS · módulo que não existe ou que a pessoa não usa</text>
+    <text class="mono" x="788" y="1462">{</text>
+    <text class="mono" x="788" y="1480" xml:space="preserve">  "campo": "mods.MOD-13"</text>
+    <text class="mono" x="788" y="1498">}</text>
+    <rect class="node-red" x="736" y="1510" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="1524" text-anchor="middle">500</text><text class="mono" x="788" y="1524">ERRO_INESPERADO · falha inesperada · grava ERRO</text>
+    <text class="muted" x="736" y="1544">toda recusa: só o INICIADO e auditoriaErros (4xx ALERTA, 500 ERRO), com X-Trace-Id</text>
+    <text class="muted" x="736" y="1564">auditoria: quem pede, contaId (a conta de quem pede) e alvo (a pessoa) desde o INICIADO</text>
   </g>
   <g id="ep-get-usuarios-id-permissoes-historico">
-    <g filter="url(#sombra)"><rect class="node" x="40" y="1190" width="632" height="582" rx="10"/></g>
+    <g filter="url(#sombra)"><rect class="node" x="40" y="1190" width="632" height="600" rx="10"/></g>
     <rect class="node-green" x="56" y="1206" width="40" height="24" rx="6"/><text class="label-strong" x="76.0" y="1223" text-anchor="middle">GET</text>
     <text class="label-strong" x="108" y="1223">/usuarios/{id}/permissoes/historico</text>
     <rect class="node-external" x="572" y="1206" width="84" height="24" rx="12"/><text class="chip-text" x="614.0" y="1222" text-anchor="middle">COM LOGIN</text>
@@ -245,7 +252,7 @@
     <text class="label" x="56" y="1292">Para quê: mostrar o Registro de mudanças das permissões da pessoa</text>
     <text class="label" x="56" y="1310">Quem usa: quem pode abrir as Permissões dela; a própria pessoa não vê</text>
     <text class="label" x="56" y="1328">Login: sim, token de acesso; exige MOD-03 · U e ser superior</text>
-    <text class="muted" x="56" y="1346">Requisitos: RN-256</text>
+    <text class="muted" x="56" y="1346">Requisitos: RN-256 · RN-286</text>
     <line class="divider" x1="40" y1="1366" x2="672" y2="1366"/><text class="boundary-label" x="56" y="1388">PEDIDO</text>
     <text class="mono" x="56" y="1412">Authorization: Bearer &lt;token&gt;</text>
     <text class="mono" x="56" y="1430">?ate=2026-11-01T13:00:00Z</text>
@@ -265,11 +272,63 @@
     <text class="mono" x="108" y="1694" xml:space="preserve">    }</text>
     <text class="mono" x="108" y="1712" xml:space="preserve">  }</text>
     <text class="mono" x="108" y="1730">]</text>
-    <rect class="node-red" x="56" y="1742" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1756" text-anchor="middle">404</text>
-    <text class="mono" x="108" y="1756">USUARIO_INEXISTENTE</text>
+    <text class="muted" x="108" y="1748">"por": quem salvou, ou quem descontratou ou contratou (RN-286)</text>
+    <rect class="node-red" x="56" y="1760" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="1774" text-anchor="middle">404</text>
+    <text class="mono" x="108" y="1774">USUARIO_INEXISTENTE</text>
+  </g>
+  <g id="grupo-teste"><text class="section" x="40" y="1840">TESTE · SÓ COM AMBIENTE=hml E Teste__Relogio=sim · COMO O /_teste/relogio (CONTRATO usuarios)</text><line class="divider" x1="40" y1="1852" x2="1352" y2="1852"/></g>
+  <g id="ep-teste-contratacao">
+  <g filter="url(#sombra)"><rect class="node" x="40" y="1876" width="632" height="596" rx="10"/></g>
+  <rect class="node-blue" x="56" y="1892" width="48" height="24" rx="6"/><text class="label-strong" x="80" y="1909" text-anchor="middle">POST</text><text class="label-strong" x="116" y="1909">/_teste/contratacao</text>
+  <rect class="node-note" x="572" y="1892" width="84" height="24" rx="12"/><text class="chip-text" x="614" y="1908" text-anchor="middle">SEM LOGIN</text>
+  <line class="divider" x1="40" y1="1932" x2="672" y2="1932"/><text class="boundary-label" x="56" y="1954">USO</text>
+  <text class="label" x="56" y="1978" xml:space="preserve">Para quê: fazer o papel do Catálogo ao contratar ou descontratar</text>
+  <text class="label" x="56" y="1996" xml:space="preserve">Quem usa: só a suíte de qa do CI (ci.sh, local e GitHub); nunca o Azure</text>
+  <text class="label" x="56" y="2014" xml:space="preserve">Login: não; só existe com AMBIENTE=hml e Teste__Relogio=sim</text>
+  <text class="muted" x="56" y="2032" xml:space="preserve">Requisitos: RN-285 · RN-286 · RN-287 · RN-238 · 17 RN-166 e RN-275</text>
+  <line class="divider" x1="40" y1="2052" x2="672" y2="2052"/><text class="boundary-label" x="56" y="2074">PEDIDO</text>
+  <text class="mono" x="56" y="2098" xml:space="preserve">{</text>
+  <text class="mono" x="56" y="2116" xml:space="preserve">  &quot;conta&quot;: &quot;conta-ebfga&quot;,</text>
+  <text class="mono" x="56" y="2134" xml:space="preserve">  &quot;mod&quot;: &quot;MOD-06&quot;,</text>
+  <text class="mono" x="56" y="2152" xml:space="preserve">  &quot;contratado&quot;: false,</text>
+  <text class="mono" x="56" y="2170" xml:space="preserve">  &quot;por&quot;: &quot;usr-dboaz-caio&quot;</text>
+  <text class="mono" x="56" y="2188" xml:space="preserve">}</text>
+  <line class="divider" x1="40" y1="2208" x2="672" y2="2208"/><text class="boundary-label" x="56" y="2230">RESPOSTAS</text>
+  <rect class="chip" x="56" y="2240" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2254" text-anchor="middle">204</text><text class="mono" x="108" y="2254" xml:space="preserve">aviso concluído: só responde depois de mover em todos</text>
+  <rect class="node-red" x="56" y="2266" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2280" text-anchor="middle">404</text><text class="mono" x="108" y="2280" xml:space="preserve">fora de AMBIENTE=hml com Teste__Relogio=sim: não existe</text>
+  <rect class="node-red" x="56" y="2292" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2306" text-anchor="middle">422</text><text class="mono" x="108" y="2306" xml:space="preserve">DADOS_INVALIDOS · campo ausente, inválido ou inexistente</text>
+  <rect class="node-red" x="56" y="2318" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="2332" text-anchor="middle">500</text><text class="mono" x="108" y="2332" xml:space="preserve">ERRO_INESPERADO · grava ERRO, com X-Trace-Id</text>
+  <text class="muted" x="56" y="2356" xml:space="preserve">grava contratacoes como o Catálogo (false fecha ate; true abre desde)</text>
+  <text class="muted" x="56" y="2374" xml:space="preserve">e roda o mesmo AVISAR_CONTRATACAO_MUDOU de 17 RN-275: mods ↔ suspensos,</text>
+  <text class="muted" x="56" y="2392" xml:space="preserve">versao e pv + 1, registrosPermissao com por, AVISAR_PERMISSOES_NOVAS</text>
+  <text class="muted" x="56" y="2410" xml:space="preserve">auditoria com quem = por, contaId e alvo = conta; X-Trace-Id na resposta</text>
+  <text class="muted" x="56" y="2428" xml:space="preserve">mesmo estado já gravado: 204 sem mudança, sem subir versao nem pv</text>
+  <text class="muted" x="56" y="2446" xml:space="preserve">&quot;campo&quot; no 422: conta (não existe), mod (não existe), contratado, por</text>
+  </g>
+  <g id="ep-teste-modulo">
+  <g filter="url(#sombra)"><rect class="node" x="720" y="1876" width="632" height="596" rx="10"/></g>
+  <rect class="node-green" x="736" y="1892" width="48" height="24" rx="6"/><text class="label-strong" x="760" y="1909" text-anchor="middle">GET</text><text class="label-strong" x="796" y="1909">/_teste/modulo/{mod}</text>
+  <rect class="node-external" x="1252" y="1892" width="84" height="24" rx="12"/><text class="chip-text" x="1294" y="1908" text-anchor="middle">COM LOGIN</text>
+  <line class="divider" x1="720" y1="1932" x2="1352" y2="1932"/><text class="boundary-label" x="736" y="1954">USO</text>
+  <text class="label" x="736" y="1978" xml:space="preserve">Para quê: um pedido de módulo sem endereço próprio (a Presença)</text>
+  <text class="label" x="736" y="1996" xml:space="preserve">Quem usa: só a suíte de qa do CI, para provar o 403 da RN-285</text>
+  <text class="label" x="736" y="2014" xml:space="preserve">Login: token de acesso; exige {mod} · U, pelo mesmo ComAcesso</text>
+  <text class="muted" x="736" y="2032" xml:space="preserve">Requisitos: RN-285 · RN-239 · RNF-208 · RNF-220</text>
+  <line class="divider" x1="720" y1="2052" x2="1352" y2="2052"/><text class="boundary-label" x="736" y="2074">PEDIDO</text>
+  <text class="mono" x="736" y="2098" xml:space="preserve">GET /_teste/modulo/MOD-06</text>
+  <text class="mono" x="736" y="2116" xml:space="preserve">Authorization: Bearer &lt;token&gt;</text>
+  <text class="muted" x="736" y="2134" xml:space="preserve">sem corpo; só existe com AMBIENTE=hml e Teste__Relogio=sim</text>
+  <line class="divider" x1="720" y1="2154" x2="1352" y2="2154"/><text class="boundary-label" x="736" y="2176">RESPOSTAS</text>
+  <rect class="chip" x="736" y="2186" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2200" text-anchor="middle">204</text><text class="mono" x="788" y="2200" xml:space="preserve">o token tem {mod} · U e o pv da sessão</text>
+  <rect class="node-red" x="736" y="2212" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2226" text-anchor="middle">401</text><text class="mono" x="788" y="2226" xml:space="preserve">PERMISSOES_DESATUALIZADAS · pv antigo, sessão mantida</text>
+  <rect class="node-red" x="736" y="2238" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2252" text-anchor="middle">403</text><text class="mono" x="788" y="2252" xml:space="preserve">ACESSO_NEGADO · o token não tem {mod} · U</text>
+  <rect class="node-red" x="736" y="2264" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="2278" text-anchor="middle">404</text><text class="mono" x="788" y="2278" xml:space="preserve">fora de AMBIENTE=hml com Teste__Relogio=sim: não existe</text>
+  <text class="muted" x="736" y="2302" xml:space="preserve">a mesma exigência de rota de um módulo real (ExigênciaDaRota):</text>
+  <text class="muted" x="736" y="2320" xml:space="preserve">confere o pv antes do módulo, como qualquer rota com login</text>
+  <text class="muted" x="736" y="2338" xml:space="preserve">não lê as permissões: decide pelo token (RNF-208)</text>
   </g>
   </g>
-  <g id="marca-rodape" transform="translate(0,2208)">
+  <g id="marca-rodape" transform="translate(0,3032)">
     <rect class="wm-band" x="0" y="0" width="1392" height="168"/>
     <line class="wm-sep" x1="0" y1="0.5" x2="1392" y2="0.5"/>
     <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
@@ -281,7 +340,7 @@
     <rect class="chip" x="762" y="47" width="14" height="14" rx="3"/><text class="label" x="784" y="58">resposta de sucesso</text>
     <rect class="node" x="40" y="73" width="14" height="14" rx="3"/><text class="label" x="62" y="84">endereço e regra comum</text><rect class="node-purple" x="246" y="73" width="14" height="14" rx="3"/><text class="label" x="268" y="84">auditado: responde o cabeçalho X-Trace-Id</text>
     <line class="divider" x1="40" y1="114" x2="1352" y2="114"/>
-    <text class="footer" x="40" y="142">v09 · 403 sem MOD-03 · U auditado (INICIADO e ALERTA, X-Trace-Id) e AVISAR_PERMISSOES_NOVAS no traceId do PUT (RN-270, RN-275)</text>
-    <text class="wm-file" x="1352" y="142" text-anchor="end">autorizacao-contrato-api_v09_20261108-1159.svg</text>
+    <text class="footer" x="40" y="142">v11 · endereços de teste: POST /_teste/contratacao (aviso de 17 RN-275) e GET /_teste/modulo/{mod} (401 e 403 da RN-285), só com AMBIENTE=hml e Teste__Relogio=sim</text>
+    <text class="wm-file" x="1352" y="142" text-anchor="end">autorizacao-contrato-api_v11_20261112-0200.svg</text>
   </g>
 </svg>

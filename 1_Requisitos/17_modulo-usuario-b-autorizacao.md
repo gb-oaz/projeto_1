@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v26"
-data: "2026-11-08 12:02"
-status: "Aprovado"
+versao: "v34"
+data: "2026-11-12 02:03"
+status: "Em revisão"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v26** · 2026-11-08 12:02 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v34** · 2026-11-12 02:03 · **Em revisão**
 
 # Módulo Usuários · Autorização
 
@@ -206,6 +206,38 @@ Esquema do Cenário: quem vê o registro
     | o João, com Adm.        | vê     |
     | a própria Maria         | não vê |
     | o membro do time no SAC | não vê |
+```
+
+<a id="RN-285"></a>
+
+### `RN-285` Módulo suspenso
+
+> Descontratação: [`RN-238`](#RN-238) e [17_modulo-usuario `RN-166`](17_modulo-usuario.md#RN-166)
+
+```gherkin
+Cenário: a escola descontrata a Presença
+  Dado a staff Maria dentro da Presença, com a Utilização marcada pela conta master
+  Quando a escola descontrata a Presença
+  Então na próxima ação a Maria vai para Módulos com "Você não tem acesso a este módulo."
+  E não vê mais o card da Presença, sem precisar entrar de novo
+
+Cenário: a escola contrata a Presença de novo
+  Dado a Presença da Maria suspensa
+  Quando a escola contrata a Presença de novo
+  Então na próxima ação o card da Presença volta para a Maria, só com a aba Utilização
+  E ninguém precisou marcar a Presença para ela outra vez
+```
+
+<a id="RN-286"></a>
+
+### `RN-286` Quem suspende e reativa
+
+```gherkin
+Cenário: ninguém suspende nem reativa pela tela Permissões
+  Dado a Presença da Maria suspensa
+  Quando a conta master abre Permissões da Maria
+  Então não vê a Presença para marcar nem para desmarcar
+  E a tela não tem ação de suspender ou de reativar um módulo de uma pessoa
 ```
 
 <a id="RNF-221"></a>
@@ -716,6 +748,121 @@ Cenário: a própria pessoa não vê
   Então a resposta é 403 ACESSO_NEGADO
 ```
 
+<a id="RN-285-api"></a>
+
+### `RN-285` Módulo suspenso
+
+> Token invalidado pela descontratação: [17_modulo-usuario-a-autenticacao `RNF-203`](17_modulo-usuario-a-autenticacao.md#RNF-203)
+
+```gherkin
+Cenário: pedido à Presença suspensa
+  Dado a Maria com "MOD-06" com "U", na versão de permissões 7, com um token de pv 7
+  Quando a escola descontrata a Presença
+  E a Maria envia um pedido da Presença com o token de pv 7
+  Então a resposta é 401 PERMISSOES_DESATUALIZADAS, sem encerrar a sessão
+  E POST /auth/renovar devolve um token de pv 8, sem "MOD-06" em mods
+  E o mesmo pedido da Presença com o token de pv 8 recebe 403 ACESSO_NEGADO
+
+Cenário: permissões durante a suspensão
+  Dado a Presença da Maria suspensa na versão 8
+  E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
+  Quando a conta master envia GET /usuarios/usr-ebfga-maria/permissoes
+  Então a resposta é 200 com a versão 8
+  E sem "MOD-06" em mods nem em concediveis
+
+Cenário: a escola contrata a Presença de novo
+  Dado a Presença da Maria suspensa na versão 8
+  E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
+  Quando a escola contrata a Presença de novo
+  Então GET /usuarios/usr-ebfga-maria/permissoes traz a versão 9 com "MOD-06" com "U"
+  E o token de pv 8 recebe 401 PERMISSOES_DESATUALIZADAS no próximo pedido
+  E POST /auth/renovar devolve um token de pv 9 com "MOD-06" com "U"
+```
+
+<a id="RN-286-api"></a>
+
+### `RN-286` Quem suspende e reativa
+
+> Aviso do Catálogo: [17_modulo-usuario `RN-275`](17_modulo-usuario.md#RN-275)
+
+```gherkin
+Cenário: só a contratação suspende
+  Dado a Maria com "MOD-06" com "U", na versão 7, e o João com "MOD-06" com "U"
+  E a execução do Catálogo em que o membro do time Caio descontrata a Presença da EBFGA
+  Quando o Catálogo avisa que a contratação da EBFGA mudou
+  Então "MOD-06" fica suspenso com "U" para a Maria e para o João
+  E GET /usuarios/usr-ebfga-maria/permissoes/historico ganha a versão 8
+  E essa versão vem por "usr-dboaz-caio", com "MOD-06" de "U" para null
+
+Cenário: a conta master tenta reativar
+  Dado a Presença da Maria suspensa na versão 8
+  E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
+  Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes com If-Match "8" e:
+    """
+    {
+      "mods": {
+        "MOD-03": "CU",
+        "MOD-06": "U"
+      }
+    }
+    """
+  Então a resposta é 422 MODULO_NAO_CONTRATADO
+  E a mensagem é "O módulo Presença não está contratado."
+  E as permissões da Maria continuam na versão 8, com a Presença suspensa
+
+Cenário: só a contratação reativa
+  Dado a Presença da Maria suspensa
+  E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
+  Quando o Catálogo avisa que a EBFGA contratou a Presença de novo
+  Então "MOD-06" volta a mods com "U" em cada usuário da EBFGA que o tinha suspenso
+```
+
+<a id="RN-287"></a>
+
+### `RN-287` Suspenso não é removido
+
+```gherkin
+Cenário: o que fica guardado
+  Dado a Maria com "MOD-03" com "CU", "MOD-05" com "U" e "MOD-06" com "U", na versão 7
+  Quando a escola descontrata a Presença
+  Então as permissões guardadas da Maria ficam:
+    """
+    {
+      "versao": 8,
+      "pv": 8,
+      "mods": {
+        "MOD-03": "CU",
+        "MOD-05": "U"
+      },
+      "suspensos": [
+        {
+          "mod": "MOD-06",
+          "abas": "U"
+        }
+      ]
+    }
+    """
+
+Cenário: salvar não apaga o suspenso
+  Dado a Presença da Maria suspensa na versão 8
+  E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
+  Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes com If-Match "8" e:
+    """
+    {
+      "mods": {
+        "MOD-03": "CU"
+      }
+    }
+    """
+  Então a resposta é 200 com a versão 9, sem "MOD-05"
+  E quando a escola contrata a Presença de novo, "MOD-06" volta com "U"
+
+Cenário: desmarcado antes não volta
+  Dado a conta master tendo desmarcado a Presença da Maria, com a Presença contratada
+  Quando a escola descontrata a Presença e depois a contrata de novo
+  Então GET /usuarios/usr-ebfga-maria/permissoes não traz "MOD-06" em mods
+```
+
 <a id="RNF-208"></a>
 
 ### `RNF-208` Autorizar pelo token
@@ -845,21 +992,21 @@ Cenário: o que este documento não trata
 
 ### Web
 
-**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v01_20261103-1139.svg`
+**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg`
 
-[![Web: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-web_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-usuarios-web_v01_20261103-1139.svg)
+[![Web: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg)
 
 ### PWA
 
-**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v01_20261103-1139.svg`
+**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg`
 
-[![PWA: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v01_20261103-1139.svg)
+[![PWA: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg)
 
 ### Mobile
 
-**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v01_20261103-1139.svg`
+**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg`
 
-[![Mobile: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v01_20261103-1139.svg)
+[![Mobile: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg)
 
 ---
 
@@ -871,21 +1018,21 @@ Cenário: o que este documento não trata
 
 [![Casos de uso da autorização: o administrador e o staff com Administrar usuários, e por generalização a conta master, veem e salvam as permissões e o registro de mudanças, com a conferência do que quem concede tem e a recarga quando outro salvou antes; quem recebe vê o módulo novo sem sair, a casca pelo token e a recusa no endereço direto; no quest, os módulos de Quem usa e da sala](../2_Diagramas/autorizacao-casos-de-uso_v01_20261101-2337.svg)](../2_Diagramas/autorizacao-casos-de-uso_v01_20261101-2337.svg)
 
-**Autorização · conceder permissões · sequência** — `2_Diagramas/autorizacao-sequencia_v04_20261108-1157.svg`
+**Autorização · conceder permissões · sequência** — `2_Diagramas/autorizacao-sequencia_v07_20261112-0201.svg`
 
-[![Sequência de conceder permissões: o administrador do deboaz concede o SAC ao membro do time e a conta master concede a Presença ao staff, com as concedíveis, o salvamento com a versão, as recusas, a nova versão nas sessões e a renovação que leva o módulo à casca, com as telas de exemplo de cada passo](../2_Diagramas/autorizacao-sequencia_v04_20261108-1157.svg)](../2_Diagramas/autorizacao-sequencia_v04_20261108-1157.svg)
+[![Sequência de conceder permissões: o administrador do deboaz concede o SAC ao membro do time e a conta master concede a Presença ao staff, com as concedíveis, o salvamento com a versão, as recusas, a nova versão nas sessões e a renovação que leva o módulo à casca, com as telas de exemplo de cada passo, e a contratação que suspende e reativa o módulo](../2_Diagramas/autorizacao-sequencia_v07_20261112-0201.svg)](../2_Diagramas/autorizacao-sequencia_v07_20261112-0201.svg)
 
-**Autorização · contrato de API** — `2_Diagramas/autorizacao-contrato-api_v09_20261108-1159.svg`
+**Autorização · contrato de API** — `2_Diagramas/autorizacao-contrato-api_v11_20261112-0200.svg`
 
-[![Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, com os códigos de erro](../2_Diagramas/autorizacao-contrato-api_v09_20261108-1159.svg)](../2_Diagramas/autorizacao-contrato-api_v09_20261108-1159.svg)
+[![Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, o módulo suspenso e os endereços de teste da contratação e do módulo, com os códigos de erro](../2_Diagramas/autorizacao-contrato-api_v11_20261112-0200.svg)](../2_Diagramas/autorizacao-contrato-api_v11_20261112-0200.svg)
 
-**Autorização · classes** — `2_Diagramas/autorizacao-classes_v01_20261101-1502.svg`
+**Autorização · classes** — `2_Diagramas/autorizacao-classes_v02_20261112-0055.svg`
 
-[![Diagrama de classes da autorização: permissões do usuário com versão e pv, permissão por módulo e abas, mudança de permissão imutável, cálculo das permissões, autorização no token e exigência de cada rota, com papéis e abas](../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg)](../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg)
+[![Diagrama de classes da autorização: permissões do usuário com versão e pv, permissão por módulo e abas, mudança de permissão imutável, cálculo das permissões, autorização no token e exigência de cada rota, com papéis e abas](../2_Diagramas/autorizacao-classes_v02_20261112-0055.svg)](../2_Diagramas/autorizacao-classes_v02_20261112-0055.svg)
 
-**Autorização · documentos** — `2_Diagramas/autorizacao-documentos_v03_20261107-1402.svg`
+**Autorização · documentos** — `2_Diagramas/autorizacao-documentos_v04_20261112-0050.svg`
 
-[![Modelo de dados da autorização: permissoes embutidas em usuarios com versao, pv, mods e suspensos, registrosPermissao imutável, o pv da sessao no Redis, as coleções contratacoes e modulos e as claims do token](../2_Diagramas/autorizacao-documentos_v03_20261107-1402.svg)](../2_Diagramas/autorizacao-documentos_v03_20261107-1402.svg)
+[![Modelo de dados da autorização: permissoes embutidas em usuarios com versao, pv, mods e suspensos, registrosPermissao imutável, o pv da sessao no Redis, as coleções contratacoes e modulos e as claims do token](../2_Diagramas/autorizacao-documentos_v04_20261112-0050.svg)](../2_Diagramas/autorizacao-documentos_v04_20261112-0050.svg)
 
 ---
 
@@ -895,20 +1042,19 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v26** | 2026-11-08 12:02 | Diagramas (17 `RN-270`, `RN-275`): sequência v03 → v04 (AVISAR_PERMISSOES_NOVAS no traceId do PUT, 403 sem MOD-03 · U auditado; setas restauradas), contrato de API v08 → v09 (403 sem o módulo com INICIADO e ALERTA e X-Trace-Id; falha na interna com 2 ERRO); cenários sem mudança |
+| **v34** | 2026-11-12 02:03 | Diagramas: contrato de API v10 → v11 (endereços de teste POST /_teste/contratacao, que roda o aviso de [17 `RN-275`](17_modulo-usuario.md#RN-275), e GET /_teste/modulo/{mod}, para o 401 e o 403 de `RN-285-api`; só com AMBIENTE=hml e Teste__Relogio=sim) e sequência v06 → v07 (nota do teste); cenários sem mudança |
+| v33 | 2026-11-12 01:59 | Dados explícitos nos cenários de API: `RN-286` "só a contratação suspende" com a Maria (versão 7) e o João, os dois com "MOD-06" com "U"; a Presença da Maria suspensa fica com "MOD-03" com "CU" e "MOD-05" com "U" em mods (`RN-285`, `RN-286`, `RN-287`) |
+| v32 | 2026-11-12 00:57 | Diagramas do módulo suspenso (`RN-285` a `RN-287`): sequência v05 → v06 (o aviso AVISAR_CONTRATACAO_MUDOU move a permissão entre mods e suspensos, sobe versao e pv, 401 e renovação, depois 403), contrato de API v09 → v10 (422 MODULO_NAO_CONTRATADO para o suspenso, "por" de quem descontratou), classes v01 → v02, documentos v03 → v04 (suspensos como [{mod, abas}]); cenários sem mudança |
+| v31 | 2026-11-12 00:44 | Módulo suspenso (`permissoes.suspensos`): `RN-285` e `RN-285-api` (descontratação suspende, recontratação devolve; 401 PERMISSOES_DESATUALIZADAS e depois 403 ACESSO_NEGADO), `RN-286` e `RN-286-api` (só a contratação suspende e reativa; PUT com o suspenso é 422 MODULO_NAO_CONTRATADO), `RN-287` (suspenso guardado com as abas, salvar não o apaga, desmarcado não volta); status → Em revisão |
+| v30 | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", [17 `RN-189`](17_modulo-usuario.md#RN-189)), sem mudança de fluxo |
+| v29 | 2026-11-09 01:17 | Diagrama: autorizacao-sequencia v05 com as telas das vistas hub-time-deboaz e hub-usuarios pwa v03, sem mudança de fluxo |
+| v28 | 2026-11-09 00:58 | Telas: vistas hub-usuarios web, pwa e mobile v02 → v03 (números de exemplo do card, [17 `RN-189`](17_modulo-usuario.md#RN-189)); permissões sem mudança |
+| v27 | 2026-11-08 23:45 | Telas: vistas hub-usuarios web, pwa e mobile v01 → v02 (card do módulo com a alternância Dia, Semana e Mês e os perfis staff e autônomo, [17 `RN-189`](17_modulo-usuario.md#RN-189)); permissões sem mudança |
+| v26 | 2026-11-08 12:02 | Diagramas (17 `RN-270`, `RN-275`): sequência v03 → v04 (AVISAR_PERMISSOES_NOVAS no traceId do PUT, 403 sem MOD-03 · U auditado; setas restauradas), contrato de API v08 → v09 (403 sem o módulo com INICIADO e ALERTA e X-Trace-Id; falha na interna com 2 ERRO); cenários sem mudança |
 | v25 | 2026-11-08 11:35 | Diagramas (17 `RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (PUT permissões com auditoria INICIADO e CONCLUIDO de EDITAR_PERMISSOES, recusas em "auditoriaErros" com ALERTA, 500 ERRO_INESPERADO com ERRO, X-Trace-Id; renovação auditada como RENOVAR_SESSAO), contrato de API v07 → v08 (403 sem MOD-03 · U antes do caso de uso, sem X-Trace-Id nem registros); cenários sem mudança |
 | v24 | 2026-11-08 09:50 | Contrato de API v06 → v07 (17 `RN-178`): EDITAR_PERMISSOES com contaId da conta de quem pede e alvo a pessoa, desde o INICIADO; cenários sem mudança |
 | v23 | 2026-11-08 02:15 | `RN-233-api`: tabela de exemplos com linhas de até 100 caracteres (célula do participante reescrita, mesmo sentido); regras sem mudança |
-| v22 | 2026-11-08 02:14 | Contrato de API v06 (17 `RN-178`, `RN-270`, `RN-271`): PUT /usuarios/{id}/permissoes grava INICIADO e CONCLUIDO de EDITAR_PERMISSOES em "auditoria" e a versão em "registrosPermissao"; recusas 4xx em "auditoriaErros" (ALERTA); 500 ERRO_INESPERADO (ERRO); X-Trace-Id em toda resposta do caso de uso; cenários sem mudança |
-| v21 | 2026-11-07 14:05 | Diagrama autorizacao-documentos v03: índices como o ms_mono cria na partida (login, registrosPermissao com versao); contratacoes com _id e sigla, ainda sem índice; cenários sem mudança |
-| v20 | 2026-11-06 23:23 | Diagrama autorizacao-documentos v02, fiel ao código: suspensos só no requisito, modulos com quemUsa, tipo ADMINISTRADOR |
-| v19 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
-| v18 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
-| v17 | 2026-11-03 11:45 | Estrutura do módulo (06 `RNF-103` v17): seção Telas nova, com a vista hub-usuarios em Web, PWA e Mobile (permissões, salvar, recusas, registro de mudanças e aviso de quem recebe) |
-| v16 | 2026-11-02 17:24 | Staff com Administrar usuários repassa o MOD-03 ao staff abaixo, só com as abas que tem (`RN-252`): sai o 403 "Só a conta master concede o módulo Usuários." e o MOD-03 entra nas concedíveis da staff (`RF-160`); contrato de API v05 |
-| v15 | 2026-11-02 14:02 | Aprovado |
-| v14 | 2026-11-02 14:01 | Regras explícitas: abaixo é quem a pessoa criou, direta ou indiretamente, e staff nenhum repassa Administrar usuários (`RN-252`); o que cada aba libera (`RN-251`); módulos de cada papel por extenso (`RN-233`); 422 DADOS_INVALIDOS para módulo que não existe ou que a pessoa não usa (`RF-161`); contrato de API v04, com a mensagem de cada erro; sequência v02, com textos neutros |
 
 ---
 
-<sub>boaz · v26 · 2026-11-08 12:02 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v34 · 2026-11-12 02:03 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>

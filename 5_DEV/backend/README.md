@@ -20,9 +20,11 @@ Um único serviço, `ms_mono`, com a estrutura hexagonal de
 │   │   ├── guias/                guia de uso de cada API do Swagger (Markdown)
 │   │   └── exemplos/             exemplos de cada endpoint (gerados dos contratos, não edite)
 │   ├── wwwroot/doc/api/          swagger.css, design/ e diagramas/ (cópias geradas, não edite)
-│   └── infra/
-│       ├── in/<contexto>/<feature>/    controllers HTTP, finos (chamam ports/in)
-│       └── out/<contexto>/<feature>/   MongoDB e Redis (implementam ports/out)
+│   ├── primario/in/<contexto>/<feature>/    adaptadores primários: controllers HTTP finos, partida e
+│   │                                        agendamento (chamam ports/in)
+│   ├── primario/out/<contexto>/<feature>/   o que os primários devolvem: fluxo SSE, sessão na resposta
+│   ├── secundario/out/<contexto>/<feature>/ adaptadores secundários: MongoDB e Redis (implementam ports/out)
+│   └── secundario/in/<contexto>/<feature>/  o que volta dos secundários: canal aoVivo:encerrar do Redis
 ├── tests/                        espelha core/ e ms_mono/, um xUnit por projeto
 ├── scripts/diagramas-da-doc.sh   copia de 2_Diagramas/ os diagramas que os guias mostram
 ├── scripts/exemplos-da-doc.py    gera os exemplos de cada endpoint a partir dos contratos
@@ -90,9 +92,9 @@ Ninguém se cadastra como administrador: o time deboaz nasce da configuração.
 
 1. **Na partida**, antes de aceitar o primeiro pedido (`/health` inclusive), o
    backend grava o registro de módulos, cria os índices do MongoDB
-   (`infra/out/commons/Indices.cs`, diagrama `identidade-acesso-documentos`) e
+   (`secundario/out/commons/Indices.cs`, diagrama `identidade-acesso-documentos`) e
    garante as contas iniciais (`IInicializarContas`, chamado por
-   `infra/in/commons/usuario/usuarios/Partida.cs`; RN-190, RN-265 a RN-267):
+   `primario/in/commons/usuario/usuarios/Partida.cs`; RN-190, RN-265 a RN-267):
    - em todo ambiente, a conta do time (`conta-dboaz`, seção `Time`) e o
      administrador `usr-dboaz-admin`, com `USUARIO_ADMIN_ENTRADA` e o resumo
      (PBKDF2) de `USUARIO_ADMIN_SENHA`;
@@ -162,7 +164,7 @@ Tudo que muda de um ambiente para outro vem da configuração, nunca do código:
 `ms_mono/appsettings.json` traz os padrões e cada parâmetro pode ser trocado por
 variável de ambiente, com `__` no lugar de `:`. Faltando um parâmetro
 obrigatório, o backend não sobe e diz qual variável definir
-(`ms_mono/infra/out/commons/Configuracoes.cs`).
+(`ms_mono/secundario/out/commons/Configuracoes.cs`).
 
 | Variável | Padrão (appsettings.json) | Para quê |
 |---|---|---|

@@ -58,4 +58,78 @@ public class PermissoesDoUsuarioTests
 
         Assert.Equal(Mods(("MOD-05", "C"), ("MOD-06", "U"), ("MOD-12", "U")), p.Mods);
     }
+
+    static ModulosDaConta ModulosCom(params string[] contratados) => new(
+        [
+            new ModuloRegistrado("MOD-03", "Usuários", TipoDeModulo.DaConta, new HashSet<(Perfil, FrenteDeUso)>()),
+            new ModuloRegistrado("MOD-05", "Quiz", TipoDeModulo.Contratavel, new HashSet<(Perfil, FrenteDeUso)>()),
+            new ModuloRegistrado("MOD-06", "Presença", TipoDeModulo.Contratavel, new HashSet<(Perfil, FrenteDeUso)>()),
+        ],
+        contratados.ToHashSet(), contaDoTime: false);
+
+    [Fact]
+    public void RN_287_descontratar_suspende_com_as_abas()
+    {
+        var p = new PermissoesDoUsuario("usr-ebfga-maria", 7, 7, Mods(("MOD-03", "CU"), ("MOD-05", "U"), ("MOD-06", "U")));
+
+        var mudanca = p.AcompanharContratacao(ModulosCom("MOD-05"), "usr-dboaz-caio", Agora)!;
+
+        Assert.Equal((8, 8), (p.Versao, p.Pv));
+        Assert.Equal(Mods(("MOD-03", "CU"), ("MOD-05", "U")), p.Mods);
+        Assert.Equal(Mods(("MOD-06", "U")), p.Suspensos);
+        Assert.Equal(("usr-dboaz-caio", 8), (mudanca.Por, mudanca.Versao));
+        Assert.Equal(new Dictionary<string, Abas?> { ["MOD-06"] = Abas.U }, mudanca.Antes);
+        Assert.Equal(new Dictionary<string, Abas?> { ["MOD-06"] = null }, mudanca.Depois);
+    }
+
+    [Fact]
+    public void RN_285_contratar_de_novo_devolve_as_abas()
+    {
+        var p = new PermissoesDoUsuario("usr-ebfga-maria", 8, 8, Mods(("MOD-03", "CU")), Mods(("MOD-06", "U")));
+
+        var mudanca = p.AcompanharContratacao(ModulosCom("MOD-06"), "usr-dboaz-caio", Agora)!;
+
+        Assert.Equal((9, 9), (p.Versao, p.Pv));
+        Assert.Equal(Mods(("MOD-03", "CU"), ("MOD-06", "U")), p.Mods);
+        Assert.Empty(p.Suspensos);
+        Assert.Equal(new Dictionary<string, Abas?> { ["MOD-06"] = null }, mudanca.Antes);
+        Assert.Equal(new Dictionary<string, Abas?> { ["MOD-06"] = Abas.U }, mudanca.Depois);
+    }
+
+    [Fact]
+    public void RN_287_sem_modulo_a_mover_nada_muda()
+    {
+        var p = new PermissoesDoUsuario("usr-ebfga-maria", 7, 7, Mods(("MOD-03", "CU")));
+
+        Assert.Null(p.AcompanharContratacao(ModulosCom(), "usr-dboaz-caio", Agora));
+        Assert.Equal((7, 7), (p.Versao, p.Pv));
+    }
+
+    [Fact]
+    public void Suspenso_que_ja_voltou_a_mods_so_sai_dos_suspensos()
+    {
+        var p = new PermissoesDoUsuario("usr-ebfga-maria", 8, 8, Mods(("MOD-06", "CU")), Mods(("MOD-06", "U")));
+
+        Assert.Null(p.AcompanharContratacao(ModulosCom("MOD-06"), "usr-dboaz-caio", Agora));
+        Assert.Equal(Mods(("MOD-06", "CU")), p.Mods);
+        Assert.Empty(p.Suspensos);
+    }
+
+    [Fact]
+    public void RN_287_salvar_nao_apaga_o_suspenso()
+    {
+        var p = new PermissoesDoUsuario("usr-ebfga-maria", 8, 8, Mods(("MOD-03", "CU"), ("MOD-05", "U")), Mods(("MOD-06", "U")));
+
+        p.Salvar(Mods(("MOD-03", "CU")), new HashSet<string> { "MOD-03", "MOD-05" }, "usr-ebfga-master", Agora);
+
+        Assert.Equal(Mods(("MOD-06", "U")), p.Suspensos);
+    }
+
+    [Fact]
+    public void RN_239_subir_o_pv_nao_muda_a_versao()
+    {
+        var p = new PermissoesDoUsuario("usr-ebfga-maria", 7, 7, Mods(("MOD-03", "CU")));
+        p.SubirPv();
+        Assert.Equal((7, 8), (p.Versao, p.Pv));
+    }
 }

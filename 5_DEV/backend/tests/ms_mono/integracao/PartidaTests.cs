@@ -1,9 +1,9 @@
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
-using Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
-using Boaz.MsMono.Infra.Out.Commons;
-using Boaz.MsMono.Infra.Out.Commons.Usuario.Autorizacao;
+using Boaz.MsMono.Primario.In.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Secundario.Out.Commons;
+using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autorizacao;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;

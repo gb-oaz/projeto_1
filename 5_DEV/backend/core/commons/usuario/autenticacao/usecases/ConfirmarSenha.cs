@@ -8,6 +8,8 @@ using Execucao = Boaz.Core.Commons.Usuario.Usuarios.UseCases.Execucao;
 using ExecucaoEmAndamento = Boaz.Core.Commons.Usuario.Usuarios.UseCases.ExecucaoEmAndamento;
 using IAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoria;
 using IAuditoriaDeErros = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoriaDeErros;
+using IAtualizarCardUsuarios = Boaz.Core.Commons.Usuario.Usuarios.Ports.In.IAtualizarCardUsuarios;
+using MudancaNoCadastroDto = Boaz.Core.Commons.Usuario.Usuarios.Dtos.MudancaNoCadastroDto;
 using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Usuario.Autenticacao.UseCases;
@@ -30,14 +32,17 @@ public sealed class ConfirmarSenha : IConfirmarSenha
     readonly AberturaDeSessao abertura;
     readonly AuditoriaDaExecucao auditada;
     readonly TimeProvider relogio;
+    readonly IAtualizarCardUsuarios cardsDoModulo;
 
     /// <summary>Monta o caso de uso com as portas de saída.</summary>
     public ConfirmarSenha(IUsuarios usuarios, IContas contas, IGeracoesDeSenha geracoes, ISessoes sessoes,
-        IPermissoes permissoes, IAssinador assinador, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio)
+        IPermissoes permissoes, IAssinador assinador, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio,
+        IAtualizarCardUsuarios cardsDoModulo)
     {
         this.usuarios = usuarios;
         this.geracoes = geracoes;
         this.relogio = relogio;
+        this.cardsDoModulo = cardsDoModulo;
         abertura = new AberturaDeSessao(usuarios, contas, sessoes, permissoes, new EmissorDeTokens(sessoes, assinador), relogio);
         auditada = new AuditoriaDaExecucao(auditoria, erros, relogio);
     }
@@ -57,6 +62,8 @@ public sealed class ConfirmarSenha : IConfirmarSenha
         var conta = await abertura.ContaDisponivel(usuario, primeiroAcesso: true, ct);
 
         var aberta = await AbrirPrimeiraSessao(geracao, usuario, conta, aparelho, agora, ct);
+        // quem estava pendente ficou ativo: os cards do Usuários mudam na mesma execução (RN-278)
+        await cardsDoModulo.Executar(new MudancaNoCadastroDto(usuario.ContaId, usuario.Id), ct);
         await RegistrarConclusao(andamento, aberta, ct);
         return aberta.Resposta;
     }

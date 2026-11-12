@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "16_modulo-catalogo"
 tipo: "Funcionalidade"
 titulo: "Catálogo"
-versao: "v28"
-data: "2026-11-05 12:34"
-status: "Aprovado"
+versao: "v29"
+data: "2026-11-08 23:16"
+status: "Em revisão"
 objetivo: "catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante, e a vitrine de cada módulo contratável, que a instituição e o educador autônomo veem em A contratar, simulam e incluem na conta."
 ---
 
-> **boaz · Funcionalidade** · `16_modulo-catalogo` · **v28** · 2026-11-05 12:34 · **Aprovado**
+> **boaz · Funcionalidade** · `16_modulo-catalogo` · **v29** · 2026-11-08 23:16 · **Em revisão**
 
 # Catálogo
 
@@ -1886,13 +1886,22 @@ Cenário: o que este documento não trata
 
 ---
 
+<a id="em-aberto"></a>
+
+## Em aberto
+
+- Em qual tarefa o card do Catálogo (`RF-116`, `GET /catalogo/resumo`) passa ao card comum de [15_modulos `RN-276`](15_modulos.md#RN-276), com os recortes de `RN-277` e o ao vivo de `RN-279`? — **Produto**
+
+---
+
 <a id="historico"></a>
 
 ## Histórico
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v28** | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
+| **v29** | 2026-11-08 23:16 | Em aberto: card do Catálogo (`RF-116`) passa ao card comum de 15_modulos (`RN-276`, `RN-277`, `RN-279`) numa tarefa à parte; status → Em revisão |
+| v28 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v27 | 2026-11-04 01:06 | Aprovado, sem pendências em aberto |
 | v26 | 2026-11-04 01:05 | Catalogar módulo com Dados, Preço, Desconto e Vitrine, já Ativo ao salvar (`RF-123`), ativar e desativar, com as contas que já têm o módulo usando e pagando (`RF-169`), situação no Catálogo (`RF-170`), configuração mínima (`RN-263`), só o administrador do deboaz (`RN-264`); sem a data Vale a partir de: preço e desconto valem ao salvar (`RN-194`, `RF-118`); sem custo não pede valores e com custo os declara, sem Com custo sem preço (`RN-199`, `RF-116`, `RN-257`); vistas catalogar-modulo v01 e catalogo-deboaz Web v02, PWA v04 e Mobile v04; catalogar-sequencia v01, sequência v05, casos de uso v04, contrato v05, classes v06 e documentos v06 |
 | v25 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
@@ -1901,8 +1910,7 @@ Cenário: o que este documento não trata
 | v22 | 2026-11-03 12:33 | Lista do catálogo só com o espaço de cada módulo, sem nomes de outros módulos (`RF-117`, vistas pwa e mobile v02); `RF-121` sai para o módulo Contas (fora de escopo); nova `RN-257`: mudar o custo vale para todas as contratações; diagramas com a referência 16_modulo-catalogo (casos de uso v02, sequência v04, contrato v02, classes v04, documentos v04) |
 | v21 | 2026-11-03 11:49 | Estrutura do módulo (06 `RNF-103` v17): Telas em Web, PWA e Mobile, uma vista por plataforma, separadas da vista hub-catalogo-deboaz v04 |
 | v20 | 2026-11-03 11:02 | Telas: card do Catálogo nos quatro tamanhos no compact, no medium e no expanded, sem outros módulos e sem o Painel de administração (vista-hub-catalogo-deboaz v04, catalogo-sequencia v03); ficha do módulo com a receita do resumo (R$ 200.996,76, R$ 201k) e os 5 meses do contrato no lugar das 7 semanas |
-| v19 | 2026-11-03 10:48 | Documento renomeado para 16_modulo-catalogo; cenários divididos em Cenários de tela e Cenários de API, com os endereços e códigos do contrato catalogo-contrato-api v01 (`RF-116` a `RF-120`, `RF-122` a `RF-125`, `RN-191` a `RN-194`, `RN-196`, `RN-199`, `RN-200`, `RNF-210` a `RNF-212`, âncoras -api); exemplos de entidades com o id do registro (MOD-03) e o administrador usr-dboaz-admin; catalogo-sequencia v02, com as telas |
 
 ---
 
-<sub>boaz · v28 · 2026-11-05 12:34 · `1_Requisitos/16_modulo-catalogo.md`</sub>
+<sub>boaz · v29 · 2026-11-08 23:16 · `1_Requisitos/16_modulo-catalogo.md`</sub>

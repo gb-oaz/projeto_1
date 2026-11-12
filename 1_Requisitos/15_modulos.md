@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "15_modulos"
 tipo: "Funcionalidade"
 titulo: "Módulos"
-versao: "v25"
-data: "2026-11-05 12:34"
-status: "Aprovado"
+versao: "v30"
+data: "2026-11-09 09:05"
+status: "Em revisão"
 objetivo: "definir como um módulo do deboaz é construído, para que todo módulo siga o mesmo molde antes de entrar no catálogo."
 ---
 
-> **boaz · Funcionalidade** · `15_modulos` · **v25** · 2026-11-05 12:34 · **Aprovado**
+> **boaz · Funcionalidade** · `15_modulos` · **v30** · 2026-11-09 09:05 · **Em revisão**
 
 # Módulos
 
@@ -17,9 +17,9 @@ objetivo: "definir como um módulo do deboaz é construído, para que todo módu
 
 ---
 
-<a id="cenarios"></a>
+<a id="cenarios-tela"></a>
 
-## Cenários
+## Cenários de tela
 
 <a id="porta-de-entrada"></a>
 
@@ -103,7 +103,7 @@ Cenário: ícone repetido
 
 <a id="RF-128"></a>
 
-### `RF-128` Três tamanhos do card
+### `RF-128` Quatro tamanhos do card
 
 ```gherkin
 Cenário: tamanho padrão
@@ -144,7 +144,7 @@ Cenário: mudar o tamanho
   Dado a conta master em Ordenar
   Quando toca no menu do card da Presença e escolhe "Expandida"
   Então o card da Presença ocupa a linha toda
-  E, no menu, "Expandida" aparece marcada
+  E no menu "Expandida" aparece marcada
 
 Cenário: outro aparelho
   Dado o Lucas Andrade com a Carteirinha na reduzida no celular
@@ -156,18 +156,20 @@ Cenário: outro aparelho
 
 ### `RF-133` Atualização dos números
 
+> Escolha salva para a pessoa: [17_modulo-usuario `RN-283`](17_modulo-usuario.md#RN-283)
+
 ```gherkin
 Cenário: na abertura, o padrão
   Dado a conta master da Escola Bento Freitas com Módulos aberto e "Na abertura" marcado na Conta
   E o card de Usuários com "248" usuários ativos
   Quando um staff cria um participante em outro aparelho
   Então o card continua com "248"
-  E, ao sair de Módulos e voltar, mostra "249"
+  E ao sair de Módulos e voltar, mostra "249"
 
 Cenário: ao vivo
-  Dado a mesma conta master com "Ao vivo" marcado na Conta
+  Dado a mesma conta master com "Ao vivo" e "A cada 15 s" marcados na Conta
   Quando um staff cria um participante em outro aparelho
-  Então o card de Usuários passa a "249" sem ela sair de Módulos
+  Então em até 15 s o card de Usuários passa a "249" sem ela sair de Módulos
   E a rolagem da tela não muda
 
 Cenário: outro aparelho
@@ -372,7 +374,7 @@ Esquema do Cenário: limite de cada dado
     | o rótulo do macro   | 20 caracteres | cabe                            |
     | a série curta       | 5 pontos      | cabe                            |
     | os números de apoio | 4             | é encurtado para 3 no documento |
-    | a série das semanas | 7 pontos      | cabe                            |
+    | a série longa       | 12 pontos     | cabe                            |
     | a lista             | 4 linhas      | é encurtada para 3 no documento |
 ```
 
@@ -429,10 +431,11 @@ Esquema do Cenário: o que conta como abertura
   Então os números dos cards se atualizam
 
   Exemplos:
-    | ação                       |
-    | troca de aba em Módulos    |
-    | volta de um módulo aberto  |
-    | puxa a tela para atualizar |
+    | ação                                  |
+    | toca em Módulos na barra de navegação |
+    | troca de aba em Módulos               |
+    | volta de um módulo aberto             |
+    | puxa a tela para atualizar            |
 
 Cenário: ao vivo sem piscar
   Dado "Ao vivo" marcado
@@ -463,6 +466,145 @@ Esquema do Cenário: toda imagem segue a regra
     | a foto do estudante no quest             |
     | uma imagem da vitrine de um módulo       |
     | qualquer imagem pedida por um módulo     |
+```
+
+<a id="RN-276"></a>
+
+### `RN-276` Card comum de todo módulo
+
+> Ícone do card: [`RN-219`](#RN-219), guardado na aba Dados do [16_modulo-catalogo `RF-123`](16_modulo-catalogo.md#RF-123)
+
+```gherkin
+Cenário: participante como perfil do card
+  Dado a ficha da Carteirinha com o card para a conta master e para o participante
+  Quando o Lucas Andrade abre a Carteira no quest
+  Então vê o card da Carteirinha
+
+Cenário: perfil fora da ficha
+  Dado a ficha do Usuários sem o participante entre os perfis do card
+  Quando o Lucas Andrade abre a Carteira no quest
+  Então não vê o card do Usuários
+
+Cenário: mesmo ícone em todo perfil e tamanho
+  Dado o ícone do Usuários guardado na aba Dados do Catálogo
+  Quando a conta master e a staff Maria veem o card do Usuários nos quatro tamanhos
+  Então as duas veem o mesmo ícone em todos eles
+  E os números mudam de um perfil para o outro
+```
+
+<a id="RN-277"></a>
+
+### `RN-277` Recortes dia, semana e mês
+
+> Toque no card fora do seletor abre o módulo: [`RF-128`](#RF-128)
+
+```gherkin
+Esquema do Cenário: série de cada tamanho
+  Dado o card do Usuários da EBFGA em 2026-11-08 com o recorte "<recorte>"
+  Quando o card está na <tamanho>
+  Então a série mostra <pontos>, o atual por último, com os rótulos <rotulos>
+
+  Exemplos:
+    | recorte | tamanho   | pontos                | rotulos                |
+    | Mês     | normal    | os 5 últimos meses    | "jul" a "nov"          |
+    | Mês     | expandida | os 12 últimos meses   | "dez" a "nov"          |
+    | Semana  | normal    | as 5 últimas semanas  | "S8" a "S12"           |
+    | Semana  | expandida | as 12 últimas semanas | "S1" a "S12"           |
+    | Dia     | normal    | os 5 últimos dias     | "4" a "8"              |
+    | Dia     | expandida | os 12 últimos dias    | "28" a "8"             |
+
+Esquema do Cenário: tendência do recorte
+  Dado o card do Usuários da EBFGA com 335 agora e <antes> no fim do <periodo> anterior
+  Quando a conta master escolhe "<recorte>" no card
+  Então a tendência mostra "<tendencia>"
+
+  Exemplos:
+    | recorte | periodo | antes | tendencia    |
+    | Mês     | mês     | 323   | +12 no mês   |
+    | Semana  | semana  | 333   | +2 na semana |
+    | Dia     | dia     | 334   | +1 no dia    |
+
+Cenário: trocar o recorte sem abrir o módulo
+  Dado a conta master com o card do Usuários na normal, em "Mês", no celular
+  Quando toca em "Semana" no seletor Dia, Semana e Mês do card
+  Então a série e a tendência passam à semana e o módulo não abre
+  E no computador o card continua em "Mês", o padrão, porque a escolha fica no aparelho
+```
+
+<a id="RN-279"></a>
+
+### `RN-279` Atualização na abertura e ao vivo
+
+> Escolha da pessoa: [`RF-133`](#RF-133) e [`RN-220`](#RN-220)
+
+```gherkin
+Cenário: padrão, sem conexão aberta
+  Dado a conta master da EBFGA sem escolha feita, com "Na abertura" marcado
+  Quando toca em Módulos na barra de navegação
+  Então os números dos cards se atualizam nesse momento
+  E nada mais chega até a próxima abertura, para economizar dados
+
+Esquema do Cenário: ligar o ao vivo
+  Dado a conta master com "Na abertura" marcado na Conta
+  Quando marca "Ao vivo" e escolhe "<intervalo>"
+  Então os cards se atualizam a cada <segundos> s com Módulos aberto
+  E a linha "Intervalo" aparece só com "Ao vivo" marcado
+  E a escolha vale também nos outros aparelhos dela
+
+  Exemplos:
+    | intervalo                 | segundos |
+    | A cada 5 s                | 5        |
+    | A cada 15 s               | 15       |
+    | A cada 30 s               | 30       |
+    | A cada 1 min              | 60       |
+    | A cada 5 min, já marcado  | 300      |
+
+Cenário: desligar o ao vivo para economizar dados
+  Dado a conta master com "Ao vivo" e "A cada 5 s" marcados
+  Quando marca "Na abertura"
+  Então a conexão ao vivo fecha e a linha "Intervalo" se esconde
+  E os números só se atualizam ao tocar em Módulos, como no padrão
+```
+
+<a id="RN-282"></a>
+
+### `RN-282` Ao vivo encerrado e queda de rede
+
+```gherkin
+Esquema do Cenário: encerrado pelo deboaz
+  Dado a conta master com "Ao vivo" salvo e Módulos aberto no tablet
+  Quando o tablet recebe o evento "encerrado" com o código "<codigo>"
+  Então o tablet mostra o snackbar "<aviso>", sem ação, que some sozinho
+  E o seletor do tablet segue mostrando "Na abertura" marcado
+  E só o tablet fica pausado em "Na abertura"; o "Ao vivo" salvo para ela não muda
+  E o tablet não reconecta sozinho
+
+  Exemplos:
+    | codigo          | aviso                                         |
+    | LIMITE_CONEXOES | Ao vivo pausado: aberto em outros 3 aparelhos |
+    | ACESSO_NEGADO   | Ao vivo pausado: sem acesso a este módulo     |
+
+Cenário: queda de rede
+  Dado a conta master com "Ao vivo" e Módulos aberto no celular
+  Quando a rede cai
+  Então o celular tenta reconectar depois de 1, 2, 4, 8, 16, 32 e 60 s
+  E depois a cada 60 s, até a rede voltar ou Módulos fechar
+  E enquanto tenta, cada card mantém os últimos números com a marca "reconectando…"
+  E a tela segue livre para rolar e tocar
+  E o card mostra os números atuais ao reconectar
+
+Cenário: reabrir o app não religa
+  Dado o tablet pausado em "Na abertura" depois do "encerrado", com "Ao vivo" salvo
+  Quando a conta master fecha e abre o app no tablet
+  Então o tablet continua pausado e os números só se atualizam ao tocar em Módulos
+  E quando ela marca "Ao vivo" de novo no tablet, a pausa sai e o tablet reconecta
+  E nada novo é salvo, porque a escolha dela já era "Ao vivo"
+
+Cenário: sessão terminada com o ao vivo aberto
+  Dado a conta master com "Ao vivo" e Módulos aberto no tablet
+  Quando o tablet recebe o evento "encerrado" com o código "SESSAO_TERMINADA"
+  Então não aparece snackbar de ao vivo pausado
+  E ela vai para a tela de entrada, como em qualquer sessão terminada
 ```
 
 <a id="MOD-01"></a>
@@ -708,6 +850,7 @@ Esquema do Cenário: o que todo módulo entrega
   Exemplos:
     | dado                          | quem precisa           | onde                                |
     | o ícone, só dele              | todo módulo            | os quatro tamanhos e o Catálogo     |
+    | os perfis que veem o card     | todo módulo            | o card; o participante pode ser um  |
     | o nome, até 16 caracteres     | todo módulo            | reduzida, normal, expandida e topo  |
     | a frase, até duas linhas      | contratável            | Catálogo e vitrine da landing page  |
     | o mascote padrinho            | contratável            | Catálogo e destaque da landing page |
@@ -715,9 +858,9 @@ Esquema do Cenário: o que todo módulo entrega
     | o dado macro, por perfil      | todo módulo            | reduzida                            |
     | o número principal e rótulo   | todo módulo            | normal e expandida                  |
     | a tendência e o sentido       | número que muda        | normal e expandida                  |
-    | a série curta ou progresso    | todo módulo            | normal e expandida                  |
+    | a série curta ou progresso    | todo módulo            | normal, por dia, semana e mês       |
     | até 3 números de apoio        | opcional               | normal e expandida                  |
-    | a série das semanas, 7 pontos | todo módulo            | expandida                           |
+    | a série longa, 12 pontos      | todo módulo            | expandida, por dia, semana e mês    |
     | a lista, até 3 linhas         | todo módulo            | expandida                           |
     | o estado sem dados            | todo módulo            | normal, expandida e reduzida        |
     | o rótulo falado               | todo módulo            | os quatro tamanhos                  |
@@ -726,6 +869,11 @@ Esquema do Cenário: o que todo módulo entrega
     | o aviso para completar        | módulo que pede algo   | módulo aberto e card                |
     | a vitrine de telas            | contratável            | Catálogo e página do módulo         |
     | como funciona e quem usa      | contratável            | Catálogo e página do módulo         |
+
+Cenário: cada número de uma consulta
+  Quando o módulo é especificado
+  Então cada número do card diz de que dados do próprio módulo sai
+  E o documento do módulo guarda esses números numa coleção só dele, como na RN-278
 ```
 
 <a id="fora-de-escopo"></a>
@@ -742,23 +890,124 @@ Cenário: o que este documento não trata
 
 ---
 
+<a id="cenarios-api"></a>
+
+## Cenários de API
+
+<a id="RN-276-api"></a>
+
+### `RN-276` Card comum de todo módulo
+
+> Corpo inteiro do card do Usuários: [17_modulo-usuario `RN-189`](17_modulo-usuario.md#RN-189-api)
+
+```gherkin
+Esquema do Cenário: campos do card
+  Dado a conta master da EBFGA com o token de acesso e o "MOD-03" contratado
+  Quando envia GET /usuarios/card
+  Então a resposta é 200 e traz <campo> com <conteudo>
+
+  Exemplos:
+    | campo        | conteudo                                                     |
+    | modulo       | o ID do módulo, "MOD-03"                                     |
+    | perfil       | o perfil de quem pede, "INSTITUICAO"                         |
+    | versao       | o número que sobe a cada mudança dos números                 |
+    | atualizadoEm | a data e a hora da última mudança, em UTC                    |
+    | vazio        | true quando o módulo ainda não tem dados                     |
+    | selo         | o número do selo, 0 sem nada a avisar                        |
+    | reduzida     | valor e rotulo do dado macro                                 |
+    | normal       | valor, rotulo e até 3 apoio, cada um com nome e valor        |
+    | expandida    | até 3 linhas em lista, cada uma com nome e valor             |
+    | series       | dia, semana e mes, 12 números cada, do mais antigo ao atual  |
+
+Cenário: todos os tamanhos e nenhum ícone
+  Quando a conta master envia GET /usuarios/card
+  Então a resposta traz a reduzida, a normal e a expandida, sem pedir o tamanho
+  E não traz o ícone, que vem do Catálogo
+
+Cenário: perfil fora da ficha
+  Dado a ficha do Usuários sem o participante entre os perfis do card
+  Quando o Lucas Andrade envia GET /usuarios/card
+  Então a resposta é 403 ACESSO_NEGADO
+```
+
+<a id="RN-278"></a>
+
+### `RN-278` Números do card guardados prontos
+
+> Instância: coleção "cardUsuarios" do [17_modulo-usuario `RN-280`](17_modulo-usuario.md#RN-280)
+
+```gherkin
+Cenário: atualizado na mesma execução da mudança
+  Dado o card do Usuários da EBFGA na versao 418, com 298 participantes ativos
+  Quando o staff João envia POST /usuarios e cria o participante Lucas Andrade com 201
+  Então o card guardado passa à versao 419 com 299 participantes na mesma execução
+  E o próximo GET /usuarios/card traz 299, lido do card guardado
+
+Cenário: fechamento do dia, da semana e do mês
+  Dado o card do Usuários da EBFGA com 400 dias, 106 semanas e 24 meses guardados
+  Quando chega 00:00 de 2027-03-01, segunda-feira, no horário de Brasília
+  Então o card guardado abre o dia 2027-03-01, a semana dele e o mês 2027-03
+  E sai o dia, a semana e o mês mais antigos, para manter 400, 106 e 24
+
+Cenário: números que mudam só com o tempo
+  Dado o Lucas Andrade com o último acesso em 2026-10-01, sem mudança desde então
+  Quando a conta master envia GET /usuarios/card em 2026-11-08
+  Então o Lucas conta em "Sem acesso há 30 dias"
+  E essa contagem, o selo e "Códigos vencidos" são refeitos na leitura e no fechamento do dia
+  E a versao não sobe por eles
+```
+
+<a id="RN-279-api"></a>
+
+### `RN-279` Atualização na abertura e ao vivo
+
+```gherkin
+Cenário: conectar com o intervalo
+  Dado a conta master da EBFGA com o token de acesso
+  Quando envia GET /usuarios/card/ao-vivo?intervalo=30 com Accept "text/event-stream"
+  Então a resposta é 200 e a conexão fica aberta
+  E o primeiro evento "card" traz o mesmo corpo de GET /usuarios/card, com id igual à versao
+  E a cada 30 s chega um evento "card", se a versao mudou
+  E um ": ping" chega a cada 30 s, qualquer que seja o intervalo, para manter a conexão
+
+Esquema do Cenário: intervalo pedido
+  Quando a conta master envia GET /usuarios/card/ao-vivo <pedido>
+  Então <resposta>
+
+  Exemplos:
+    | pedido          | resposta                                                     |
+    | ?intervalo=5    | é 200, com um "card" a cada 5 s, se a versao mudou           |
+    | ?intervalo=300  | é 200, com um "card" a cada 300 s e um ": ping" a cada 30 s  |
+    | sem o parâmetro | é 200, como ?intervalo=300, o padrão                         |
+    | ?intervalo=10   | é 422 DADOS_INVALIDOS com o campo "intervalo"                |
+    | ?intervalo=0    | é 422 DADOS_INVALIDOS com o campo "intervalo"                |
+
+Cenário: quarta conexão do mesmo usuário
+  Dado a conta master com 3 conexões ao vivo abertas: celular, tablet e computador
+  Quando ela envia GET /usuarios/card/ao-vivo de um segundo computador
+  Então a 4ª conexão recebe 200 e fica aberta
+  E a mais antiga recebe o evento "encerrado" com o código "LIMITE_CONEXOES" e fecha
+```
+
+---
+
 <a id="historico"></a>
 
 ## Histórico
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v25** | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md`; a [porta de entrada](#porta-de-entrada) cita os documentos em `.md` |
+| **v30** | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Dado, Então ou E (`RF-129`, `RF-133`, `RN-278`, `RN-279`, `RN-282`), sem mudar o comportamento |
+| v29 | 2026-11-09 03:21 | `RN-279`: a linha "Intervalo" só aparece com "Ao vivo" marcado; `RN-282`: aviso em snackbar sem ação que some sozinho, com "Na abertura" visível no seletor; "reconectando…" nos cards sem travar a tela; SESSAO_TERMINADA leva à tela de entrada, sem aviso de pausa |
+| v28 | 2026-11-09 00:53 | `RN-282`: a pausa depois do "encerrado" é só daquele aparelho e não muda o "Ao vivo" salvo; reabrir o app não religa, só marcar "Ao vivo" de novo no aparelho, sem salvar nada novo; Em aberto respondido e seção removida |
+| v27 | 2026-11-09 00:44 | `RN-277` com os rótulos dos pontos (nov, S1 a S12, dia do mês), a tendência por recorte ("+12 no mês", "+2 na semana", "+1 no dia") e o seletor que não abre o módulo; `RN-278` selo e Códigos vencidos refeitos na leitura, sem subir a versao; `RN-279-api` ping a cada 30 s; `RN-282` novo (aviso do encerrado, aparelho volta a Na abertura, reconexão até 60 s); `RF-133` cita a preferência salva (17 `RN-283`); Em aberto: volta ao ao vivo |
+| v26 | 2026-11-08 23:16 | Card comum de todo módulo: `RN-276` (perfis da ficha, o participante pode ser um; ícone do Catálogo; GET /<modulo>/card com todos os tamanhos), `RN-277` recortes dia, semana e mês, `RN-278` números guardados prontos, `RN-279` na abertura e ao vivo (GET /<modulo>/card/ao-vivo, 5 a 300 s, até 3 conexões); `RF-128` quatro tamanhos; `RF-133`, `RN-218`, `RN-220` e a ficha do módulo ajustados; seção Cenários vira Cenários de tela e ganha Cenários de API; status → Em revisão |
+| v25 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md`; a [porta de entrada](#porta-de-entrada) cita os documentos em `.md` |
 | v24 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v23 | 2026-11-03 22:01 | Imagem enviada em SVG: toda imagem é convertida em SVG no hub ou no quest e enviada como texto (`RN-260`) |
 | v22 | 2026-11-03 10:48 | Registro do Catálogo (`MOD-14`) aponta para o documento renomeado 16_modulo-catalogo |
 | v21 | 2026-11-01 18:20 | Só Gherkin: contexto, RF, RN, registro de módulos (um cenário por MOD-NN, mesmo ID como âncora), quem usa cada módulo, ficha do módulo e fora de escopo viram cenários; status → Em revisão |
-| v20 | 2026-11-01 03:57 | Aprovado |
-| v19 | 2026-11-01 03:38 | `MOD-15` Painel de administração retirado: juntado ao `MOD-03` Usuários, que no time deboaz cuida também das contas de instituição e de educador autônomo |
-| v18 | 2026-11-01 02:08 | Registro do Usuários (`MOD-03`) aponta também para 17-a (autenticação) e 17-b (autorização) |
-| v17 | 2026-11-01 01:20 | Aprovação |
-| v16 | 2026-11-01 01:14 | Tarefas (`MOD-09`) passa a ser da conta, base da aplicação, cobrado por participante (`RN-204`); ficha do módulo ganha Publicações no Feed |
 
 ---
 
-<sub>boaz · v25 · 2026-11-05 12:34 · `1_Requisitos/15_modulos.md`</sub>
+<sub>boaz · v30 · 2026-11-09 09:05 · `1_Requisitos/15_modulos.md`</sub>

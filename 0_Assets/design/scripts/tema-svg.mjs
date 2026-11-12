@@ -439,7 +439,8 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
   }
   // card de módulo nos quatro tamanhos, em células quadradas (grade estilo Windows Phone; largura × altura em células de lado cel):
   // mínima 1x1 = ícone e selo; reduzida 2x2 = ícone, nome e um número macro; normal 4x4 = número, tendência, série e números
-  // de apoio; expandida 4x8 = a normal com o gráfico das semanas e a lista do módulo. Ordenando: alça, botão de opções e o menu
+  // de apoio; expandida 4x8 = a normal com a série longa (12 pontos do recorte) e a lista do módulo. Ordenando: alça, botão de opções e o menu.
+  // Com recorte (Dia, Semana ou Mês), o seletor fica no card e não abre o módulo; a série curta mostra os 5 últimos pontos
   const TAM = { minima: 'minimal', reduzida: 'reduced', normal: 'normal', expandida: 'expanded' };
   function cardTamanho(e, x, y, cel, tamanho, ic, titulo, { n, metrica = {}, ordenando, aberto } = {}) {
     const g = num('module-card-grid-gap'), k = TAM[tamanho], c = num(`module-card-${k}-columns`), r = num(`module-card-${k}-rows`);
@@ -455,11 +456,12 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
       s += txt(x + p, y + p + 64, t, 'title-small', e['on-surface']) + txt(x + p, y + h - p, metrica.valor, 'headline-small', e.primary);
       if (n) s += selo(e, x + w - 20, y + 20, n);
     } else {
-      s = cardModulo(e, x, y, w, h, ic, titulo, { n, metrica });
+      // a expandida já mostra a série longa: a curta sai do alto do card
+      s = cardModulo(e, x, y, w, h, ic, titulo, { n, metrica: tamanho === 'expandida' && metrica.longa ? { ...metrica, serie: undefined } : metrica });
       if (tamanho === 'expandida') {
-        const yy = y + cel * 4 + g * 3 - 64, lw = w - 2 * p, serie = metrica.semanas || metrica.serie || [];
-        s += `<rect x="${x + p}" y="${yy}" width="${lw}" height="1" fill="${e['outline-variant']}"/>` + txt(x + p, yy + 32, 'Últimas semanas', 'title-small', e['on-surface']);
-        s += graficoBarras(e, x + p, yy + 48, lw, 132, serie, { destaque: serie.length - 1, rotulos: serie.map((_, i) => `S${i + 1}`), mostrarValores: true, barraMax: 28 });
+        const yy = y + cel * 4 + g * 3 - 64, lw = w - 2 * p, serie = metrica.longa || metrica.serie || [];
+        s += `<rect x="${x + p}" y="${yy}" width="${lw}" height="1" fill="${e['outline-variant']}"/>` + txt(x + p, yy + 32, metrica.tituloLonga || 'Últimas semanas', 'title-small', e['on-surface']);
+        s += graficoBarras(e, x + p, yy + 48, lw, 132, serie, { destaque: serie.length - 1, rotulos: metrica.rotulosLonga || serie.map((_, i) => `S${i + 1}`), mostrarValores: true, barraMax: 28 });
         (metrica.lista || []).forEach(([a, b], i) => {
           const ly = yy + 204 + i * 48;
           s += `<rect x="${x + p}" y="${ly}" width="${lw}" height="1" fill="${e['outline-variant']}"/>` + txt(x + p, meio(ly, 48, 'body-medium'), a, 'body-medium', e['on-surface']) + txt(x + w - p, meio(ly, 48, 'title-small'), b, 'title-small', e.primary, 'end');
@@ -505,7 +507,7 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
         if (estado) { const ew = largura(estado, 'label-medium') + 16; s += rect(x + p, y + h - p - 24, ew, 24, cantos.small, e['tertiary-container']) + txt(x + p + 8, meio(y + h - p - 24, 24, 'label-medium'), estado, 'label-medium', e['on-tertiary-container']); }
         return s;
       }
-      const { valor, rotulo, tendencia, melhora, serie, progresso, extras = [] } = metrica, y0 = y + 72, gw = serie ? Math.min(132, w * 0.36) : 0;
+      const { valor, rotulo, tendencia, melhora, progresso, recorte, extras = [] } = metrica, serie = metrica.serie && metrica.serie.slice(-5), y0 = y + 72, gw = serie ? Math.min(132, w * 0.36) : 0;
       s += txt(x + p, y0 + 28, valor, 'headline-medium', e.primary);
       if (tendencia) {
         // a seta diz para onde o número foi; a cor diz se isso é bom (melhora: padrão subir é bom; false quando cair é bom)
@@ -515,6 +517,8 @@ export function desenhista({ esquemas, tipos, cantos, janelas, tokensComp, fonte
       s += txt(x + p, y0 + 50, corta(rotulo, 'body-medium', w - 2 * p - gw - 12), 'body-medium', e['on-surface-variant']);
       if (serie) s += graficoBarras(e, x + w - p - gw, y0, gw, 54, serie, { destaque: serie.length - 1, barraMax: 16 });
       let ye = y0 + 66;
+      // seletor do recorte (RN-277): toque nele troca a série e a tendência, sem abrir o módulo
+      if (recorte) { const ops = ['Dia', 'Semana', 'Mês']; s += segmentado(e, x + p, ye - 2, ops, ops.indexOf(recorte), w - 2 * p).svg; ye += num('segmented-button-height') + 8; }
       if (progresso !== undefined) { s += rect(x + p, ye, w - 2 * p, 8, 4, e['surface-container-highest']) + rect(x + p, ye, Math.max(8, (w - 2 * p) * progresso), 8, 4, e.primary); ye += 18; }
       if (extras.length) {
         s += `<rect x="${x + p}" y="${ye}" width="${w - 2 * p}" height="1" fill="${e['outline-variant']}"/>`;
@@ -840,10 +844,11 @@ export function temaSvg({ esquemas, tipos, cantos, janelas, tokensComp, fonte, v
     ['Comum · Navegação da casca', 'Compact: barra com os destinos e, abaixo do topo, abas primárias com os subníveis do destino (Módulos: Contratados, Da conta e A contratar); medium e expanded: barra lateral em acordeão.', 136, (e, x, y) =>
       abas(e, x, y, 336, ['Contratados', 'Da conta', 'A contratar']) + nav3(e, x, y + 56, 336, [['modulo', 'Módulos'], ['feed', 'Feed'], ['perfil', 'Conta']])
         + nav3(e, x + 356, y + 56, 336, [['evento', 'Tarefas'], ['feed', 'Feed'], ['carteira', 'Carteira'], ['perfil', 'Perfil']], '5', 2, 2)],
-    ['Comum · Card de módulo', 'Módulos e Carteira, em células quadradas de 76dp ou mais (Windows Phone): mínima 1x1, reduzida 2x2, normal 4x4 (padrão) e expandida 4x8; janela larga = mais colunas.', 672, (e, x, y) => {
+    ['Comum · Card de módulo', 'Módulos e Carteira, em células quadradas de 76dp ou mais (Windows Phone): mínima 1x1, reduzida 2x2, normal 4x4 (padrão) e expandida 4x8; janela larga = mais colunas. Com série: seletor Dia | Semana | Mês, que não abre o módulo; normal com os 5 últimos pontos, expandida com 12.', 672, (e, x, y) => {
       const g = num('module-card-grid-gap'), cel = num('module-card-cell-min-size'), W = 4 * cel + 3 * g, x1 = x + (PW - 2 * PAD - 2 * W - 36) / 2, x2 = x1 + W + 36;
-      const pres = { valor: '94%', rotulo: 'presença na semana', tendencia: '+2 pts', serie: [88, 91, 90, 92, 94], extras: [['12', 'turmas', 'secondary'], ['3', 'sem chamada hoje', 'tertiary'], ['18', 'faltas seguidas', 'error']],
-        semanas: [86, 88, 91, 90, 89, 92, 94], lista: [['7º A', '98%'], ['8º B', '91%'], ['9º C', '87%']] };
+      const sem = [85, 87, 86, 88, 91, 90, 89, 88, 91, 90, 92, 94];
+      const pres = { valor: '94%', rotulo: 'presença', tendencia: '+2 na semana', recorte: 'Semana', serie: sem, extras: [['12', 'turmas', 'secondary'], ['3', 'sem chamada hoje', 'tertiary'], ['18', 'faltas seguidas', 'error']],
+        longa: sem, tituloLonga: 'Últimas 12 semanas', rotulosLonga: sem.map((_, i) => `S${i + 1}`), lista: [['7º A', '98%'], ['8º B', '91%'], ['9º C', '87%']] };
       const cart = { valor: '312', rotulo: 'carteirinhas prontas', progresso: 0.92, extras: [['28', 'esperando a foto', 'tertiary'], ['4', 'vencendo', 'error']] };
       const a = cardTamanho(e, x1, y, cel, 'expandida', 'check', 'Presença', { n: '3', metrica: pres });
       const b = cardTamanho(e, x2, y, cel, 'normal', 'perfil', 'Carteirinha', { metrica: cart });

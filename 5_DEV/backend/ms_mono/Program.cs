@@ -5,20 +5,22 @@ using Boaz.Core.Commons.Usuario.Autorizacao.UseCases;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 using Boaz.Core.Commons.Usuario.Usuarios.UseCases;
-using Boaz.MsMono.Infra.In.Commons;
-using Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
-using Boaz.MsMono.Infra.Out.Commons;
-using Boaz.MsMono.Infra.Out.Commons.Usuario;
-using Boaz.MsMono.Infra.Out.Commons.Usuario.Autenticacao;
-using Boaz.MsMono.Infra.Out.Commons.Usuario.Autorizacao;
-using Boaz.MsMono.Infra.Out.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Primario.In.Commons;
+using Boaz.MsMono.Primario.In.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Secundario.In.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Secundario.Out.Commons;
+using Boaz.MsMono.Secundario.Out.Commons.Usuario;
+using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autenticacao;
+using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autorizacao;
+using Boaz.MsMono.Secundario.Out.Commons.Usuario.Usuarios;
 using Boaz.MsMono.Sistema;
 using Microsoft.Extensions.Options;
 using Autenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Ports.Out;
 using Autorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 
 // Ponto de composição do backend (RN-149): aqui, e só aqui, as portas do
-// core/ são ligadas aos adaptadores de infra/in/ e infra/out/.
+// core/ são ligadas aos adaptadores primários (primario/in e primario/out) e
+// secundários (secundario/in e secundario/out).
 var builder = WebApplication.CreateBuilder(args);
 var servicos = builder.Services;
 
@@ -26,12 +28,14 @@ servicos.AddConfiguracoes();
 servicos.AddDocumentacaoApi();
 servicos.AddJsonDasApis();
 servicos.AddControladoresDasApis();
-servicos.AddSingleton(TimeProvider.System);
+// o relógio de toda a aplicação; só o relógio de teste (sistema/TesteController) o desloca
+servicos.AddSingleton<RelogioDaAplicacao>();
+servicos.AddSingleton<TimeProvider>(s => s.GetRequiredService<RelogioDaAplicacao>());
 // AMBIENTE (hml ou prd): só homologação tem as contas qa (17 RN-179, RN-266)
 servicos.AddSingleton(new Boaz.Core.Commons.Usuario.Usuarios.Domain.AmbienteDaAplicacao(
     builder.Configuration[Boaz.Core.Commons.Usuario.Usuarios.Domain.ContasIniciais.VariavelDoAmbiente]));
 
-// ── infra/out: banco, cache, índices e o registro de módulos ─────────────────
+// ── secundario/out: banco, cache, índices e o registro de módulos ────────────
 servicos.AddSingleton<Armazenamento>();
 servicos.AddSingleton<Indices>();
 servicos.AddSingleton<RegistroDeModulos>();
@@ -45,7 +49,13 @@ servicos.AddSingleton<IAuditoria>(s => s.GetRequiredService<RegistrosNoBanco>())
 servicos.AddSingleton<IAuditoriaDeErros>(s => s.GetRequiredService<RegistrosNoBanco>());
 servicos.AddSingleton<IPedidosDeAjuda>(s => s.GetRequiredService<RegistrosNoBanco>());
 servicos.AddSingleton<IPagamentos>(s => s.GetRequiredService<RegistrosNoBanco>());
-servicos.AddSingleton<IIndicadores, IndicadoresNoBanco>();
+servicos.AddSingleton<IRepositorioCardUsuarios, CardsNoBanco>();
+servicos.AddSingleton<IContagemDoCard, ContagemNoBanco>();
+servicos.AddSingleton<IPreferencias, PreferenciasNoBanco>();
+servicos.AddSingleton<EncerramentosPeloRedis>();
+servicos.AddSingleton<IConexoesAoVivo, ConexoesNoRedis>();
+servicos.AddSingleton<ITravaDoFechamento, TravaNoRedis>();
+servicos.AddSingleton<IAcessoAoVivo, AcessoDoAoVivo>();
 servicos.AddSingleton<ISessoesDosUsuarios, SessoesDosUsuarios>();
 servicos.AddSingleton<TentativasNoRedis>();
 servicos.AddSingleton<ITentativasDeLiberacao>(s => s.GetRequiredService<TentativasNoRedis>());
@@ -67,6 +77,7 @@ servicos.AddSingleton<Autorizacao.IUsuarios>(s => s.GetRequiredService<Permissoe
 servicos.AddSingleton<Autorizacao.IPermissoesGuardadas>(s => s.GetRequiredService<PermissoesNoBanco>());
 servicos.AddSingleton<Autorizacao.IModulos>(s => s.GetRequiredService<RegistroDeModulos>());
 servicos.AddSingleton<Autorizacao.IContratacoes, ContratacoesNoBanco>();
+servicos.AddSingleton<ContratacoesDeTeste>();
 servicos.AddSingleton<Autorizacao.ISessoesDoUsuario, AvisoDePermissoes>();
 
 // ── core: cada porta de entrada ligada ao caso de uso dela ───────────────────
@@ -98,7 +109,12 @@ servicos.AddSingleton<IPedirNovaGeracaoDeSenha, PedirNovaGeracaoDeSenha>();
 servicos.AddSingleton<IGerarNovoCodigoDeAcesso, GerarNovoCodigoDeAcesso>();
 servicos.AddSingleton<IDesativarUsuario, DesativarUsuario>();
 servicos.AddSingleton<IReativarUsuario, ReativarUsuario>();
-servicos.AddSingleton<ILerCardDeUsuarios, LerCardDeUsuarios>();
+servicos.AddSingleton<IObterCardUsuarios, ObterCardUsuarios>();
+servicos.AddSingleton<IAtualizarCardUsuarios, AtualizarCardUsuarios>();
+servicos.AddSingleton<IFecharCardsDoDia, FecharCardsDoDia>();
+servicos.AddSingleton<IAcompanharCardAoVivo, AcompanharCardAoVivo>();
+servicos.AddSingleton<IObterPreferencias, ObterPreferencias>();
+servicos.AddSingleton<ISalvarPreferencias, SalvarPreferencias>();
 servicos.AddSingleton<ILerTempoDaConta, LerTempoDaConta>();
 servicos.AddSingleton<ISalvarTempoDaConta, SalvarTempoDaConta>();
 servicos.AddSingleton<IListarContas, ListarContas>();
@@ -119,8 +135,10 @@ servicos.AddSingleton<ISalvarPermissoes, SalvarPermissoes>();
 servicos.AddSingleton<ILerHistoricoDePermissoes, LerHistoricoDePermissoes>();
 servicos.AddSingleton<IAvisarContratacaoMudou, AvisarContratacaoMudou>();
 
-// ── infra/in: a partida, antes do primeiro pedido ────────────────────────────
+// ── primario: a partida, antes do primeiro pedido ────────────────────────────
 servicos.AddSingleton<Partida>();
+// o fechamento da 00:00 de Brasília, em segundo plano (15 RN-278)
+servicos.AddHostedService<FechamentoDosCards>();
 
 var app = builder.Build();
 
@@ -133,7 +151,7 @@ if (DocumentacaoApi.Habilitada(app.Configuration))
     app.UseDocumentacaoApi();
 }
 
-// ── infra/in: os controllers (sistema/ e infra/in/<contexto>/<feature>/) ─────
+// ── primario/in: os controllers (sistema/ e primario/in/<contexto>/<feature>/) ─
 app.MapControllers();
 
 // A partida, antes de aceitar pedidos (usuario-inicializacao-sequencia): a

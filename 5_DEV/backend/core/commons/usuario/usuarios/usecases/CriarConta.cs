@@ -17,7 +17,8 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// "CONCLUIDO" antes de responder e, na recusa ou na falha, o registro de erro
 /// antes de a exceção sair daqui (RN-178, RN-270, RN-271). Sem log.
 /// </summary>
-public sealed class CriarConta(IContas contas, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio, AmbienteDaAplicacao ambiente)
+public sealed class CriarConta(IContas contas, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio, AmbienteDaAplicacao ambiente,
+    IAtualizarCardUsuarios cardsDoModulo)
     : ICriarConta
 {
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
@@ -43,6 +44,7 @@ public sealed class CriarConta(IContas contas, IAuditoria auditoria, IAuditoriaD
         var master = MontarMaster(conta, senha, agora);
 
         await Gravar(conta, master, comprovante, agora, ct);
+        await cardsDoModulo.Executar(new MudancaNoCadastroDto(conta.Id), ct);
         await RegistrarConclusao(execucao, conta, ct);
         return new(conta.Id, master.Login, senha, comprovante);
     }

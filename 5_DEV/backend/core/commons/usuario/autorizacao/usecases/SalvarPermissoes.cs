@@ -69,7 +69,7 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
 
         var permissoes = await PermissoesNaVersao(alvo, versaoLida, ct);
         var modulos = await leitor.ModulosDe(alvo, ct);
-        GarantirQuePodeMudar(alvo, permissoes.Visiveis(modulos.Disponiveis), novos, modulos,
+        GarantirQuePodeMudar(alvo, permissoes.Visiveis(modulos.Disponiveis), permissoes.Suspensos, novos, modulos,
             CalculoDePermissoes.Concediveis(quem, modsDeQuem, alvo, modulos));
         await Gravar(alvo, permissoes, novos, modulos, quem.Id, versaoLida, execucao, ct);
         await auditada.Concluir(execucao, ct);
@@ -84,9 +84,13 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
         return permissoes.Versao == versaoLida ? permissoes : throw FalhaDeAutorizacao.VersaoDesatualizada(permissoes.Versao, alvo.Nome);
     }
 
-    /// <summary>Cada módulo que muda existe, está contratado, o alvo usa e quem concede tem as abas (RN-166, RN-241).</summary>
+    /// <summary>
+    /// Cada módulo que muda existe, está contratado e não está suspenso no alvo,
+    /// o alvo usa e quem concede tem as abas (RN-166, RN-241, RN-286).
+    /// </summary>
     /// <exception cref="FalhaDeAutorizacao">MODULO_INEXISTENTE, MODULO_NAO_CONTRATADO, MODULO_NAO_USADO ou PERMISSAO_ACIMA.</exception>
-    static void GarantirQuePodeMudar(UsuarioAutorizado alvo, IReadOnlyDictionary<string, Abas> antes, IReadOnlyDictionary<string, Abas> novos,
+    static void GarantirQuePodeMudar(UsuarioAutorizado alvo, IReadOnlyDictionary<string, Abas> antes, IReadOnlyDictionary<string, Abas> suspensos,
+        IReadOnlyDictionary<string, Abas> novos,
         ModulosDaConta modulos, IReadOnlyDictionary<string, Abas> concediveis)
     {
         foreach (var mod in antes.Keys.Union(novos.Keys).Order(StringComparer.Ordinal))
@@ -95,7 +99,7 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
             var anterior = antes.TryGetValue(mod, out var a) ? a : (Abas?)null;
             if (depois == anterior) continue;
             var modulo = modulos.Registrado(mod) ?? throw FalhaDeAutorizacao.ModuloInexistente(mod);
-            if (!modulos.Disponiveis.Contains(mod)) throw FalhaDeAutorizacao.ModuloNaoContratado(mod, modulo.Nome);
+            if (!modulos.Disponiveis.Contains(mod) || suspensos.ContainsKey(mod)) throw FalhaDeAutorizacao.ModuloNaoContratado(mod, modulo.Nome);
             if (!CalculoDePermissoes.AlvoUsa(alvo, modulo)) throw FalhaDeAutorizacao.ModuloNaoUsado(mod, modulo.Nome, alvo.Nome);
             var mexe = (depois ?? anterior!.Value).Com(anterior ?? depois!.Value);
             if (!concediveis.TryGetValue(mod, out var pode) || !pode.Contem(mexe))

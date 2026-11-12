@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v87), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v108), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -949,38 +949,232 @@ Funcionalidade: Usuários
     E o Lucas e a Bia ficam os dois sem matrícula
 
   @RN-189
-  Cenário: dados do card
-    Dado a conta master da EBFGA, com 37 staff e 298 participantes ativos
+  Cenário: card da instituição
+    Dado a conta master da EBFGA, com 36 staff e 298 participantes ativos e 4 pendentes
+    E "staff" e "usuários ativos" contam também a própria conta master
     Quando envia GET /usuarios/card
-    Então a resposta é 200 com:
+    Então a resposta é 200 com, além de series:
       """
       {
+        "modulo": "MOD-03",
+        "perfil": "INSTITUICAO",
+        "versao": 418,
+        "atualizadoEm": "2026-11-08T15:00:00Z",
+        "vazio": false,
         "selo": 2,
-        "dado": 335,
-        "rotulo": "usuários ativos",
-        "noMes": 12,
-        "meses": [
-          301,
-          310,
-          318,
-          323,
-          335
-        ],
-        "staff": 37,
-        "participantes": 298
+        "reduzida": {
+          "valor": 335,
+          "rotulo": "usuários ativos"
+        },
+        "normal": {
+          "valor": 335,
+          "rotulo": "usuários ativos",
+          "apoio": [
+            {
+              "nome": "staff",
+              "valor": 37
+            },
+            {
+              "nome": "participantes",
+              "valor": 298
+            },
+            {
+              "nome": "pendentes",
+              "valor": 4
+            }
+          ]
+        },
+        "expandida": {
+          "lista": [
+            {
+              "nome": "Sem acesso há 30 dias",
+              "valor": 14
+            },
+            {
+              "nome": "Desativados",
+              "valor": 6
+            },
+            {
+              "nome": "Códigos vencidos",
+              "valor": 2
+            }
+          ]
+        }
+      }
+      """
+    E series traz dia, semana e mes com 12 números cada
+    E series.mes termina em 301, 310, 318, 323 e 335
+
+  @RN-189
+  Cenário: só a conta master
+    Dado a conta master da EBFGA recém-criada, sem staff nem participantes
+    Quando envia GET /usuarios/card
+    Então a resposta é 200 com "vazio": true
+    E a reduzida e a normal trazem valor 1, a própria conta master
+    E na normal "staff" vem com 1 e "participantes" com 0
+    E "vazio" passa a false quando a EBFGA cria o primeiro staff ou participante
+
+  @RN-189
+  Esquema do Cenário: perfil e dado macro de cada um
+    Quando <quem> envia GET /usuarios/card
+    Então perfil é "<perfil>" e a reduzida traz <reduzida>
+
+    Exemplos:
+      | quem                      | perfil      | reduzida                    |
+      | o administrador do deboaz | DEBOAZ      | 112 e "contas ativas"       |
+      | o membro do time Caio     | DEBOAZ      | 112 e "contas ativas"       |
+      | a conta master da EBFGA   | INSTITUICAO | 335 e "usuários ativos"     |
+      | a staff Maria             | STAFF       | 41 e "usuários ativos"      |
+      | o educador autônomo Pedro | AUTONOMO    | 32 e "usuários ativos"      |
+
+  @RN-189
+  Esquema do Cenário: sem o card
+    Quando <quem> envia GET /usuarios/card
+    Então a resposta é 403 ACESSO_NEGADO
+
+    Exemplos:
+      | quem                         |
+      | o participante Lucas Andrade |
+      | um staff sem o Usuários      |
+
+  @RN-280
+  Esquema do Cenário: números do perfil DEBOAZ, lidos de "contas"
+    Quando o card do perfil DEBOAZ conta <numero>
+    Então lê as contas de tipo INSTITUICAO ou AUTONOMO com <filtro>
+    E "sem acesso há 30 dias" pede a conta com criadaEm há mais de 30 dias
+    E o ultimoAcessoMaster nulo ou há mais de 30 dias
+
+    Exemplos:
+      | numero                                | filtro                                        |
+      | o selo e Master sem acesso há 30 dias | ATIVA e sem acesso há 30 dias                 |
+      | o dado macro                          | estado ATIVA                                  |
+      | instituições                          | estado ATIVA e tipo INSTITUICAO               |
+      | autônomos                             | estado ATIVA e tipo AUTONOMO                  |
+      | suspensas                             | estado SUSPENSA                               |
+      | Desativadas                           | estado DESATIVADA                             |
+      | Encerradas                            | estado ENCERRADA                              |
+
+  @RN-280
+  Esquema do Cenário: números das contas, lidos de "usuarios" e "geracoesSenha"
+    Dado o perfil INSTITUICAO ou AUTONOMO contando os usuarios do contaId da conta
+    E o perfil STAFF contando os usuarios com criadoPor igual à staff
+    E o selo do STAFF conta só as geracoesSenha com pedidaPor igual à staff
+    Quando o card conta <numero>
+    Então lê <consulta>
+
+    Exemplos:
+      | numero                | consulta                                                     |
+      | o selo                | PENDENTE com a geracoesSenha vencendo hoje, sem confirmadaEm |
+      | o dado macro          | MASTER, STAFF e PARTICIPANTE ATIVO; no STAFF, sem a MASTER   |
+      | staff                 | MASTER e STAFF ATIVO na INSTITUICAO; no STAFF, só STAFF      |
+      | participantes         | PARTICIPANTE ATIVO, na INSTITUICAO e no STAFF                |
+      | pendentes             | estado PENDENTE                                              |
+      | criados no mês        | criadoEm no mês atual, no AUTONOMO                           |
+      | Sem acesso há 30 dias | ATIVO, criadoEm e ultimoAcesso (ou nulo) há mais de 30 dias  |
+      | Desativados           | estado DESATIVADO                                            |
+      | Códigos vencidos      | PENDENTE com a última geracoesSenha vencida                  |
+
+  @RN-280
+  Cenário: criar participante atualiza os cards guardados
+    Dado o card da EBFGA com 298 participantes e o card da staff Maria com 38
+    Quando a Maria envia POST /usuarios e cria o participante Lucas Andrade com 201
+    Então o Lucas é gravado com criadoPor "usr-ebfga-maria" na mesma execução
+    E "cardUsuarios" passa a 299 no card da EBFGA e a 39 no card da Maria, e a versao sobe
+    E o selo, "Sem acesso há 30 dias" e "Códigos vencidos" não sobem a versao: são refeitos na leitura
+
+  @RN-280
+  Esquema do Cenário: casos de uso que recontam o card
+    Quando <caso> termina com sucesso
+    Então os cards guardados que ele toca são recontados na mesma execução e a versao sobe
+
+    Exemplos:
+      | caso                                                    |
+      | POST /contas, que cria a conta e a conta master         |
+      | POST /contas/{id}/estado, que muda o estado da conta    |
+      | POST /usuarios, que cria staff ou participante          |
+      | POST /usuarios/{id}/desativar e /reativar               |
+      | POST /usuarios/gerar-senha, a senha gerada no acesso    |
+      | POST /usuarios/{id}/nova-geracao-senha                  |
+
+  @RN-280
+  Cenário: nova geração de senha reconta o card
+    Dado o card da EBFGA na versao 419
+    Quando o João envia POST /usuarios/usr-ebfga-paulo/nova-geracao-senha e recebe 201
+    Então o card da EBFGA é recontado na mesma execução e passa à versao 420
+
+  @RN-280
+  Cenário: quem nunca entrou conta como sem acesso
+    Dado o participante Davi Rocha da EBFGA, ATIVO desde 2026-09-01, sem nenhum acesso
+    E o ultimoAcesso dele nulo
+    Quando a conta master envia GET /usuarios/card em 2026-11-08
+    Então o Davi conta em "Sem acesso há 30 dias"
+
+  @RN-280
+  Cenário: recém-criado que nunca entrou não conta
+    Dado o participante Bruno Lima da EBFGA, ATIVO, criado em 2026-11-03, sem nenhum acesso
+    E o ultimoAcesso dele nulo
+    Quando a conta master envia GET /usuarios/card em 2026-11-08
+    Então o Bruno não conta em "Sem acesso há 30 dias", porque existe há só 5 dias
+
+  @RN-281
+  Esquema do Cenário: quem não conecta
+    Quando <quem> envia GET /usuarios/card/ao-vivo?intervalo=30
+    Então a resposta é 403 ACESSO_NEGADO e nenhuma conexão fica aberta
+
+    Exemplos:
+      | quem                         |
+      | o participante Lucas Andrade |
+      | um staff sem o Usuários      |
+
+  @RN-281
+  Cenário: sessão termina com a conexão aberta
+    Dado a staff Maria conectada por GET /usuarios/card/ao-vivo?intervalo=5, no navegador
+    E a sessão dela de 8 h no navegador
+    Quando a sessão expira por 8 h sem uso, com a conexão ao vivo aberta
+    Então ela recebe o evento "encerrado" com o código "SESSAO_TERMINADA" e a conexão fecha
+
+  @RN-281
+  Cenário: Usuários retirado com a conexão aberta
+    Dado a staff Maria conectada ao vivo com "A cada 30 s" e "MOD-03" com "CU"
+    Quando a conta master retira dela o "MOD-03"
+    Então em até 30 s ela recebe "encerrado" com o código "ACESSO_NEGADO"
+    E a conexão fecha
+
+  @RN-283
+  Cenário: sem escolha feita
+    Dado o participante Lucas Andrade com o token de acesso, sem escolha salva
+    Quando envia GET /usuarios/eu/preferencias
+    Então a resposta é 200, sem o cabeçalho X-Trace-Id, com:
+      """
+      {
+        "atualizacaoCards": "NA_ABERTURA",
+        "intervaloAoVivo": 300
       }
       """
 
-  @RN-189
-  Esquema do Cenário: dado de cada perfil
-    Quando <quem> envia GET /usuarios/card
-    Então dado e rotulo são <dado>
+  @RN-283
+  Cenário: ligar o ao vivo
+    Dado a conta master da EBFGA com o token de acesso, sem nenhum módulo exigido
+    Quando envia PUT /usuarios/eu/preferencias com:
+      """
+      {
+        "atualizacaoCards": "AO_VIVO",
+        "intervaloAoVivo": 15
+      }
+      """
+    Então a resposta é 200 com o mesmo corpo, sem o cabeçalho X-Trace-Id
+    E o GET /usuarios/eu/preferencias de outro aparelho dela traz "AO_VIVO" e 15
+    E as coleções "auditoria" e "auditoriaErros" não ganham registro, nem no GET nem no PUT
+
+  @RN-283
+  Esquema do Cenário: valor inválido
+    Quando a conta master envia PUT /usuarios/eu/preferencias com <campo> igual a <valor>
+    Então a resposta é 422 DADOS_INVALIDOS com o campo "<campo>"
 
     Exemplos:
-      | quem                      | dado                        |
-      | a conta master da EBFGA   | 335 e "usuários ativos"     |
-      | o educador autônomo Pedro | 32 e "participantes ativos" |
-      | o administrador do deboaz | 112 e "contas ativas"       |
+      | campo            | valor     |
+      | intervaloAoVivo  | 10        |
+      | atualizacaoCards | "SEMPRE"  |
 
   @RN-190
   Cenário: senha fora das telas
@@ -1209,11 +1403,12 @@ Funcionalidade: Usuários
       | auditoriaErros     | traceId, contaId+quando, sem prazo de expiração               |
       | geracoesSenha      | usuarioId+pedidaEm↓, resumoComprovante, contaId+pedidaEm      |
       | registrosPermissao | usuarioId+em↓+versao↓                                         |
+      | cardUsuarios       | contaId+perfil+usuarioId único                                |
       | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205             |
 
   @RNF-227
   Cenário: segunda partida não duplica
-    Dado a aplicação de homologação iniciada em 2026-11-05, com as 7 coleções e seus índices
+    Dado a aplicação de homologação iniciada em 2026-11-05, com as 8 coleções e seus índices
     Quando ela inicia de novo em 2026-11-06
     Então cada coleção continua uma só, com os mesmos índices, nenhum repetido
     E nenhum documento das coleções é apagado nem duplicado
@@ -1235,7 +1430,7 @@ Funcionalidade: Usuários
 
   @RNF-227
   Cenário: pronta depois da partida
-    Dado a partida de homologação concluída, com as 7 coleções e seus índices prontos
+    Dado a partida de homologação concluída, com as 8 coleções e seus índices prontos
     E os módulos gravados e as contas iniciais garantidas
     Quando envia GET /health, sem login, sem corpo nem cabeçalho
     Então a resposta é 200, sem corpo
@@ -1325,6 +1520,7 @@ Funcionalidade: Usuários
           },
           "suspensos": []
         },
+        "criadoPor": "usr-ebfga-master",
         "criadoEm": "2026-03-14T10:20:00Z",
         "ultimoAcesso": "2026-10-29T09:42:00Z"
       }
@@ -1352,6 +1548,7 @@ Funcionalidade: Usuários
             "parentesco": "PAI"
           }
         ],
+        "criadoPor": "usr-ebfga-maria",
         "criadoEm": "2026-03-20T15:00:00Z",
         "ultimoAcesso": "2026-10-28T22:10:00Z"
       }
@@ -1411,6 +1608,65 @@ Funcionalidade: Usuários
         "guardarAte": "2031-11-08T01:10:00Z"
       }
       """
+
+  @exemplo-entidades
+  Cenário: card guardado
+    Então o card da EBFGA em "cardUsuarios", com dias, semanas e meses só nos 2 últimos, é:
+      """
+      {
+        "_id": "card-ebfga-INSTITUICAO",
+        "contaId": "conta-ebfga",
+        "perfil": "INSTITUICAO",
+        "usuarioId": null,
+        "versao": 418,
+        "atualizadoEm": "2026-11-08T15:00:00Z",
+        "atual": {
+          "selo": 2,
+          "valor": 335,
+          "apoio": {
+            "staff": 37,
+            "participantes": 298,
+            "pendentes": 4
+          },
+          "lista": {
+            "semAcesso30Dias": 14,
+            "desativados": 6,
+            "codigosVencidos": 2
+          }
+        },
+        "dias": [
+          {
+            "dia": "2026-11-07",
+            "valor": 334
+          },
+          {
+            "dia": "2026-11-08",
+            "valor": 335
+          }
+        ],
+        "semanas": [
+          {
+            "semana": "2026-W44",
+            "valor": 333
+          },
+          {
+            "semana": "2026-W45",
+            "valor": 335
+          }
+        ],
+        "meses": [
+          {
+            "mes": "2026-10",
+            "valor": 323
+          },
+          {
+            "mes": "2026-11",
+            "valor": 335
+          }
+        ]
+      }
+      """
+    E dias guarda até 400, semanas até 106 e meses até 24, como na RN-278 de 15_modulos
 
   @fora-de-escopo
   Cenário: o que este documento não trata

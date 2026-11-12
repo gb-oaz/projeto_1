@@ -105,18 +105,6 @@ public class RegrasTests
     }
 
     [Fact]
-    public void RN_189_numeros_do_card()
-    {
-        var card = new NumerosDoCard(2, [301, 310, 318, 323, 335], 37, 298);
-        Assert.Equal((335, 12), (card.Dado, card.NoMes));
-        Assert.Equal((0, 0), (new NumerosDoCard(0, [], null, null).Dado, new NumerosDoCard(0, [], null, null).NoMes));
-        Assert.Equal(7, new NumerosDoCard(0, [7], null, null).NoMes);
-        Assert.Equal("contas ativas", NumerosDoCard.Rotulo(TipoUsuario.Administrador, false));
-        Assert.Equal("participantes ativos", NumerosDoCard.Rotulo(TipoUsuario.Master, true));
-        Assert.Equal("usuários ativos", NumerosDoCard.Rotulo(TipoUsuario.Staff, false));
-    }
-
-    [Fact]
     public void RN_182_geracao_de_senha()
     {
         var maria = Novo("usr-ebfga-maria", TipoUsuario.Staff);

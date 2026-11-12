@@ -749,35 +749,103 @@
         {
           "nome": "200",
           "corpo": {
+            "modulo": "MOD-03",
+            "perfil": "INSTITUICAO",
+            "versao": 7,
+            "atualizadoEm": "2026-11-09T14:32:05-03:00",
+            "vazio": false,
             "selo": 2,
-            "dado": 335,
-            "rotulo": "usuários ativos",
-            "noMes": 12,
-            "meses": [
-              301,
-              310,
-              318,
-              323,
-              335
-            ],
-            "staff": 37,
-            "participantes": 298
+            "reduzida": {
+              "valor": 335,
+              "rotulo": "usuários ativos"
+            },
+            "normal": {
+              "valor": 335,
+              "rotulo": "usuários ativos",
+              "apoio": [
+                {
+                  "nome": "staff",
+                  "valor": 37
+                },
+                {
+                  "nome": "participantes",
+                  "valor": 298
+                },
+                {
+                  "nome": "pendentes",
+                  "valor": 4
+                }
+              ]
+            },
+            "expandida": {
+              "lista": [
+                {
+                  "nome": "Sem acesso há 30 dias",
+                  "valor": 14
+                },
+                {
+                  "nome": "Desativados",
+                  "valor": 6
+                },
+                {
+                  "nome": "Códigos vencidos",
+                  "valor": 2
+                }
+              ]
+            },
+            "series": {
+              "dia": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                326,
+                330,
+                333,
+                335
+              ],
+              "semana": [
+                290,
+                294,
+                298,
+                301,
+                305,
+                309,
+                312,
+                318,
+                322,
+                326,
+                331,
+                335
+              ],
+              "mes": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                301,
+                310,
+                318,
+                323,
+                335
+              ]
+            }
           }
         }
       ],
       "401": [
         {
-          "nome": "TOKEN_INVALIDO",
+          "nome": "SESSAO_TERMINADA",
           "corpo": {
-            "codigo": "TOKEN_INVALIDO",
-            "mensagem": "Token inválido."
-          }
-        },
-        {
-          "nome": "PERMISSOES_DESATUALIZADAS",
-          "corpo": {
-            "codigo": "PERMISSOES_DESATUALIZADAS",
-            "mensagem": "Suas permissões mudaram. Renove a sessão."
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
           }
         }
       ],
@@ -1151,6 +1219,219 @@
           "corpo": {
             "codigo": "ACESSO_NEGADO",
             "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ]
+    }
+  },
+  "GET usuarios/card/ao-vivo": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "card",
+          "corpo": {
+            "modulo": "MOD-03",
+            "perfil": "INSTITUICAO",
+            "versao": 7,
+            "atualizadoEm": "2026-11-09T14:32:05-03:00",
+            "vazio": false,
+            "selo": 2,
+            "reduzida": {
+              "valor": 335,
+              "rotulo": "usuários ativos"
+            },
+            "normal": {
+              "valor": 335,
+              "rotulo": "usuários ativos",
+              "apoio": [
+                {
+                  "nome": "staff",
+                  "valor": 37
+                },
+                {
+                  "nome": "participantes",
+                  "valor": 298
+                },
+                {
+                  "nome": "pendentes",
+                  "valor": 4
+                }
+              ]
+            },
+            "expandida": {
+              "lista": [
+                {
+                  "nome": "Sem acesso há 30 dias",
+                  "valor": 14
+                },
+                {
+                  "nome": "Desativados",
+                  "valor": 6
+                },
+                {
+                  "nome": "Códigos vencidos",
+                  "valor": 2
+                }
+              ]
+            },
+            "series": {
+              "dia": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                326,
+                330,
+                333,
+                335
+              ],
+              "semana": [
+                290,
+                294,
+                298,
+                301,
+                305,
+                309,
+                312,
+                318,
+                322,
+                326,
+                331,
+                335
+              ],
+              "mes": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                301,
+                310,
+                318,
+                323,
+                335
+              ]
+            }
+          }
+        },
+        {
+          "nome": "LIMITE_CONEXOES",
+          "corpo": {
+            "codigo": "LIMITE_CONEXOES"
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA"
+          }
+        },
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"intervalo\" está faltando ou é inválido.",
+            "campo": "intervalo"
+          }
+        }
+      ]
+    }
+  },
+  "GET usuarios/eu/preferencias": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "atualizacaoCards": "NA_ABERTURA",
+            "intervaloAoVivo": 300
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        }
+      ]
+    }
+  },
+  "PUT usuarios/eu/preferencias": {
+    "pedido": {
+      "atualizacaoCards": "AO_VIVO",
+      "intervaloAoVivo": 15
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "atualizacaoCards": "AO_VIVO",
+            "intervaloAoVivo": 15
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"atualizacaoCards\" está faltando ou é inválido.",
+            "campo": "atualizacaoCards"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"intervaloAoVivo\" está faltando ou é inválido.",
+            "campo": "intervaloAoVivo"
           }
         }
       ]

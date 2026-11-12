@@ -15,7 +15,8 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// </summary>
 public sealed class PedirNovaGeracaoDeSenha(
     IUsuarios usuarios, IContas contas, IGeracoesDeSenha geracoes, ISessoesDosUsuarios sessoes, IAuditoria auditoria,
-    IAuditoriaDeErros erros, TimeProvider relogio) : IPedirNovaGeracaoDeSenha
+    IAuditoriaDeErros erros, TimeProvider relogio,
+    IAtualizarCardUsuarios cardsDoModulo) : IPedirNovaGeracaoDeSenha
 {
     readonly Apoio apoio = new(usuarios, contas, relogio);
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
@@ -34,6 +35,7 @@ public sealed class PedirNovaGeracaoDeSenha(
         var alvo = await AlvoComSenha(quem, pedido.UsuarioId, ct);
         var (geracao, codigo) = GeracaoDeSenhaPedida.Pedir(alvo, quem.Id, apoio.Agora);
         await Gravar(alvo, geracao, execucao, ct);
+        await cardsDoModulo.Executar(new MudancaNoCadastroDto(alvo.ContaId, alvo.Id), ct);
         await auditada.Concluir(execucao, ct);
         return new(codigo, geracao.VenceEm);
     }

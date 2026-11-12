@@ -79,16 +79,6 @@ public sealed record CodigoDeLiberacaoDto(string CodigoLiberacao, DateTimeOffset
 /// <param name="CodigoGeradoEm">Quando foi gerado.</param>
 public sealed record CodigoDeAcessoDto(string Login, DateTimeOffset CodigoGeradoEm);
 
-/// <summary>GET /usuarios/card (RN-189).</summary>
-/// <param name="Selo">Códigos de liberação que vencem hoje.</param>
-/// <param name="Dado">Usuários, participantes ou contas ativas.</param>
-/// <param name="Rotulo">O que o dado conta.</param>
-/// <param name="NoMes">Diferença desde o fim do mês anterior.</param>
-/// <param name="Meses">Os 5 últimos meses.</param>
-/// <param name="Staff">Staff ativo; só na instituição.</param>
-/// <param name="Participantes">Participantes ativos; não vem no time.</param>
-public sealed record CardDeUsuariosDto(int Selo, int Dado, string Rotulo, int NoMes, IReadOnlyList<int> Meses, int? Staff, int? Participantes);
-
 /// <summary>POST /contas: 201, com a senha mostrada uma vez.</summary>
 /// <param name="ContaId">Id da conta.</param>
 /// <param name="Login">Entrada da conta master.</param>

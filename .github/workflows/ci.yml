@@ -440,6 +440,8 @@ jobs:
   # (::add-mask::); nenhum segredo do GitHub é usado. A suíte de integração
   # recebe o backend publicado (API_COMANDO) e as PARTIDA_* para os cenários
   # de inicialização. O MongoDB do compose é um replica set de um nó (RNF-223).
+  # Só esse backend sobe com Teste__Relogio=sim (relógio e fechamento de teste,
+  # /_teste/*, contrato usuarios v15); no Azure o Terraform grava "nao".
   # ===========================================================================
   qa:
     name: QA

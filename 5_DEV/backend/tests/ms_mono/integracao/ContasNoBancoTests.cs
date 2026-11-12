@@ -1,6 +1,6 @@
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
-using Boaz.MsMono.Infra.Out.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Secundario.Out.Commons.Usuario.Usuarios;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson;
 using MongoDB.Driver;

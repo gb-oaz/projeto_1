@@ -920,10 +920,10 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         return (proprios[0], proprios[1], internas);
     }
 
-    // o Catálogo é outro contexto: o contrato de API não tem endereço para
-    // descontratar nem para o aviso, e a suíte não injeta o traceId de outra execução
+    // o Catálogo é outro contexto: a suíte não injeta o traceId de outra execução
+    // (o aviso em si, "o Catálogo avisa que a contratação da EBFGA mudou", é
+    // POST /_teste/contratacao, em commons/autorizacao/SuspensoPassos.cs)
     [Given(@"^a execução do Catálogo com o traceId ""trc-5b81e0d4"", em que o Caio descontrata a Presença$")]
-    [When(@"^o Catálogo avisa que a contratação da EBFGA mudou$")]
     [Then(@"^os dois com o traceId ""trc-5b81e0d4"", ""usr-dboaz-caio"", a ""conta-ebfga"" e o alvo ""conta-ebfga""$")]
     [Then(@"^cada usuário da EBFGA ganha ""INICIADO"" e ""CONCLUIDO"" de ""AVISAR_PERMISSOES_NOVAS""$")]
     [Then(@"^esses vão com o mesmo traceId, o Caio, a ""conta-ebfga"" e o usuário como alvo$")]

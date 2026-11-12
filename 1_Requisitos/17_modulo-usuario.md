@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v89"
-data: "2026-11-08 12:21"
+versao: "v108"
+data: "2026-11-12 02:31"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v89** · 2026-11-08 12:21 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v108** · 2026-11-12 02:31 · **Em revisão**
 
 # Módulo Usuários
 
@@ -268,7 +268,7 @@ Cenário: família perdeu o código
 Cenário: membro só com o SAC
   Dado o membro do time Caio Lima, sem módulos
   Quando o administrador do deboaz marca para ele a Utilização do SAC e salva
-  Então, na próxima ação, o Caio vê só o card do SAC em Módulos
+  Então o Caio vê só o card do SAC em Módulos na próxima ação
   E não vê os cards de Usuários nem do Catálogo
 ```
 
@@ -568,32 +568,59 @@ Cenário: dois participantes sem matrícula no autônomo
 
 ### `RN-189` Card do módulo Usuários
 
+> Card comum: [15_modulos `RN-276`](15_modulos.md#RN-276), com os recortes de `RN-277`
+
 ```gherkin
-Esquema do Cenário: dados do card por tamanho
-  Dado a conta master da EBFGA na aba Da conta
-  Quando o card Usuários está <tamanho>
+Esquema do Cenário: dados do card por perfil e tamanho
+  Dado o card Usuários do perfil <perfil>, no recorte que as vistas mostram
+  Quando está na <tamanho>
   Então mostra <dados>
+  E a normal mostra a série de 5 pontos do recorte
 
   Exemplos:
-    | tamanho       | dados                                                      |
-    | mínima 1x1    | o ícone e o selo "2", códigos de liberação que vencem hoje |
-    | reduzida 2x2  | 335 · usuários ativos                                      |
-    | normal 4x4    | 335, +12 no mês, 5 meses em barras, 37 staff, 298 part.    |
-    | expandida 4x8 | 7 semanas e a lista Sem acesso há 30 dias e Desativados    |
+    | perfil      | tamanho  | dados                                                        |
+    | deboaz      | mínima   | o ícone e o selo "7", igual a Master sem acesso há 30 dias   |
+    | deboaz      | reduzida | 112 · contas ativas                                          |
+    | deboaz      | normal   | 112, "+4 no mês", 82 instituições, 30 autônomos, 4 suspensas |
+    | instituição | mínima   | o ícone e o selo "2": códigos de liberação que vencem hoje   |
+    | instituição | reduzida | 335 · usuários ativos                                        |
+    | instituição | normal   | 335, "+12 no mês", 37 staff, 298 participantes, 4 pendentes  |
+    | staff       | mínima   | o ícone e o selo "1": códigos que ela pediu e vencem hoje    |
+    | staff       | reduzida | 41 · usuários ativos, só os criados por ela                  |
+    | staff       | normal   | 41, "+2 na semana", 3 staff, 38 participantes, 2 pendentes   |
+    | autônomo    | mínima   | o ícone e o selo "1": códigos de liberação que vencem hoje   |
+    | autônomo    | reduzida | 32 · usuários ativos, com o próprio Pedro                    |
+    | autônomo    | normal   | 32, "+1 no dia", 4 criados no mês, 1 pendente                |
 
-Esquema do Cenário: card para cada perfil
-  Quando <quem> vê o card Usuários na reduzida
-  Então vê "<dado>"
+Esquema do Cenário: lista da expandida de cada perfil
+  Dado o card Usuários do perfil <perfil> na expandida, com a série de 12 pontos
+  Então a lista mostra "<primeira>", "<segunda>" e "<terceira>"
 
   Exemplos:
-    | quem                      | dado                      |
-    | a conta master da EBFGA   | 335 · usuários ativos     |
-    | o educador autônomo Pedro | 32 · participantes ativos |
-    | o administrador do deboaz | 112 · contas ativas       |
+    | perfil      | primeira                       | segunda       | terceira           |
+    | deboaz      | Master sem acesso há 30 dias 7 | Desativadas 3 | Encerradas 2       |
+    | instituição | Sem acesso há 30 dias 14       | Desativados 6 | Códigos vencidos 2 |
+    | staff       | Sem acesso há 30 dias 5        | Desativados 1 | Códigos vencidos 1 |
+    | autônomo    | Sem acesso há 30 dias 3        | Desativados 2 | Códigos vencidos 0 |
+
+Esquema do Cenário: quem vê o card
+  Quando <quem> abre Módulos
+  Então <resultado>
+
+  Exemplos:
+    | quem                           | resultado                                    |
+    | o administrador do deboaz      | vê o card do perfil deboaz                   |
+    | o membro do time Caio          | vê o mesmo card do administrador             |
+    | a conta master da EBFGA        | vê o card do perfil instituição              |
+    | a staff Maria, com o Usuários  | vê o card do perfil staff, só com os dela    |
+    | um staff sem o Usuários        | não vê o card                                |
+    | o educador autônomo Pedro      | vê o card do perfil autônomo                 |
+    | o participante Lucas, no quest | não vê o card                                |
 
 Cenário: sem dados
-  Dado a EBFGA recém-criada, sem usuários
+  Dado a EBFGA recém-criada, só com a conta master, sem staff nem participantes
   Então o card mostra "Cadastre o staff e os participantes" e Configurar
+  E a conta master não tira o card do estado sem dados, mesmo contando em "usuários ativos"
 
 Cenário: rótulo falado
   Quando o leitor de tela lê o card na mínima
@@ -1820,38 +1847,243 @@ Cenário: dois participantes sem matrícula no autônomo
 
 ### `RN-189` Card do módulo Usuários
 
+> Formato comum: [15_modulos `RN-276`](15_modulos.md#RN-276-api)
+
 ```gherkin
-Cenário: dados do card
-  Dado a conta master da EBFGA, com 37 staff e 298 participantes ativos
+Cenário: card da instituição
+  Dado a conta master da EBFGA, com 36 staff e 298 participantes ativos e 4 pendentes
+  E "staff" e "usuários ativos" contam também a própria conta master
   Quando envia GET /usuarios/card
-  Então a resposta é 200 com:
+  Então a resposta é 200 com, além de series:
     """
     {
+      "modulo": "MOD-03",
+      "perfil": "INSTITUICAO",
+      "versao": 418,
+      "atualizadoEm": "2026-11-08T15:00:00Z",
+      "vazio": false,
       "selo": 2,
-      "dado": 335,
-      "rotulo": "usuários ativos",
-      "noMes": 12,
-      "meses": [
-        301,
-        310,
-        318,
-        323,
-        335
-      ],
-      "staff": 37,
-      "participantes": 298
+      "reduzida": {
+        "valor": 335,
+        "rotulo": "usuários ativos"
+      },
+      "normal": {
+        "valor": 335,
+        "rotulo": "usuários ativos",
+        "apoio": [
+          {
+            "nome": "staff",
+            "valor": 37
+          },
+          {
+            "nome": "participantes",
+            "valor": 298
+          },
+          {
+            "nome": "pendentes",
+            "valor": 4
+          }
+        ]
+      },
+      "expandida": {
+        "lista": [
+          {
+            "nome": "Sem acesso há 30 dias",
+            "valor": 14
+          },
+          {
+            "nome": "Desativados",
+            "valor": 6
+          },
+          {
+            "nome": "Códigos vencidos",
+            "valor": 2
+          }
+        ]
+      }
+    }
+    """
+  E series traz dia, semana e mes com 12 números cada
+  E series.mes termina em 301, 310, 318, 323 e 335
+
+Cenário: só a conta master
+  Dado a conta master da EBFGA recém-criada, sem staff nem participantes
+  Quando envia GET /usuarios/card
+  Então a resposta é 200 com "vazio": true
+  E a reduzida e a normal trazem valor 1, a própria conta master
+  E na normal "staff" vem com 1 e "participantes" com 0
+  E "vazio" passa a false quando a EBFGA cria o primeiro staff ou participante
+
+Esquema do Cenário: perfil e dado macro de cada um
+  Quando <quem> envia GET /usuarios/card
+  Então perfil é "<perfil>" e a reduzida traz <reduzida>
+
+  Exemplos:
+    | quem                      | perfil      | reduzida                    |
+    | o administrador do deboaz | DEBOAZ      | 112 e "contas ativas"       |
+    | o membro do time Caio     | DEBOAZ      | 112 e "contas ativas"       |
+    | a conta master da EBFGA   | INSTITUICAO | 335 e "usuários ativos"     |
+    | a staff Maria             | STAFF       | 41 e "usuários ativos"      |
+    | o educador autônomo Pedro | AUTONOMO    | 32 e "usuários ativos"      |
+
+Esquema do Cenário: sem o card
+  Quando <quem> envia GET /usuarios/card
+  Então a resposta é 403 ACESSO_NEGADO
+
+  Exemplos:
+    | quem                         |
+    | o participante Lucas Andrade |
+    | um staff sem o Usuários      |
+```
+
+<a id="RN-280"></a>
+
+### `RN-280` Números do card guardados
+
+> Regra comum: [15_modulos `RN-278`](15_modulos.md#RN-278)
+
+```gherkin
+Esquema do Cenário: números do perfil DEBOAZ, lidos de "contas"
+  Quando o card do perfil DEBOAZ conta <numero>
+  Então lê as contas de tipo INSTITUICAO ou AUTONOMO com <filtro>
+  E "sem acesso há 30 dias" pede a conta com criadaEm há mais de 30 dias
+  E o ultimoAcessoMaster nulo ou há mais de 30 dias
+
+  Exemplos:
+    | numero                                | filtro                                        |
+    | o selo e Master sem acesso há 30 dias | ATIVA e sem acesso há 30 dias                 |
+    | o dado macro                          | estado ATIVA                                  |
+    | instituições                          | estado ATIVA e tipo INSTITUICAO               |
+    | autônomos                             | estado ATIVA e tipo AUTONOMO                  |
+    | suspensas                             | estado SUSPENSA                               |
+    | Desativadas                           | estado DESATIVADA                             |
+    | Encerradas                            | estado ENCERRADA                              |
+
+Esquema do Cenário: números das contas, lidos de "usuarios" e "geracoesSenha"
+  Dado o perfil INSTITUICAO ou AUTONOMO contando os usuarios do contaId da conta
+  E o perfil STAFF contando os usuarios com criadoPor igual à staff
+  E o selo do STAFF conta só as geracoesSenha com pedidaPor igual à staff
+  Quando o card conta <numero>
+  Então lê <consulta>
+
+  Exemplos:
+    | numero                | consulta                                                     |
+    | o selo                | PENDENTE com a geracoesSenha vencendo hoje, sem confirmadaEm |
+    | o dado macro          | MASTER, STAFF e PARTICIPANTE ATIVO; no STAFF, sem a MASTER   |
+    | staff                 | MASTER e STAFF ATIVO na INSTITUICAO; no STAFF, só STAFF      |
+    | participantes         | PARTICIPANTE ATIVO, na INSTITUICAO e no STAFF                |
+    | pendentes             | estado PENDENTE                                              |
+    | criados no mês        | criadoEm no mês atual, no AUTONOMO                           |
+    | Sem acesso há 30 dias | ATIVO, criadoEm e ultimoAcesso (ou nulo) há mais de 30 dias  |
+    | Desativados           | estado DESATIVADO                                            |
+    | Códigos vencidos      | PENDENTE com a última geracoesSenha vencida                  |
+
+Cenário: criar participante atualiza os cards guardados
+  Dado o card da EBFGA com 298 participantes e o card da staff Maria com 38
+  Quando a Maria envia POST /usuarios e cria o participante Lucas Andrade com 201
+  Então o Lucas é gravado com criadoPor "usr-ebfga-maria" na mesma execução
+  E "cardUsuarios" passa a 299 no card da EBFGA e a 39 no card da Maria, e a versao sobe
+  E o selo, "Sem acesso há 30 dias" e "Códigos vencidos" não sobem a versao: são refeitos na leitura
+
+Esquema do Cenário: casos de uso que recontam o card
+  Quando <caso> termina com sucesso
+  Então os cards guardados que ele toca são recontados na mesma execução e a versao sobe
+
+  Exemplos:
+    | caso                                                    |
+    | POST /contas, que cria a conta e a conta master         |
+    | POST /contas/{id}/estado, que muda o estado da conta    |
+    | POST /usuarios, que cria staff ou participante          |
+    | POST /usuarios/{id}/desativar e /reativar               |
+    | POST /usuarios/gerar-senha, a senha gerada no acesso    |
+    | POST /usuarios/{id}/nova-geracao-senha                  |
+
+Cenário: nova geração de senha reconta o card
+  Dado o card da EBFGA na versao 419
+  Quando o João envia POST /usuarios/usr-ebfga-paulo/nova-geracao-senha e recebe 201
+  Então o card da EBFGA é recontado na mesma execução e passa à versao 420
+
+Cenário: quem nunca entrou conta como sem acesso
+  Dado o participante Davi Rocha da EBFGA, ATIVO desde 2026-09-01, sem nenhum acesso
+  E o ultimoAcesso dele nulo
+  Quando a conta master envia GET /usuarios/card em 2026-11-08
+  Então o Davi conta em "Sem acesso há 30 dias"
+
+Cenário: recém-criado que nunca entrou não conta
+  Dado o participante Bruno Lima da EBFGA, ATIVO, criado em 2026-11-03, sem nenhum acesso
+  E o ultimoAcesso dele nulo
+  Quando a conta master envia GET /usuarios/card em 2026-11-08
+  Então o Bruno não conta em "Sem acesso há 30 dias", porque existe há só 5 dias
+```
+
+<a id="RN-281"></a>
+
+### `RN-281` Card ao vivo do Usuários
+
+> Regra comum: [15_modulos `RN-279`](15_modulos.md#RN-279-api)
+
+```gherkin
+Esquema do Cenário: quem não conecta
+  Quando <quem> envia GET /usuarios/card/ao-vivo?intervalo=30
+  Então a resposta é 403 ACESSO_NEGADO e nenhuma conexão fica aberta
+
+  Exemplos:
+    | quem                         |
+    | o participante Lucas Andrade |
+    | um staff sem o Usuários      |
+
+Cenário: sessão termina com a conexão aberta
+  Dado a staff Maria conectada por GET /usuarios/card/ao-vivo?intervalo=5, no navegador
+  E a sessão dela de 8 h no navegador
+  Quando a sessão expira por 8 h sem uso, com a conexão ao vivo aberta
+  Então ela recebe o evento "encerrado" com o código "SESSAO_TERMINADA" e a conexão fecha
+
+Cenário: Usuários retirado com a conexão aberta
+  Dado a staff Maria conectada ao vivo com "A cada 30 s" e "MOD-03" com "CU"
+  Quando a conta master retira dela o "MOD-03"
+  Então em até 30 s ela recebe "encerrado" com o código "ACESSO_NEGADO"
+  E a conexão fecha
+```
+
+<a id="RN-283"></a>
+
+### `RN-283` Preferência de atualização dos cards
+
+> Escolha na tela: [15_modulos `RF-133`](15_modulos.md#RF-133) e [`RN-279`](15_modulos.md#RN-279)
+
+```gherkin
+Cenário: sem escolha feita
+  Dado o participante Lucas Andrade com o token de acesso, sem escolha salva
+  Quando envia GET /usuarios/eu/preferencias
+  Então a resposta é 200, sem o cabeçalho X-Trace-Id, com:
+    """
+    {
+      "atualizacaoCards": "NA_ABERTURA",
+      "intervaloAoVivo": 300
     }
     """
 
-Esquema do Cenário: dado de cada perfil
-  Quando <quem> envia GET /usuarios/card
-  Então dado e rotulo são <dado>
+Cenário: ligar o ao vivo
+  Dado a conta master da EBFGA com o token de acesso, sem nenhum módulo exigido
+  Quando envia PUT /usuarios/eu/preferencias com:
+    """
+    {
+      "atualizacaoCards": "AO_VIVO",
+      "intervaloAoVivo": 15
+    }
+    """
+  Então a resposta é 200 com o mesmo corpo, sem o cabeçalho X-Trace-Id
+  E o GET /usuarios/eu/preferencias de outro aparelho dela traz "AO_VIVO" e 15
+  E as coleções "auditoria" e "auditoriaErros" não ganham registro, nem no GET nem no PUT
+
+Esquema do Cenário: valor inválido
+  Quando a conta master envia PUT /usuarios/eu/preferencias com <campo> igual a <valor>
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "<campo>"
 
   Exemplos:
-    | quem                      | dado                        |
-    | a conta master da EBFGA   | 335 e "usuários ativos"     |
-    | o educador autônomo Pedro | 32 e "participantes ativos" |
-    | o administrador do deboaz | 112 e "contas ativas"       |
+    | campo            | valor     |
+    | intervaloAoVivo  | 10        |
+    | atualizacaoCards | "SEMPRE"  |
 ```
 
 <a id="RN-190"></a>
@@ -2130,10 +2362,11 @@ Esquema do Cenário: coleção pronta antes do primeiro pedido
     | auditoriaErros     | traceId, contaId+quando, sem prazo de expiração               |
     | geracoesSenha      | usuarioId+pedidaEm↓, resumoComprovante, contaId+pedidaEm      |
     | registrosPermissao | usuarioId+em↓+versao↓                                         |
+    | cardUsuarios       | contaId+perfil+usuarioId único                                |
     | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205             |
 
 Cenário: segunda partida não duplica
-  Dado a aplicação de homologação iniciada em 2026-11-05, com as 7 coleções e seus índices
+  Dado a aplicação de homologação iniciada em 2026-11-05, com as 8 coleções e seus índices
   Quando ela inicia de novo em 2026-11-06
   Então cada coleção continua uma só, com os mesmos índices, nenhum repetido
   E nenhum documento das coleções é apagado nem duplicado
@@ -2159,7 +2392,7 @@ Esquema do Cenário: índice que não pode ser criado
 
 ```gherkin
 Cenário: pronta depois da partida
-  Dado a partida de homologação concluída, com as 7 coleções e seus índices prontos
+  Dado a partida de homologação concluída, com as 8 coleções e seus índices prontos
   E os módulos gravados e as contas iniciais garantidas
   Quando envia GET /health, sem login, sem corpo nem cabeçalho
   Então a resposta é 200, sem corpo
@@ -2252,6 +2485,7 @@ Cenário: escola EBFGA cadastrada
         },
         "suspensos": []
       },
+      "criadoPor": "usr-ebfga-master",
       "criadoEm": "2026-03-14T10:20:00Z",
       "ultimoAcesso": "2026-10-29T09:42:00Z"
     }
@@ -2279,6 +2513,7 @@ Cenário: escola EBFGA cadastrada
           "parentesco": "PAI"
         }
       ],
+      "criadoPor": "usr-ebfga-maria",
       "criadoEm": "2026-03-20T15:00:00Z",
       "ultimoAcesso": "2026-10-28T22:10:00Z"
     }
@@ -2337,6 +2572,64 @@ Cenário: geração de senha, acesso anônimo, auditoria e erro
       "guardarAte": "2031-11-08T01:10:00Z"
     }
     """
+
+Cenário: card guardado
+  Então o card da EBFGA em "cardUsuarios", com dias, semanas e meses só nos 2 últimos, é:
+    """
+    {
+      "_id": "card-ebfga-INSTITUICAO",
+      "contaId": "conta-ebfga",
+      "perfil": "INSTITUICAO",
+      "usuarioId": null,
+      "versao": 418,
+      "atualizadoEm": "2026-11-08T15:00:00Z",
+      "atual": {
+        "selo": 2,
+        "valor": 335,
+        "apoio": {
+          "staff": 37,
+          "participantes": 298,
+          "pendentes": 4
+        },
+        "lista": {
+          "semAcesso30Dias": 14,
+          "desativados": 6,
+          "codigosVencidos": 2
+        }
+      },
+      "dias": [
+        {
+          "dia": "2026-11-07",
+          "valor": 334
+        },
+        {
+          "dia": "2026-11-08",
+          "valor": 335
+        }
+      ],
+      "semanas": [
+        {
+          "semana": "2026-W44",
+          "valor": 333
+        },
+        {
+          "semana": "2026-W45",
+          "valor": 335
+        }
+      ],
+      "meses": [
+        {
+          "mes": "2026-10",
+          "valor": 323
+        },
+        {
+          "mes": "2026-11",
+          "valor": 335
+        }
+      ]
+    }
+    """
+  E dias guarda até 400, semanas até 106 e meses até 24, como na RN-278 de 15_modulos
 ```
 
 <a id="fora-de-escopo"></a>
@@ -2365,13 +2658,13 @@ Cenário: o que este documento não trata
 
 [![Web: vista do acesso ao hub: criar conta com domínio e sigla, igual para escola, empresa e autônomo, que só troca o CNPJ pelo CPF, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha](../2_Diagramas/vista-hub-acesso-web_v01_20261103-1229.svg)](../2_Diagramas/vista-hub-acesso-web_v01_20261103-1229.svg)
 
-**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v01_20261103-1139.svg`
+**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg`
 
-[![Web: vista do módulo Usuários: card do módulo nos quatro tamanhos no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-web_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-usuarios-web_v01_20261103-1139.svg)
+[![Web: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg)
 
-**Hub · time deboaz · usuários · web · vista** — `2_Diagramas/vista-hub-time-deboaz-web_v01_20261103-1139.svg`
+**Hub · time deboaz · usuários · web · vista** — `2_Diagramas/vista-hub-time-deboaz-web_v03_20261109-0048.svg`
 
-[![Web: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card nos quatro tamanhos com as contas assinantes e os membros do time, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-web_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-time-deboaz-web_v01_20261103-1139.svg)
+[![Web: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-web_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-time-deboaz-web_v03_20261109-0048.svg)
 
 **Quest · sala anônima · web · vista** — `2_Diagramas/vista-quest-sala-anonima-web_v01_20261103-1229.svg`
 
@@ -2383,13 +2676,13 @@ Cenário: o que este documento não trata
 
 [![PWA: vista do acesso ao hub: criar conta com domínio e sigla, igual para escola, empresa e autônomo, que só troca o CNPJ pelo CPF, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha](../2_Diagramas/vista-hub-acesso-pwa_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-acesso-pwa_v01_20261103-1139.svg)
 
-**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v01_20261103-1139.svg`
+**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg`
 
-[![PWA: vista do módulo Usuários: card do módulo nos quatro tamanhos no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v01_20261103-1139.svg)
+[![PWA: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg)
 
-**Hub · time deboaz · usuários · pwa · vista** — `2_Diagramas/vista-hub-time-deboaz-pwa_v01_20261103-1139.svg`
+**Hub · time deboaz · usuários · pwa · vista** — `2_Diagramas/vista-hub-time-deboaz-pwa_v03_20261109-0048.svg`
 
-[![PWA: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card nos quatro tamanhos com as contas assinantes e os membros do time, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-pwa_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-time-deboaz-pwa_v01_20261103-1139.svg)
+[![PWA: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-pwa_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-time-deboaz-pwa_v03_20261109-0048.svg)
 
 **Quest · sala anônima · pwa · vista** — `2_Diagramas/vista-quest-sala-anonima-pwa_v01_20261103-1139.svg`
 
@@ -2401,13 +2694,13 @@ Cenário: o que este documento não trata
 
 [![Mobile: vista do acesso ao hub: criar conta com domínio e sigla, igual para escola, empresa e autônomo, que só troca o CNPJ pelo CPF, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha](../2_Diagramas/vista-hub-acesso-mobile_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-acesso-mobile_v01_20261103-1139.svg)
 
-**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v01_20261103-1139.svg`
+**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg`
 
-[![Mobile: vista do módulo Usuários: card do módulo nos quatro tamanhos no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v01_20261103-1139.svg)
+[![Mobile: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg)
 
-**Hub · time deboaz · usuários · mobile · vista** — `2_Diagramas/vista-hub-time-deboaz-mobile_v01_20261103-1139.svg`
+**Hub · time deboaz · usuários · mobile · vista** — `2_Diagramas/vista-hub-time-deboaz-mobile_v03_20261109-0048.svg`
 
-[![Mobile: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card nos quatro tamanhos com as contas assinantes e os membros do time, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-mobile_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-time-deboaz-mobile_v01_20261103-1139.svg)
+[![Mobile: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-mobile_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-time-deboaz-mobile_v03_20261109-0048.svg)
 
 **Quest · sala anônima · mobile · vista** — `2_Diagramas/vista-quest-sala-anonima-mobile_v01_20261103-1139.svg`
 
@@ -2423,29 +2716,29 @@ Cenário: o que este documento não trata
 
 [![Casos de uso de identidade e acesso: conta master, staff, participantes, permissões, senhas, edição de staff e participante, novo código de acesso, SAC, contas e tempo de sessão cuidados pelo time deboaz no módulo Usuários e entradas no quest](../2_Diagramas/identidade-acesso_v04_20261101-0351.svg)](../2_Diagramas/identidade-acesso_v04_20261101-0351.svg)
 
-**Usuários · sequência** — `2_Diagramas/usuarios-sequencia_v07_20261108-1156.svg`
+**Usuários · sequência** — `2_Diagramas/usuarios-sequencia_v09_20261109-0111.svg`
 
-[![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v07_20261108-1156.svg)](../2_Diagramas/usuarios-sequencia_v07_20261108-1156.svg)
+[![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, e o card do módulo recontado na mesma execução, lido na abertura com Dia, Semana e Mês trocados no aparelho sem chamada, preferência salva pela Conta, ao vivo por SSE com até 3 conexões e ping de 30 s, pausa só no aparelho no encerrado, reconexão na queda de rede e fechado à 00:00 de Brasília, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v09_20261109-0111.svg)](../2_Diagramas/usuarios-sequencia_v09_20261109-0111.svg)
 
-**Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg`
+**Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v05_20261112-0056.svg`
 
-[![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)
+[![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v05_20261112-0056.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v05_20261112-0056.svg)
 
-**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v11_20261108-1159.svg`
+**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg`
 
-[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão e card; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v11_20261108-1159.svg)](../2_Diagramas/usuarios-contrato-api_v11_20261108-1159.svg)
+[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão, card no formato comum e card ao vivo por SSE com ping a cada 30 s e preferências de atualização dos cards; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg)](../2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg)
 
-**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v07_20261108-1159.svg`
+**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg`
 
-[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v07_20261108-1159.svg)](../2_Diagramas/identidade-acesso-classes_v07_20261108-1159.svg)
+[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; CardUsuarios com NumerosDoCard e PontoDaSerie e as portas IRepositorioCardUsuarios, IContagemDoCard e IConexoesAoVivo; PreferenciasDeCards do Usuário; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg)](../2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg)
 
-**Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg`
+**Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v03_20261112-0056.svg`
 
-[![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)
+[![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v03_20261112-0056.svg)](../2_Diagramas/usuario-hexagonal_v03_20261112-0056.svg)
 
-**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v16_20261108-1220.svg`
+**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v20_20261112-0056.svg`
 
-[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos, auditoria com traceId e etapa e auditoriaErros; no Redis, sessao, sessoes e tentativas; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v16_20261108-1220.svg)](../2_Diagramas/identidade-acesso-documentos_v16_20261108-1220.svg)
+[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos, auditoria com traceId e etapa, auditoriaErros e cardUsuarios; usuarios.criadoPor no card da staff e usuarios.preferencias; no Redis, sessao, sessoes, tentativas e aoVivo; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v20_20261112-0056.svg)](../2_Diagramas/identidade-acesso-documentos_v20_20261112-0056.svg)
 
 ---
 
@@ -2455,20 +2748,18 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v89** | 2026-11-08 12:21 | Diagrama (`RN-270`, `RN-275`): modelo de documentos v15 → v16 (auditoriaErros em verde, coleção já no código) |
-| v88 | 2026-11-08 12:02 | Diagramas da v85 (`RN-270`, `RN-271`, `RN-275`): contrato de API v10 → v11 (403 sem o módulo com INICIADO e ALERTA ACESSO_NEGADO e X-Trace-Id; GET sem o módulo sem registro; ações internas), sequência v06 → v07 (ENCERRAR_SESSOES_DO_USUARIO na nova geração e no desativar, falha com 2 ERRO), classes v06 → v07 e documentos v14 → v15 (AcaoAuditada com 24 ações) |
-| v87 | 2026-11-08 11:59 | `RN-178`: "E à parte" no cenário das permissões, Gherkin válido; comportamento sem mudança |
-| v86 | 2026-11-08 11:58 | `RN-178`: "2 registros da ação <acao>" no Esquema, com os registros das ações internas da `RN-275` à parte e com o mesmo traceId; permissões com o "INICIADO" e o "CONCLUIDO" de AVISAR_PERMISSOES_NOVAS; comportamento sem mudança |
-| v85 | 2026-11-08 11:53 | `RN-270`: o 403 ACESSO_NEGADO sem o módulo passa a ser auditado nos endereços que mudam estado (INICIADO só, auditoriaErros ALERTA com quem, contaId e alvo, X-Trace-Id); leitura sem o módulo e 401 de token seguem sem registro; `RN-271`: X-Trace-Id em toda resposta auditada; `RN-275` novo: ENCERRAR_SESSOES_DO_USUARIO, AVISAR_PERMISSOES_NOVAS e AVISAR_CONTRATACAO_MUDOU auditados com o traceId, quem e contaId de quem chama, falha como ERRO |
-| v84 | 2026-11-08 11:35 | Diagrama (`RN-270`): contrato de API v09 → v10 (403 ACESSO_NEGADO sem o módulo, MOD-03 · U, recusado antes do caso de uso, sem traceId, registros nem X-Trace-Id, como o 422 do corpo que não é JSON) |
-| v83 | 2026-11-08 11:31 | Auditoria em todos os casos de uso: `RN-178` com REATIVAR_USUARIO, EDITAR_USUARIO, NOVO_CODIGO_ACESSO e SALVAR_TEMPO_SESSAO da conta nos Exemplos e cenários de GERAR_SENHA sem login, CODIGO_MASTER e SALVAR_TEMPO_SESSAO do time (quem, contaId e alvo por etapa); `RN-270` com a recusa prevista de cada caso de uso como ALERTA e o 403 sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registro |
-| v82 | 2026-11-08 10:13 | `RN-178`: POST /contas/{id}/estado com o mesmo estado responde 200 e grava INICIADO e CONCLUIDO de MUDAR_ESTADO_CONTA, com contaId e alvo da conta pedida, como no contrato v09 |
-| v81 | 2026-11-08 09:50 | Diagramas da auditoria (`RN-178`): contrato de API v08 → v09 (quem, contaId e alvo de GERAR_SENHA sem login, MUDAR_ESTADO_CONTA, SALVAR_TEMPO_SESSAO da conta e do time, CODIGO_MASTER e EDITAR_PERMISSOES; o mesmo estado da conta responde 200 e grava INICIADO e CONCLUIDO), sequência v05 → v06 (quem, contaId e alvo de GERAR_SENHA, CODIGO_MASTER e MUDAR_ESTADO_CONTA) |
-| v80 | 2026-11-08 02:15 | `RN-271`: corpo que não é JSON recebe 422 DADOS_INVALIDOS com "O campo "corpo" está faltando ou é inválido." e o campo "corpo", como no contrato v08; segue sem X-Trace-Id e sem registros |
-| v79 | 2026-11-08 02:14 | Diagramas da v76–v78 (`RN-178`, `RN-271`, `RN-274`): contrato de API v07 → v08 (POST /contas/esqueci-senha-master auditado com ESQUECI_SENHA_MASTER, X-Trace-Id, 429 LIMITE_ATENDIMENTO como ALERTA e 500 ERRO_INESPERADO; 422 de corpo que não é JSON com DADOS_INVALIDOS e campo "corpo", sem X-Trace-Id), sequência v04 → v05 (INICIADO de CRIAR_USUARIO sem alvo, alvo só no CONCLUIDO) |
-| v78 | 2026-11-08 02:11 | `RN-178`, `RN-272`, `RN-274`: AcaoAuditada com 21 ações (EDITAR_PERMISSOES, ENTRAR_HUB, ENTRAR_QUEST, ENTRAR_SALA, CONFIRMAR_SENHA, RENOVAR_SESSAO, SAIR, ENCERRAR_SESSAO, ENCERRAR_SESSOES, ESQUECI_SENHA_MASTER e as 11 anteriores), auditoria e auditoriaErros gravadas também pela Autenticação; diagramas: classes v05 → v06, modelo de documentos v13 → v14 |
-| v77 | 2026-11-08 02:08 | `RN-178`: CRIAR_USUARIO sem alvo no INICIADO e na recusa (409 MATRICULA_EM_USO), alvo só no CONCLUIDO; quem e contaId desde o INICIADO; `RN-271`: corpo que não é JSON recebe 422 antes do caso de uso, sem X-Trace-Id nem registros |
+| **v108** | 2026-11-12 02:31 | `RN-189`: o card fica sem dados ("vazio" true) enquanto a conta não tem staff nem participantes; a conta master não conta para o "vazio", mesmo entrando nos usuários ativos; `RN-189-api`: cenário "só a conta master" |
+| v107 | 2026-11-12 00:57 | Diagramas: adaptadores do ms_mono em primario/{in,out} e secundario/{in,out} (infra/out passa a secundario/out): pacotes hexagonal v02 → v03, inicialização v04 → v05, documentos v19 → v20 (também permissoes.suspensos como [{mod, abas}], 17-b `RN-287`); cenários sem mudança |
+| v106 | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", a conta master nas contagens, `RN-189`) |
+| v105 | 2026-11-11 23:28 | Diagrama: contrato de API v16 → v17 (`RN-280`: a MASTER conta em "usuários ativos" na INSTITUICAO e no AUTONOMO e em "staff" na INSTITUICAO, não no STAFF; reduzida do AUTONOMO "usuários ativos"; versao sobe em gerar-senha e nova-geracao-senha; ao vivo sem retomada nem Last-Event-ID, toda conexão começa pelo card inteiro); cenários sem mudança |
+| v104 | 2026-11-11 23:25 | `RN-280`: a conta master entra em "usuários ativos" e em "staff" na INSTITUICAO e em "usuários ativos" no AUTONOMO, não no STAFF; casos de uso que recontam o card, com gerar senha e nova geração; `RN-189` e `RN-189-api`: autônomo com 32 usuários ativos, EBFGA com 36 staff mais a master |
+| v103 | 2026-11-11 23:24 | Diagramas: documentos v18 → v19 (cardUsuarios, aoVivo e usuarios.preferencias já no código, fora do vermelho; falta 10 removida) e contrato de API v15 → v16 (PUT /_teste/relogio com 422 DADOS_INVALIDOS no campo "agora"; POST /_teste/fechamento fecha o dia mesmo já fechado); cenários sem mudança |
+| v102 | 2026-11-11 23:17 | Diagramas: adaptadores primários do backend em ms_mono/primario/ (antes infra/in/): pacotes da arquitetura hexagonal v01 → v02 e sequência da inicialização v03 → v04; cenários sem mudança |
+| v101 | 2026-11-09 09:14 | Diagrama: contrato de API v14 → v15 (endereços de teste PUT e DELETE /_teste/relogio e POST /_teste/fechamento, sem login, só com AMBIENTE=hml e Teste__Relogio=sim, ligado só no backend do CI; fora disso, 404) |
+| v100 | 2026-11-09 09:10 | `RN-280`: "Sem acesso há 30 dias" conta só quem existe há mais de 30 dias (criadoEm, e na conta criadaEm) e tem o último acesso há mais de 30 dias ou nulo, como no contrato v14; cenário do recém-criado que não conta |
+| v99 | 2026-11-09 09:09 | Diagrama: contrato de API v13 → v14 (GET /usuarios/card com os nomes do apoio e da lista de DEBOAZ, INSTITUICAO, STAFF e AUTONOMO; Sem acesso há 30 dias com criadoEm há mais de 30 dias e ultimoAcesso há mais de 30 dias ou nulo, na conta criadaEm e ultimoAcessoMaster) |
+| v98 | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Então ou E (`RF-155`, `RN-189`, `RN-280`); `RN-280`: "Sem acesso há 30 dias" conta também quem nunca entrou (ultimoAcesso nulo), com cenário; `RN-281`: sessão expirada por 8 h sem uso com ?intervalo=5 |
 
 ---
 
-<sub>boaz · v89 · 2026-11-08 12:21 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v108 · 2026-11-12 02:31 · `1_Requisitos/17_modulo-usuario.md`</sub>

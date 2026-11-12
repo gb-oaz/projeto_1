@@ -31,27 +31,3 @@ public sealed record FiltroDeUsuarios(string ContaId, IReadOnlySet<TipoUsuario> 
 /// <param name="Estado">Só as do estado; null lista todas.</param>
 /// <param name="Pagina">Página, começando em 1.</param>
 public sealed record FiltroDeContas(string? Busca, EstadoConta? Estado, int Pagina);
-
-/// <summary>
-/// Os números do card Usuários (RN-189), lidos dos indicadores: a série dos
-/// últimos 5 meses termina no valor de agora.
-/// </summary>
-/// <param name="Selo">Códigos de liberação que vencem hoje.</param>
-/// <param name="Meses">Ativos no fim de cada um dos 5 últimos meses; o último é agora.</param>
-/// <param name="Staff">Staff ativo; null no autônomo e no time.</param>
-/// <param name="Participantes">Participantes ativos; null no time.</param>
-public sealed record NumerosDoCard(int Selo, IReadOnlyList<int> Meses, int? Staff, int? Participantes)
-{
-    /// <summary>O dado principal: o valor de agora.</summary>
-    public int Dado => Meses.Count > 0 ? Meses[^1] : 0;
-
-    /// <summary>Quanto subiu ou desceu desde o fim do mês anterior.</summary>
-    public int NoMes => Meses.Count > 1 ? Meses[^1] - Meses[^2] : Dado;
-
-    /// <summary>
-    /// O rótulo do dado para quem vê: usuários ativos na instituição,
-    /// participantes ativos no autônomo e contas ativas no time.
-    /// </summary>
-    public static string Rotulo(TipoUsuario quem, bool contaDeAutonomo) =>
-        quem.DoTime() ? "contas ativas" : contaDeAutonomo ? "participantes ativos" : "usuários ativos";
-}

@@ -29,7 +29,8 @@ public sealed partial class AutorizacaoPassos(Mundo mundo, Execucoes execucoes)
     // "a Maria com Administrar usuários e a Utilização da Sugestão e do Quiz"
     [Given(@"^(a Maria|o staff João Lima|o João|o membro do time Caio Lima) (?:só )?com (Administrar usuários.*|a Utilização.*)$")]
     // "a Maria com ""MOD-03"" só com ""C""", "a Ana com ""MOD-05"" com ""U"" concedida pelo João"
-    [Given(@"^(a Maria|o professor João|o João|a Ana|o Paulo)(?:, da escola ""EBFGA"",)? com (""MOD-.+)$")]
+    // (", na versão 7" e "em mods" no fim são de SuspensoPassos.cs)
+    [Given(@"^(a Maria|o professor João|o João|a Ana|o Paulo)(?:, da escola ""EBFGA"",)? com (""MOD-(?:(?!, na versão).)+)(?<! em mods)$")]
     public async Task ComPermissoes(string quem, string permissoes)
     {
         var pessoa = await Pessoa(quem);
@@ -281,9 +282,9 @@ public sealed partial class AutorizacaoPassos(Mundo mundo, Execucoes execucoes)
     [When(@"^ela envia um pedido com o token de pv \d+$")]
     public Task PedidoComPvAntigo() => mundo.Enviar("GET", "/auth/sessoes", token: mundo.TokenGuardado);
 
-    // descontratar ainda não tem endereço: a contratação termina pelo banco
+    // POST /_teste/contratacao faz o papel do Catálogo (Mundo.ContratacaoMudou, RN-285)
     [When(@"^a escola descontrata a Presença$")]
-    public Task Descontrata() => mundo.Descontratar("MOD-06");
+    public Task Descontrata() => mundo.ContratacaoMudou("MOD-06", contratada: false);
 
     [When(@"^a conta master salva para a Maria (Configuração|Utilização|Configuração e Utilização) do Quiz$")]
     public async Task SalvaOQuiz(string abas) =>
@@ -602,7 +603,7 @@ public sealed partial class AutorizacaoPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^quando a escola contrata a Presença de novo, ""(MOD-\d+)"" volta com ""(\w+)""$")]
     public async Task VoltaComARecontratacao(string mod, string abas)
     {
-        await mundo.Contratar(mod);
+        await mundo.ContratacaoMudou(mod, contratada: true);
         Assert.Equal(abas, (await ModsDe(await mundo.Maria())).GetValueOrDefault(mod));
     }
 

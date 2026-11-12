@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "12_hub-ui"
 tipo: "Funcionalidade"
 titulo: "Hub · UI"
-versao: "v38"
-data: "2026-11-08 12:02"
+versao: "v47"
+data: "2026-11-11 23:28"
 status: "Em revisão"
 objetivo: "definir como as telas do hub ficam no celular e na web — entrada, módulos (contratados, da conta e a contratar), feed, conta e módulo aberto — com os textos, os componentes compostos e o mascote de cada bloco."
 ---
 
-> **boaz · Funcionalidade** · `12_hub-ui` · **v38** · 2026-11-08 12:02 · **Em revisão**
+> **boaz · Funcionalidade** · `12_hub-ui` · **v47** · 2026-11-11 23:28 · **Em revisão**
 
 # Hub · UI
 
@@ -315,6 +315,24 @@ Cenário: fundo das telas
   E o Halo da entrada e as Ondas do vão do catálogo ficam por cima
 ```
 
+<a id="RN-284"></a>
+
+### `RN-284` Abas de Módulos por perfil
+
+> Card do Usuários de cada perfil: [17_modulo-usuario `RN-189`](17_modulo-usuario.md#RN-189)
+
+```gherkin
+Esquema do Cenário: abas de cada perfil
+  Quando <quem> abre Módulos
+  Então vê <abas>
+
+  Exemplos:
+    | quem                      | abas                                      |
+    | a conta master da EBFGA   | "Contratados", "Da conta" e "A contratar" |
+    | o educador autônomo Pedro | "Contratados", "Da conta" e "A contratar" |
+    | a staff Maria             | só "Contratados"                          |
+```
+
 <a id="RNF-151"></a>
 
 ### `RNF-151` Títulos
@@ -399,9 +417,9 @@ Cenário: o que este documento não trata
 
 [![Web: entrada no medium e no expanded, primeira vez e com as contas acessadas, só com o logo sobre o fundo Halo](../2_Diagramas/vista-hub-entrada-web_v01_20261103-1435.svg)](../2_Diagramas/vista-hub-entrada-web_v01_20261103-1435.svg)
 
-**Hub · módulos · web · vista** — `2_Diagramas/vista-hub-meus-modulos-web_v01_20261103-1435.svg`
+**Hub · módulos · web · vista** — `2_Diagramas/vista-hub-meus-modulos-web_v02_20261109-0054.svg`
 
-[![Web: Módulos no medium e no expanded, com a barra lateral aberta e encolhida](../2_Diagramas/vista-hub-meus-modulos-web_v01_20261103-1435.svg)](../2_Diagramas/vista-hub-meus-modulos-web_v01_20261103-1435.svg)
+[![Web: Módulos no medium e no expanded, com a barra lateral aberta e encolhida, a Conta com Ao vivo e o Intervalo e o aviso de ao vivo pausado](../2_Diagramas/vista-hub-meus-modulos-web_v02_20261109-0054.svg)](../2_Diagramas/vista-hub-meus-modulos-web_v02_20261109-0054.svg)
 
 **Hub · módulos · a contratar · web · vista** — `2_Diagramas/vista-hub-catalogo-web_v01_20261103-1435.svg`
 
@@ -417,9 +435,9 @@ Cenário: o que este documento não trata
 
 [![PWA: primeiro acesso com Entrar e Criar conta, contas acessadas, outra conta e criar conta no compact](../2_Diagramas/vista-hub-entrada-pwa_v01_20261103-1435.svg)](../2_Diagramas/vista-hub-entrada-pwa_v01_20261103-1435.svg)
 
-**Hub · módulos · pwa · vista** — `2_Diagramas/vista-hub-meus-modulos-pwa_v02_20261103-2210.svg`
+**Hub · módulos · pwa · vista** — `2_Diagramas/vista-hub-meus-modulos-pwa_v03_20261109-0054.svg`
 
-[![PWA: Módulos com os cards em grade nos quatro tamanhos, rolagem, Da conta, A contratar, a ordenação com o menu do card, o Feed, a Conta e a Foto no compact](../2_Diagramas/vista-hub-meus-modulos-pwa_v02_20261103-2210.svg)](../2_Diagramas/vista-hub-meus-modulos-pwa_v02_20261103-2210.svg)
+[![PWA: Módulos com os cards em grade nos quatro tamanhos, rolagem, Da conta, A contratar, a ordenação com o menu do card, o Feed, a Conta com Na abertura, Ao vivo e o Intervalo, a Foto e os avisos de ao vivo pausado no compact](../2_Diagramas/vista-hub-meus-modulos-pwa_v03_20261109-0054.svg)](../2_Diagramas/vista-hub-meus-modulos-pwa_v03_20261109-0054.svg)
 
 **Hub · módulos · a contratar · pwa · vista** — `2_Diagramas/vista-hub-catalogo-pwa_v01_20261103-1435.svg`
 
@@ -435,9 +453,9 @@ Cenário: o que este documento não trata
 
 [![Mobile: primeiro acesso com Entrar e Criar conta, contas acessadas, outra conta e criar conta no compact](../2_Diagramas/vista-hub-entrada-mobile_v01_20261103-1435.svg)](../2_Diagramas/vista-hub-entrada-mobile_v01_20261103-1435.svg)
 
-**Hub · módulos · mobile · vista** — `2_Diagramas/vista-hub-meus-modulos-mobile_v02_20261103-2210.svg`
+**Hub · módulos · mobile · vista** — `2_Diagramas/vista-hub-meus-modulos-mobile_v03_20261109-0054.svg`
 
-[![Mobile: Módulos com os cards em grade nos quatro tamanhos, rolagem, Da conta, A contratar, a ordenação com o menu do card, o Feed, a Conta e a Foto no compact](../2_Diagramas/vista-hub-meus-modulos-mobile_v02_20261103-2210.svg)](../2_Diagramas/vista-hub-meus-modulos-mobile_v02_20261103-2210.svg)
+[![Mobile: Módulos com os cards em grade nos quatro tamanhos, rolagem, Da conta, A contratar, a ordenação com o menu do card, o Feed, a Conta com Na abertura, Ao vivo e o Intervalo, a Foto e os avisos de ao vivo pausado no compact](../2_Diagramas/vista-hub-meus-modulos-mobile_v03_20261109-0054.svg)](../2_Diagramas/vista-hub-meus-modulos-mobile_v03_20261109-0054.svg)
 
 **Hub · módulos · a contratar · mobile · vista** — `2_Diagramas/vista-hub-catalogo-mobile_v01_20261103-1435.svg`
 
@@ -457,9 +475,9 @@ Cenário: o que este documento não trata
 
 [![Casos de uso da carcaça do hub: a pessoa do hub escolhe a conta do aparelho, entra, cria conta, sai, vê Módulos, ordena, abre o módulo, vê o Feed e a Conta, envia a foto e escolhe o tema; a conta master vê A contratar e o detalhe; entrar, criar conta e sair vêm do 17, a vitrine do 16 e o conteúdo de cada módulo, do documento dele](../2_Diagramas/hub-casos-de-uso_v02_20261103-2204.svg)](../2_Diagramas/hub-casos-de-uso_v02_20261103-2204.svg)
 
-**Hub · carcaça · sequência com as telas** — `2_Diagramas/hub-sequencia_v02_20261103-2205.svg`
+**Hub · carcaça · sequência com as telas** — `2_Diagramas/hub-sequencia_v03_20261109-0110.svg`
 
-[![Sequência da carcaça do hub com as telas: entrar pela conta do aparelho, por outra conta ou criando a conta (referência ao 17), navegar por Contratados e Feed, ordenar só no aparelho, ver A contratar e o detalhe (referência ao 16), ver a Conta, enviar a foto e escolher o tema; os dados da conta vêm do módulo Usuários (17) e a foto vai em SVG](../2_Diagramas/hub-sequencia_v02_20261103-2205.svg)](../2_Diagramas/hub-sequencia_v02_20261103-2205.svg)
+[![Sequência da carcaça do hub com as telas: entrar pela conta do aparelho, por outra conta ou criando a conta (referência ao 17), navegar por Contratados e Feed, ordenar só no aparelho, ver A contratar e o detalhe (referência ao 16), ver a Conta, enviar a foto e escolher o tema; os dados da conta vêm do módulo Usuários (17) e a foto vai em SVG; atualização dos cards: preferência salva, ao vivo com ping de 30 s, pausa só no aparelho e reconexão](../2_Diagramas/hub-sequencia_v03_20261109-0110.svg)](../2_Diagramas/hub-sequencia_v03_20261109-0110.svg)
 
 **Entrada no hub · sequência (17_modulo-usuario-a)** — `2_Diagramas/autenticacao-sequencia_v04_20261108-0216.svg`
 
@@ -469,9 +487,9 @@ Cenário: o que este documento não trata
 
 [![Contrato de API da autenticação do 17-a, com a entrada no hub e o sair](../2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg)](../2_Diagramas/autenticacao-contrato-api_v04_20261108-0949.svg)
 
-**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v11_20261108-1159.svg`
+**Criar conta · contrato de API (17_modulo-usuario)** — `2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg`
 
-[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v11_20261108-1159.svg)](../2_Diagramas/usuarios-contrato-api_v11_20261108-1159.svg)
+[![Contrato de API dos usuários do 17, com a criação da conta master](../2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg)](../2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg)
 
 ---
 
@@ -481,7 +499,16 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v38** | 2026-11-08 12:02 | Diagrama: contrato de API dos usuários do 17 v10 → v11 (403 sem o módulo auditado com INICIADO e ALERTA, X-Trace-Id; ações internas no traceId de quem chama; 17 `RN-270`, `RN-275`) |
+| **v47** | 2026-11-11 23:28 | Diagrama: contrato de API dos usuários do 17 v16 → v17 (a MASTER nas contagens do card, gerar senha reconta o card, ao vivo sem retomada) |
+| v46 | 2026-11-11 23:24 | Diagrama: contrato de API dos usuários do 17 v15 → v16 (PUT /_teste/relogio com 422 DADOS_INVALIDOS no campo "agora") |
+| v45 | 2026-11-09 09:14 | Diagrama: contrato de API dos usuários do 17 v14 → v15 (endereços de teste PUT e DELETE /_teste/relogio e POST /_teste/fechamento, sem login, só com AMBIENTE=hml e Teste__Relogio=sim, ligado só no backend do CI; fora disso, 404) |
+| v44 | 2026-11-09 09:09 | Diagrama: contrato de API dos usuários do 17 v13 → v14 (nomes do apoio e da lista do card por perfil; Sem acesso há 30 dias só para quem existe há mais de 30 dias) |
+| v43 | 2026-11-09 01:17 | Diagrama: hub-sequencia v03 com as telas da vista hub-meus-modulos pwa v03 e a fase Atualização dos cards (15 `RF-133`, `RN-220`, `RN-279`, `RN-282`; 17 `RN-283`) |
+| v42 | 2026-11-09 01:03 | Diagrama: contrato de API dos usuários do 17 v12 → v13 (preferências de atualização dos cards e ping de 30 s) |
+| v41 | 2026-11-09 00:58 | Telas ([15 `RF-133`](15_modulos.md#RF-133), [`RN-279`](15_modulos.md#RN-279), [`RN-282`](15_modulos.md#RN-282)): vistas de Módulos web v01 → v02 e pwa e mobile v02 → v03, com a Conta em Ao vivo, o Intervalo (A cada 5 s a A cada 5 min) e os avisos de ao vivo pausado; cenários sem mudança |
+| v40 | 2026-11-09 00:44 | `RN-284` novo: abas de Módulos por perfil (o autônomo, dono da conta, vê as três abas como a conta master; o staff vê só Contratados) |
+| v39 | 2026-11-08 23:35 | Diagrama: contrato de API dos usuários do 17 v11 → v12 (card no formato comum e card ao vivo por SSE) |
+| v38 | 2026-11-08 12:02 | Diagrama: contrato de API dos usuários do 17 v10 → v11 (403 sem o módulo auditado com INICIADO e ALERTA, X-Trace-Id; ações internas no traceId de quem chama; 17 `RN-270`, `RN-275`) |
 | v37 | 2026-11-08 11:35 | Diagrama: contrato de API dos usuários do 17 v09 → v10 (403 ACESSO_NEGADO sem o módulo recusado antes do caso de uso, sem X-Trace-Id nem registros, `RN-270`) |
 | v36 | 2026-11-08 09:50 | Diagramas: contrato de API da autenticação do 17-a v03 → v04 (403 ACESSO_INDISPONIVEL no confirmar-senha com quem e contaId) e dos usuários do 17 v08 → v09 (quem, contaId e alvo da auditoria por endereço) |
 | v35 | 2026-11-08 02:20 | Diagramas da autenticação do 17-a: contrato de API v02 → v03 e sequência v03 → v04 (auditoria das entradas e sessões, X-Trace-Id, recusas como ALERTA, 500 ERRO_INESPERADO) |
@@ -489,15 +516,7 @@ Cenário: o que este documento não trata
 | v33 | 2026-11-08 02:04 | Diagrama: contrato de API dos usuários do 17 v06 → v07 (500 ERRO_INESPERADO confirmado, PUT permissões auditado) |
 | v32 | 2026-11-08 02:00 | Diagrama: contrato de API dos usuários do 17 v05 → v06 (auditoria, X-Trace-Id); status → Em revisão |
 | v31 | 2026-11-07 16:40 | Status → Aprovado, sem pendências em aberto |
-| v30 | 2026-11-07 14:52 | Diagramas: contrato de API dos usuários (17_modulo-usuario) v04 → v05; status → Em revisão |
-| v29 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
-| v28 | 2026-11-03 22:11 | Vista de Módulos pwa e mobile v02, com o Feed definido no documento do módulo Feed; aprovado, sem pendências em aberto |
-| v27 | 2026-11-03 22:05 | Em aberto respondido: conteúdo e contrato de cada card no documento do módulo (`RN-210`); Feed como espaço reservado do futuro módulo Feed (`RF-85`); conta identificada pelo nome da instituição e pela foto ou inicial (`RN-125`); foto enviada em SVG (`RF-86`, [15 RN-260](15_modulos.md#RN-260)); Atualização dos cards guardada na conta (`RF-81`); casos de uso e sequência v02 |
-| v26 | 2026-11-03 14:39 | Telas separadas em Web, PWA e Mobile (vistas entrada, módulos, a contratar e módulo aberto v01); Diagramas: casos de uso e sequência com as telas da carcaça do hub, com a entrada e o sair do [17-a RF-134](17_modulo-usuario-a-autenticacao.md#RF-134), a criação da conta do [17 RF-104](17_modulo-usuario.md#RF-104) e a vitrine do 16 como referência; Em aberto: os contratos ainda não definidos dos cards de Módulos, do Feed, da conta, da foto e da Atualização dos cards |
-| v25 | 2026-11-03 13:54 | A contratar e detalhe do módulo só com a carcaça (`RF-82`, `RF-83`, vista-hub-catalogo v09 e vista-hub-meus-modulos v13, sem desenhar outros módulos, nem no código do time): cards, carrossel, descrição, como funciona, quem usa, calculadora e Incluir na conta passam para o Catálogo ([16_modulo-catalogo `RF-164` a `RF-168`](16_modulo-catalogo.md#RF-164)) |
-| v24 | 2026-11-01 18:21 | Só Gherkin, telas e diagramas: contexto, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); vistas em Telas; status → Em revisão |
-| v23 | 2026-11-01 03:57 | Aprovado |
 
 ---
 
-<sub>boaz · v38 · 2026-11-08 12:02 · `1_Requisitos/12_hub-ui.md`</sub>
+<sub>boaz · v47 · 2026-11-11 23:28 · `1_Requisitos/12_hub-ui.md`</sub>

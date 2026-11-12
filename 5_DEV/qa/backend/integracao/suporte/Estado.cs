@@ -98,6 +98,18 @@ public static class Estado
             Builders<BsonDocument>.Filter.Eq("_id", usuarioId),
             Builders<BsonDocument>.Update.Set("permissoes.versao", versao).Set("permissoes.pv", versao));
 
+    // módulo suspenso na pessoa (17-b RN-285, RN-287): fora de mods, guardado em
+    // "suspensos" com as abas, na versão do exemplo ("suspensa na versão 8").
+    // Só o aviso do Catálogo suspende pela API, e ele não é provocável de fora
+    public static Task Suspender(string usuarioId, string moduloId, string abas, int versao) =>
+        Banco.GetCollection<BsonDocument>("usuarios").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", usuarioId),
+            Builders<BsonDocument>.Update
+                .Unset($"permissoes.mods.{moduloId}")
+                .Set("permissoes.suspensos", new BsonArray { new BsonDocument { ["mod"] = moduloId, ["abas"] = abas } })
+                .Set("permissoes.versao", versao)
+                .Set("permissoes.pv", versao));
+
     // a conta contrata um módulo hoje (16_modulo-catalogo, coleção contratacoes)
     public static Task Contratar(string contaId, string sigla, string moduloId) =>
         Banco.GetCollection<BsonDocument>("contratacoes").InsertOneAsync(new BsonDocument
@@ -124,6 +136,73 @@ public static class Estado
         Banco.GetCollection<BsonDocument>("geracoesSenha").UpdateManyAsync(
             Builders<BsonDocument>.Filter.Eq("usuarioId", usuarioId),
             Builders<BsonDocument>.Update.Set("pedidaEm", DateTime.UtcNow - tempo));
+
+    // o código de liberação vence hoje, no horário de Brasília, e ainda não
+    // venceu (selo do card, 17 RN-280): vence no meio do que resta do dia
+    public static Task CodigoVenceHoje(string usuarioId)
+    {
+        var agora = DateTime.UtcNow;
+        var fimDoDia = agora.AddHours(-3).Date.AddDays(1).AddHours(3);
+        var vence = agora + (fimDoDia - agora) / 2;
+        return Banco.GetCollection<BsonDocument>("geracoesSenha").UpdateManyAsync(
+            Builders<BsonDocument>.Filter.Eq("usuarioId", usuarioId),
+            Builders<BsonDocument>.Update.Set("pedidaEm", vence - TimeSpan.FromHours(72)));
+    }
+
+    // último acesso dos usuários (17 RN-280, "Sem acesso há 30 dias"): a API só
+    // o grava quando a pessoa entra, e o cenário precisa dele no passado
+    public static Task UltimoAcesso(IEnumerable<string> usuarioIds, DateTime quando) =>
+        Banco.GetCollection<BsonDocument>("usuarios").UpdateManyAsync(
+            Builders<BsonDocument>.Filter.In("_id", usuarioIds),
+            Builders<BsonDocument>.Update.Set("ultimoAcesso", quando));
+
+    // quem nunca entrou: ultimoAcesso nulo (17 RN-280, conta em "Sem acesso há 30 dias")
+    public static Task UltimoAcessoNulo(string usuarioId) =>
+        Banco.GetCollection<BsonDocument>("usuarios").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", usuarioId),
+            Builders<BsonDocument>.Update.Set("ultimoAcesso", BsonNull.Value));
+
+    // usuários criados há algum tempo ("ATIVO desde 2026-09-01"): "Sem acesso
+    // há 30 dias" só conta quem existe há mais de 30 dias (17 RN-280)
+    public static Task CriadoEm(IEnumerable<string> usuarioIds, DateTime quando) =>
+        Banco.GetCollection<BsonDocument>("usuarios").UpdateManyAsync(
+            Builders<BsonDocument>.Filter.In("_id", usuarioIds),
+            Builders<BsonDocument>.Update.Set("criadoEm", quando));
+
+    // master que nunca entrou: ultimoAcessoMaster nulo (17 RN-280)
+    public static Task UltimoAcessoMasterNulo(string contaId) =>
+        Banco.GetCollection<BsonDocument>("contas").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", contaId),
+            Builders<BsonDocument>.Update.Set("ultimoAcessoMaster", BsonNull.Value));
+
+    // conta criada há algum tempo ("Master sem acesso há 30 dias", 17 RN-280)
+    public static Task CriadaEm(string contaId, DateTime quando) =>
+        Banco.GetCollection<BsonDocument>("contas").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", contaId),
+            Builders<BsonDocument>.Update.Set("criadaEm", quando));
+
+    // último acesso da conta master (17 RN-280, "Master sem acesso há 30 dias")
+    public static Task UltimoAcessoMaster(string contaId, DateTime quando) =>
+        Banco.GetCollection<BsonDocument>("contas").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", contaId),
+            Builders<BsonDocument>.Update.Set("ultimoAcessoMaster", quando));
+
+    // meses anteriores do card guardado (17 RN-280, 15 RN-278): o histórico só
+    // nasce com o tempo. Entram antes do mês atual, que o backend já gravou;
+    // sem o card guardado, nada muda (o cenário falha pela resposta)
+    public static Task MesesAnterioresDoCard(string contaId, string perfil, IReadOnlyList<int> valores)
+    {
+        var mesAtual = DateTime.UtcNow.AddHours(-3);
+        var meses = new BsonArray(valores.Select((valor, i) => new BsonDocument
+        {
+            ["mes"] = mesAtual.AddMonths(i - valores.Count).ToString("yyyy-MM"),
+            ["valor"] = valor,
+        }));
+        return Banco.GetCollection<BsonDocument>("cardUsuarios").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("contaId", contaId) & Builders<BsonDocument>.Filter.Eq("perfil", perfil)
+                & Builders<BsonDocument>.Filter.Eq("usuarioId", BsonNull.Value),
+            Builders<BsonDocument>.Update.PushEach("meses", meses, position: 0));
+    }
 
     // a sessão passou do tempo sem uso: a chave expira (RN-226, RNF-217)
     public static Task ExpirarSessao(string sid) => redis.Value.GetDatabase().KeyDeleteAsync($"sessao:{sid}");

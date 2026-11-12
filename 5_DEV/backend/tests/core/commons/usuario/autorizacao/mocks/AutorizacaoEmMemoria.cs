@@ -32,7 +32,7 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
         LerPermissoes = new LerPermissoes(this, this, this, this, Relogio);
         SalvarPermissoes = new SalvarPermissoes(this, this, this, this, this, this, this, Relogio);
         LerHistoricoDePermissoes = new LerHistoricoDePermissoes(this, this, this, this, Relogio);
-        AvisarContratacaoMudou = new AvisarContratacaoMudou(this, this, this, this, Relogio);
+        AvisarContratacaoMudou = new AvisarContratacaoMudou(this, this, this, this, this, this, this, Relogio);
         AutorizarPedido = new AutorizarPedido();
         AutorizarPedidoAuditado = new AutorizarPedidoAuditado(this, this, Relogio);
     }
@@ -67,8 +67,9 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
         usuarios[id] = new UsuarioAutorizado(id, contaId, nome, papel, criadoPor);
 
     /// <summary>Grava permissões direto, como o preparo pelo banco do QA ("na versão 7").</summary>
-    public void Definir(string usuarioId, int versao, IReadOnlyDictionary<string, Abas>? mods = null, int? pv = null) =>
-        permissoes[usuarioId] = new PermissoesDoUsuario(usuarioId, versao, pv ?? versao, mods ?? new Dictionary<string, Abas>());
+    public void Definir(string usuarioId, int versao, IReadOnlyDictionary<string, Abas>? mods = null, int? pv = null,
+        IReadOnlyDictionary<string, Abas>? suspensos = null) =>
+        permissoes[usuarioId] = new PermissoesDoUsuario(usuarioId, versao, pv ?? versao, mods ?? new Dictionary<string, Abas>(), suspensos);
 
     /// <summary>A conta contrata o módulo.</summary>
     public void Contratar(string contaId, string moduloId)
@@ -113,6 +114,9 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
 
     Task<UsuarioAutorizado?> IUsuarios.Buscar(string id, CancellationToken ct) => Task.FromResult(usuarios.GetValueOrDefault(id));
 
+    Task<IReadOnlyList<UsuarioAutorizado>> IUsuarios.DaConta(string contaId, CancellationToken ct) =>
+        Task.FromResult<IReadOnlyList<UsuarioAutorizado>>(usuarios.Values.Where(u => u.ContaId == contaId).OrderBy(u => u.Id, StringComparer.Ordinal).ToList());
+
     Task<PermissoesDoUsuario?> IPermissoesGuardadas.Buscar(string usuarioId, CancellationToken ct) => Task.FromResult(Guardadas(usuarioId));
 
     Task<bool> IPermissoesGuardadas.Salvar(PermissoesDoUsuario novas, MudancaDePermissao mudanca, int versaoLida, CancellationToken ct)
@@ -122,7 +126,8 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
         if (PerderAProximaCorrida)
         {
             PerderAProximaCorrida = false;
-            Definir(novas.UsuarioId, atual + 1, permissoes.GetValueOrDefault(novas.UsuarioId)?.Mods);
+            var guardadas = permissoes.GetValueOrDefault(novas.UsuarioId);
+            Definir(novas.UsuarioId, atual + 1, guardadas?.Mods, suspensos: guardadas?.Suspensos);
             return Task.FromResult(false);
         }
         if (atual != versaoLida) return Task.FromResult(false);
@@ -131,16 +136,11 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
         return Task.FromResult(true);
     }
 
-    Task<IReadOnlyList<(string UsuarioId, int Pv)>> IPermissoesGuardadas.SubirPvDaConta(string contaId, CancellationToken ct)
+    Task<int> IPermissoesGuardadas.SubirPv(string usuarioId, CancellationToken ct)
     {
-        var subiram = new List<(string, int)>();
-        foreach (var usuario in usuarios.Values.Where(u => u.ContaId == contaId))
-        {
-            var p = permissoes.GetValueOrDefault(usuario.Id) ?? PermissoesDoUsuario.Vazias(usuario.Id);
-            permissoes[usuario.Id] = new PermissoesDoUsuario(usuario.Id, p.Versao, p.Pv + 1, p.Mods);
-            subiram.Add((usuario.Id, p.Pv + 1));
-        }
-        return Task.FromResult<IReadOnlyList<(string, int)>>(subiram);
+        var p = permissoes.GetValueOrDefault(usuarioId) ?? PermissoesDoUsuario.Vazias(usuarioId);
+        permissoes[usuarioId] = new PermissoesDoUsuario(usuarioId, p.Versao, p.Pv + 1, p.Mods, p.Suspensos);
+        return Task.FromResult(p.Pv + 1);
     }
 
     Task<IReadOnlyList<MudancaDePermissao>> IPermissoesGuardadas.Historico(string usuarioId, DateTimeOffset? ate, int limite, CancellationToken ct) =>
@@ -175,5 +175,5 @@ public sealed class AutorizacaoEmMemoria : IUsuarios, IPermissoesGuardadas, IMod
         return Task.CompletedTask;
     }
 
-    static PermissoesDoUsuario Copia(PermissoesDoUsuario p) => new(p.UsuarioId, p.Versao, p.Pv, p.Mods.ToDictionary());
+    static PermissoesDoUsuario Copia(PermissoesDoUsuario p) => new(p.UsuarioId, p.Versao, p.Pv, p.Mods.ToDictionary(), p.Suspensos.ToDictionary());
 }

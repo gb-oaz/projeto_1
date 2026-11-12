@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "14_estrutura-projetos"
 tipo: "Transversal"
 titulo: "Estrutura dos projetos"
-versao: "v15"
-data: "2026-11-05 12:34"
-status: "Aprovado"
+versao: "v18"
+data: "2026-11-12 02:03"
+status: "Em revisão"
 objetivo: "definir uma organização de pastas e de dependências única para backend, web e mobile, que separa o domínio (core) dos adaptadores."
 ---
 
-> **boaz · Transversal** · `14_estrutura-projetos` · **v15** · 2026-11-05 12:34 · **Aprovado**
+> **boaz · Transversal** · `14_estrutura-projetos` · **v18** · 2026-11-12 02:03 · **Em revisão**
 
 # Estrutura dos projetos
 
@@ -29,7 +29,9 @@ objetivo: "definir uma organização de pastas e de dependências única para ba
 Cenário: uma frente por pasta
   Então o código fica em 5_DEV/: o backend em C#, a web em Vue e os apps em .NET MAUI
   E cada frente tem um core/ por contexto e feature, com domínio, casos de uso e portas
-  E os runtimes têm os adaptadores: primários em infra/in e secundários em infra/out
+  E na web e no mobile os adaptadores primários ficam em infra/in e os secundários em infra/out
+  E no backend os primários ficam em ms_mono/primario/{in,out}
+  E os secundários do backend ficam em ms_mono/secundario/{in,out}
 
 Cenário: um runtime por frente (decisão de 2026-10-24)
   Então o backend é um único serviço, o ms_mono, com todos os contextos
@@ -52,10 +54,10 @@ Esquema do Cenário: feature hub/salas
   E os adaptadores ficam em <adaptadores>
 
   Exemplos:
-    | frente  | adaptadores                                         |
-    | backend | ms_mono/infra/in/hub/salas/ e infra/out/hub/salas/  |
-    | web     | apps/hub/infra/in/hub/salas/ e infra/out/hub/salas/ |
-    | mobile  | apps/hub/infra/in/hub/salas/ e infra/out/hub/salas/ |
+    | frente  | adaptadores                                                           |
+    | backend | ms_mono/primario/{in,out}/hub/salas/ e secundario/{in,out}/hub/salas/ |
+    | web     | apps/hub/infra/in/hub/salas/ e infra/out/hub/salas/                   |
+    | mobile  | apps/hub/infra/in/hub/salas/ e infra/out/hub/salas/                   |
 ```
 
 <a id="RN-144"></a>
@@ -121,9 +123,11 @@ Esquema do Cenário: dependência do core
 ```gherkin
 Cenário: fluxo de uma chamada
   Dado o endpoint de criar sala em infra/in/hub/salas/
+  E no backend, em ms_mono/primario/in/hub/salas/
   Então ele chama a feature só pela interface de ports/in/
   E usecases/ implementa ports/in/ e usa ports/out/
   E o repositório em infra/out/hub/salas/ implementa ports/out/
+  E no backend, em ms_mono/secundario/out/hub/salas/
 ```
 
 <a id="RN-149"></a>
@@ -254,7 +258,11 @@ Cenário: projeto do hub
 ```gherkin
 Cenário: runtime do backend
   Então ms_mono/ é o ASP.NET Core que gera a imagem backend-mono e referencia todos os contextos
-  E tem infra/in/<contexto>/<feature>/ com os endpoints e infra/out/ com MongoDB e Redis
+  E tem primario/ e secundario/, cada um com in/ e out/ por <contexto>/<feature>/
+  E primario/in/ recebe quem chama: os endpoints, a partida e o agendamento
+  E primario/out/ responde a quem chamou: o fluxo SSE e a sessão na resposta
+  E secundario/in/ recebe o que chega da infraestrutura: as assinaturas de canal do Redis
+  E secundario/out/ chama a infraestrutura: MongoDB, Redis, índices e configurações
   E sistema/ guarda prontidão e documentação da API
   E wwwroot/doc/api/design/ guarda a cópia gerada do design system
 ```
@@ -460,9 +468,9 @@ Cenário: rodar no emulador Android
 
 ## Diagramas
 
-**Estrutura dos projetos** — `2_Diagramas/estrutura-projetos_v06_20261102-1248.svg`
+**Estrutura dos projetos** — `2_Diagramas/estrutura-projetos_v08_20261112-0202.svg`
 
-[![Estrutura dos projetos: padrão de cada feature (infra/in, components, ports/in, usecases, domain, dtos, ports/out, infra/out), agrupada por módulo quando preciso e as pastas do backend (core e ms_mono), da web (core e apps landing_page, hub, quest) e do mobile (core e apps hub, quest), as suítes do qa por alvo e tipo (backend/integracao, backend/carga, frontend/web/funcional com Cypress, frontend/mobile/funcional com Appium) com o contrato de cada uma, e as regras de dependência](../2_Diagramas/estrutura-projetos_v06_20261102-1248.svg)](../2_Diagramas/estrutura-projetos_v06_20261102-1248.svg)
+[![Estrutura dos projetos: padrão de cada feature (infra/in, components, ports/in, usecases, domain, dtos, ports/out, infra/out), agrupada por módulo quando preciso e as pastas do backend (core e ms_mono com primario/in, primario/out, secundario/in e secundario/out), da web (core e apps landing_page, hub, quest) e do mobile (core e apps hub, quest), as suítes do qa por alvo e tipo (backend/integracao, backend/carga, frontend/web/funcional com Cypress, frontend/mobile/funcional com Appium) com o contrato de cada uma, e as regras de dependência](../2_Diagramas/estrutura-projetos_v08_20261112-0202.svg)](../2_Diagramas/estrutura-projetos_v08_20261112-0202.svg)
 
 ---
 
@@ -472,7 +480,10 @@ Cenário: rodar no emulador Android
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v15** | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
+| **v18** | 2026-11-12 02:03 | Diagrama: estrutura-projetos v07 → v08 (ms_mono com primario/in, primario/out, secundario/in e secundario/out e o papel de cada um, `RNF-177`; regras de dependência com primario/secundario no backend e infra/in e infra/out na web e no mobile, `RN-143`, `RN-148`); cenários sem mudança |
+| v17 | 2026-11-12 01:58 | Adaptadores do backend em ms_mono/primario/{in,out} e ms_mono/secundario/{in,out}, sem infra/out no ms_mono (arquitetura hexagonal, `RN-143`, `RN-148`, `RNF-177`); web e mobile seguem com infra/in e infra/out |
+| v16 | 2026-11-11 23:18 | Adaptadores primários do backend em ms_mono/primario e infra/out só com os secundários (arquitetura hexagonal, `RN-143`, `RN-148`, `RNF-177`); web e mobile seguem com apps/<app>/infra/in; diagrama estrutura-projetos v06 → v07; status → Em revisão |
+| v15 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v14 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v13 | 2026-11-02 12:26 | `RNF-175` alterado: `dtos/`, um caso de uso por classe, features agrupadas por módulo (`core/commons/usuario/`) e só bibliotecas do .NET no core; `RNF-178` alterado: unitários no domínio, integração com mock das portas e cobertura medida por projeto; diagrama `estrutura-projetos_v06` |
 | v12 | 2026-11-01 18:25 | Só Gherkin e diagramas: contexto, RN e RNF viram cenários (mesmos IDs como âncora); status → Em revisão |
@@ -480,9 +491,7 @@ Cenário: rodar no emulador Android
 | v10 | 2026-10-26 23:53 | `RNF-177` alterado: `ms_mono/sistema/` (endpoints de sistema e documentação da API) e `wwwroot/doc/api/design/` (cópia gerada do design system) |
 | v09 | 2026-10-25 03:57 | `RNF-187` e `RNF-198` alterados: as propriedades comuns do mobile ficam em `5_DEV/frontend/mobile/Directory.Build.props`; diagrama `estrutura-projetos_v05`; status: Aprovado |
 | v08 | 2026-10-25 01:12 | Status → Aprovado |
-| v07 | 2026-10-24 23:21 | Pendência respondida: `RNF-198` (endereço do backend no build, pela propriedade `ApiUrl`) incluído; `RNF-196` com as versões do Appium e dos drivers no `package.json` da suíte; seção Em aberto removida |
-| v06 | 2026-10-24 22:47 | Pendência respondida: o funcional do mobile usa Appium com testes em C# (`RNF-196`, contrato `executar.sh` na máquina); `RN-153` e `RNF-191` alterados; Em aberto com o endereço do backend de teste no app; diagrama `estrutura-projetos_v04` |
 
 ---
 
-<sub>boaz · v15 · 2026-11-05 12:34 · `1_Requisitos/14_estrutura-projetos.md`</sub>
+<sub>boaz · v18 · 2026-11-12 02:03 · `1_Requisitos/14_estrutura-projetos.md`</sub>
