@@ -122,12 +122,17 @@ public sealed class ComAcessoAttribute(string modulo, string aba) : Attribute, I
     // quest, recebe o 403 do módulo, não o 401 da frente (card do Usuários, RN-189)
     public bool FrenteDoToken { get; init; }
 
+    // sem token ou com um token inválido, 401 SESSAO_TERMINADA no lugar do
+    // TOKEN_INVALIDO (card e ao vivo do Usuários, contrato usuarios v15)
+    public bool SemSessaoValida { get; init; }
+
     public ExigenciaDaRota Exigencia { get; } = Acesso.Exigencia(modulo, aba);
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var http = context.HttpContext;
-        var acesso = await Acesso.Conferir(http, FrenteDoToken ? Http.FrenteDoToken(Http.Token(http)) : Frente);
+        var frente = FrenteDoToken ? Http.FrenteDoToken(Http.Token(http)) : Frente;
+        var acesso = SemSessaoValida ? await Acesso.ConferirSessao(http, frente) : await Acesso.Conferir(http, frente);
         http.RequestServices.GetRequiredService<IAutorizarPedido>().Executar(Exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods));
         http.Items[typeof(AcessoConferido)] = acesso;
         await next();
@@ -135,14 +140,15 @@ public sealed class ComAcessoAttribute(string modulo, string aba) : Attribute, I
 }
 
 // Rota com login que não exige módulo (preferências, RN-283): o token é
-// conferido (assinatura, sessão viva e pv atual), na frente dele, hub ou quest.
+// conferido (assinatura, sessão viva e pv atual), na frente dele, hub ou quest;
+// sem token ou com um token inválido, 401 SESSAO_TERMINADA (contrato usuarios v15).
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class ComSessaoAttribute : Attribute, IAsyncActionFilter, IMarcaDeLogin
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var http = context.HttpContext;
-        http.Items[typeof(AcessoConferido)] = await Acesso.Conferir(http, Http.FrenteDoToken(Http.Token(http)));
+        http.Items[typeof(AcessoConferido)] = await Acesso.ConferirSessao(http, Http.FrenteDoToken(Http.Token(http)));
         await next();
     }
 }
@@ -206,4 +212,20 @@ static class Acesso
     public static Task<AcessoConferido> Conferir(HttpContext http, Frente frente) =>
         http.RequestServices.GetRequiredService<IConferirAcesso>()
             .Executar(new ConferenciaDeAcessoDto(Http.Token(http), frente), http.RequestAborted);
+
+    // Como Conferir, mas a falta de um token válido (ausente, malformado, com a
+    // assinatura errada, vencido ou de outra frente) responde SESSAO_TERMINADA:
+    // as rotas do card e das preferências só conhecem esse 401 (contrato
+    // usuarios v15). PERMISSOES_DESATUALIZADAS continua, para o cliente renovar.
+    public static async Task<AcessoConferido> ConferirSessao(HttpContext http, Frente frente)
+    {
+        try
+        {
+            return await Conferir(http, frente);
+        }
+        catch (FalhaDeAutenticacao falha) when (falha.Codigo == FalhaDeAutenticacao.TokenInvalido().Codigo)
+        {
+            throw FalhaDeAutenticacao.SessaoTerminada();
+        }
+    }
 }

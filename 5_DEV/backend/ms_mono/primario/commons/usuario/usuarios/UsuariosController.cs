@@ -96,10 +96,10 @@ public sealed class UsuariosController : ControllerBase
     /// <param name="obter">Caso de uso ObterCardUsuarios.</param>
     /// <param name="ct">Cancelamento do pedido.</param>
     /// <response code="200">O card no formato comum dos módulos.</response>
-    /// <response code="401">Token de acesso ausente ou inválido.</response>
+    /// <response code="401">SESSAO_TERMINADA: sem token, token inválido ou sessão que terminou.</response>
     /// <response code="403">Participante, ou staff sem MOD-03 · U.</response>
     [HttpGet("card", Name = "obterCardUsuarios")]
-    [ComAcesso(Usuarios, nameof(Abas.U), FrenteDoToken = true)]
+    [ComAcesso(Usuarios, nameof(Abas.U), FrenteDoToken = true, SemSessaoValida = true)]
     [ProducesResponseType<CardDoModuloDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<Erro>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<Erro>(StatusCodes.Status403Forbidden)]
@@ -117,11 +117,11 @@ public sealed class UsuariosController : ControllerBase
     /// <param name="json">O JSON das APIs, igual ao de GET /usuarios/card.</param>
     /// <param name="ct">Cancelamento do pedido (a conexão fechou).</param>
     /// <response code="200">O fluxo de eventos, aberto.</response>
-    /// <response code="401">Token de acesso ausente ou inválido.</response>
+    /// <response code="401">SESSAO_TERMINADA: sem token, token inválido ou sessão que terminou.</response>
     /// <response code="403">Participante, ou staff sem MOD-03 · U.</response>
     /// <response code="422">Intervalo fora da lista.</response>
     [HttpGet("card/ao-vivo", Name = "acompanharCardAoVivo")]
-    [ComAcesso(Usuarios, nameof(Abas.U), FrenteDoToken = true)]
+    [ComAcesso(Usuarios, nameof(Abas.U), FrenteDoToken = true, SemSessaoValida = true)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<Erro>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<Erro>(StatusCodes.Status403Forbidden)]
@@ -169,7 +169,7 @@ public sealed class UsuariosController : ControllerBase
     /// <param name="obter">Caso de uso ObterPreferencias.</param>
     /// <param name="ct">Cancelamento do pedido.</param>
     /// <response code="200">A escolha.</response>
-    /// <response code="401">Token de acesso ausente ou inválido.</response>
+    /// <response code="401">SESSAO_TERMINADA: sem token, token inválido ou sessão que terminou.</response>
     [HttpGet("eu/preferencias", Name = "obterPreferencias")]
     [ComSessao]
     [ProducesResponseType<PreferenciasDto>(StatusCodes.Status200OK)]
@@ -186,7 +186,7 @@ public sealed class UsuariosController : ControllerBase
     /// <param name="salvar">Caso de uso SalvarPreferencias.</param>
     /// <param name="ct">Cancelamento do pedido.</param>
     /// <response code="200">A escolha salva.</response>
-    /// <response code="401">Token de acesso ausente ou inválido.</response>
+    /// <response code="401">SESSAO_TERMINADA: sem token, token inválido ou sessão que terminou.</response>
     /// <response code="422">Campo inválido.</response>
     [HttpPut("eu/preferencias", Name = "salvarPreferencias")]
     [ComSessao]

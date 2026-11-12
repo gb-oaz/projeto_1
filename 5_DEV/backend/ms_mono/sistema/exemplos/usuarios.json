@@ -842,17 +842,10 @@
       ],
       "401": [
         {
-          "nome": "TOKEN_INVALIDO",
+          "nome": "SESSAO_TERMINADA",
           "corpo": {
-            "codigo": "TOKEN_INVALIDO",
-            "mensagem": "Token inválido."
-          }
-        },
-        {
-          "nome": "PERMISSOES_DESATUALIZADAS",
-          "corpo": {
-            "codigo": "PERMISSOES_DESATUALIZADAS",
-            "mensagem": "Suas permissões mudaram. Renove a sessão."
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
           }
         }
       ],
@@ -1349,17 +1342,10 @@
       ],
       "401": [
         {
-          "nome": "TOKEN_INVALIDO",
+          "nome": "SESSAO_TERMINADA",
           "corpo": {
-            "codigo": "TOKEN_INVALIDO",
-            "mensagem": "Token inválido."
-          }
-        },
-        {
-          "nome": "PERMISSOES_DESATUALIZADAS",
-          "corpo": {
-            "codigo": "PERMISSOES_DESATUALIZADAS",
-            "mensagem": "Suas permissões mudaram. Renove a sessão."
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
           }
         }
       ],
@@ -1398,17 +1384,10 @@
       ],
       "401": [
         {
-          "nome": "TOKEN_INVALIDO",
+          "nome": "SESSAO_TERMINADA",
           "corpo": {
-            "codigo": "TOKEN_INVALIDO",
-            "mensagem": "Token inválido."
-          }
-        },
-        {
-          "nome": "PERMISSOES_DESATUALIZADAS",
-          "corpo": {
-            "codigo": "PERMISSOES_DESATUALIZADAS",
-            "mensagem": "Suas permissões mudaram. Renove a sessão."
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
           }
         }
       ]
@@ -1431,17 +1410,10 @@
       ],
       "401": [
         {
-          "nome": "TOKEN_INVALIDO",
+          "nome": "SESSAO_TERMINADA",
           "corpo": {
-            "codigo": "TOKEN_INVALIDO",
-            "mensagem": "Token inválido."
-          }
-        },
-        {
-          "nome": "PERMISSOES_DESATUALIZADAS",
-          "corpo": {
-            "codigo": "PERMISSOES_DESATUALIZADAS",
-            "mensagem": "Suas permissões mudaram. Renove a sessão."
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
           }
         }
       ],

@@ -296,6 +296,21 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
         Assert.All(new[] { "dia", "semana", "mes" }, s => Assert.Equal(12, corpo["series"]![s]!.AsArray().Count));
     }
 
+    // contrato usuarios v15: o card, o ao vivo e as preferências só conhecem o 401 SESSAO_TERMINADA
+    [Theory]
+    [InlineData("GET", "/usuarios/card", null)]
+    [InlineData("GET", "/usuarios/card/ao-vivo?intervalo=30", "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJxYSJ9.invalida")]
+    [InlineData("GET", "/usuarios/eu/preferencias", "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJxYSJ9.invalida")]
+    [InlineData("PUT", "/usuarios/eu/preferencias", null)]
+    public async Task RN_283_sem_token_valido_a_sessao_terminou(string metodo, string caminho, string? token)
+    {
+        using var api = backend.Cliente();
+
+        var resposta = await api.Enviar(metodo, caminho, metodo == "PUT" ? new { atualizacaoCards = "AO_VIVO", intervaloAoVivo = 15 } : null, token);
+
+        Assert.Equal((HttpStatusCode.Unauthorized, "SESSAO_TERMINADA"), (resposta.Status, resposta.Codigo));
+    }
+
     static string[] Linhas(System.Text.Json.Nodes.JsonNode linhas) =>
         [.. linhas.AsArray().Select(l => $"{l!["nome"]!.GetValue<string>()} {l["valor"]!.GetValue<int>()}")];
 
