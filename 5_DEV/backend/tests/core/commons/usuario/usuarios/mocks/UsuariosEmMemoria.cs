@@ -38,7 +38,7 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
         SalvarPreferencias = new SalvarPreferencias(Cards);
         CriarUsuario = new CriarUsuario(this, this, this, this, this, Relogio, AtualizarCardUsuarios);
         EditarUsuario = new EditarUsuario(this, this, this, this, this, Relogio, AtualizarCardUsuarios);
-        GerarSenha = new GerarSenha(this, this, this, this, this, this, Relogio);
+        GerarSenha = new GerarSenha(this, this, this, this, this, this, Relogio, AtualizarCardUsuarios);
         PedirNovaGeracaoDeSenha = new PedirNovaGeracaoDeSenha(this, this, this, this, this, this, Relogio, AtualizarCardUsuarios);
         GerarNovoCodigoDeAcesso = new GerarNovoCodigoDeAcesso(this, this, this, this, this, Relogio);
         DesativarUsuario = new DesativarUsuario(this, this, this, this, this, Relogio, AtualizarCardUsuarios);

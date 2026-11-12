@@ -12,11 +12,12 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// seguida bloqueia, como na entrada do hub. Sem login, auditado com o traceId
 /// recebido: "INICIADO" sem quem, sem conta e sem alvo; "CONCLUIDO" com a conta
 /// e o alvo, quem teve a senha gerada; na recusa ou na falha, o registro de erro
-/// antes de a exceção sair (RN-178, RN-270, RN-271).
+/// antes de a exceção sair (RN-178, RN-270, RN-271). Os cards do Usuários são
+/// recontados na mesma execução (RN-280).
 /// </summary>
 public sealed class GerarSenha(
     IUsuarios usuarios, IContas contas, IGeracoesDeSenha geracoes, ITentativasDeLiberacao tentativas, IAuditoria auditoria,
-    IAuditoriaDeErros erros, TimeProvider relogio) : IGerarSenha
+    IAuditoriaDeErros erros, TimeProvider relogio, IAtualizarCardUsuarios cardsDoModulo) : IGerarSenha
 {
     readonly Apoio apoio = new(usuarios, contas, relogio);
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
@@ -37,6 +38,8 @@ public sealed class GerarSenha(
         var senha = Senha.Gerar(await NomeDaSenha(usuario, ct));
         var comprovante = CodigoDeLiberacao.Comprovante();
         await Gravar(usuario, geracao, senha, comprovante, ct);
+        // o card da conta é recontado na mesma execução e a versao sobe (RN-280)
+        await cardsDoModulo.Executar(new MudancaNoCadastroDto(usuario.ContaId, usuario.Id), ct);
         await tentativas.Apagar(entrada, ct);
         await RegistrarConclusao(execucao, usuario, ct);
         return new(senha, comprovante);

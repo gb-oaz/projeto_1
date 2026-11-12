@@ -34,11 +34,14 @@ sealed class ContagemDosCards(IRepositorioCardUsuarios cards, IContagemDoCard co
 {
     /// <summary>O card guardado; se ainda não existe, contado agora e gravado na versao 1.</summary>
     public async Task<CardUsuarios> Guardado(DonoDeCard dono, DateTimeOffset agora, CancellationToken ct) =>
-        await cards.Obter(dono.Id, ct) ?? await Recontar(Novo(dono, agora), agora, ct);
+        await cards.Obter(dono.Id, ct) ?? await Recontar(Novo(dono, agora), agora, false, ct);
 
-    /// <summary>Reconta o card do dono (criando-o se faltar) e grava, se mudou.</summary>
+    /// <summary>
+    /// Reconta o card do dono (criando-o se faltar) na execução que mudou o
+    /// cadastro e grava com a versao + 1, mesmo com os números iguais (17 v104 RN-280).
+    /// </summary>
     public async Task<CardUsuarios> Recontar(DonoDeCard dono, DateTimeOffset agora, CancellationToken ct) =>
-        await Recontar(await cards.Obter(dono.Id, ct) ?? Novo(dono, agora), agora, ct);
+        await Recontar(await cards.Obter(dono.Id, ct) ?? Novo(dono, agora), agora, true, ct);
 
     /// <summary>Os números do card com o que muda só com o tempo refeito agora, sem gravar.</summary>
     public async Task<NumerosDoCard> NoTempo(CardUsuarios card, DateTimeOffset agora, CancellationToken ct) =>
@@ -48,9 +51,9 @@ sealed class ContagemDosCards(IRepositorioCardUsuarios cards, IContagemDoCard co
     public Task<NumerosDoCard> Contar(CardUsuarios card, DateTimeOffset agora, CancellationToken ct) =>
         contagem.Contar(card.Perfil, card.ContaId, card.UsuarioId, agora, ct);
 
-    async Task<CardUsuarios> Recontar(CardUsuarios card, DateTimeOffset agora, CancellationToken ct)
+    async Task<CardUsuarios> Recontar(CardUsuarios card, DateTimeOffset agora, bool sempre, CancellationToken ct)
     {
-        if (card.Aplicar(await Contar(card, agora, ct), agora)) await cards.Salvar(card, ct);
+        if (card.Aplicar(await Contar(card, agora, ct), agora, sempre)) await cards.Salvar(card, ct);
         return card;
     }
 

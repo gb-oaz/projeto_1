@@ -217,12 +217,16 @@ public sealed class CardUsuarios
 
     /// <summary>
     /// Os números recontados na execução que mudou o cadastro (RN-278): grava os
-    /// números e o ponto de hoje das séries e sobe a versao, se algo mudou.
+    /// números e o ponto de hoje das séries e sobe a versao, se algo mudou ou
+    /// se <paramref name="sempre"/> (os casos de uso que mudam o cadastro, RN-280).
     /// </summary>
+    /// <param name="numeros">Os números de agora.</param>
+    /// <param name="agora">A hora do relógio.</param>
+    /// <param name="sempre">Sobe a versao mesmo com os números iguais.</param>
     /// <returns>True se mudou (e precisa ser gravado).</returns>
-    public bool Aplicar(NumerosDoCard numeros, DateTimeOffset agora)
+    public bool Aplicar(NumerosDoCard numeros, DateTimeOffset agora, bool sempre = false)
     {
-        var mudou = Versao == 0 | !Atual.Iguais(numeros);
+        var mudou = sempre | Versao == 0 | !Atual.Iguais(numeros);
         mudou |= Marcar(CalendarioDoCard.Dia(agora), numeros.Valor);
         if (!mudou) return false;
         Subir(numeros, agora);
@@ -305,11 +309,10 @@ public static class NomesDoCard
     /// <summary>O nome que a pessoa lê (a própria chave, se não for conhecida).</summary>
     public static string Nome(string chave) => Nomes.GetValueOrDefault(chave, chave);
 
-    /// <summary>O rótulo do dado macro: contas ativas, usuários ativos ou participantes ativos.</summary>
+    /// <summary>O rótulo do dado macro: contas ativas (DEBOAZ) ou usuários ativos (17 v104 RN-189).</summary>
     public static string Rotulo(PerfilCard perfil) => perfil switch
     {
         PerfilCard.Deboaz => "contas ativas",
-        PerfilCard.Autonomo => "participantes ativos",
         _ => "usuários ativos",
     };
 }

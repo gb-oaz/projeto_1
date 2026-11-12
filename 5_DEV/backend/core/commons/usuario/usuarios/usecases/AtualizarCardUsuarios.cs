@@ -9,7 +9,7 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// <summary>
 /// Os cards guardados na mesma execução da mudança (RN-278, RN-280): reconta o
 /// card da conta, o da staff que criou o usuário e, quando a conta mudou, o
-/// DEBOAZ; grava com a versao + 1 o que mudou. Sem transação: o fechamento da
+/// DEBOAZ; grava cada um com a versao + 1, mesmo com os números iguais. Sem transação: o fechamento da
 /// 00:00 reconta tudo e corrige um desvio.
 /// </summary>
 public sealed class AtualizarCardUsuarios(

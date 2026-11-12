@@ -127,9 +127,12 @@ public sealed class ContagemNoBanco(Armazenamento armazenamento) : IContagemDoCa
         {
             var inicioDoMes = InicioDoMes(agora);
             var criados = await Contar(Usuarios, escopo & Bson.Filtro.Gte("criadoEm", Bson.Valor(inicioDoMes)), ct);
-            return new NumerosDoCard(tempo.Selo, participantes, [new(N.CriadosNoMes, criados), new(N.Pendentes, pendentes)], lista);
+            return new NumerosDoCard(tempo.Selo, participantes + await MasterAtiva(contaId, ct),
+                [new(N.CriadosNoMes, criados), new(N.Pendentes, pendentes)], lista);
         }
-        var staff = await Contar(Usuarios, escopo & Tipo("STAFF") & Estado("ATIVO"), ct);
+        // na INSTITUICAO, a conta master entra em "staff" e em "usuários ativos"; no STAFF, não (17 v104 RN-280)
+        var staff = await Contar(Usuarios, escopo & Tipo("STAFF") & Estado("ATIVO"), ct)
+            + (perfil == PerfilCard.Instituicao ? await MasterAtiva(contaId, ct) : 0);
         return new NumerosDoCard(tempo.Selo, staff + participantes,
             [new(N.Staff, staff), new(N.Participantes, participantes), new(N.Pendentes, pendentes)], lista);
     }
@@ -181,6 +184,10 @@ public sealed class ContagemNoBanco(Armazenamento armazenamento) : IContagemDoCa
         var f = Bson.Filtro.Eq("contaId", contaId) & Bson.Filtro.In("tipo", TiposDoCard);
         return perfil == PerfilCard.Staff ? f & Bson.Filtro.Eq("criadoPor", usuarioId) : f;
     }
+
+    // a própria conta master, se está ativa: 0 ou 1
+    Task<int> MasterAtiva(string contaId, CancellationToken ct) =>
+        Contar(Usuarios, Bson.Filtro.Eq("contaId", contaId) & Tipo("MASTER") & Estado("ATIVO"), ct);
 
     static FilterDefinition<BsonDocument> Tipo(string tipo) => Bson.Filtro.Eq("tipo", tipo);
 

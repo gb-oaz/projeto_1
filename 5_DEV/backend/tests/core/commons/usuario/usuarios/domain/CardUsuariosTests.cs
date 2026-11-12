@@ -33,10 +33,13 @@ public class CardUsuariosTests
         Assert.Equal((1, 335), (card.Versao, card.Atual.Valor));
         Assert.False(card.Aplicar(DaEscola(298), Domingo.AddMinutes(5)));
         Assert.Equal(1, card.Versao);
+        // o caso de uso que muda o cadastro sobe a versao mesmo com os números iguais (17 v104 RN-280)
+        Assert.True(card.Aplicar(DaEscola(298), Domingo.AddMinutes(6), sempre: true));
+        Assert.Equal(2, card.Versao);
 
         var depois = Domingo.AddHours(1);
         Assert.True(card.Aplicar(DaEscola(299), depois));
-        Assert.Equal((2, 336, depois), (card.Versao, card.Atual.Valor, card.AtualizadoEm));
+        Assert.Equal((3, 336, depois), (card.Versao, card.Atual.Valor, card.AtualizadoEm));
         Assert.Equal([new PontoDaSerie("2026-11-08", 336)], card.Dias);
         Assert.Equal([new PontoDaSerie("2026-W45", 336)], card.Semanas);
         Assert.Equal([new PontoDaSerie("2026-11", 336)], card.Meses);
@@ -124,7 +127,7 @@ public class CardUsuariosTests
     public void RN_280_nomes_e_rotulos_de_cada_perfil()
     {
         Assert.Equal("contas ativas", NomesDoCard.Rotulo(PerfilCard.Deboaz));
-        Assert.Equal("participantes ativos", NomesDoCard.Rotulo(PerfilCard.Autonomo));
+        Assert.Equal("usuários ativos", NomesDoCard.Rotulo(PerfilCard.Autonomo));
         Assert.Equal("usuários ativos", NomesDoCard.Rotulo(PerfilCard.Staff));
         Assert.Equal("Master sem acesso há 30 dias", NomesDoCard.Nome(NomesDoCard.MasterSemAcesso30Dias));
         Assert.Equal("criados no mês", NomesDoCard.Nome(NomesDoCard.CriadosNoMes));

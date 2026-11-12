@@ -287,9 +287,10 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
         var corpo = card.Corpo!;
         Assert.Equal(("MOD-03", "INSTITUICAO", false), (card.Texto("modulo"), card.Texto("perfil"), corpo["vazio"]!.GetValue<bool>()));
         Assert.True(corpo["versao"]!.GetValue<int>() >= 1);
-        Assert.Equal((2, "usuários ativos"), (corpo["reduzida"]!["valor"]!.GetValue<int>(), corpo["reduzida"]!["rotulo"]!.GetValue<string>()));
-        Assert.Equal(["staff 1", "participantes 1", "pendentes 1"], Linhas(corpo["normal"]!["apoio"]!));
-        Assert.Equal(2, corpo["normal"]!["valor"]!.GetValue<int>());
+        // a conta master entra em "usuários ativos" e em "staff" (17 v104 RN-280)
+        Assert.Equal((3, "usuários ativos"), (corpo["reduzida"]!["valor"]!.GetValue<int>(), corpo["reduzida"]!["rotulo"]!.GetValue<string>()));
+        Assert.Equal(["staff 2", "participantes 1", "pendentes 1"], Linhas(corpo["normal"]!["apoio"]!));
+        Assert.Equal(3, corpo["normal"]!["valor"]!.GetValue<int>());
         Assert.Equal(["Sem acesso há 30 dias 0", "Desativados 0", "Códigos vencidos 0"], Linhas(corpo["expandida"]!["lista"]!));
         // o código do Rui vence daqui a 72 h, não hoje
         Assert.Equal(0, corpo["selo"]!.GetValue<int>());

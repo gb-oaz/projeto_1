@@ -79,6 +79,19 @@ public class CardDoModuloTests
     }
 
     [Fact]
+    public async Task RN_280_gerar_senha_e_nova_geracao_recontam_e_sobem_a_versao_com_os_numeros_iguais()
+    {
+        var codigo = (await mock.CriarUsuario.Executar(new("usr-ebfga-master", "STAFF", "Gustavo Boaz de Moura Souza", "gustavo"), TraceId.Novo())).CodigoLiberacao!;
+        var antes = Cards.Card("card-ebfga-INSTITUICAO")!.Versao;
+
+        await mock.GerarSenha.Executar(new("gustavo.ebfga@deboaz.com", codigo), TraceId.Novo());
+        Assert.Equal(antes + 1, Cards.Card("card-ebfga-INSTITUICAO")!.Versao);
+
+        await mock.PedirNovaGeracaoDeSenha.Executar(new("usr-ebfga-master", "usr-ebfga-gustavo"), TraceId.Novo());
+        Assert.Equal(antes + 2, Cards.Card("card-ebfga-INSTITUICAO")!.Versao);
+    }
+
+    [Fact]
     public async Task RN_280_usuario_criado_por_uma_staff_reconta_o_card_dela()
     {
         await mock.AtualizarCardUsuarios.Executar(new MudancaNoCadastroDto("conta-ebfga", "usr-ebfga-ana"));
