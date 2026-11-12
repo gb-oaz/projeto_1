@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "15_modulos"
 tipo: "Funcionalidade"
 titulo: "Módulos"
-versao: "v30"
-data: "2026-11-09 09:05"
+versao: "v31"
+data: "2026-11-12 16:58"
 status: "Em revisão"
 objetivo: "definir como um módulo do deboaz é construído, para que todo módulo siga o mesmo molde antes de entrar no catálogo."
 ---
 
-> **boaz · Funcionalidade** · `15_modulos` · **v30** · 2026-11-09 09:05 · **Em revisão**
+> **boaz · Funcionalidade** · `15_modulos` · **v31** · 2026-11-12 16:58 · **Em revisão**
 
 # Módulos
 
@@ -627,7 +627,8 @@ Esquema do Cenário: registro do Contas
 
 ```gherkin
 Esquema do Cenário: registro do SAC
-  Dado o módulo "MOD-02" SAC, da conta, sem custo, sem documento, Registrado
+  Dado o módulo "MOD-02" SAC, da conta, sem custo, Especificado
+  E o documento 18_modulo-sac
   Então <perfil> o usa no <frente> para <objetivo>
 
   Exemplos:
@@ -997,7 +998,8 @@ Cenário: quarta conexão do mesmo usuário
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v30** | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Dado, Então ou E (`RF-129`, `RF-133`, `RN-278`, `RN-279`, `RN-282`), sem mudar o comportamento |
+| **v31** | 2026-11-12 16:58 | `MOD-02` SAC Especificado, com o documento [18_modulo-sac](18_modulo-sac.md) |
+| v30 | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Dado, Então ou E (`RF-129`, `RF-133`, `RN-278`, `RN-279`, `RN-282`), sem mudar o comportamento |
 | v29 | 2026-11-09 03:21 | `RN-279`: a linha "Intervalo" só aparece com "Ao vivo" marcado; `RN-282`: aviso em snackbar sem ação que some sozinho, com "Na abertura" visível no seletor; "reconectando…" nos cards sem travar a tela; SESSAO_TERMINADA leva à tela de entrada, sem aviso de pausa |
 | v28 | 2026-11-09 00:53 | `RN-282`: a pausa depois do "encerrado" é só daquele aparelho e não muda o "Ao vivo" salvo; reabrir o app não religa, só marcar "Ao vivo" de novo no aparelho, sem salvar nada novo; Em aberto respondido e seção removida |
 | v27 | 2026-11-09 00:44 | `RN-277` com os rótulos dos pontos (nov, S1 a S12, dia do mês), a tendência por recorte ("+12 no mês", "+2 na semana", "+1 no dia") e o seletor que não abre o módulo; `RN-278` selo e Códigos vencidos refeitos na leitura, sem subir a versao; `RN-279-api` ping a cada 30 s; `RN-282` novo (aviso do encerrado, aparelho volta a Na abertura, reconexão até 60 s); `RF-133` cita a preferência salva (17 `RN-283`); Em aberto: volta ao ao vivo |
@@ -1006,8 +1008,7 @@ Cenário: quarta conexão do mesmo usuário
 | v24 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v23 | 2026-11-03 22:01 | Imagem enviada em SVG: toda imagem é convertida em SVG no hub ou no quest e enviada como texto (`RN-260`) |
 | v22 | 2026-11-03 10:48 | Registro do Catálogo (`MOD-14`) aponta para o documento renomeado 16_modulo-catalogo |
-| v21 | 2026-11-01 18:20 | Só Gherkin: contexto, RF, RN, registro de módulos (um cenário por MOD-NN, mesmo ID como âncora), quem usa cada módulo, ficha do módulo e fora de escopo viram cenários; status → Em revisão |
 
 ---
 
-<sub>boaz · v30 · 2026-11-09 09:05 · `1_Requisitos/15_modulos.md`</sub>
+<sub>boaz · v31 · 2026-11-12 16:58 · `1_Requisitos/15_modulos.md`</sub>
