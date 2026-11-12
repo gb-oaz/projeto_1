@@ -14,7 +14,8 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// antes de a exceção sair (RN-178, RN-270, RN-271).
 /// </summary>
 public sealed class MudarEstadoDaConta(
-    IUsuarios usuarios, IContas contas, ISessoesDosUsuarios sessoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio)
+    IUsuarios usuarios, IContas contas, ISessoesDosUsuarios sessoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio,
+    IAtualizarCardUsuarios cardsDoModulo)
     : IMudarEstadoDaConta
 {
     readonly Apoio apoio = new(usuarios, contas, relogio);
@@ -31,7 +32,11 @@ public sealed class MudarEstadoDaConta(
     async Task<ContaComEstadoDto> Mudar(EstadoDaContaDto pedido, Execucao execucao, CancellationToken ct)
     {
         var (conta, novo) = await ContaEEstadoPedidos(pedido, ct);
-        if (conta.MudarEstado(novo)) await Gravar(conta, novo, execucao, ct);
+        if (conta.MudarEstado(novo))
+        {
+            await Gravar(conta, novo, execucao, ct);
+            await cardsDoModulo.Executar(new MudancaNoCadastroDto(conta.Id), ct);
+        }
         await auditada.Concluir(execucao, ct);
         return new(conta.Id, conta.Estado.Texto());
     }

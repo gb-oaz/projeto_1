@@ -19,7 +19,8 @@ namespace Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 /// como no Redis.
 /// </summary>
 public sealed class AutenticacaoEmMemoria :
-    IUsuarios, IContas, IGeracoesDeSenha, ISessoes, ITentativas, IAssinador, IPermissoes, ISalas, IAuditoria, IAuditoriaDeErros
+    IUsuarios, IContas, IGeracoesDeSenha, ISessoes, ITentativas, IAssinador, IPermissoes, ISalas, IAuditoria, IAuditoriaDeErros,
+    Boaz.Core.Commons.Usuario.Usuarios.Ports.In.IAtualizarCardUsuarios
 {
     /// <summary>Iterações baixas, só para os testes não demorarem.</summary>
     public const int Iteracoes = 1_000;
@@ -48,7 +49,7 @@ public sealed class AutenticacaoEmMemoria :
         EntrarNoHub = new EntrarNoHub(this, this, this, this, this, this, this, this, Relogio);
         EntrarNoQuest = new EntrarNoQuest(this, this, this, this, this, this, this, this, Relogio);
         EntrarNaSala = new EntrarNaSala(this, this, this, this, this, this, Relogio);
-        ConfirmarSenha = new ConfirmarSenha(this, this, this, this, this, this, this, this, Relogio);
+        ConfirmarSenha = new ConfirmarSenha(this, this, this, this, this, this, this, this, Relogio, this);
         RenovarSessao = new RenovarSessao(this, this, this, this, this, this, this, this, Relogio);
         ConferirAcesso = new ConferirAcesso(this, this, Relogio);
         SairDoAparelho = new SairDoAparelho(this, this, this, Relogio);
@@ -312,5 +313,15 @@ public sealed class AutenticacaoEmMemoria :
     {
         var numero = ++acessosAnonimos;
         return Task.FromResult(new AcessoAnonimo($"anon-{numero}", $"PUPIL-{sala.Sigla}-{13464 + numero}"));
+    }
+
+    /// <summary>As mudanças no cadastro avisadas aos cards do Usuários (RN-278).</summary>
+    public List<Boaz.Core.Commons.Usuario.Usuarios.Dtos.MudancaNoCadastroDto> CardsAtualizados { get; } = [];
+
+    Task Boaz.Core.Commons.Usuario.Usuarios.Ports.In.IAtualizarCardUsuarios.Executar(
+        Boaz.Core.Commons.Usuario.Usuarios.Dtos.MudancaNoCadastroDto mudanca, CancellationToken ct)
+    {
+        CardsAtualizados.Add(mudanca);
+        return Task.CompletedTask;
     }
 }

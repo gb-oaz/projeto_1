@@ -26,7 +26,9 @@ servicos.AddConfiguracoes();
 servicos.AddDocumentacaoApi();
 servicos.AddJsonDasApis();
 servicos.AddControladoresDasApis();
-servicos.AddSingleton(TimeProvider.System);
+// o relógio de toda a aplicação; só o relógio de teste (sistema/TesteController) o desloca
+servicos.AddSingleton<RelogioDaAplicacao>();
+servicos.AddSingleton<TimeProvider>(s => s.GetRequiredService<RelogioDaAplicacao>());
 // AMBIENTE (hml ou prd): só homologação tem as contas qa (17 RN-179, RN-266)
 servicos.AddSingleton(new Boaz.Core.Commons.Usuario.Usuarios.Domain.AmbienteDaAplicacao(
     builder.Configuration[Boaz.Core.Commons.Usuario.Usuarios.Domain.ContasIniciais.VariavelDoAmbiente]));
@@ -45,7 +47,12 @@ servicos.AddSingleton<IAuditoria>(s => s.GetRequiredService<RegistrosNoBanco>())
 servicos.AddSingleton<IAuditoriaDeErros>(s => s.GetRequiredService<RegistrosNoBanco>());
 servicos.AddSingleton<IPedidosDeAjuda>(s => s.GetRequiredService<RegistrosNoBanco>());
 servicos.AddSingleton<IPagamentos>(s => s.GetRequiredService<RegistrosNoBanco>());
-servicos.AddSingleton<IIndicadores, IndicadoresNoBanco>();
+servicos.AddSingleton<IRepositorioCardUsuarios, CardsNoBanco>();
+servicos.AddSingleton<IContagemDoCard, ContagemNoBanco>();
+servicos.AddSingleton<IPreferencias, PreferenciasNoBanco>();
+servicos.AddSingleton<IConexoesAoVivo, ConexoesNoRedis>();
+servicos.AddSingleton<ITravaDoFechamento, TravaNoRedis>();
+servicos.AddSingleton<IAcessoAoVivo, AcessoDoAoVivo>();
 servicos.AddSingleton<ISessoesDosUsuarios, SessoesDosUsuarios>();
 servicos.AddSingleton<TentativasNoRedis>();
 servicos.AddSingleton<ITentativasDeLiberacao>(s => s.GetRequiredService<TentativasNoRedis>());
@@ -98,7 +105,12 @@ servicos.AddSingleton<IPedirNovaGeracaoDeSenha, PedirNovaGeracaoDeSenha>();
 servicos.AddSingleton<IGerarNovoCodigoDeAcesso, GerarNovoCodigoDeAcesso>();
 servicos.AddSingleton<IDesativarUsuario, DesativarUsuario>();
 servicos.AddSingleton<IReativarUsuario, ReativarUsuario>();
-servicos.AddSingleton<ILerCardDeUsuarios, LerCardDeUsuarios>();
+servicos.AddSingleton<IObterCardUsuarios, ObterCardUsuarios>();
+servicos.AddSingleton<IAtualizarCardUsuarios, AtualizarCardUsuarios>();
+servicos.AddSingleton<IFecharCardsDoDia, FecharCardsDoDia>();
+servicos.AddSingleton<IAcompanharCardAoVivo, AcompanharCardAoVivo>();
+servicos.AddSingleton<IObterPreferencias, ObterPreferencias>();
+servicos.AddSingleton<ISalvarPreferencias, SalvarPreferencias>();
 servicos.AddSingleton<ILerTempoDaConta, LerTempoDaConta>();
 servicos.AddSingleton<ISalvarTempoDaConta, SalvarTempoDaConta>();
 servicos.AddSingleton<IListarContas, ListarContas>();
@@ -121,6 +133,8 @@ servicos.AddSingleton<IAvisarContratacaoMudou, AvisarContratacaoMudou>();
 
 // ── infra/in: a partida, antes do primeiro pedido ────────────────────────────
 servicos.AddSingleton<Partida>();
+// o fechamento da 00:00 de Brasília, em segundo plano (15 RN-278)
+servicos.AddHostedService<FechamentoDosCards>();
 
 var app = builder.Build();
 

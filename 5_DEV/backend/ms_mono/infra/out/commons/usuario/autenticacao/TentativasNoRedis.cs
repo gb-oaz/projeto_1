@@ -10,7 +10,7 @@ namespace Boaz.MsMono.Infra.Out.Commons.Usuario.Autenticacao;
 // guarda os erros seguidos, os bloqueios seguidos e até quando está bloqueado,
 // e expira quando a memória das tentativas acaba. Serve à entrada e ao código
 // de acesso (Autenticação) e ao código de liberação (Usuários).
-public sealed class TentativasNoRedis(Armazenamento armazenamento) : ITentativas, ITentativasDeLiberacao
+public sealed class TentativasNoRedis(Armazenamento armazenamento, TimeProvider relogio) : ITentativas, ITentativasDeLiberacao
 {
     static RedisKey Chave(AlvoTentativa alvo, string chave) => $"tentativas:{alvo.Texto()}:{chave}";
 
@@ -36,7 +36,7 @@ public sealed class TentativasNoRedis(Armazenamento armazenamento) : ITentativas
             new("bloqueadoAte", tentativas.BloqueadoAte?.ToUnixTimeMilliseconds() ?? -1),
             new("ultimoErro", tentativas.UltimoErro?.ToUnixTimeMilliseconds() ?? -1),
         ]);
-        if (tentativas.ExpiraEm is { } fim && fim - DateTimeOffset.UtcNow is var resta && resta > TimeSpan.Zero)
+        if (tentativas.ExpiraEm is { } fim && fim - relogio.GetUtcNow() is var resta && resta > TimeSpan.Zero)
         {
             await armazenamento.Cache.KeyExpireAsync(chave, resta);
         }

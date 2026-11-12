@@ -14,7 +14,7 @@ namespace Boaz.Core.Commons.Tests.Usuario.Usuarios.Mocks;
 /// conferências do SAC, pedidos de ajuda e contas apagadas.
 /// </summary>
 public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, ITentativasDeLiberacao, ISessoesDosUsuarios,
-    IAuditoria, IAuditoriaDeErros, IPedidosDeAjuda, IPagamentos, IIndicadores
+    IAuditoria, IAuditoriaDeErros, IPedidosDeAjuda, IPagamentos
 {
     readonly Dictionary<string, UsuarioCadastrado> usuarios = [];
     readonly Dictionary<string, ContaAssinante> contas = [];
@@ -30,20 +30,25 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     {
         ListarUsuarios = new ListarUsuarios(this, this, Relogio);
         LerUsuario = new LerUsuario(this, this, Relogio);
-        CriarUsuario = new CriarUsuario(this, this, this, this, this, Relogio);
-        EditarUsuario = new EditarUsuario(this, this, this, this, this, Relogio);
+        AtualizarCardUsuarios = new AtualizarCardUsuarios(this, this, Cards, Cards, Relogio);
+        ObterCardUsuarios = new ObterCardUsuarios(this, this, Cards, Cards, Relogio);
+        FecharCardsDoDia = new FecharCardsDoDia(Cards, Cards, Cards, Relogio);
+        AcompanharCardAoVivo = new AcompanharCardAoVivo(this, this, Cards, Cards, Cards, Cards, Relogio);
+        ObterPreferencias = new ObterPreferencias(Cards);
+        SalvarPreferencias = new SalvarPreferencias(Cards);
+        CriarUsuario = new CriarUsuario(this, this, this, this, this, Relogio, AtualizarCardUsuarios);
+        EditarUsuario = new EditarUsuario(this, this, this, this, this, Relogio, AtualizarCardUsuarios);
         GerarSenha = new GerarSenha(this, this, this, this, this, this, Relogio);
-        PedirNovaGeracaoDeSenha = new PedirNovaGeracaoDeSenha(this, this, this, this, this, this, Relogio);
+        PedirNovaGeracaoDeSenha = new PedirNovaGeracaoDeSenha(this, this, this, this, this, this, Relogio, AtualizarCardUsuarios);
         GerarNovoCodigoDeAcesso = new GerarNovoCodigoDeAcesso(this, this, this, this, this, Relogio);
-        DesativarUsuario = new DesativarUsuario(this, this, this, this, this, Relogio);
-        ReativarUsuario = new ReativarUsuario(this, this, this, this, Relogio);
-        LerCardDeUsuarios = new LerCardDeUsuarios(this, this, this, Relogio);
-        CriarConta = new CriarConta(this, this, this, Relogio, new AmbienteDaAplicacao(ambiente));
+        DesativarUsuario = new DesativarUsuario(this, this, this, this, this, Relogio, AtualizarCardUsuarios);
+        ReativarUsuario = new ReativarUsuario(this, this, this, this, Relogio, AtualizarCardUsuarios);
+        CriarConta = new CriarConta(this, this, this, Relogio, new AmbienteDaAplicacao(ambiente), AtualizarCardUsuarios);
         SugerirSigla = new SugerirSigla(this);
         PedirAjudaDaMaster = new PedirAjudaDaMaster(this, this, this, Relogio);
         ListarContas = new ListarContas(this, this, Relogio);
         LerConta = new LerConta(this, this, this, Relogio);
-        MudarEstadoDaConta = new MudarEstadoDaConta(this, this, this, this, this, Relogio);
+        MudarEstadoDaConta = new MudarEstadoDaConta(this, this, this, this, this, Relogio, AtualizarCardUsuarios);
         GerarCodigoDaMaster = new GerarCodigoDaMaster(this, this, this, this, this, this, this, Relogio);
         LerTempoDaConta = new LerTempoDaConta(this, this, Relogio);
         SalvarTempoDaConta = new SalvarTempoDaConta(this, this, this, this, Relogio);
@@ -73,8 +78,20 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
     public IDesativarUsuario DesativarUsuario { get; }
     /// <summary>POST /usuarios/{id}/reativar.</summary>
     public IReativarUsuario ReativarUsuario { get; }
+    /// <summary>Os cards guardados, a contagem, o ao vivo e as preferências, em memória.</summary>
+    public CardsEmMemoria Cards { get; } = new();
+    /// <summary>A recontagem na mesma execução.</summary>
+    public IAtualizarCardUsuarios AtualizarCardUsuarios { get; }
     /// <summary>GET /usuarios/card.</summary>
-    public ILerCardDeUsuarios LerCardDeUsuarios { get; }
+    public IObterCardUsuarios ObterCardUsuarios { get; }
+    /// <summary>O fechamento da 00:00.</summary>
+    public IFecharCardsDoDia FecharCardsDoDia { get; }
+    /// <summary>GET /usuarios/card/ao-vivo.</summary>
+    public IAcompanharCardAoVivo AcompanharCardAoVivo { get; }
+    /// <summary>GET /usuarios/eu/preferencias.</summary>
+    public IObterPreferencias ObterPreferencias { get; }
+    /// <summary>PUT /usuarios/eu/preferencias.</summary>
+    public ISalvarPreferencias SalvarPreferencias { get; }
     /// <summary>POST /contas.</summary>
     public ICriarConta CriarConta { get; }
     /// <summary>GET /contas/sigla-sugerida.</summary>
@@ -113,15 +130,6 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     /// <summary>O último pagamento de uma conta.</summary>
     public void Pagou(string contaId, DateOnly quando) => pagamentos[contaId] = quando;
-
-    /// <summary>Ativos no fim de cada mês, por conta (ou "time" para as contas ativas).</summary>
-    public Dictionary<string, IReadOnlyList<int>> Meses { get; } = [];
-
-    /// <summary>Ativos hoje, por conta e tipo.</summary>
-    public Dictionary<(string ContaId, TipoUsuario Tipo), int> Ativos { get; } = [];
-
-    /// <summary>Códigos que vencem hoje, por conta.</summary>
-    public Dictionary<string, int> Selos { get; } = [];
 
     // ── o que os testes conferem ───────────────────────────────────────────────
 
@@ -411,20 +419,6 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     Task<DateOnly?> IPagamentos.UltimoPagamento(string contaId, CancellationToken ct) =>
         Task.FromResult(pagamentos.TryGetValue(contaId, out var data) ? data : (DateOnly?)null);
-
-    // ── IIndicadores ───────────────────────────────────────────────────────────
-
-    Task<IReadOnlyList<int>> IIndicadores.UsuariosAtivosPorMes(string contaId, IReadOnlySet<TipoUsuario> tipos, DateTimeOffset agora, int meses,
-        CancellationToken ct) => Task.FromResult(Meses.GetValueOrDefault(contaId) ?? []);
-
-    Task<int> IIndicadores.UsuariosAtivos(string contaId, TipoUsuario tipo, CancellationToken ct) =>
-        Task.FromResult(Ativos.GetValueOrDefault((contaId, tipo)));
-
-    Task<IReadOnlyList<int>> IIndicadores.ContasAtivasPorMes(DateTimeOffset agora, int meses, CancellationToken ct) =>
-        Task.FromResult(Meses.GetValueOrDefault("time") ?? []);
-
-    Task<int> IIndicadores.CodigosQueVencem(string contaId, DateTimeOffset de, DateTimeOffset ate, CancellationToken ct) =>
-        Task.FromResult(Selos.GetValueOrDefault(contaId));
 
     static bool Contem(string texto, string busca) => texto.Contains(busca, StringComparison.OrdinalIgnoreCase);
 

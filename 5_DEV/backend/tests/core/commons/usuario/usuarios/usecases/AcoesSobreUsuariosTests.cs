@@ -244,30 +244,4 @@ public class AcoesSobreUsuariosTests
         Assert.Equal(new[] { "INICIADO" }, mock.Gravacoes);
         Assert.Empty(mock.Erros);
     }
-
-    [Fact]
-    public async Task RN_189_dados_do_card()
-    {
-        mock.Meses["conta-ebfga"] = [301, 310, 318, 323, 335];
-        mock.Ativos[("conta-ebfga", TipoUsuario.Staff)] = 37;
-        mock.Ativos[("conta-ebfga", TipoUsuario.Participante)] = 298;
-        mock.Selos["conta-ebfga"] = 2;
-
-        Assert.Equal(new CardDeUsuariosDto(2, 335, "usuários ativos", 12, [301, 310, 318, 323, 335], 37, 298) with { Meses = mock.Meses["conta-ebfga"] },
-            await mock.LerCardDeUsuarios.Executar(new("usr-ebfga-master")));
-    }
-
-    [Theory]
-    [InlineData("usr-preis-pedro", "conta-preis", 32, "participantes ativos")]
-    [InlineData("usr-dboaz-admin", "time", 112, "contas ativas")]
-    public async Task RN_189_dado_de_cada_perfil(string quem, string chave, int dado, string rotulo)
-    {
-        mock.Meses[chave] = [dado - 4, dado];
-        var card = await mock.LerCardDeUsuarios.Executar(new(quem));
-        Assert.Equal((dado, rotulo, 4, null as int?), (card.Dado, card.Rotulo, card.NoMes, card.Staff));
-    }
-
-    [Fact]
-    public async Task RN_189_participante_nao_ve_o_card() =>
-        await Falha("ACESSO_NEGADO", () => mock.LerCardDeUsuarios.Executar(new("usr-ebfga-lucas")));
 }

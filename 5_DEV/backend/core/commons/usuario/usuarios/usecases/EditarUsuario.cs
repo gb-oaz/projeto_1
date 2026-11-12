@@ -14,7 +14,8 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// antes de a exceção sair (RN-178, RN-270, RN-271).
 /// </summary>
 public sealed class EditarUsuario(
-    IUsuarios usuarios, IContas contas, ISessoesDosUsuarios sessoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio)
+    IUsuarios usuarios, IContas contas, ISessoesDosUsuarios sessoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio,
+    IAtualizarCardUsuarios cardsDoModulo)
     : IEditarUsuario
 {
     readonly Apoio apoio = new(usuarios, contas, relogio);
@@ -37,6 +38,7 @@ public sealed class EditarUsuario(
         var codigo = await CodigoDoNomeCurtoNovo(alvo, nomeCurto, ct);
         var mudouEntrada = alvo.Editar(nome, nomeCurto, matricula, responsaveis, apoio.Agora, () => codigo);
         await Gravar(alvo, mudouEntrada, execucao, ct);
+        await cardsDoModulo.Executar(new MudancaNoCadastroDto(alvo.ContaId, alvo.Id), ct);
         await auditada.Concluir(execucao, ct);
         return new(alvo.Id, alvo.Login);
     }

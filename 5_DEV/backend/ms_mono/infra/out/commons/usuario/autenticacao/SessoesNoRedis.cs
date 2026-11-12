@@ -9,7 +9,7 @@ namespace Boaz.MsMono.Infra.Out.Commons.Usuario.Autenticacao;
 // com o tempo sem uso (RN-226), e o conjunto sessoes:<usuario> guarda os sids
 // de cada pessoa, para listar e encerrar todas. A chave que expirou é a sessão
 // que terminou: o conjunto é limpo na próxima leitura.
-public sealed class SessoesNoRedis(Armazenamento armazenamento) : ISessoes
+public sealed class SessoesNoRedis(Armazenamento armazenamento, TimeProvider relogio) : ISessoes
 {
     static RedisKey Chave(string sid) => $"sessao:{sid}";
 
@@ -43,7 +43,7 @@ public sealed class SessoesNoRedis(Armazenamento armazenamento) : ISessoes
         ]);
         if (sessao.ExpiraEm is { } fim)
         {
-            await cache.KeyExpireAsync(chave, fim - DateTimeOffset.UtcNow is var resta && resta > TimeSpan.Zero ? resta : TimeSpan.FromMilliseconds(1));
+            await cache.KeyExpireAsync(chave, fim - relogio.GetUtcNow() is var resta && resta > TimeSpan.Zero ? resta : TimeSpan.FromMilliseconds(1));
         }
         await cache.SetAddAsync(DoUsuarioChave(sessao.UsuarioId), sessao.Sid);
     }

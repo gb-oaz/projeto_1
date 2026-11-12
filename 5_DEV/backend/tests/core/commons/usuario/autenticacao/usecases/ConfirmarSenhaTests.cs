@@ -22,6 +22,8 @@ public class ConfirmarSenhaTests
         Assert.Equal(("usr-ebfga-paulo", "hub"), (Claims(sessao).Sub, Claims(sessao).Aud));
         Assert.Equal(Aparelho.Navegador, sessao.Aparelho);
         Assert.Equal(EstadoUsuario.Ativo, c.Mock.Usuario("usr-ebfga-paulo").Estado);
+        // 17 RN-280: o pendente virou ativo, e os cards do Usuários são recontados na mesma execução
+        Assert.Equal(new Boaz.Core.Commons.Usuario.Usuarios.Dtos.MudancaNoCadastroDto("conta-ebfga", "usr-ebfga-paulo"), Assert.Single(c.Mock.CardsAtualizados));
         await Falha("COMPROVANTE_INVALIDO", () => c.Mock.ConfirmarSenha.Executar(new ConfirmacaoDeSenhaDto(comprovante), Trace));
     }
 

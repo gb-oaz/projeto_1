@@ -5,6 +5,7 @@ using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Boaz.MsMono.Sistema;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Options;
 
 namespace Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
 
@@ -88,21 +89,115 @@ public sealed class UsuariosController : ControllerBase
 
     /// <summary>Montar o card Usuários</summary>
     /// <remarks>
-    /// Exige MOD-03 · U (RN-189). Instituição: staff + participantes ativos, sem a conta master; autônomo:
-    /// participantes ativos; time: contas ativas. Selo: códigos de liberação que vencem hoje (UTC).
+    /// Exige MOD-03 · U (RN-189, RN-280, 15_modulos RN-276 a RN-278). O card guardado do perfil de quem pede (DEBOAZ,
+    /// INSTITUICAO, STAFF ou AUTONOMO), com os 4 tamanhos e as 3 séries; o selo, "Sem acesso há 30 dias" e "Códigos
+    /// vencidos" são refeitos na leitura. O participante não tem o card.
     /// </remarks>
-    /// <param name="ler">Caso de uso LerCardDeUsuarios.</param>
+    /// <param name="obter">Caso de uso ObterCardUsuarios.</param>
     /// <param name="ct">Cancelamento do pedido.</param>
-    /// <response code="200">Os números do card e o selo.</response>
+    /// <response code="200">O card no formato comum dos módulos.</response>
     /// <response code="401">Token de acesso ausente ou inválido.</response>
-    /// <response code="403">Sem MOD-03 · U.</response>
-    [HttpGet("card", Name = "lerCardDeUsuarios")]
-    [ComAcesso(Usuarios, nameof(Abas.U))]
-    [ProducesResponseType<CardDeUsuariosDto>(StatusCodes.Status200OK)]
+    /// <response code="403">Participante, ou staff sem MOD-03 · U.</response>
+    [HttpGet("card", Name = "obterCardUsuarios")]
+    [ComAcesso(Usuarios, nameof(Abas.U), FrenteDoToken = true)]
+    [ProducesResponseType<CardDoModuloDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<Erro>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<Erro>(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<CardDeUsuariosDto>> LerCard([FromServices] ILerCardDeUsuarios ler, CancellationToken ct) =>
-        Ok(await ler.Executar(new QuemPedeDto(HttpContext.QuemPede()), ct));
+    public async Task<ActionResult<CardDoModuloDto>> ObterCard([FromServices] IObterCardUsuarios obter, CancellationToken ct) =>
+        Ok(await obter.Executar(new QuemPedeDto(HttpContext.QuemPede()), ct));
+
+    /// <summary>Acompanhar o card Usuários ao vivo</summary>
+    /// <remarks>
+    /// Exige MOD-03 · U (RN-281, 15_modulos RN-279). Fluxo text/event-stream: o evento "card" ao abrir e, a cada
+    /// intervalo (5, 15, 30, 60 ou 300 s; padrão 300), se a versao mudou; ": ping" a cada 30 s; "encerrado" com
+    /// LIMITE_CONEXOES, SESSAO_TERMINADA ou ACESSO_NEGADO antes de fechar. Até 3 conexões por usuário.
+    /// </remarks>
+    /// <param name="intervalo">Segundos entre as conferências: 5, 15, 30, 60 ou 300.</param>
+    /// <param name="acompanhar">Caso de uso AcompanharCardAoVivo.</param>
+    /// <param name="json">O JSON das APIs, igual ao de GET /usuarios/card.</param>
+    /// <param name="ct">Cancelamento do pedido (a conexão fechou).</param>
+    /// <response code="200">O fluxo de eventos, aberto.</response>
+    /// <response code="401">Token de acesso ausente ou inválido.</response>
+    /// <response code="403">Participante, ou staff sem MOD-03 · U.</response>
+    /// <response code="422">Intervalo fora da lista.</response>
+    [HttpGet("card/ao-vivo", Name = "acompanharCardAoVivo")]
+    [ComAcesso(Usuarios, nameof(Abas.U), FrenteDoToken = true)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<Erro>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<Erro>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<Erro>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task AcompanharAoVivo(
+        [FromQuery] string? intervalo,
+        [FromServices] IAcompanharCardAoVivo acompanhar,
+        [FromServices] IOptions<JsonOptions> json,
+        CancellationToken ct)
+    {
+        var acesso = HttpContext.Acesso();
+        var (conexao, card) = await acompanhar.Abrir(new AberturaAoVivoDto(acesso.Sub, acesso.Sid, intervalo), ct);
+        try
+        {
+            var fluxo = new FluxoDeEventos(HttpContext, json.Value.JsonSerializerOptions);
+            await fluxo.Abrir(ct);
+            await fluxo.Card(card, ct);
+            while (true)
+            {
+                var passo = await acompanhar.Proximo(conexao, ct);
+                if (passo.Ping) await fluxo.Ping(ct);
+                else if (passo.Card is { } novo) await fluxo.Card(novo, ct);
+                else if (passo.Encerrado is { } motivo)
+                {
+                    await fluxo.Encerrado(motivo, ct);
+                    break;
+                }
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            // a conexão fechou do outro lado
+        }
+        finally
+        {
+            await acompanhar.Fechar(conexao, CancellationToken.None);
+        }
+    }
+
+    /// <summary>Ler a escolha de atualização dos cards</summary>
+    /// <remarks>
+    /// Com login, sem módulo exigido (RN-283): de quem pede, pelo token. Sem escolha salva, NA_ABERTURA e 300. Sem
+    /// auditoria nem X-Trace-Id.
+    /// </remarks>
+    /// <param name="obter">Caso de uso ObterPreferencias.</param>
+    /// <param name="ct">Cancelamento do pedido.</param>
+    /// <response code="200">A escolha.</response>
+    /// <response code="401">Token de acesso ausente ou inválido.</response>
+    [HttpGet("eu/preferencias", Name = "obterPreferencias")]
+    [ComSessao]
+    [ProducesResponseType<PreferenciasDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<Erro>(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<PreferenciasDto>> ObterPreferencias([FromServices] IObterPreferencias obter, CancellationToken ct) =>
+        Ok(await obter.Executar(new QuemPedeDto(HttpContext.QuemPede()), ct));
+
+    /// <summary>Salvar a escolha de atualização dos cards</summary>
+    /// <remarks>
+    /// Com login, sem módulo exigido (RN-283): troca a escolha inteira, que acompanha a pessoa em todos os aparelhos.
+    /// Sem auditoria nem X-Trace-Id.
+    /// </remarks>
+    /// <param name="corpo">A escolha: atualizacaoCards e intervaloAoVivo.</param>
+    /// <param name="salvar">Caso de uso SalvarPreferencias.</param>
+    /// <param name="ct">Cancelamento do pedido.</param>
+    /// <response code="200">A escolha salva.</response>
+    /// <response code="401">Token de acesso ausente ou inválido.</response>
+    /// <response code="422">Campo inválido.</response>
+    [HttpPut("eu/preferencias", Name = "salvarPreferencias")]
+    [ComSessao]
+    [ProducesResponseType<PreferenciasDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<Erro>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<Erro>(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<PreferenciasDto>> SalvarPreferencias(
+        [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] PreferenciasCorpo? corpo,
+        [FromServices] ISalvarPreferencias salvar,
+        CancellationToken ct) =>
+        Ok(await salvar.Executar(new NovasPreferenciasDto(HttpContext.QuemPede(), corpo?.AtualizacaoCards, corpo?.IntervaloAoVivo), ct));
 
     /// <summary>Abrir o usuário selecionado</summary>
     /// <remarks>Exige MOD-03 · U (RF-153, RN-186). Id de outra conta responde 404 (RN-235).</remarks>

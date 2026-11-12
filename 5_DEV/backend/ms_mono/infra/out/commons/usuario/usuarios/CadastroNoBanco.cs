@@ -334,49 +334,6 @@ public sealed class RegistrosNoBanco(Armazenamento armazenamento) : IAuditoria, 
     public Task<DateOnly?> UltimoPagamento(string contaId, CancellationToken ct = default) => Task.FromResult<DateOnly?>(null);
 }
 
-// Números do card Usuários (RN-189), contados no cadastro. Cada mês conta quem
-// está ativo hoje e já existia no fim daquele mês: o último é o número de hoje.
-public sealed class IndicadoresNoBanco(Armazenamento armazenamento) : IIndicadores
-{
-    public async Task<IReadOnlyList<int>> UsuariosAtivosPorMes(string contaId, IReadOnlySet<TipoUsuario> tipos, DateTimeOffset agora, int meses,
-        CancellationToken ct = default)
-    {
-        var filtro = Bson.Filtro.Eq("contaId", contaId) & Bson.Filtro.Eq("estado", "ATIVO") & Bson.Filtro.In("tipo", tipos.Select(t => t.Texto()));
-        return await PorMes(armazenamento.Colecao(Colecoes.Usuarios), filtro, "criadoEm", agora, meses, ct);
-    }
-
-    public async Task<int> UsuariosAtivos(string contaId, TipoUsuario tipo, CancellationToken ct = default) =>
-        (int)await armazenamento.Colecao(Colecoes.Usuarios).CountDocumentsAsync(
-            Bson.Filtro.Eq("contaId", contaId) & Bson.Filtro.Eq("estado", "ATIVO") & Bson.Filtro.Eq("tipo", tipo.Texto()), cancellationToken: ct);
-
-    public Task<IReadOnlyList<int>> ContasAtivasPorMes(DateTimeOffset agora, int meses, CancellationToken ct = default) =>
-        PorMes(armazenamento.Colecao(Colecoes.Contas), Bson.Filtro.Ne("_id", TimeDeboaz.ContaId) & Bson.Filtro.Eq("estado", "ATIVA"),
-            "criadaEm", agora, meses, ct);
-
-    // gerações abertas (código sem uso) que vencem entre de e ate (72 h depois do pedido)
-    public async Task<int> CodigosQueVencem(string contaId, DateTimeOffset de, DateTimeOffset ate, CancellationToken ct = default) =>
-        (int)await armazenamento.Colecao(Colecoes.GeracoesSenha).CountDocumentsAsync(
-            Bson.Filtro.Eq("contaId", contaId)
-            & Bson.Filtro.Ne("resumoCodigo", BsonNull.Value)
-            & Bson.Filtro.Eq("senhaMostradaEm", BsonNull.Value)
-            & Bson.Filtro.Gte("pedidaEm", Bson.Valor(de - CodigoDeLiberacao.Validade))
-            & Bson.Filtro.Lt("pedidaEm", Bson.Valor(ate - CodigoDeLiberacao.Validade)), cancellationToken: ct);
-
-    static async Task<IReadOnlyList<int>> PorMes(IMongoCollection<BsonDocument> colecao, FilterDefinition<BsonDocument> filtro, string criadoEm,
-        DateTimeOffset agora, int meses, CancellationToken ct)
-    {
-        var contagem = new List<int>();
-        var inicioDoMes = new DateTimeOffset(agora.Year, agora.Month, 1, 0, 0, 0, TimeSpan.Zero);
-        for (var i = meses - 1; i > 0; i--)
-        {
-            var fim = inicioDoMes.AddMonths(1 - i);
-            contagem.Add((int)await colecao.CountDocumentsAsync(filtro & Bson.Filtro.Lt(criadoEm, Bson.Valor(fim)), cancellationToken: ct));
-        }
-        contagem.Add((int)await colecao.CountDocumentsAsync(filtro, cancellationToken: ct));
-        return contagem;
-    }
-}
-
 // Encerrar sessões a pedido do cadastro (desativar, nova senha, conta fora do
 // ar): o caso de uso da Autenticação encerra as de cada usuário, na execução de
 // quem chama (RN-275).

@@ -37,6 +37,9 @@ public sealed class Armazenamento
     // Cache das sessões e das tentativas.
     public IDatabase Cache => cache.Value.GetDatabase();
 
+    // Mensagens entre as réplicas (pub/sub do Redis): o canal aoVivo:encerrar.
+    public ISubscriber Mensagens => cache.Value.GetSubscriber();
+
     // O servidor aceita transação: replica set (setName no hello) ou mongos
     // (msg isdbgrid). Um MongoDB standalone, como o do job backend do GitHub
     // Actions, não aceita. Perguntado uma vez por processo.
@@ -75,6 +78,7 @@ public static class Colecoes
     public const string AuditoriaErros = "auditoriaErros";
     public const string PedidosAjuda = "pedidosAjuda";
     public const string RegistrosPermissao = "registrosPermissao";
+    public const string CardUsuarios = "cardUsuarios";
     public const string Modulos = "modulos";
     public const string Contratacoes = "contratacoes";
 }

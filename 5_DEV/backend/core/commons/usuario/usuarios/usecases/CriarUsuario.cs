@@ -18,8 +18,8 @@ namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 /// alvo antes de a exceção sair (RN-178, RN-270, RN-271).
 /// </summary>
 public sealed class CriarUsuario(
-    IUsuarios usuarios, IContas contas, IGeracoesDeSenha geracoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio)
-    : ICriarUsuario
+    IUsuarios usuarios, IContas contas, IGeracoesDeSenha geracoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio,
+    IAtualizarCardUsuarios cardsDoModulo) : ICriarUsuario
 {
     readonly Apoio apoio = new(usuarios, contas, relogio);
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
@@ -40,6 +40,7 @@ public sealed class CriarUsuario(
 
         var novo = await Montar(quem, conta, dados, ct);
         var (codigo, venceEm) = await Gravar(novo, quem, ct);
+        await cardsDoModulo.Executar(new MudancaNoCadastroDto(novo.ContaId, novo.Id), ct);
         await RegistrarConclusao(execucao, novo, ct);
         return new(novo.Id, novo.Login, novo.Estado.Texto(), codigo, venceEm);
     }

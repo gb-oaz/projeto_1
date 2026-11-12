@@ -48,6 +48,8 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
         (Colecoes.Auditoria, Comum(Chave.Ascending("traceId"), "traceId")),
         (Colecoes.AuditoriaErros, Comum(Chave.Ascending("traceId"), "traceId")),
         (Colecoes.AuditoriaErros, Comum(Chave.Ascending("contaId").Ascending("quando"), "contaId_quando")),
+        // cardUsuarios: um card por conta, perfil e staff (RN-280); usuarioId null fora do STAFF
+        (Colecoes.CardUsuarios, Unico(Chave.Ascending("contaId").Ascending("perfil").Ascending("usuarioId"), "contaId_perfil_usuarioId_unico")),
         // pedidos de ajuda (limite por aparelho, RNF-205)
         (Colecoes.PedidosAjuda, Comum(Chave.Ascending("aparelho").Ascending("quando"), "aparelho_quando")),
     ];

@@ -48,3 +48,8 @@ public sealed record TempoDaContaCorpo(string? StaffNavegador, string? StaffApp,
 /// <param name="MastersNavegador">As contas master no navegador.</param>
 /// <param name="MastersApp">As contas master no app.</param>
 public sealed record TempoDoTimeCorpo(string? MembrosNavegador, string? MembrosApp, string? MastersNavegador, string? MastersApp);
+
+/// <summary>A escolha de atualização dos cards, inteira (RN-283).</summary>
+/// <param name="AtualizacaoCards">NA_ABERTURA ou AO_VIVO.</param>
+/// <param name="IntervaloAoVivo">5, 15, 30, 60 ou 300.</param>
+public sealed record PreferenciasCorpo(string? AtualizacaoCards, int? IntervaloAoVivo);

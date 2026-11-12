@@ -118,14 +118,31 @@ public sealed class ComAcessoAttribute(string modulo, string aba) : Attribute, I
 {
     public Frente Frente { get; init; } = Frente.Hub;
 
+    // a frente do próprio token (hub ou quest): o participante, que entra pelo
+    // quest, recebe o 403 do módulo, não o 401 da frente (card do Usuários, RN-189)
+    public bool FrenteDoToken { get; init; }
+
     public ExigenciaDaRota Exigencia { get; } = Acesso.Exigencia(modulo, aba);
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var http = context.HttpContext;
-        var acesso = await Acesso.Conferir(http, Frente);
+        var acesso = await Acesso.Conferir(http, FrenteDoToken ? Http.FrenteDoToken(Http.Token(http)) : Frente);
         http.RequestServices.GetRequiredService<IAutorizarPedido>().Executar(Exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods));
         http.Items[typeof(AcessoConferido)] = acesso;
+        await next();
+    }
+}
+
+// Rota com login que não exige módulo (preferências, RN-283): o token é
+// conferido (assinatura, sessão viva e pv atual), na frente dele, hub ou quest.
+[AttributeUsage(AttributeTargets.Method)]
+public sealed class ComSessaoAttribute : Attribute, IAsyncActionFilter, IMarcaDeLogin
+{
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        var http = context.HttpContext;
+        http.Items[typeof(AcessoConferido)] = await Acesso.Conferir(http, Http.FrenteDoToken(Http.Token(http)));
         await next();
     }
 }
