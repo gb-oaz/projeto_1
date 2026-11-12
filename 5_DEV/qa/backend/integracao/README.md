@@ -87,6 +87,8 @@ integracao/
     ├── AuditoriaPassos.cs          auditoria do que muda estado, erros e alertas, traceId (RN-178, RN-270, RN-271)
     ├── IndicesPassos.cs            coleções e índices prontos na partida e GET /health (RNF-227, RNF-227-api)
     ├── modulos.feature             15_modulos.md: card comum, pela instância do Usuários (RN-276, RN-278, RN-279)
+    ├── contrato.feature            respostas do contrato usuarios v15 sem cenário no requisito (propostas ao deboaz-po)
+    ├── ContratoPassos.cs           passos de contrato.feature
     ├── CardPassos.cs               GET /usuarios/card (RN-189, RN-280; 15 RN-276, RN-278)
     ├── AoVivoPassos.cs             GET /usuarios/card/ao-vivo (RN-281; 15 RN-279)
     └── PreferenciasPassos.cs       GET e PUT /usuarios/eu/preferencias (RN-283)
@@ -117,6 +119,10 @@ Os outros requisitos, do mesmo jeito:
 | `17_modulo-usuario-b-autorizacao.md` | `commons/autorizacao/autorizacao.feature` | `Autorização` |
 | `17_modulo-usuario.md` | `hub/usuarios/usuarios.feature` | `Usuários` |
 | `15_modulos.md` | `hub/usuarios/modulos.feature` | `Módulos · card do Usuários` |
+
+`hub/usuarios/contrato.feature` não é cópia: traz as respostas do contrato
+(`usuarios-contrato-api` v15) que o requisito ainda não tem como cenário, com a
+tag `@contrato-v15`. Quando o requisito as trouxer, saem de lá e entram por cópia.
 
 Dois cenários com o mesmo nome no requisito: o segundo ganha o ID no fim
 (`nome curto repetido · RF-153`), porque o Reqnroll não aceita nome repetido.

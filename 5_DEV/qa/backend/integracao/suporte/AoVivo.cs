@@ -39,6 +39,9 @@ public sealed class Fluxo : IDisposable
     HttpResponseMessage? resposta;
 
     public required string Nome { get; init; }
+    public required string Caminho { get; init; }
+    // o Cache-Control da resposta (contrato v15: no-store)
+    public string? CacheControl { get; private set; }
     public int Status { get; private set; }
     public string? TipoDoConteudo { get; private set; }
     public DateTimeOffset Aberto { get; private set; }
@@ -57,17 +60,19 @@ public sealed class Fluxo : IDisposable
         }
     }
 
-    public static async Task<Fluxo> Abrir(string nome, string caminho, string token)
+    // sem token (null): a recusa 401 do contrato
+    public static async Task<Fluxo> Abrir(string nome, string caminho, string? token)
     {
-        var fluxo = new Fluxo { Nome = nome };
+        var fluxo = new Fluxo { Nome = nome, Caminho = caminho };
         using var pedido = new HttpRequestMessage(HttpMethod.Get, caminho.TrimStart('/'));
-        pedido.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        if (token is not null) pedido.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         pedido.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
         using var cabecalhos = CancellationTokenSource.CreateLinkedTokenSource(fluxo.parar.Token);
         cabecalhos.CancelAfter(TimeSpan.FromSeconds(10));
         fluxo.resposta = await fluxo.http.SendAsync(pedido, HttpCompletionOption.ResponseHeadersRead, cabecalhos.Token);
         fluxo.Status = (int)fluxo.resposta.StatusCode;
         fluxo.TipoDoConteudo = fluxo.resposta.Content.Headers.ContentType?.MediaType;
+        fluxo.CacheControl = fluxo.resposta.Headers.CacheControl?.ToString();
         fluxo.Aberto = DateTimeOffset.UtcNow;
         _ = Task.Run(fluxo.Ler);
         return fluxo;
@@ -171,7 +176,7 @@ public sealed class AoVivo : IDisposable
 {
     public List<Fluxo> Fluxos { get; } = [];
 
-    public async Task<Fluxo> Abrir(string nome, string caminho, string token)
+    public async Task<Fluxo> Abrir(string nome, string caminho, string? token)
     {
         var fluxo = await Fluxo.Abrir(nome, caminho, token);
         Fluxos.Add(fluxo);
