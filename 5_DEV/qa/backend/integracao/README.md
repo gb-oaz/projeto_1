@@ -272,6 +272,9 @@ ela.
   fechamento) promete o próprio documento de "cardUsuarios";
   `suporte/CardGuardado.cs` o lê pelo contaId e o perfil, pelos campos do
   modelo de documentos.
+  Quarta exceção: o módulo suspenso (17-b RN-285 a RN-287) não sai na API, e a
+  RN-287 promete as permissões guardadas; `suporte/PermissoesGuardadas.cs` lê
+  só o campo "permissoes" do usuário (versao, pv, mods, suspensos) pelo `_id`.
 - **Valores dos exemplos**: `usr-ebfga-maria`, `3f9c2a71` (sessão da Maria no
   navegador) e `EBFGA-LUCAS-0412` são trocados pelos valores reais na hora do
   pedido (`Mundo.Apelidos`); a pessoa é criada pela API na primeira vez que
@@ -289,12 +292,18 @@ ela.
 - **O que vem do banco, porque a API não cria**: o módulo contratado pela
   escola (o catálogo ainda não tem o endereço de contratar e descontratar:
   `Estado.Contratar`/`Descontratar`), a versão das permissões dos exemplos
-  ("na versão 6": `Estado.DefinirVersao`), a hora do pedido do código de
+  ("na versão 6": `Estado.DefinirVersao`), o módulo suspenso na pessoa
+  ("a Presença da Maria suspensa na versão 8": `Estado.Suspender`), a hora do pedido do código de
   liberação ("pedido há 73 h": `Estado.PedidoHa`; "vence hoje":
   `Estado.CodigoVenceHoje`), o último acesso ("Sem acesso há 30 dias":
   `Estado.UltimoAcesso`, `Estado.UltimoAcessoMaster`), os meses anteriores do
   card guardado (`Estado.MesesAnterioresDoCard`), o tempo sem uso da sessão e
   os bloqueios seguidos.
+- **Aviso do Catálogo** (`Mundo.ContratacaoMudou`, 17 RN-275, 17-b RN-285 a
+  RN-287): a contratação muda pelo banco, mas só o aviso
+  AVISAR_CONTRATACAO_MUDOU suspende e reativa o módulo nas pessoas, e o
+  contrato ainda não tem endereço que o provoque de fora; o passo fica
+  pendente ali, num lugar só, até o endereço existir.
 - **Relógio do backend** (`suporte/Relogio.cs`, 15 RN-278): só com
   `AMBIENTE=hml` e `Teste__Relogio=sim`, o backend expõe `PUT /_teste/relogio`
   (`{"agora": "2027-02-28T23:50:00-03:00"}`, 204; o relógio anda a partir

@@ -98,6 +98,18 @@ public static class Estado
             Builders<BsonDocument>.Filter.Eq("_id", usuarioId),
             Builders<BsonDocument>.Update.Set("permissoes.versao", versao).Set("permissoes.pv", versao));
 
+    // módulo suspenso na pessoa (17-b RN-285, RN-287): fora de mods, guardado em
+    // "suspensos" com as abas, na versão do exemplo ("suspensa na versão 8").
+    // Só o aviso do Catálogo suspende pela API, e ele não é provocável de fora
+    public static Task Suspender(string usuarioId, string moduloId, string abas, int versao) =>
+        Banco.GetCollection<BsonDocument>("usuarios").UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", usuarioId),
+            Builders<BsonDocument>.Update
+                .Unset($"permissoes.mods.{moduloId}")
+                .Set("permissoes.suspensos", new BsonArray { new BsonDocument { ["mod"] = moduloId, ["abas"] = abas } })
+                .Set("permissoes.versao", versao)
+                .Set("permissoes.pv", versao));
+
     // a conta contrata um módulo hoje (16_modulo-catalogo, coleção contratacoes)
     public static Task Contratar(string contaId, string sigla, string moduloId) =>
         Banco.GetCollection<BsonDocument>("contratacoes").InsertOneAsync(new BsonDocument

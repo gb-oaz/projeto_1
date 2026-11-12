@@ -470,6 +470,24 @@ public sealed partial class Mundo
     public async Task Contratar(string moduloId) => await Estado.Contratar(await Conta(), "EBFGA", moduloId);
     public async Task Descontratar(string moduloId) => await Estado.Descontratar(await Conta(), moduloId);
 
+    // a contratação muda e o Catálogo avisa o Usuários (AVISAR_CONTRATACAO_MUDOU,
+    // 17 RN-275; 17-b RN-285 a RN-287): só esse aviso suspende e reativa o módulo
+    // em cada usuário, sobe versao e pv e grava o histórico com quem descontratou
+    // ou contratou. A contratação muda pelo banco, como antes; o aviso ainda não
+    // tem endereço no contrato (nem de teste, como /_teste/relogio), por isso o
+    // passo fica pendente aqui, num lugar só: com o endereço, troca-se o throw
+    // pelo pedido
+    public const string SemAvisoDaContratacao =
+        "o contrato não tem endereço que provoque de fora o aviso do Catálogo (AVISAR_CONTRATACAO_MUDOU): " +
+        "nem descontratar no Catálogo, nem um endereço de teste como /_teste/relogio (pedido ao deboaz-arc)";
+
+    public async Task ContratacaoMudou(string moduloId, bool contratada)
+    {
+        if (contratada) await Contratar(moduloId);
+        else await Descontratar(moduloId);
+        throw new Reqnroll.PendingStepException(SemAvisoDaContratacao);
+    }
+
     // GET /usuarios/{id}/permissoes por quem concede (a conta master, ou o
     // administrador para os membros do time)
     public async Task<JsonObject> Permissoes(Pessoa pessoa, Pessoa? por = null)
