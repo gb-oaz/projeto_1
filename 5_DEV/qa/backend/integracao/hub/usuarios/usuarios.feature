@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v100), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v104), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -950,7 +950,8 @@ Funcionalidade: Usuários
 
   @RN-189
   Cenário: card da instituição
-    Dado a conta master da EBFGA, com 37 staff e 298 participantes ativos e 4 pendentes
+    Dado a conta master da EBFGA, com 36 staff e 298 participantes ativos e 4 pendentes
+    E "staff" e "usuários ativos" contam também a própria conta master
     Quando envia GET /usuarios/card
     Então a resposta é 200 com, além de series:
       """
@@ -1015,7 +1016,7 @@ Funcionalidade: Usuários
       | o membro do time Caio     | DEBOAZ      | 112 e "contas ativas"       |
       | a conta master da EBFGA   | INSTITUICAO | 335 e "usuários ativos"     |
       | a staff Maria             | STAFF       | 41 e "usuários ativos"      |
-      | o educador autônomo Pedro | AUTONOMO    | 32 e "participantes ativos" |
+      | o educador autônomo Pedro | AUTONOMO    | 32 e "usuários ativos"      |
 
   @RN-189
   Esquema do Cenário: sem o card
@@ -1055,8 +1056,8 @@ Funcionalidade: Usuários
     Exemplos:
       | numero                | consulta                                                     |
       | o selo                | PENDENTE com a geracoesSenha vencendo hoje, sem confirmadaEm |
-      | o dado macro          | STAFF e PARTICIPANTE ATIVO; no AUTONOMO, só PARTICIPANTE     |
-      | staff                 | STAFF ATIVO, na INSTITUICAO e no STAFF                       |
+      | o dado macro          | MASTER, STAFF e PARTICIPANTE ATIVO; no STAFF, sem a MASTER   |
+      | staff                 | MASTER e STAFF ATIVO na INSTITUICAO; no STAFF, só STAFF      |
       | participantes         | PARTICIPANTE ATIVO, na INSTITUICAO e no STAFF                |
       | pendentes             | estado PENDENTE                                              |
       | criados no mês        | criadoEm no mês atual, no AUTONOMO                           |
@@ -1071,6 +1072,26 @@ Funcionalidade: Usuários
     Então o Lucas é gravado com criadoPor "usr-ebfga-maria" na mesma execução
     E "cardUsuarios" passa a 299 no card da EBFGA e a 39 no card da Maria, e a versao sobe
     E o selo, "Sem acesso há 30 dias" e "Códigos vencidos" não sobem a versao: são refeitos na leitura
+
+  @RN-280
+  Esquema do Cenário: casos de uso que recontam o card
+    Quando <caso> termina com sucesso
+    Então os cards guardados que ele toca são recontados na mesma execução e a versao sobe
+
+    Exemplos:
+      | caso                                                    |
+      | POST /contas, que cria a conta e a conta master         |
+      | POST /contas/{id}/estado, que muda o estado da conta    |
+      | POST /usuarios, que cria staff ou participante          |
+      | POST /usuarios/{id}/desativar e /reativar               |
+      | POST /usuarios/gerar-senha, a senha gerada no acesso    |
+      | POST /usuarios/{id}/nova-geracao-senha                  |
+
+  @RN-280
+  Cenário: nova geração de senha reconta o card
+    Dado o card da EBFGA na versao 419
+    Quando o João envia POST /usuarios/usr-ebfga-paulo/nova-geracao-senha e recebe 201
+    Então o card da EBFGA é recontado na mesma execução e passa à versao 420
 
   @RN-280
   Cenário: quem nunca entrou conta como sem acesso

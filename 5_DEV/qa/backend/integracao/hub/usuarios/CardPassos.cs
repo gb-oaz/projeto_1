@@ -44,7 +44,7 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
     JsonObject? documento;
 
     // ── RN-189-api · card da instituição ───────────────────────────────────
-    // 37 staff e 298 participantes ativos; 4 pendentes: 2 com o código que vence
+    // 36 staff (mais a conta master, 37) e 298 participantes ativos; 4 pendentes: 2 com o código que vence
     // hoje (o selo 2) e 2 com o código vencido ("Códigos vencidos" 2); 14 dos
     // participantes sem acesso há mais de 30 dias e 6 participantes desativados
     // (expandida). Os meses de antes (301, 310, 318, 323) só existem com o tempo
@@ -94,9 +94,10 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
     }
 
     // ── RN-189-api · perfil e dado macro ───────────────────────────────────
-    // cada um com os números do exemplo: 112 contas ativas (DEBOAZ), 37 staff e
+    // cada um com os números do exemplo: 112 contas ativas (DEBOAZ), 36 staff, a master e
     // 298 participantes (EBFGA), 3 staff e 38 participantes criados pela Maria
-    // (41) e 32 participantes do Pedro. O Caio recebe o Usuários (MOD-03 · U),
+    // (41, a master não entra) e 31 participantes do Pedro (32 com ele). A
+    // conta master entra em "usuários ativos" e em "staff" (17 v104). O Caio recebe o Usuários (MOD-03 · U),
     // que o card exige
     [When(@"^(o administrador do deboaz|o membro do time Caio|a conta master da EBFGA|a staff Maria|o educador autônomo Pedro) envia GET /usuarios/card$")]
     public async Task PedeOCard(string quem)
@@ -105,7 +106,7 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
         switch (quem)
         {
             case "a conta master da EBFGA":
-                await Povoar(por = await mundo.Master(), 37, 298, "m");
+                await Povoar(por = await mundo.Master(), 36, 298, "m");
                 break;
             case "a staff Maria":
                 por = await mundo.Maria();
@@ -113,7 +114,7 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
                 await Povoar(por, 3, 38, "s");
                 break;
             case "o educador autônomo Pedro":
-                await Povoar(por = await mundo.Pedro(), 0, 32, "a");
+                await Povoar(por = await mundo.Pedro(), 0, 31, "a");
                 break;
             case "o membro do time Caio":
                 await ContasAtivas(112);
@@ -205,6 +206,7 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
     [Given(@"^o perfil INSTITUICAO ou AUTONOMO contando os usuarios do contaId da conta$")]
     [Given(@"^o perfil STAFF contando os usuarios com criadoPor igual à staff$")]
     [Given(@"^o selo do STAFF conta só as geracoesSenha com pedidaPor igual à staff$")]
+    [Given(@"^""staff"" e ""usuários ativos"" contam também a própria conta master$")]
     public static void ConsultaDoCard() { }
 
     [When(@"^o card conta (.+)$")]
@@ -325,6 +327,109 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
         AssertDiferenca(guardado, lido, "o selo", 1, "código que vence hoje");
         AssertDiferenca(guardado, lido, "Sem acesso há 30 dias", 1, "participante da Maria sem acesso há 31 dias");
         AssertDiferenca(guardado, lido, "Códigos vencidos", 1, "código pedido há 73 h");
+    }
+
+    // ── RN-280 · casos de uso que recontam o card ──────────────────────────
+    // cada caso roda depois do card lido; o card que ele toca (DEBOAZ para as
+    // contas, INSTITUICAO para os usuários) tem de vir com a versao maior no
+    // GET seguinte
+    readonly List<(string Perfil, int Antes, int Depois)> versoes = [];
+
+    [When(@"^(POST /contas, que cria a conta e a conta master|POST /contas/\{id\}/estado, que muda o estado da conta|POST /usuarios, que cria staff ou participante|POST /usuarios/\{id\}/desativar e /reativar|POST /usuarios/gerar-senha, a senha gerada no acesso|POST /usuarios/\{id\}/nova-geracao-senha) termina com sucesso$")]
+    public async Task CasoDeUso(string caso)
+    {
+        var master = await mundo.Master();
+        var admin = mundo.Admin();
+        switch (caso.Split(',')[0])
+        {
+            case "POST /contas":
+                {
+                    var antes = Versao(await Card(admin));
+                    await ContaQa(11, "INSTITUICAO");
+                    versoes.Add(("DEBOAZ", antes, Versao(await Card(admin))));
+                    break;
+                }
+            case "POST /contas/{id}/estado":
+                {
+                    var conta = await ContaQa(12, "INSTITUICAO");
+                    var antes = Versao(await Card(admin));
+                    await MudarEstado(conta, "SUSPENSA");
+                    versoes.Add(("DEBOAZ", antes, Versao(await Card(admin))));
+                    break;
+                }
+            case "POST /usuarios":
+                {
+                    var antes = Versao(await Card(master));
+                    await NovoParticipante(master, "recontaa");
+                    versoes.Add(("INSTITUICAO", antes, Versao(await Card(master))));
+                    break;
+                }
+            case "POST /usuarios/{id}/desativar e /reativar":
+                {
+                    var id = await NovoParticipante(master, "recontab");
+                    var antes = Versao(await Card(master));
+                    await Desativar(master, id);
+                    var desativado = Versao(await Card(master));
+                    versoes.Add(("INSTITUICAO", antes, desativado));
+                    Exigir(await mundo.EnviarComo(master, "POST", $"/usuarios/{id}/reativar"), 204, "POST /usuarios/{id}/reativar");
+                    versoes.Add(("INSTITUICAO", desativado, Versao(await Card(master))));
+                    break;
+                }
+            case "POST /usuarios/gerar-senha":
+                {
+                    var (pessoa, codigo) = await mundo.Pendente("Rita Moura", "rita", "20260093");
+                    var antes = Versao(await Card(master));
+                    Exigir(await mundo.Enviar("POST", "/usuarios/gerar-senha", new JsonObject
+                    {
+                        ["entrada"] = pessoa.Entrada,
+                        ["codigoLiberacao"] = codigo,
+                    }.ToJsonString()), 200, "POST /usuarios/gerar-senha");
+                    versoes.Add(("INSTITUICAO", antes, Versao(await Card(master))));
+                    break;
+                }
+            default:
+                {
+                    var paulo = await mundo.Paulo();
+                    var antes = Versao(await Card(master));
+                    Exigir(await mundo.EnviarComo(master, "POST", $"/usuarios/{paulo.Id}/nova-geracao-senha"), 201, "POST /usuarios/{id}/nova-geracao-senha");
+                    versoes.Add(("INSTITUICAO", antes, Versao(await Card(master))));
+                    break;
+                }
+        }
+    }
+
+    [Then(@"^os cards guardados que ele toca são recontados na mesma execução e a versao sobe$")]
+    public void VersoesSobem()
+    {
+        Assert.True(versoes.Count > 0, "nenhum caso de uso rodou");
+        foreach (var (perfil, a, d) in versoes) Assert.True(d > a, $"card {perfil}: a versao devia subir de {a}, veio {d}");
+    }
+
+    // ── RN-280 · nova geração de senha reconta o card ──────────────────────
+    // o João, com Administrar usuários, cria o Paulo (abaixo dele, RN-252); a
+    // versao do exemplo (419) é o histórico da escola: confere-se que sobe 1
+    [Given(@"^o card da EBFGA na versao \d+$")]
+    public async Task CardDaEbfga()
+    {
+        var joao = await mundo.Joao();
+        await mundo.Conceder(joao, new() { ["MOD-03"] = "CU" });
+        await mundo.Paulo(joao);
+        antes["INSTITUICAO"] = await Card(await mundo.Master());
+    }
+
+    [When(@"^o João envia POST (/usuarios/usr-ebfga-paulo/nova-geracao-senha) e recebe 201$")]
+    public async Task JoaoNovaGeracao(string caminho)
+    {
+        await mundo.EnviarComo(await mundo.Joao(), "POST", await mundo.Traduzir(caminho));
+        Respostas.Confere(mundo.Ultima, 201);
+    }
+
+    [Then(@"^o card da EBFGA é recontado na mesma execução e passa à versao \d+$")]
+    public async Task Recontado()
+    {
+        var card = await Card(await mundo.Master());
+        Assert.True(Versao(card) == Versao(antes["INSTITUICAO"]) + 1,
+            $"a versao devia passar de {Versao(antes["INSTITUICAO"])} a {Versao(antes["INSTITUICAO"]) + 1}, veio {Versao(card)}");
     }
 
     // ── 15 RN-276-api · campos do card ─────────────────────────────────────
@@ -617,7 +722,7 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
     [Then(@"^o card da EBFGA em ""cardUsuarios"", com dias, semanas e meses só nos 2 últimos, é:$")]
     public async Task CardGuardadoComo(string json)
     {
-        await InstituicaoCompleta(37, 298, 4);
+        await InstituicaoCompleta(36, 298, 4);
         documento = await CardGuardado.Ler(await mundo.Conta(), "INSTITUICAO");
         var esperado = JsonNode.Parse(await mundo.Traduzir(json))!.AsObject();
         esperado.Remove("versao");
