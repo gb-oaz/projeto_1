@@ -1,5 +1,11 @@
+using System.Text.Json;
+using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
+using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
+using Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
+using Boaz.MsMono.Primario.In.Commons;
+using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autorizacao;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -10,11 +16,19 @@ namespace Boaz.MsMono.Sistema;
 /// <param name="Agora">Data e hora com o fuso.</param>
 public sealed record RelogioDeTesteCorpo(string? Agora);
 
+/// <summary>O corpo de POST /_teste/contratacao (contrato autorizacao v11).</summary>
+/// <param name="Conta">A conta cuja contratação muda.</param>
+/// <param name="Mod">O módulo contratado ou descontratado.</param>
+/// <param name="Contratado">true contrata; false descontrata.</param>
+/// <param name="Por">Quem contratou ou descontratou (o "por" do registro).</param>
+public sealed record ContratacaoDeTesteCorpo(string? Conta, string? Mod, JsonElement Contratado, string? Por);
+
 /// <summary>
 /// O relógio de teste (contrato usuarios v15, 15 RN-278): só com AMBIENTE=hml e
 /// Teste__Relogio=sim; fora disso, os endereços respondem 404, como se não
 /// existissem. Sem login: a proteção é o endereço não existir fora do teste.
-/// Fora da documentação da API.
+/// Também o papel do Catálogo na contratação e um pedido de módulo sem endereço
+/// próprio (contrato autorizacao v11, grupo TESTE). Fora da documentação da API.
 /// </summary>
 [ApiController]
 [Route("_teste")]
@@ -45,6 +59,48 @@ public sealed class TesteController(RelogioDaAplicacao relogio) : ControllerBase
         await fechar.Executar(sobDemanda: true, ct);
         return NoContent();
     }
+
+    /// <summary>
+    /// O papel do Catálogo (contrato autorizacao v11; RN-285 a RN-287): grava a
+    /// contratação e roda o mesmo aviso AVISAR_CONTRATACAO_MUDOU de 17 RN-275,
+    /// com quem = por e a conta; responde só depois de mover em todos. O estado
+    /// já gravado responde 204 sem aviso, sem subir versão nem pv.
+    /// </summary>
+    [HttpPost("contratacao")]
+    public async Task<IActionResult> Contratacao([FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] ContratacaoDeTesteCorpo? corpo,
+        [FromServices] ContratacoesDeTeste contratacoes, [FromServices] IModulos modulos, [FromServices] IAvisarContratacaoMudou avisar,
+        CancellationToken ct)
+    {
+        var traceId = HttpContext.NovoTraceId();
+        var conta = Preenchido(corpo?.Conta, "conta");
+        var mod = Preenchido(corpo?.Mod, "mod");
+        var contratado = corpo?.Contratado.ValueKind switch
+        {
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            _ => throw FalhaDeUsuarios.DadosInvalidos("contratado"),
+        };
+        var por = Preenchido(corpo?.Por, "por");
+        var sigla = await contratacoes.SiglaDaConta(conta, ct) ?? throw FalhaDeUsuarios.DadosInvalidos("conta");
+        if (!(await modulos.Registrados(ct)).Any(m => m.Id == mod)) throw FalhaDeUsuarios.DadosInvalidos("mod");
+
+        if (await contratacoes.Mudar(conta, sigla, mod, contratado, relogio.GetUtcNow(), ct))
+        {
+            await avisar.Executar(conta, new ExecucaoDeQuemChama(traceId, por, conta), ct);
+        }
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Um pedido de módulo sem endereço próprio (contrato autorizacao v11, RN-285):
+    /// exige {mod} · U pela mesma exigência de rota de um módulo real.
+    /// </summary>
+    [HttpGet("modulo/{mod}")]
+    [ComAcesso("{mod}", nameof(Abas.U))]
+    public IActionResult Modulo() => NoContent();
+
+    static string Preenchido(string? valor, string campo) =>
+        string.IsNullOrWhiteSpace(valor) ? throw FalhaDeUsuarios.DadosInvalidos(campo) : valor;
 }
 
 // Desligado, 404 sem corpo antes de tudo (até da leitura do corpo).

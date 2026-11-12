@@ -112,7 +112,8 @@ public sealed class ComLoginAttribute : Attribute, IMarcaDeLogin;
 // Toda rota com login declara o que exige (RNF-220): o token é conferido
 // (assinatura, sessão viva e pv atual) e depois o módulo e a aba pedidos, com as
 // permissões que o token carrega (RN-241). A aba vem como texto, nameof(Abas.U),
-// porque atributo não recebe struct.
+// porque atributo não recebe struct. O módulo entre chaves ("{mod}") vem da
+// rota: o endereço de teste GET /_teste/modulo/{mod} (contrato autorizacao v11).
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class ComAcessoAttribute(string modulo, string aba) : Attribute, IAsyncActionFilter, IMarcaDeLogin
 {
@@ -133,7 +134,8 @@ public sealed class ComAcessoAttribute(string modulo, string aba) : Attribute, I
         var http = context.HttpContext;
         var frente = FrenteDoToken ? Http.FrenteDoToken(Http.Token(http)) : Frente;
         var acesso = SemSessaoValida ? await Acesso.ConferirSessao(http, frente) : await Acesso.Conferir(http, frente);
-        http.RequestServices.GetRequiredService<IAutorizarPedido>().Executar(Exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods));
+        http.RequestServices.GetRequiredService<IAutorizarPedido>()
+            .Executar(Acesso.DaRota(Exigencia, http), new PedidoAutorizavelDto(acesso.Papel, acesso.Mods));
         http.Items[typeof(AcessoConferido)] = acesso;
         await next();
     }
@@ -207,6 +209,13 @@ static class Acesso
     // A exigência do atributo: o módulo e a aba ("C", "U" ou "CU").
     public static ExigenciaDaRota Exigencia(string modulo, string aba) =>
         new(modulo, Abas.De(aba) ?? throw new ArgumentException($"Aba desconhecida: {aba}.", nameof(aba)));
+
+    // A exigência com o módulo entre chaves trocado pelo valor da rota; sem o
+    // valor, a exigência fica sem módulo e a rota é recusada (RNF-220).
+    public static ExigenciaDaRota DaRota(ExigenciaDaRota exigencia, HttpContext http) =>
+        exigencia.Modulo is ['{', .. var nome, '}']
+            ? exigencia with { Modulo = http.Request.RouteValues[nome]?.ToString() }
+            : exigencia;
 
     // O token do pedido, conferido pela Autenticação (assinatura, sessão viva e pv atual).
     public static Task<AcessoConferido> Conferir(HttpContext http, Frente frente) =>

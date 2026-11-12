@@ -65,7 +65,22 @@ public class LerPermissoesTests
         Assert.Contains(("usr-ebfga-maria", token.Pv), mundo.Mock.Avisos);
 
         mundo.Mock.Contratar("conta-ebfga", "MOD-06");
+        await mundo.Mock.AvisarContratacaoMudou.Executar("conta-ebfga", Catalogo);
         Assert.Equal("U", (await mundo.Ler("usr-ebfga-master", "usr-ebfga-maria")).Mods["MOD-06"]);
+    }
+
+    [Fact]
+    public async Task RN_285_permissoes_durante_a_suspensao()
+    {
+        await mundo.Conceder("usr-ebfga-maria", ("MOD-03", "CU"), ("MOD-05", "U"), ("MOD-06", "U"));
+
+        mundo.Mock.Descontratar("conta-ebfga", "MOD-06");
+        await mundo.Mock.AvisarContratacaoMudou.Executar("conta-ebfga", Catalogo);
+
+        var lidas = await mundo.Ler("usr-ebfga-master", "usr-ebfga-maria");
+        Assert.Equal(9, lidas.Versao);
+        Assert.DoesNotContain("MOD-06", lidas.Mods.Keys);
+        Assert.DoesNotContain("MOD-06", lidas.Concediveis.Select(c => c.Mod));
     }
 
     public static TheoryData<string, string, string?> Concessoes() => new()

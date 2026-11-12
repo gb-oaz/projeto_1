@@ -77,6 +77,7 @@ servicos.AddSingleton<Autorizacao.IUsuarios>(s => s.GetRequiredService<Permissoe
 servicos.AddSingleton<Autorizacao.IPermissoesGuardadas>(s => s.GetRequiredService<PermissoesNoBanco>());
 servicos.AddSingleton<Autorizacao.IModulos>(s => s.GetRequiredService<RegistroDeModulos>());
 servicos.AddSingleton<Autorizacao.IContratacoes, ContratacoesNoBanco>();
+servicos.AddSingleton<ContratacoesDeTeste>();
 servicos.AddSingleton<Autorizacao.ISessoesDoUsuario, AvisoDePermissoes>();
 
 // ── core: cada porta de entrada ligada ao caso de uso dela ───────────────────

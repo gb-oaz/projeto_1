@@ -7,7 +7,8 @@ using MongoDB.Driver;
 
 namespace Boaz.MsMono.Secundario.Out.Commons.Usuario.Autorizacao;
 
-// Permissões guardadas no documento do usuário (permissoes: versao, pv e mods)
+// Permissões guardadas no documento do usuário (permissoes: versao, pv, mods e
+// suspensos [{mod, abas}], RN-285 a RN-287)
 // e o registro de mudanças (registrosPermissao), conforme autorizacao-documentos.
 // A gravação só vale se a versão não mudou desde a leitura (RNF-222, RNF-223).
 public sealed class PermissoesNoBanco(Armazenamento armazenamento) : IUsuarios, IPermissoesGuardadas
@@ -21,7 +22,20 @@ public sealed class PermissoesNoBanco(Armazenamento armazenamento) : IUsuarios, 
     public async Task<UsuarioAutorizado?> Buscar(string id, CancellationToken ct = default)
     {
         var d = await Usuarios.Find(Bson.Filtro.Eq("_id", id)).FirstOrDefaultAsync(ct);
-        if (d is null) return null;
+        return d is null ? null : await Autorizado(d, ct);
+    }
+
+    public async Task<IReadOnlyList<UsuarioAutorizado>> DaConta(string contaId, CancellationToken ct = default)
+    {
+        var lidos = await Usuarios.Find(Bson.Filtro.Eq("contaId", contaId)).Sort(Builders<BsonDocument>.Sort.Ascending("_id")).ToListAsync(ct);
+        var daConta = new List<UsuarioAutorizado>();
+        foreach (var d in lidos) daConta.Add(await Autorizado(d, ct));
+        return daConta;
+    }
+
+    async Task<UsuarioAutorizado> Autorizado(BsonDocument d, CancellationToken ct)
+    {
+        var id = d["_id"].AsString;
         var contaId = d.Texto("contaId")!;
         var deAutonomo = false;
         if (d.Texto("tipo") == "MASTER")
@@ -42,7 +56,7 @@ public sealed class PermissoesNoBanco(Armazenamento armazenamento) : IUsuarios, 
         var mods = p.Documento("mods")?.Elements
             .Where(e => e.Value.IsString && Abas.De(e.Value.AsString) is not null)
             .ToDictionary(e => e.Name, e => Abas.De(e.Value.AsString)!.Value) ?? [];
-        return new PermissoesDoUsuario(usuarioId, versao, p.Inteiro("pv", versao), mods);
+        return new PermissoesDoUsuario(usuarioId, versao, p.Inteiro("pv", versao), mods, Suspensos(p));
     }
 
     // as permissões e o registro da mudança numa só operação (RNF-223): numa
@@ -60,7 +74,8 @@ public sealed class PermissoesNoBanco(Armazenamento armazenamento) : IUsuarios, 
         var mudar = Bson.Mudar
             .Set("permissoes.versao", permissoes.Versao)
             .Set("permissoes.pv", permissoes.Pv)
-            .Set("permissoes.mods", Mods(permissoes.Mods));
+            .Set("permissoes.mods", Mods(permissoes.Mods))
+            .Set("permissoes.suspensos", Suspensos(permissoes.Suspensos));
         var resultado = sessao is null
             ? await Usuarios.UpdateOneAsync(filtro, mudar, cancellationToken: ct)
             : await Usuarios.UpdateOneAsync(sessao, filtro, mudar, cancellationToken: ct);
@@ -81,20 +96,15 @@ public sealed class PermissoesNoBanco(Armazenamento armazenamento) : IUsuarios, 
         return true;
     }
 
-    // a contratação da conta mudou: o pv de todos sobe, para os tokens serem refeitos (RN-237)
-    public async Task<IReadOnlyList<(string UsuarioId, int Pv)>> SubirPvDaConta(string contaId, CancellationToken ct = default)
+    // a contratação da conta mudou sem mexer nos módulos dele: só o pv sobe, para o token ser refeito (RN-239)
+    public async Task<int> SubirPv(string usuarioId, CancellationToken ct = default)
     {
-        var subiram = new List<(string, int)>();
-        foreach (var d in await Usuarios.Find(Bson.Filtro.Eq("contaId", contaId)).ToListAsync(ct))
-        {
-            var p = d.Documento("permissoes");
-            var versao = p?.Inteiro("versao", 1) ?? 1;
-            var pv = (p?.Inteiro("pv", versao) ?? versao) + 1;
-            await Usuarios.UpdateOneAsync(Bson.Filtro.Eq("_id", d["_id"]),
-                Bson.Mudar.Set("permissoes.versao", versao).Set("permissoes.pv", pv), cancellationToken: ct);
-            subiram.Add((d["_id"].AsString, pv));
-        }
-        return subiram;
+        var p = (await Usuarios.Find(Bson.Filtro.Eq("_id", usuarioId)).FirstOrDefaultAsync(ct))?.Documento("permissoes");
+        var versao = p?.Inteiro("versao", 1) ?? 1;
+        var pv = (p?.Inteiro("pv", versao) ?? versao) + 1;
+        await Usuarios.UpdateOneAsync(Bson.Filtro.Eq("_id", usuarioId),
+            Bson.Mudar.Set("permissoes.versao", versao).Set("permissoes.pv", pv), cancellationToken: ct);
+        return pv;
     }
 
     public async Task<IReadOnlyList<MudancaDePermissao>> Historico(string usuarioId, DateTimeOffset? ate, int limite, CancellationToken ct = default)
@@ -111,6 +121,18 @@ public sealed class PermissoesNoBanco(Armazenamento armazenamento) : IUsuarios, 
 
     static BsonDocument Mods(IReadOnlyDictionary<string, Abas?> mods) =>
         new(mods.OrderBy(m => m.Key, StringComparer.Ordinal).Select(m => new BsonElement(m.Key, Bson.Valor(m.Value?.ToString()))));
+
+    // [{mod, abas}], na ordem do id do módulo
+    static BsonArray Suspensos(IReadOnlyDictionary<string, Abas> suspensos) =>
+        new(suspensos.OrderBy(m => m.Key, StringComparer.Ordinal).Select(m => new BsonDocument { ["mod"] = m.Key, ["abas"] = m.Value.ToString() }));
+
+    static Dictionary<string, Abas> Suspensos(BsonDocument permissoes) =>
+        permissoes.GetValue("suspensos", BsonNull.Value) is BsonArray lista
+            ? lista.OfType<BsonDocument>()
+                .Select(s => (Mod: s.Texto("mod"), Abas: s.Texto("abas") is { } a ? Abas.De(a) : null))
+                .Where(s => s.Mod is not null && s.Abas is not null)
+                .GroupBy(s => s.Mod!).ToDictionary(g => g.Key, g => g.First().Abas!.Value)
+            : [];
 
     static Dictionary<string, Abas?> ModsDe(BsonDocument? d) =>
         d?.Elements.ToDictionary(e => e.Name, e => e.Value.IsString ? Abas.De(e.Value.AsString) : null) ?? [];
