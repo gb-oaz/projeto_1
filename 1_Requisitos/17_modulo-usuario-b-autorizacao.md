@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v29"
-data: "2026-11-09 01:17"
+versao: "v30"
+data: "2026-11-11 23:31"
 status: "Aprovado"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v29** · 2026-11-09 01:17 · **Aprovado**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v30** · 2026-11-11 23:31 · **Aprovado**
 
 # Módulo Usuários · Autorização
 
@@ -845,21 +845,21 @@ Cenário: o que este documento não trata
 
 ### Web
 
-**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v03_20261109-0048.svg`
+**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg`
 
-[![Web: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-web_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-usuarios-web_v03_20261109-0048.svg)
+[![Web: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg)
 
 ### PWA
 
-**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v03_20261109-0048.svg`
+**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg`
 
-[![PWA: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v03_20261109-0048.svg)
+[![PWA: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg)
 
 ### Mobile
 
-**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v03_20261109-0048.svg`
+**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg`
 
-[![Mobile: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v03_20261109-0048.svg)
+[![Mobile: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg)
 
 ---
 
@@ -895,7 +895,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v29** | 2026-11-09 01:17 | Diagrama: autorizacao-sequencia v05 com as telas das vistas hub-time-deboaz e hub-usuarios pwa v03, sem mudança de fluxo |
+| **v30** | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", [17 `RN-189`](17_modulo-usuario.md#RN-189)), sem mudança de fluxo |
+| v29 | 2026-11-09 01:17 | Diagrama: autorizacao-sequencia v05 com as telas das vistas hub-time-deboaz e hub-usuarios pwa v03, sem mudança de fluxo |
 | v28 | 2026-11-09 00:58 | Telas: vistas hub-usuarios web, pwa e mobile v02 → v03 (números de exemplo do card, [17 `RN-189`](17_modulo-usuario.md#RN-189)); permissões sem mudança |
 | v27 | 2026-11-08 23:45 | Telas: vistas hub-usuarios web, pwa e mobile v01 → v02 (card do módulo com a alternância Dia, Semana e Mês e os perfis staff e autônomo, [17 `RN-189`](17_modulo-usuario.md#RN-189)); permissões sem mudança |
 | v26 | 2026-11-08 12:02 | Diagramas (17 `RN-270`, `RN-275`): sequência v03 → v04 (AVISAR_PERMISSOES_NOVAS no traceId do PUT, 403 sem MOD-03 · U auditado; setas restauradas), contrato de API v08 → v09 (403 sem o módulo com INICIADO e ALERTA e X-Trace-Id; falha na interna com 2 ERRO); cenários sem mudança |
@@ -914,4 +915,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v29 · 2026-11-09 01:17 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v30 · 2026-11-11 23:31 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
