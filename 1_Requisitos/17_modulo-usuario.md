@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v104"
-data: "2026-11-11 23:25"
+versao: "v105"
+data: "2026-11-11 23:28"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v104** · 2026-11-11 23:25 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v105** · 2026-11-11 23:28 · **Em revisão**
 
 # Módulo Usuários
 
@@ -2715,9 +2715,9 @@ Cenário: o que este documento não trata
 
 [![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v04_20261111-2316.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v04_20261111-2316.svg)
 
-**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v16_20261111-2323.svg`
+**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg`
 
-[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão, card no formato comum e card ao vivo por SSE com ping a cada 30 s e preferências de atualização dos cards; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v16_20261111-2323.svg)](../2_Diagramas/usuarios-contrato-api_v16_20261111-2323.svg)
+[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão, card no formato comum e card ao vivo por SSE com ping a cada 30 s e preferências de atualização dos cards; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg)](../2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg)
 
 **Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg`
 
@@ -2739,7 +2739,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v104** | 2026-11-11 23:25 | `RN-280`: a conta master entra em "usuários ativos" e em "staff" na INSTITUICAO e em "usuários ativos" no AUTONOMO, não no STAFF; casos de uso que recontam o card, com gerar senha e nova geração; `RN-189` e `RN-189-api`: autônomo com 32 usuários ativos, EBFGA com 36 staff mais a master |
+| **v105** | 2026-11-11 23:28 | Diagrama: contrato de API v16 → v17 (`RN-280`: a MASTER conta em "usuários ativos" na INSTITUICAO e no AUTONOMO e em "staff" na INSTITUICAO, não no STAFF; reduzida do AUTONOMO "usuários ativos"; versao sobe em gerar-senha e nova-geracao-senha; ao vivo sem retomada nem Last-Event-ID, toda conexão começa pelo card inteiro); cenários sem mudança |
+| v104 | 2026-11-11 23:25 | `RN-280`: a conta master entra em "usuários ativos" e em "staff" na INSTITUICAO e em "usuários ativos" no AUTONOMO, não no STAFF; casos de uso que recontam o card, com gerar senha e nova geração; `RN-189` e `RN-189-api`: autônomo com 32 usuários ativos, EBFGA com 36 staff mais a master |
 | v103 | 2026-11-11 23:24 | Diagramas: documentos v18 → v19 (cardUsuarios, aoVivo e usuarios.preferencias já no código, fora do vermelho; falta 10 removida) e contrato de API v15 → v16 (PUT /_teste/relogio com 422 DADOS_INVALIDOS no campo "agora"; POST /_teste/fechamento fecha o dia mesmo já fechado); cenários sem mudança |
 | v102 | 2026-11-11 23:17 | Diagramas: adaptadores primários do backend em ms_mono/primario/ (antes infra/in/): pacotes da arquitetura hexagonal v01 → v02 e sequência da inicialização v03 → v04; cenários sem mudança |
 | v101 | 2026-11-09 09:14 | Diagrama: contrato de API v14 → v15 (endereços de teste PUT e DELETE /_teste/relogio e POST /_teste/fechamento, sem login, só com AMBIENTE=hml e Teste__Relogio=sim, ligado só no backend do CI; fora disso, 404) |
@@ -2752,4 +2753,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v104 · 2026-11-11 23:25 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v105 · 2026-11-11 23:28 · `1_Requisitos/17_modulo-usuario.md`</sub>
