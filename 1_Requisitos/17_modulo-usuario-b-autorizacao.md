@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v32"
-data: "2026-11-12 00:57"
+versao: "v33"
+data: "2026-11-12 01:59"
 status: "Em revisão"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v32** · 2026-11-12 00:57 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v33** · 2026-11-12 01:59 · **Em revisão**
 
 # Módulo Usuários · Autorização
 
@@ -765,12 +765,14 @@ Cenário: pedido à Presença suspensa
 
 Cenário: permissões durante a suspensão
   Dado a Presença da Maria suspensa na versão 8
+  E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
   Quando a conta master envia GET /usuarios/usr-ebfga-maria/permissoes
   Então a resposta é 200 com a versão 8
   E sem "MOD-06" em mods nem em concediveis
 
 Cenário: a escola contrata a Presença de novo
   Dado a Presença da Maria suspensa na versão 8
+  E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
   Quando a escola contrata a Presença de novo
   Então GET /usuarios/usr-ebfga-maria/permissoes traz a versão 9 com "MOD-06" com "U"
   E o token de pv 8 recebe 401 PERMISSOES_DESATUALIZADAS no próximo pedido
@@ -785,14 +787,16 @@ Cenário: a escola contrata a Presença de novo
 
 ```gherkin
 Cenário: só a contratação suspende
-  Dado a execução do Catálogo em que o membro do time Caio descontrata a Presença da EBFGA
+  Dado a Maria com "MOD-06" com "U", na versão 7, e o João com "MOD-06" com "U"
+  E a execução do Catálogo em que o membro do time Caio descontrata a Presença da EBFGA
   Quando o Catálogo avisa que a contratação da EBFGA mudou
-  Então "MOD-06" fica suspenso em cada usuário da EBFGA que o tinha marcado
+  Então "MOD-06" fica suspenso com "U" para a Maria e para o João
   E GET /usuarios/usr-ebfga-maria/permissoes/historico ganha a versão 8
   E essa versão vem por "usr-dboaz-caio", com "MOD-06" de "U" para null
 
 Cenário: a conta master tenta reativar
   Dado a Presença da Maria suspensa na versão 8
+  E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
   Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes com If-Match "8" e:
     """
     {
@@ -808,6 +812,7 @@ Cenário: a conta master tenta reativar
 
 Cenário: só a contratação reativa
   Dado a Presença da Maria suspensa
+  E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
   Quando o Catálogo avisa que a EBFGA contratou a Presença de novo
   Então "MOD-06" volta a mods com "U" em cada usuário da EBFGA que o tinha suspenso
 ```
@@ -840,6 +845,7 @@ Cenário: o que fica guardado
 
 Cenário: salvar não apaga o suspenso
   Dado a Presença da Maria suspensa na versão 8
+  E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
   Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes com If-Match "8" e:
     """
     {
@@ -1036,7 +1042,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v32** | 2026-11-12 00:57 | Diagramas do módulo suspenso (`RN-285` a `RN-287`): sequência v05 → v06 (o aviso AVISAR_CONTRATACAO_MUDOU move a permissão entre mods e suspensos, sobe versao e pv, 401 e renovação, depois 403), contrato de API v09 → v10 (422 MODULO_NAO_CONTRATADO para o suspenso, "por" de quem descontratou), classes v01 → v02, documentos v03 → v04 (suspensos como [{mod, abas}]); cenários sem mudança |
+| **v33** | 2026-11-12 01:59 | Dados explícitos nos cenários de API: `RN-286` "só a contratação suspende" com a Maria (versão 7) e o João, os dois com "MOD-06" com "U"; a Presença da Maria suspensa fica com "MOD-03" com "CU" e "MOD-05" com "U" em mods (`RN-285`, `RN-286`, `RN-287`) |
+| v32 | 2026-11-12 00:57 | Diagramas do módulo suspenso (`RN-285` a `RN-287`): sequência v05 → v06 (o aviso AVISAR_CONTRATACAO_MUDOU move a permissão entre mods e suspensos, sobe versao e pv, 401 e renovação, depois 403), contrato de API v09 → v10 (422 MODULO_NAO_CONTRATADO para o suspenso, "por" de quem descontratou), classes v01 → v02, documentos v03 → v04 (suspensos como [{mod, abas}]); cenários sem mudança |
 | v31 | 2026-11-12 00:44 | Módulo suspenso (`permissoes.suspensos`): `RN-285` e `RN-285-api` (descontratação suspende, recontratação devolve; 401 PERMISSOES_DESATUALIZADAS e depois 403 ACESSO_NEGADO), `RN-286` e `RN-286-api` (só a contratação suspende e reativa; PUT com o suspenso é 422 MODULO_NAO_CONTRATADO), `RN-287` (suspenso guardado com as abas, salvar não o apaga, desmarcado não volta); status → Em revisão |
 | v30 | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", [17 `RN-189`](17_modulo-usuario.md#RN-189)), sem mudança de fluxo |
 | v29 | 2026-11-09 01:17 | Diagrama: autorizacao-sequencia v05 com as telas das vistas hub-time-deboaz e hub-usuarios pwa v03, sem mudança de fluxo |
@@ -1046,8 +1053,7 @@ Cenário: o que este documento não trata
 | v25 | 2026-11-08 11:35 | Diagramas (17 `RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (PUT permissões com auditoria INICIADO e CONCLUIDO de EDITAR_PERMISSOES, recusas em "auditoriaErros" com ALERTA, 500 ERRO_INESPERADO com ERRO, X-Trace-Id; renovação auditada como RENOVAR_SESSAO), contrato de API v07 → v08 (403 sem MOD-03 · U antes do caso de uso, sem X-Trace-Id nem registros); cenários sem mudança |
 | v24 | 2026-11-08 09:50 | Contrato de API v06 → v07 (17 `RN-178`): EDITAR_PERMISSOES com contaId da conta de quem pede e alvo a pessoa, desde o INICIADO; cenários sem mudança |
 | v23 | 2026-11-08 02:15 | `RN-233-api`: tabela de exemplos com linhas de até 100 caracteres (célula do participante reescrita, mesmo sentido); regras sem mudança |
-| v22 | 2026-11-08 02:14 | Contrato de API v06 (17 `RN-178`, `RN-270`, `RN-271`): PUT /usuarios/{id}/permissoes grava INICIADO e CONCLUIDO de EDITAR_PERMISSOES em "auditoria" e a versão em "registrosPermissao"; recusas 4xx em "auditoriaErros" (ALERTA); 500 ERRO_INESPERADO (ERRO); X-Trace-Id em toda resposta do caso de uso; cenários sem mudança |
 
 ---
 
-<sub>boaz · v32 · 2026-11-12 00:57 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v33 · 2026-11-12 01:59 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
