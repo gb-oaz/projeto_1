@@ -283,12 +283,21 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
 
         var card = await api.Enviar("GET", "/usuarios/card", token: master.Token);
 
-        Assert.Equal((2, 1, 1, "usuários ativos"), (card.Corpo!["dado"]!.GetValue<int>(), card.Corpo["staff"]!.GetValue<int>(),
-            card.Corpo["participantes"]!.GetValue<int>(), card.Texto("rotulo")));
+        // 17 v101 RN-189-api: formato comum do card (15 RN-276), perfil INSTITUICAO
+        var corpo = card.Corpo!;
+        Assert.Equal(("MOD-03", "INSTITUICAO", false), (card.Texto("modulo"), card.Texto("perfil"), corpo["vazio"]!.GetValue<bool>()));
+        Assert.True(corpo["versao"]!.GetValue<int>() >= 1);
+        Assert.Equal((2, "usuários ativos"), (corpo["reduzida"]!["valor"]!.GetValue<int>(), corpo["reduzida"]!["rotulo"]!.GetValue<string>()));
+        Assert.Equal(["staff 1", "participantes 1", "pendentes 1"], Linhas(corpo["normal"]!["apoio"]!));
+        Assert.Equal(2, corpo["normal"]!["valor"]!.GetValue<int>());
+        Assert.Equal(["Sem acesso há 30 dias 0", "Desativados 0", "Códigos vencidos 0"], Linhas(corpo["expandida"]!["lista"]!));
         // o código do Rui vence daqui a 72 h, não hoje
-        Assert.Equal(0, card.Corpo["selo"]!.GetValue<int>());
-        Assert.Equal(5, card.Corpo["meses"]!.AsArray().Count);
+        Assert.Equal(0, corpo["selo"]!.GetValue<int>());
+        Assert.All(new[] { "dia", "semana", "mes" }, s => Assert.Equal(12, corpo["series"]![s]!.AsArray().Count));
     }
+
+    static string[] Linhas(System.Text.Json.Nodes.JsonNode linhas) =>
+        [.. linhas.AsArray().Select(l => $"{l!["nome"]!.GetValue<string>()} {l["valor"]!.GetValue<int>()}")];
 
     [Fact]
     public async Task RF_114_tempo_de_sessao_da_conta()
