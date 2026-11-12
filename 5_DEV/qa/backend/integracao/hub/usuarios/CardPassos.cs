@@ -432,6 +432,55 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
             $"a versao devia passar de {Versao(antes["INSTITUICAO"])} a {Versao(antes["INSTITUICAO"]) + 1}, veio {Versao(card)}");
     }
 
+    // ── RN-189-api · só a conta master ─────────────────────────────────────
+    // a EBFGA nasce em cada cenário (banco limpo): só a conta master. Ela entra
+    // em "staff" e nos usuários ativos, mas não tira o card do "vazio"
+    [Given(@"^a conta master da EBFGA recém-criada, sem staff nem participantes$")]
+    public async Task SoAMaster()
+    {
+        mundo.Sujeito = await mundo.Master();
+        await mundo.TokenDe(mundo.Sujeito);
+    }
+
+    [Then(@"^a resposta é 200 com ""vazio"": (true|false)$")]
+    public void Vazio(string vazio)
+    {
+        Respostas.Confere(mundo.Ultima, 200);
+        Assert.True(mundo.Ultima.Corpo?["vazio"]?.GetValueKind() == (vazio == "true" ? System.Text.Json.JsonValueKind.True : System.Text.Json.JsonValueKind.False),
+            $"esperava \"vazio\": {vazio}: {mundo.Ultima}");
+    }
+
+    [Then(@"^a reduzida e a normal trazem valor (\d+), a própria conta master$")]
+    public void ReduzidaENormal(int valor)
+    {
+        var card = mundo.Ultima.Corpo!;
+        Assert.True(card["reduzida"]?["valor"]?.GetValue<int>() == valor, $"reduzida.valor devia ser {valor}: {card.ToJsonString()}");
+        Assert.True(card["normal"]?["valor"]?.GetValue<int>() == valor, $"normal.valor devia ser {valor}: {card.ToJsonString()}");
+    }
+
+    [Then(@"^na normal ""(\w+)"" vem com (\d+) e ""(\w+)"" com (\d+)$")]
+    public void ApoioDaNormal(string nome1, int valor1, string nome2, int valor2)
+    {
+        var apoio = mundo.Ultima.Corpo?["normal"]?["apoio"] as JsonArray ?? [];
+        foreach (var (nome, valor) in new[] { (nome1, valor1), (nome2, valor2) })
+        {
+            var linha = apoio.FirstOrDefault(l => l?["nome"]?.GetValue<string>() == nome);
+            Assert.True(linha?["valor"]?.GetValue<int>() == valor, $"normal.apoio \"{nome}\" devia vir com {valor}: {apoio.ToJsonString()}");
+        }
+    }
+
+    // o primeiro staff (ativo, senha confirmada); o primeiro participante é o
+    // caso "vazio" de 15 RN-276 (modulos.feature), com CardDepoisDeUmaMudanca
+    [Then(@"^""vazio"" passa a false quando a EBFGA cria o primeiro staff ou participante$")]
+    public async Task VazioPassaAFalse()
+    {
+        var master = await mundo.Master();
+        await mundo.NovoStaff("primst", "Primeiro Staff", master);
+        var card = await Card(master);
+        Assert.True(card["vazio"]?.GetValueKind() == System.Text.Json.JsonValueKind.False,
+            $"com o primeiro staff, esperava \"vazio\": false: {card.ToJsonString()}");
+    }
+
     // ── 15 RN-276-api · campos do card ─────────────────────────────────────
     // o Usuários (MOD-03) é da conta: não há o que contratar
     [Given(@"^a conta master da EBFGA com o token de acesso e o ""MOD-03"" contratado$")]
@@ -441,7 +490,8 @@ public sealed class CardPassos(Mundo mundo, Relogio relogio)
         await mundo.TokenDe(mundo.Sujeito);
     }
 
-    // a EBFGA do Dado ainda não tem staff nem participantes: vazio true e selo 0.
+    // a EBFGA do Dado ainda não tem staff nem participantes, só a conta master,
+    // que não conta para o vazio (17 RN-189, v108): vazio true e selo 0.
     // versao, atualizadoEm e vazio são conferidos também depois de uma mudança
     [Then(@"^a resposta é 200 e traz (\w+) com (.+)$")]
     public async Task TrazOCampo(string campo, string conteudo)

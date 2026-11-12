@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v104), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v108), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -1004,6 +1004,15 @@ Funcionalidade: Usuários
       """
     E series traz dia, semana e mes com 12 números cada
     E series.mes termina em 301, 310, 318, 323 e 335
+
+  @RN-189
+  Cenário: só a conta master
+    Dado a conta master da EBFGA recém-criada, sem staff nem participantes
+    Quando envia GET /usuarios/card
+    Então a resposta é 200 com "vazio": true
+    E a reduzida e a normal trazem valor 1, a própria conta master
+    E na normal "staff" vem com 1 e "participantes" com 0
+    E "vazio" passa a false quando a EBFGA cria o primeiro staff ou participante
 
   @RN-189
   Esquema do Cenário: perfil e dado macro de cada um
