@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v103"
-data: "2026-11-11 23:24"
+versao: "v104"
+data: "2026-11-11 23:25"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v103** · 2026-11-11 23:24 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v104** · 2026-11-11 23:25 · **Em revisão**
 
 # Módulo Usuários
 
@@ -589,7 +589,7 @@ Esquema do Cenário: dados do card por perfil e tamanho
     | staff       | reduzida | 41 · usuários ativos, só os criados por ela                  |
     | staff       | normal   | 41, "+2 na semana", 3 staff, 38 participantes, 2 pendentes   |
     | autônomo    | mínima   | o ícone e o selo "1": códigos de liberação que vencem hoje   |
-    | autônomo    | reduzida | 32 · participantes ativos                                    |
+    | autônomo    | reduzida | 32 · usuários ativos, com o próprio Pedro                    |
     | autônomo    | normal   | 32, "+1 no dia", 4 criados no mês, 1 pendente                |
 
 Esquema do Cenário: lista da expandida de cada perfil
@@ -1850,7 +1850,8 @@ Cenário: dois participantes sem matrícula no autônomo
 
 ```gherkin
 Cenário: card da instituição
-  Dado a conta master da EBFGA, com 37 staff e 298 participantes ativos e 4 pendentes
+  Dado a conta master da EBFGA, com 36 staff e 298 participantes ativos e 4 pendentes
+  E "staff" e "usuários ativos" contam também a própria conta master
   Quando envia GET /usuarios/card
   Então a resposta é 200 com, além de series:
     """
@@ -1914,7 +1915,7 @@ Esquema do Cenário: perfil e dado macro de cada um
     | o membro do time Caio     | DEBOAZ      | 112 e "contas ativas"       |
     | a conta master da EBFGA   | INSTITUICAO | 335 e "usuários ativos"     |
     | a staff Maria             | STAFF       | 41 e "usuários ativos"      |
-    | o educador autônomo Pedro | AUTONOMO    | 32 e "participantes ativos" |
+    | o educador autônomo Pedro | AUTONOMO    | 32 e "usuários ativos"      |
 
 Esquema do Cenário: sem o card
   Quando <quem> envia GET /usuarios/card
@@ -1959,8 +1960,8 @@ Esquema do Cenário: números das contas, lidos de "usuarios" e "geracoesSenha"
   Exemplos:
     | numero                | consulta                                                     |
     | o selo                | PENDENTE com a geracoesSenha vencendo hoje, sem confirmadaEm |
-    | o dado macro          | STAFF e PARTICIPANTE ATIVO; no AUTONOMO, só PARTICIPANTE     |
-    | staff                 | STAFF ATIVO, na INSTITUICAO e no STAFF                       |
+    | o dado macro          | MASTER, STAFF e PARTICIPANTE ATIVO; no STAFF, sem a MASTER   |
+    | staff                 | MASTER e STAFF ATIVO na INSTITUICAO; no STAFF, só STAFF      |
     | participantes         | PARTICIPANTE ATIVO, na INSTITUICAO e no STAFF                |
     | pendentes             | estado PENDENTE                                              |
     | criados no mês        | criadoEm no mês atual, no AUTONOMO                           |
@@ -1974,6 +1975,24 @@ Cenário: criar participante atualiza os cards guardados
   Então o Lucas é gravado com criadoPor "usr-ebfga-maria" na mesma execução
   E "cardUsuarios" passa a 299 no card da EBFGA e a 39 no card da Maria, e a versao sobe
   E o selo, "Sem acesso há 30 dias" e "Códigos vencidos" não sobem a versao: são refeitos na leitura
+
+Esquema do Cenário: casos de uso que recontam o card
+  Quando <caso> termina com sucesso
+  Então os cards guardados que ele toca são recontados na mesma execução e a versao sobe
+
+  Exemplos:
+    | caso                                                    |
+    | POST /contas, que cria a conta e a conta master         |
+    | POST /contas/{id}/estado, que muda o estado da conta    |
+    | POST /usuarios, que cria staff ou participante          |
+    | POST /usuarios/{id}/desativar e /reativar               |
+    | POST /usuarios/gerar-senha, a senha gerada no acesso    |
+    | POST /usuarios/{id}/nova-geracao-senha                  |
+
+Cenário: nova geração de senha reconta o card
+  Dado o card da EBFGA na versao 419
+  Quando o João envia POST /usuarios/usr-ebfga-paulo/nova-geracao-senha e recebe 201
+  Então o card da EBFGA é recontado na mesma execução e passa à versao 420
 
 Cenário: quem nunca entrou conta como sem acesso
   Dado o participante Davi Rocha da EBFGA, ATIVO desde 2026-09-01, sem nenhum acesso
@@ -2720,7 +2739,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v103** | 2026-11-11 23:24 | Diagramas: documentos v18 → v19 (cardUsuarios, aoVivo e usuarios.preferencias já no código, fora do vermelho; falta 10 removida) e contrato de API v15 → v16 (PUT /_teste/relogio com 422 DADOS_INVALIDOS no campo "agora"; POST /_teste/fechamento fecha o dia mesmo já fechado); cenários sem mudança |
+| **v104** | 2026-11-11 23:25 | `RN-280`: a conta master entra em "usuários ativos" e em "staff" na INSTITUICAO e em "usuários ativos" no AUTONOMO, não no STAFF; casos de uso que recontam o card, com gerar senha e nova geração; `RN-189` e `RN-189-api`: autônomo com 32 usuários ativos, EBFGA com 36 staff mais a master |
+| v103 | 2026-11-11 23:24 | Diagramas: documentos v18 → v19 (cardUsuarios, aoVivo e usuarios.preferencias já no código, fora do vermelho; falta 10 removida) e contrato de API v15 → v16 (PUT /_teste/relogio com 422 DADOS_INVALIDOS no campo "agora"; POST /_teste/fechamento fecha o dia mesmo já fechado); cenários sem mudança |
 | v102 | 2026-11-11 23:17 | Diagramas: adaptadores primários do backend em ms_mono/primario/ (antes infra/in/): pacotes da arquitetura hexagonal v01 → v02 e sequência da inicialização v03 → v04; cenários sem mudança |
 | v101 | 2026-11-09 09:14 | Diagrama: contrato de API v14 → v15 (endereços de teste PUT e DELETE /_teste/relogio e POST /_teste/fechamento, sem login, só com AMBIENTE=hml e Teste__Relogio=sim, ligado só no backend do CI; fora disso, 404) |
 | v100 | 2026-11-09 09:10 | `RN-280`: "Sem acesso há 30 dias" conta só quem existe há mais de 30 dias (criadoEm, e na conta criadaEm) e tem o último acesso há mais de 30 dias ou nulo, como no contrato v14; cenário do recém-criado que não conta |
@@ -2729,11 +2749,7 @@ Cenário: o que este documento não trata
 | v97 | 2026-11-09 03:21 | `RN-283`: GET e PUT /usuarios/eu/preferencias sem o cabeçalho X-Trace-Id e sem auditoria, como no contrato v13 |
 | v96 | 2026-11-09 01:17 | Diagrama: usuarios-sequencia v09 com as telas das vistas hub-usuarios, hub-time-deboaz e hub-meus-modulos pwa v03; card real, troca de recorte sem chamada (15 `RN-277`), PUT /usuarios/eu/preferencias (`RN-283`), ping de 30 s, pausa só no aparelho e reconexão (15 `RN-282`) |
 | v95 | 2026-11-09 01:03 | Diagramas de `RN-283` e da v28 de 15_modulos: contrato de API v12 → v13 (GET e PUT /usuarios/eu/preferencias definitivo, sem auditoria; ping a cada 30 s; sem reconectar depois do encerrado; Códigos vencidos 2), documentos v17 → v18 (usuarios.preferencias embutido) e classes v08 → v09 (PreferenciasDeCards) |
-| v94 | 2026-11-09 00:58 | Telas (`RN-189`; 15_modulos `RN-277`; 12_hub-ui `RN-284`): vistas hub-usuarios e hub-time-deboaz web, pwa e mobile v02 → v03 (números de exemplo de cada perfil, rótulos dos pontos e tendências do recorte, staff só com a aba Contratados); cenários sem mudança |
-| v93 | 2026-11-09 00:44 | `RN-189` com os números de exemplo de cada perfil (deboaz 112, +4 no mês, selo 7 igual a Master sem acesso; staff 41 na semana; autônomo 32 no dia) e a lista da expandida; Códigos vencidos da EBFGA 3 → 2 (`RN-189-api` e exemplo do card); `RN-280` selo e contagens por tempo sem subir a versao; `RN-283` novo: GET e PUT /usuarios/eu/preferencias |
-| v92 | 2026-11-08 23:45 | Telas (`RN-189`; 15_modulos `RN-276`, `RN-277`): vistas hub-usuarios web, pwa e mobile v01 → v02 (alternância Dia, Semana e Mês no card, 12 pontos na expandida, cards dos perfis staff e autônomo) e hub-time-deboaz v01 → v02 (card do perfil deboaz com 112 contas ativas, recortes e 12 pontos); cenários sem mudança |
-| v91 | 2026-11-08 23:35 | Diagramas do card (`RN-189`, `RN-280`, `RN-281`, 15_modulos `RN-276` a `RN-279`): contrato de API v11 → v12 (GET /usuarios/card no formato comum, GET /usuarios/card/ao-vivo por SSE, proposta pendente de preferências), sequência v07 → v08 (fase do card, telas pendentes), classes v07 → v08 (CardUsuarios e portas) e documentos v16 → v17 (cardUsuarios, criadoPor, aoVivo no Redis) |
 
 ---
 
-<sub>boaz · v103 · 2026-11-11 23:24 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v104 · 2026-11-11 23:25 · `1_Requisitos/17_modulo-usuario.md`</sub>
