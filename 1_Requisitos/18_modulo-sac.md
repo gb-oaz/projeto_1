@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "18_modulo-sac"
 tipo: "Funcionalidade"
 titulo: "SAC"
-versao: "v01"
-data: "2026-11-12 16:58"
+versao: "v02"
+data: "2026-11-12 17:19"
 status: "Rascunho"
 objetivo: "permitir que a conta master da instituição e o educador autônomo abram chamados para falar com o time deboaz, acompanhem a conversa até a solução e avaliem o atendimento, e que o time deboaz atenda todos os chamados dentro do prazo de cada categoria."
 ---
 
-> **boaz · Funcionalidade** · `18_modulo-sac` · **v01** · 2026-11-12 16:58 · **Rascunho**
+> **boaz · Funcionalidade** · `18_modulo-sac` · **v02** · 2026-11-12 17:19 · **Rascunho**
 
 # SAC
 
@@ -1169,7 +1169,25 @@ Cenário: o que o SAC não faz
 
 ## Diagramas
 
-> Diagramas a desenhar pelo `deboaz-arc`: `sac-casos-de-uso`, `sac-sequencia` (com as telas), `sac-contrato-api`, `sac-classes` e `sac-documentos`
+**SAC · casos de uso** — `2_Diagramas/sac-casos-de-uso_v01_20261112-1705.svg`
+
+[![Casos de uso do SAC: a conta cliente (master ou autônomo) abre, acompanha, conversa, reabre, encerra e avalia; o membro do time vê a fila, assume, responde com nota interna, pede informação, resolve e atende o pedido de senha; o administrador configura os prazos; a tela Entrar registra o pedido sem login como chamado; o relógio aplica os 7 dias e descarta anexos não usados](../2_Diagramas/sac-casos-de-uso_v01_20261112-1705.svg)](../2_Diagramas/sac-casos-de-uso_v01_20261112-1705.svg)
+
+**SAC · sequência com as telas** — `2_Diagramas/sac-sequencia_v01_20261112-1705.svg`
+
+[![Sequência do SAC em 6 fases com as telas previstas (vista-hub-sac-cliente e vista-hub-sac-time, a desenhar): abrir com anexo verificado, assumir e responder com a conversa ao vivo (SSE e canal Redis, até 5 s), pedir informação e resolver, confirmar e avaliar, prazos automáticos e descarte, e o pedido de senha sem login virando chamado](../2_Diagramas/sac-sequencia_v01_20261112-1705.svg)](../2_Diagramas/sac-sequencia_v01_20261112-1705.svg)
+
+**SAC · contrato de API** — `2_Diagramas/sac-contrato-api_v01_20261112-1705.svg`
+
+[![Contrato de API do SAC: anexos, chamados, conversa e ao vivo, assumir, status, reabrir, encerrar, avaliação, configuração e card, com o formato de erro, a tabela de códigos e as decisões técnicas](../2_Diagramas/sac-contrato-api_v01_20261112-1705.svg)](../2_Diagramas/sac-contrato-api_v01_20261112-1705.svg)
+
+**SAC · classes** — `2_Diagramas/sac-classes_v01_20261112-1705.svg`
+
+[![Classes do SAC na arquitetura hexagonal: features chamados, anexos, configuracao e card em core/hub/sac com ports, usecases, dtos e domínio (Chamado, Anexo, PrazosDoSac, CardDoSac), adaptadores primários e secundários no ms_mono](../2_Diagramas/sac-classes_v01_20261112-1705.svg)](../2_Diagramas/sac-classes_v01_20261112-1705.svg)
+
+**SAC · modelo de documentos** — `2_Diagramas/sac-documentos_v01_20261112-1705.svg`
+
+[![Modelo de documentos do SAC: chamados com origem e avaliação embutidas, mensagensChamado, anexosSac, configuracaoSac, cardSac e contadores, arquivos no armazenamento de objetos e chaves no Redis, com referências às coleções do 17](../2_Diagramas/sac-documentos_v01_20261112-1705.svg)](../2_Diagramas/sac-documentos_v01_20261112-1705.svg)
 
 ---
 
@@ -1189,8 +1207,9 @@ Cenário: o que o SAC não faz
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v01** | 2026-11-12 16:58 | Criação: chamados da conta master e do autônomo com o time deboaz (`RF-171` a `RF-181`), regras (`RN-288` a `RN-297`) e medidas (`RNF-229` a `RNF-231`), com as âncoras -api; telas e diagramas a desenhar |
+| **v02** | 2026-11-12 17:19 | Diagramas: sac-casos-de-uso, sac-sequencia (com as vistas previstas), sac-contrato-api, sac-classes e sac-documentos v01; cenários sem mudança |
+| v01 | 2026-11-12 16:58 | Criação: chamados da conta master e do autônomo com o time deboaz (`RF-171` a `RF-181`), regras (`RN-288` a `RN-297`) e medidas (`RNF-229` a `RNF-231`), com as âncoras -api; telas e diagramas a desenhar |
 
 ---
 
-<sub>boaz · v01 · 2026-11-12 16:58 · `1_Requisitos/18_modulo-sac.md`</sub>
+<sub>boaz · v02 · 2026-11-12 17:19 · `1_Requisitos/18_modulo-sac.md`</sub>

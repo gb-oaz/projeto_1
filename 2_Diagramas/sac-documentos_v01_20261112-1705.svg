@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1784 1482" width="1784" height="1482">
+  <title>SAC · modelo de documentos</title>
+  <desc>Modelo de documentos do SAC (1_Requisitos/18_modulo-sac.md): chamados (agregado com origem e avaliação embutidas, prazo de resposta fixo na abertura, Atrasado calculado na leitura), mensagensChamado (mensagens, notas internas e eventos da linha do tempo, só inclusão), anexosSac (metadados verificados; arquivo no armazenamento de objetos; descarte em 24 h se não usado), configuracaoSac (prazos por categoria), cardSac (dias fechados para as séries) e contadores; referências às coleções do 17 (contas, usuarios, auditoria, pedidosAjuda com o novo campo chamado) e chaves Redis (canal do chamado ao vivo, cache e versão do card, trava do agendamento). v01: criação.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <!-- ── markers, filtro e gradiente da marca d'água: copie sempre ── -->
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+    <symbol id="ic-objetos" viewBox="0 0 24 24"><ellipse class="ico" cx="12" cy="6" rx="8.5" ry="2.8"/><path class="ico" d="M3.5,6 L6,20 C6.3,21.2 8.8,22 12,22 C15.2,22 17.7,21.2 18,20 L20.5,6"/></symbol>
+    <symbol id="ic-cache" viewBox="0 0 24 24"><rect class="ico" x="5" y="5" width="14" height="14" rx="2"/><path class="ico" d="M9,2 V5 M15,2 V5 M9,19 V22 M15,19 V22 M2,9 H5 M2,15 H5 M19,9 H22 M19,15 H22"/><path class="ico-fill" d="M13,7.5 L9.5,12.6 H12 L11,16.5 L14.5,11.4 H12 Z"/></symbol>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1784" height="1482"/>
+<g id="marca-topo"><rect class="wm-band" x="0" y="0" width="1784" height="112"/><rect class="wm-accent" x="0" y="110" width="1784" height="2"/><text class="wm-eyebrow" x="40" y="40">BOAZ · MODELO DE DOCUMENTOS</text><text class="title" x="40" y="72">SAC · modelo de documentos</text><text class="subtitle" x="40" y="94">Coleções do SAC no MongoDB (Cosmos DB for MongoDB), arquivos no armazenamento de objetos e chaves no Redis</text><text class="wm-meta-label" x="1496" y="44">VERSÃO</text><rect class="wm-badge" x="1496" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1520" y="71" text-anchor="middle">v01</text><line class="wm-sep" x1="1568" y1="32" x2="1568" y2="80"/><text class="wm-meta-label" x="1592" y="44">DATA</text><text class="wm-meta-value" x="1592" y="72">2026-11-12 · 17:05</text></g>
+<g id="col-chamados"><g id="c-chamados" filter="url(#sombra)"><rect class="node-green" x="40" y="152" width="488" height="834" rx="6"/></g><text class="label-strong" x="54" y="178">chamados</text><rect class="chip" x="343.6" y="164" width="172.4" height="20" rx="10"/><text class="chip-text" x="429.8" y="178" text-anchor="middle">sem partição · agregado</text><line class="divider" x1="40" y1="192" x2="528" y2="192"/><text class="mono" x="54" y="212">_id: &quot;SAC-000042&quot;  (contadores.chamados)</text><text class="mono" x="54" y="230">versao  (+1 a cada mudança; id do ao vivo)</text><text class="mono" x="54" y="248">contaId → contas  · null no pedido sem login</text><text class="mono" x="54" y="266">conta: sigla · nome · tipo  (cópia)</text><text class="mono" x="54" y="284">  tipo: INSTITUICAO | AUTONOMO</text><text class="mono" x="54" y="302">abertoPor → usuarios</text><text class="mono" x="54" y="320">categoria: ACESSO_E_SENHA | COBRANCA |</text><text class="mono" x="54" y="338">  MODULO_COM_PROBLEMA | DUVIDA_DE_USO |</text><text class="mono" x="54" y="356">  SUGESTAO_AO_DEBOAZ | SENHA_CONTA_MASTER</text><text class="mono" x="54" y="374">assunto · descricao</text><text class="mono" x="54" y="392">relacionadoA → chamados  · null</text><text class="mono" x="54" y="410">anexos[ ] → anexosSac  (da abertura)</text><text class="mono" x="54" y="428">status: ABERTO | EM_ATENDIMENTO |</text><text class="mono" x="54" y="446">  AGUARDANDO_CLIENTE | RESOLVIDO | FECHADO</text><text class="mono" x="54" y="464">responsavel: usuarioId → usuarios · nome</text><text class="mono" x="54" y="482">abertoEm · atualizadoEm</text><text class="mono" x="54" y="500">prazoResposta  (horas úteis, fixo na abertura)</text><text class="mono" x="54" y="518">primeiraRespostaEm  · null até a 1ª ao cliente</text><text class="mono" x="54" y="536">esperandoTimeDesde  · null na vez da conta</text><text class="mono" x="54" y="554">aguardandoDesde · resolvidoEm · fechadoEm</text><text class="mono" x="54" y="572">fechamento: CONFIRMADO | PELA_CONTA | PRAZO</text><text class="mono" x="54" y="590">naoLidoPelaConta · naoLidoPeloTime</text><text class="mono" x="54" y="608">busca  (número, sigla, nome, assunto sem acento)</text><text class="mono" x="54" y="626">guardarAte  (fechadoEm + 5 anos, RNF-231)</text><rect class="node-blue" x="52" y="632" width="464" height="102" rx="4"/><text class="label" x="62" y="651">origem</text><text class="mono" x="66" y="672">tipo: HUB | ENTRAR_SEM_LOGIN</text><text class="mono" x="66" y="690">pedido: &quot;ajuda-000087&quot;  · só sem login</text><text class="mono" x="66" y="708">instituicao · contato  · só sem login</text><text class="mono" x="66" y="726">aparelho  · limite do 17 (RNF-205)</text><rect class="node-blue" x="52" y="742" width="464" height="48" rx="4"/><text class="label" x="62" y="761">avaliacao  · uma só (RN-296)</text><text class="mono" x="66" y="782">nota: 1..5 · comentario ≤ 500 · em</text><line class="divider" x1="40" y1="804" x2="528" y2="804"/><text class="uml-keyword" x="54" y="824">índices</text><text class="mono" x="54" y="844">contaId + atualizadoEm↓  (Meus chamados)</text><text class="mono" x="54" y="862">contaId + status  (limite de 10, RN-294)</text><text class="mono" x="54" y="880">status + esperandoTimeDesde  (fila do time)</text><text class="mono" x="54" y="898">responsavel.usuarioId + status  (Meus)</text><text class="mono" x="54" y="916">status + prazoResposta, 1ª resposta nula</text><text class="mono" x="54" y="934">  (Atrasado, lido na hora: RN-289)</text><text class="mono" x="54" y="952">status + aguardandoDesde · status + resolvidoEm</text><text class="mono" x="54" y="970">avaliacao.nota · busca · guardarAte</text></g>
+<g id="col-mensagens"><g id="c-mensagens" filter="url(#sombra)"><rect class="node-green" x="584" y="152" width="424" height="382" rx="6"/></g><text class="label-strong" x="598" y="178">mensagensChamado</text><rect class="chip" x="850.8" y="164" width="145.2" height="20" rx="10"/><text class="chip-text" x="923.4" y="178" text-anchor="middle">partição: chamadoId</text><line class="divider" x1="584" y1="192" x2="1008" y2="192"/><text class="mono" x="598" y="212">_id: &quot;msg-000318&quot;  (contadores)</text><text class="mono" x="598" y="230">chamadoId → chamados</text><text class="mono" x="598" y="248">versao  (a do chamado ao gravar)</text><text class="mono" x="598" y="266">tipo: MENSAGEM | NOTA_INTERNA | EVENTO</text><rect class="node-blue" x="596" y="272" width="400" height="84" rx="4"/><text class="label" x="606" y="291">autor</text><text class="mono" x="610" y="312">tipo: CONTA | TIME | SISTEMA</text><text class="mono" x="610" y="330">usuarioId → usuarios  · null no SISTEMA</text><text class="mono" x="610" y="348">nome: &quot;Caio, do time deboaz&quot;</text><text class="mono" x="598" y="376">texto ≤ 5.000  · null no EVENTO</text><text class="mono" x="598" y="394">anexos[ ] → anexosSac  · até 5</text><text class="mono" x="598" y="412">evento: ABERTO | ASSUMIU | TROCOU_RESPONSAVEL |</text><text class="mono" x="598" y="430">  STATUS | AVALIADO  · de · para</text><text class="mono" x="598" y="448">em · guardarAte</text><line class="divider" x1="584" y1="460" x2="1008" y2="460"/><text class="uml-keyword" x="598" y="480">índices</text><text class="mono" x="598" y="500">chamadoId + versao  (ao vivo: desde a versão)</text><text class="mono" x="598" y="518">chamadoId + em  (conversa e linha do tempo)</text></g>
+<g id="col-anexos"><g id="c-anexos" filter="url(#sombra)"><rect class="node-green" x="584" y="582" width="424" height="344" rx="6"/></g><text class="label-strong" x="598" y="608">anexosSac</text><rect class="chip" x="898.4" y="594" width="97.6" height="20" rx="10"/><text class="chip-text" x="947.2" y="608" text-anchor="middle">sem partição</text><line class="divider" x1="584" y1="622" x2="1008" y2="622"/><text class="mono" x="598" y="642">_id: &quot;anx-7f3a21&quot;  (aleatório, único)</text><text class="mono" x="598" y="660">nome · tipo: image/png | image/jpeg |</text><text class="mono" x="598" y="678">  application/pdf  (pelo conteúdo)</text><text class="mono" x="598" y="696">tamanho ≤ 10 MB · sha256</text><text class="mono" x="598" y="714">enviadoPor → usuarios · contaId → contas</text><text class="mono" x="598" y="732">enviadoEm</text><text class="mono" x="598" y="750">verificacao: LIMPO · motor · em</text><text class="mono" x="598" y="768">objeto: &quot;sac/anexos/anx-7f3a21&quot;</text><text class="mono" x="598" y="786">chamadoId · mensagemId  · null até usar</text><text class="mono" x="598" y="804">expiraEm: enviadoEm + 24 h  · null ao usar</text><text class="mono" x="598" y="822">guardarAte</text><line class="divider" x1="584" y1="834" x2="1008" y2="834"/><text class="uml-keyword" x="598" y="854">índices</text><text class="mono" x="598" y="874">chamadoId</text><text class="mono" x="598" y="892">expiraEm  (descarte dos não usados)</text><text class="mono" x="598" y="910">enviadoPor + enviadoEm</text></g>
+<g id="col-config"><g id="c-config" filter="url(#sombra)"><rect class="node-green" x="1064" y="152" width="336" height="168" rx="6"/></g><text class="label-strong" x="1078" y="178">configuracaoSac</text><rect class="chip" x="1290.4" y="164" width="97.6" height="20" rx="10"/><text class="chip-text" x="1339.2" y="178" text-anchor="middle">um documento</text><line class="divider" x1="1064" y1="192" x2="1400" y2="192"/><text class="mono" x="1078" y="212">_id: &quot;prazos&quot;</text><rect class="node-blue" x="1076" y="218" width="312" height="48" rx="4"/><text class="label" x="1086" y="237">prazos[ ]  · 6 categorias (RN-289)</text><text class="mono" x="1090" y="258">categoria · horasUteis 1..80</text><text class="mono" x="1078" y="286">salvaEm · salvaPor → usuarios</text><text class="mono" x="1078" y="304">versao</text></g>
+<g id="col-card"><g id="c-card" filter="url(#sombra)"><rect class="node-green" x="1064" y="368" width="336" height="218" rx="6"/></g><text class="label-strong" x="1078" y="394">cardSac</text><rect class="chip" x="1263.2" y="380" width="124.8" height="20" rx="10"/><text class="chip-text" x="1325.6" y="394" text-anchor="middle">partição: escopo</text><line class="divider" x1="1064" y1="408" x2="1400" y2="408"/><text class="mono" x="1078" y="428">_id: &quot;&lt;escopo&gt;:&lt;AAAA-MM-DD&gt;&quot;</text><text class="mono" x="1078" y="446">escopo: DEBOAZ | contaId</text><text class="mono" x="1078" y="464">dia</text><text class="mono" x="1078" y="482">emAndamento · abertos · resolvidos</text><text class="mono" x="1078" y="500">semResposta · atrasados</text><text class="mono" x="1078" y="518">notaMedia · primeiraRespostaMediaH</text><line class="divider" x1="1064" y1="530" x2="1400" y2="530"/><text class="uml-keyword" x="1078" y="550">índices</text><text class="mono" x="1078" y="570">único: escopo + dia</text></g>
+<g id="col-contadores"><g id="c-contadores" filter="url(#sombra)"><rect class="node-green" x="1064" y="634" width="336" height="94" rx="6"/></g><text class="label-strong" x="1078" y="660">contadores</text><rect class="chip" x="1290.4" y="646" width="97.6" height="20" rx="10"/><text class="chip-text" x="1339.2" y="660" text-anchor="middle">um por série</text><line class="divider" x1="1064" y1="674" x2="1400" y2="674"/><text class="mono" x="1078" y="694">_id: &quot;chamados&quot; | &quot;mensagensChamado&quot;</text><text class="mono" x="1078" y="712">valor  ($inc atômico ao numerar)</text></g>
+<g id="col-contas"><g id="c-contas" filter="url(#sombra)"><rect class="node-external" x="1456" y="152" width="288" height="76" rx="6"/></g><text class="label-strong" x="1470" y="178">contas</text><rect class="chip" x="1702.4" y="164" width="29.6" height="20" rx="10"/><text class="chip-text" x="1717.2" y="178" text-anchor="middle">17</text><line class="divider" x1="1456" y1="192" x2="1744" y2="192"/><text class="mono" x="1470" y="212">_id · sigla · nome · tipo</text></g>
+<g id="col-usuarios"><g id="c-usuarios" filter="url(#sombra)"><rect class="node-external" x="1456" y="260" width="288" height="76" rx="6"/></g><text class="label-strong" x="1470" y="286">usuarios</text><rect class="chip" x="1702.4" y="272" width="29.6" height="20" rx="10"/><text class="chip-text" x="1717.2" y="286" text-anchor="middle">17</text><line class="divider" x1="1456" y1="300" x2="1744" y2="300"/><text class="mono" x="1470" y="320">_id · nome · papel</text></g>
+<g id="col-auditoria"><g id="c-auditoria" filter="url(#sombra)"><rect class="node-external" x="1456" y="368" width="288" height="94" rx="6"/></g><text class="label-strong" x="1470" y="394">auditoria</text><rect class="chip" x="1654.8" y="380" width="77.2" height="20" rx="10"/><text class="chip-text" x="1693.4" y="394" text-anchor="middle">17 RN-178</text><line class="divider" x1="1456" y1="408" x2="1744" y2="408"/><text class="mono" x="1470" y="428">acao · quem · alvo &quot;SAC-000042&quot;</text><text class="mono" x="1470" y="446">INICIADO · CONCLUIDO · traceId</text></g>
+<g id="col-pedidos"><g id="c-pedidos" filter="url(#sombra)"><rect class="node-external" x="1456" y="494" width="288" height="112" rx="6"/></g><text class="label-strong" x="1470" y="520">pedidosAjuda</text><rect class="chip" x="1654.8" y="506" width="77.2" height="20" rx="10"/><text class="chip-text" x="1693.4" y="520" text-anchor="middle">17 RN-274</text><line class="divider" x1="1456" y1="534" x2="1744" y2="534"/><text class="mono" x="1470" y="554">_id: &quot;ajuda-000087&quot;</text><text class="mono" x="1470" y="572">aparelho · quando</text><text class="mono" x="1470" y="590">chamado → chamados  (novo)</text></g>
+<g id="armazenamento"><g id="objetos" filter="url(#sombra)"><rect class="node-orange" x="40" y="1034" width="488" height="104" rx="6"/></g><use href="#ic-objetos" x="54" y="1046" width="24" height="24"/><text class="label-strong" x="88" y="1063">Armazenamento de objetos</text><line class="divider" x1="40" y1="1078" x2="528" y2="1078"/><text class="mono" x="54" y="1098">contêiner privado sac-anexos</text><text class="mono" x="54" y="1116">sac/anexos/&lt;id&gt;  · só o backend lê e grava</text></g>
+<g id="chaves-redis"><g id="redis" filter="url(#sombra)"><rect class="node-orange" x="40" y="1186" width="488" height="140" rx="6"/></g><use href="#ic-cache" x="54" y="1198" width="24" height="24"/><text class="label-strong" x="88" y="1215">Redis</text><line class="divider" x1="40" y1="1230" x2="528" y2="1230"/><text class="mono" x="54" y="1250">sac:chamado:&lt;id&gt;  canal · carga {versao}</text><text class="mono" x="54" y="1268">sac:card:&lt;escopo&gt;  JSON do card · TTL 5 min</text><text class="mono" x="54" y="1286">sac:card:versao:&lt;escopo&gt;  INCR a cada mudança</text><text class="mono" x="54" y="1304">sac:prazos  trava SET NX PX 55 s</text></g>
+<g id="referencias"><path class="edge edge-async" d="M584,232 H528" marker-end="url(#seta-aberta)"/><path class="edge edge-async" d="M584,642 H528" marker-end="url(#seta-aberta)"/><path class="edge edge-async" d="M584,768 H556 V1086 H528" marker-end="url(#seta-aberta)"/><path class="edge edge-async" d="M432,152 V136 H1600.0 V152" marker-end="url(#seta-aberta)"/><rect class="edge-label-bg" x="879.6" y="118" width="304.7" height="16"/><text class="muted" x="1032" y="130" text-anchor="middle">contaId · responsavel.usuarioId · abertoPor</text></g>
+<g id="nota-1"><path class="node-note" d="M1064,776 H1388 L1400,788 V882 H1064 Z"/><text class="muted" x="1076" y="798">Decisão 1 · pedido de senha (RF-179):</text><text class="muted" x="1076" y="816">POST /contas/esqueci-senha-master grava</text><text class="muted" x="1076" y="834">o chamado SENHA_CONTA_MASTER e o</text><text class="muted" x="1076" y="852">pedidosAjuda do 17 com o mesmo número;</text><text class="muted" x="1076" y="870">o SAC lê só chamados.</text></g>
+<g id="nota-2"><path class="node-note" d="M1064,906 H1388 L1400,918 V1012 H1064 Z"/><text class="muted" x="1076" y="928">Decisão 3 · prazos (RN-289, RN-290):</text><text class="muted" x="1076" y="946">Atrasado é calculado na leitura;</text><text class="muted" x="1076" y="964">os 7 dias (Resolvido e Fechado)</text><text class="muted" x="1076" y="982">rodam no AgendamentoDoSac a cada</text><text class="muted" x="1076" y="1000">1 min, com a trava sac:prazos.</text></g>
+<g id="nota-3"><path class="node-note" d="M1064,1036 H1388 L1400,1048 V1124 H1064 Z"/><text class="muted" x="1076" y="1058">Decisão 4 · anexos (RN-292):</text><text class="muted" x="1076" y="1076">verificados no envio, antes de gravar;</text><text class="muted" x="1076" y="1094">não usados em 24 h saem do banco</text><text class="muted" x="1076" y="1112">e do armazenamento pelo agendamento.</text></g>
+<g id="nota-imutavel"><path class="node-note" d="M1456,654 H1732 L1744,666 V742 H1456 Z"/><text class="muted" x="1468" y="676">Mensagens, eventos e</text><text class="muted" x="1468" y="694">auditoria só incluem:</text><text class="muted" x="1468" y="712">nada altera nem apaga</text><text class="muted" x="1468" y="730">(RN-293, RN-297).</text></g>
+<g id="nota-card"><path class="node-note" d="M1456,766 H1732 L1744,778 V872 H1456 Z"/><text class="muted" x="1468" y="788">Card do dia corrente:</text><text class="muted" x="1468" y="806">contado em chamados;</text><text class="muted" x="1468" y="824">cardSac guarda os dias</text><text class="muted" x="1468" y="842">fechados à 00:00 (15</text><text class="muted" x="1468" y="860">RN-278) para as séries.</text></g>
+<g id="marca-rodape" transform="translate(0,1366)"><rect class="wm-band" x="0" y="0" width="1784" height="116"/><line class="wm-sep" x1="0" y1="0.5" x2="1784" y2="0.5"/><text class="wm-eyebrow" x="40" y="30">LEGENDA</text><rect class="node-green" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">coleção do SAC</text><rect class="node-blue" x="193.6" y="47" width="14" height="14" rx="3"/><text class="label" x="215.6" y="58">embutido no documento</text><rect class="node-orange" x="399" y="47" width="14" height="14" rx="3"/><text class="label" x="421" y="58">armazenamento e Redis</text><rect class="node-external" x="604.4" y="47" width="14" height="14" rx="3"/><text class="label" x="626.4" y="58">coleção do 17 (Usuários)</text><rect class="node-note" x="832" y="47" width="14" height="14" rx="3"/><text class="label" x="854" y="58">decisão</text><line class="edge edge-async" x1="933.8" y1="54" x2="961.8" y2="54" marker-end="url(#seta-aberta)"/><text class="label" x="973.8" y="58">referência por id</text><line class="divider" x1="40" y1="76" x2="1744" y2="76"/><text class="footer" x="40" y="100">v01 · coleções chamados, mensagensChamado, anexosSac, configuracaoSac, cardSac e contadores; arquivos e chaves Redis do SAC</text><text class="wm-file" x="1744" y="100" text-anchor="end">sac-documentos_v01_20261112-1705.svg</text></g>
+</svg>
