@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v108"
-data: "2026-11-12 02:31"
+versao: "v109"
+data: "2026-11-12 17:21"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v108** · 2026-11-12 02:31 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v109** · 2026-11-12 17:21 · **Em revisão**
 
 # Módulo Usuários
 
@@ -897,6 +897,7 @@ Cenário: conta master esqueceu a senha
     }
     """
   Então a resposta é 202 e a mensagem entra no SAC do time deboaz
+  E entra como o chamado "SAC-000087" da categoria "SENHA_CONTA_MASTER", já na criação
 ```
 
 <a id="RF-112-api"></a>
@@ -1525,6 +1526,7 @@ Cenário: pedido de ajuda da conta master
   Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "ESQUECI_SENHA_MASTER"
   E os dois com o traceId de X-Trace-Id, sem quem e sem contaId
   E o "CONCLUIDO" vai com o alvo "ajuda-000087", o pedido gravado em "pedidosAjuda"
+  E o id do pedido é "ajuda-" com o número do chamado, e o campo chamado é "SAC-000087"
 
 Cenário: quarto pedido do dia
   Dado 3 pedidos POST /contas/esqueci-senha-master do mesmo aparelho nas últimas 24 h
@@ -2363,7 +2365,7 @@ Esquema do Cenário: coleção pronta antes do primeiro pedido
     | geracoesSenha      | usuarioId+pedidaEm↓, resumoComprovante, contaId+pedidaEm      |
     | registrosPermissao | usuarioId+em↓+versao↓                                         |
     | cardUsuarios       | contaId+perfil+usuarioId único                                |
-    | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205             |
+    | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205; chamado    |
 
 Cenário: segunda partida não duplica
   Dado a aplicação de homologação iniciada em 2026-11-05, com as 8 coleções e seus índices
@@ -2748,7 +2750,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v108** | 2026-11-12 02:31 | `RN-189`: o card fica sem dados ("vazio" true) enquanto a conta não tem staff nem participantes; a conta master não conta para o "vazio", mesmo entrando nos usuários ativos; `RN-189-api`: cenário "só a conta master" |
+| **v109** | 2026-11-12 17:21 | Pedido de senha da conta master vira chamado "SENHA_CONTA_MASTER" do SAC na criação, id "ajuda-" com o número do chamado e campo chamado em "pedidosAjuda" (`RF-111-api`, `RN-274`, índices; [18_modulo-sac `RF-179`](18_modulo-sac.md#RF-179-api)) |
+| v108 | 2026-11-12 02:31 | `RN-189`: o card fica sem dados ("vazio" true) enquanto a conta não tem staff nem participantes; a conta master não conta para o "vazio", mesmo entrando nos usuários ativos; `RN-189-api`: cenário "só a conta master" |
 | v107 | 2026-11-12 00:57 | Diagramas: adaptadores do ms_mono em primario/{in,out} e secundario/{in,out} (infra/out passa a secundario/out): pacotes hexagonal v02 → v03, inicialização v04 → v05, documentos v19 → v20 (também permissoes.suspensos como [{mod, abas}], 17-b `RN-287`); cenários sem mudança |
 | v106 | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", a conta master nas contagens, `RN-189`) |
 | v105 | 2026-11-11 23:28 | Diagrama: contrato de API v16 → v17 (`RN-280`: a MASTER conta em "usuários ativos" na INSTITUICAO e no AUTONOMO e em "staff" na INSTITUICAO, não no STAFF; reduzida do AUTONOMO "usuários ativos"; versao sobe em gerar-senha e nova-geracao-senha; ao vivo sem retomada nem Last-Event-ID, toda conexão começa pelo card inteiro); cenários sem mudança |
@@ -2757,9 +2760,7 @@ Cenário: o que este documento não trata
 | v102 | 2026-11-11 23:17 | Diagramas: adaptadores primários do backend em ms_mono/primario/ (antes infra/in/): pacotes da arquitetura hexagonal v01 → v02 e sequência da inicialização v03 → v04; cenários sem mudança |
 | v101 | 2026-11-09 09:14 | Diagrama: contrato de API v14 → v15 (endereços de teste PUT e DELETE /_teste/relogio e POST /_teste/fechamento, sem login, só com AMBIENTE=hml e Teste__Relogio=sim, ligado só no backend do CI; fora disso, 404) |
 | v100 | 2026-11-09 09:10 | `RN-280`: "Sem acesso há 30 dias" conta só quem existe há mais de 30 dias (criadoEm, e na conta criadaEm) e tem o último acesso há mais de 30 dias ou nulo, como no contrato v14; cenário do recém-criado que não conta |
-| v99 | 2026-11-09 09:09 | Diagrama: contrato de API v13 → v14 (GET /usuarios/card com os nomes do apoio e da lista de DEBOAZ, INSTITUICAO, STAFF e AUTONOMO; Sem acesso há 30 dias com criadoEm há mais de 30 dias e ultimoAcesso há mais de 30 dias ou nulo, na conta criadaEm e ultimoAcessoMaster) |
-| v98 | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Então ou E (`RF-155`, `RN-189`, `RN-280`); `RN-280`: "Sem acesso há 30 dias" conta também quem nunca entrou (ultimoAcesso nulo), com cenário; `RN-281`: sessão expirada por 8 h sem uso com ?intervalo=5 |
 
 ---
 
-<sub>boaz · v108 · 2026-11-12 02:31 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v109 · 2026-11-12 17:21 · `1_Requisitos/17_modulo-usuario.md`</sub>

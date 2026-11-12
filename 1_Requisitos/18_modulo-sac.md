@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "18_modulo-sac"
 tipo: "Funcionalidade"
 titulo: "SAC"
-versao: "v03"
-data: "2026-11-12 17:20"
+versao: "v04"
+data: "2026-11-12 17:21"
 status: "Rascunho"
 objetivo: "permitir que a conta master da instituição e o educador autônomo abram chamados para falar com o time deboaz, acompanhem a conversa até a solução e avaliem o atendimento, e que o time deboaz atenda todos os chamados dentro do prazo de cada categoria."
 ---
 
-> **boaz · Funcionalidade** · `18_modulo-sac` · **v03** · 2026-11-12 17:20 · **Rascunho**
+> **boaz · Funcionalidade** · `18_modulo-sac` · **v04** · 2026-11-12 17:21 · **Rascunho**
 
 # SAC
 
@@ -52,6 +52,8 @@ Cenário: instituição abre um chamado
   Dado a conta master da EBFGA no SAC
   Quando toca em "Abrir chamado", escolhe "Módulo com problema"
   E informa o assunto "Presença não salva a chamada", a descrição e o print "erro.png"
+  E vê abaixo da descrição "Ao menos 20 caracteres"
+  E abaixo dos anexos "PNG, JPG ou PDF · até 10 MB cada · até 5 arquivos"
   E toca em "Enviar"
   Então vê "Chamado SAC-000042 aberto. Resposta até hoje, 18:00"
   E o chamado aparece no topo de Meus chamados, como "Aberto"
@@ -82,9 +84,16 @@ Cenário: lista da instituição
   E cada linha mostra o número, o assunto, o status e a última atualização
   E SAC-000042 aparece em negrito, com a marca "Nova resposta"
 
-Cenário: filtro por status
-  Quando a conta master toca no filtro "Em andamento"
-  Então vê SAC-000042 e SAC-000039, sem o SAC-000031
+Esquema do Cenário: filtros de Meus chamados
+  Dado o filtro "Todos" marcado ao abrir o SAC
+  Quando a conta master toca no filtro "<filtro>"
+  Então vê <resultado>
+
+  Exemplos:
+    | filtro       | resultado                                  |
+    | Todos        | SAC-000042, SAC-000039 e SAC-000031        |
+    | Em andamento | SAC-000042 e SAC-000039, sem o SAC-000031  |
+    | Fechados     | só o SAC-000031                            |
 
 Cenário: sem chamados
   Dado o educador autônomo Pedro Reis sem chamados
@@ -99,7 +108,8 @@ Cenário: sem chamados
 ```gherkin
 Cenário: responder ao time
   Dado o SAC-000042 "Aguardando sua resposta", com a pergunta do Caio "Qual a turma?"
-  Quando a conta master escreve "Turma 7A", anexa "chamada-7a.png" e toca em "Enviar"
+  Quando a conta master escreve "Turma 7A" no campo "Escreva sua mensagem"
+  E anexa "chamada-7a.png" e toca em "Enviar"
   Então a mensagem aparece no fim da conversa, com a hora "11:30"
   E o status passa a "Em atendimento"
 
@@ -112,7 +122,8 @@ Cenário: chamado fechado não recebe mensagem
   Dado o SAC-000031 "Fechado"
   Quando a conta master abre o chamado
   Então não vê o campo de mensagem
-  E vê "Chamado fechado" e o botão "Abrir chamado relacionado"
+  E vê "Chamado fechado", o apoio "Precisa de mais ajuda sobre o mesmo assunto?"
+  E o botão "Abrir chamado relacionado"
 ```
 
 <a id="RF-174"></a>
@@ -140,6 +151,10 @@ Esquema do Cenário: filtros da fila
     | Aguardando cliente  | os chamados à espera da resposta da conta           |
     | Nota baixa          | os chamados fechados com 1 ou 2 estrelas            |
 
+Cenário: chamado já respondido
+  Quando o Caio responde o SAC-000042, aberto às 10:00, às 11:00
+  Então a linha do SAC-000042 na fila mostra "Respondido em 1 h" no lugar do prazo
+
 Cenário: busca
   Quando o Caio busca "EBFGA" na fila
   Então vê os chamados da Escola Bento Freitas, de todos os status
@@ -152,7 +167,10 @@ Cenário: busca
 ```gherkin
 Cenário: assumir e responder
   Dado o SAC-000042 "Aberto", sem responsável
-  Quando o Caio toca em "Assumir" e envia "Olá! Qual a turma da chamada?"
+  Quando o Caio abre o chamado
+  Então vê "Assuma o chamado para responder à conta." no lugar do campo de mensagem
+  E ao tocar em "Assumir", o campo mostra "Escreva para a conta"
+  E ele envia "Olá! Qual a turma da chamada?"
   Então o chamado passa a "Em atendimento", com o Caio como responsável
   E a conta master vê a mensagem assinada "Caio, do time deboaz"
 
@@ -182,7 +200,8 @@ Cenário: pedir informação
 Cenário: resolver
   Quando o Caio toca em "Resolver" e envia "Corrigido. Pode salvar de novo."
   Então o chamado passa a "Resolvido"
-  E a conta master vê "Resolveu?" com os botões "Confirmar solução" e "Reabrir"
+  E a conta master vê "Resolveu?" e "Confirme a solução ou reabra o chamado."
+  E os botões "Confirmar solução" e "Reabrir", sem o campo de mensagem
 
 Cenário: resolver sem mensagem
   Quando o Caio toca em "Resolver" com o campo de mensagem vazio
@@ -197,13 +216,18 @@ Cenário: resolver sem mensagem
 ```gherkin
 Cenário: reabrir o resolvido
   Dado o SAC-000042 "Resolvido" há 2 dias
-  Quando a conta master toca em "Reabrir" e envia "Ainda aparece o erro na 8B"
-  Então o chamado volta a "Em atendimento", com o Caio como responsável
+  Quando a conta master toca em "Reabrir"
+  Então o chamado só muda depois que ela escreve o motivo e toca em "Enviar"
+  E com "Ainda aparece o erro na 8B" o chamado volta a "Em atendimento", com o Caio
+  E a conversa volta a aceitar mensagens
 
 Cenário: encerrar antes da solução
   Dado o SAC-000039 "Em atendimento"
-  Quando a conta master toca em "Encerrar chamado" e confirma "Não preciso mais"
-  Então o chamado passa a "Fechado"
+  Quando a conta master toca em "Encerrar chamado"
+  Então vê "Encerrar chamado?" e "O SAC-000039 passa a Fechado e não recebe mais mensagens."
+  E os botões "Cancelar" e "Não preciso mais"
+  E ao tocar em "Não preciso mais" o chamado passa a "Fechado"
+  E ao tocar em "Cancelar" nada muda
 
 Cenário: chamado relacionado
   Dado o SAC-000031 "Fechado"
@@ -219,9 +243,15 @@ Cenário: chamado relacionado
 Cenário: confirmar com avaliação
   Dado o SAC-000042 "Resolvido"
   Quando a conta master toca em "Confirmar solução"
-  E escolhe 5 estrelas, escreve "Resolvido em 4 h, obrigado" e toca em "Enviar"
-  Então o chamado passa a "Fechado" com "Sua avaliação: 5 estrelas"
-  E o Caio vê a nota e o comentário no chamado
+  Então vê as 5 estrelas, "Sua nota ajuda o time deboaz a melhorar." e o comentário opcional
+  E o botão "Enviar" só fica ativo depois de escolher as estrelas
+  E com 5 estrelas e "Resolvido em 4 h, obrigado" o chamado passa a "Fechado"
+  E a conta vê "Sua avaliação: 5 estrelas", e o Caio vê a nota e o comentário
+
+Cenário: cancelar não confirma
+  Quando a conta master toca em "Cancelar" na avaliação
+  Então o SAC-000042 continua "Resolvido", com "Confirmar solução" e "Reabrir"
+  E se ela nada fizer, fecha pelo prazo de 7 dias, sem avaliação
 
 Cenário: avaliar depois do fechamento automático
   Dado o SAC-000040 fechado sozinho em 2026-11-10, sem avaliação
@@ -245,12 +275,14 @@ Cenário: pedido chega à fila
   Quando o Caio abre o SAC
   Então vê o chamado SAC-000087, na categoria "Senha da conta master"
   E a origem "Tela Entrar, sem login", a instituição e o contato informados
+  E na fila a linha mostra "Escola Bento Freitas", o nome informado, no lugar da conta
 
 Cenário: gerar o código pelo chamado
   Dado o Caio com a Utilização do SAC e do Usuários
   Quando assume o SAC-000087 e toca em "Conferir e gerar código da master"
   Então abre a conferência da conta master da EBFGA
-  E depois do código gerado, o Caio resolve o chamado com a nota "Código enviado ao contato"
+  E depois do código gerado, o Caio resolve o chamado com "Código enviado ao contato"
+  E essa mensagem fica como nota interna, porque não há conversa com quem pediu
 
 Cenário: membro só com o SAC
   Dado a Ana Lima com a Utilização do SAC, sem o Usuários
@@ -286,7 +318,9 @@ Cenário: rótulo falado
 ```gherkin
 Cenário: mudar um prazo
   Dado o administrador do deboaz na aba Configuração do SAC
-  Quando muda "Dúvida de uso" de 16 h úteis para 12 h úteis e toca em "Salvar"
+  E o campo "Horas" de cada categoria, com o sufixo "h úteis"
+  E o aviso "Vale para os chamados abertos depois de salvar"
+  Quando muda "Dúvida de uso" de 16 para 12 h úteis e toca em "Salvar"
   Então vê "Prazos salvos"
   E os chamados de "Dúvida de uso" abertos depois disso têm o prazo de 12 h úteis
   E os já abertos mantêm o prazo que tinham
@@ -322,7 +356,8 @@ Esquema do Cenário: chamados que cada perfil vê
 Cenário: chamado de outra conta
   Dado o link do SAC-000045, do Pedro Reis
   Quando a conta master da EBFGA abre o link
-  Então vê "Chamado não encontrado", sem saber se ele existe
+  Então vê "Chamado não encontrado" e "Volte a Meus chamados pela seta."
+  E não sabe se o chamado existe
 ```
 
 <a id="RN-289"></a>
@@ -354,6 +389,12 @@ Cenário: a primeira resposta para o prazo
   Quando o Caio envia a primeira mensagem ao cliente às 11:00
   Então o prazo do SAC-000042 está cumprido
   E nota interna e "Assumir" sem mensagem não cumprem o prazo
+
+Cenário: pedido sem login cumpre o prazo ao resolver
+  Dado o SAC-000087 "Senha da conta master", aberto às 09:00, com prazo às 13:00
+  Quando o Caio o resolve às 12:00 com "Código enviado ao contato"
+  Então o prazo está cumprido, mesmo sem mensagem à conta
+  E a mensagem de resolver fica como nota interna
 ```
 
 <a id="RN-290"></a>
@@ -378,6 +419,7 @@ Esquema do Cenário: mudanças de status permitidas
     | Resolvido          | passam 7 dias sem a conta reabrir       | Fechado            |
     | Aberto             | a conta encerra                         | Fechado            |
     | Em atendimento     | a conta encerra                         | Fechado            |
+    | Aguardando cliente | a conta encerra, porque desistiu        | Fechado            |
 
 Esquema do Cenário: mudanças recusadas
   Dado um chamado "<de>"
@@ -479,6 +521,11 @@ Cenário: resolvido não conta
   Dado a EBFGA com 9 chamados em andamento e 3 "Resolvido"
   Quando a conta master abre um chamado novo
   Então o chamado é aberto
+
+Cenário: reabrir não confere o limite
+  Dado a EBFGA com 10 chamados em andamento e o SAC-000042 "Resolvido"
+  Quando a conta master reabre o SAC-000042
+  Então o chamado volta a "Em atendimento", com 11 em andamento
 ```
 
 <a id="RN-295"></a>
@@ -500,10 +547,10 @@ Esquema do Cenário: dados do card por perfil e tamanho
     | deboaz      | normal   | 14, "+3 no mês", Sem resposta 5, Atrasados 2, Nota média 4,6 |
     | instituição | mínima   | o ícone e o selo "1": respostas novas não lidas              |
     | instituição | reduzida | 2 · chamados em andamento                                    |
-    | instituição | normal   | 2, "+1 no mês", Aguardando você 1, Resolvidos 3, 1ª resp. 2 h |
+    | instituição | normal   | 2, "+1 no mês", Aguardando você 1, Em atendimento 1, Resolvidos 3 |
     | autônomo    | mínima   | o ícone, sem selo                                            |
     | autônomo    | reduzida | 1 · chamados em andamento                                    |
-    | autônomo    | normal   | 1, "-1 no mês", Aguardando você 0, Resolvidos 2, 1ª resp. 3 h |
+    | autônomo    | normal   | 1, "-1 no mês", Aguardando você 0, Em atendimento 1, Resolvidos 2 |
 
 Esquema do Cenário: lista da expandida de cada perfil
   Dado o card SAC do perfil <perfil> na expandida, com a série de 12 pontos
@@ -519,6 +566,11 @@ Cenário: sem dados
   Dado o Pedro Reis sem nenhum chamado
   Então o card mostra "Precisa de ajuda? Fale com o time deboaz" e "Abrir chamado"
   E tocar em "Abrir chamado" abre o formulário, sem passar pela lista
+
+Cenário: ordem e destaque das métricas da conta
+  Quando a conta master vê o card na normal ou na expandida
+  Então as métricas vêm na ordem Aguardando você, Em atendimento e Resolvidos no recorte
+  E "Aguardando você" vem em destaque, porque pede a ação dela
 
 Cenário: série do card
   Quando a conta master vê o card na normal, no recorte "Mês"
@@ -540,6 +592,7 @@ Esquema do Cenário: quem avalia e quando
     | "Resolvido"                           | a conta master      | avalia e o chamado fecha     |
     | "Fechado" há 6 dias, sem avaliação    | a conta master      | avalia                       |
     | "Fechado" há 8 dias, sem avaliação    | a conta master      | não vê mais as estrelas      |
+    | "Resolvido", e toca em "Cancelar"     | a conta master      | segue "Resolvido", sem nota  |
     | "Fechado", com 5 estrelas             | a conta master      | vê só a nota dada            |
     | "Fechado" pela conta, sem resposta    | a conta master      | não vê as estrelas           |
     | "Resolvido"                           | o Caio, do time     | não vê as estrelas           |
@@ -566,7 +619,8 @@ Cenário: o que fica registrado
 ```gherkin
 Esquema do Cenário: contagem do prazo
   Dado os dias úteis de segunda a sexta, das 08:00 às 18:00, no horário de Brasília
-  E sem os feriados nacionais
+  E sem os feriados nacionais, contando a Sexta-feira Santa e o 20 de novembro
+  E com o Carnaval e o Corpus Christi como dias úteis
   Quando um chamado de <prazo> úteis é aberto <quando>
   Então o prazo vence <vence>
 
@@ -575,7 +629,9 @@ Esquema do Cenário: contagem do prazo
     | 8 h   | quinta, 2026-11-12, 10:00  | quinta, 2026-11-12, 18:00 |
     | 4 h   | quinta, 2026-11-12, 17:00  | sexta, 2026-11-13, 11:00  |
     | 4 h   | sábado, 2026-11-14, 09:00  | segunda, 2026-11-16, 12:00 |
-    | 16 h  | sexta, 2026-11-13, 14:00   | terça, 2026-11-17, 12:00  |
+    | 16 h  | sexta, 2026-11-13, 14:00   | terça, 2026-11-17, 10:00  |
+    | 4 h   | quinta, 2026-11-19, 17:00  | segunda, 2026-11-23, 11:00 |
+    | 4 h   | terça, 2027-02-09, 08:00   | terça, 2027-02-09, 12:00  |
 ```
 
 <a id="RNF-230"></a>
@@ -672,6 +728,10 @@ Esquema do Cenário: pedido inválido
     | o assunto com 4 caracteres            | assunto    |
     | a descrição com 5.001 caracteres      | descricao  |
     | o relacionadoA "SAC-000045", do Pedro | relacionadoA |
+
+Cenário: membro do time não abre chamado
+  Quando o Caio, com "MOD-02" com "U", envia POST /sac/chamados
+  Então a resposta é 403 ACESSO_NEGADO
 ```
 
 <a id="RF-172-api"></a>
@@ -843,7 +903,7 @@ Cenário: sem mensagem
 
 ```gherkin
 Cenário: reabrir
-  Dado o SAC-000042 "RESOLVIDO" há 2 dias
+  Dado o SAC-000042 "RESOLVIDO" há 2 dias, com a EBFGA no limite de 10 em andamento
   Quando a conta master envia POST /sac/chamados/SAC-000042/reabrir com:
     """
     {
@@ -883,6 +943,7 @@ Esquema do Cenário: avaliação recusada
 
   Exemplos:
     | quem           | corpo                         | resposta                                |
+    | a conta master | sem a nota                    | 422 DADOS_INVALIDOS com o campo nota    |
     | a conta master | a nota 6                      | 422 DADOS_INVALIDOS com o campo nota    |
     | a conta master | um comentário de 501 letras   | 422 DADOS_INVALIDOS com o campo comentario |
     | a conta master | a nota 4, já avaliado         | 409 JA_AVALIADO                         |
@@ -912,6 +973,12 @@ Cenário: pedido na fila do time
       "status": "ABERTO"
     }
     """
+
+Cenário: resolver o pedido
+  Quando o Caio envia POST /sac/chamados/SAC-000087/status com o status "RESOLVIDO"
+  E a mensagem "Código enviado ao contato"
+  Então a resposta é 200 e a mensagem é gravada como nota interna
+  E o prazo de primeira resposta fica cumprido
 
 Cenário: sem conversa com quem pediu
   Quando o Caio envia POST /sac/chamados/SAC-000087/mensagens com "interna": false
@@ -957,6 +1024,7 @@ Esquema do Cenário: mudança recusada
     | FECHADO   | a conta master | reabrir                    | 409 CHAMADO_FECHADO           |
     | RESOLVIDO | a conta master | reabrir, depois de 7 dias  | 409 PRAZO_REABERTURA_VENCIDO  |
     | RESOLVIDO | o Caio         | status com "FECHADO"       | 409 TRANSICAO_INVALIDA        |
+    | RESOLVIDO | a conta master | mensagens                  | 409 TRANSICAO_INVALIDA        |
 
 Cenário: fechamento por prazo
   Dado o SAC-000039 "AGUARDANDO_CLIENTE" desde 2026-11-05T13:00:00Z
@@ -993,6 +1061,18 @@ Esquema do Cenário: anexo recusado
     | POST /sac/anexos com "tela.mp4"                | 415 TIPO_NAO_ACEITO        |
     | POST /sac/anexos com "nota.pdf" com ameaça     | 422 ANEXO_RECUSADO         |
     | uma mensagem com 6 anexos                      | 422 LIMITE_ANEXOS          |
+    | POST /sac/anexos com a verificação fora do ar  | 503 VERIFICACAO_INDISPONIVEL |
+
+Esquema do Cenário: anexo que não pode ser usado
+  Quando a conta master envia POST /sac/chamados ou /mensagens com o anexo <anexo>
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "anexos"
+
+  Exemplos:
+    | anexo                                      |
+    | "anx-000000", que não existe               |
+    | "anx-55d0e2", enviado pelo Pedro Reis      |
+    | "anx-7f3a21", já usado no SAC-000042       |
+    | "anx-1c2d3e", descartado depois de 24 h    |
 ```
 
 <a id="RN-293-api"></a>
@@ -1020,6 +1100,10 @@ Cenário: décimo primeiro chamado
   Dado a EBFGA com 10 chamados em ABERTO, EM_ATENDIMENTO ou AGUARDANDO_CLIENTE
   Quando a conta master envia POST /sac/chamados
   Então a resposta é 409 LIMITE_CHAMADOS e nenhum chamado é aberto
+
+Cenário: reabrir não confere o limite
+  Quando a conta master envia POST /sac/chamados/SAC-000042/reabrir com os 10 em andamento
+  Então a resposta é 200 com o status "EM_ATENDIMENTO"
 ```
 
 <a id="RN-295-api"></a>
@@ -1054,12 +1138,12 @@ Cenário: card da instituição
             "valor": 1
           },
           {
-            "nome": "Resolvidos no mês",
-            "valor": 3
+            "nome": "Em atendimento",
+            "valor": 1
           },
           {
-            "nome": "1ª resposta média (h)",
-            "valor": 2
+            "nome": "Resolvidos no mês",
+            "valor": 3
           }
         ]
       }
@@ -1080,6 +1164,23 @@ Esquema do Cenário: quem pede o card
 Cenário: ao vivo
   Quando a conta master envia GET /sac/card/ao-vivo?intervalo=30
   Então a resposta é 200, como em RN-279 de 15_modulos
+```
+
+<a id="RN-296-api"></a>
+
+### `RN-296` Avaliação única
+
+```gherkin
+Esquema do Cenário: avaliação fora do prazo ou do caminho
+  Dado o chamado <chamado>
+  Quando a conta dona envia POST /sac/chamados/<id>/avaliacao com a nota 4
+  Então a resposta é <resposta>
+
+  Exemplos:
+    | chamado                                 | id         | resposta                     |
+    | fechado há 6 dias, sem avaliação        | SAC-000040 | 201                          |
+    | fechado há 8 dias, sem avaliação        | SAC-000036 | 409 PRAZO_AVALIACAO_VENCIDO  |
+    | encerrado pela conta, sem resposta      | SAC-000039 | 409 TRANSICAO_INVALIDA       |
 ```
 
 <a id="RN-297-api"></a>
@@ -1131,6 +1232,11 @@ Cenário: salvar os prazos
     """
   Então a resposta é 200 e GET /sac/configuracao traz os prazos novos
 
+Cenário: time lê os prazos
+  Quando o Caio, com "MOD-02" só com "U", envia GET /sac/configuracao
+  Então a resposta é 200 com os prazos de cada categoria
+  E a conta master da EBFGA recebe 403 ACESSO_NEGADO no mesmo pedido
+
 Esquema do Cenário: recusas
   Quando <quem> envia PUT /sac/configuracao com <corpo>
   Então a resposta é <resposta>
@@ -1141,6 +1247,29 @@ Esquema do Cenário: recusas
     | o administrador do deboaz     | horasUteis 0             | 422 FORA_DOS_LIMITES     |
     | o Caio, só com "U" no MOD-02  | horasUteis 12            | 403 ACESSO_NEGADO        |
     | a conta master da EBFGA       | horasUteis 12            | 403 ACESSO_NEGADO        |
+```
+
+<a id="RNF-230-api"></a>
+
+### `RNF-230` Mensagem na conversa
+
+```gherkin
+Cenário: conversa ao vivo
+  Dado o token da conta master da EBFGA
+  Quando envia GET /sac/chamados/SAC-000042/ao-vivo com Accept "text/event-stream"
+  Então a resposta é 200 e a conexão fica aberta
+  E quando o Caio envia uma mensagem, o evento "mensagem" chega em até 5 s
+  E o evento tem o id da mensagem, como "msg-000319", e o mesmo corpo de GET do chamado
+  E a nota interna do Caio não chega à conta
+
+Cenário: reconexão sem perder mensagem
+  Dado a conexão caída depois do evento "msg-000318"
+  Quando a conta master reconecta com o cabeçalho Last-Event-ID "msg-000318"
+  Então recebe primeiro as mensagens enviadas depois da "msg-000318", na ordem
+
+Cenário: chamado de outra conta
+  Quando a conta master envia GET /sac/chamados/SAC-000045/ao-vivo
+  Então a resposta é 404 CHAMADO_INEXISTENTE
 ```
 
 <a id="fora-de-escopo"></a>
@@ -1237,7 +1366,7 @@ Cenário: o que o SAC não faz
 
 - Além do selo no card, a conta recebe aviso de resposta nova por e-mail, WhatsApp ou notificação do aparelho? — **Produto**
 - A conta desativada por falta de pagamento (17 `RF-113`) pode abrir chamado no SAC, se não entra no hub? — **Produto**
-- Feriados estaduais e municipais entram na contagem de horas úteis (`RNF-229`)? — **Produto**
+- Hoje valem os feriados nacionais, com a Sexta-feira Santa e o 20 de novembro, e o Carnaval e o Corpus Christi são úteis (`RNF-229`); feriados estaduais e municipais entram na contagem? — **Produto**
 
 ---
 
@@ -1247,10 +1376,11 @@ Cenário: o que o SAC não faz
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v03** | 2026-11-12 17:20 | Telas: vistas vista-hub-sac-cliente, vista-hub-sac-time e vista-hub-sac-configuracao v01 em Web, PWA e Mobile (com o card do SAC, `RN-295`); cenários sem mudança |
+| **v04** | 2026-11-12 17:21 | Retorno do arquiteto e do designer: `RNF-229` (terça 10:00, feriados nacionais com Sexta-feira Santa e 20/11, Carnaval e Corpus Christi úteis), `RNF-230-api` (conversa ao vivo), `RN-296-api` (409 PRAZO_AVALIACAO_VENCIDO e TRANSICAO_INVALIDA), `RN-292-api` (503 VERIFICACAO_INDISPONIVEL, 422 no campo anexos), `RF-171-api` (403 do time), `RN-290` (encerrar de Aguardando cliente; mensagem no Resolvido 409), `RN-289` e `RF-179` (pedido sem login cumpre o prazo ao resolver, mensagem como nota interna), `RN-294` (reabrir sem limite), `RF-178` (nota obrigatória, Cancelar não confirma), `RF-181-api` (GET com U); textos das vistas em `RF-171` a `RF-177`, `RF-181`, `RN-288`; ordem das métricas em `RN-295` |
+| v03 | 2026-11-12 17:20 | Telas: vistas vista-hub-sac-cliente, vista-hub-sac-time e vista-hub-sac-configuracao v01 em Web, PWA e Mobile (com o card do SAC, `RN-295`); cenários sem mudança |
 | v02 | 2026-11-12 17:19 | Diagramas: sac-casos-de-uso, sac-sequencia (com as vistas previstas), sac-contrato-api, sac-classes e sac-documentos v01; cenários sem mudança |
 | v01 | 2026-11-12 16:58 | Criação: chamados da conta master e do autônomo com o time deboaz (`RF-171` a `RF-181`), regras (`RN-288` a `RN-297`) e medidas (`RNF-229` a `RNF-231`), com as âncoras -api; telas e diagramas a desenhar |
 
 ---
 
-<sub>boaz · v03 · 2026-11-12 17:20 · `1_Requisitos/18_modulo-sac.md`</sub>
+<sub>boaz · v04 · 2026-11-12 17:21 · `1_Requisitos/18_modulo-sac.md`</sub>
