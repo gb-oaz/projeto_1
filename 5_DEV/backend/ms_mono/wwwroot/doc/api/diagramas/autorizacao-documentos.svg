@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1720 900" width="1720" height="900">
   <title>Autorização · documentos</title>
-  <desc>Modelo de dados do requisito 17-b (Módulo Usuários · Autorização): as permissões embutidas em usuarios com versao e pv, o registro imutável das mudanças, o pv da sessão no Redis comparado em cada pedido, e as coleções modulos e contratacoes que limitam o que pode ser concedido. v01: criação. v02: fiel ao ms_mono — permissoes.suspensos não é gravado (RN-238 sai do cálculo), modulos traz quemUsa, tipo ADMINISTRADOR, índice de registrosPermissao por usuarioId + em, e salvar ainda grava em duas operações (RNF-223 pede uma). v03: índices como Indices.cs cria na partida — login único criado, registrosPermissao por usuarioId + em + versao; contratacoes com _id e sigla, ainda sem índice.</desc>
+  <desc>Modelo de dados do requisito 17-b (Módulo Usuários · Autorização): as permissões embutidas em usuarios com versao e pv, o registro imutável das mudanças, o pv da sessão no Redis comparado em cada pedido, e as coleções modulos e contratacoes que limitam o que pode ser concedido. v01: criação. v02: fiel ao ms_mono — permissoes.suspensos não é gravado (RN-238 sai do cálculo), modulos traz quemUsa, tipo ADMINISTRADOR, índice de registrosPermissao por usuarioId + em, e salvar ainda grava em duas operações (RNF-223 pede uma). v03: índices como Indices.cs cria na partida — login único criado, registrosPermissao por usuarioId + em + versao; contratacoes com _id e sigla, ainda sem índice. v04: permissoes.suspensos gravado como [{mod, abas}] (17-b v31: RN-285 a RN-287) — a descontratação move a permissão de mods para suspensos e sobe versao e pv, a recontratação a devolve; o token de exemplo é o de pv 8, já sem o módulo suspenso.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -117,10 +117,10 @@
     <text class="title" x="40" y="72">Autorização · documentos</text>
     <text class="subtitle" x="40" y="94">Permissões no usuário, registro de mudanças, a versão nas sessões e as coleções de módulos e contratações</text>
     <text class="wm-meta-label" x="1432" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1432" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1456" y="71" text-anchor="middle">v03</text>
+    <rect class="wm-badge" x="1432" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1456" y="71" text-anchor="middle">v04</text>
     <line class="wm-sep" x1="1504" y1="32" x2="1504" y2="80"/>
     <text class="wm-meta-label" x="1528" y="44">DATA</text>
-    <text class="wm-meta-value" x="1528" y="72">2026-11-07 · 14:02</text>
+    <text class="wm-meta-value" x="1528" y="72">2026-11-12 · 00:50</text>
   </g>
   <g id="desenho" transform="translate(0,152)">
     <path class="edge edge-async" d="M300,372 L300,324" marker-end="url(#seta-aberta)"/>
@@ -134,12 +134,12 @@
     <text class="mono" x="54" y="78" xml:space="preserve">tipo: ADMINISTRADOR | MEMBRO_TIME | MASTER | …</text>
     <text class="mono" x="54" y="96" xml:space="preserve">estado</text>
     <rect class="node-blue" x="52" y="110" width="496" height="138" rx="4"/><text class="label" x="62" y="129">permissoes  · staff e membro do time</text>
-    <text class="mono" x="66" y="150" xml:space="preserve">versao: 7  (If-Match no PUT, RNF-222)</text>
-    <text class="mono" x="66" y="168" xml:space="preserve">pv: 7  (vai no token, RN-239)</text>
+    <text class="mono" x="66" y="150" xml:space="preserve">versao: 8  (If-Match no PUT, RNF-222)</text>
+    <text class="mono" x="66" y="168" xml:space="preserve">pv: 8  (vai no token, RN-239)</text>
     <text class="mono" x="66" y="186" xml:space="preserve">mods:</text>
     <text class="mono" x="66" y="204" xml:space="preserve">  "MOD-03": "CU"</text>
-    <text class="mono" x="66" y="222" xml:space="preserve">  "MOD-06": "U"</text>
-    <text class="mono" x="66" y="240" xml:space="preserve">suspensos: só no requisito (RN-238)</text>
+    <text class="mono" x="66" y="222" xml:space="preserve">suspensos: [ { "mod": "MOD-06", "abas": "U" } ]</text>
+    <text class="mono" x="66" y="240" xml:space="preserve">  só a contratação move entre os dois (RN-285 a 287)</text>
     <line class="divider" x1="40" y1="266" x2="560" y2="266"/><text class="uml-keyword" x="54" y="286">índices</text>
     <text class="mono" x="54" y="306">único: login (criado na partida)</text>
     <g id="c-registros" filter="url(#sombra)"><rect class="node-green" x="40" y="372" width="520" height="220" rx="6"/></g>
@@ -180,18 +180,17 @@
     <text class="mono" x="694" y="506" xml:space="preserve">nome · tipo · quemUsa[ ]</text>
     <line class="divider" x1="680" y1="518" x2="1140" y2="518"/><text class="uml-keyword" x="694" y="538">índices</text>
     <text class="mono" x="694" y="558">as chaves de mods vêm daqui</text>
-    <g id="c-token" filter="url(#sombra)"><rect class="node-blue" x="1260" y="0" width="420" height="204" rx="6"/></g>
+    <g id="c-token" filter="url(#sombra)"><rect class="node-blue" x="1260" y="0" width="420" height="184" rx="6"/></g>
     <text class="label-strong" x="1274" y="26">claims no token</text>
     <rect class="chip" x="1553" y="12" width="115" height="20" rx="10"/><text class="chip-text" x="1610" y="26" text-anchor="middle">não é guardado</text>
     <line class="divider" x1="1260" y1="40" x2="1680" y2="40"/>
     <text class="mono" x="1274" y="60" xml:space="preserve">{</text>
     <text class="mono" x="1274" y="78" xml:space="preserve">  "papel": "STAFF",</text>
     <text class="mono" x="1274" y="96" xml:space="preserve">  "mods": {</text>
-    <text class="mono" x="1274" y="114" xml:space="preserve">    "MOD-03": "CU",</text>
-    <text class="mono" x="1274" y="132" xml:space="preserve">    "MOD-06": "U"</text>
-    <text class="mono" x="1274" y="150" xml:space="preserve">  },</text>
-    <text class="mono" x="1274" y="168" xml:space="preserve">  "pv": 7</text>
-    <text class="mono" x="1274" y="186" xml:space="preserve">}</text>
+    <text class="mono" x="1274" y="114" xml:space="preserve">    "MOD-03": "CU"</text>
+    <text class="mono" x="1274" y="132" xml:space="preserve">  },</text>
+    <text class="mono" x="1274" y="150" xml:space="preserve">  "pv": 8</text>
+    <text class="mono" x="1274" y="168" xml:space="preserve">}</text>
     <g><path class="node-note" d="M1260,252 H1664 L1680,268 V332 H1260 Z"/><text class="muted" x="1276" y="278">Salvar grava permissoes pela versão lida</text><text class="muted" x="1276" y="298">e depois o registro (RNF-223: sem transação);</text><text class="muted" x="1276" y="318">o pv novo chega às sessões em até 1 s.</text></g>
     <g><path class="node-note" d="M1260,380 H1664 L1680,396 V460 H1260 Z"/><text class="muted" x="1276" y="406">Concedíveis = mods de quem concede que</text><text class="muted" x="1276" y="426">a conta contratou; a conta master e o</text><text class="muted" x="1276" y="446">administrador concedem tudo (RN-167).</text></g>
   </g>
@@ -206,7 +205,7 @@
     <rect class="node-note" x="762" y="47" width="14" height="14" rx="3"/><text class="label" x="784" y="58">nota</text>
     <line class="edge edge-async" x1="839" y1="54" x2="881" y2="54" marker-end="url(#seta-aberta)"/><text class="label" x="895" y="58">referência por id</text>
     <line class="divider" x1="40" y1="76" x2="1680" y2="76"/>
-    <text class="footer" x="40" y="100">v03 · índices como o ms_mono cria na partida (login, registrosPermissao com versao); contratacoes com _id e sigla, sem índice; transação ainda a fazer</text>
-    <text class="wm-file" x="1680" y="100" text-anchor="end">autorizacao-documentos_v03_20261107-1402.svg</text>
+    <text class="footer" x="40" y="100">v04 · permissoes.suspensos como [{mod, abas}]: descontratar move de mods para suspensos e sobe versao e pv; recontratar devolve (RN-285 a RN-287)</text>
+    <text class="wm-file" x="1680" y="100" text-anchor="end">autorizacao-documentos_v04_20261112-0050.svg</text>
   </g>
 </svg>

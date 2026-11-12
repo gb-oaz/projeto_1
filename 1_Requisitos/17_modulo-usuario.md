@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v106"
-data: "2026-11-11 23:31"
+versao: "v107"
+data: "2026-11-12 00:57"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v106** · 2026-11-11 23:31 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v107** · 2026-11-12 00:57 · **Em revisão**
 
 # Módulo Usuários
 
@@ -2711,9 +2711,9 @@ Cenário: o que este documento não trata
 
 [![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, e o card do módulo recontado na mesma execução, lido na abertura com Dia, Semana e Mês trocados no aparelho sem chamada, preferência salva pela Conta, ao vivo por SSE com até 3 conexões e ping de 30 s, pausa só no aparelho no encerrado, reconexão na queda de rede e fechado à 00:00 de Brasília, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v09_20261109-0111.svg)](../2_Diagramas/usuarios-sequencia_v09_20261109-0111.svg)
 
-**Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v04_20261111-2316.svg`
+**Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v05_20261112-0056.svg`
 
-[![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v04_20261111-2316.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v04_20261111-2316.svg)
+[![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v05_20261112-0056.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v05_20261112-0056.svg)
 
 **Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg`
 
@@ -2723,13 +2723,13 @@ Cenário: o que este documento não trata
 
 [![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; CardUsuarios com NumerosDoCard e PontoDaSerie e as portas IRepositorioCardUsuarios, IContagemDoCard e IConexoesAoVivo; PreferenciasDeCards do Usuário; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg)](../2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg)
 
-**Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v02_20261111-2316.svg`
+**Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v03_20261112-0056.svg`
 
-[![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v02_20261111-2316.svg)](../2_Diagramas/usuario-hexagonal_v02_20261111-2316.svg)
+[![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v03_20261112-0056.svg)](../2_Diagramas/usuario-hexagonal_v03_20261112-0056.svg)
 
-**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v19_20261111-2323.svg`
+**Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v20_20261112-0056.svg`
 
-[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos, auditoria com traceId e etapa, auditoriaErros e cardUsuarios; usuarios.criadoPor no card da staff e usuarios.preferencias; no Redis, sessao, sessoes, tentativas e aoVivo; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v19_20261111-2323.svg)](../2_Diagramas/identidade-acesso-documentos_v19_20261111-2323.svg)
+[![Modelo de documentos: contas com tempos de sessão e conferências, usuarios com permissões (mapa de módulos com versão e pv) e responsáveis, geracoesSenha, registrosPermissao, acessosAnonimos, auditoria com traceId e etapa, auditoriaErros e cardUsuarios; usuarios.criadoPor no card da staff e usuarios.preferencias; no Redis, sessao, sessoes, tentativas e aoVivo; contas iniciais com as 6 contas qa, que voltam ao estado inicial a cada partida](../2_Diagramas/identidade-acesso-documentos_v20_20261112-0056.svg)](../2_Diagramas/identidade-acesso-documentos_v20_20261112-0056.svg)
 
 ---
 
@@ -2739,7 +2739,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v106** | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", a conta master nas contagens, `RN-189`) |
+| **v107** | 2026-11-12 00:57 | Diagramas: adaptadores do ms_mono em primario/{in,out} e secundario/{in,out} (infra/out passa a secundario/out): pacotes hexagonal v02 → v03, inicialização v04 → v05, documentos v19 → v20 (também permissoes.suspensos como [{mod, abas}], 17-b `RN-287`); cenários sem mudança |
+| v106 | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", a conta master nas contagens, `RN-189`) |
 | v105 | 2026-11-11 23:28 | Diagrama: contrato de API v16 → v17 (`RN-280`: a MASTER conta em "usuários ativos" na INSTITUICAO e no AUTONOMO e em "staff" na INSTITUICAO, não no STAFF; reduzida do AUTONOMO "usuários ativos"; versao sobe em gerar-senha e nova-geracao-senha; ao vivo sem retomada nem Last-Event-ID, toda conexão começa pelo card inteiro); cenários sem mudança |
 | v104 | 2026-11-11 23:25 | `RN-280`: a conta master entra em "usuários ativos" e em "staff" na INSTITUICAO e em "usuários ativos" no AUTONOMO, não no STAFF; casos de uso que recontam o card, com gerar senha e nova geração; `RN-189` e `RN-189-api`: autônomo com 32 usuários ativos, EBFGA com 36 staff mais a master |
 | v103 | 2026-11-11 23:24 | Diagramas: documentos v18 → v19 (cardUsuarios, aoVivo e usuarios.preferencias já no código, fora do vermelho; falta 10 removida) e contrato de API v15 → v16 (PUT /_teste/relogio com 422 DADOS_INVALIDOS no campo "agora"; POST /_teste/fechamento fecha o dia mesmo já fechado); cenários sem mudança |
@@ -2754,4 +2755,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v106 · 2026-11-11 23:31 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v107 · 2026-11-12 00:57 · `1_Requisitos/17_modulo-usuario.md`</sub>

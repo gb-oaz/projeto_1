@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v31"
-data: "2026-11-12 00:44"
+versao: "v32"
+data: "2026-11-12 00:57"
 status: "Em revisão"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v31** · 2026-11-12 00:44 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v32** · 2026-11-12 00:57 · **Em revisão**
 
 # Módulo Usuários · Autorização
 
@@ -1012,21 +1012,21 @@ Cenário: o que este documento não trata
 
 [![Casos de uso da autorização: o administrador e o staff com Administrar usuários, e por generalização a conta master, veem e salvam as permissões e o registro de mudanças, com a conferência do que quem concede tem e a recarga quando outro salvou antes; quem recebe vê o módulo novo sem sair, a casca pelo token e a recusa no endereço direto; no quest, os módulos de Quem usa e da sala](../2_Diagramas/autorizacao-casos-de-uso_v01_20261101-2337.svg)](../2_Diagramas/autorizacao-casos-de-uso_v01_20261101-2337.svg)
 
-**Autorização · conceder permissões · sequência** — `2_Diagramas/autorizacao-sequencia_v05_20261109-0111.svg`
+**Autorização · conceder permissões · sequência** — `2_Diagramas/autorizacao-sequencia_v06_20261112-0054.svg`
 
-[![Sequência de conceder permissões: o administrador do deboaz concede o SAC ao membro do time e a conta master concede a Presença ao staff, com as concedíveis, o salvamento com a versão, as recusas, a nova versão nas sessões e a renovação que leva o módulo à casca, com as telas de exemplo de cada passo](../2_Diagramas/autorizacao-sequencia_v05_20261109-0111.svg)](../2_Diagramas/autorizacao-sequencia_v05_20261109-0111.svg)
+[![Sequência de conceder permissões: o administrador do deboaz concede o SAC ao membro do time e a conta master concede a Presença ao staff, com as concedíveis, o salvamento com a versão, as recusas, a nova versão nas sessões e a renovação que leva o módulo à casca, com as telas de exemplo de cada passo, e a contratação que suspende e reativa o módulo](../2_Diagramas/autorizacao-sequencia_v06_20261112-0054.svg)](../2_Diagramas/autorizacao-sequencia_v06_20261112-0054.svg)
 
-**Autorização · contrato de API** — `2_Diagramas/autorizacao-contrato-api_v09_20261108-1159.svg`
+**Autorização · contrato de API** — `2_Diagramas/autorizacao-contrato-api_v10_20261112-0052.svg`
 
-[![Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, com os códigos de erro](../2_Diagramas/autorizacao-contrato-api_v09_20261108-1159.svg)](../2_Diagramas/autorizacao-contrato-api_v09_20261108-1159.svg)
+[![Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, o módulo suspenso, com os códigos de erro](../2_Diagramas/autorizacao-contrato-api_v10_20261112-0052.svg)](../2_Diagramas/autorizacao-contrato-api_v10_20261112-0052.svg)
 
-**Autorização · classes** — `2_Diagramas/autorizacao-classes_v01_20261101-1502.svg`
+**Autorização · classes** — `2_Diagramas/autorizacao-classes_v02_20261112-0055.svg`
 
-[![Diagrama de classes da autorização: permissões do usuário com versão e pv, permissão por módulo e abas, mudança de permissão imutável, cálculo das permissões, autorização no token e exigência de cada rota, com papéis e abas](../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg)](../2_Diagramas/autorizacao-classes_v01_20261101-1502.svg)
+[![Diagrama de classes da autorização: permissões do usuário com versão e pv, permissão por módulo e abas, mudança de permissão imutável, cálculo das permissões, autorização no token e exigência de cada rota, com papéis e abas](../2_Diagramas/autorizacao-classes_v02_20261112-0055.svg)](../2_Diagramas/autorizacao-classes_v02_20261112-0055.svg)
 
-**Autorização · documentos** — `2_Diagramas/autorizacao-documentos_v03_20261107-1402.svg`
+**Autorização · documentos** — `2_Diagramas/autorizacao-documentos_v04_20261112-0050.svg`
 
-[![Modelo de dados da autorização: permissoes embutidas em usuarios com versao, pv, mods e suspensos, registrosPermissao imutável, o pv da sessao no Redis, as coleções contratacoes e modulos e as claims do token](../2_Diagramas/autorizacao-documentos_v03_20261107-1402.svg)](../2_Diagramas/autorizacao-documentos_v03_20261107-1402.svg)
+[![Modelo de dados da autorização: permissoes embutidas em usuarios com versao, pv, mods e suspensos, registrosPermissao imutável, o pv da sessao no Redis, as coleções contratacoes e modulos e as claims do token](../2_Diagramas/autorizacao-documentos_v04_20261112-0050.svg)](../2_Diagramas/autorizacao-documentos_v04_20261112-0050.svg)
 
 ---
 
@@ -1036,7 +1036,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v31** | 2026-11-12 00:44 | Módulo suspenso (`permissoes.suspensos`): `RN-285` e `RN-285-api` (descontratação suspende, recontratação devolve; 401 PERMISSOES_DESATUALIZADAS e depois 403 ACESSO_NEGADO), `RN-286` e `RN-286-api` (só a contratação suspende e reativa; PUT com o suspenso é 422 MODULO_NAO_CONTRATADO), `RN-287` (suspenso guardado com as abas, salvar não o apaga, desmarcado não volta); status → Em revisão |
+| **v32** | 2026-11-12 00:57 | Diagramas do módulo suspenso (`RN-285` a `RN-287`): sequência v05 → v06 (o aviso AVISAR_CONTRATACAO_MUDOU move a permissão entre mods e suspensos, sobe versao e pv, 401 e renovação, depois 403), contrato de API v09 → v10 (422 MODULO_NAO_CONTRATADO para o suspenso, "por" de quem descontratou), classes v01 → v02, documentos v03 → v04 (suspensos como [{mod, abas}]); cenários sem mudança |
+| v31 | 2026-11-12 00:44 | Módulo suspenso (`permissoes.suspensos`): `RN-285` e `RN-285-api` (descontratação suspende, recontratação devolve; 401 PERMISSOES_DESATUALIZADAS e depois 403 ACESSO_NEGADO), `RN-286` e `RN-286-api` (só a contratação suspende e reativa; PUT com o suspenso é 422 MODULO_NAO_CONTRATADO), `RN-287` (suspenso guardado com as abas, salvar não o apaga, desmarcado não volta); status → Em revisão |
 | v30 | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", [17 `RN-189`](17_modulo-usuario.md#RN-189)), sem mudança de fluxo |
 | v29 | 2026-11-09 01:17 | Diagrama: autorizacao-sequencia v05 com as telas das vistas hub-time-deboaz e hub-usuarios pwa v03, sem mudança de fluxo |
 | v28 | 2026-11-09 00:58 | Telas: vistas hub-usuarios web, pwa e mobile v02 → v03 (números de exemplo do card, [17 `RN-189`](17_modulo-usuario.md#RN-189)); permissões sem mudança |
@@ -1049,4 +1050,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v31 · 2026-11-12 00:44 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v32 · 2026-11-12 00:57 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
