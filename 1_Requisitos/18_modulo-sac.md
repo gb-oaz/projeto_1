@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "18_modulo-sac"
 tipo: "Funcionalidade"
 titulo: "SAC"
-versao: "v02"
-data: "2026-11-12 17:19"
+versao: "v03"
+data: "2026-11-12 17:20"
 status: "Rascunho"
 objetivo: "permitir que a conta master da instituição e o educador autônomo abram chamados para falar com o time deboaz, acompanhem a conversa até a solução e avaliem o atendimento, e que o time deboaz atenda todos os chamados dentro do prazo de cada categoria."
 ---
 
-> **boaz · Funcionalidade** · `18_modulo-sac` · **v02** · 2026-11-12 17:19 · **Rascunho**
+> **boaz · Funcionalidade** · `18_modulo-sac` · **v03** · 2026-11-12 17:20 · **Rascunho**
 
 # SAC
 
@@ -1161,7 +1161,47 @@ Cenário: o que o SAC não faz
 
 ## Telas
 
-> Vistas a desenhar pelo `deboaz-uxui`, uma por plataforma (Web, PWA e Mobile): `vista-hub-sac-cliente` (Meus chamados, Abrir chamado, conversa e avaliação), `vista-hub-sac-time` (fila, conversa com nota interna, pedido de senha da master) e `vista-hub-sac-configuracao` (prazos por categoria)
+### Web
+
+**Hub · SAC da conta · web · vista** — `2_Diagramas/vista-hub-sac-cliente-web_v01_20261112-1716.svg`
+
+[![Web: Meus chamados no medium; no expanded, a lista com a conversa Aguardando sua resposta, com Abrir chamado (erro Escolha a categoria) e com o chamado fechado; no medium, a avaliação Como foi o atendimento?](../2_Diagramas/vista-hub-sac-cliente-web_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-cliente-web_v01_20261112-1716.svg)
+
+**Hub · SAC do time deboaz · web · vista** — `2_Diagramas/vista-hub-sac-time-web_v01_20261112-1716.svg`
+
+[![Web: fila do time no medium; no expanded, a fila com a conversa com nota interna e com o pedido de senha da master; no medium, o diálogo de assumir chamado de outro](../2_Diagramas/vista-hub-sac-time-web_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-time-web_v01_20261112-1716.svg)
+
+**Hub · SAC · configuração · web · vista** — `2_Diagramas/vista-hub-sac-configuracao-web_v01_20261112-1716.svg`
+
+[![Web: aba Configuração com os prazos por categoria no medium e o erro Prazo entre 1 e 80 h úteis no expanded](../2_Diagramas/vista-hub-sac-configuracao-web_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-configuracao-web_v01_20261112-1716.svg)
+
+### PWA
+
+**Hub · SAC da conta · pwa · vista** — `2_Diagramas/vista-hub-sac-cliente-pwa_v01_20261112-1716.svg`
+
+[![PWA: Meus chamados com Nova resposta, sem chamados, Abrir chamado com anexos e o erro Escolha a categoria, menu de categorias, aviso de aberto, conversa com linha do tempo, Resolveu?, avaliação com 5 estrelas, chamado fechado, encerrar, chamado relacionado, não encontrado e o card do SAC da instituição e do autônomo sem chamados](../2_Diagramas/vista-hub-sac-cliente-pwa_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-cliente-pwa_v01_20261112-1716.svg)
+
+**Hub · SAC do time deboaz · pwa · vista** — `2_Diagramas/vista-hub-sac-time-pwa_v01_20261112-1716.svg`
+
+[![PWA: fila com busca, filtros e Atrasado, Assumir, nota interna com Pedir informação e Resolver (erro Escreva a solução para a conta), assumir chamado de outro, pedido de senha da master com e sem o Usuários, avaliação vista pelo time e o card do SAC do deboaz](../2_Diagramas/vista-hub-sac-time-pwa_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-time-pwa_v01_20261112-1716.svg)
+
+**Hub · SAC · configuração · pwa · vista** — `2_Diagramas/vista-hub-sac-configuracao-pwa_v01_20261112-1716.svg`
+
+[![PWA: aba Configuração com o prazo da primeira resposta de cada categoria em horas úteis, o erro Prazo entre 1 e 80 h úteis e o aviso Prazos salvos](../2_Diagramas/vista-hub-sac-configuracao-pwa_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-configuracao-pwa_v01_20261112-1716.svg)
+
+### Mobile
+
+**Hub · SAC da conta · mobile · vista** — `2_Diagramas/vista-hub-sac-cliente-mobile_v01_20261112-1716.svg`
+
+[![Mobile: as mesmas telas da vista pwa no app, de Meus chamados à avaliação, e o card do SAC nos quatro tamanhos e sem dados](../2_Diagramas/vista-hub-sac-cliente-mobile_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-cliente-mobile_v01_20261112-1716.svg)
+
+**Hub · SAC do time deboaz · mobile · vista** — `2_Diagramas/vista-hub-sac-time-mobile_v01_20261112-1716.svg`
+
+[![Mobile: as mesmas telas da vista pwa no app, da fila ao pedido de senha da master, e o card do SAC do deboaz](../2_Diagramas/vista-hub-sac-time-mobile_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-time-mobile_v01_20261112-1716.svg)
+
+**Hub · SAC · configuração · mobile · vista** — `2_Diagramas/vista-hub-sac-configuracao-mobile_v01_20261112-1716.svg`
+
+[![Mobile: as mesmas telas da vista pwa no app: prazos por categoria, erro de limite e Prazos salvos](../2_Diagramas/vista-hub-sac-configuracao-mobile_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-configuracao-mobile_v01_20261112-1716.svg)
 
 ---
 
@@ -1207,9 +1247,10 @@ Cenário: o que o SAC não faz
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v02** | 2026-11-12 17:19 | Diagramas: sac-casos-de-uso, sac-sequencia (com as vistas previstas), sac-contrato-api, sac-classes e sac-documentos v01; cenários sem mudança |
+| **v03** | 2026-11-12 17:20 | Telas: vistas vista-hub-sac-cliente, vista-hub-sac-time e vista-hub-sac-configuracao v01 em Web, PWA e Mobile (com o card do SAC, `RN-295`); cenários sem mudança |
+| v02 | 2026-11-12 17:19 | Diagramas: sac-casos-de-uso, sac-sequencia (com as vistas previstas), sac-contrato-api, sac-classes e sac-documentos v01; cenários sem mudança |
 | v01 | 2026-11-12 16:58 | Criação: chamados da conta master e do autônomo com o time deboaz (`RF-171` a `RF-181`), regras (`RN-288` a `RN-297`) e medidas (`RNF-229` a `RNF-231`), com as âncoras -api; telas e diagramas a desenhar |
 
 ---
 
-<sub>boaz · v02 · 2026-11-12 17:19 · `1_Requisitos/18_modulo-sac.md`</sub>
+<sub>boaz · v03 · 2026-11-12 17:20 · `1_Requisitos/18_modulo-sac.md`</sub>
