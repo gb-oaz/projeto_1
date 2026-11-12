@@ -1,7 +1,7 @@
 # qa · backend · integração
 
 Testes de aceitação da API: os **Cenários de API** dos requisitos
-(`1_Requisitos/*.html`, seção `cenarios-api`) rodando contra o backend no ar.
+(`1_Requisitos/*.md`, seção `cenarios-api`) rodando contra o backend no ar.
 Cada cenário em Gherkin vira um teste xUnit que faz pedidos HTTP de verdade.
 
 Ferramentas: **Reqnroll** (Gherkin em português) sobre **xUnit** e o
@@ -92,6 +92,10 @@ integracao/
     ├── CardPassos.cs               GET /usuarios/card (RN-189, RN-280; 15 RN-276, RN-278)
     ├── AoVivoPassos.cs             GET /usuarios/card/ao-vivo (RN-281; 15 RN-279)
     └── PreferenciasPassos.cs       GET e PUT /usuarios/eu/preferencias (RN-283)
+└── hub/sac/                        18_modulo-sac.md (chamados, anexos, configuração, card, conversa ao vivo)
+    ├── sac.feature
+    ├── SacPassos.cs                "<quem> envia <MÉTODO> /sac/…": prepara o chamado do caminho e monta o corpo
+    └── ChamadosDoExemplo.cs        chamados, anexos e mensagens dos exemplos; a fila do time; ganchos de teste do SAC
 ```
 
 A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
@@ -119,6 +123,7 @@ Os outros requisitos, do mesmo jeito:
 | `17_modulo-usuario-b-autorizacao.md` | `commons/autorizacao/autorizacao.feature` | `Autorização` |
 | `17_modulo-usuario.md` | `hub/usuarios/usuarios.feature` | `Usuários` |
 | `15_modulos.md` | `hub/usuarios/modulos.feature` | `Módulos · card do Usuários` |
+| `18_modulo-sac.md` | `hub/sac/sac.feature` | `SAC` |
 
 `hub/usuarios/contrato.feature` não é cópia: traz as respostas do contrato
 (`usuarios-contrato-api` v15) que o requisito ainda não tem como cenário, com a
@@ -142,7 +147,7 @@ requisito.
 **Passo que ainda não dá para testar**: `throw new PendingStepException("motivo")`.
 O cenário sai como pulado, com o motivo na saída. Os casos de hoje: o
 contrato ainda não tem o endereço (sala ao vivo, troca de chave, os pedidos
-da Presença e do Quiz, a caixa do SAC), é tela (fica no qa do
+da Presença e do Quiz), é tela (fica no qa do
 frontend), só o banco mostra (fica nos testes do backend), é segredo do Key
 Vault ou é fora de escopo.
 
@@ -311,6 +316,20 @@ ela.
   daí), `DELETE /_teste/relogio` (volta ao real) e `POST /_teste/fechamento`
   (roda o fechamento da 00:00 de Brasília na hora, 204). Sem eles, 404. O
   relógio volta ao real no fim do cenário que o mudou.
+- **SAC** (`hub/sac/ChamadosDoExemplo.cs`, 18 v04, contrato sac v01): os
+  números dos exemplos (`SAC-000042`, `anx-7f3a21`, `msg-000318`, `ajuda-000087`)
+  viram os gerados pelo backend, pelo `Mundo.Apelidos`; o SAC-000045 é do
+  Pedro, os outros da EBFGA; o time é o Caio (e a Ana Lima) com "MOD-02" "U".
+  O tempo (7 dias de Aguardando cliente e de Resolvido, prazo de avaliação, 24 h
+  dos anexos, horas úteis) anda pelo relógio de teste; com o mesmo resguardo,
+  o backend expõe `POST /_teste/sac/agendamento` (roda na hora o
+  AgendamentoDoSac: prazos e descarte de anexos, 204), `PUT
+  /_teste/sac/verificacao` (`{"disponivel": false}`: verificação dos anexos
+  fora do ar, 204) e `DELETE /_teste/sac/verificacao` (volta, 204); a
+  verificação trata como ameaça o arquivo com a assinatura de teste EICAR. A
+  cada salto do relógio as pessoas entram de novo (o token vence pelo relógio
+  da aplicação). O pedido de senha (17 RF-111, RN-274) é conferido pela fila do
+  time; o campo `chamado` de "pedidosAjuda" só o banco mostra (testes do backend).
 - **Card ao vivo** (`suporte/AoVivo.cs`): a conexão SSE fica aberta pela
   suíte e fecha no fim do cenário; os tempos (intervalo, ping de 30 s) são
   esperados de verdade, com 5 s de folga, por isso esses cenários levam até

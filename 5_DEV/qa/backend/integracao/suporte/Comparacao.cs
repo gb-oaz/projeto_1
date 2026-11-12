@@ -6,16 +6,22 @@ namespace Boaz.Qa.Integracao.Suporte;
 // Confere a resposta com o JSON do cenário: os campos do exemplo precisam
 // estar na resposta com o mesmo valor; listas em qualquer ordem; data e hora
 // do exemplo só pedem uma data e hora; "eyJ…" só pede o começo. Com exato,
-// campo a mais também é diferença (os mods de um token, por exemplo).
+// campo a mais também é diferença (os mods de um token, por exemplo). Com
+// folga, a data e hora do exemplo vale de verdade, com essa folga: o pedido
+// feito com o relógio de teste numa hora do exemplo (18 RF-171, prazoResposta).
 public static partial class Comparacao
 {
-    public static void Confere(JsonNode? esperado, JsonNode? atual, string caminho = "$", bool exato = false)
+    public static void Confere(JsonNode? esperado, JsonNode? atual, string caminho = "$", bool exato = false,
+        TimeSpan? folga = null)
     {
-        var erro = Diferenca(esperado, atual, caminho, exato);
+        var erro = Diferenca(esperado, atual, caminho, exato, folga);
         if (erro is not null) throw new Xunit.Sdk.XunitException($"{erro}\nresposta: {atual?.ToJsonString()}");
     }
 
-    static string? Diferenca(JsonNode? esperado, JsonNode? atual, string caminho, bool exato)
+    // true se o atual tem os campos do esperado, como em Confere
+    public static bool Contem(JsonNode? esperado, JsonNode? atual) => Diferenca(esperado, atual, "$", false, null) is null;
+
+    static string? Diferenca(JsonNode? esperado, JsonNode? atual, string caminho, bool exato, TimeSpan? folga)
     {
         switch (esperado)
         {
@@ -26,7 +32,7 @@ public static partial class Comparacao
                 foreach (var (campo, valor) in objeto)
                 {
                     if (!a.ContainsKey(campo)) return $"{caminho}.{campo}: ausente";
-                    if (Diferenca(valor, a[campo], $"{caminho}.{campo}", exato) is { } e) return e;
+                    if (Diferenca(valor, a[campo], $"{caminho}.{campo}", exato, folga) is { } e) return e;
                 }
                 if (exato && a.FirstOrDefault(c => !objeto.ContainsKey(c.Key)) is { Key: not null } extra) return $"{caminho}.{extra.Key}: a mais";
                 return null;
@@ -36,7 +42,7 @@ public static partial class Comparacao
                 var livres = l.ToList();
                 for (var i = 0; i < lista.Count; i++)
                 {
-                    var par = livres.FirstOrDefault(x => Diferenca(lista[i], x, caminho, exato) is null);
+                    var par = livres.FirstOrDefault(x => Diferenca(lista[i], x, caminho, exato, folga) is null);
                     if (par is null && livres.Count > 0) return $"{caminho}[{i}]: nenhum item igual a {lista[i]!.ToJsonString()}";
                     livres.Remove(par);
                 }
@@ -47,7 +53,11 @@ public static partial class Comparacao
                 {
                     var s = esperado.GetValue<string>();
                     var veio = atual?.GetValueKind() == System.Text.Json.JsonValueKind.String ? atual.GetValue<string>() : null;
-                    if (DataHora().IsMatch(s)) return veio is not null && DateTimeOffset.TryParse(veio, out _) ? null : $"{caminho}: esperava data e hora, veio {atual?.ToJsonString()}";
+                    if (DataHora().IsMatch(s))
+                    {
+                        if (veio is null || !DateTimeOffset.TryParse(veio, out var data)) return $"{caminho}: esperava data e hora, veio {atual?.ToJsonString()}";
+                        return folga is not { } f || (data - DateTimeOffset.Parse(s)).Duration() <= f ? null : $"{caminho}: esperava {s}, com folga de {f}, veio {veio}";
+                    }
                     if (s.EndsWith('…')) return veio?.StartsWith(s[..^1], StringComparison.Ordinal) == true ? null : $"{caminho}: esperava começar com {s[..^1]}, veio {atual?.ToJsonString()}";
                 }
                 return JsonNode.DeepEquals(esperado, atual) ? null : $"{caminho}: esperava {texto}, veio {atual?.ToJsonString()}";

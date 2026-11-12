@@ -62,5 +62,23 @@ public sealed class Api : IDisposable
         return new Resposta((int)resposta.StatusCode, await resposta.Content.ReadAsStringAsync(), cookies, cabecalhos);
     }
 
+    // POST multipart/form-data com um arquivo no campo do contrato (18 RN-292:
+    // POST /sac/anexos, campo "arquivo"); o tipo vai como o navegador mandaria,
+    // pela extensão, e o backend confere pelo conteúdo
+    public async Task<Resposta> EnviarArquivo(string caminho, string campo, string nome, byte[] conteudo,
+        string tipo, string? token = null)
+    {
+        using var pedido = new HttpRequestMessage(HttpMethod.Post, caminho.TrimStart('/'));
+        var arquivo = new ByteArrayContent(conteudo);
+        arquivo.Headers.ContentType = new MediaTypeHeaderValue(tipo);
+        pedido.Content = new MultipartFormDataContent { { arquivo, campo, nome } };
+        if (token is not null) pedido.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        using var resposta = await http.SendAsync(pedido);
+        var cabecalhos = resposta.Headers.Concat(resposta.Content.Headers)
+            .GroupBy(c => c.Key, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => string.Join(",", g.SelectMany(c => c.Value)), StringComparer.OrdinalIgnoreCase);
+        return new Resposta((int)resposta.StatusCode, await resposta.Content.ReadAsStringAsync(), [], cabecalhos);
+    }
+
     public void Dispose() => http.Dispose();
 }

@@ -82,7 +82,8 @@ public sealed partial class IndicesPassos(Partida partida)
     {
         var esperados = new List<Indice>();
         var semExpiracao = false;
-        foreach (var parte in descricao.Split(", ", StringSplitOptions.TrimEntries))
+        // "; chamado": o índice novo depois do motivo (17 v109, pedidosAjuda)
+        foreach (var parte in descricao.Split([", ", "; "], StringSplitOptions.TrimEntries))
         {
             if (parte == "sem prazo de expiração")
             {

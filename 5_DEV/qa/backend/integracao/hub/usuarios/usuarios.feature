@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v108), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v109), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -157,6 +157,7 @@ Funcionalidade: Usuários
       }
       """
     Então a resposta é 202 e a mensagem entra no SAC do time deboaz
+    E entra como o chamado "SAC-000087" da categoria "SENHA_CONTA_MASTER", já na criação
 
   @RF-112
   Cenário: professor que saiu da escola
@@ -700,6 +701,7 @@ Funcionalidade: Usuários
     Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "ESQUECI_SENHA_MASTER"
     E os dois com o traceId de X-Trace-Id, sem quem e sem contaId
     E o "CONCLUIDO" vai com o alvo "ajuda-000087", o pedido gravado em "pedidosAjuda"
+    E o id do pedido é "ajuda-" com o número do chamado, e o campo chamado é "SAC-000087"
 
   @RN-274
   Cenário: quarto pedido do dia
@@ -1404,7 +1406,7 @@ Funcionalidade: Usuários
       | geracoesSenha      | usuarioId+pedidaEm↓, resumoComprovante, contaId+pedidaEm      |
       | registrosPermissao | usuarioId+em↓+versao↓                                         |
       | cardUsuarios       | contaId+perfil+usuarioId único                                |
-      | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205             |
+      | pedidosAjuda       | aparelho+quando, o limite por aparelho da RNF-205; chamado    |
 
   @RNF-227
   Cenário: segunda partida não duplica

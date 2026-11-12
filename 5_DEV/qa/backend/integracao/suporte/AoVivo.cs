@@ -60,12 +60,14 @@ public sealed class Fluxo : IDisposable
         }
     }
 
-    // sem token (null): a recusa 401 do contrato
-    public static async Task<Fluxo> Abrir(string nome, string caminho, string? token)
+    // sem token (null): a recusa 401 do contrato. ultimoId: o cabeçalho
+    // Last-Event-ID da reconexão (18 RNF-230)
+    public static async Task<Fluxo> Abrir(string nome, string caminho, string? token, string? ultimoId = null)
     {
         var fluxo = new Fluxo { Nome = nome, Caminho = caminho };
         using var pedido = new HttpRequestMessage(HttpMethod.Get, caminho.TrimStart('/'));
         if (token is not null) pedido.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        if (ultimoId is not null) pedido.Headers.TryAddWithoutValidation("Last-Event-ID", ultimoId);
         pedido.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
         using var cabecalhos = CancellationTokenSource.CreateLinkedTokenSource(fluxo.parar.Token);
         cabecalhos.CancelAfter(TimeSpan.FromSeconds(10));
@@ -176,9 +178,9 @@ public sealed class AoVivo : IDisposable
 {
     public List<Fluxo> Fluxos { get; } = [];
 
-    public async Task<Fluxo> Abrir(string nome, string caminho, string? token)
+    public async Task<Fluxo> Abrir(string nome, string caminho, string? token, string? ultimoId = null)
     {
-        var fluxo = await Fluxo.Abrir(nome, caminho, token);
+        var fluxo = await Fluxo.Abrir(nome, caminho, token, ultimoId);
         Fluxos.Add(fluxo);
         return fluxo;
     }
