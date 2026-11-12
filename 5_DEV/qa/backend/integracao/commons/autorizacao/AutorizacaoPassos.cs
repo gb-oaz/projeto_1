@@ -29,8 +29,8 @@ public sealed partial class AutorizacaoPassos(Mundo mundo, Execucoes execucoes)
     // "a Maria com Administrar usuários e a Utilização da Sugestão e do Quiz"
     [Given(@"^(a Maria|o staff João Lima|o João|o membro do time Caio Lima) (?:só )?com (Administrar usuários.*|a Utilização.*)$")]
     // "a Maria com ""MOD-03"" só com ""C""", "a Ana com ""MOD-05"" com ""U"" concedida pelo João"
-    // (", na versão 7" no fim é de SuspensoPassos.cs)
-    [Given(@"^(a Maria|o professor João|o João|a Ana|o Paulo)(?:, da escola ""EBFGA"",)? com (""MOD-(?:(?!, na versão).)+)$")]
+    // (", na versão 7" e "em mods" no fim são de SuspensoPassos.cs)
+    [Given(@"^(a Maria|o professor João|o João|a Ana|o Paulo)(?:, da escola ""EBFGA"",)? com (""MOD-(?:(?!, na versão).)+)(?<! em mods)$")]
     public async Task ComPermissoes(string quem, string permissoes)
     {
         var pessoa = await Pessoa(quem);
@@ -282,8 +282,7 @@ public sealed partial class AutorizacaoPassos(Mundo mundo, Execucoes execucoes)
     [When(@"^ela envia um pedido com o token de pv \d+$")]
     public Task PedidoComPvAntigo() => mundo.Enviar("GET", "/auth/sessoes", token: mundo.TokenGuardado);
 
-    // descontratar ainda não tem endereço: a contratação termina pelo banco e o
-    // aviso do Catálogo fica pendente (Mundo.ContratacaoMudou, RN-285)
+    // POST /_teste/contratacao faz o papel do Catálogo (Mundo.ContratacaoMudou, RN-285)
     [When(@"^a escola descontrata a Presença$")]
     public Task Descontrata() => mundo.ContratacaoMudou("MOD-06", contratada: false);
 

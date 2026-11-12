@@ -8,19 +8,25 @@ namespace Boaz.Qa.Integracao.Commons.Autorizacao;
 // Módulo suspenso (17-b RN-285, RN-286, RN-287): os passos ficam na mesma
 // classe de AutorizacaoPassos.cs, para usar Mods e ModsDe.
 //
-// O estado "Presença suspensa" vem do banco (Estado.Suspender), como no
-// exemplo de RN-287: "MOD-03" com "CU" e "MOD-05" com "U" em mods e "MOD-06"
-// com "U" em suspensos. Descontratar e contratar de novo passam por
-// Mundo.ContratacaoMudou, que fica pendente enquanto o aviso do Catálogo não
-// tem endereço. O que só o documento mostra ("suspensos") é lido por
+// O estado "Presença suspensa" vem do banco (Estado.Suspender), com os mods
+// que a linha seguinte do Dado diz ("a Maria com … em mods"). Descontratar e
+// contratar de novo passam por Mundo.ContratacaoMudou (POST /_teste/contratacao,
+// contrato v11); o pedido da Presença é GET /_teste/modulo/MOD-06 (sequência
+// v07, passos 64 e 73). O que só o documento mostra ("suspensos") é lido por
 // PermissoesGuardadas (quarta exceção do README, seção 6).
 public sealed partial class AutorizacaoPassos
 {
-    const string SemPresencaNoContrato =
-        "o contrato ainda não tem endereço da Presença (MOD-06): o 403 ACESSO_NEGADO do módulo suspenso fica pendente";
+    // o pedido da Presença, que não tem endereço próprio (contrato v11)
+    const string PedidoDaPresencaDeTeste = "/_teste/modulo/MOD-06";
 
-    // quem tinha a Presença quando a contratação mudou (RN-286)
+    // quem está com a Presença suspensa no Dado (RN-286, "só a contratação reativa")
     readonly List<(Pessoa Pessoa, string Abas)> comAPresenca = [];
+
+    // a versão da Presença suspensa, para a linha "em mods" a manter
+    int versaoSuspensa;
+
+    // quem descontratou na execução do Catálogo (RN-286)
+    Pessoa? quemMudou;
 
     // registro do histórico que o Então conferiu por último ("essa versão")
     JsonObject? registro;
@@ -45,7 +51,6 @@ public sealed partial class AutorizacaoPassos
         var mods = Mods(permissoes);
         await mundo.Conceder(maria, mods);
         await Estado.DefinirVersao(maria.Id, versao);
-        comAPresenca.Add((maria, mods.GetValueOrDefault("MOD-06", "")));
         mundo.Sujeito = maria;
         return maria;
     }
@@ -56,31 +61,52 @@ public sealed partial class AutorizacaoPassos
     [Given(@"^a Presença da Maria suspensa$")]
     public Task Suspensa() => PresencaSuspensa(8);
 
-    // a Maria com a sessão aberta e o token de pv igual à versão ("o token de pv 8")
+    // só a Presença suspensa, sem contratação em vigor; os mods vêm da linha
+    // seguinte (MaisEmMods)
     async Task PresencaSuspensa(int versao)
     {
         var maria = await mundo.Maria();
-        await mundo.Conceder(maria, new() { ["MOD-03"] = "CU", ["MOD-05"] = "U" });
+        versaoSuspensa = versao;
         await mundo.Descontratar("MOD-06");
-        await Estado.Suspender(maria.Id, "MOD-06", "U", versao);
-        mundo.Atual = await mundo.Entrar(maria, Navegador);
-        mundo.TokenGuardado = mundo.Atual.Acesso;
+        await SuspensaComSessao(maria);
         comAPresenca.Add((maria, "U"));
         mundo.Sujeito = maria;
     }
 
-    // a Maria (versão 7, como nos exemplos) e o João tinham a Presença; o aviso
-    // é o Quando seguinte, "o Catálogo avisa que a contratação da EBFGA mudou"
-    [Given(@"^a execução do Catálogo em que o membro do time Caio descontrata a Presença da EBFGA$")]
-    public async Task CaioDescontrata()
+    // "E a Maria com ""MOD-03"" com ""CU"" e ""MOD-05"" com ""U"" em mods": o PUT do
+    // preparo sobe a versão; a suspensão é gravada de novo na versão do Dado, e
+    // a sessão aberta depois, com o token de pv igual a ela ("o token de pv 8")
+    [Given(@"^a Maria com (""MOD-.+) em mods$")]
+    public async Task MaisEmMods(string permissoes)
     {
-        await MariaCom(@"""MOD-06"" com ""U""", 7);
-        var joao = await mundo.Joao();
-        await mundo.Conceder(joao, new() { ["MOD-06"] = "U" });
-        comAPresenca.Add((joao, "U"));
-        await mundo.Caio();
-        await mundo.Descontratar("MOD-06");
+        var maria = await mundo.Maria();
+        await mundo.Conceder(maria, Mods(permissoes));
+        await SuspensaComSessao(maria);
     }
+
+    async Task SuspensaComSessao(Pessoa maria)
+    {
+        await Estado.Suspender(maria.Id, "MOD-06", "U", versaoSuspensa);
+        mundo.Atual = await mundo.Entrar(maria, Navegador);
+        mundo.TokenGuardado = mundo.Atual.Acesso;
+    }
+
+    [Given(@"^a Maria com ""(MOD-\d+)"" com ""(\w+)"", na versão (\d+), e o João com ""(MOD-\d+)"" com ""(\w+)""$")]
+    public async Task MariaEJoao(string modMaria, string abasMaria, int versao, string modJoao, string abasJoao)
+    {
+        var joao = await mundo.Joao();
+        await mundo.Conceder(joao, new() { [modJoao] = abasJoao });
+        var maria = await mundo.Maria();
+        await mundo.Conceder(maria, new() { [modMaria] = abasMaria });
+        await Estado.DefinirVersao(maria.Id, versao);
+    }
+
+    // o Caio é quem descontrata; o aviso é o Quando seguinte
+    [Given(@"^a execução do Catálogo em que o membro do time Caio descontrata a Presença da EBFGA$")]
+    public async Task CaioDescontrata() => quemMudou = await mundo.Caio();
+
+    [When(@"^o Catálogo avisa que a contratação da EBFGA mudou$")]
+    public async Task CatalogoAvisa() => await mundo.ContratacaoMudou("MOD-06", contratada: false, por: quemMudou);
 
     [Given(@"^a conta master tendo desmarcado a Presença da Maria, com a Presença contratada$")]
     public async Task MasterDesmarcou()
@@ -105,14 +131,13 @@ public sealed partial class AutorizacaoPassos
     }
 
     // ── pedidos ─────────────────────────────────────────────────────────────
-    // o 401 do pv antigo vem antes da rota (RF-148): o pedido vai a
-    // GET /auth/sessoes, como em "ela envia um pedido com o token de pv 6",
-    // porque a Presença ainda não tem endereço no contrato
+    // o token guardado no Dado (pv antigo); depois da renovação, o da sessão
     [When(@"^a Maria envia um pedido da Presença com o token de pv \d+$")]
-    public Task PedidoDaPresenca() => mundo.Enviar("GET", "/auth/sessoes", token: mundo.TokenGuardado);
+    public Task PedidoDaPresenca() => mundo.Enviar("GET", PedidoDaPresencaDeTeste, token: mundo.TokenGuardado);
 
     [Then(@"^o mesmo pedido da Presença com o token de pv \d+ recebe 403 ACESSO_NEGADO$")]
-    public static void PresencaNegada() => throw new PendingStepException(SemPresencaNoContrato);
+    public async Task PresencaNegada() =>
+        Respostas.Confere(await mundo.Enviar("GET", PedidoDaPresencaDeTeste, token: mundo.Atual!.Acesso), 403, "ACESSO_NEGADO");
 
     [When(@"^a conta master envia PUT (/usuarios/\S+/permissoes) com If-Match ""(\d+)"" e:$")]
     public async Task MasterSalvaNaVersao(string caminho, string versao, string json) =>
@@ -188,11 +213,10 @@ public sealed partial class AutorizacaoPassos
     }
 
     // ── o que fica guardado ────────────────────────────────────────────────
-    [Then(@"^""(MOD-\d+)"" fica suspenso em cada usuário da EBFGA que o tinha marcado$")]
-    public async Task SuspensoEmCada(string mod)
+    [Then(@"^""(MOD-\d+)"" fica suspenso com ""(\w+)"" para a Maria e para o João$")]
+    public async Task SuspensoParaOsDois(string mod, string abas)
     {
-        Assert.NotEmpty(comAPresenca);
-        foreach (var (pessoa, abas) in comAPresenca)
+        foreach (var pessoa in new[] { await mundo.Maria(), await mundo.Joao() })
         {
             Assert.DoesNotContain(mod, (await ModsDe(pessoa)).Keys);
             Assert.Equal(abas, await PermissoesGuardadas.AbasSuspensas(pessoa.Id, mod));

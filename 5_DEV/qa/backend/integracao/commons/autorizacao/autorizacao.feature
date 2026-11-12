@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.md (v32), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.md (v34), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Autorização
   1_Requisitos/17_modulo-usuario-b-autorizacao.md · Cenários de API
@@ -400,6 +400,7 @@ Funcionalidade: Autorização
   @RN-285
   Cenário: permissões durante a suspensão
     Dado a Presença da Maria suspensa na versão 8
+    E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
     Quando a conta master envia GET /usuarios/usr-ebfga-maria/permissoes
     Então a resposta é 200 com a versão 8
     E sem "MOD-06" em mods nem em concediveis
@@ -407,6 +408,7 @@ Funcionalidade: Autorização
   @RN-285
   Cenário: a escola contrata a Presença de novo
     Dado a Presença da Maria suspensa na versão 8
+    E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
     Quando a escola contrata a Presença de novo
     Então GET /usuarios/usr-ebfga-maria/permissoes traz a versão 9 com "MOD-06" com "U"
     E o token de pv 8 recebe 401 PERMISSOES_DESATUALIZADAS no próximo pedido
@@ -414,15 +416,17 @@ Funcionalidade: Autorização
 
   @RN-286
   Cenário: só a contratação suspende
-    Dado a execução do Catálogo em que o membro do time Caio descontrata a Presença da EBFGA
+    Dado a Maria com "MOD-06" com "U", na versão 7, e o João com "MOD-06" com "U"
+    E a execução do Catálogo em que o membro do time Caio descontrata a Presença da EBFGA
     Quando o Catálogo avisa que a contratação da EBFGA mudou
-    Então "MOD-06" fica suspenso em cada usuário da EBFGA que o tinha marcado
+    Então "MOD-06" fica suspenso com "U" para a Maria e para o João
     E GET /usuarios/usr-ebfga-maria/permissoes/historico ganha a versão 8
     E essa versão vem por "usr-dboaz-caio", com "MOD-06" de "U" para null
 
   @RN-286
   Cenário: a conta master tenta reativar
     Dado a Presença da Maria suspensa na versão 8
+    E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
     Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes com If-Match "8" e:
       """
       {
@@ -439,6 +443,7 @@ Funcionalidade: Autorização
   @RN-286
   Cenário: só a contratação reativa
     Dado a Presença da Maria suspensa
+    E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
     Quando o Catálogo avisa que a EBFGA contratou a Presença de novo
     Então "MOD-06" volta a mods com "U" em cada usuário da EBFGA que o tinha suspenso
 
@@ -467,6 +472,7 @@ Funcionalidade: Autorização
   @RN-287
   Cenário: salvar não apaga o suspenso
     Dado a Presença da Maria suspensa na versão 8
+    E a Maria com "MOD-03" com "CU" e "MOD-05" com "U" em mods
     Quando a conta master envia PUT /usuarios/usr-ebfga-maria/permissoes com If-Match "8" e:
       """
       {

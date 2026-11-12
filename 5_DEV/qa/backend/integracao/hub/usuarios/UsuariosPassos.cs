@@ -965,7 +965,7 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
     [Then(@"^quando a escola recontrata a Presença, ""(MOD-\d+)"" volta com ""(\w+)""$")]
     public async Task Recontrata(string mod, string abas)
     {
-        await mundo.Contratar(mod);
+        await mundo.ContratacaoMudou(mod, contratada: true);
         Assert.Equal(abas, Mods((await mundo.Permissoes(mundo.Sujeito!))["mods"]!).GetValueOrDefault(mod));
     }
 

@@ -473,19 +473,23 @@ public sealed partial class Mundo
     // a contratação muda e o Catálogo avisa o Usuários (AVISAR_CONTRATACAO_MUDOU,
     // 17 RN-275; 17-b RN-285 a RN-287): só esse aviso suspende e reativa o módulo
     // em cada usuário, sobe versao e pv e grava o histórico com quem descontratou
-    // ou contratou. A contratação muda pelo banco, como antes; o aviso ainda não
-    // tem endereço no contrato (nem de teste, como /_teste/relogio), por isso o
-    // passo fica pendente aqui, num lugar só: com o endereço, troca-se o throw
-    // pelo pedido
-    public const string SemAvisoDaContratacao =
-        "o contrato não tem endereço que provoque de fora o aviso do Catálogo (AVISAR_CONTRATACAO_MUDOU): " +
-        "nem descontratar no Catálogo, nem um endereço de teste como /_teste/relogio (pedido ao deboaz-arc)";
-
-    public async Task ContratacaoMudou(string moduloId, bool contratada)
+    // ou contratou. POST /_teste/contratacao (contrato autorizacao v11, grupo
+    // TESTE, mesmo resguardo do /_teste/relogio) faz o papel do Catálogo: grava
+    // contratacoes e roda o aviso, e só responde 204 depois de mover em todos.
+    // Quem muda é o membro do time Caio, como no exemplo, se o passo não disser.
+    // Não passa por Ultima: o Então confere o pedido do cenário, não o preparo
+    public async Task ContratacaoMudou(string moduloId, bool contratada, Pessoa? por = null)
     {
-        if (contratada) await Contratar(moduloId);
-        else await Descontratar(moduloId);
-        throw new Reqnroll.PendingStepException(SemAvisoDaContratacao);
+        por ??= await Caio();
+        var corpo = new JsonObject
+        {
+            ["conta"] = await Conta(),
+            ["mod"] = moduloId,
+            ["contratado"] = contratada,
+            ["por"] = por.Id,
+        };
+        Exigir(await api.Enviar("POST", "/_teste/contratacao", corpo.ToJsonString()), 204,
+            "POST /_teste/contratacao (aviso do Catálogo de teste do backend, Teste__Relogio=sim)");
     }
 
     // GET /usuarios/{id}/permissoes por quem concede (a conta master, ou o

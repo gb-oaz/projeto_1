@@ -300,10 +300,11 @@ ela.
   card guardado (`Estado.MesesAnterioresDoCard`), o tempo sem uso da sessão e
   os bloqueios seguidos.
 - **Aviso do Catálogo** (`Mundo.ContratacaoMudou`, 17 RN-275, 17-b RN-285 a
-  RN-287): a contratação muda pelo banco, mas só o aviso
-  AVISAR_CONTRATACAO_MUDOU suspende e reativa o módulo nas pessoas, e o
-  contrato ainda não tem endereço que o provoque de fora; o passo fica
-  pendente ali, num lugar só, até o endereço existir.
+  RN-287): `POST /_teste/contratacao` (`{conta, mod, contratado, por}`, 204;
+  contrato autorizacao v11, mesmo resguardo do relógio) grava a contratação e
+  roda o AVISAR_CONTRATACAO_MUDOU; quem muda é o Caio, se o passo não disser.
+  O pedido de um módulo sem endereço próprio (a Presença) é
+  `GET /_teste/modulo/{mod}` (204, 401 PERMISSOES_DESATUALIZADAS, 403).
 - **Relógio do backend** (`suporte/Relogio.cs`, 15 RN-278): só com
   `AMBIENTE=hml` e `Teste__Relogio=sim`, o backend expõe `PUT /_teste/relogio`
   (`{"agora": "2027-02-28T23:50:00-03:00"}`, 204; o relógio anda a partir
