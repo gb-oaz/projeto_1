@@ -112,6 +112,22 @@ public class CardUsuariosTests
     }
 
     [Fact]
+    public void RN_189_so_a_conta_master_e_vazio()
+    {
+        NumerosDoCard SoAMaster(int staff, int participantes, int master = 1) => new(0, staff + participantes,
+            [new(NomesDoCard.Staff, staff), new(NomesDoCard.Participantes, participantes), new(NomesDoCard.Pendentes, 0)],
+            [new(NomesDoCard.SemAcesso30Dias, 0), new(NomesDoCard.Desativados, 0), new(NomesDoCard.CodigosVencidos, 0)], master);
+
+        var soAMaster = SoAMaster(staff: 1, participantes: 0);
+        Assert.True(soAMaster.Vazio);
+        Assert.Equal((1, 1), (soAMaster.Valor, soAMaster.Apoio[0].Valor));
+        Assert.False(SoAMaster(staff: 2, participantes: 0).Vazio);
+        Assert.False(SoAMaster(staff: 1, participantes: 1).Vazio);
+        Assert.False(SoAMaster(staff: 1, participantes: 0, master: 0).Vazio);
+        Assert.False(SoAMaster(staff: 1, participantes: 0).Iguais(SoAMaster(staff: 1, participantes: 0, master: 0)));
+    }
+
+    [Fact]
     public void RN_276_dto_no_formato_comum()
     {
         var card = Novo();

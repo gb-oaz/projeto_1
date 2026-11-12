@@ -58,6 +58,7 @@ public sealed class CardsNoBanco(Armazenamento armazenamento) : IRepositorioCard
             ["valor"] = c.Atual.Valor,
             ["apoio"] = Linhas(c.Atual.Apoio),
             ["lista"] = Linhas(c.Atual.Lista),
+            ["master"] = c.Atual.Master,
         },
         ["dias"] = Serie(c.Dias, "dia"),
         ["semanas"] = Serie(c.Semanas, "semana"),
@@ -81,7 +82,8 @@ public sealed class CardsNoBanco(Armazenamento armazenamento) : IRepositorioCard
             d.Texto("usuarioId"),
             d.Inteiro("versao"),
             d.Data("atualizadoEm") ?? DateTimeOffset.UnixEpoch,
-            new NumerosDoCard(atual?.Inteiro("selo") ?? 0, atual?.Inteiro("valor") ?? 0, Linhas(atual?.Documento("apoio")), Linhas(atual?.Documento("lista"))),
+            new NumerosDoCard(atual?.Inteiro("selo") ?? 0, atual?.Inteiro("valor") ?? 0, Linhas(atual?.Documento("apoio")), Linhas(atual?.Documento("lista")),
+                atual?.Inteiro("master") ?? 0),
             Serie(d, "dias", "dia"),
             Serie(d, "semanas", "semana"),
             Serie(d, "meses", "mes"));
@@ -127,14 +129,16 @@ public sealed class ContagemNoBanco(Armazenamento armazenamento) : IContagemDoCa
         {
             var inicioDoMes = InicioDoMes(agora);
             var criados = await Contar(Usuarios, escopo & Bson.Filtro.Gte("criadoEm", Bson.Valor(inicioDoMes)), ct);
-            return new NumerosDoCard(tempo.Selo, participantes + await MasterAtiva(contaId, ct),
-                [new(N.CriadosNoMes, criados), new(N.Pendentes, pendentes)], lista);
+            var masterDoAutonomo = await MasterAtiva(contaId, ct);
+            return new NumerosDoCard(tempo.Selo, participantes + masterDoAutonomo,
+                [new(N.CriadosNoMes, criados), new(N.Pendentes, pendentes)], lista, masterDoAutonomo);
         }
         // na INSTITUICAO, a conta master entra em "staff" e em "usuários ativos"; no STAFF, não (17 v104 RN-280)
-        var staff = await Contar(Usuarios, escopo & Tipo("STAFF") & Estado("ATIVO"), ct)
-            + (perfil == PerfilCard.Instituicao ? await MasterAtiva(contaId, ct) : 0);
+        // a conta master não conta para o "vazio" (17 v108 RN-189)
+        var master = perfil == PerfilCard.Instituicao ? await MasterAtiva(contaId, ct) : 0;
+        var staff = await Contar(Usuarios, escopo & Tipo("STAFF") & Estado("ATIVO"), ct) + master;
         return new NumerosDoCard(tempo.Selo, staff + participantes,
-            [new(N.Staff, staff), new(N.Participantes, participantes), new(N.Pendentes, pendentes)], lista);
+            [new(N.Staff, staff), new(N.Participantes, participantes), new(N.Pendentes, pendentes)], lista, master);
     }
 
     public async Task<NumerosNoTempo> NoTempo(PerfilCard perfil, string contaId, string? usuarioId, DateTimeOffset agora,

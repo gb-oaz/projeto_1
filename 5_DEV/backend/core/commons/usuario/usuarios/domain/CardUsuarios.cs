@@ -69,10 +69,20 @@ public sealed record LinhaDoCard(string Chave, int Valor);
 /// <param name="Valor">O dado macro.</param>
 /// <param name="Apoio">Os números de apoio (normal).</param>
 /// <param name="Lista">Os números da lista (expandida).</param>
-public sealed record NumerosDoCard(int Selo, int Valor, IReadOnlyList<LinhaDoCard> Apoio, IReadOnlyList<LinhaDoCard> Lista)
+/// <param name="Master">
+/// A conta master ativa contada no dado macro e em "staff" (0 ou 1, 17 v104
+/// RN-280); não conta para o "vazio" (17 v108 RN-189).
+/// </param>
+public sealed record NumerosDoCard(int Selo, int Valor, IReadOnlyList<LinhaDoCard> Apoio, IReadOnlyList<LinhaDoCard> Lista, int Master = 0)
 {
-    /// <summary>Sem nenhum número: o módulo ainda não tem dados.</summary>
-    public bool Vazio => Selo == 0 && Valor == 0 && Apoio.All(l => l.Valor == 0) && Lista.All(l => l.Valor == 0);
+    /// <summary>
+    /// Sem nenhum número além da própria conta master: a conta ainda não tem
+    /// staff nem participantes (RN-189, RN-276).
+    /// </summary>
+    public bool Vazio =>
+        Selo == 0 && Valor - Master == 0
+        && Apoio.All(l => l.Valor - (l.Chave == NomesDoCard.Staff ? Master : 0) == 0)
+        && Lista.All(l => l.Valor == 0);
 
     /// <summary>Com o que muda só com o tempo refeito agora (RN-280), sem mexer no resto.</summary>
     public NumerosDoCard ComTempo(NumerosNoTempo tempo) => this with
@@ -83,7 +93,8 @@ public sealed record NumerosDoCard(int Selo, int Valor, IReadOnlyList<LinhaDoCar
 
     /// <summary>Os mesmos números.</summary>
     public bool Iguais(NumerosDoCard outros) =>
-        Selo == outros.Selo && Valor == outros.Valor && Apoio.SequenceEqual(outros.Apoio) && Lista.SequenceEqual(outros.Lista);
+        Selo == outros.Selo && Valor == outros.Valor && Master == outros.Master
+        && Apoio.SequenceEqual(outros.Apoio) && Lista.SequenceEqual(outros.Lista);
 }
 
 /// <summary>O que muda só com o tempo (RN-280): o selo e alguns números da lista, refeitos na leitura.</summary>
