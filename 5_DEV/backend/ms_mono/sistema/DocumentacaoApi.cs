@@ -1,7 +1,7 @@
-using Boaz.MsMono.Primario.Commons;
-using Boaz.MsMono.Primario.Commons.Usuario.Autenticacao;
-using Boaz.MsMono.Primario.Commons.Usuario.Autorizacao;
-using Boaz.MsMono.Primario.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Primario.In.Commons;
+using Boaz.MsMono.Primario.In.Commons.Usuario.Autenticacao;
+using Boaz.MsMono.Primario.In.Commons.Usuario.Autorizacao;
+using Boaz.MsMono.Primario.In.Commons.Usuario.Usuarios;
 using Microsoft.OpenApi;
 
 namespace Boaz.MsMono.Sistema;
