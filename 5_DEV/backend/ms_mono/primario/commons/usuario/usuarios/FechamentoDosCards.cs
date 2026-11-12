@@ -1,7 +1,7 @@
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Usuarios;
 
 // O agendamento do fechamento da 00:00 de Brasília (15 RN-278), em segundo
 // plano: confere a cada 30 s, pelo relógio da aplicação, se o dia de Brasília

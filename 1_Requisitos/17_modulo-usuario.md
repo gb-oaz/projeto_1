@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v101"
-data: "2026-11-09 09:14"
+versao: "v102"
+data: "2026-11-11 23:17"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v101** · 2026-11-09 09:14 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v102** · 2026-11-11 23:17 · **Em revisão**
 
 # Módulo Usuários
 
@@ -2692,9 +2692,9 @@ Cenário: o que este documento não trata
 
 [![Sequência do módulo Usuários: criar a conta com a sigla sugerida, criar o staff com o código de liberação, primeiro acesso com a senha gerada e o comprovante, nova geração de senha pelo superior, desativar com o fim das sessões e, no time deboaz, o código da conta master pela conferência do cadastro e o estado da conta, com as recusas de cada passo, e o card do módulo recontado na mesma execução, lido na abertura com Dia, Semana e Mês trocados no aparelho sem chamada, preferência salva pela Conta, ao vivo por SSE com até 3 conexões e ping de 30 s, pausa só no aparelho no encerrado, reconexão na queda de rede e fechado à 00:00 de Brasília, com as telas de cada fase](../2_Diagramas/usuarios-sequencia_v09_20261109-0111.svg)](../2_Diagramas/usuarios-sequencia_v09_20261109-0111.svg)
 
-**Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg`
+**Usuários · inicialização · sequência** — `2_Diagramas/usuario-inicializacao-sequencia_v04_20261111-2316.svg`
 
-[![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v03_20261107-1214.svg)
+[![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v04_20261111-2316.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v04_20261111-2316.svg)
 
 **Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v15_20261109-0912.svg`
 
@@ -2704,9 +2704,9 @@ Cenário: o que este documento não trata
 
 [![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; CardUsuarios com NumerosDoCard e PontoDaSerie e as portas IRepositorioCardUsuarios, IContagemDoCard e IConexoesAoVivo; PreferenciasDeCards do Usuário; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg)](../2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg)
 
-**Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg`
+**Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v02_20261111-2316.svg`
 
-[![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)](../2_Diagramas/usuario-hexagonal_v01_20261106-2312.svg)
+[![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v02_20261111-2316.svg)](../2_Diagramas/usuario-hexagonal_v02_20261111-2316.svg)
 
 **Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v18_20261109-0103.svg`
 
@@ -2720,7 +2720,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v101** | 2026-11-09 09:14 | Diagrama: contrato de API v14 → v15 (endereços de teste PUT e DELETE /_teste/relogio e POST /_teste/fechamento, sem login, só com AMBIENTE=hml e Teste__Relogio=sim, ligado só no backend do CI; fora disso, 404) |
+| **v102** | 2026-11-11 23:17 | Diagramas: adaptadores primários do backend em ms_mono/primario/ (antes infra/in/): pacotes da arquitetura hexagonal v01 → v02 e sequência da inicialização v03 → v04; cenários sem mudança |
+| v101 | 2026-11-09 09:14 | Diagrama: contrato de API v14 → v15 (endereços de teste PUT e DELETE /_teste/relogio e POST /_teste/fechamento, sem login, só com AMBIENTE=hml e Teste__Relogio=sim, ligado só no backend do CI; fora disso, 404) |
 | v100 | 2026-11-09 09:10 | `RN-280`: "Sem acesso há 30 dias" conta só quem existe há mais de 30 dias (criadoEm, e na conta criadaEm) e tem o último acesso há mais de 30 dias ou nulo, como no contrato v14; cenário do recém-criado que não conta |
 | v99 | 2026-11-09 09:09 | Diagrama: contrato de API v13 → v14 (GET /usuarios/card com os nomes do apoio e da lista de DEBOAZ, INSTITUICAO, STAFF e AUTONOMO; Sem acesso há 30 dias com criadoEm há mais de 30 dias e ultimoAcesso há mais de 30 dias ou nulo, na conta criadaEm e ultimoAcessoMaster) |
 | v98 | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Então ou E (`RF-155`, `RN-189`, `RN-280`); `RN-280`: "Sem acesso há 30 dias" conta também quem nunca entrou (ultimoAcesso nulo), com cenário; `RN-281`: sessão expirada por 8 h sem uso com ?intervalo=5 |
@@ -2734,4 +2735,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v101 · 2026-11-09 09:14 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v102 · 2026-11-11 23:17 · `1_Requisitos/17_modulo-usuario.md`</sub>

@@ -12,7 +12,7 @@ using GrupoAutenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Domain.GrupoDeF
 using GrupoAutorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Domain.GrupoDeFalha;
 using GrupoUsuarios = Boaz.Core.Commons.Usuario.Usuarios.Domain.GrupoDeFalha;
 
-namespace Boaz.MsMono.Infra.In.Commons;
+namespace Boaz.MsMono.Primario.Commons;
 
 // O corpo de toda resposta de erro (contratos *-contrato-api): o código, a
 // mensagem e, quando a falha tem, o campo, o tentarEm, os limites, o módulo,

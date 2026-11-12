@@ -12,9 +12,9 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Boaz.MsMono.Infra.In.Commons;
+namespace Boaz.MsMono.Primario.Commons;
 
-// Os controllers da API (infra/in/<contexto>/<feature>/*Controller.cs): finos,
+// Os controllers da API (primario/<contexto>/<feature>/*Controller.cs): finos,
 // cada ação só traduz o HTTP para a porta de entrada do caso de uso. O MVC é
 // ajustado para responder como o contrato de API manda, sem os automatismos do
 // [ApiController] que mudariam as respostas:

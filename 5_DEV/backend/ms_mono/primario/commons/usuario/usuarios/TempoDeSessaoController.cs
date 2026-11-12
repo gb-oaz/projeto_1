@@ -6,7 +6,7 @@ using Boaz.MsMono.Sistema;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Usuarios;
 
 /// <summary>
 /// O tempo de sessão (17_modulo-usuario): o do staff e dos participantes de uma

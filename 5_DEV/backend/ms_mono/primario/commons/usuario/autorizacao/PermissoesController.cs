@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using AcaoAuditada = Boaz.Core.Commons.Usuario.Usuarios.Domain.AcaoAuditada;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Autorizacao;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Autorizacao;
 
 /// <summary>O corpo do PUT: o conjunto inteiro de módulos e abas.</summary>
 /// <param name="Mods">Cada módulo (MOD-03…) com as abas concedidas ("CU", "U"…).</param>

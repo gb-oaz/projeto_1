@@ -1,6 +1,6 @@
 using Boaz.Core.Commons.Usuario.Usuarios.Dtos;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Usuarios;
 
 // Corpos dos pedidos, como chegam no JSON (usuarios-contrato-api v03). Quem
 // pede não vem no corpo: sai do token.

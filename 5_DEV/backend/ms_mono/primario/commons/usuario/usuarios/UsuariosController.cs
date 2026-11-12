@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Usuarios;
 
 /// <summary>
 /// O staff, os participantes e os membros do time (17_modulo-usuario): gerar a

@@ -20,9 +20,9 @@ Um único serviço, `ms_mono`, com a estrutura hexagonal de
 │   │   ├── guias/                guia de uso de cada API do Swagger (Markdown)
 │   │   └── exemplos/             exemplos de cada endpoint (gerados dos contratos, não edite)
 │   ├── wwwroot/doc/api/          swagger.css, design/ e diagramas/ (cópias geradas, não edite)
-│   └── infra/
-│       ├── in/<contexto>/<feature>/    controllers HTTP, finos (chamam ports/in)
-│       └── out/<contexto>/<feature>/   MongoDB e Redis (implementam ports/out)
+│   ├── primario/<contexto>/<feature>/  adaptadores primários: controllers HTTP finos, fluxo SSE,
+│   │                                   partida e agendamento (chamam ports/in)
+│   └── infra/out/<contexto>/<feature>/ adaptadores secundários: MongoDB e Redis (implementam ports/out)
 ├── tests/                        espelha core/ e ms_mono/, um xUnit por projeto
 ├── scripts/diagramas-da-doc.sh   copia de 2_Diagramas/ os diagramas que os guias mostram
 ├── scripts/exemplos-da-doc.py    gera os exemplos de cada endpoint a partir dos contratos
@@ -92,7 +92,7 @@ Ninguém se cadastra como administrador: o time deboaz nasce da configuração.
    backend grava o registro de módulos, cria os índices do MongoDB
    (`infra/out/commons/Indices.cs`, diagrama `identidade-acesso-documentos`) e
    garante as contas iniciais (`IInicializarContas`, chamado por
-   `infra/in/commons/usuario/usuarios/Partida.cs`; RN-190, RN-265 a RN-267):
+   `primario/commons/usuario/usuarios/Partida.cs`; RN-190, RN-265 a RN-267):
    - em todo ambiente, a conta do time (`conta-dboaz`, seção `Time`) e o
      administrador `usr-dboaz-admin`, com `USUARIO_ADMIN_ENTRADA` e o resumo
      (PBKDF2) de `USUARIO_ADMIN_SENHA`;

@@ -3,7 +3,7 @@ using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.MsMono.Sistema;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Autenticacao;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Autenticacao;
 
 /// <summary>A chave pública que confere a assinatura dos tokens (RNF-207, RNF-218).</summary>
 [ApiController]

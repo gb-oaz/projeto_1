@@ -5,8 +5,8 @@ using Boaz.Core.Commons.Usuario.Autorizacao.UseCases;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 using Boaz.Core.Commons.Usuario.Usuarios.UseCases;
-using Boaz.MsMono.Infra.In.Commons;
-using Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Primario.Commons;
+using Boaz.MsMono.Primario.Commons.Usuario.Usuarios;
 using Boaz.MsMono.Infra.Out.Commons;
 using Boaz.MsMono.Infra.Out.Commons.Usuario;
 using Boaz.MsMono.Infra.Out.Commons.Usuario.Autenticacao;
@@ -18,7 +18,7 @@ using Autenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Ports.Out;
 using Autorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 
 // Ponto de composição do backend (RN-149): aqui, e só aqui, as portas do
-// core/ são ligadas aos adaptadores de infra/in/ e infra/out/.
+// core/ são ligadas aos adaptadores primários (primario/) e secundários (infra/out/).
 var builder = WebApplication.CreateBuilder(args);
 var servicos = builder.Services;
 
@@ -131,7 +131,7 @@ servicos.AddSingleton<ISalvarPermissoes, SalvarPermissoes>();
 servicos.AddSingleton<ILerHistoricoDePermissoes, LerHistoricoDePermissoes>();
 servicos.AddSingleton<IAvisarContratacaoMudou, AvisarContratacaoMudou>();
 
-// ── infra/in: a partida, antes do primeiro pedido ────────────────────────────
+// ── primario: a partida, antes do primeiro pedido ────────────────────────────
 servicos.AddSingleton<Partida>();
 // o fechamento da 00:00 de Brasília, em segundo plano (15 RN-278)
 servicos.AddHostedService<FechamentoDosCards>();
@@ -147,7 +147,7 @@ if (DocumentacaoApi.Habilitada(app.Configuration))
     app.UseDocumentacaoApi();
 }
 
-// ── infra/in: os controllers (sistema/ e infra/in/<contexto>/<feature>/) ─────
+// ── primario: os controllers (sistema/ e primario/<contexto>/<feature>/) ─────
 app.MapControllers();
 
 // A partida, antes de aceitar pedidos (usuario-inicializacao-sequencia): a

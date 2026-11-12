@@ -5,7 +5,7 @@ using Boaz.MsMono.Infra.Out.Commons;
 using Boaz.MsMono.Infra.Out.Commons.Usuario.Autorizacao;
 using Microsoft.Extensions.Options;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Usuarios;
 
 // O adaptador primário da partida (diagrama usuario-inicializacao-sequencia):
 // roda no Program.cs antes de app.Run, ou seja, antes de /health e do primeiro

@@ -4,7 +4,7 @@ using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Dtos;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Usuarios;
 
 // O fluxo SSE de GET /usuarios/card/ao-vivo (contrato usuarios v15): o evento
 // "card" (id = versao, o corpo de GET /usuarios/card expandido, uma linha por

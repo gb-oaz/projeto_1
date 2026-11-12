@@ -7,7 +7,7 @@ namespace Boaz.MsMono.Infra.Out.Commons;
 // mensagem dizendo qual variável definir. A lista completa está no README do
 // backend. As entradas e senhas das contas iniciais (USUARIO_*) não são uma
 // seção: o adaptador da partida as lê pelo nome exato da variável
-// (infra/in/commons/usuario/usuarios/Partida.cs, RNF-225).
+// (primario/commons/usuario/usuarios/Partida.cs, RNF-225).
 
 // Seção "Mongo": o banco de dados dentro do servidor de ConnectionStrings:MongoDb.
 public sealed class OpcoesDoMongo

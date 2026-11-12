@@ -1,7 +1,7 @@
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Autenticacao;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Autenticacao;
 
 /// <summary>A sessão aberta no navegador: a renovação vai no cookie deboaz_renovacao e não aparece no corpo.</summary>
 /// <param name="TokenAcesso">O token de acesso (JWT), para o cabeçalho Authorization: Bearer.</param>

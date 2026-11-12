@@ -4,7 +4,7 @@ using Boaz.MsMono.Sistema;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Autenticacao;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Autenticacao;
 
 /// <summary>
 /// Entrada no hub, no quest e na sala e a confirmação da senha

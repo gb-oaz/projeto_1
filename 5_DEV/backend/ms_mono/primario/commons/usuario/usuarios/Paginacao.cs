@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Boaz.MsMono.Infra.In.Commons.Usuario.Usuarios;
+namespace Boaz.MsMono.Primario.Commons.Usuario.Usuarios;
 
 static class Paginacao
 {
