@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "14_estrutura-projetos"
 tipo: "Transversal"
 titulo: "Estrutura dos projetos"
-versao: "v17"
-data: "2026-11-12 01:58"
+versao: "v18"
+data: "2026-11-12 02:03"
 status: "Em revisão"
 objetivo: "definir uma organização de pastas e de dependências única para backend, web e mobile, que separa o domínio (core) dos adaptadores."
 ---
 
-> **boaz · Transversal** · `14_estrutura-projetos` · **v17** · 2026-11-12 01:58 · **Em revisão**
+> **boaz · Transversal** · `14_estrutura-projetos` · **v18** · 2026-11-12 02:03 · **Em revisão**
 
 # Estrutura dos projetos
 
@@ -468,9 +468,9 @@ Cenário: rodar no emulador Android
 
 ## Diagramas
 
-**Estrutura dos projetos** — `2_Diagramas/estrutura-projetos_v07_20261111-2316.svg`
+**Estrutura dos projetos** — `2_Diagramas/estrutura-projetos_v08_20261112-0202.svg`
 
-[![Estrutura dos projetos: padrão de cada feature (infra/in, components, ports/in, usecases, domain, dtos, ports/out, infra/out), agrupada por módulo quando preciso e as pastas do backend (core e ms_mono), da web (core e apps landing_page, hub, quest) e do mobile (core e apps hub, quest), as suítes do qa por alvo e tipo (backend/integracao, backend/carga, frontend/web/funcional com Cypress, frontend/mobile/funcional com Appium) com o contrato de cada uma, e as regras de dependência](../2_Diagramas/estrutura-projetos_v07_20261111-2316.svg)](../2_Diagramas/estrutura-projetos_v07_20261111-2316.svg)
+[![Estrutura dos projetos: padrão de cada feature (infra/in, components, ports/in, usecases, domain, dtos, ports/out, infra/out), agrupada por módulo quando preciso e as pastas do backend (core e ms_mono com primario/in, primario/out, secundario/in e secundario/out), da web (core e apps landing_page, hub, quest) e do mobile (core e apps hub, quest), as suítes do qa por alvo e tipo (backend/integracao, backend/carga, frontend/web/funcional com Cypress, frontend/mobile/funcional com Appium) com o contrato de cada uma, e as regras de dependência](../2_Diagramas/estrutura-projetos_v08_20261112-0202.svg)](../2_Diagramas/estrutura-projetos_v08_20261112-0202.svg)
 
 ---
 
@@ -480,7 +480,8 @@ Cenário: rodar no emulador Android
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v17** | 2026-11-12 01:58 | Adaptadores do backend em ms_mono/primario/{in,out} e ms_mono/secundario/{in,out}, sem infra/out no ms_mono (arquitetura hexagonal, `RN-143`, `RN-148`, `RNF-177`); web e mobile seguem com infra/in e infra/out |
+| **v18** | 2026-11-12 02:03 | Diagrama: estrutura-projetos v07 → v08 (ms_mono com primario/in, primario/out, secundario/in e secundario/out e o papel de cada um, `RNF-177`; regras de dependência com primario/secundario no backend e infra/in e infra/out na web e no mobile, `RN-143`, `RN-148`); cenários sem mudança |
+| v17 | 2026-11-12 01:58 | Adaptadores do backend em ms_mono/primario/{in,out} e ms_mono/secundario/{in,out}, sem infra/out no ms_mono (arquitetura hexagonal, `RN-143`, `RN-148`, `RNF-177`); web e mobile seguem com infra/in e infra/out |
 | v16 | 2026-11-11 23:18 | Adaptadores primários do backend em ms_mono/primario e infra/out só com os secundários (arquitetura hexagonal, `RN-143`, `RN-148`, `RNF-177`); web e mobile seguem com apps/<app>/infra/in; diagrama estrutura-projetos v06 → v07; status → Em revisão |
 | v15 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v14 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
@@ -493,4 +494,4 @@ Cenário: rodar no emulador Android
 
 ---
 
-<sub>boaz · v17 · 2026-11-12 01:58 · `1_Requisitos/14_estrutura-projetos.md`</sub>
+<sub>boaz · v18 · 2026-11-12 02:03 · `1_Requisitos/14_estrutura-projetos.md`</sub>

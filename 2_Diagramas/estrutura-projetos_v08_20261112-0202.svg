@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1592 1922" width="1592" height="1922">
   <title>Estrutura dos projetos</title>
-  <desc>Diagrama de pacotes da estrutura hexagonal comum de 5_DEV/: em cada frente (backend C#, web Vue e mobile .NET MAUI), core/&lt;contexto&gt;/&lt;feature&gt;/ com domain, usecases, ports/in e ports/out (e components no frontend), e runtimes (ms_mono no backend, apps/&lt;app&gt; no frontend) com os adaptadores primários (infra/in) e secundários (infra/out). v01: criação. v02: sem microsserviços futuros; ms_mono como runtime do backend. Faixa do qa (5_DEV/qa/): uma suíte por pasta &lt;alvo&gt;/&lt;tipo&gt; (backend/integracao, backend/carga, frontend/web/funcional, frontend/mobile/funcional), caixa-preta, com o contrato de imagem. v03: estrutura do qa. v04: funcional do mobile com Appium (C#, xUnit), na máquina, pelo executar.sh. v05: propriedades comuns do mobile movidas para 5_DEV/frontend/mobile/Directory.Build.props. v06: dtos/ na feature, um caso de uso por classe, features agrupadas por módulo (core/commons/usuario/) e testes do core com mocks das portas. v07: no backend, adaptadores primários (controllers, SSE, partida e agendamento) em ms_mono/primario/&lt;contexto&gt;/&lt;feature&gt;/ e só os secundários em ms_mono/infra/out/.</desc>
+  <desc>Diagrama de pacotes da estrutura hexagonal comum de 5_DEV/: em cada frente (backend C#, web Vue e mobile .NET MAUI), core/&lt;contexto&gt;/&lt;feature&gt;/ com domain, usecases, ports/in e ports/out (e components no frontend), e runtimes (ms_mono no backend, apps/&lt;app&gt; no frontend) com os adaptadores primários e secundários (infra/in e infra/out no frontend; ms_mono/primario/{in,out} e ms_mono/secundario/{in,out} no backend). v01: criação. v02: sem microsserviços futuros; ms_mono como runtime do backend. Faixa do qa (5_DEV/qa/): uma suíte por pasta &lt;alvo&gt;/&lt;tipo&gt; (backend/integracao, backend/carga, frontend/web/funcional, frontend/mobile/funcional), caixa-preta, com o contrato de imagem. v03: estrutura do qa. v04: funcional do mobile com Appium (C#, xUnit), na máquina, pelo executar.sh. v05: propriedades comuns do mobile movidas para 5_DEV/frontend/mobile/Directory.Build.props. v06: dtos/ na feature, um caso de uso por classe, features agrupadas por módulo (core/commons/usuario/) e testes do core com mocks das portas. v07: no backend, adaptadores primários (controllers, SSE, partida e agendamento) em ms_mono/primario/&lt;contexto&gt;/&lt;feature&gt;/ e só os secundários em ms_mono/infra/out/. v08: requisito 14 v17 (RNF-177, RN-143, RN-148) — ms_mono com primario/in (endpoints, partida, agendamento), primario/out (SSE, sessão na resposta), secundario/in (canais do Redis) e secundario/out (MongoDB, Redis, índices, configurações); regras de dependência com primario/secundario no backend e infra/in e infra/out na web e no mobile.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -119,8 +119,8 @@
 <text class="wm-eyebrow" x="40" y="40">BOAZ · UML PACOTES</text>
 <text class="title" x="40" y="72">Estrutura dos projetos</text>
 <text class="subtitle" x="40" y="94">Hexagonal nas três frentes: core por contexto e feature e runtimes com adaptadores (in, out); qa de fora, uma suíte por pasta</text>
-<text class="wm-meta-label" x="1304" y="44">VERSÃO</text><rect class="wm-badge" x="1304" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1328" y="71" text-anchor="middle">v07</text>
-<line class="wm-sep" x1="1376" y1="32" x2="1376" y2="80"/><text class="wm-meta-label" x="1400" y="44">DATA</text><text class="wm-meta-value" x="1400" y="72">2026-11-11 · 23:16</text>
+<text class="wm-meta-label" x="1304" y="44">VERSÃO</text><rect class="wm-badge" x="1304" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1328" y="71" text-anchor="middle">v08</text>
+<line class="wm-sep" x1="1376" y1="32" x2="1376" y2="80"/><text class="wm-meta-label" x="1400" y="44">DATA</text><text class="wm-meta-value" x="1400" y="72">2026-11-12 · 02:02</text>
 </g>
 <g id="padrao-feature">
 <text class="section" x="40" y="160">1 · PADRÃO DE CADA FEATURE — IGUAL NO BACKEND, NA WEB E NO MOBILE</text>
@@ -150,7 +150,7 @@
 <line class="edge edge-async" x1="352" y1="404" x2="958" y2="404" marker-end="url(#heranca)"/>
 <rect class="edge-label-bg" x="586.0" y="384" width="140.0" height="16"/>
 <text class="muted" x="656" y="396" text-anchor="middle">implementa ports/out</text>
-<text class="muted" x="640" y="328" text-anchor="middle">no backend: ms_mono/primario/, que importa ports/in direto</text>
+<text class="muted" x="640" y="328" text-anchor="middle">no backend: ms_mono/primario/in/ chama ports/in; ms_mono/secundario/out/ implementa ports/out</text>
 <g id="dtos" filter="url(#sombra)"><rect class="node-purple" x="1224" y="368" width="184" height="72" rx="10"/><text class="label-strong" x="1316.0" y="400.0" text-anchor="middle">dtos/</text><text class="mono" x="1316.0" y="420.0" text-anchor="middle">entrada e saída</text></g>
 <path class="edge edge-async" d="M1144 284 H1184 V404 H1222" marker-end="url(#seta-aberta)"/>
 <text class="uml-keyword" x="1192" y="352" text-anchor="start">«import»</text>
@@ -163,12 +163,14 @@
 <rect class="boundary" x="560" y="536" width="472" height="680" rx="14"/><text class="boundary-label" x="576" y="560">WEB · 5_DEV/frontend/web/</text><text class="mono" x="576" y="582">Vue 3 · TypeScript · Vite · um package.json</text>
 <rect class="boundary" x="1080" y="536" width="472" height="680" rx="14"/><text class="boundary-label" x="1096" y="560">MOBILE · 5_DEV/frontend/mobile/</text><text class="mono" x="1096" y="582">.NET MAUI · uma solution (Boaz.Mobile.slnx)</text>
 <g id="backend-runtime">
-<g filter="url(#sombra)"><rect class="node-blue" x="56" y="608" width="56" height="14" rx="2"/><rect class="node-blue" x="56" y="622" width="440" height="120" rx="4"/><text class="label-strong" x="276" y="648" text-anchor="middle">ms_mono/</text></g>
-<rect class="node" x="72" y="660" width="196" height="74" rx="8"/><text class="label" x="170" y="682" text-anchor="middle">primario/</text><text class="mono" x="170" y="702" text-anchor="middle">&lt;contexto&gt;/&lt;feature&gt;/</text><text class="mono" x="170" y="722" text-anchor="middle">HTTP, SSE, agenda</text>
-<rect class="node" x="284" y="660" width="196" height="74" rx="8"/><text class="label" x="382" y="682" text-anchor="middle">infra/out/</text><text class="mono" x="382" y="702" text-anchor="middle">&lt;contexto&gt;/&lt;feature&gt;/</text><text class="mono" x="382" y="722" text-anchor="middle">MongoDB · Redis</text>
-<text class="muted" x="56" y="768">ms_mono/: runtime e composição (Program.cs)</text>
-<g><rect class="chip" x="56" y="784" width="95" height="22" rx="11"/><text class="chip-text" x="103.5" y="799" text-anchor="middle">backend-mono</text></g>
-<text class="mono" x="56" y="836">Dockerfile em 5_DEV/backend/</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="56" y="608" width="56" height="14" rx="2"/><rect class="node-blue" x="56" y="622" width="440" height="184" rx="4"/><text class="label-strong" x="276" y="648" text-anchor="middle">ms_mono/ · in/ e out/ por &lt;contexto&gt;/&lt;feature&gt;/</text></g>
+<rect class="node" x="72" y="660" width="196" height="64" rx="8"/><text class="label" x="170" y="686" text-anchor="middle">primario/in/</text><text class="mono" x="170" y="708" text-anchor="middle">HTTP · partida · agenda</text>
+<rect class="node" x="284" y="660" width="196" height="64" rx="8"/><text class="label" x="382" y="686" text-anchor="middle">primario/out/</text><text class="mono" x="382" y="708" text-anchor="middle">SSE · sessão na resposta</text>
+<rect class="node" x="72" y="732" width="196" height="64" rx="8"/><text class="label" x="170" y="758" text-anchor="middle">secundario/in/</text><text class="mono" x="170" y="780" text-anchor="middle">canais do Redis</text>
+<rect class="node" x="284" y="732" width="196" height="64" rx="8"/><text class="label" x="382" y="758" text-anchor="middle">secundario/out/</text><text class="mono" x="382" y="780" text-anchor="middle">MongoDB · Redis · índices</text>
+<text class="muted" x="56" y="832">ms_mono/: runtime e composição (Program.cs)</text>
+<g><rect class="chip" x="56" y="844" width="95" height="22" rx="11"/><text class="chip-text" x="103.5" y="859" text-anchor="middle">backend-mono</text></g>
+<text class="mono" x="163" y="859">Dockerfile em 5_DEV/backend/</text>
 </g>
 <g id="web-runtime">
 <g id="web-app-0" filter="url(#sombra)"><rect class="node-blue" x="576" y="608" width="56" height="14" rx="2"/><rect class="node-blue" x="576" y="622" width="120" height="120" rx="4"/><text class="label-strong" x="636.0" y="648" text-anchor="middle">landing_page/</text><text class="mono" x="636.0" y="670" text-anchor="middle">infra/in/</text><text class="mono" x="636.0" y="690" text-anchor="middle">infra/out/</text></g>
@@ -188,7 +190,7 @@
 <g><rect class="chip" x="1223" y="784" width="89" height="22" rx="11"/><text class="chip-text" x="1267.5" y="799" text-anchor="middle">net10.0-ios</text></g>
 <text class="mono" x="1096" y="836">landing_page só no backend e na web</text>
 </g>
-<line class="edge edge-async" x1="276" y1="856" x2="276" y2="902" marker-end="url(#seta-aberta)"/>
+<line class="edge edge-async" x1="276" y1="872" x2="276" y2="902" marker-end="url(#seta-aberta)"/>
 <text class="uml-keyword" x="284" y="884" text-anchor="start">«import»</text>
 <text class="mono" x="56" y="884">core/&lt;contexto&gt;/</text>
 <g id="core-40-0" filter="url(#sombra)"><rect class="node-purple" x="56" y="904" width="56" height="14" rx="2"/><rect class="node-purple" x="56" y="918" width="120" height="88" rx="4"/><text class="label-strong" x="116.0" y="944" text-anchor="middle">landing_page/</text><text class="mono" x="116.0" y="966" text-anchor="middle">feature_1/ … n/</text></g>
@@ -233,7 +235,7 @@
 </g>
 <g id="regras">
 <text class="section" x="40" y="1656">4 · REGRAS DE DEPENDÊNCIA</text>
-<text class="label" x="40" y="1688">• infra/in (no backend, primario/) só chama ports/in; infra/out implementa ports/out</text><text class="label" x="816" y="1688">• um contexto não importa outro: o que é comum vai para core/commons/</text>
+<text class="label" x="40" y="1688">• backend: primario/in chama ports/in, secundario/out implementa ports/out; web e mobile: infra/in e infra/out</text><text class="label" x="816" y="1688">• um contexto não importa outro: o que é comum vai para core/commons/</text>
 <text class="label" x="40" y="1712">• core/ não importa ms_mono, apps/ nem bibliotecas de I/O (HTTP, banco, cache)</text><text class="label" x="816" y="1712">• só o runtime (ms_mono, apps/&lt;app&gt;) liga as portas aos adaptadores</text>
 <text class="label" x="40" y="1736">• mesmos nomes de contexto e de feature em todas as frentes, em snake_case</text><text class="label" x="816" y="1736">• mobile: net10.0-ios só no macOS (5_DEV/frontend/mobile/Directory.Build.props)</text>
 <text class="label" x="40" y="1760">• o qa não importa código de 5_DEV/backend/ nem de 5_DEV/frontend/</text><text class="label" x="816" y="1760">• o qa testa as imagens e os apps pelo contrato da suíte (Dockerfile)</text>
@@ -247,5 +249,5 @@
 <line class="edge edge-async" x1="1064" y1="54" x2="1092" y2="54" marker-end="url(#seta-aberta)"/><text class="label" x="1104" y="58">«import» · depende de</text>
 <line class="edge edge-async" x1="1279" y1="54" x2="1307" y2="54" marker-end="url(#heranca)"/><text class="label" x="1319" y="58">implementa (realização)</text>
 <rect class="node-orange" x="40" y="73" width="14" height="14" rx="3"/><text class="label" x="62" y="84">suíte de qa (pasta com Dockerfile)</text>
-<line class="divider" x1="40" y1="102" x2="1552" y2="102"/><text class="footer" x="40" y="126">v07 · no backend, os adaptadores primários saem de infra/in/ para ms_mono/primario/; infra/ fica só com os secundários (infra/out/)</text><text class="wm-file" x="1552" y="126" text-anchor="end">estrutura-projetos_v07_20261111-2316.svg</text></g>
+<line class="divider" x1="40" y1="102" x2="1552" y2="102"/><text class="footer" x="40" y="126">v08 · ms_mono com primario/{in,out} e secundario/{in,out}, cada um com seu papel (RNF-177); web e mobile seguem com infra/in e infra/out</text><text class="wm-file" x="1552" y="126" text-anchor="end">estrutura-projetos_v08_20261112-0202.svg</text></g>
 </svg>

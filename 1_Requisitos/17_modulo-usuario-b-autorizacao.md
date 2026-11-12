@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v33"
-data: "2026-11-12 01:59"
+versao: "v34"
+data: "2026-11-12 02:03"
 status: "Em revisão"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v33** · 2026-11-12 01:59 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v34** · 2026-11-12 02:03 · **Em revisão**
 
 # Módulo Usuários · Autorização
 
@@ -1018,13 +1018,13 @@ Cenário: o que este documento não trata
 
 [![Casos de uso da autorização: o administrador e o staff com Administrar usuários, e por generalização a conta master, veem e salvam as permissões e o registro de mudanças, com a conferência do que quem concede tem e a recarga quando outro salvou antes; quem recebe vê o módulo novo sem sair, a casca pelo token e a recusa no endereço direto; no quest, os módulos de Quem usa e da sala](../2_Diagramas/autorizacao-casos-de-uso_v01_20261101-2337.svg)](../2_Diagramas/autorizacao-casos-de-uso_v01_20261101-2337.svg)
 
-**Autorização · conceder permissões · sequência** — `2_Diagramas/autorizacao-sequencia_v06_20261112-0054.svg`
+**Autorização · conceder permissões · sequência** — `2_Diagramas/autorizacao-sequencia_v07_20261112-0201.svg`
 
-[![Sequência de conceder permissões: o administrador do deboaz concede o SAC ao membro do time e a conta master concede a Presença ao staff, com as concedíveis, o salvamento com a versão, as recusas, a nova versão nas sessões e a renovação que leva o módulo à casca, com as telas de exemplo de cada passo, e a contratação que suspende e reativa o módulo](../2_Diagramas/autorizacao-sequencia_v06_20261112-0054.svg)](../2_Diagramas/autorizacao-sequencia_v06_20261112-0054.svg)
+[![Sequência de conceder permissões: o administrador do deboaz concede o SAC ao membro do time e a conta master concede a Presença ao staff, com as concedíveis, o salvamento com a versão, as recusas, a nova versão nas sessões e a renovação que leva o módulo à casca, com as telas de exemplo de cada passo, e a contratação que suspende e reativa o módulo](../2_Diagramas/autorizacao-sequencia_v07_20261112-0201.svg)](../2_Diagramas/autorizacao-sequencia_v07_20261112-0201.svg)
 
-**Autorização · contrato de API** — `2_Diagramas/autorizacao-contrato-api_v10_20261112-0052.svg`
+**Autorização · contrato de API** — `2_Diagramas/autorizacao-contrato-api_v11_20261112-0200.svg`
 
-[![Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, o módulo suspenso, com os códigos de erro](../2_Diagramas/autorizacao-contrato-api_v10_20261112-0052.svg)](../2_Diagramas/autorizacao-contrato-api_v10_20261112-0052.svg)
+[![Contrato dos endereços de permissões: ler as permissões e as concedíveis, salvar o conjunto com If-Match e o histórico das mudanças, o módulo suspenso e os endereços de teste da contratação e do módulo, com os códigos de erro](../2_Diagramas/autorizacao-contrato-api_v11_20261112-0200.svg)](../2_Diagramas/autorizacao-contrato-api_v11_20261112-0200.svg)
 
 **Autorização · classes** — `2_Diagramas/autorizacao-classes_v02_20261112-0055.svg`
 
@@ -1042,7 +1042,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v33** | 2026-11-12 01:59 | Dados explícitos nos cenários de API: `RN-286` "só a contratação suspende" com a Maria (versão 7) e o João, os dois com "MOD-06" com "U"; a Presença da Maria suspensa fica com "MOD-03" com "CU" e "MOD-05" com "U" em mods (`RN-285`, `RN-286`, `RN-287`) |
+| **v34** | 2026-11-12 02:03 | Diagramas: contrato de API v10 → v11 (endereços de teste POST /_teste/contratacao, que roda o aviso de [17 `RN-275`](17_modulo-usuario.md#RN-275), e GET /_teste/modulo/{mod}, para o 401 e o 403 de `RN-285-api`; só com AMBIENTE=hml e Teste__Relogio=sim) e sequência v06 → v07 (nota do teste); cenários sem mudança |
+| v33 | 2026-11-12 01:59 | Dados explícitos nos cenários de API: `RN-286` "só a contratação suspende" com a Maria (versão 7) e o João, os dois com "MOD-06" com "U"; a Presença da Maria suspensa fica com "MOD-03" com "CU" e "MOD-05" com "U" em mods (`RN-285`, `RN-286`, `RN-287`) |
 | v32 | 2026-11-12 00:57 | Diagramas do módulo suspenso (`RN-285` a `RN-287`): sequência v05 → v06 (o aviso AVISAR_CONTRATACAO_MUDOU move a permissão entre mods e suspensos, sobe versao e pv, 401 e renovação, depois 403), contrato de API v09 → v10 (422 MODULO_NAO_CONTRATADO para o suspenso, "por" de quem descontratou), classes v01 → v02, documentos v03 → v04 (suspensos como [{mod, abas}]); cenários sem mudança |
 | v31 | 2026-11-12 00:44 | Módulo suspenso (`permissoes.suspensos`): `RN-285` e `RN-285-api` (descontratação suspende, recontratação devolve; 401 PERMISSOES_DESATUALIZADAS e depois 403 ACESSO_NEGADO), `RN-286` e `RN-286-api` (só a contratação suspende e reativa; PUT com o suspenso é 422 MODULO_NAO_CONTRATADO), `RN-287` (suspenso guardado com as abas, salvar não o apaga, desmarcado não volta); status → Em revisão |
 | v30 | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", [17 `RN-189`](17_modulo-usuario.md#RN-189)), sem mudança de fluxo |
@@ -1056,4 +1057,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v33 · 2026-11-12 01:59 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v34 · 2026-11-12 02:03 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
