@@ -81,6 +81,14 @@ public static class Colecoes
     public const string CardUsuarios = "cardUsuarios";
     public const string Modulos = "modulos";
     public const string Contratacoes = "contratacoes";
+
+    // SAC (sac-documentos v01)
+    public const string Chamados = "chamados";
+    public const string MensagensChamado = "mensagensChamado";
+    public const string AnexosSac = "anexosSac";
+    public const string ConfiguracaoSac = "configuracaoSac";
+    public const string CardSac = "cardSac";
+    public const string Contadores = "contadores";
 }
 
 // Leitura e escrita de campos de BsonDocument com nulos e datas.
@@ -101,6 +109,10 @@ public static class Bson
     public static BsonValue Valor(string? texto) => texto is null ? BsonNull.Value : texto;
 
     public static BsonValue Valor(DateTimeOffset? data) => data is { } d ? new BsonDateTime(d.UtcDateTime) : BsonNull.Value;
+
+    public static bool Logico(this BsonDocument d, string campo) => d.TryGetValue(campo, out var v) && v.IsBoolean && v.AsBoolean;
+
+    public static long Longo(this BsonDocument d, string campo) => d.TryGetValue(campo, out var v) && v.IsNumeric ? v.ToInt64() : 0;
 
     public static FilterDefinitionBuilder<BsonDocument> Filtro => Builders<BsonDocument>.Filter;
 

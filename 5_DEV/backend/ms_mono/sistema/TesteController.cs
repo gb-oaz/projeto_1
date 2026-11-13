@@ -6,6 +6,7 @@ using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Boaz.MsMono.Primario.In.Commons;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autorizacao;
+using Boaz.MsMono.Secundario.Out.Hub.Sac;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -15,6 +16,10 @@ namespace Boaz.MsMono.Sistema;
 /// <summary>O corpo de PUT /_teste/relogio.</summary>
 /// <param name="Agora">Data e hora com o fuso.</param>
 public sealed record RelogioDeTesteCorpo(string? Agora);
+
+/// <summary>O corpo de PUT /_teste/sac/verificacao.</summary>
+/// <param name="Disponivel">false derruba a verificação de segurança dos anexos.</param>
+public sealed record VerificacaoDeTesteCorpo(bool? Disponivel);
 
 /// <summary>O corpo de POST /_teste/contratacao (contrato autorizacao v11).</summary>
 /// <param name="Conta">A conta cuja contratação muda.</param>
@@ -27,8 +32,10 @@ public sealed record ContratacaoDeTesteCorpo(string? Conta, string? Mod, JsonEle
 /// O relógio de teste (contrato usuarios v15, 15 RN-278): só com AMBIENTE=hml e
 /// Teste__Relogio=sim; fora disso, os endereços respondem 404, como se não
 /// existissem. Sem login: a proteção é o endereço não existir fora do teste.
-/// Também o papel do Catálogo na contratação e um pedido de módulo sem endereço
-/// próprio (contrato autorizacao v11, grupo TESTE). Fora da documentação da API.
+/// Também o papel do Catálogo na contratação, um pedido de módulo sem endereço
+/// próprio (contrato autorizacao v11, grupo TESTE) e os ganchos do SAC: o
+/// agendamento na hora e a verificação dos anexos fora do ar (18_modulo-sac,
+/// hub/sac do qa). Fora da documentação da API.
 /// </summary>
 [ApiController]
 [Route("_teste")]
@@ -88,6 +95,35 @@ public sealed class TesteController(RelogioDaAplicacao relogio) : ControllerBase
         {
             await avisar.Executar(conta, new ExecucaoDeQuemChama(traceId, por, conta), ct);
         }
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Roda agora, com o relógio da aplicação, o que o AgendamentoDoSac faz a
+    /// cada 1 min (18 RN-290, RN-292): os 7 dias e o descarte dos anexos; só
+    /// responde ao terminar.
+    /// </summary>
+    [HttpPost("sac/agendamento")]
+    public async Task<IActionResult> AgendamentoDoSac(CancellationToken ct)
+    {
+        await Primario.In.Hub.Sac.AgendamentoDoSac.Rotinas(HttpContext.RequestServices, ct);
+        return NoContent();
+    }
+
+    /// <summary>A verificação de segurança dos anexos fora do ar (false) ou de volta (true): 503 VERIFICACAO_INDISPONIVEL (RN-292).</summary>
+    [HttpPut("sac/verificacao")]
+    public IActionResult Verificacao([FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] VerificacaoDeTesteCorpo? corpo,
+        [FromServices] InterruptorDaVerificacao interruptor)
+    {
+        interruptor.Disponivel = corpo?.Disponivel ?? throw FalhaDeUsuarios.DadosInvalidos("disponivel");
+        return NoContent();
+    }
+
+    /// <summary>A verificação de segurança dos anexos volta ao normal.</summary>
+    [HttpDelete("sac/verificacao")]
+    public IActionResult VerificacaoNormal([FromServices] InterruptorDaVerificacao interruptor)
+    {
+        interruptor.Disponivel = true;
         return NoContent();
     }
 

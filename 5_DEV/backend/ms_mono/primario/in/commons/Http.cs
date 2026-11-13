@@ -8,6 +8,7 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
+using Boaz.Core.Hub.Sac.Chamados.Domain;
 using GrupoAutenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Domain.GrupoDeFalha;
 using GrupoAutorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Domain.GrupoDeFalha;
 using GrupoUsuarios = Boaz.Core.Commons.Usuario.Usuarios.Domain.GrupoDeFalha;
@@ -25,7 +26,8 @@ public sealed record Erro(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Maximo = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Mod = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Abas = null,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? Versao = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? Versao = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Responsavel = null);
 
 public static class Http
 {
@@ -112,6 +114,7 @@ public static class Http
         FalhaDeUsuarios f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, f.TentarEm, f.Minimo, f.Maximo)),
         FalhaDeAutenticacao f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, f.TentarEm)),
         FalhaDeAutorizacao f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Mod: f.Mod, Abas: f.Abas, Versao: f.Versao)),
+        FalhaDoSac f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Minimo: f.Minimo, Maximo: f.Maximo, Responsavel: f.Responsavel)),
         BadHttpRequestException => (StatusCodes.Status422UnprocessableEntity, CorpoInvalido),
         OperationCanceledException => null,
         _ => (StatusCodes.Status500InternalServerError, ErroInesperado),
@@ -126,6 +129,17 @@ public static class Http
         GrupoUsuarios.Vencido => StatusCodes.Status410Gone,
         GrupoUsuarios.DadosInvalidos => StatusCodes.Status422UnprocessableEntity,
         _ => StatusCodes.Status429TooManyRequests,
+    };
+
+    static int Status(GrupoDaFalha grupo) => grupo switch
+    {
+        GrupoDaFalha.Proibido => StatusCodes.Status403Forbidden,
+        GrupoDaFalha.NaoEncontrado => StatusCodes.Status404NotFound,
+        GrupoDaFalha.Conflito => StatusCodes.Status409Conflict,
+        GrupoDaFalha.MuitoGrande => StatusCodes.Status413PayloadTooLarge,
+        GrupoDaFalha.TipoNaoAceito => StatusCodes.Status415UnsupportedMediaType,
+        GrupoDaFalha.DadosInvalidos => StatusCodes.Status422UnprocessableEntity,
+        _ => StatusCodes.Status503ServiceUnavailable,
     };
 
     static int Status(GrupoAutenticacao grupo) => grupo switch

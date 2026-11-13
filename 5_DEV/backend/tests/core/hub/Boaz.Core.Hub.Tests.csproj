@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Testes de core/hub/: unitários do domínio (domain/, dtos/) e dos casos de
+    uso com as portas de saída em memória (mocks/).
+  -->
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <!-- core/commons é medido pelo projeto de testes dele -->
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)/cobertura.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../core/hub/Boaz.Core.Hub.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

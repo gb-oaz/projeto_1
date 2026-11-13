@@ -66,6 +66,24 @@ public enum AcaoAuditada
     AvisarPermissoesNovas,
     /// <summary>Interna: a contratação de uma conta mudou, avisada pelo Catálogo (RN-275).</summary>
     AvisarContratacaoMudou,
+    /// <summary>POST /sac/chamados (18 RN-297).</summary>
+    AbrirChamado,
+    /// <summary>POST /sac/chamados/{id}/mensagens (18 RN-297).</summary>
+    EnviarMensagem,
+    /// <summary>POST /sac/chamados/{id}/assumir (18 RN-297).</summary>
+    AssumirChamado,
+    /// <summary>POST /sac/chamados/{id}/status (18 RN-297).</summary>
+    MudarStatus,
+    /// <summary>POST /sac/chamados/{id}/reabrir (18 RN-297).</summary>
+    ReabrirChamado,
+    /// <summary>POST /sac/chamados/{id}/encerrar (18 RN-297).</summary>
+    EncerrarChamado,
+    /// <summary>POST /sac/chamados/{id}/avaliacao (18 RN-297).</summary>
+    AvaliarChamado,
+    /// <summary>PUT /sac/configuracao (18 RN-297).</summary>
+    SalvarPrazosSac,
+    /// <summary>Sem quem: o agendamento do SAC muda o status pelos 7 dias (18 RN-290, RN-297).</summary>
+    FecharPorPrazo,
 }
 
 /// <summary>Os textos do contrato de API para os tipos e estados.</summary>
@@ -137,6 +155,15 @@ public static class Textos
         AcaoAuditada.EncerrarSessoesDoUsuario => "ENCERRAR_SESSOES_DO_USUARIO",
         AcaoAuditada.AvisarPermissoesNovas => "AVISAR_PERMISSOES_NOVAS",
         AcaoAuditada.AvisarContratacaoMudou => "AVISAR_CONTRATACAO_MUDOU",
+        AcaoAuditada.AbrirChamado => "ABRIR_CHAMADO",
+        AcaoAuditada.EnviarMensagem => "ENVIAR_MENSAGEM",
+        AcaoAuditada.AssumirChamado => "ASSUMIR_CHAMADO",
+        AcaoAuditada.MudarStatus => "MUDAR_STATUS",
+        AcaoAuditada.ReabrirChamado => "REABRIR_CHAMADO",
+        AcaoAuditada.EncerrarChamado => "ENCERRAR_CHAMADO",
+        AcaoAuditada.AvaliarChamado => "AVALIAR_CHAMADO",
+        AcaoAuditada.SalvarPrazosSac => "SALVAR_PRAZOS_SAC",
+        AcaoAuditada.FecharPorPrazo => "FECHAR_POR_PRAZO",
         _ => "ESQUECI_SENHA_MASTER",
     };
 

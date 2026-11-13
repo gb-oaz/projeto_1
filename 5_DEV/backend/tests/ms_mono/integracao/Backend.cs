@@ -25,7 +25,9 @@ public sealed class Backend : WebApplicationFactory<Program>, IAsyncLifetime
         .UseSetting("Mongo:Banco", NomeDoBanco)
         .UseSetting("USUARIO_ADMIN_ENTRADA", AdminEntrada)
         .UseSetting("USUARIO_ADMIN_SENHA", AdminSenha)
-        .UseSetting("Time:Nome", NomeDoTime);
+        .UseSetting("Time:Nome", NomeDoTime)
+        // o dublê da verificação dos anexos do SAC (sem clamd nos testes)
+        .UseSetting("Sac:VerificacaoLocal", "sim");
 
     // O banco do teste, para preparar o que a API não cria (uma contratação).
     public IMongoDatabase Banco => new MongoClient(

@@ -275,9 +275,9 @@ public sealed class GeracoesNoBanco(Armazenamento armazenamento) : IGeracoesDeSe
             .Set("resumoComprovante", Bson.Valor(geracao.ResumoComprovante)), cancellationToken: ct);
 }
 
-// Auditoria e erros (RN-178, RN-270: 5 anos, só inclusão), pedidos de ajuda ao
-// SAC e o último pagamento.
-public sealed class RegistrosNoBanco(Armazenamento armazenamento) : IAuditoria, IAuditoriaDeErros, IPedidosDeAjuda, IPagamentos
+// Auditoria e erros (RN-178, RN-270: 5 anos, só inclusão) e o último
+// pagamento. Os pedidos de ajuda ficam no SAC (PedidosDeAjudaNoSac).
+public sealed class RegistrosNoBanco(Armazenamento armazenamento) : IAuditoria, IAuditoriaDeErros, IPagamentos
 {
     public Task Registrar(RegistroDeAuditoria registro, CancellationToken ct = default) =>
         armazenamento.Colecao(Colecoes.Auditoria).InsertOneAsync(new BsonDocument
@@ -307,28 +307,6 @@ public sealed class RegistrosNoBanco(Armazenamento armazenamento) : IAuditoria, 
             ["quando"] = Bson.Valor(registro.Quando),
             ["guardarAte"] = Bson.Valor(registro.GuardarAte),
         }, cancellationToken: ct);
-
-    public async Task<IReadOnlyList<DateTimeOffset>> EnviosDoAparelho(string aparelho, DateTimeOffset desde, CancellationToken ct = default)
-    {
-        var lidos = await armazenamento.Colecao(Colecoes.PedidosAjuda)
-            .Find(Bson.Filtro.Eq("aparelho", aparelho) & Bson.Filtro.Gt("quando", Bson.Valor(desde))).ToListAsync(ct);
-        return lidos.Select(d => d.Data("quando")).OfType<DateTimeOffset>().ToList();
-    }
-
-    // o id do pedido é o alvo do "CONCLUIDO" do ESQUECI_SENHA_MASTER (RN-274)
-    public async Task<string> Enviar(string aparelho, string instituicao, string contato, DateTimeOffset quando, CancellationToken ct = default)
-    {
-        var id = Guid.NewGuid().ToString("N");
-        await armazenamento.Colecao(Colecoes.PedidosAjuda).InsertOneAsync(new BsonDocument
-        {
-            ["_id"] = id,
-            ["aparelho"] = aparelho,
-            ["instituicao"] = instituicao,
-            ["contato"] = contato,
-            ["quando"] = Bson.Valor(quando),
-        }, cancellationToken: ct);
-        return id;
-    }
 
     // a cobrança ainda não existe: nenhuma conta tem pagamento registrado
     public Task<DateOnly?> UltimoPagamento(string contaId, CancellationToken ct = default) => Task.FromResult<DateOnly?>(null);
