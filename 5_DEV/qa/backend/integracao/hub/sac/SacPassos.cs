@@ -686,6 +686,14 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
         // /sac/chamados/{id}/{acao}/{m}
         var exemplo = partes.Length > 2 && partes[1] == "chamados" ? partes[2] : null;
         var acao = partes.Length > 3 ? partes[3] : "";
+        // RF-173: o anexo que o corpo do exemplo cita ("anx-81bc09") é enviado antes por quem pede
+        if (json is not null)
+        {
+            foreach (var anexo in AnexoNoTexto().Matches(json).Select(m => m.Value).Distinct())
+            {
+                if (!mundo.Apelidos.ContainsKey(anexo)) await sac.Anexo(pessoa, anexo);
+            }
+        }
         string? corpo = json is null ? null : await mundo.Traduzir(json);
 
         if (exemplo is not null) await Preparar(exemplo, acao, doTime, resto, partes.Length > 4 ? partes[4] : null);
@@ -818,7 +826,7 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
             {
                 "com \"RESOLVIDO\"" => Status("RESOLVIDO", ChamadosDoExemplo.Solucao),
                 "com \"FECHADO\"" => Status("FECHADO", "Fechando"),
-                "com o status \"RESOLVIDO\"" => Pendente(caminho, "RESOLVIDO"),
+                "com o status \"RESOLVIDO\"" => Pendente(await mundo.Traduzir(caminho), "RESOLVIDO"),
                 _ => Status("AGUARDANDO_CLIENTE", ChamadosDoExemplo.Pergunta),
             },
             "reabrir" => new JsonObject { ["mensagem"] = "Ainda aparece o erro na 8B" }.ToJsonString(),
@@ -837,6 +845,7 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
 
     string? Pendente(string caminho, string status)
     {
+        // o caminho chega traduzido: "SAC-000087" já é o número real
         statusPendente = (caminho, status);
         return null;
     }
@@ -955,6 +964,9 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
 
     [GeneratedRegex(@"^msg-\d{6}$")]
     private static partial Regex Mensagem();
+
+    [GeneratedRegex(@"anx-[0-9a-f]{6}")]
+    private static partial Regex AnexoNoTexto();
 
     [GeneratedRegex(@"^anx-\w+$")]
     private static partial Regex Anexo();
