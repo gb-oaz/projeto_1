@@ -123,8 +123,17 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
     [InlineData("{ \"tipo\": \"STAFF\", \"nome\": ", "application/json")]
     public async Task RN_271_corpo_que_nao_e_json_nao_chega_ao_caso_de_uso(string corpo, string tipo)
     {
+        // Com o token da Maria, como no cenário: o 401 vem antes do 422 (18 RN-297-api).
+        // A chave de assinatura é de cada host, então entra pelo host de produção.
+        var (_, master) = await preparo.Conta(Sigla());
         using var producao = backend.WithWebHostBuilder(b => b.UseEnvironment("Production"));
         using var http = producao.CreateClient();
+        using (var api = new Cliente(producao.CreateClient()))
+        {
+            var sessao = await api.Enviar("POST", "/auth/hub/entrar", new { entrada = master.Entrada, senha = master.Senha, aparelho = "APP" });
+            Assert.Equal(HttpStatusCode.OK, sessao.Status);
+            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessao.Texto("tokenAcesso"));
+        }
         var auditoria = await backend.Banco.GetCollection<BsonDocument>("auditoria").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty);
         var erros = await backend.Banco.GetCollection<BsonDocument>("auditoriaErros").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty);
 

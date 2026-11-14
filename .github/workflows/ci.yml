@@ -262,12 +262,6 @@ jobs:
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 5s --health-retries 12
-      # Armazenamento de objetos dos anexos do SAC (05 RNF-235): o Azurite, como
-      # em 4_CI_CD/local/compose.yml. Sem health check: "services" não troca o
-      # comando da imagem, e o azurite padrão sobe blob, fila e tabela.
-      azurite:
-        image: mcr.microsoft.com/azure-storage/azurite:3.34.0
-        ports: ["10000:10000"]
     # Strings de conexão lidas pelo .NET (ConnectionStrings:MongoDb / :Redis /
     # :Blob). A do Blob usa a conta e a chave públicas de desenvolvimento do
     # Azurite (devstoreaccount1): não é segredo.
@@ -281,6 +275,20 @@ jobs:
         working-directory: 5_DEV/backend
     steps:
       - uses: actions/checkout@v4
+      # Armazenamento de objetos dos anexos do SAC (05 RNF-235): o Azurite num
+      # passo, não em "services", que não troca o comando da imagem. Igual ao
+      # 4_CI_CD/local/compose.yml: só o blob e --skipApiVersionCheck, porque o
+      # Azure.Storage.Blobs pede uma versão da API mais nova que a do Azurite.
+      - name: Azurite
+        working-directory: .
+        run: |
+          docker run -d --name azurite -p 10000:10000 mcr.microsoft.com/azure-storage/azurite:3.34.0 \
+            azurite-blob --blobHost 0.0.0.0 --inMemoryPersistence --skipApiVersionCheck --loose
+          for i in $(seq 1 30); do
+            curl -s -o /dev/null http://localhost:10000/ && exit 0
+            sleep 1
+          done
+          docker logs azurite; exit 1
       # SDK .NET na versão exata fixada no global.json (RNF-01, RNF-19).
       - uses: actions/setup-dotnet@v4
         with:
