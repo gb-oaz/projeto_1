@@ -131,6 +131,16 @@ public sealed class ChamadoTests
     public void RN_290_reabrir_recusado(StatusDoChamado de, int dias, string codigo) =>
         Assert.Equal(codigo, Codigo(() => No(de).Reabrir(Conta, "De novo", Abertura.AddDays(dias))));
 
+    // O resolvido passou dos 7 dias: a recusa é a mesma antes ou depois de o
+    // agendamento fechá-lo pelo prazo (RN-290), não depende de quem chega primeiro.
+    [Fact]
+    public void RN_290_reabrir_o_fechado_pelo_prazo_e_prazo_vencido()
+    {
+        var c = No(StatusDoChamado.Resolvido);
+        Assert.True(c.AplicarPrazos(Abertura.AddDays(8)));
+        Assert.Equal("PRAZO_REABERTURA_VENCIDO", Codigo(() => c.Reabrir(Conta, "De novo", Abertura.AddDays(8))));
+    }
+
     [Theory]
     [InlineData(StatusDoChamado.Aberto)]
     [InlineData(StatusDoChamado.EmAtendimento)]

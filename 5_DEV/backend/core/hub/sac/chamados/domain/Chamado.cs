@@ -212,6 +212,10 @@ public sealed class Chamado(DadosDoChamado dados)
     /// <summary>A conta reabre o resolvido em até 7 dias, com o mesmo responsável (RF-177, RN-290); não confere o limite (RN-294).</summary>
     public void Reabrir(Autor conta, string texto, DateTimeOffset agora)
     {
+        // fechado pelo prazo é o resolvido que passou dos 7 dias: a mesma recusa,
+        // antes ou depois de o agendamento passar (RN-290)
+        if (Dados.Status == StatusDoChamado.Fechado && Dados.Fechamento == Domain.Fechamento.Prazo)
+            throw FalhaDoSac.PrazoReaberturaVencido();
         GarantirAberto();
         if (Dados.Status != StatusDoChamado.Resolvido) throw FalhaDoSac.TransicaoInvalida();
         if (agora > Dados.ResolvidoEm!.Value + LimitesDoChamado.SeteDias) throw FalhaDoSac.PrazoReaberturaVencido();
