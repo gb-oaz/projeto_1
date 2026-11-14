@@ -7,7 +7,7 @@ description: Base comum de todos os agentes do boaz para ler, interpretar e rast
 
 Os requisitos do boaz são **documentos `.md` em `1_Requisitos/`**; o comportamento esperado está em **blocos ` ```gherkin `** dentro deles. Não existe um `.feature` por requisito: os `.feature` de `5_DEV/qa/` são **cópias** dos cenários de API, com a tag do ID. A fonte da verdade é sempre o `.md`.
 
-Esta skill é de **leitura e rastreabilidade**. Escrever ou mudar requisito é só do `deboaz-po` (skill `requisito`); os outros agentes **propõem** o cenário na resposta, nunca editam `1_Requisitos/`.
+Esta skill é de **leitura e rastreabilidade**. Escrever ou mudar requisito é só do `deboaz-arc` (skill `requisito`); os outros agentes **propõem** o cenário na resposta, nunca editam `1_Requisitos/`.
 
 ## 1 · Localizar (sem varrer pastas)
 
@@ -75,13 +75,13 @@ Antes de agir, confira e **anote** o que faltar:
 - Dependência citada (`> [...]`) que não existe mais ou mudou de versão.
 - Item de `Em aberto` que bloqueia a sua tarefa.
 
-Achou? **Não decida sozinho.** Pare a parte afetada, siga com o resto e devolva na resposta, endereçado ao `deboaz-po`, com o ID, a dúvida e — quando ajudar — o cenário proposto em Gherkin (formato em `referencias/escrita-de-cenarios.md`).
+Achou? **Não decida sozinho.** Pare a parte afetada, siga com o resto e devolva na resposta, endereçado ao `deboaz-arc`, com o ID, a dúvida e — quando ajudar — o cenário proposto em Gherkin (formato em `referencias/escrita-de-cenarios.md`).
 
 ## 6 · Regras invioláveis
 
 - Leia o requisito **antes** de atuar; cite documento, versão e IDs no que entregar.
 - Não invente regra, texto exibido, limite ou código de erro: se não está no `.md` (ou no contrato do `deboaz-arc`), é lacuna.
-- Não altere requisito em silêncio; só o `deboaz-po` escreve em `1_Requisitos/`, preservando a estrutura (front matter, âncoras, seções, histórico).
+- Não altere requisito em silêncio; só o `deboaz-arc` escreve em `1_Requisitos/`, preservando a estrutura (front matter, âncoras, seções, histórico).
 - Divergência entre implementação e requisito é reportada, não "corrigida" no requisito para caber no código.
 - Mudou um cenário de API? Os `.feature` e passos do qa precisam mudar junto (`deboaz-qa`).
 
@@ -95,9 +95,9 @@ Toda resposta que tocou requisito termina com:
 Requisito: 1_Requisitos/<doc>.md (vNN)
 Atendidos: RF-134, RF-137-api
 Pendentes: RF-135 (motivo)
-Lacunas/ambiguidades → deboaz-po: RN-xx — <dúvida>
+Lacunas/ambiguidades → deboaz-arc: RN-xx — <dúvida>
 ```
 
 ## Skills relacionadas
 
-`requisito` (escrever, só o PO) · `engenharia-requisitos` (qualidade e impacto) · `estrategia-qa` (do cenário ao teste) · `desenvolvimento` (fluxo TDD) · `engenharia-software` (BDD no ciclo).
+`requisito` (escrever, só o `deboaz-arc`) · `engenharia-requisitos` (qualidade e impacto) · `estrategia-qa` (do cenário ao teste) · `desenvolvimento` (fluxo TDD) · `engenharia-software` (BDD no ciclo).

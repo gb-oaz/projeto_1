@@ -5,7 +5,7 @@ description: Princípios de engenharia de software compartilhados pelos agentes 
 
 # Engenharia de software → como o boaz constrói
 
-Base comum de arquitetura, back, front e qa (e do PO, na parte estratégica de DDD e no modelo espiral). O **requisito `1_Requisitos/14_estrutura-projetos.md` prevalece** sobre qualquer texto genérico daqui; em conflito, siga o requisito e reporte a divergência.
+Base comum de arquitetura, back, front e qa (e dos requisitos, na parte estratégica de DDD e no modelo espiral). O **requisito `1_Requisitos/14_estrutura-projetos.md` prevalece** sobre qualquer texto genérico daqui; em conflito, siga o requisito e reporte a divergência.
 
 ## Princípios que valem em todo código
 

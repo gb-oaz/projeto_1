@@ -1,12 +1,12 @@
 # Domain-Driven Design
 
-## Estratégico (PO, arquiteto)
+## Estratégico (arquiteto)
 
 - **Domínio e subdomínios**: núcleo (o que diferencia o produto), de suporte e genéricos (autenticação, e-mail). Investimento de modelagem vai para o núcleo.
 - **Bounded context**: fronteira onde um termo tem um sentido só. No boaz os contextos são pastas de `core/` (`commons`, `hub`, `quest`, `landing_page`) e os módulos de `15_modulos.md`.
-- **Linguagem ubíqua**: o vocabulário do `99_glossario.md`, igual em cenário, vista, contrato, classe, coleção e teste. Termo novo → proposta ao `deboaz-po` para o glossário.
+- **Linguagem ubíqua**: o vocabulário do `99_glossario.md`, igual em cenário, vista, contrato, classe, coleção e teste. Termo novo → proposta ao `deboaz-arc` para o glossário.
 - **Mapa de contextos**: como os contextos se relacionam (cliente-fornecedor, conformista, camada anticorrupção). No projeto, contextos só falam por `commons` (RN-146); dado de outro contexto é **só lido** e aparece no modelo de documentos como tal.
-- **Sinais para o PO**: o mesmo termo com dois sentidos em documentos diferentes indica dois contextos — registre em Em aberto em vez de unificar à força.
+- **Sinais para os requisitos**: o mesmo termo com dois sentidos em documentos diferentes indica dois contextos — registre em Em aberto em vez de unificar à força.
 
 ## Tático (arquiteto, back, front)
 

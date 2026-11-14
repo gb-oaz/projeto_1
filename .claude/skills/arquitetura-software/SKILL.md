@@ -5,7 +5,7 @@ description: Competência de arquiteto do boaz para tomar e documentar decisões
 
 # Arquitetura de software → decisões que suportam o requisito
 
-O arquiteto **define e orienta** decisões técnicas; não decide regra de negócio (é do `deboaz-po`) nem experiência (é do `deboaz-uxui`). Toda decisão nasce de um cenário ou de um `RNF` — cite o ID. Base: `gherkin-bdd` e `engenharia-software`.
+O arquiteto **define e orienta** decisões técnicas; também é dono das regras de negócio (requisitos em `1_Requisitos/`); experiência é do `deboaz-uxui`. Toda decisão nasce de um cenário ou de um `RNF` — cite o ID. Base: `gherkin-bdd` e `engenharia-software`.
 
 Ordem de prevalência: requisitos (`01_stack`, `03_ci-qualidade`, `05_cd-implantacao`, `14_estrutura-projetos`, módulos) → diagramas aprovados → esta skill. Divergiu? Siga o requisito e reporte.
 
@@ -22,7 +22,7 @@ Para cada módulo, leia `cenarios-tela` e `cenarios-api` e extraia:
 | `RNF` de segurança/sessão | autenticação, autorização, armazenamento de segredo |
 | termo do glossário | nome de agregado, coleção, DTO, campo JSON |
 
-Faltou informação para decidir → pergunta ao `deboaz-po` (comportamento) ou ADR com alternativas (técnica).
+Faltou informação para decidir → decida no requisito primeiro (comportamento) ou ADR com alternativas (técnica).
 
 ## 2 · Conjunto de diagramas de um módulo (nesta ordem)
 

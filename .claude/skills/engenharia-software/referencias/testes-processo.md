@@ -2,7 +2,7 @@
 
 ## BDD → TDD no boaz
 
-1. **Descobrir** (PO): conversa vira exemplos concretos → cenários Gherkin no `.md`.
+1. **Descobrir** (`deboaz-arc`): conversa vira exemplos concretos → cenários Gherkin no `.md`.
 2. **Formular**: vistas (UX/UI) e diagramas (arquiteto) ilustram os cenários.
 3. **Automatizar** (qa): cenários viram testes vermelhos em `5_DEV/qa/` (`.feature` com a tag do ID).
 4. **Implementar** (back/front): TDD interno — unitário vermelho → verde → refatora — até o teste do qa ficar verde.
@@ -29,7 +29,7 @@ Muitos unitários, menos integração, poucos ponta a ponta. O qa cobre o compor
 
 ## Modelo espiral
 
-Cada volta da espiral = **objetivos → análise de riscos → desenvolvimento e verificação → planejamento da próxima volta**. No boaz cada volta é um módulo ou uma fatia (uma tarefa `tarefa_<NN>`), passando por PO → UX/UI → arquiteto → qa → back/front. Use-o para:
+Cada volta da espiral = **objetivos → análise de riscos → desenvolvimento e verificação → planejamento da próxima volta**. No boaz cada volta é um módulo ou uma fatia (uma tarefa `tarefa_<NN>`), passando por arquiteto (Gherkin) → UX/UI → arquiteto (diagramas) → qa → back/front. Use-o para:
 - atacar primeiro o que tem mais risco (regra incerta, integração nova, limite de desempenho);
 - transformar risco não resolvido em item de **Em aberto** ou em protótipo (vista) antes de codar;
 - revisar o requisito ao fim de cada volta com o que se aprendeu (nova versão, nunca edição silenciosa).

@@ -5,7 +5,7 @@ description: Competência de UX do boaz para projetar e avaliar a experiência a
 
 # UX e usabilidade → vistas que cumprem o Gherkin
 
-O `deboaz-uxui` **define e valida** a experiência e o design. Não decide regra de negócio (`deboaz-po`) nem implementa (`deboaz-frontend`). Base de leitura: `gherkin-bdd`. Visual e tokens: `design-system`. Desenho: `diagrama-dev` (seção Vista de tela). Regras do projeto: `1_Requisitos/06_design-system-telas.md` (RN-27 a RNF-118).
+O `deboaz-uxui` **define e valida** a experiência e o design. Não decide regra de negócio (`deboaz-arc`) nem implementa (`deboaz-frontend`). Base de leitura: `gherkin-bdd`. Visual e tokens: `design-system`. Desenho: `diagrama-dev` (seção Vista de tela). Regras do projeto: `1_Requisitos/06_design-system-telas.md` (RN-27 a RNF-118).
 
 ## 1 · Do cenário ao fluxo
 
@@ -16,7 +16,7 @@ O `deboaz-uxui` **define e valida** a experiência e o design. Não decide regra
 5. **Inventário de estados por tela**: vazio, carregando, sucesso, erro, sem permissão, sem conexão — com o **texto exato** do Gherkin.
 6. **Arquitetura da informação**: agrupamento, hierarquia, rótulos (do glossário), navegação pela casca da aplicação (`08_hub-ux` RF-17) — sem inventar menu que nenhum cenário pede.
 
-Cenário que não fecha um fluxo (estado sem saída, ação sem resposta visível, texto ausente) é **lacuna** → `deboaz-po`, com a proposta em Gherkin.
+Cenário que não fecha um fluxo (estado sem saída, ação sem resposta visível, texto ausente) é **lacuna** → `deboaz-arc`, com a proposta em Gherkin.
 
 ## 2 · Prototipação = vistas
 
@@ -33,7 +33,7 @@ Cenário que não fecha um fluxo (estado sem saída, ação sem resposta visíve
 - **PWA**: instalação, offline, atualização — `referencias/pwa-ux.md`.
 - **Fidelidade ao Gherkin**: cada texto, estado e ação do cenário aparece na vista, com o mesmo texto.
 
-Formato do achado: `Vista/tela · heurística ou critério · severidade · problema · proposta`. Problema que exige mudar regra → `deboaz-po`; que exige mudar código → `deboaz-frontend`; que exige token/componente → você mesmo, no design system.
+Formato do achado: `Vista/tela · heurística ou critério · severidade · problema · proposta`. Problema que exige mudar regra → `deboaz-arc`; que exige mudar código → `deboaz-frontend`; que exige token/componente → você mesmo, no design system.
 
 ## 4 · Material Design 3 e "Material UI 3"
 

@@ -5,7 +5,7 @@ description: Competência de QA do boaz — estratégia de testes guiada por ris
 
 # Estratégia de QA → `5_DEV/qa/`
 
-O `deboaz-qa` **define a estratégia e valida a qualidade**. Cada teste nasce de um cenário Gherkin do `.md` (skill `gherkin-bdd`) e cita o ID. O qa não decide regra (`deboaz-po`), não muda contrato (`deboaz-arc`) e não corrige código de produto (back/front). Fluxo da tarefa: etapa 2 da skill `desenvolvimento` (vermelho antes do código).
+O `deboaz-qa` **define a estratégia e valida a qualidade**. Cada teste nasce de um cenário Gherkin do `.md` (skill `gherkin-bdd`) e cita o ID. O qa não decide regra nem muda contrato (ambos do `deboaz-arc`) e não corrige código de produto (back/front). Fluxo da tarefa: etapa 2 da skill `desenvolvimento` (vermelho antes do código).
 
 Prevalência: `14_estrutura-projetos` (RN-151 a RN-156, RNF-190 a RNF-196), `03_ci-qualidade` (RN-142, RNF-18, RNF-194 a RNF-197), `5_DEV/qa/README.md` → esta skill.
 
@@ -22,7 +22,7 @@ Prevalência: `14_estrutura-projetos` (RN-151 a RN-156, RNF-190 a RNF-196), `03_
 1. **Inventário**: liste os IDs do documento (comando em `gherkin-bdd/referencias/rastreabilidade.md`), separe tela × API × `RNF` numérico.
 2. **Risco** (probabilidade × impacto): autenticação, autorização, isolamento por escola, dinheiro/contratação, perda de dado e integração nova primeiro.
 3. **Nível certo** (pirâmide): Cenários de API → `backend/integracao`; Cenários de tela → `frontend/web|mobile/funcional` (só fluxos de valor e o que a API não prova); `RNF` com número → `backend/carga`; regra interna → pedir unitário ao dono da frente.
-4. **Derivação de casos**: para cada regra, positivos, negativos, alternativos e limites — técnicas em `referencias/tecnicas-de-teste.md`. Caso necessário que **não está** no Gherkin → **não teste por conta própria**: proponha o cenário ao `deboaz-po`.
+4. **Derivação de casos**: para cada regra, positivos, negativos, alternativos e limites — técnicas em `referencias/tecnicas-de-teste.md`. Caso necessário que **não está** no Gherkin → **não teste por conta própria**: proponha o cenário ao `deboaz-arc`.
 5. **Matriz de cobertura** por ID (formato em `gherkin-bdd/referencias/rastreabilidade.md`) na entrega.
 
 ## 3 · Suítes e ferramentas
@@ -45,18 +45,18 @@ Contrato comum (RNF-191): `Dockerfile` na raiz da suíte, alvo por `API_URL`/`AP
 
 ## 5 · Regressão e exploratório
 
-- **Regressão**: a suíte inteira roda no CI a cada PR (job `qa`); bug corrigido ganha cenário (via PO) e teste que o reproduz antes do fix (`fix_<NN>`).
-- **Exploratório**: sessões curtas com missão ("explorar a troca de permissões com sessão aberta em dois aparelhos"), anotando achados; achado vira proposta de cenário ao PO, não teste avulso.
+- **Regressão**: a suíte inteira roda no CI a cada PR (job `qa`); bug corrigido ganha cenário (via `deboaz-arc`) e teste que o reproduz antes do fix (`fix_<NN>`).
+- **Exploratório**: sessões curtas com missão ("explorar a troca de permissões com sessão aberta em dois aparelhos"), anotando achados; achado vira proposta de cenário ao `deboaz-arc`, não teste avulso.
 - Teste instável (flaky) é defeito: isole a causa (espera, dado compartilhado, ordem), nunca só aumente o timeout ou repita.
 
 ## 6 · Entrega
 
-Lista de testes por ID com estado (vermelho pelo motivo certo / verde / pendente), matriz de cobertura, lacunas enviadas ao PO e riscos sem cobertura.
+Lista de testes por ID com estado (vermelho pelo motivo certo / verde / pendente), matriz de cobertura, lacunas enviadas ao `deboaz-arc` e riscos sem cobertura.
 
 ## Critérios de qualidade
 
 - [ ] Todo teste tem a tag/nome com o ID; todo ID testável do documento tem teste ou justificativa.
-- [ ] Negativos e limites cobertos onde o Gherkin os traz; os que faltam viraram proposta ao PO.
+- [ ] Negativos e limites cobertos onde o Gherkin os traz; os que faltam viraram proposta ao `deboaz-arc`.
 - [ ] Nenhum import de código de produto; estado preparado pela API sempre que possível.
 - [ ] Sem espera fixa (`sleep`); seletores estáveis; dados únicos por execução.
 - [ ] Contrato da suíte respeitado (Dockerfile, variáveis, JUnit, código de saída).

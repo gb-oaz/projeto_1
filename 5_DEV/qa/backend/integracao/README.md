@@ -88,7 +88,7 @@ integracao/
     ├── AuditoriaPassos.cs          auditoria do que muda estado, erros e alertas, traceId (RN-178, RN-270, RN-271)
     ├── IndicesPassos.cs            coleções e índices prontos na partida e GET /health (RNF-227, RNF-227-api)
     ├── modulos.feature             15_modulos.md: card comum, pela instância do Usuários (RN-276, RN-278, RN-279)
-    ├── contrato.feature            respostas do contrato usuarios v15 sem cenário no requisito (propostas ao deboaz-po)
+    ├── contrato.feature            respostas do contrato usuarios v15 sem cenário no requisito (propostas ao deboaz-arc)
     ├── ContratoPassos.cs           passos de contrato.feature
     ├── CardPassos.cs               GET /usuarios/card (RN-189, RN-280; 15 RN-276, RN-278)
     ├── AoVivoPassos.cs             GET /usuarios/card/ao-vivo (RN-281; 15 RN-279)

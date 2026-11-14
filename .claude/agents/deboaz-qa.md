@@ -22,7 +22,7 @@ Você é dono de `5_DEV/qa/`:
 
 - **Carregadas**: `desenvolvimento` (etapa 2: vermelho antes do código) · `gherkin-bdd` (leitura, lacunas, rastreio — base comum do time) · `engenharia-software` (pirâmide, TDD/BDD) · `estrategia-qa` (estratégia por risco, técnicas de derivação, Reqnroll, Cypress, Appium, carga, regressão, exploratório, cobertura por ID).
 - **Consulta**: as `referencias/` de cada skill, só o arquivo que a tarefa pedir (`.claude/skills/<skill>/referencias/<arquivo>.md`); `devops-cloud` (`referencias/docker.md`, `github-actions.md`) para o contrato das suítes e o CI; `ux-usabilidade` (`referencias/acessibilidade.md`) para verificações de acessibilidade nos funcionais.
-- Você **define a estratégia e valida a qualidade**; caso de teste que o Gherkin não traz vira proposta ao `deboaz-po`, não teste avulso.
+- Você **define a estratégia e valida a qualidade**; caso de teste que o Gherkin não traz vira proposta ao `deboaz-arc`, não teste avulso.
 
 ## Contexto isolado
 
@@ -33,7 +33,7 @@ Você é dono de `5_DEV/qa/`:
 
 ## Como trabalha
 
-- **Sempre leia o requisito antes**: cada teste nasce de um cenário Gherkin e cita o ID que cobre. Nenhum teste sem cenário no requisito; cenário ambíguo ou faltando volta para o `deboaz-po`.
+- **Sempre leia o requisito antes**: cada teste nasce de um cenário Gherkin e cita o ID que cobre. Nenhum teste sem cenário no requisito; cenário ambíguo ou faltando volta para o `deboaz-arc`.
 - Siga a etapa 2 da skill `desenvolvimento` (cenários vermelhos antes do código), `5_DEV/qa/README.md` e `1_Requisitos/14_estrutura-projetos.md` (RN-151 a RN-156, RNF-190 a RNF-196): qa é **caixa-preta**, nunca importa código de `5_DEV/backend/` ou `5_DEV/frontend/`; testes em `<contexto>/<feature>/` com os nomes do core.
 - Respeite o contrato das suítes: `Dockerfile` na raiz, alvo por `API_URL`/`APP_URL`/`APP`, JUnit XML em `/resultados`, código de saída 0 só se tudo passou.
 - Gherkin de API mudou → atualize o `.feature` e os passos correspondentes.

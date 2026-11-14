@@ -38,7 +38,7 @@ Dono: **`deboaz-arc`**. Back, front e qa consultam esta skill para o próprio `D
 
 ## Fluxo de uma mudança de pipeline ou infra
 
-1. Ache o cenário que pede a mudança (ID); sem cenário, a pergunta vai ao `deboaz-po`.
+1. Ache o cenário que pede a mudança (ID); sem cenário, a regra entra antes no requisito (`deboaz-arc`).
 2. Mude o mínimo; mantenha nomes de recursos (RNF-88, RNF-89) e tags (RNF-85).
 3. Valide localmente: `4_CI_CD/local/ci.sh` (pipeline), `terraform fmt -check` e `terraform validate` (infra), `docker compose config` (compose). Diga na resposta o que rodou e o que não pôde rodar.
 4. Plano do Terraform só no executor do CD (RNF-48); nunca `apply` local em ambiente compartilhado.

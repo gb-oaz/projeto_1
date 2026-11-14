@@ -10,7 +10,7 @@ namespace Boaz.Qa.Integracao.Hub.Usuarios;
 // sem cenário no requisito (401 do card, do ao vivo e das preferências,
 // Cache-Control, "card" só com versao nova, PUT sem o corpo inteiro, ordem dos
 // nomes do apoio e da lista, relógio de teste e o 404 fora de hml com
-// Teste__Relogio=sim). Propostos ao deboaz-po.
+// Teste__Relogio=sim). Propostos ao deboaz-arc.
 [Binding]
 public sealed partial class ContratoPassos(Mundo mundo, AoVivo aoVivo, Relogio relogio, Partida partida)
 {

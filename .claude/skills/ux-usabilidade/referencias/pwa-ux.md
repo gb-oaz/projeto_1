@@ -1,6 +1,6 @@
 # Experiência de PWA
 
-No boaz, **PWA** é a web instalada no celular: vista própria `-pwa`, classe de janela compact, com anotações (`06_design-system-telas` RNF-103). Comportamento offline, instalação e atualização **só existem se um cenário pedir** — sem cenário, é lacuna para o `deboaz-po`, não decisão de UX.
+No boaz, **PWA** é a web instalada no celular: vista própria `-pwa`, classe de janela compact, com anotações (`06_design-system-telas` RNF-103). Comportamento offline, instalação e atualização **só existem se um cenário pedir** — sem cenário, é lacuna para o `deboaz-arc`, não decisão de UX.
 
 ## O que avaliar na vista `-pwa`
 

@@ -21,5 +21,5 @@ Severidade: 0 não é problema · 1 cosmético · 2 menor · 3 maior (corrigir a
 vista-hub-usuarios-web_v04 · H5 Prevenção de erros · 3
 Problema: "Salvar" ativo com e-mail inválido; o erro só aparece após o envio.
 Proposta: validar o formato ao sair do campo e mostrar "Informe um e-mail válido" sob ele.
-Dono: deboaz-uxui (vista) → deboaz-po se o texto não existir no Gherkin.
+Dono: deboaz-uxui (vista) → deboaz-arc se o texto não existir no Gherkin.
 ```

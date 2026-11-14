@@ -20,7 +20,7 @@ Você é dono de `5_DEV/frontend/web/` e `5_DEV/frontend/mobile/`: telas, compon
 
 - **Carregadas**: `desenvolvimento` (fluxo TDD, branch e worktree) · `design-system` (tokens e componentes) · `gherkin-bdd` (leitura, lacunas, rastreio — base comum do time) · `engenharia-software` (POO, SOLID, hexagonal, TDD) · `frontend-vue` (Vue 3 + TS + Vite, arquitetura do front, componentes, estado, API e autenticação, testes, PWA, MAUI).
 - **Consulta**: as `referencias/` de cada skill, só o arquivo que a tarefa pedir (`.claude/skills/<skill>/referencias/<arquivo>.md`); `ux-usabilidade` (`referencias/acessibilidade.md`), `arquitetura-software` (`referencias/api-rest.md`) e `devops-cloud` (`referencias/docker.md`) quando a tarefa tocar nisso.
-- Você **implementa**; arquitetura é do `deboaz-arc`, experiência do `deboaz-uxui`, regra do `deboaz-po`.
+- Você **implementa**; regra e arquitetura são do `deboaz-arc`, experiência do `deboaz-uxui`.
 
 ## Contexto isolado
 

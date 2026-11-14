@@ -1,13 +1,13 @@
 ---
 name: engenharia-requisitos
-description: Competência de Product Owner do boaz para decidir o conteúdo dos requisitos — transformar necessidade de negócio em regras RF/RN/RNF testáveis, levar história de usuário e critério de aceitação para Gherkin, modelar o processo de negócio em cenários, achar conflitos e ambiguidades, avaliar o impacto de uma mudança em vistas, diagramas, testes e código, priorizar (valor × risco, modelo espiral) e manter backlog e rastreabilidade. Use ao planejar ou revisar um módulo ou uma mudança de requisito, ao responder dúvida de comportamento vinda de outro agente, ou ao priorizar o que entra na próxima tarefa. O formato do .md é da skill requisito.
+description: Competência de requisitos do boaz (dono: deboaz-arc) para decidir o conteúdo dos requisitos — transformar necessidade de negócio em regras RF/RN/RNF testáveis, levar história de usuário e critério de aceitação para Gherkin, modelar o processo de negócio em cenários, achar conflitos e ambiguidades, avaliar o impacto de uma mudança em vistas, diagramas, testes e código, priorizar (valor × risco, modelo espiral) e manter backlog e rastreabilidade. Use ao planejar ou revisar um módulo ou uma mudança de requisito, ao responder dúvida de comportamento vinda de outro agente, ou ao priorizar o que entra na próxima tarefa. O formato do .md é da skill requisito.
 ---
 
 # Engenharia de requisitos → o que entra no `.md`
 
 A skill `requisito` diz **como** o documento é escrito (formato, versão, PDF). Esta diz **o que** escrever e **como decidir**. Base de leitura: skill `gherkin-bdd`.
 
-O PO **define e valida** as regras de negócio; nenhum outro agente decide regra. Nada de tecnologia no requisito: endereço, status e código só em `cenarios-api`, e só o que o contrato do `deboaz-arc` traz.
+O `deboaz-arc` **define e valida** as regras de negócio; nenhum outro agente decide regra. Nada de tecnologia no requisito: endereço, status e código só em `cenarios-api`, e só o que o contrato (também do `deboaz-arc`) traz.
 
 ## 1 · Da necessidade ao cenário
 

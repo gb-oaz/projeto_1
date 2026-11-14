@@ -4,7 +4,7 @@ Suíte: `5_DEV/qa/backend/carga/` (ferramenta livre, ex.: k6 — RN-153). Roda s
 
 ## Regras
 
-- **Limite vem do requisito** (RN-155): cada teste cita o `RNF` e usa o número dele (ex.: "200 pedidos por segundo em até 300 ms"); o qa não inventa limite. `RNF` sem número → lacuna para o PO.
+- **Limite vem do requisito** (RN-155): cada teste cita o `RNF` e usa o número dele (ex.: "200 pedidos por segundo em até 300 ms"); o qa não inventa limite. `RNF` sem número → lacuna para o `deboaz-arc`.
 - Thresholds da ferramenta = critério do `RNF` (ex.: `p(95)<300`, taxa de erro < 1 %); a saída é 0 só se todos passarem.
 
 ## Tipos

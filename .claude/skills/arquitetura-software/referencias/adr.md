@@ -8,7 +8,7 @@ Não precisa de ADR: o que o requisito já decide (a decisão já está no Gherk
 
 ## Onde (decisão de 2026-11-08)
 
-**Não há pasta de ADR.** O ADR vai na **resposta** do arquiteto, endereçado ao `deboaz-po`, que registra o resultado como **cenário datado** no requisito transversal certo (`01` stack, `05` implantação, `14` estrutura) — no padrão já usado, ex.: `Cenário: um runtime por frente (decisão de 2026-10-24)`. Os diagramas afetados ganham nova versão na mesma tarefa.
+**Não há pasta de ADR.** O ADR vai na **resposta** do arquiteto, e o próprio `deboaz-arc` registra o resultado como **cenário datado** no requisito transversal certo (`01` stack, `05` implantação, `14` estrutura) — no padrão já usado, ex.: `Cenário: um runtime por frente (decisão de 2026-10-24)`. Os diagramas afetados ganham nova versão na mesma tarefa.
 
 Cenário datado proposto pelo arquiteto:
 

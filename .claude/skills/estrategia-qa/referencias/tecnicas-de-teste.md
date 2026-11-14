@@ -1,6 +1,6 @@
 # Técnicas de derivação de casos
 
-Use para **conferir** se o Gherkin cobre o necessário. Caso que falta vira proposta ao `deboaz-po`; o qa não cria regra.
+Use para **conferir** se o Gherkin cobre o necessário. Caso que falta vira proposta ao `deboaz-arc`; o qa não cria regra.
 
 | Técnica | Quando | Exemplo |
 |---|---|---|

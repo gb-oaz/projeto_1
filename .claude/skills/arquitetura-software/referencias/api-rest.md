@@ -39,7 +39,7 @@ O contrato do módulo (diagrama `contrato-*` em `2_Diagramas/`) é a fonte da ve
 ## Evolução
 
 - Mudança compatível: adicionar campo opcional, novo endereço, novo código de erro documentado.
-- Mudança incompatível: remover/renomear campo, mudar tipo ou semântica → nova versão do contrato, aviso ao PO (cenários de API), qa e front.
+- Mudança incompatível: remover/renomear campo, mudar tipo ou semântica → nova versão do contrato, atualização dos cenários de API pelo `deboaz-arc`, qa e front.
 
 ## Segurança no contrato
 

@@ -1,6 +1,6 @@
-# Boas práticas de escrita de cenários (para propor ao PO)
+# Boas práticas de escrita de cenários (para propor ao `deboaz-arc`)
 
-Quem escreve no `.md` é o `deboaz-po`, no formato da skill `requisito`. Os outros agentes usam isto para **propor** um cenário na resposta, já no estilo do projeto.
+Quem escreve no `.md` é o `deboaz-arc`, no formato da skill `requisito`. Os outros agentes usam isto para **propor** um cenário na resposta, já no estilo do projeto.
 
 ## Princípios
 
@@ -32,7 +32,7 @@ Quem escreve no `.md` é o `deboaz-po`, no formato da skill `requisito`. Os outr
 - **Limites** (`RNF` com número): no limite, logo abaixo, logo acima.
 - **Estados de tela**: vazio, carregando, erro, sucesso, sem conexão.
 
-## Formato da proposta (na resposta, para o `deboaz-po`)
+## Formato da proposta (na resposta, para o `deboaz-arc`)
 
 ````
 Proposta para 1_Requisitos/<doc>.md — <RF-xx ou "novo ID">
