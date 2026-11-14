@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+
 namespace Boaz.Core.Hub.Sac.Chamados.Domain;
 
 /// <summary>Grupo de uma recusa do SAC, para o adaptador de entrada escolher o status HTTP.</summary>
@@ -11,7 +13,7 @@ public enum GrupoDaFalha
     Conflito,
     /// <summary>413: anexo com mais de 10 MB.</summary>
     MuitoGrande,
-    /// <summary>415: anexo que não é PNG, JPG ou PDF.</summary>
+    /// <summary>415: anexo que não é PNG nem JPG.</summary>
     TipoNaoAceito,
     /// <summary>422: a forma do pedido.</summary>
     DadosInvalidos,
@@ -21,10 +23,10 @@ public enum GrupoDaFalha
 
 /// <summary>
 /// Uma recusa do SAC, com o código e a mensagem do contrato (sac-contrato-api
-/// v01). O adaptador de entrada a transforma na resposta { codigo, mensagem }
+/// v02). O adaptador de entrada a transforma na resposta { codigo, mensagem }
 /// com o campo, os limites ou o responsável, quando há.
 /// </summary>
-public sealed class FalhaDoSac : Exception
+public sealed class FalhaDoSac : Exception, IRecusaPrevista
 {
     FalhaDoSac(GrupoDaFalha grupo, string codigo, string mensagem) : base(mensagem) => (Grupo, Codigo) = (grupo, codigo);
 
@@ -88,8 +90,8 @@ public sealed class FalhaDoSac : Exception
     /// <summary>Anexo com mais de 10 MB (RN-292).</summary>
     public static FalhaDoSac AnexoGrande() => new(GrupoDaFalha.MuitoGrande, "ANEXO_GRANDE", "Cada arquivo com até 10 MB.");
 
-    /// <summary>Anexo que não é PNG, JPG ou PDF pelo conteúdo (RN-292).</summary>
-    public static FalhaDoSac TipoNaoAceito() => new(GrupoDaFalha.TipoNaoAceito, "TIPO_NAO_ACEITO", "Envie PNG, JPG ou PDF.");
+    /// <summary>Anexo que não é PNG nem JPG pelo conteúdo (RN-292).</summary>
+    public static FalhaDoSac TipoNaoAceito() => new(GrupoDaFalha.TipoNaoAceito, "TIPO_NAO_ACEITO", "Envie PNG ou JPG.");
 
     /// <summary>A verificação de segurança achou ameaça (RN-292).</summary>
     public static FalhaDoSac AnexoRecusado() =>

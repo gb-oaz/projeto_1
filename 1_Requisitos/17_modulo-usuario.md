@@ -2726,17 +2726,17 @@ Cenário: o que este documento não trata
 
 [![Sequência da inicialização da aplicação: lê as entradas e senhas do Key Vault, recebe-as como variáveis de ambiente, valida cada segredo e para a partida se faltar ou for inválido, cria o administrador e, em homologação, as 6 contas qa com o qaadmin e dados fictícios sem duplicar, com os módulos da lista do Key Vault, e volta cada conta qa ao estado inicial a cada partida](../2_Diagramas/usuario-inicializacao-sequencia_v05_20261112-0056.svg)](../2_Diagramas/usuario-inicializacao-sequencia_v05_20261112-0056.svg)
 
-**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg`
+**Usuários · contrato de API** — `2_Diagramas/usuarios-contrato-api_v18_20261113-0856.svg`
 
-[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão, card no formato comum e card ao vivo por SSE com ping a cada 30 s e preferências de atualização dos cards; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg)](../2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg)
+[![Contrato de API do módulo Usuários: criar conta, sigla sugerida, gerar a senha com o código de liberação e atendimento sem login; listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar; tempo de sessão, card no formato comum e card ao vivo por SSE com ping a cada 30 s e preferências de atualização dos cards; no time deboaz, contas, estado da conta, código da conta master e tempo de sessão do time, com pedido, respostas e códigos de erro](../2_Diagramas/usuarios-contrato-api_v18_20261113-0856.svg)](../2_Diagramas/usuarios-contrato-api_v18_20261113-0856.svg)
 
-**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg`
+**Usuários · classes** — `2_Diagramas/identidade-acesso-classes_v10_20261113-0900.svg`
 
-[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; CardUsuarios com NumerosDoCard e PontoDaSerie e as portas IRepositorioCardUsuarios, IContagemDoCard e IConexoesAoVivo; PreferenciasDeCards do Usuário; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg)](../2_Diagramas/identidade-acesso-classes_v09_20261109-0103.svg)
+[![Diagrama de classes dos usuários: Conta com os tempos de sessão e as conferências do cadastro, Usuário abstrato com ContaMaster, MembroDoTime, Staff e Participante, Responsável, GeraçãoDeSenha com o comprovante, RegistroDeAuditoria imutável com traceId e etapa, RegistroDeErro com nivel e as portas IAuditoria e IAuditoriaDeErros e AcessoAnônimo; CardUsuarios com NumerosDoCard e PontoDaSerie e as portas IRepositorioCardUsuarios, IContagemDoCard e IConexoesAoVivo; PreferenciasDeCards do Usuário; sessão e permissões nos diagramas de autenticação e de autorização](../2_Diagramas/identidade-acesso-classes_v10_20261113-0900.svg)](../2_Diagramas/identidade-acesso-classes_v10_20261113-0900.svg)
 
-**Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v03_20261112-0056.svg`
+**Usuários · pacotes da arquitetura hexagonal** — `2_Diagramas/usuario-hexagonal_v04_20261113-0900.svg`
 
-[![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v03_20261112-0056.svg)](../2_Diagramas/usuario-hexagonal_v03_20261112-0056.svg)
+[![Pacotes da arquitetura hexagonal do módulo Usuários: core, frentes, commons/usuario e, dentro dele, autenticacao, autorizacao e usuarios, cada um com domain, dtos, ports e usecases; os adaptadores ficam no ms_mono](../2_Diagramas/usuario-hexagonal_v04_20261113-0900.svg)](../2_Diagramas/usuario-hexagonal_v04_20261113-0900.svg)
 
 **Usuários, autenticação e autorização · documentos** — `2_Diagramas/identidade-acesso-documentos_v20_20261112-0056.svg`
 

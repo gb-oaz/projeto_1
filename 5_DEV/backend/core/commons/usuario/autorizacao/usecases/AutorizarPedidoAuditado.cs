@@ -1,10 +1,9 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.Ports.Out;
+using Boaz.Core.Commons.Auditoria.UseCases;
 using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
-using AuditoriaDaExecucao = Boaz.Core.Commons.Usuario.Usuarios.UseCases.AuditoriaDaExecucao;
-using Execucao = Boaz.Core.Commons.Usuario.Usuarios.UseCases.Execucao;
-using IAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoria;
-using IAuditoriaDeErros = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoriaDeErros;
 
 namespace Boaz.Core.Commons.Usuario.Autorizacao.UseCases;
 

@@ -141,11 +141,13 @@ resource "azurerm_subnet_network_security_group_association" "appgw" {
 # ── Private DNS dos private endpoints (RNF-61) ────────────────────────────────
 
 locals {
-  zonas_dns = {
+  zonas_dns = merge({
     kv     = "privatelink.vaultcore.azure.net"
     cosmos = "privatelink.mongo.cosmos.azure.com"
     redis  = "privatelink.redis.azure.net"
-  }
+    }, local.arquivos_conta ? {
+    blob = "privatelink.blob.core.windows.net" # anexos do SAC (RNF-235)
+  } : {})
 }
 
 resource "azurerm_private_dns_zone" "zona" {
@@ -163,14 +165,17 @@ resource "azurerm_private_dns_zone_virtual_network_link" "zona" {
   tags                = local.tags
 }
 
-# Um private endpoint por serviço (RNF-61): _pe-kv, _pe-cosmos, _pe-redis.
-# Desligado, nenhum: cobram por hora e as aplicações estão em zero (RN-26)
+# Um private endpoint por serviço (RNF-61): _pe-kv, _pe-cosmos, _pe-redis e,
+# com a conta dos anexos, _pe-blob. Desligado, nenhum: cobram por hora e as
+# aplicações estão em zero (RN-26, RNF-92)
 locals {
-  private_endpoints = var.ligado ? {
+  private_endpoints = var.ligado ? merge({
     kv     = { recurso = azurerm_key_vault.kv.id, subrecurso = "vault" }
     cosmos = { recurso = azurerm_cosmosdb_account.cosmos.id, subrecurso = "MongoDB" }
     redis  = { recurso = azurerm_managed_redis.redis[0].id, subrecurso = "redisEnterprise" }
-  } : {}
+    }, local.arquivos_conta ? {
+    blob = { recurso = azurerm_storage_account.arquivos[0].id, subrecurso = "blob" }
+  } : {}) : {}
 }
 
 resource "azurerm_private_endpoint" "pe" {

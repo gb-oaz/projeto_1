@@ -8,8 +8,9 @@ namespace Boaz.MsMono.Primario.In.Hub.Sac;
 
 // O agendamento do SAC, em segundo plano, a cada 1 min pelo relógio da
 // aplicação, com a trava sac:prazos (uma réplica só por vez): os 7 dias de
-// Aguardando cliente e de Resolvido (RN-290), o descarte dos anexos não usados
-// em 24 h (RN-292) e, quando o dia de Brasília vira, o fechamento do card
+// Aguardando cliente e de Resolvido (RN-290), o descarte dos anexos de
+// expiraEm vencido, no Blob ou no GridFS (RN-292, RNF-234) e, quando o dia de
+// Brasília vira, o fechamento do card
 // (15 RN-278). Falha vai para o log e o minuto seguinte tenta de novo. O
 // relógio de teste roda as rotinas na hora (POST /_teste/sac/agendamento).
 public sealed class AgendamentoDoSac(IServiceProvider servicos, TravaDoAgendamentoNoRedis trava, TimeProvider relogio,
@@ -21,7 +22,7 @@ public sealed class AgendamentoDoSac(IServiceProvider servicos, TravaDoAgendamen
     public static async Task Rotinas(IServiceProvider servicos, CancellationToken ct)
     {
         await servicos.GetRequiredService<IAplicarPrazos>().Executar(ct);
-        await servicos.GetRequiredService<IDescartarAnexosNaoUsados>().Executar(ct);
+        await servicos.GetRequiredService<IDescartarAnexosVencidos>().Executar(ct);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

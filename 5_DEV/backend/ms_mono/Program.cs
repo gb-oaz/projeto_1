@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Ports.Out;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autenticacao.UseCases;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
@@ -17,7 +18,9 @@ using Boaz.MsMono.Primario.In.Commons;
 using Boaz.MsMono.Primario.In.Hub.Sac;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Usuarios;
 using Boaz.MsMono.Secundario.In.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Secundario.In.Hub.Sac;
 using Boaz.MsMono.Secundario.Out.Commons;
+using Boaz.MsMono.Secundario.Out.Commons.Auditoria;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autenticacao;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autorizacao;
@@ -54,13 +57,16 @@ servicos.AddSingleton<Armazenamento>();
 servicos.AddSingleton<Indices>();
 servicos.AddSingleton<RegistroDeModulos>();
 
+// commons/auditoria: auditoria e auditoriaErros, de todos os módulos
+servicos.AddSingleton<AuditoriaNoBanco>();
+servicos.AddSingleton<IAuditoria>(s => s.GetRequiredService<AuditoriaNoBanco>());
+servicos.AddSingleton<IAuditoriaDeErros>(s => s.GetRequiredService<AuditoriaNoBanco>());
+
 // commons/usuario/usuarios
 servicos.AddSingleton<IUsuarios, UsuariosNoBanco>();
 servicos.AddSingleton<IContas, ContasNoBanco>();
 servicos.AddSingleton<IGeracoesDeSenha, GeracoesNoBanco>();
 servicos.AddSingleton<RegistrosNoBanco>();
-servicos.AddSingleton<IAuditoria>(s => s.GetRequiredService<RegistrosNoBanco>());
-servicos.AddSingleton<IAuditoriaDeErros>(s => s.GetRequiredService<RegistrosNoBanco>());
 // os pedidos de ajuda sem login viram chamados do SAC (18 RF-179)
 servicos.AddSingleton<IPedidosDeAjuda, PedidosDeAjudaNoSac>();
 servicos.AddSingleton<IPagamentos>(s => s.GetRequiredService<RegistrosNoBanco>());
@@ -95,16 +101,26 @@ servicos.AddSingleton<Autorizacao.IContratacoes, ContratacoesNoBanco>();
 servicos.AddSingleton<ContratacoesDeTeste>();
 servicos.AddSingleton<Autorizacao.ISessoesDoUsuario, AvisoDePermissoes>();
 
-// hub/sac (sac-classes v01): chamados, anexos, prazos e card
+// hub/sac (sac-classes v04, sac-hexagonal v03): chamados, anexos, prazos e card
 servicos.AddSingleton<ChamadosNoBanco>();
 servicos.AddSingleton<SacChamados.IChamados>(s => s.GetRequiredService<ChamadosNoBanco>());
 servicos.AddSingleton<SacChamados.INumeracao>(s => s.GetRequiredService<ChamadosNoBanco>());
+servicos.AddSingleton<AvisosDoChamadoPeloRedis>();
 servicos.AddSingleton<SacChamados.ICanalDoChamado, CanalDoChamadoNoRedis>();
 servicos.AddSingleton<SacChamados.IPessoasDoSac, PessoasDoSacNoBanco>();
-servicos.AddSingleton<AnexosNoBanco>();
+// o AMBIENTE lido na resolução, como o relógio: o expiraEm do anexo usado é por ambiente (18 RNF-234)
+servicos.AddSingleton(s => new AnexosNoBanco(s.GetRequiredService<Armazenamento>(), s.GetRequiredService<SacAnexos.IArquivos>(),
+    new Boaz.Core.Commons.Usuario.Usuarios.Domain.AmbienteDaAplicacao(
+        s.GetRequiredService<IConfiguration>()[Boaz.Core.Commons.Usuario.Usuarios.Domain.ContasIniciais.VariavelDoAmbiente])));
 servicos.AddSingleton<SacAnexos.IAnexos>(s => s.GetRequiredService<AnexosNoBanco>());
 servicos.AddSingleton<SacChamados.IAnexosDoChamado>(s => s.GetRequiredService<AnexosNoBanco>());
-servicos.AddSingleton<SacAnexos.IArquivos, ArquivosNoGridFs>();
+// os arquivos dos anexos: gravados no destino (Sac:Arquivos:Destino, BLOB ou
+// GRIDFS) e lidos de onde cada um foi guardado (18 RNF-233); o Blob só existe
+// com a conta configurada (ConnectionStrings:Blob ou Sac:Arquivos:Blob)
+servicos.AddSingleton<ArquivosNoGridFs>();
+servicos.AddSingleton(s => new ArquivosDosAnexos(s.GetRequiredService<ArquivosNoGridFs>(),
+    ArquivosNoBlob.Da(builder.Configuration, s.GetRequiredService<TimeProvider>()), ArquivosDosAnexos.DestinoDa(builder.Configuration)));
+servicos.AddSingleton<SacAnexos.IArquivos>(s => s.GetRequiredService<ArquivosDosAnexos>());
 // a verificação dos anexos: o clamd em Sac:ClamAv; sem ele, o dublê em
 // homologação e falha fechada fora dela; o interruptor é do relógio de teste
 servicos.AddSingleton(s => new InterruptorDaVerificacao(InterruptorDaVerificacao.Escolher(builder.Configuration,
@@ -188,7 +204,7 @@ servicos.AddSingleton<IRegistrarPedidoDeSenha, RegistrarPedidoDeSenha>();
 servicos.AddSingleton<IAplicarPrazos, AplicarPrazos>();
 servicos.AddSingleton<IEnviarAnexo, EnviarAnexo>();
 servicos.AddSingleton<ILerAnexo, LerAnexo>();
-servicos.AddSingleton<IDescartarAnexosNaoUsados, DescartarAnexosNaoUsados>();
+servicos.AddSingleton<IDescartarAnexosVencidos, DescartarAnexosVencidos>();
 servicos.AddSingleton<ILerPrazos, LerPrazos>();
 servicos.AddSingleton<ISalvarPrazos, SalvarPrazos>();
 servicos.AddSingleton<ILerCardDoSac, LerCardDoSac>();

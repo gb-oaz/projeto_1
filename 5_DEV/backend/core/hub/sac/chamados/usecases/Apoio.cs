@@ -1,49 +1,8 @@
-using Boaz.Core.Commons.Usuario.Usuarios.Domain;
-using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 using Boaz.Core.Hub.Sac.Chamados.Domain;
 using Boaz.Core.Hub.Sac.Chamados.Dtos;
 using Boaz.Core.Hub.Sac.Chamados.Ports.Out;
 
 namespace Boaz.Core.Hub.Sac.Chamados.UseCases;
-
-/// <summary>Uma execução auditada do SAC (18 RN-297, 17 RN-178): o traceId, a ação, a conta, quem e o alvo.</summary>
-/// <param name="TraceId">A execução, no X-Trace-Id.</param>
-/// <param name="Acao">O que se faz.</param>
-/// <param name="ContaId">A conta, se há.</param>
-/// <param name="Quem">Quem pede; null no sistema.</param>
-/// <param name="Alvo">O chamado, se já existe.</param>
-sealed record ExecucaoDoSac(TraceId TraceId, AcaoAuditada Acao, string? ContaId, string? Quem, string? Alvo);
-
-/// <summary>
-/// A auditoria dos casos de uso do SAC (17 RN-178, RN-270, RN-271): o
-/// "INICIADO" ao chegar, a regra, o "CONCLUIDO" com o alvo antes de responder
-/// e, na recusa ou na falha, o registro de erro com o mesmo traceId.
-/// </summary>
-sealed class AuditoriaDoSac(IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio)
-{
-    /// <summary>Executa a regra auditada; a regra devolve a resposta e o alvo do "CONCLUIDO".</summary>
-    public async Task<T> Auditar<T>(ExecucaoDoSac execucao, Func<Task<(T Resposta, string? Alvo)>> regra, CancellationToken ct)
-    {
-        await Registrar(execucao, EtapaDaExecucao.Iniciado, ct);
-        try
-        {
-            var (resposta, alvo) = await regra();
-            await Registrar(execucao with { Alvo = alvo ?? execucao.Alvo }, EtapaDaExecucao.Concluido, ct);
-            return resposta;
-        }
-        catch (Exception falha) when (falha is not OperationCanceledException)
-        {
-            var (codigo, nivel) = falha is FalhaDoSac recusa ? (recusa.Codigo, NivelDoErro.Alerta) : (RegistroDeErro.ErroInesperado, NivelDoErro.Erro);
-            await erros.Registrar(new RegistroDeErro(execucao.TraceId, execucao.ContaId, execucao.Quem, execucao.Acao, execucao.Alvo, codigo, nivel,
-                relogio.GetUtcNow()), ct);
-            throw;
-        }
-    }
-
-    Task Registrar(ExecucaoDoSac execucao, EtapaDaExecucao etapa, CancellationToken ct) =>
-        auditoria.Registrar(new RegistroDeAuditoria(execucao.TraceId, etapa, execucao.ContaId, execucao.Quem, execucao.Acao, execucao.Alvo,
-            relogio.GetUtcNow()), ct);
-}
 
 /// <summary>
 /// O que os casos de uso do chamado repetem: carregar pelo lado de quem pede

@@ -51,9 +51,12 @@ Precisa de:
   banco local. Sem elas o backend não sobe (RNF-226).
 
 ```bash
-# 1. MongoDB e Redis nas portas padrão do appsettings.json (uma vez; --rm apaga ao parar)
+# 1. MongoDB, Redis e Azurite (Blob dos anexos do SAC, RNF-233) nas portas padrão
+#    (uma vez; --rm apaga ao parar). Sem o Azurite, os testes de ArquivosDosAnexosTests falham
 docker run -d --rm --name boaz-mongo -p 127.0.0.1:27017:27017 mongo:8.0
 docker run -d --rm --name boaz-redis -p 127.0.0.1:6379:6379 redis:8.0
+docker run -d --rm --name boaz-azurite -p 127.0.0.1:10000:10000 mcr.microsoft.com/azure-storage/azurite:3.34.0 \
+  azurite-blob --blobHost 0.0.0.0 --inMemoryPersistence --skipApiVersionCheck --loose
 
 # 2. backend, na pasta 5_DEV/backend, com a entrada e a senha do administrador
 #    (senha da RNF-202: 8+ caracteres, com maiúscula, número e especial)

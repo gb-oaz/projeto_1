@@ -1,3 +1,6 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.Ports.Out;
+using Boaz.Core.Commons.Auditoria.UseCases;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 using Boaz.Core.Hub.Sac.Chamados.Domain;
@@ -17,12 +20,12 @@ public sealed class AbrirChamado(
     IChamados chamados, INumeracao numeracao, ICanalDoChamado canal, IPessoasDoSac pessoas, IAnexosDoChamado anexos, IPrazosDoSac prazos,
     IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio) : IAbrirChamado
 {
-    readonly AuditoriaDoSac auditada = new(auditoria, erros, relogio);
+    readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
     readonly Conversa conversa = new(chamados, numeracao, canal, pessoas);
 
     /// <inheritdoc />
     public Task<ChamadoAbertoDto> Executar(PedidoAbrirChamado pedido, QuemPede quem, TraceId traceId, CancellationToken ct = default) =>
-        auditada.Auditar(new ExecucaoDoSac(traceId, AcaoAuditada.AbrirChamado, quem.ContaId, quem.UsuarioId, null), async () =>
+        auditada.Auditar(new Execucao(traceId, AcaoAuditada.AbrirChamado, quem.ContaId, quem.UsuarioId, null), async andamento =>
         {
             quem.SoConta();
             var (categoria, assunto, descricao, relacionadoA, ids) = pedido.Validar();
@@ -40,6 +43,8 @@ public sealed class AbrirChamado(
                 await prazos.HorasUteis(categoria, ct), agora);
             await conversa.Incluir(chamado, ct);
             if (ids.Count > 0) await anexos.Vincular(ids, numero, null, false, ct);
-            return (ChamadoAbertoDto.De(chamado.Dados), (string?)numero.Valor);
+            andamento.Alvejar(numero.Valor);
+            await auditada.Concluir(andamento.Atual, ct);
+            return ChamadoAbertoDto.De(chamado.Dados);
         }, ct);
 }

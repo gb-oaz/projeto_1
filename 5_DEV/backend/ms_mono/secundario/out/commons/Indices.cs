@@ -52,6 +52,7 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
         (Colecoes.CardUsuarios, Unico(Chave.Ascending("contaId").Ascending("perfil").Ascending("usuarioId"), "contaId_perfil_usuarioId_unico")),
         // pedidos de ajuda (limite por aparelho, RNF-205)
         (Colecoes.PedidosAjuda, Comum(Chave.Ascending("aparelho").Ascending("quando"), "aparelho_quando")),
+        (Colecoes.PedidosAjuda, Comum(Chave.Ascending("chamado"), "chamado")),
         // SAC (sac-documentos v01): Meus chamados, o limite de 10, a fila do
         // time, o atrasado, os 7 dias do agendamento e a guarda de 5 anos
         (Colecoes.Chamados, Comum(Chave.Ascending("contaId").Descending("atualizadoEm"), "contaId_atualizadoEm")),

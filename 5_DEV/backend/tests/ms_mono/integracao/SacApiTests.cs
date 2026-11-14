@@ -11,7 +11,7 @@ using MongoDB.Driver;
 
 namespace Boaz.MsMono.Tests.Integracao;
 
-// Endereços do SAC (18_modulo-sac v04, sac-contrato-api v01) com banco e cache
+// Endereços do SAC (18_modulo-sac v06, sac-contrato-api v03) com banco e cache
 // reais: os adaptadores de chamados, anexos (GridFS e verificação local),
 // prazos, card, canal ao vivo e o agendamento. O comportamento de cada cenário
 // é coberto pelo qa (hub/sac); aqui, a ligação de ponta a ponta.
@@ -101,8 +101,9 @@ public class SacApiTests(Backend backend) : IClassFixture<Backend>
     {
         var (_, master) = await preparo.Conta(Preparo.SiglaSorteada());
         using var api = backend.Cliente();
-        var eicar = Encoding.ASCII.GetBytes("%PDF-1.4\n" + string.Concat(@"X5O!P%@AP[4\PZX54(P^)7CC)7}$", "EICAR-STANDARD-", "ANTIVIRUS-TEST-FILE!$H+H*"));
-        Assert.Equal((HttpStatusCode.UnprocessableEntity, "ANEXO_RECUSADO"), Par(await EnviarArquivo(master.Token, "nota.pdf", eicar)));
+        // só PNG e JPG (v06): a ameaça de teste vai num JPG
+        byte[] eicar = [0xFF, 0xD8, 0xFF, 0xE0, .. Encoding.ASCII.GetBytes(string.Concat(@"X5O!P%@AP[4\PZX54(P^)7CC)7}$", "EICAR-STANDARD-", "ANTIVIRUS-TEST-FILE!$H+H*")), 0xFF, 0xD9];
+        Assert.Equal((HttpStatusCode.UnprocessableEntity, "ANEXO_RECUSADO"), Par(await EnviarArquivo(master.Token, "nota.jpg", eicar)));
         Assert.Equal((HttpStatusCode.UnsupportedMediaType, "TIPO_NAO_ACEITO"), Par(await EnviarArquivo(master.Token, "tela.mp4", [0, 0, 0, 0x18])));
         var interruptor = backend.Services.GetRequiredService<InterruptorDaVerificacao>();
         interruptor.Disponivel = false;
@@ -129,6 +130,81 @@ public class SacApiTests(Backend backend) : IClassFixture<Backend>
     }
 
     static (HttpStatusCode, string?) Par(Resposta r) => (r.Status, r.Codigo);
+
+    // RN-292 v06, contrato v03: só PNG e JPG, pelo conteúdo; PDF, com qualquer
+    // nome, responde 415 com a mensagem do contrato
+    [Theory]
+    [InlineData("boleto.pdf")]
+    [InlineData("foto.png")]
+    public async Task RN_292_pdf_nao_e_aceito(string nome)
+    {
+        var (_, master) = await preparo.Conta(Preparo.SiglaSorteada());
+        var pdf = Encoding.ASCII.GetBytes("%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n");
+
+        var resposta = await EnviarArquivo(master.Token, nome, pdf);
+
+        Assert.Equal((HttpStatusCode.UnsupportedMediaType, "TIPO_NAO_ACEITO", "Envie PNG ou JPG."),
+            (resposta.Status, resposta.Codigo, resposta.Corpo?["mensagem"]?.GetValue<string>()));
+    }
+
+    // o JPG continua aceito, com o tipo pelo conteúdo
+    [Fact]
+    public async Task RN_292_jpg_aceito_com_o_tipo_do_conteudo()
+    {
+        var (_, master) = await preparo.Conta(Preparo.SiglaSorteada());
+        byte[] jpg = [0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, (byte)'J', (byte)'F', (byte)'I', (byte)'F', 0, 1, 1, 0, 0xFF, 0xD9];
+
+        var resposta = await EnviarArquivo(master.Token, "foto.jpg", jpg);
+
+        Assert.Equal((HttpStatusCode.Created, "image/jpeg"), (resposta.Status, resposta.Corpo?["tipo"]?.GetValue<string>()));
+    }
+
+    // RN-289, contrato v03: prazoPerto na fila do time, calculado na leitura:
+    // sem a 1ª resposta e com 1 hora útil ou menos até o prazoResposta (30 min
+    // de relógio antes dele bastam: falta no máximo isso de hora útil); nunca
+    // junto com atrasado; com a 1ª resposta, nenhum dos dois
+    [Fact]
+    public async Task RN_289_prazoPerto_na_fila_do_time()
+    {
+        var (_, master) = await preparo.Conta(Preparo.SiglaSorteada());
+        var time = await preparo.Admin();
+        using var api = backend.Cliente();
+        var semResposta = (await api.Enviar("POST", "/sac/chamados", Corpo(), master.Token)).Texto("id");
+        var respondido = (await api.Enviar("POST", "/sac/chamados", Corpo(), master.Token)).Texto("id");
+        await api.Enviar("POST", $"/sac/chamados/{respondido}/assumir", token: time.Token);
+        await api.Enviar("POST", $"/sac/chamados/{respondido}/status", new { status = "AGUARDANDO_CLIENTE", mensagem = "Qual a turma?" }, time.Token);
+        var prazo = DateTimeOffset.Parse((await api.Enviar("GET", $"/sac/chamados/{semResposta}", token: time.Token)).Texto("prazoResposta"),
+            System.Globalization.CultureInfo.InvariantCulture);
+        var relogio = backend.Services.GetRequiredService<RelogioDaAplicacao>();
+
+        async Task<(bool? Perto, bool? Atrasado)> Item(string id)
+        {
+            var quem = await preparo.Admin();
+            var fila = await api.Enviar("GET", $"/sac/chamados?busca={id}", token: quem.Token);
+            var item = fila.Corpo!["itens"]!.AsArray().Single(i => i!["id"]!.GetValue<string>() == id)!;
+            Assert.True(item.AsObject().ContainsKey("prazoPerto"), $"o item da fila do time devia trazer prazoPerto: {item.ToJsonString()}");
+            return (item["prazoPerto"]?.GetValue<bool>(), item["atrasado"]?.GetValue<bool>());
+        }
+
+        var logo = await Item(semResposta);
+        relogio.Definir(prazo.AddMinutes(-30));
+        try
+        {
+            var perto = await Item(semResposta);
+            var jaRespondido = await Item(respondido);
+            relogio.Definir(prazo.AddMinutes(1));
+            var vencido = await Item(semResposta);
+
+            Assert.Equal(((bool?)false, (bool?)false), logo);
+            Assert.Equal(((bool?)true, (bool?)false), perto);
+            Assert.Equal(((bool?)false, (bool?)false), jaRespondido);
+            Assert.Equal(((bool?)false, (bool?)true), vencido);
+        }
+        finally
+        {
+            relogio.Real();
+        }
+    }
 
     [Fact]
     public async Task RN_290_sete_dias_sem_resposta_pelo_agendamento()

@@ -1,0 +1,1485 @@
+{
+  "POST sac/anexos": {
+    "pedido": null,
+    "respostas": {
+      "201": [
+        {
+          "nome": "201",
+          "corpo": {
+            "id": "anx-7f3a21",
+            "nome": "erro.png",
+            "tipo": "image/png",
+            "tamanho": 2097152
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "413": [
+        {
+          "nome": "ANEXO_GRANDE",
+          "corpo": {
+            "codigo": "ANEXO_GRANDE",
+            "mensagem": "Cada arquivo com até 10 MB."
+          }
+        }
+      ],
+      "415": [
+        {
+          "nome": "TIPO_NAO_ACEITO",
+          "corpo": {
+            "codigo": "TIPO_NAO_ACEITO",
+            "mensagem": "Envie PNG ou JPG."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "ANEXO_RECUSADO",
+          "corpo": {
+            "codigo": "ANEXO_RECUSADO",
+            "mensagem": "Arquivo recusado pela verificação de segurança."
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"arquivo\" está faltando ou é inválido.",
+            "campo": "arquivo"
+          }
+        }
+      ],
+      "503": [
+        {
+          "nome": "VERIFICACAO_INDISPONIVEL",
+          "corpo": {
+            "codigo": "VERIFICACAO_INDISPONIVEL",
+            "mensagem": "A verificação de segurança dos arquivos está fora do ar. Tente de novo em instantes."
+          }
+        }
+      ]
+    }
+  },
+  "GET sac/anexos/{id}": {
+    "pedido": null,
+    "respostas": {
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "ANEXO_INEXISTENTE",
+          "corpo": {
+            "codigo": "ANEXO_INEXISTENTE",
+            "mensagem": "Anexo não encontrado."
+          }
+        }
+      ]
+    }
+  },
+  "POST sac/chamados": {
+    "pedido": {
+      "categoria": "MODULO_COM_PROBLEMA",
+      "assunto": "Presença não salva a chamada",
+      "descricao": "Ao tocar em Salvar na chamada da turma…",
+      "relacionadoA": null,
+      "anexos": [
+        "anx-7f3a21"
+      ]
+    },
+    "respostas": {
+      "201": [
+        {
+          "nome": "201",
+          "corpo": {
+            "id": "SAC-000042",
+            "status": "ABERTO",
+            "categoria": "MODULO_COM_PROBLEMA",
+            "abertoEm": "2026-11-12T13:00:00Z",
+            "prazoResposta": "2026-11-12T21:00:00Z",
+            "responsavel": null
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "LIMITE_CHAMADOS",
+          "corpo": {
+            "codigo": "LIMITE_CHAMADOS",
+            "mensagem": "Você já tem 10 chamados em andamento. Acompanhe-os em Meus chamados."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"assunto\" deve ter de 5 a 120 caracteres.",
+            "campo": "assunto"
+          }
+        },
+        {
+          "nome": "LIMITE_ANEXOS",
+          "corpo": {
+            "codigo": "LIMITE_ANEXOS",
+            "mensagem": "Até 5 arquivos por mensagem.",
+            "campo": "anexos"
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": "Algo deu errado. Tente de novo mais tarde."
+          }
+        }
+      ]
+    }
+  },
+  "GET sac/chamados": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "itens": [
+              {
+                "id": "SAC-000042",
+                "assunto": "Presença não salva a chamada",
+                "categoria": "MODULO_COM_PROBLEMA",
+                "status": "AGUARDANDO_CLIENTE",
+                "atualizadoEm": "2026-11-12T14:20:00Z",
+                "novaResposta": true
+              }
+            ],
+            "total": 7,
+            "pagina": 1
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"filtro\" está faltando ou é inválido.",
+            "campo": "filtro"
+          }
+        }
+      ]
+    }
+  },
+  "GET sac/chamados/{id}": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "id": "SAC-000042",
+            "assunto": "Presença não salva a chamada",
+            "descricao": "Ao tocar em Salvar na chamada da turma…",
+            "categoria": "MODULO_COM_PROBLEMA",
+            "status": "RESOLVIDO",
+            "conta": {
+              "id": "conta-EBFGA",
+              "sigla": "EBFGA",
+              "nome": "Escola Bento Freitas",
+              "tipo": "INSTITUICAO"
+            },
+            "relacionadoA": null,
+            "anexos": [
+              "anx-7f3a21"
+            ],
+            "responsavel": "Caio Lima",
+            "abertoEm": "2026-11-12T13:00:00Z",
+            "atualizadoEm": "2026-11-12T17:00:00Z",
+            "prazoResposta": "2026-11-12T21:00:00Z",
+            "resolvidoEm": "2026-11-12T17:00:00Z",
+            "fechadoEm": null,
+            "avaliacao": null,
+            "podeAvaliar": true,
+            "podeReabrir": true,
+            "mensagens": [
+              {
+                "id": "msg-000301",
+                "tipo": "MENSAGEM",
+                "interna": false,
+                "autor": {
+                  "tipo": "TIME",
+                  "nome": "Caio Lima"
+                },
+                "texto": "Olá! Qual a turma da chamada?",
+                "anexos": [],
+                "enviadaEm": "2026-11-12T14:00:00Z"
+              }
+            ],
+            "linhaDoTempo": [
+              {
+                "id": "msg-000305",
+                "evento": "STATUS",
+                "de": "EM_ATENDIMENTO",
+                "para": "RESOLVIDO",
+                "autor": {
+                  "tipo": "TIME",
+                  "nome": "Caio Lima"
+                },
+                "em": "2026-11-12T17:00:00Z"
+              }
+            ]
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CHAMADO_INEXISTENTE",
+          "corpo": {
+            "codigo": "CHAMADO_INEXISTENTE",
+            "mensagem": "Chamado não encontrado."
+          }
+        }
+      ]
+    }
+  },
+  "GET sac/chamados/{id}/ao-vivo": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "mensagem",
+          "corpo": {
+            "id": "msg-000319",
+            "tipo": "MENSAGEM",
+            "interna": false,
+            "autor": {
+              "tipo": "TIME",
+              "nome": "Caio Lima"
+            },
+            "texto": "Pode testar de novo a chamada da 7A?",
+            "anexos": [],
+            "enviadaEm": "2026-11-12T15:10:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CHAMADO_INEXISTENTE",
+          "corpo": {
+            "codigo": "CHAMADO_INEXISTENTE",
+            "mensagem": "Chamado não encontrado."
+          }
+        }
+      ]
+    }
+  },
+  "POST sac/chamados/{id}/mensagens": {
+    "pedido": {
+      "texto": "Turma 7A",
+      "anexos": [
+        "anx-81bc09"
+      ],
+      "interna": false
+    },
+    "respostas": {
+      "201": [
+        {
+          "nome": "201",
+          "corpo": {
+            "id": "msg-000318",
+            "autor": "Escola Bento Freitas",
+            "enviadaEm": "2026-11-12T14:30:00Z",
+            "statusChamado": "EM_ATENDIMENTO"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CHAMADO_INEXISTENTE",
+          "corpo": {
+            "codigo": "CHAMADO_INEXISTENTE",
+            "mensagem": "Chamado não encontrado."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "CHAMADO_FECHADO",
+          "corpo": {
+            "codigo": "CHAMADO_FECHADO",
+            "mensagem": "Chamado fechado. Abra um relacionado."
+          }
+        },
+        {
+          "nome": "SEM_CONVERSA",
+          "corpo": {
+            "codigo": "SEM_CONVERSA",
+            "mensagem": "Quem pediu não tem login: use nota interna e resolva o pedido."
+          }
+        },
+        {
+          "nome": "TRANSICAO_INVALIDA",
+          "corpo": {
+            "codigo": "TRANSICAO_INVALIDA",
+            "mensagem": "Conta encerrada não volta."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"texto\" está faltando ou é inválido.",
+            "campo": "texto"
+          }
+        },
+        {
+          "nome": "LIMITE_ANEXOS",
+          "corpo": {
+            "codigo": "LIMITE_ANEXOS",
+            "mensagem": "Até 5 arquivos por mensagem."
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": "Algo deu errado. Tente de novo mais tarde."
+          }
+        }
+      ]
+    }
+  },
+  "PATCH sac/chamados/{id}/mensagens/{m}": {
+    "pedido": null,
+    "respostas": {}
+  },
+  "PUT sac/chamados/{id}/mensagens/{m}": {
+    "pedido": null,
+    "respostas": {}
+  },
+  "DELETE sac/chamados/{id}/mensagens/{m}": {
+    "pedido": null,
+    "respostas": {}
+  },
+  "POST sac/chamados/{id}/assumir": {
+    "pedido": {
+      "substituir": false
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "id": "SAC-000042",
+            "status": "EM_ATENDIMENTO",
+            "responsavel": "Caio Lima"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CHAMADO_INEXISTENTE",
+          "corpo": {
+            "codigo": "CHAMADO_INEXISTENTE",
+            "mensagem": "Chamado não encontrado."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "JA_ASSUMIDO",
+          "corpo": {
+            "codigo": "JA_ASSUMIDO",
+            "mensagem": "Este chamado já está com Ana Lima.",
+            "responsavel": "Ana Lima"
+          }
+        },
+        {
+          "nome": "CHAMADO_FECHADO",
+          "corpo": {
+            "codigo": "CHAMADO_FECHADO",
+            "mensagem": "Chamado fechado. Abra um relacionado."
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": "Algo deu errado. Tente de novo mais tarde."
+          }
+        }
+      ]
+    }
+  },
+  "POST sac/chamados/{id}/status": {
+    "pedido": {
+      "status": "RESOLVIDO",
+      "mensagem": "Corrigido. Pode salvar de novo."
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "id": "SAC-000042",
+            "status": "RESOLVIDO",
+            "resolvidoEm": "2026-11-12T17:00:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CHAMADO_INEXISTENTE",
+          "corpo": {
+            "codigo": "CHAMADO_INEXISTENTE",
+            "mensagem": "Chamado não encontrado."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "TRANSICAO_INVALIDA",
+          "corpo": {
+            "codigo": "TRANSICAO_INVALIDA",
+            "mensagem": "Conta encerrada não volta."
+          }
+        },
+        {
+          "nome": "CHAMADO_FECHADO",
+          "corpo": {
+            "codigo": "CHAMADO_FECHADO",
+            "mensagem": "Chamado fechado. Abra um relacionado."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"status\" está faltando ou é inválido.",
+            "campo": "status"
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": "Algo deu errado. Tente de novo mais tarde."
+          }
+        }
+      ]
+    }
+  },
+  "POST sac/chamados/{id}/reabrir": {
+    "pedido": {
+      "mensagem": "Ainda aparece o erro na 8B"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "id": "SAC-000042",
+            "status": "EM_ATENDIMENTO",
+            "responsavel": "Caio Lima"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CHAMADO_INEXISTENTE",
+          "corpo": {
+            "codigo": "CHAMADO_INEXISTENTE",
+            "mensagem": "Chamado não encontrado."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "PRAZO_REABERTURA_VENCIDO",
+          "corpo": {
+            "codigo": "PRAZO_REABERTURA_VENCIDO",
+            "mensagem": "Prazo para reabrir encerrado."
+          }
+        },
+        {
+          "nome": "TRANSICAO_INVALIDA",
+          "corpo": {
+            "codigo": "TRANSICAO_INVALIDA",
+            "mensagem": "Conta encerrada não volta."
+          }
+        },
+        {
+          "nome": "CHAMADO_FECHADO",
+          "corpo": {
+            "codigo": "CHAMADO_FECHADO",
+            "mensagem": "Chamado fechado. Abra um relacionado."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"mensagem\" está faltando ou é inválido.",
+            "campo": "mensagem"
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": "Algo deu errado. Tente de novo mais tarde."
+          }
+        }
+      ]
+    }
+  },
+  "POST sac/chamados/{id}/encerrar": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "id": "SAC-000042",
+            "status": "FECHADO",
+            "resolvidoEm": null
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CHAMADO_INEXISTENTE",
+          "corpo": {
+            "codigo": "CHAMADO_INEXISTENTE",
+            "mensagem": "Chamado não encontrado."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "TRANSICAO_INVALIDA",
+          "corpo": {
+            "codigo": "TRANSICAO_INVALIDA",
+            "mensagem": "Conta encerrada não volta."
+          }
+        },
+        {
+          "nome": "CHAMADO_FECHADO",
+          "corpo": {
+            "codigo": "CHAMADO_FECHADO",
+            "mensagem": "Chamado fechado. Abra um relacionado."
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": "Algo deu errado. Tente de novo mais tarde."
+          }
+        }
+      ]
+    }
+  },
+  "POST sac/chamados/{id}/avaliacao": {
+    "pedido": {
+      "nota": 5,
+      "comentario": "Resolvido em 4 h, obrigado"
+    },
+    "respostas": {
+      "201": [
+        {
+          "nome": "201",
+          "corpo": {
+            "id": "SAC-000042",
+            "status": "FECHADO",
+            "avaliacao": {
+              "nota": 5,
+              "comentario": "Resolvido em 4 h, obrigado",
+              "em": "2026-11-12T17:10:00Z"
+            }
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "CHAMADO_INEXISTENTE",
+          "corpo": {
+            "codigo": "CHAMADO_INEXISTENTE",
+            "mensagem": "Chamado não encontrado."
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "JA_AVALIADO",
+          "corpo": {
+            "codigo": "JA_AVALIADO",
+            "mensagem": "Este chamado já foi avaliado."
+          }
+        },
+        {
+          "nome": "PRAZO_AVALIACAO_VENCIDO",
+          "corpo": {
+            "codigo": "PRAZO_AVALIACAO_VENCIDO",
+            "mensagem": "Prazo para avaliar encerrado."
+          }
+        },
+        {
+          "nome": "TRANSICAO_INVALIDA",
+          "corpo": {
+            "codigo": "TRANSICAO_INVALIDA",
+            "mensagem": "Conta encerrada não volta."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"nota\" está faltando ou é inválido.",
+            "campo": "nota"
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": "Algo deu errado. Tente de novo mais tarde."
+          }
+        }
+      ]
+    }
+  },
+  "GET sac/configuracao": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "prazos": [
+              {
+                "categoria": "ACESSO_E_SENHA",
+                "horasUteis": 4
+              },
+              {
+                "categoria": "COBRANCA",
+                "horasUteis": 8
+              },
+              {
+                "categoria": "MODULO_COM_PROBLEMA",
+                "horasUteis": 8
+              },
+              {
+                "categoria": "DUVIDA_DE_USO",
+                "horasUteis": 16
+              },
+              {
+                "categoria": "SUGESTAO_AO_DEBOAZ",
+                "horasUteis": 40
+              },
+              {
+                "categoria": "SENHA_CONTA_MASTER",
+                "horasUteis": 4
+              }
+            ],
+            "salvaEm": null,
+            "salvaPor": null
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ]
+    }
+  },
+  "PUT sac/configuracao": {
+    "pedido": {
+      "prazos": [
+        {
+          "categoria": "ACESSO_E_SENHA",
+          "horasUteis": 4
+        },
+        {
+          "categoria": "DUVIDA_DE_USO",
+          "horasUteis": 12
+        }
+      ]
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "prazos": [
+              {
+                "categoria": "ACESSO_E_SENHA",
+                "horasUteis": 4
+              },
+              {
+                "categoria": "COBRANCA",
+                "horasUteis": 8
+              },
+              {
+                "categoria": "MODULO_COM_PROBLEMA",
+                "horasUteis": 8
+              },
+              {
+                "categoria": "DUVIDA_DE_USO",
+                "horasUteis": 16
+              },
+              {
+                "categoria": "SUGESTAO_AO_DEBOAZ",
+                "horasUteis": 40
+              },
+              {
+                "categoria": "SENHA_CONTA_MASTER",
+                "horasUteis": 4
+              }
+            ],
+            "salvaEm": null,
+            "salvaPor": null
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido."
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "FORA_DOS_LIMITES",
+          "corpo": {
+            "codigo": "FORA_DOS_LIMITES",
+            "mensagem": "O campo \"horasUteis\" deve ter de 1 a 80.",
+            "campo": "horasUteis",
+            "minimo": "1",
+            "maximo": "80"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"prazos\" está faltando ou é inválido.",
+            "campo": "prazos"
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": "Algo deu errado. Tente de novo mais tarde."
+          }
+        }
+      ]
+    }
+  },
+  "GET sac/card": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "modulo": "MOD-02",
+            "perfil": "INSTITUICAO",
+            "versao": 57,
+            "atualizadoEm": "2026-11-12T14:20:00Z",
+            "vazio": false,
+            "selo": 1,
+            "reduzida": {
+              "valor": 2,
+              "rotulo": "chamados em andamento"
+            },
+            "normal": {
+              "valor": 2,
+              "rotulo": "chamados em andamento",
+              "apoio": [
+                {
+                  "nome": "Aguardando você",
+                  "valor": 1
+                },
+                {
+                  "nome": "Em atendimento",
+                  "valor": 1
+                },
+                {
+                  "nome": "Resolvidos no mês",
+                  "valor": 3
+                }
+              ]
+            },
+            "expandida": {
+              "lista": [
+                {
+                  "nome": "Aguardando você",
+                  "valor": 1
+                },
+                {
+                  "nome": "Em atendimento",
+                  "valor": 1
+                },
+                {
+                  "nome": "Resolvidos no mês",
+                  "valor": 3
+                }
+              ]
+            },
+            "series": {
+              "dia": [
+                1,
+                1,
+                2,
+                3,
+                3,
+                2,
+                2,
+                1,
+                2,
+                3,
+                2,
+                2
+              ],
+              "semana": [
+                0,
+                1,
+                1,
+                2,
+                3,
+                2,
+                2,
+                3,
+                2,
+                1,
+                2,
+                2
+              ],
+              "mes": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                3,
+                2,
+                2
+              ]
+            }
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ]
+    }
+  },
+  "GET sac/card/ao-vivo": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "card",
+          "corpo": {
+            "modulo": "MOD-02",
+            "perfil": "INSTITUICAO",
+            "versao": 57,
+            "atualizadoEm": "2026-11-12T14:20:00Z",
+            "vazio": false,
+            "selo": 1,
+            "reduzida": {
+              "valor": 2,
+              "rotulo": "chamados em andamento"
+            },
+            "normal": {
+              "valor": 2,
+              "rotulo": "chamados em andamento",
+              "apoio": [
+                {
+                  "nome": "Aguardando você",
+                  "valor": 1
+                },
+                {
+                  "nome": "Em atendimento",
+                  "valor": 1
+                },
+                {
+                  "nome": "Resolvidos no mês",
+                  "valor": 3
+                }
+              ]
+            },
+            "expandida": {
+              "lista": [
+                {
+                  "nome": "Aguardando você",
+                  "valor": 1
+                },
+                {
+                  "nome": "Em atendimento",
+                  "valor": 1
+                },
+                {
+                  "nome": "Resolvidos no mês",
+                  "valor": 3
+                }
+              ]
+            },
+            "series": {
+              "dia": [
+                1,
+                1,
+                2,
+                3,
+                3,
+                2,
+                2,
+                1,
+                2,
+                3,
+                2,
+                2
+              ],
+              "semana": [
+                0,
+                1,
+                1,
+                2,
+                3,
+                2,
+                2,
+                3,
+                2,
+                1,
+                2,
+                2
+              ],
+              "mes": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                3,
+                2,
+                2
+              ]
+            }
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação."
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"intervalo\" está faltando ou é inválido.",
+            "campo": "intervalo"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -17,9 +17,9 @@ public interface ILerAnexo
     Task<ArquivoDoAnexo> Executar(string id, QuemPede quem, CancellationToken ct = default);
 }
 
-/// <summary>O descarte dos anexos não usados em 24 h (RN-292), pelo AgendamentoDoSac.</summary>
-public interface IDescartarAnexosNaoUsados
+/// <summary>O descarte dos anexos de expiraEm vencido (RN-292, RNF-234), pelo AgendamentoDoSac.</summary>
+public interface IDescartarAnexosVencidos
 {
-    /// <summary>Tira do banco e do armazenamento; devolve quantos.</summary>
+    /// <summary>Tira o arquivo de onde foi guardado e o registro do não usado; devolve quantos.</summary>
     Task<int> Executar(CancellationToken ct = default);
 }

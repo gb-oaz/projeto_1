@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Hub.Sac.Chamados.Domain;
 using Boaz.Core.Hub.Sac.Chamados.Dtos;
 using Boaz.Core.Hub.Tests.Sac.Mocks;
@@ -16,7 +17,7 @@ public sealed class CasosDeUsoTests
         var aberto = await c.Abrir.Executar(Corpo(), Master, Trace);
         Assert.Equal(("SAC-000042", "ABERTO", (string?)null), (aberto.Id, aberto.Status, aberto.Responsavel));
         Assert.Equal(new DateTimeOffset(2026, 11, 12, 21, 0, 0, TimeSpan.Zero), aberto.PrazoResposta);
-        Assert.Equal(["INICIADO", "CONCLUIDO"], c.Mock.Auditoria.Select(a => a.Etapa == Boaz.Core.Commons.Usuario.Usuarios.Domain.EtapaDaExecucao.Iniciado ? "INICIADO" : "CONCLUIDO"));
+        Assert.Equal(["INICIADO", "CONCLUIDO"], c.Mock.Auditoria.Select(a => a.Etapa == Boaz.Core.Commons.Auditoria.Domain.EtapaDaExecucao.Iniciado ? "INICIADO" : "CONCLUIDO"));
         Assert.Equal("SAC-000042", c.Mock.Auditoria[1].Alvo);
         Assert.Single(c.Mock.Avisos);
     }
@@ -165,7 +166,7 @@ public sealed class CasosDeUsoTests
         Assert.Equal(1, await c.Prazos.Executar());
         Assert.Equal(StatusDoChamado.Resolvido, c.Mock.Chamados[aguardando].Status);
         var registro = c.Mock.Auditoria.Last();
-        Assert.Equal((Boaz.Core.Commons.Usuario.Usuarios.Domain.AcaoAuditada.FecharPorPrazo, (string?)null, aguardando),
+        Assert.Equal((Boaz.Core.Commons.Auditoria.Domain.AcaoAuditada.FecharPorPrazo, (string?)null, aguardando),
             (registro.Acao, registro.Quem, registro.Alvo));
         var lido = await c.Ler.Executar(aguardando, Master);
         Assert.Contains(lido.LinhaDoTempo, e => e.Autor.Tipo == "SISTEMA");

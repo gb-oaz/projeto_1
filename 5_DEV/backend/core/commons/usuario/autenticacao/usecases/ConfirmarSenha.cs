@@ -1,16 +1,13 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.Ports.Out;
+using Boaz.Core.Commons.Auditoria.UseCases;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.Out;
-using AcaoAuditada = Boaz.Core.Commons.Usuario.Usuarios.Domain.AcaoAuditada;
-using AuditoriaDaExecucao = Boaz.Core.Commons.Usuario.Usuarios.UseCases.AuditoriaDaExecucao;
-using Execucao = Boaz.Core.Commons.Usuario.Usuarios.UseCases.Execucao;
-using ExecucaoEmAndamento = Boaz.Core.Commons.Usuario.Usuarios.UseCases.ExecucaoEmAndamento;
-using IAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoria;
-using IAuditoriaDeErros = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoriaDeErros;
+using AcaoAuditada = Boaz.Core.Commons.Auditoria.Domain.AcaoAuditada;
 using IAtualizarCardUsuarios = Boaz.Core.Commons.Usuario.Usuarios.Ports.In.IAtualizarCardUsuarios;
 using MudancaNoCadastroDto = Boaz.Core.Commons.Usuario.Usuarios.Dtos.MudancaNoCadastroDto;
-using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Usuario.Autenticacao.UseCases;
 

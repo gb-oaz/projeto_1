@@ -34,6 +34,17 @@ public static class Ambiente
         Ler("PARTIDA_ConnectionStrings__MongoDb", Ler("PARTIDA_ConnectionStrings__Mongo", MongoUrl));
     public static string PartidaMongoBanco => Ler("PARTIDA_Mongo__Banco", "");
 
+    // o armazenamento de objetos dos anexos do SAC (18 RNF-233, 05 RNF-235): a
+    // conexão do Blob e o contêiner do backend de API_URL, para conferir onde o
+    // arquivo foi guardado e que foi removido (RNF-234), sem ler o conteúdo de
+    // documento nenhum. Sem BLOB_CONEXAO, vale a da instância de Partida (o
+    // mesmo Azurite no ci.sh); sem nenhuma, os cenários que olham o Blob ficam
+    // pendentes
+    public static string BlobConexao => Ler("BLOB_CONEXAO", Ler("PARTIDA_ConnectionStrings__Blob", ""));
+    public static string BlobConteiner => Ler("BLOB_CONTEINER", "anexos-sac");
+    public static string PartidaBlobConexao => Ler("PARTIDA_ConnectionStrings__Blob", BlobConexao);
+    public static string PartidaBlobConteiner => Ler("PARTIDA_Sac__Arquivos__Conteiner", "anexos-sac-partida");
+
     // valor de uma variável do Key Vault (USUARIO_*), ou vazio
     public static string Segredo(string nome) => Ler(nome, "");
 

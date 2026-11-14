@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "18_modulo-sac"
 tipo: "Funcionalidade"
 titulo: "SAC"
-versao: "v04"
-data: "2026-11-12 17:21"
+versao: "v06"
+data: "2026-11-13 21:37"
 status: "Rascunho"
 objetivo: "permitir que a conta master da instituição e o educador autônomo abram chamados para falar com o time deboaz, acompanhem a conversa até a solução e avaliem o atendimento, e que o time deboaz atenda todos os chamados dentro do prazo de cada categoria."
 ---
 
-> **boaz · Funcionalidade** · `18_modulo-sac` · **v04** · 2026-11-12 17:21 · **Rascunho**
+> **boaz · Funcionalidade** · `18_modulo-sac` · **v06** · 2026-11-13 21:37 · **Rascunho**
 
 # SAC
 
@@ -53,7 +53,7 @@ Cenário: instituição abre um chamado
   Quando toca em "Abrir chamado", escolhe "Módulo com problema"
   E informa o assunto "Presença não salva a chamada", a descrição e o print "erro.png"
   E vê abaixo da descrição "Ao menos 20 caracteres"
-  E abaixo dos anexos "PNG, JPG ou PDF · até 10 MB cada · até 5 arquivos"
+  E abaixo dos anexos "PNG ou JPG · até 10 MB cada · até 5 arquivos"
   E toca em "Enviar"
   Então vê "Chamado SAC-000042 aberto. Resposta até hoje, 18:00"
   E o chamado aparece no topo de Meus chamados, como "Aberto"
@@ -158,6 +158,12 @@ Cenário: chamado já respondido
 Cenário: busca
   Quando o Caio busca "EBFGA" na fila
   Então vê os chamados da Escola Bento Freitas, de todos os status
+
+Cenário: fila zerada
+  Dado nenhum chamado "Aberto" sem responsável
+  Quando o Caio toca no filtro "Sem responsável"
+  Então vê "Nenhum chamado esperando o time", com o mascote Orgulhoso
+  E o mascote aparece animado, e parado quando o aparelho pede menos movimento
 ```
 
 <a id="RF-175"></a>
@@ -201,6 +207,7 @@ Cenário: resolver
   Quando o Caio toca em "Resolver" e envia "Corrigido. Pode salvar de novo."
   Então o chamado passa a "Resolvido"
   E a conta master vê "Resolveu?" e "Confirme a solução ou reabra o chamado."
+  E o mascote do "Resolveu?" aparece animado, e parado com menos movimento pedido
   E os botões "Confirmar solução" e "Reabrir", sem o campo de mensagem
 
 Cenário: resolver sem mensagem
@@ -385,6 +392,20 @@ Cenário: atrasado
   Então o chamado ganha a marca "Atrasado" na fila do time
   E a conta master continua vendo só "Aberto"
 
+Esquema do Cenário: prazo vencendo
+  Dado o <chamado> sem resposta do time, com o prazo de primeira resposta <prazo>
+  Quando o Caio vê a fila <quando>
+  Então a linha do chamado mostra <prazo na fila>
+  E o selo Lento aparece animado, e parado quando o aparelho pede menos movimento
+
+  Exemplos:
+    | chamado    | prazo               | quando              | prazo na fila                    |
+    | SAC-000087 | quinta, 14:00       | quinta, 12:59       | o prazo, sem o selo Lento        |
+    | SAC-000087 | quinta, 14:00       | quinta, 13:00       | "Vence em 1 h", com o selo Lento |
+    | SAC-000087 | quinta, 14:00       | quinta, 13:40       | "Vence em 20 min", com o selo Lento |
+    | SAC-000088 | sexta, 08:30        | quinta, 17:30       | "Vence em 1 h", com o selo Lento |
+    | SAC-000087 | quinta, 14:00       | quinta, 14:01       | a marca "Atrasado"               |
+
 Cenário: a primeira resposta para o prazo
   Quando o Caio envia a primeira mensagem ao cliente às 11:00
   Então o prazo do SAC-000042 está cumprido
@@ -476,10 +497,16 @@ Esquema do Cenário: arquivo anexado
     | arquivo       | tamanho | resultado                                     |
     | erro.png      | 2 MB    | o arquivo é anexado                           |
     | foto.jpg      | 10 MB   | o arquivo é anexado                           |
-    | boleto.pdf    | 1 MB    | o arquivo é anexado                           |
+    | boleto.jpg    | 1 MB    | o arquivo é anexado                           |
     | foto.jpg      | 11 MB   | vê "Cada arquivo com até 10 MB"               |
-    | tela.mp4      | 3 MB    | vê "Envie PNG, JPG ou PDF"                    |
-    | planilha.xlsx | 1 MB    | vê "Envie PNG, JPG ou PDF"                    |
+    | boleto.pdf    | 1 MB    | vê "Envie PNG ou JPG"                         |
+    | tela.mp4      | 3 MB    | vê "Envie PNG ou JPG"                         |
+    | planilha.xlsx | 1 MB    | vê "Envie PNG ou JPG"                         |
+
+Cenário: onde aparece a recusa do tipo
+  Quando a conta master anexa "boleto.pdf"
+  Então "Envie PNG ou JPG" aparece num Aviso de ação logo abaixo dos anexos
+  E o arquivo não é anexado
 
 Cenário: sexto arquivo
   Dado a mensagem com 5 arquivos anexados
@@ -487,7 +514,7 @@ Cenário: sexto arquivo
   Então vê "Até 5 arquivos por mensagem"
 
 Cenário: arquivo recusado na verificação
-  Quando a conta master anexa "nota.pdf" que não passa na verificação de segurança
+  Quando a conta master anexa "nota.jpg" que não passa na verificação de segurança
   Então vê "Arquivo recusado pela verificação de segurança" e ele não é anexado
 ```
 
@@ -651,9 +678,97 @@ Cenário: conversa aberta dos dois lados
 
 ```gherkin
 Cenário: chamado antigo
-  Dado o SAC-000012 fechado em 2026-11-12
+  Dado o SAC-000012 fechado em produção em 2026-11-12
   Então o chamado, as mensagens e os anexos ficam disponíveis até 2031-11-12, 5 anos depois
   E a conta master o encontra na busca de Meus chamados durante todo esse tempo
+```
+
+<a id="RNF-232"></a>
+
+### `RNF-232` Coleções e índices do SAC prontos na partida
+
+> Mesma regra da partida: [17_modulo-usuario `RNF-227`](17_modulo-usuario.md#RNF-227)
+
+```gherkin
+Esquema do Cenário: coleção pronta antes do primeiro pedido
+  Dado o banco de homologação sem as coleções do SAC
+  Quando a aplicação inicia
+  Então antes de aceitar o primeiro pedido, a coleção "<colecao>" existe
+  E tem os índices <indices>
+
+  Exemplos:
+    | colecao          | indices                                                       |
+    | chamados         | contaId+atualizadoEm↓, contaId+status, status+ordemDaFila     |
+    | chamados         | responsavel.usuarioId+status, status+prazoResposta            |
+    | chamados         | status+aguardandoDesde, status+resolvidoEm                    |
+    | chamados         | avaliacao.nota, guardarAte                                    |
+    | mensagensChamado | chamadoId+numero                                              |
+    | anexosSac        | chamadoId, expiraEm, enviadoPor+enviadoEm                     |
+    | cardSac          | escopo+dia único, o escopo_dia_unico                          |
+
+Cenário: prazos sem índice
+  Dado o banco de homologação sem a coleção "configuracaoSac"
+  Quando a aplicação inicia
+  Então ela aceita pedidos sem criar índice em "configuracaoSac"
+  E a coleção guarda um só documento, "prazos", criado no primeiro "Salvar" da RF-181
+
+Esquema do Cenário: índice que não pode ser criado
+  Dado <impedimento> na coleção "<colecao>"
+  Quando a aplicação inicia
+  Então o índice <indice> não é criado
+  E o log cita o nome do índice e da coleção, nunca o valor que impediu
+  E a aplicação <resultado>
+
+  Exemplos:
+    | colecao          | indice           | impedimento             | resultado               |
+    | cardSac          | escopo_dia_unico | dois cards EBFGA no dia | para antes do 1º pedido |
+    | mensagensChamado | chamadoId_numero | o banco recusa o índice | aceita pedidos e avisa  |
+```
+
+<a id="RNF-233"></a>
+
+### `RNF-233` Onde ficam os arquivos dos anexos
+
+> Armazenamento por ambiente: [05_cd-implantacao `RNF-235`](05_cd-implantacao.md#RNF-235)
+
+```gherkin
+Esquema do Cenário: mesmo anexo com o armazenamento de objetos ligado ou desligado
+  Dado o ambiente com o armazenamento de objetos (Azure Blob Storage) <estado>
+  Quando a conta master anexa "erro.png" de 2 MB ao SAC-000042 e o Caio o abre
+  Então o Caio vê o mesmo "erro.png", guardado como foi enviado, sem conversão
+  E o arquivo fica <onde>
+
+  Exemplos:
+    | estado    | onde                                       |
+    | ligado    | no armazenamento de objetos                |
+    | desligado | no banco (GridFS), sem mudar nada na tela  |
+
+Cenário: verificação antes de guardar
+  Dado o armazenamento de objetos ligado
+  Quando a conta master anexa "nota.jpg" que não passa na verificação de segurança
+  Então vê "Arquivo recusado pela verificação de segurança"
+  E nada é guardado, nem no armazenamento de objetos nem no banco
+
+Cenário: cada anexo é lido de onde foi guardado
+  Dado o "boleto.jpg" do SAC-000040 guardado no banco, com o armazenamento desligado
+  E o armazenamento de objetos ligado depois
+  Quando a conta master anexa "erro.png" ao SAC-000042
+  Então o "erro.png" fica no armazenamento de objetos e o "boleto.jpg" continua no banco
+  E os dois abrem iguais para o Caio, cada um lido de onde foi guardado, sem migração
+  E o "boleto.jpg" sai do banco só no descarte da RNF-234
+```
+
+<a id="RNF-234"></a>
+
+### `RNF-234` Descarte dos arquivos por ambiente
+
+```gherkin
+Cenário: anexo removido pela guarda
+  Dado o SAC-000042 fechado em 2026-11-12, com o anexo "erro.png" na mensagem da conta
+  Quando a conta master abre o chamado depois do prazo de guarda do arquivo
+  Então vê, no lugar do anexo, "erro.png" e "Anexo removido", com o mascote Sonolento
+  E tocar no anexo não baixa nada
+  E as mensagens da conversa continuam visíveis
 ```
 
 ---
@@ -813,7 +928,7 @@ Cenário: fila de chamados em andamento
   Quando envia GET /sac/chamados?situacao=EM_ANDAMENTO&pagina=1
   Então a resposta é 200 com os 14 chamados de todas as contas, até 50 por página
   E o mais antigo esperando o time vem primeiro
-  E cada item traz também conta, responsavel, prazoResposta e atrasado
+  E cada item traz também conta, responsavel, prazoResposta, prazoPerto e atrasado
 
 Esquema do Cenário: filtros da fila
   Quando o Caio envia GET /sac/chamados?<filtro>
@@ -1008,6 +1123,34 @@ Cenário: anexo de outra conta
   Então a resposta é 404 ANEXO_INEXISTENTE
 ```
 
+<a id="RN-289-api"></a>
+
+### `RN-289` Categorias e prazos de primeira resposta
+
+```gherkin
+Esquema do Cenário: prazo perto na fila
+  Dado o SAC-000087 sem 1ª resposta, com prazoResposta "2026-11-12T17:00:00Z"
+  Quando o Caio envia GET /sac/chamados?situacao=EM_ANDAMENTO em <quando>
+  Então o item do SAC-000087 traz prazoPerto <perto> e atrasado <atrasado>
+
+  Exemplos:
+    | quando               | perto | atrasado |
+    | 2026-11-12T15:59:00Z | false | false    |
+    | 2026-11-12T16:00:00Z | true  | false    |
+    | 2026-11-12T16:40:00Z | true  | false    |
+    | 2026-11-12T17:01:00Z | false | true     |
+
+Cenário: 1 hora útil atravessando a noite
+  Dado o SAC-000088 sem 1ª resposta, com prazoResposta "2026-11-13T11:30:00Z"
+  Quando o Caio envia GET /sac/chamados?situacao=EM_ANDAMENTO em "2026-11-12T20:30:00Z"
+  Então o item do SAC-000088 traz prazoPerto true, com 1 hora útil até o prazo
+
+Cenário: chamado já respondido
+  Dado o SAC-000042 com a 1ª resposta do Caio e o prazoResposta daqui a 30 min
+  Quando o Caio envia GET /sac/chamados?situacao=EM_ANDAMENTO
+  Então o item do SAC-000042 traz prazoPerto false e atrasado false
+```
+
 <a id="RN-290-api"></a>
 
 ### `RN-290` Status do chamado
@@ -1058,10 +1201,25 @@ Esquema do Cenário: anexo recusado
   Exemplos:
     | pedido                                         | resposta                   |
     | POST /sac/anexos com "foto.jpg" de 11 MB       | 413 ANEXO_GRANDE           |
-    | POST /sac/anexos com "tela.mp4"                | 415 TIPO_NAO_ACEITO        |
-    | POST /sac/anexos com "nota.pdf" com ameaça     | 422 ANEXO_RECUSADO         |
+    | POST /sac/anexos com "nota.jpg" com ameaça     | 422 ANEXO_RECUSADO         |
     | uma mensagem com 6 anexos                      | 422 LIMITE_ANEXOS          |
     | POST /sac/anexos com a verificação fora do ar  | 503 VERIFICACAO_INDISPONIVEL |
+
+Esquema do Cenário: tipo não aceito
+  Quando a conta master envia POST /sac/anexos <arquivo>
+  Então a resposta é 415 com:
+    """
+    {
+      "codigo": "TIPO_NAO_ACEITO",
+      "mensagem": "Envie PNG ou JPG."
+    }
+    """
+
+  Exemplos:
+    | arquivo                       |
+    | com "boleto.pdf"              |
+    | com um PDF chamado "foto.png" |
+    | com "tela.mp4"                |
 
 Esquema do Cenário: anexo que não pode ser usado
   Quando a conta master envia POST /sac/chamados ou /mensagens com o anexo <anexo>
@@ -1073,6 +1231,30 @@ Esquema do Cenário: anexo que não pode ser usado
     | "anx-55d0e2", enviado pelo Pedro Reis      |
     | "anx-7f3a21", já usado no SAC-000042       |
     | "anx-1c2d3e", descartado depois de 24 h    |
+
+Cenário: baixar o anexo
+  Dado o "erro.png" do SAC-000042, enviado como "anx-7f3a21"
+  Quando a conta master envia GET /sac/anexos/anx-7f3a21
+  Então a resposta é 200 com o arquivo, igual ao enviado
+  E o cabeçalho Content-Type "image/png"
+  E o cabeçalho Content-Disposition 'attachment; filename="erro.png"'
+
+Esquema do Cenário: ganchos de teste do SAC fora do teste
+  Dado a aplicação iniciada em <ambiente>, com Teste__Relogio <flag>
+  Quando envia <metodo> <endereco>
+  Então a resposta é 404
+
+  Exemplos:
+    | ambiente    | flag    | metodo | endereco                |
+    | produção    | "sim"   | POST   | /_teste/sac/agendamento |
+    | produção    | "sim"   | PUT    | /_teste/sac/verificacao |
+    | homologação | ausente | POST   | /_teste/sac/agendamento |
+    | homologação | ausente | DELETE | /_teste/sac/verificacao |
+
+Cenário: gancho da verificação sem o campo disponivel
+  Dado a aplicação de homologação, com Teste__Relogio "sim"
+  Quando envia PUT /_teste/sac/verificacao sem "disponivel"
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "disponivel"
 ```
 
 <a id="RN-293-api"></a>
@@ -1089,6 +1271,11 @@ Esquema do Cenário: mensagem não muda
     | PATCH  |
     | PUT    |
     | DELETE |
+
+Cenário: sem login
+  Quando alguém sem token envia PATCH /sac/chamados/SAC-000042/mensagens/msg-000318
+  Então a resposta é 405, sem corpo, com o cabeçalho Allow vazio
+  E o token não é conferido
 ```
 
 <a id="RN-294-api"></a>
@@ -1164,6 +1351,38 @@ Esquema do Cenário: quem pede o card
 Cenário: ao vivo
   Quando a conta master envia GET /sac/card/ao-vivo?intervalo=30
   Então a resposta é 200, como em RN-279 de 15_modulos
+  E traz Content-Type "text/event-stream" e Cache-Control "no-store"
+  E o 1º evento "card" chega logo ao abrir, com o corpo de GET /sac/card
+  E sem versão nova, a cada 30 s chega o comentário ": ping"
+
+Esquema do Cenário: card sem sessão válida
+  Quando alguém envia GET <endereco> <token>
+  Então a resposta é 401 SESSAO_TERMINADA, seja qual for o problema do token
+  E nenhum fluxo fica aberto
+
+  Exemplos:
+    | endereco                       | token                                  |
+    | /sac/card                      | sem o cabeçalho Authorization          |
+    | /sac/card                      | com o token vencido                    |
+    | /sac/card/ao-vivo?intervalo=30 | com o token adulterado                 |
+    | /sac/card/ao-vivo?intervalo=30 | da sessão encerrada em outro aparelho  |
+
+Esquema do Cenário: intervalo inválido no card ao vivo
+  Quando a conta master envia GET /sac/card/ao-vivo?intervalo=<intervalo>
+  Então a resposta é 422 com:
+    """
+    {
+      "codigo": "DADOS_INVALIDOS",
+      "mensagem": "O campo \"intervalo\" está faltando ou é inválido.",
+      "campo": "intervalo"
+    }
+    """
+  E nenhum fluxo fica aberto
+
+  Exemplos:
+    | intervalo |
+    | 10        |
+    | 0         |
 ```
 
 <a id="RN-296-api"></a>
@@ -1191,6 +1410,7 @@ Esquema do Cenário: avaliação fora do prazo ou do caminho
 Esquema do Cenário: ações auditadas
   Quando <quem> envia <pedido> com sucesso
   Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "<acao>", com o mesmo traceId
+  E a resposta traz o cabeçalho X-Trace-Id com esse traceId
 
   Exemplos:
     | quem           | pedido                                      | acao               |
@@ -1206,6 +1426,47 @@ Esquema do Cenário: ações auditadas
 Cenário: mudança feita pelo prazo
   Quando o SAC-000039 passa a "RESOLVIDO" por 7 dias sem resposta
   Então "auditoria" ganha a ação "FECHAR_POR_PRAZO", sem quem, com o alvo "SAC-000039"
+
+Esquema do Cenário: X-Trace-Id da ação auditada
+  Quando <quem> envia POST /sac/chamados <caso>
+  Então a resposta é <resposta> com o cabeçalho X-Trace-Id, como "trc-7f3a9c21"
+  E esse é o traceId de "INICIADO" em "auditoria" e de <registro>
+
+  Exemplos:
+    | quem           | caso            | resposta            | registro                    |
+    | a conta master | válido          | 201                 | "CONCLUIDO"                 |
+    | a conta master | sem a categoria | 422 DADOS_INVALIDOS | "auditoriaErros" com ALERTA |
+    | a staff Maria  | válido          | 403 ACESSO_NEGADO   | "auditoriaErros" com ALERTA |
+    | a conta master | com falha geral | 500 ERRO_INESPERADO | "auditoriaErros" com ERRO   |
+
+Esquema do Cenário: pedidos sem auditoria
+  Quando a conta master envia <pedido> com sucesso
+  Então a resposta não traz X-Trace-Id e nada é gravado em "auditoria"
+
+  Exemplos:
+    | pedido                                    |
+    | GET /sac/chamados/SAC-000042              |
+    | GET /sac/chamados/SAC-000042/ao-vivo      |
+    | GET /sac/card                             |
+    | POST /sac/anexos com "erro.png"           |
+
+Cenário: 401 antes de tudo
+  Dado o token da conta master com as permissões já mudadas
+  Quando envia POST /sac/chamados com o corpo "abc", que não é JSON
+  Então a resposta é 401 PERMISSOES_DESATUALIZADAS, não 422
+  E sem X-Trace-Id, nada é gravado em "auditoria" nem em "auditoriaErros"
+
+Cenário: corpo que não é JSON
+  Quando a conta master envia POST /sac/chamados com o corpo "abc"
+  Então a resposta é 422 com:
+    """
+    {
+      "codigo": "DADOS_INVALIDOS",
+      "mensagem": "O campo \"corpo\" está faltando ou é inválido.",
+      "campo": "corpo"
+    }
+    """
+  E sem X-Trace-Id, nada é gravado em "auditoria"
 ```
 
 <a id="RF-181-api"></a>
@@ -1237,6 +1498,43 @@ Cenário: time lê os prazos
   Então a resposta é 200 com os prazos de cada categoria
   E a conta master da EBFGA recebe 403 ACESSO_NEGADO no mesmo pedido
 
+Cenário: prazos nunca salvos
+  Dado nenhum prazo salvo na aba Configuração
+  Quando o Caio envia GET /sac/configuracao
+  Então a resposta é 200 com as 6 categorias, nesta ordem, nos prazos padrão:
+    """
+    {
+      "prazos": [
+        {
+          "categoria": "ACESSO_E_SENHA",
+          "horasUteis": 4
+        },
+        {
+          "categoria": "COBRANCA",
+          "horasUteis": 8
+        },
+        {
+          "categoria": "MODULO_COM_PROBLEMA",
+          "horasUteis": 8
+        },
+        {
+          "categoria": "DUVIDA_DE_USO",
+          "horasUteis": 16
+        },
+        {
+          "categoria": "SUGESTAO_AO_DEBOAZ",
+          "horasUteis": 40
+        },
+        {
+          "categoria": "SENHA_CONTA_MASTER",
+          "horasUteis": 4
+        }
+      ],
+      "salvaEm": null,
+      "salvaPor": null
+    }
+    """
+
 Esquema do Cenário: recusas
   Quando <quem> envia PUT /sac/configuracao com <corpo>
   Então a resposta é <resposta>
@@ -1258,6 +1556,7 @@ Cenário: conversa ao vivo
   Dado o token da conta master da EBFGA
   Quando envia GET /sac/chamados/SAC-000042/ao-vivo com Accept "text/event-stream"
   Então a resposta é 200 e a conexão fica aberta
+  E traz Content-Type "text/event-stream" e Cache-Control "no-store"
   E quando o Caio envia uma mensagem, o evento "mensagem" chega em até 5 s
   E o evento tem o id da mensagem, como "msg-000319", e o mesmo corpo de GET do chamado
   E a nota interna do Caio não chega à conta
@@ -1267,9 +1566,110 @@ Cenário: reconexão sem perder mensagem
   Quando a conta master reconecta com o cabeçalho Last-Event-ID "msg-000318"
   Então recebe primeiro as mensagens enviadas depois da "msg-000318", na ordem
 
+Cenário: conversa sem mensagem nova
+  Dado a conexão ao vivo do SAC-000042 aberta, sem mensagem nova
+  Quando passam 30 s
+  Então chega o comentário ": ping" e a conexão continua aberta
+
 Cenário: chamado de outra conta
   Quando a conta master envia GET /sac/chamados/SAC-000045/ao-vivo
   Então a resposta é 404 CHAMADO_INEXISTENTE
+```
+
+<a id="RNF-232-api"></a>
+
+### `RNF-232` Coleções e índices do SAC prontos na partida
+
+```gherkin
+Cenário: pronta depois da partida
+  Dado a partida de homologação concluída, com as coleções do SAC e seus índices prontos
+  Quando envia GET /health, sem login
+  Então a resposta é 200, sem corpo
+
+Cenário: índice único que não pode ser criado
+  Dado dois documentos de "cardSac" com o escopo "EBFGA" e o dia 2026-11-12
+  Quando a aplicação de homologação inicia
+  Então GET /health, sem login, não tem resposta, a conexão é recusada
+  E o processo termina com código 1, como na RNF-227
+
+Cenário: índice não único que não pode ser criado
+  Dado o banco recusa o índice chamadoId_numero em "mensagensChamado" na partida
+  Quando envia GET /health, sem login
+  Então a resposta é 200, sem corpo
+  E o log traz um aviso com o nome do índice e da coleção, nunca o valor
+```
+
+<a id="RNF-233-api"></a>
+
+### `RNF-233` Onde ficam os arquivos dos anexos
+
+```gherkin
+Esquema do Cenário: o mesmo arquivo nos dois armazenamentos
+  Dado o armazenamento de objetos <estado> no ambiente
+  E o "erro.png" de 2 MB enviado por POST /sac/anexos como "anx-7f3a21"
+  Quando a conta master envia GET /sac/anexos/anx-7f3a21
+  Então a resposta é 200 com os mesmos bytes enviados, sem conversão
+  E o cabeçalho Content-Type "image/png"
+
+  Exemplos:
+    | estado    |
+    | ligado    |
+    | desligado |
+
+Cenário: anexo lido de onde foi guardado, sem migração
+  Dado o "erro.png" enviado como "anx-7f3a21" com o armazenamento de objetos desligado
+  E a aplicação reinicia com o armazenamento de objetos ligado
+  Quando a conta master envia GET /sac/anexos/anx-7f3a21
+  Então a resposta é 200 com os mesmos bytes enviados, sem conversão
+  E o arquivo continua só no GridFS, sem migração
+
+Cenário: verificação fora do ar
+  Dado o armazenamento de objetos ligado e a verificação de segurança fora do ar
+  Quando a conta master envia POST /sac/anexos com "erro.png"
+  Então a resposta é 503 VERIFICACAO_INDISPONIVEL e nada é guardado
+```
+
+<a id="RNF-234-api"></a>
+
+### `RNF-234` Descarte dos arquivos por ambiente
+
+> Guarda dos chamados: [`RNF-231`](#RNF-231)
+
+```gherkin
+Esquema do Cenário: quando o arquivo do anexo é removido
+  Dado o "erro.png" enviado como "anx-7f3a21" em 2026-11-12 10:00, em <ambiente>
+  E <uso>
+  Quando a conta master envia GET /sac/anexos/anx-7f3a21 em <quando>
+  Então a resposta é 404 ANEXO_INEXISTENTE e o arquivo já foi removido
+
+  Exemplos:
+    | ambiente    | uso                                    | quando           |
+    | produção    | sem chamado nem mensagem em 24 h       | 2026-11-13 10:01 |
+    | homologação | sem chamado nem mensagem em 24 h       | 2026-11-13 10:01 |
+    | homologação | no SAC-000042                          | 2026-12-12 10:01 |
+    | produção    | no SAC-000042, fechado em 2026-11-20   | 2031-11-20 10:01 |
+
+Cenário: anexo vencido responde 404 antes de o arquivo sair
+  Dado o "erro.png" enviado como "anx-7f3a21" em 2026-11-12 10:00, em homologação
+  E sem chamado nem mensagem que o use
+  E o relógio em 2026-11-13 10:01, antes de o agendamento rodar
+  Quando a conta master envia GET /sac/anexos/anx-7f3a21
+  Então a resposta é 404 ANEXO_INEXISTENTE
+
+Esquema do Cenário: arquivo ainda guardado
+  Dado o "erro.png" do SAC-000042 enviado em 2026-11-12 10:00, em <ambiente>
+  Quando a conta master envia GET /sac/anexos/anx-7f3a21 em <quando>
+  Então a resposta é 200 com o arquivo
+
+  Exemplos:
+    | ambiente    | quando           |
+    | homologação | 2026-12-12 09:59 |
+    | produção    | 2031-11-19 10:00 |
+
+Cenário: conversa sem o arquivo em homologação
+  Dado o arquivo do "anx-7f3a21" removido 30 dias depois do envio, em homologação
+  Quando a conta master envia GET /sac/chamados/SAC-000042
+  Então a resposta é 200 com o chamado e as mensagens, sem nada removido
 ```
 
 <a id="fora-de-escopo"></a>
@@ -1292,45 +1692,45 @@ Cenário: o que o SAC não faz
 
 ### Web
 
-**Hub · SAC da conta · web · vista** — `2_Diagramas/vista-hub-sac-cliente-web_v01_20261112-1716.svg`
+**Hub · SAC da conta · web · vista** — `2_Diagramas/vista-hub-sac-cliente-web_v03_20261113-1351.svg`
 
-[![Web: Meus chamados no medium; no expanded, a lista com a conversa Aguardando sua resposta, com Abrir chamado (erro Escolha a categoria) e com o chamado fechado; no medium, a avaliação Como foi o atendimento?](../2_Diagramas/vista-hub-sac-cliente-web_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-cliente-web_v01_20261112-1716.svg)
+[![Web: Meus chamados no medium; no expanded, a lista com a conversa Aguardando sua resposta, com Abrir chamado (erro Escolha a categoria) e com o chamado fechado; no medium, a avaliação Como foi o atendimento?](../2_Diagramas/vista-hub-sac-cliente-web_v03_20261113-1351.svg)](../2_Diagramas/vista-hub-sac-cliente-web_v03_20261113-1351.svg)
 
-**Hub · SAC do time deboaz · web · vista** — `2_Diagramas/vista-hub-sac-time-web_v01_20261112-1716.svg`
+**Hub · SAC do time deboaz · web · vista** — `2_Diagramas/vista-hub-sac-time-web_v03_20261113-1351.svg`
 
-[![Web: fila do time no medium; no expanded, a fila com a conversa com nota interna e com o pedido de senha da master; no medium, o diálogo de assumir chamado de outro](../2_Diagramas/vista-hub-sac-time-web_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-time-web_v01_20261112-1716.svg)
+[![Web: fila do time no medium; no expanded, a fila com a conversa com nota interna e com o pedido de senha da master; no medium, o diálogo de assumir chamado de outro](../2_Diagramas/vista-hub-sac-time-web_v03_20261113-1351.svg)](../2_Diagramas/vista-hub-sac-time-web_v03_20261113-1351.svg)
 
-**Hub · SAC · configuração · web · vista** — `2_Diagramas/vista-hub-sac-configuracao-web_v01_20261112-1716.svg`
+**Hub · SAC · configuração · web · vista** — `2_Diagramas/vista-hub-sac-configuracao-web_v03_20261113-1351.svg`
 
-[![Web: aba Configuração com os prazos por categoria no medium e o erro Prazo entre 1 e 80 h úteis no expanded](../2_Diagramas/vista-hub-sac-configuracao-web_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-configuracao-web_v01_20261112-1716.svg)
+[![Web: aba Configuração com os prazos por categoria no medium e o erro Prazo entre 1 e 80 h úteis no expanded](../2_Diagramas/vista-hub-sac-configuracao-web_v03_20261113-1351.svg)](../2_Diagramas/vista-hub-sac-configuracao-web_v03_20261113-1351.svg)
 
 ### PWA
 
-**Hub · SAC da conta · pwa · vista** — `2_Diagramas/vista-hub-sac-cliente-pwa_v01_20261112-1716.svg`
+**Hub · SAC da conta · pwa · vista** — `2_Diagramas/vista-hub-sac-cliente-pwa_v03_20261113-1351.svg`
 
-[![PWA: Meus chamados com Nova resposta, sem chamados, Abrir chamado com anexos e o erro Escolha a categoria, menu de categorias, aviso de aberto, conversa com linha do tempo, Resolveu?, avaliação com 5 estrelas, chamado fechado, encerrar, chamado relacionado, não encontrado e o card do SAC da instituição e do autônomo sem chamados](../2_Diagramas/vista-hub-sac-cliente-pwa_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-cliente-pwa_v01_20261112-1716.svg)
+[![PWA: Meus chamados com Nova resposta, sem chamados, Abrir chamado com anexos e o erro Escolha a categoria, menu de categorias, aviso de aberto, conversa com linha do tempo, Resolveu?, avaliação com 5 estrelas, chamado fechado, encerrar, chamado relacionado, não encontrado e o card do SAC da instituição e do autônomo sem chamados](../2_Diagramas/vista-hub-sac-cliente-pwa_v03_20261113-1351.svg)](../2_Diagramas/vista-hub-sac-cliente-pwa_v03_20261113-1351.svg)
 
-**Hub · SAC do time deboaz · pwa · vista** — `2_Diagramas/vista-hub-sac-time-pwa_v01_20261112-1716.svg`
+**Hub · SAC do time deboaz · pwa · vista** — `2_Diagramas/vista-hub-sac-time-pwa_v03_20261113-1351.svg`
 
-[![PWA: fila com busca, filtros e Atrasado, Assumir, nota interna com Pedir informação e Resolver (erro Escreva a solução para a conta), assumir chamado de outro, pedido de senha da master com e sem o Usuários, avaliação vista pelo time e o card do SAC do deboaz](../2_Diagramas/vista-hub-sac-time-pwa_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-time-pwa_v01_20261112-1716.svg)
+[![PWA: fila com busca, filtros e Atrasado, Assumir, nota interna com Pedir informação e Resolver (erro Escreva a solução para a conta), assumir chamado de outro, pedido de senha da master com e sem o Usuários, avaliação vista pelo time e o card do SAC do deboaz](../2_Diagramas/vista-hub-sac-time-pwa_v03_20261113-1351.svg)](../2_Diagramas/vista-hub-sac-time-pwa_v03_20261113-1351.svg)
 
-**Hub · SAC · configuração · pwa · vista** — `2_Diagramas/vista-hub-sac-configuracao-pwa_v01_20261112-1716.svg`
+**Hub · SAC · configuração · pwa · vista** — `2_Diagramas/vista-hub-sac-configuracao-pwa_v03_20261113-1351.svg`
 
-[![PWA: aba Configuração com o prazo da primeira resposta de cada categoria em horas úteis, o erro Prazo entre 1 e 80 h úteis e o aviso Prazos salvos](../2_Diagramas/vista-hub-sac-configuracao-pwa_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-configuracao-pwa_v01_20261112-1716.svg)
+[![PWA: aba Configuração com o prazo da primeira resposta de cada categoria em horas úteis, o erro Prazo entre 1 e 80 h úteis e o aviso Prazos salvos](../2_Diagramas/vista-hub-sac-configuracao-pwa_v03_20261113-1351.svg)](../2_Diagramas/vista-hub-sac-configuracao-pwa_v03_20261113-1351.svg)
 
 ### Mobile
 
-**Hub · SAC da conta · mobile · vista** — `2_Diagramas/vista-hub-sac-cliente-mobile_v01_20261112-1716.svg`
+**Hub · SAC da conta · mobile · vista** — `2_Diagramas/vista-hub-sac-cliente-mobile_v03_20261113-1351.svg`
 
-[![Mobile: as mesmas telas da vista pwa no app, de Meus chamados à avaliação, e o card do SAC nos quatro tamanhos e sem dados](../2_Diagramas/vista-hub-sac-cliente-mobile_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-cliente-mobile_v01_20261112-1716.svg)
+[![Mobile: as mesmas telas da vista pwa no app, de Meus chamados à avaliação, e o card do SAC nos quatro tamanhos e sem dados](../2_Diagramas/vista-hub-sac-cliente-mobile_v03_20261113-1351.svg)](../2_Diagramas/vista-hub-sac-cliente-mobile_v03_20261113-1351.svg)
 
-**Hub · SAC do time deboaz · mobile · vista** — `2_Diagramas/vista-hub-sac-time-mobile_v01_20261112-1716.svg`
+**Hub · SAC do time deboaz · mobile · vista** — `2_Diagramas/vista-hub-sac-time-mobile_v03_20261113-1351.svg`
 
-[![Mobile: as mesmas telas da vista pwa no app, da fila ao pedido de senha da master, e o card do SAC do deboaz](../2_Diagramas/vista-hub-sac-time-mobile_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-time-mobile_v01_20261112-1716.svg)
+[![Mobile: as mesmas telas da vista pwa no app, da fila ao pedido de senha da master, e o card do SAC do deboaz](../2_Diagramas/vista-hub-sac-time-mobile_v03_20261113-1351.svg)](../2_Diagramas/vista-hub-sac-time-mobile_v03_20261113-1351.svg)
 
-**Hub · SAC · configuração · mobile · vista** — `2_Diagramas/vista-hub-sac-configuracao-mobile_v01_20261112-1716.svg`
+**Hub · SAC · configuração · mobile · vista** — `2_Diagramas/vista-hub-sac-configuracao-mobile_v03_20261113-1351.svg`
 
-[![Mobile: as mesmas telas da vista pwa no app: prazos por categoria, erro de limite e Prazos salvos](../2_Diagramas/vista-hub-sac-configuracao-mobile_v01_20261112-1716.svg)](../2_Diagramas/vista-hub-sac-configuracao-mobile_v01_20261112-1716.svg)
+[![Mobile: as mesmas telas da vista pwa no app: prazos por categoria, erro de limite e Prazos salvos](../2_Diagramas/vista-hub-sac-configuracao-mobile_v03_20261113-1351.svg)](../2_Diagramas/vista-hub-sac-configuracao-mobile_v03_20261113-1351.svg)
 
 ---
 
@@ -1342,21 +1742,29 @@ Cenário: o que o SAC não faz
 
 [![Casos de uso do SAC: a conta cliente (master ou autônomo) abre, acompanha, conversa, reabre, encerra e avalia; o membro do time vê a fila, assume, responde com nota interna, pede informação, resolve e atende o pedido de senha; o administrador configura os prazos; a tela Entrar registra o pedido sem login como chamado; o relógio aplica os 7 dias e descarta anexos não usados](../2_Diagramas/sac-casos-de-uso_v01_20261112-1705.svg)](../2_Diagramas/sac-casos-de-uso_v01_20261112-1705.svg)
 
-**SAC · sequência com as telas** — `2_Diagramas/sac-sequencia_v01_20261112-1705.svg`
+**SAC · sequência com as telas** — `2_Diagramas/sac-sequencia_v06_20261113-1907.svg`
 
-[![Sequência do SAC em 6 fases com as telas previstas (vista-hub-sac-cliente e vista-hub-sac-time, a desenhar): abrir com anexo verificado, assumir e responder com a conversa ao vivo (SSE e canal Redis, até 5 s), pedir informação e resolver, confirmar e avaliar, prazos automáticos e descarte, e o pedido de senha sem login virando chamado](../2_Diagramas/sac-sequencia_v01_20261112-1705.svg)](../2_Diagramas/sac-sequencia_v01_20261112-1705.svg)
+[![Sequência do SAC em 7 fases com as telas das vistas pwa v01 (vista-hub-sac-cliente, vista-hub-sac-time e vista-hub-sac-configuracao), depois da inicialização: abrir com anexo verificado, assumir e responder com a conversa ao vivo (SSE e canal Redis, até 5 s), pedir informação e resolver, confirmar e avaliar, prazos automáticos e descarte, o pedido de senha sem login virando chamado (RF-179) e configurar os prazos (RF-181), com as recusas de cada passo](../2_Diagramas/sac-sequencia_v06_20261113-1907.svg)](../2_Diagramas/sac-sequencia_v06_20261113-1907.svg)
 
-**SAC · contrato de API** — `2_Diagramas/sac-contrato-api_v01_20261112-1705.svg`
+**SAC · inicialização · sequência** — `2_Diagramas/sac-inicializacao-sequencia_v04_20261113-1907.svg`
 
-[![Contrato de API do SAC: anexos, chamados, conversa e ao vivo, assumir, status, reabrir, encerrar, avaliação, configuração e card, com o formato de erro, a tabela de códigos e as decisões técnicas](../2_Diagramas/sac-contrato-api_v01_20261112-1705.svg)](../2_Diagramas/sac-contrato-api_v01_20261112-1705.svg)
+[![Sequência da partida do SAC: cria os índices e, se um índice único falha, sai com código 1 (RNF-227); escolhe a verificação de anexos; o AgendamentoDoSac roda a cada 1 min com a trava sac:prazos (prazos, descarte dos anexos não usados e card do dia); o AvisosDoChamadoPeloRedis (secundario/in) faz o SUBSCRIBE em sac:chamado:* quando a primeira conexão ao vivo precisa, e o aviso acorda a espera do CanalDoChamadoNoRedis; e os ganchos de teste /_teste/sac/*](../2_Diagramas/sac-inicializacao-sequencia_v04_20261113-1907.svg)](../2_Diagramas/sac-inicializacao-sequencia_v04_20261113-1907.svg)
 
-**SAC · classes** — `2_Diagramas/sac-classes_v01_20261112-1705.svg`
+**SAC · contrato de API** — `2_Diagramas/sac-contrato-api_v03_20261113-0914.svg`
 
-[![Classes do SAC na arquitetura hexagonal: features chamados, anexos, configuracao e card em core/hub/sac com ports, usecases, dtos e domínio (Chamado, Anexo, PrazosDoSac, CardDoSac), adaptadores primários e secundários no ms_mono](../2_Diagramas/sac-classes_v01_20261112-1705.svg)](../2_Diagramas/sac-classes_v01_20261112-1705.svg)
+[![Contrato de API do SAC: bloco comum (erro, login MOD-02, auditoria e X-Trace-Id, mensagens exatas), anexos no GridFS, chamados, conversa ao vivo por SSE, assumir, status, reabrir, encerrar, avaliação, configuração, card e card ao vivo, agendamento, pedido de senha sem login do 17 e ganchos de teste](../2_Diagramas/sac-contrato-api_v03_20261113-0914.svg)](../2_Diagramas/sac-contrato-api_v03_20261113-0914.svg)
 
-**SAC · modelo de documentos** — `2_Diagramas/sac-documentos_v01_20261112-1705.svg`
+**SAC · classes** — `2_Diagramas/sac-classes_v05_20261113-1907.svg`
 
-[![Modelo de documentos do SAC: chamados com origem e avaliação embutidas, mensagensChamado, anexosSac, configuracaoSac, cardSac e contadores, arquivos no armazenamento de objetos e chaves no Redis, com referências às coleções do 17](../2_Diagramas/sac-documentos_v01_20261112-1705.svg)](../2_Diagramas/sac-documentos_v01_20261112-1705.svg)
+[![Classes do domínio do SAC: Chamado como raiz do agregado com DadosDoChamado e ItemDaConversa, os enums, os objetos de valor, FalhaDoSac e as portas de saída, cada uma com a classe que a implementa](../2_Diagramas/sac-classes_v05_20261113-1907.svg)](../2_Diagramas/sac-classes_v05_20261113-1907.svg)
+
+**SAC · pacotes da arquitetura hexagonal** — `2_Diagramas/sac-hexagonal_v04_20261113-1907.svg`
+
+[![Pacotes da arquitetura hexagonal do SAC: core/hub/sac com as features chamados, anexos, configuracao e card; ms_mono com primario/in, primario/out, secundario/out e secundario/in (AvisosDoChamadoPeloRedis, a assinatura do canal); MongoDB, Redis e clamd; em cada feature, a cadeia adaptador primário, ports/in, usecases, domínio, ports/out, adaptador secundário e banco](../2_Diagramas/sac-hexagonal_v04_20261113-1907.svg)](../2_Diagramas/sac-hexagonal_v04_20261113-1907.svg)
+
+**SAC · modelo de documentos** — `2_Diagramas/sac-documentos_v03_20261113-0914.svg`
+
+[![Modelo de documentos do SAC: chamados com numero, ordemDaFila, origem e avaliação embutidas, mensagensChamado, anexosSac, configuracaoSac, cardSac com _id escopo:AAAA-MM-DD e contadores, arquivos no GridFS sacAnexos e as chaves Redis sac:chamado:id e sac:prazos, com referências às coleções do 17](../2_Diagramas/sac-documentos_v03_20261113-0914.svg)](../2_Diagramas/sac-documentos_v03_20261113-0914.svg)
 
 ---
 
@@ -1376,11 +1784,13 @@ Cenário: o que o SAC não faz
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v04** | 2026-11-12 17:21 | Retorno do arquiteto e do designer: `RNF-229` (terça 10:00, feriados nacionais com Sexta-feira Santa e 20/11, Carnaval e Corpus Christi úteis), `RNF-230-api` (conversa ao vivo), `RN-296-api` (409 PRAZO_AVALIACAO_VENCIDO e TRANSICAO_INVALIDA), `RN-292-api` (503 VERIFICACAO_INDISPONIVEL, 422 no campo anexos), `RF-171-api` (403 do time), `RN-290` (encerrar de Aguardando cliente; mensagem no Resolvido 409), `RN-289` e `RF-179` (pedido sem login cumpre o prazo ao resolver, mensagem como nota interna), `RN-294` (reabrir sem limite), `RF-178` (nota obrigatória, Cancelar não confirma), `RF-181-api` (GET com U); textos das vistas em `RF-171` a `RF-177`, `RF-181`, `RN-288`; ordem das métricas em `RN-295` |
+| **v06** | 2026-11-13 21:37 | Índice responsavel.usuarioId+status em chamados (`RNF-232`); respostas do contrato v03 levadas do qa: mensagem do 415, ganchos /_teste/sac com 404 fora do teste e 422 em "disponivel" (`RN-292-api`), X-Trace-Id em toda ação auditada (`RN-297-api`), sem migração (`RNF-233-api`), vencido com 404 antes da remoção (`RNF-234-api`); fila do time com prazoPerto, nunca junto com atrasado (`RF-174-api`, `RN-289-api` incluído); decisões do produto e das vistas v02: anexo removido com "Anexo removido" e o Sonolento (`RNF-234` de tela; a de API vira `RNF-234-api`), fila zerada com o Orgulhoso (`RF-174`), "Vence em 1 h" e "Vence em 20 min" com o selo Lento (`RN-289`), recusa do tipo num Aviso de ação (`RN-292`); mascote e selo animados, parados com menos movimento (`RF-174`, `RF-176`, `RN-289`); anexos só PNG ou JPG, guardados como enviados (`RF-171`, `RN-292`, `RN-292-api` com o download e o Content-Disposition); `RNF-231` em produção; novos `RNF-232` e `RNF-232-api` (índices do SAC na partida, como a `RNF-227`), `RNF-233` e `RNF-233-api` (armazenamento de objetos ligável, senão o banco; cada anexo lido de onde foi guardado, sem migração, 05 `RNF-235`) e `RNF-234` (descarte: 24 h sem uso, 5 anos em produção, 30 dias em homologação); `RN-295-api` (401 SESSAO_TERMINADA sempre, 422 do intervalo, no-store e ping); `RN-297-api` (X-Trace-Id, sem auditoria, 401 antes de tudo, corpo não JSON); `RN-293-api` (405 sem login); `RF-181-api` (prazos nunca salvos); `RNF-230-api` (no-store e ping) |
+| v05 | 2026-11-13 03:33 | Diagramas no padrão do módulo Usuários: sac-contrato-api e sac-documentos (GridFS sacAnexos, numero, ordemDaFila, cardSac e chaves Redis) v01 → v02, sac-sequencia (7 fases com as vistas pwa v01, `RF-179` e `RF-181`) e sac-classes (só o domínio) v01 → v03; novos sac-inicializacao-sequencia e sac-hexagonal v02 (secundario/in com AvisosDoChamadoPeloRedis assinando sac:chamado:*); cenários sem mudança |
+| v04 | 2026-11-12 17:21 | Retorno do arquiteto e do designer: `RNF-229` (terça 10:00, feriados nacionais com Sexta-feira Santa e 20/11, Carnaval e Corpus Christi úteis), `RNF-230-api` (conversa ao vivo), `RN-296-api` (409 PRAZO_AVALIACAO_VENCIDO e TRANSICAO_INVALIDA), `RN-292-api` (503 VERIFICACAO_INDISPONIVEL, 422 no campo anexos), `RF-171-api` (403 do time), `RN-290` (encerrar de Aguardando cliente; mensagem no Resolvido 409), `RN-289` e `RF-179` (pedido sem login cumpre o prazo ao resolver, mensagem como nota interna), `RN-294` (reabrir sem limite), `RF-178` (nota obrigatória, Cancelar não confirma), `RF-181-api` (GET com U); textos das vistas em `RF-171` a `RF-177`, `RF-181`, `RN-288`; ordem das métricas em `RN-295` |
 | v03 | 2026-11-12 17:20 | Telas: vistas vista-hub-sac-cliente, vista-hub-sac-time e vista-hub-sac-configuracao v01 em Web, PWA e Mobile (com o card do SAC, `RN-295`); cenários sem mudança |
 | v02 | 2026-11-12 17:19 | Diagramas: sac-casos-de-uso, sac-sequencia (com as vistas previstas), sac-contrato-api, sac-classes e sac-documentos v01; cenários sem mudança |
 | v01 | 2026-11-12 16:58 | Criação: chamados da conta master e do autônomo com o time deboaz (`RF-171` a `RF-181`), regras (`RN-288` a `RN-297`) e medidas (`RNF-229` a `RNF-231`), com as âncoras -api; telas e diagramas a desenhar |
 
 ---
 
-<sub>boaz · v04 · 2026-11-12 17:21 · `1_Requisitos/18_modulo-sac.md`</sub>
+<sub>boaz · v06 · 2026-11-13 21:37 · `1_Requisitos/18_modulo-sac.md`</sub>

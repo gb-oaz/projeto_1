@@ -8,10 +8,11 @@ using Boaz.Core.Hub.Sac.Chamados.Dtos;
 namespace Boaz.Core.Hub.Sac.Anexos.UseCases;
 
 /// <summary>
-/// POST /sac/anexos (RN-292), para a conta e o time: até 10 MB (413), PNG,
-/// JPG ou PDF pelo conteúdo (415), sem ameaça na verificação (422), e a
-/// verificação fora do ar recusa (503, falha fechada). Guarda o arquivo e o
-/// anexo, que vence em 24 h se não for usado.
+/// POST /sac/anexos (RN-292), para a conta e o time: até 10 MB (413), só PNG
+/// e JPG pelo conteúdo (415), sem ameaça na verificação (422), e a verificação
+/// fora do ar recusa (503, falha fechada). Guarda o arquivo como veio, no
+/// destino da configuração (RNF-233), e o anexo com o armazenamento dele; o
+/// anexo vence em 24 h se não for usado.
 /// </summary>
 public sealed class EnviarAnexo(IAnexos anexos, IArquivos arquivos, IVerificacaoDeArquivos verificacao, TimeProvider relogio) : IEnviarAnexo
 {
@@ -27,7 +28,7 @@ public sealed class EnviarAnexo(IAnexos anexos, IArquivos arquivos, IVerificacao
             case ResultadoDaVerificacao.Indisponivel: throw FalhaDoSac.VerificacaoIndisponivel();
         }
         var anexo = Anexo.Novo(Anexo.NomeDe(nome), tipo, bytes, quem.UsuarioId, quem.ContaId, relogio.GetUtcNow());
-        await arquivos.Guardar(anexo.Objeto, bytes, ct);
+        anexo = anexo with { Armazenamento = await arquivos.Guardar(anexo.Objeto, bytes, anexo.Tipo, ct) };
         await anexos.Incluir(anexo, ct);
         return AnexoDto.De(anexo);
     }

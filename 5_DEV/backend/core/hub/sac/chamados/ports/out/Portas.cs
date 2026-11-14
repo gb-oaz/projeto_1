@@ -94,8 +94,20 @@ public interface IAnexosDoChamado
     /// <summary>Todos existem, são de quem pede, não foram usados e não venceram.</summary>
     Task<bool> Disponiveis(IReadOnlyList<string> ids, string usuarioId, DateTimeOffset agora, CancellationToken ct = default);
 
-    /// <summary>Liga os anexos ao chamado e à mensagem: não vencem mais.</summary>
+    /// <summary>
+    /// Liga os anexos ao chamado e à mensagem, com o expiraEm do ambiente
+    /// (RNF-234) e, no armazenamento de objetos, a tag uso=chamado.
+    /// </summary>
     Task Vincular(IReadOnlyList<string> ids, NumeroDoChamado chamado, string? mensagemId, bool interna, CancellationToken ct = default);
+
+    /// <summary>
+    /// O chamado fechou (RNF-234): em produção, os anexos dele ganham expiraEm =
+    /// fechadoEm + 5 anos; no armazenamento de objetos, a tag uso=fechado e o metadado fechadoem.
+    /// </summary>
+    Task AoFechar(NumeroDoChamado chamado, DateTimeOffset fechadoEm, CancellationToken ct = default);
+
+    /// <summary>O chamado reabriu: os anexos dele voltam ao uso no chamado (expiraEm do ambiente, tag uso=chamado).</summary>
+    Task AoReabrir(NumeroDoChamado chamado, CancellationToken ct = default);
 }
 
 /// <summary>O prazo de primeira resposta de cada categoria (RF-181, RN-289).</summary>

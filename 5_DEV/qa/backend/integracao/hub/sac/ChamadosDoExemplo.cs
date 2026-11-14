@@ -8,7 +8,7 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 namespace Boaz.Qa.Integracao.Hub.Sac;
 
 // Os chamados dos exemplos de 1_Requisitos/18_modulo-sac.md, criados pela API
-// (contrato sac-contrato-api v01) só quando um passo os cita. O número é
+// (contrato sac-contrato-api v03) só quando um passo os cita. O número é
 // gerado pelo backend (contadores.chamados): "SAC-000042" do exemplo vira o
 // número real pelo Mundo.Apelidos, como "usr-ebfga-maria" no 17. O mesmo vale
 // para os anexos ("anx-7f3a21") e as mensagens ("msg-000318").
@@ -22,8 +22,8 @@ namespace Boaz.Qa.Integracao.Hub.Sac;
 //   POST /_teste/sac/agendamento                                     → 204
 //       roda agora, com o relógio da aplicação, o que o AgendamentoDoSac faz
 //       a cada 1 min (IAplicarPrazos: os 7 dias de Aguardando cliente e de
-//       Resolvido; IDescartarAnexosNaoUsados: os anexos sem uso em 24 h) e só
-//       responde ao terminar
+//       Resolvido; IDescartarAnexosVencidos: os anexos de expiraEm vencido,
+//       24 h sem uso ou 30 dias em hml, RNF-234) e só responde ao terminar
 //   PUT /_teste/sac/verificacao   {"disponivel": false}              → 204
 //       a verificação de segurança dos anexos fica fora do ar (503
 //       VERIFICACAO_INDISPONIVEL, falha fechada)
@@ -51,6 +51,9 @@ public sealed class ChamadosDoExemplo(Mundo mundo, Api api, Relogio relogio)
     // o número que o Quando citar é ele
     public string? DoDado { get; set; }
     public bool VerificacaoMudou { get; private set; }
+    // a fila do time montada pelo cenário (RN-289-api): GET /sac/chamados?… do
+    // Caio não prepara o MundoDaFila
+    public bool FilaDoCenario { get; set; }
 
     // ── pessoas ────────────────────────────────────────────────────────────
     public async Task<Pessoa> Caio()
@@ -397,12 +400,20 @@ public static class Arquivos
         return mp4;
     }
 
-    // PDF com a assinatura de teste EICAR (não é vírus: todo antivírus a
-    // reconhece como teste). Montada aqui para o código-fonte não a conter inteira
-    public static byte[] PdfComAmeaca()
+    // JPEG com a assinatura de teste EICAR num comentário (não é vírus: todo
+    // antivírus a reconhece como teste). Montada aqui para o código-fonte não a
+    // conter inteira. Só PNG e JPG entram (RN-292), então a ameaça vai num JPG
+    public static byte[] JpgComAmeaca()
     {
-        var eicar = string.Concat(@"X5O!P%@AP[4\PZX54(P^)7CC)7}$", "EICAR-STANDARD-", "ANTIVIRUS-TEST-FILE!$H+H*");
-        return Encoding.ASCII.GetBytes($"%PDF-1.4\n{eicar}\n%%EOF\n");
+        var eicar = Encoding.ASCII.GetBytes(string.Concat(@"X5O!P%@AP[4\PZX54(P^)7CC)7}$", "EICAR-STANDARD-", "ANTIVIRUS-TEST-FILE!$H+H*"));
+        using var saida = new MemoryStream();
+        saida.Write([0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, (byte)'J', (byte)'F', (byte)'I', (byte)'F', 0, 1, 1, 0, 0, 1, 0, 1, 0, 0]);
+        // segmento COM (0xFFFE): o tamanho conta os 2 bytes dele
+        var tamanho = eicar.Length + 2;
+        saida.Write([0xFF, 0xFE, (byte)(tamanho >> 8), (byte)tamanho]);
+        saida.Write(eicar);
+        saida.Write([0xFF, 0xD9]);
+        return saida.ToArray();
     }
 
     public static byte[] Pdf() => Encoding.ASCII.GetBytes("%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF\n");

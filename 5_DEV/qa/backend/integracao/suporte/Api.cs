@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 namespace Boaz.Qa.Integracao.Suporte;
 
 public sealed record Resposta(int Status, string Texto, IReadOnlyList<string> Cookies,
-    IReadOnlyDictionary<string, string>? Cabecalhos = null)
+    IReadOnlyDictionary<string, string>? Cabecalhos = null, byte[]? Bytes = null)
 {
     // um cabeçalho da resposta, sem diferença de maiúsculas (X-Trace-Id, 17 RN-271)
     public string? Cabecalho(string nome) =>
@@ -59,7 +59,9 @@ public sealed class Api : IDisposable
         var cabecalhos = resposta.Headers.Concat(resposta.Content.Headers)
             .GroupBy(c => c.Key, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(g => g.Key, g => string.Join(",", g.SelectMany(c => c.Value)), StringComparer.OrdinalIgnoreCase);
-        return new Resposta((int)resposta.StatusCode, await resposta.Content.ReadAsStringAsync(), cookies, cabecalhos);
+        // os bytes como vieram (o arquivo de GET /sac/anexos/{id}, 18 RNF-233) e o texto deles
+        var bytes = await resposta.Content.ReadAsByteArrayAsync();
+        return new Resposta((int)resposta.StatusCode, Encoding.UTF8.GetString(bytes), cookies, cabecalhos, bytes);
     }
 
     // POST multipart/form-data com um arquivo no campo do contrato (18 RN-292:

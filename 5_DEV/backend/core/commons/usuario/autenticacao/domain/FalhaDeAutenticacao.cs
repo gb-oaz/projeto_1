@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+
 namespace Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 
 /// <summary>
@@ -24,7 +26,7 @@ public enum GrupoDeFalha
 /// (autenticacao-contrato-api). Os casos de uso a lançam; o adaptador de entrada
 /// a transforma na resposta de erro { "codigo", "mensagem" }.
 /// </summary>
-public sealed class FalhaDeAutenticacao : Exception
+public sealed class FalhaDeAutenticacao : Exception, IRecusaPrevista
 {
     FalhaDeAutenticacao(GrupoDeFalha grupo, string codigo, string mensagem, DateTimeOffset? tentarEm = null, string? campo = null)
         : base(mensagem)

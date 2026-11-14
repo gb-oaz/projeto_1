@@ -18,6 +18,11 @@ output "ligado" {
   value = var.ligado
 }
 
+# Conta dos anexos do SAC (RNF-235): vazia quando nunca foi ligada
+output "armazenamento_objetos" {
+  value = local.arquivos_conta ? azurerm_storage_account.arquivos[0].name : ""
+}
+
 output "ip_publico" {
   description = "IP público do Application Gateway (prd)"
   value       = local.prd ? azurerm_public_ip.pip[0].ip_address : null

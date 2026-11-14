@@ -262,10 +262,19 @@ jobs:
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 5s --health-retries 12
-    # Strings de conexão lidas pelo .NET (ConnectionStrings:MongoDb / :Redis).
+      # Armazenamento de objetos dos anexos do SAC (05 RNF-235): o Azurite, como
+      # em 4_CI_CD/local/compose.yml. Sem health check: "services" não troca o
+      # comando da imagem, e o azurite padrão sobe blob, fila e tabela.
+      azurite:
+        image: mcr.microsoft.com/azure-storage/azurite:3.34.0
+        ports: ["10000:10000"]
+    # Strings de conexão lidas pelo .NET (ConnectionStrings:MongoDb / :Redis /
+    # :Blob). A do Blob usa a conta e a chave públicas de desenvolvimento do
+    # Azurite (devstoreaccount1): não é segredo.
     env:
       ConnectionStrings__MongoDb: mongodb://localhost:27017
       ConnectionStrings__Redis: localhost:6379
+      ConnectionStrings__Blob: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;"
     # Todos os comandos "run" executam na raiz do backend.
     defaults:
       run:

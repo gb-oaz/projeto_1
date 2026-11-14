@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/18_modulo-sac.md (v04), copiados do requisito:
+# Cenários de API de 1_Requisitos/18_modulo-sac.md (v06), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: SAC
   1_Requisitos/18_modulo-sac.md · Cenários de API
@@ -137,7 +137,7 @@ Funcionalidade: SAC
     Quando envia GET /sac/chamados?situacao=EM_ANDAMENTO&pagina=1
     Então a resposta é 200 com os 14 chamados de todas as contas, até 50 por página
     E o mais antigo esperando o time vem primeiro
-    E cada item traz também conta, responsavel, prazoResposta e atrasado
+    E cada item traz também conta, responsavel, prazoResposta, prazoPerto e atrasado
 
   @RF-174
   Esquema do Cenário: filtros da fila
@@ -312,6 +312,31 @@ Funcionalidade: SAC
     Quando a conta master da EBFGA envia GET /sac/anexos/anx-55d0e2, do chamado do Pedro
     Então a resposta é 404 ANEXO_INEXISTENTE
 
+  @RN-289
+  Esquema do Cenário: prazo perto na fila
+    Dado o SAC-000087 sem 1ª resposta, com prazoResposta "2026-11-12T17:00:00Z"
+    Quando o Caio envia GET /sac/chamados?situacao=EM_ANDAMENTO em <quando>
+    Então o item do SAC-000087 traz prazoPerto <perto> e atrasado <atrasado>
+
+    Exemplos:
+      | quando               | perto | atrasado |
+      | 2026-11-12T15:59:00Z | false | false    |
+      | 2026-11-12T16:00:00Z | true  | false    |
+      | 2026-11-12T16:40:00Z | true  | false    |
+      | 2026-11-12T17:01:00Z | false | true     |
+
+  @RN-289
+  Cenário: 1 hora útil atravessando a noite
+    Dado o SAC-000088 sem 1ª resposta, com prazoResposta "2026-11-13T11:30:00Z"
+    Quando o Caio envia GET /sac/chamados?situacao=EM_ANDAMENTO em "2026-11-12T20:30:00Z"
+    Então o item do SAC-000088 traz prazoPerto true, com 1 hora útil até o prazo
+
+  @RN-289
+  Cenário: chamado já respondido
+    Dado o SAC-000042 com a 1ª resposta do Caio e o prazoResposta daqui a 30 min
+    Quando o Caio envia GET /sac/chamados?situacao=EM_ANDAMENTO
+    Então o item do SAC-000042 traz prazoPerto false e atrasado false
+
   @RN-290
   Esquema do Cenário: mudança recusada
     Dado o chamado SAC-000042 "<de>"
@@ -355,10 +380,26 @@ Funcionalidade: SAC
     Exemplos:
       | pedido                                         | resposta                   |
       | POST /sac/anexos com "foto.jpg" de 11 MB       | 413 ANEXO_GRANDE           |
-      | POST /sac/anexos com "tela.mp4"                | 415 TIPO_NAO_ACEITO        |
-      | POST /sac/anexos com "nota.pdf" com ameaça     | 422 ANEXO_RECUSADO         |
+      | POST /sac/anexos com "nota.jpg" com ameaça     | 422 ANEXO_RECUSADO         |
       | uma mensagem com 6 anexos                      | 422 LIMITE_ANEXOS          |
       | POST /sac/anexos com a verificação fora do ar  | 503 VERIFICACAO_INDISPONIVEL |
+
+  @RN-292
+  Esquema do Cenário: tipo não aceito
+    Quando a conta master envia POST /sac/anexos <arquivo>
+    Então a resposta é 415 com:
+      """
+      {
+        "codigo": "TIPO_NAO_ACEITO",
+        "mensagem": "Envie PNG ou JPG."
+      }
+      """
+
+    Exemplos:
+      | arquivo                       |
+      | com "boleto.pdf"              |
+      | com um PDF chamado "foto.png" |
+      | com "tela.mp4"                |
 
   @RN-292
   Esquema do Cenário: anexo que não pode ser usado
@@ -372,6 +413,33 @@ Funcionalidade: SAC
       | "anx-7f3a21", já usado no SAC-000042       |
       | "anx-1c2d3e", descartado depois de 24 h    |
 
+  @RN-292
+  Cenário: baixar o anexo
+    Dado o "erro.png" do SAC-000042, enviado como "anx-7f3a21"
+    Quando a conta master envia GET /sac/anexos/anx-7f3a21
+    Então a resposta é 200 com o arquivo, igual ao enviado
+    E o cabeçalho Content-Type "image/png"
+    E o cabeçalho Content-Disposition 'attachment; filename="erro.png"'
+
+  @RN-292
+  Esquema do Cenário: ganchos de teste do SAC fora do teste
+    Dado a aplicação iniciada em <ambiente>, com Teste__Relogio <flag>
+    Quando envia <metodo> <endereco>
+    Então a resposta é 404
+
+    Exemplos:
+      | ambiente    | flag    | metodo | endereco                |
+      | produção    | "sim"   | POST   | /_teste/sac/agendamento |
+      | produção    | "sim"   | PUT    | /_teste/sac/verificacao |
+      | homologação | ausente | POST   | /_teste/sac/agendamento |
+      | homologação | ausente | DELETE | /_teste/sac/verificacao |
+
+  @RN-292
+  Cenário: gancho da verificação sem o campo disponivel
+    Dado a aplicação de homologação, com Teste__Relogio "sim"
+    Quando envia PUT /_teste/sac/verificacao sem "disponivel"
+    Então a resposta é 422 DADOS_INVALIDOS com o campo "disponivel"
+
   @RN-293
   Esquema do Cenário: mensagem não muda
     Quando o Caio envia <pedido> /sac/chamados/SAC-000042/mensagens/msg-000318
@@ -382,6 +450,12 @@ Funcionalidade: SAC
       | PATCH  |
       | PUT    |
       | DELETE |
+
+  @RN-293
+  Cenário: sem login
+    Quando alguém sem token envia PATCH /sac/chamados/SAC-000042/mensagens/msg-000318
+    Então a resposta é 405, sem corpo, com o cabeçalho Allow vazio
+    E o token não é conferido
 
   @RN-294
   Cenário: décimo primeiro chamado
@@ -448,6 +522,40 @@ Funcionalidade: SAC
   Cenário: ao vivo
     Quando a conta master envia GET /sac/card/ao-vivo?intervalo=30
     Então a resposta é 200, como em RN-279 de 15_modulos
+    E traz Content-Type "text/event-stream" e Cache-Control "no-store"
+    E o 1º evento "card" chega logo ao abrir, com o corpo de GET /sac/card
+    E sem versão nova, a cada 30 s chega o comentário ": ping"
+
+  @RN-295
+  Esquema do Cenário: card sem sessão válida
+    Quando alguém envia GET <endereco> <token>
+    Então a resposta é 401 SESSAO_TERMINADA, seja qual for o problema do token
+    E nenhum fluxo fica aberto
+
+    Exemplos:
+      | endereco                       | token                                  |
+      | /sac/card                      | sem o cabeçalho Authorization          |
+      | /sac/card                      | com o token vencido                    |
+      | /sac/card/ao-vivo?intervalo=30 | com o token adulterado                 |
+      | /sac/card/ao-vivo?intervalo=30 | da sessão encerrada em outro aparelho  |
+
+  @RN-295
+  Esquema do Cenário: intervalo inválido no card ao vivo
+    Quando a conta master envia GET /sac/card/ao-vivo?intervalo=<intervalo>
+    Então a resposta é 422 com:
+      """
+      {
+        "codigo": "DADOS_INVALIDOS",
+        "mensagem": "O campo \"intervalo\" está faltando ou é inválido.",
+        "campo": "intervalo"
+      }
+      """
+    E nenhum fluxo fica aberto
+
+    Exemplos:
+      | intervalo |
+      | 10        |
+      | 0         |
 
   @RN-296
   Esquema do Cenário: avaliação fora do prazo ou do caminho
@@ -465,6 +573,7 @@ Funcionalidade: SAC
   Esquema do Cenário: ações auditadas
     Quando <quem> envia <pedido> com sucesso
     Então "auditoria" ganha "INICIADO" e "CONCLUIDO" da ação "<acao>", com o mesmo traceId
+    E a resposta traz o cabeçalho X-Trace-Id com esse traceId
 
     Exemplos:
       | quem           | pedido                                      | acao               |
@@ -481,6 +590,51 @@ Funcionalidade: SAC
   Cenário: mudança feita pelo prazo
     Quando o SAC-000039 passa a "RESOLVIDO" por 7 dias sem resposta
     Então "auditoria" ganha a ação "FECHAR_POR_PRAZO", sem quem, com o alvo "SAC-000039"
+
+  @RN-297
+  Esquema do Cenário: X-Trace-Id da ação auditada
+    Quando <quem> envia POST /sac/chamados <caso>
+    Então a resposta é <resposta> com o cabeçalho X-Trace-Id, como "trc-7f3a9c21"
+    E esse é o traceId de "INICIADO" em "auditoria" e de <registro>
+
+    Exemplos:
+      | quem           | caso            | resposta            | registro                    |
+      | a conta master | válido          | 201                 | "CONCLUIDO"                 |
+      | a conta master | sem a categoria | 422 DADOS_INVALIDOS | "auditoriaErros" com ALERTA |
+      | a staff Maria  | válido          | 403 ACESSO_NEGADO   | "auditoriaErros" com ALERTA |
+      | a conta master | com falha geral | 500 ERRO_INESPERADO | "auditoriaErros" com ERRO   |
+
+  @RN-297
+  Esquema do Cenário: pedidos sem auditoria
+    Quando a conta master envia <pedido> com sucesso
+    Então a resposta não traz X-Trace-Id e nada é gravado em "auditoria"
+
+    Exemplos:
+      | pedido                                    |
+      | GET /sac/chamados/SAC-000042              |
+      | GET /sac/chamados/SAC-000042/ao-vivo      |
+      | GET /sac/card                             |
+      | POST /sac/anexos com "erro.png"           |
+
+  @RN-297
+  Cenário: 401 antes de tudo
+    Dado o token da conta master com as permissões já mudadas
+    Quando envia POST /sac/chamados com o corpo "abc", que não é JSON
+    Então a resposta é 401 PERMISSOES_DESATUALIZADAS, não 422
+    E sem X-Trace-Id, nada é gravado em "auditoria" nem em "auditoriaErros"
+
+  @RN-297
+  Cenário: corpo que não é JSON
+    Quando a conta master envia POST /sac/chamados com o corpo "abc"
+    Então a resposta é 422 com:
+      """
+      {
+        "codigo": "DADOS_INVALIDOS",
+        "mensagem": "O campo \"corpo\" está faltando ou é inválido.",
+        "campo": "corpo"
+      }
+      """
+    E sem X-Trace-Id, nada é gravado em "auditoria"
 
   @RF-181
   Cenário: salvar os prazos
@@ -509,6 +663,44 @@ Funcionalidade: SAC
     E a conta master da EBFGA recebe 403 ACESSO_NEGADO no mesmo pedido
 
   @RF-181
+  Cenário: prazos nunca salvos
+    Dado nenhum prazo salvo na aba Configuração
+    Quando o Caio envia GET /sac/configuracao
+    Então a resposta é 200 com as 6 categorias, nesta ordem, nos prazos padrão:
+      """
+      {
+        "prazos": [
+          {
+            "categoria": "ACESSO_E_SENHA",
+            "horasUteis": 4
+          },
+          {
+            "categoria": "COBRANCA",
+            "horasUteis": 8
+          },
+          {
+            "categoria": "MODULO_COM_PROBLEMA",
+            "horasUteis": 8
+          },
+          {
+            "categoria": "DUVIDA_DE_USO",
+            "horasUteis": 16
+          },
+          {
+            "categoria": "SUGESTAO_AO_DEBOAZ",
+            "horasUteis": 40
+          },
+          {
+            "categoria": "SENHA_CONTA_MASTER",
+            "horasUteis": 4
+          }
+        ],
+        "salvaEm": null,
+        "salvaPor": null
+      }
+      """
+
+  @RF-181
   Esquema do Cenário: recusas
     Quando <quem> envia PUT /sac/configuracao com <corpo>
     Então a resposta é <resposta>
@@ -525,6 +717,7 @@ Funcionalidade: SAC
     Dado o token da conta master da EBFGA
     Quando envia GET /sac/chamados/SAC-000042/ao-vivo com Accept "text/event-stream"
     Então a resposta é 200 e a conexão fica aberta
+    E traz Content-Type "text/event-stream" e Cache-Control "no-store"
     E quando o Caio envia uma mensagem, o evento "mensagem" chega em até 5 s
     E o evento tem o id da mensagem, como "msg-000319", e o mesmo corpo de GET do chamado
     E a nota interna do Caio não chega à conta
@@ -536,9 +729,101 @@ Funcionalidade: SAC
     Então recebe primeiro as mensagens enviadas depois da "msg-000318", na ordem
 
   @RNF-230
+  Cenário: conversa sem mensagem nova
+    Dado a conexão ao vivo do SAC-000042 aberta, sem mensagem nova
+    Quando passam 30 s
+    Então chega o comentário ": ping" e a conexão continua aberta
+
+  @RNF-230
   Cenário: chamado de outra conta
     Quando a conta master envia GET /sac/chamados/SAC-000045/ao-vivo
     Então a resposta é 404 CHAMADO_INEXISTENTE
+
+  @RNF-232
+  Cenário: pronta depois da partida
+    Dado a partida de homologação concluída, com as coleções do SAC e seus índices prontos
+    Quando envia GET /health, sem login
+    Então a resposta é 200, sem corpo
+
+  @RNF-232
+  Cenário: índice único que não pode ser criado
+    Dado dois documentos de "cardSac" com o escopo "EBFGA" e o dia 2026-11-12
+    Quando a aplicação de homologação inicia
+    Então GET /health, sem login, não tem resposta, a conexão é recusada
+    E o processo termina com código 1, como na RNF-227
+
+  @RNF-232
+  Cenário: índice não único que não pode ser criado
+    Dado o banco recusa o índice chamadoId_numero em "mensagensChamado" na partida
+    Quando envia GET /health, sem login
+    Então a resposta é 200, sem corpo
+    E o log traz um aviso com o nome do índice e da coleção, nunca o valor
+
+  @RNF-233
+  Esquema do Cenário: o mesmo arquivo nos dois armazenamentos
+    Dado o armazenamento de objetos <estado> no ambiente
+    E o "erro.png" de 2 MB enviado por POST /sac/anexos como "anx-7f3a21"
+    Quando a conta master envia GET /sac/anexos/anx-7f3a21
+    Então a resposta é 200 com os mesmos bytes enviados, sem conversão
+    E o cabeçalho Content-Type "image/png"
+
+    Exemplos:
+      | estado    |
+      | ligado    |
+      | desligado |
+
+  @RNF-233
+  Cenário: anexo lido de onde foi guardado, sem migração
+    Dado o "erro.png" enviado como "anx-7f3a21" com o armazenamento de objetos desligado
+    E a aplicação reinicia com o armazenamento de objetos ligado
+    Quando a conta master envia GET /sac/anexos/anx-7f3a21
+    Então a resposta é 200 com os mesmos bytes enviados, sem conversão
+    E o arquivo continua só no GridFS, sem migração
+
+  @RNF-233
+  Cenário: verificação fora do ar
+    Dado o armazenamento de objetos ligado e a verificação de segurança fora do ar
+    Quando a conta master envia POST /sac/anexos com "erro.png"
+    Então a resposta é 503 VERIFICACAO_INDISPONIVEL e nada é guardado
+
+  @RNF-234
+  Esquema do Cenário: quando o arquivo do anexo é removido
+    Dado o "erro.png" enviado como "anx-7f3a21" em 2026-11-12 10:00, em <ambiente>
+    E <uso>
+    Quando a conta master envia GET /sac/anexos/anx-7f3a21 em <quando>
+    Então a resposta é 404 ANEXO_INEXISTENTE e o arquivo já foi removido
+
+    Exemplos:
+      | ambiente    | uso                                    | quando           |
+      | produção    | sem chamado nem mensagem em 24 h       | 2026-11-13 10:01 |
+      | homologação | sem chamado nem mensagem em 24 h       | 2026-11-13 10:01 |
+      | homologação | no SAC-000042                          | 2026-12-12 10:01 |
+      | produção    | no SAC-000042, fechado em 2026-11-20   | 2031-11-20 10:01 |
+
+  @RNF-234
+  Cenário: anexo vencido responde 404 antes de o arquivo sair
+    Dado o "erro.png" enviado como "anx-7f3a21" em 2026-11-12 10:00, em homologação
+    E sem chamado nem mensagem que o use
+    E o relógio em 2026-11-13 10:01, antes de o agendamento rodar
+    Quando a conta master envia GET /sac/anexos/anx-7f3a21
+    Então a resposta é 404 ANEXO_INEXISTENTE
+
+  @RNF-234
+  Esquema do Cenário: arquivo ainda guardado
+    Dado o "erro.png" do SAC-000042 enviado em 2026-11-12 10:00, em <ambiente>
+    Quando a conta master envia GET /sac/anexos/anx-7f3a21 em <quando>
+    Então a resposta é 200 com o arquivo
+
+    Exemplos:
+      | ambiente    | quando           |
+      | homologação | 2026-12-12 09:59 |
+      | produção    | 2031-11-19 10:00 |
+
+  @RNF-234
+  Cenário: conversa sem o arquivo em homologação
+    Dado o arquivo do "anx-7f3a21" removido 30 dias depois do envio, em homologação
+    Quando a conta master envia GET /sac/chamados/SAC-000042
+    Então a resposta é 200 com o chamado e as mensagens, sem nada removido
 
   @fora-de-escopo
   Cenário: o que o SAC não faz

@@ -60,6 +60,7 @@ public sealed record ContaDto(string Id, string Sigla, string Nome, string Tipo)
 /// <param name="Responsavel">Quem do time tem o chamado.</param>
 /// <param name="PrazoResposta">O prazo de primeira resposta.</param>
 /// <param name="Atrasado">Sem a primeira resposta depois do prazo (RN-289).</param>
+/// <param name="PrazoPerto">Sem a primeira resposta e com 1 hora útil ou menos até o prazo (RN-289).</param>
 /// <param name="Origem">HUB ou ENTRAR_SEM_LOGIN.</param>
 /// <param name="Pedido">"ajuda-000087", só sem login.</param>
 /// <param name="Instituicao">A instituição informada, só sem login.</param>
@@ -67,16 +68,16 @@ public sealed record ContaDto(string Id, string Sigla, string Nome, string Tipo)
 /// <param name="Nota">A nota da avaliação, se houver.</param>
 public sealed record ResumoDoTimeDto(
     string Id, string Assunto, string Categoria, string Status, DateTimeOffset AtualizadoEm, bool NovaResposta, ContaDto? Conta,
-    string? Responsavel, DateTimeOffset PrazoResposta, bool Atrasado, string Origem,
+    string? Responsavel, DateTimeOffset PrazoResposta, bool Atrasado, bool PrazoPerto, string Origem,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Pedido,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Instituicao,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Contato,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? Nota)
 {
-    /// <summary>O item do chamado, com o atrasado calculado agora.</summary>
+    /// <summary>O item do chamado, com o atrasado e o prazo perto calculados agora.</summary>
     public static ResumoDoTimeDto De(DadosDoChamado d, DateTimeOffset agora) =>
         new(d.Id.Valor, d.Assunto, d.Categoria.Texto(), d.Status.Texto(), d.AtualizadoEm, d.NaoLidoPeloTime, ContaDto.De(d.Conta),
-            d.Responsavel?.Nome, d.PrazoResposta, Chamado.EstaAtrasado(d, agora), d.Origem.Tipo.Texto(), d.Origem.Pedido,
+            d.Responsavel?.Nome, d.PrazoResposta, Chamado.EstaAtrasado(d, agora), Chamado.PrazoEstaPerto(d, agora), d.Origem.Tipo.Texto(), d.Origem.Pedido,
             d.Origem.Instituicao, d.Origem.Contato, d.Avaliacao?.Nota);
 }
 

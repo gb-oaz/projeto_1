@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 

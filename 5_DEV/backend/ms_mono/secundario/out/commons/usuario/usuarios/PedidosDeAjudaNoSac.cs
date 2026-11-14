@@ -6,7 +6,7 @@ using MongoDB.Driver;
 namespace Boaz.MsMono.Secundario.Out.Commons.Usuario.Usuarios;
 
 // Os pedidos de ajuda da conta master sem login (17 RF-111, RNF-205) no SAC
-// (18 RF-179, sac-contrato-api v01 decisão 1): o pedido vira, na criação, o
+// (18 RF-179, sac-contrato-api v02, POST /contas/esqueci-senha-master): o pedido vira, na criação, o
 // chamado SENHA_CONTA_MASTER (IRegistrarPedidoDeSenha), e pedidosAjuda guarda
 // só o limite do aparelho, com o mesmo número ("ajuda-000087" = "SAC-000087")
 // e o chamado. O id do pedido é o alvo do "CONCLUIDO" do ESQUECI_SENHA_MASTER (RN-274).

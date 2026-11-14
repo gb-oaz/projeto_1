@@ -1,11 +1,11 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.Ports.Out;
 using Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 using Boaz.Core.Commons.Usuario.Autorizacao.UseCases;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
-using IAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoria;
-using IAuditoriaDeErros = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoriaDeErros;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
 

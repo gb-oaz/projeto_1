@@ -313,6 +313,14 @@ public sealed class Chamado(DadosDoChamado dados)
     public static bool EstaAtrasado(DadosDoChamado dados, DateTimeOffset agora) =>
         dados.PrimeiraRespostaEm is null && EstaEmAndamento(dados.Status) && agora > dados.PrazoResposta;
 
+    /// <summary>
+    /// Prazo perto (RN-289, RNF-229): sem a primeira resposta, ainda não
+    /// atrasado e com 1 hora útil ou menos até o prazo. Calculado na leitura.
+    /// </summary>
+    public static bool PrazoEstaPerto(DadosDoChamado dados, DateTimeOffset agora) =>
+        dados.PrimeiraRespostaEm is null && EstaEmAndamento(dados.Status) && !EstaAtrasado(dados, agora)
+        && CalendarioUtil.Somar(agora, 1) >= dados.PrazoResposta;
+
     /// <summary>A conta ainda pode reabrir: Resolvido há até 7 dias.</summary>
     public bool PodeReabrir(DateTimeOffset agora) =>
         Dados.Status == StatusDoChamado.Resolvido && agora <= Dados.ResolvidoEm!.Value + LimitesDoChamado.SeteDias;

@@ -14,7 +14,8 @@ public sealed class AnexosTests
     [Theory]
     [InlineData(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }, "image/png")]
     [InlineData(new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }, "image/jpeg")]
-    [InlineData(new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D, 0x31 }, "application/pdf")]
+    // o PDF saiu do RN-292 (18 v06): só PNG e JPG são reconhecidos
+    [InlineData(new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D, 0x31 }, null)]
     [InlineData(new byte[] { 0, 0, 0, 0x18, 0x66, 0x74, 0x79, 0x70 }, null)]
     public void RN_292_tipo_pelo_conteudo(byte[] inicio, string? tipo) => Assert.Equal(tipo, TipoDeAnexo.Do(inicio));
 

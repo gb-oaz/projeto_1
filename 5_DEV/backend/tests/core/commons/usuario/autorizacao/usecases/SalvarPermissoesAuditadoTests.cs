@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
 using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;

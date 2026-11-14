@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+
 namespace Boaz.Core.Commons.Usuario.Usuarios.Domain;
 
 /// <summary>
@@ -27,7 +29,7 @@ public enum GrupoDeFalha
 /// (usuarios-contrato-api). O adaptador de entrada a transforma na resposta
 /// { "codigo", "mensagem" } com os campos extras (campo, minimo, maximo, tentarEm).
 /// </summary>
-public sealed class FalhaDeUsuarios : Exception
+public sealed class FalhaDeUsuarios : Exception, IRecusaPrevista
 {
     FalhaDeUsuarios(GrupoDeFalha grupo, string codigo, string mensagem) : base(mensagem) => (Grupo, Codigo) = (grupo, codigo);
 

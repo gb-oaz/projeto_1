@@ -143,8 +143,8 @@
           "nome": "MODULO_NAO_CONTRATADO",
           "corpo": {
             "codigo": "MODULO_NAO_CONTRATADO",
-            "mensagem": "O módulo Relatórios não está contratado.",
-            "mod": "MOD-12"
+            "mensagem": "O módulo Presença não está contratado.",
+            "mod": "MOD-06"
           }
         },
         {
@@ -162,6 +162,15 @@
           "corpo": {
             "codigo": "VERSAO_AUSENTE",
             "mensagem": "Envie a versão lida das permissões no If-Match."
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": "Algo deu errado. Tente de novo mais tarde."
           }
         }
       ]

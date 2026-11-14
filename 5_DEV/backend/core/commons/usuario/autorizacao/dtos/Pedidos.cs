@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 
 namespace Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
@@ -51,5 +52,5 @@ public sealed record PedidoAutorizavelDto(string Papel, IReadOnlyDictionary<stri
 /// <param name="Quem">Quem pede, o sub do token.</param>
 /// <param name="Alvo">O alvo do endereço; null no que cria (POST /usuarios).</param>
 public sealed record ExecucaoDaRotaDto(
-    Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId TraceId, Boaz.Core.Commons.Usuario.Usuarios.Domain.AcaoAuditada Acao, string? ContaId,
+    Boaz.Core.Commons.Auditoria.Domain.TraceId TraceId, Boaz.Core.Commons.Auditoria.Domain.AcaoAuditada Acao, string? ContaId,
     string Quem, string? Alvo);

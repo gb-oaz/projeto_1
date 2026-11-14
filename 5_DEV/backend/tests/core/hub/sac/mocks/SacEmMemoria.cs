@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.Ports.Out;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 using Boaz.Core.Hub.Sac.Anexos.Domain;
@@ -181,6 +183,25 @@ public sealed class SacEmMemoria : IChamados, INumeracao, ICanalDoChamado, IPess
         return Task.CompletedTask;
     }
 
+    /// <summary>Os chamados fechados, com o fechadoEm, na ordem.</summary>
+    public List<(string Chamado, DateTimeOffset FechadoEm)> AnexosFechados { get; } = [];
+
+    public Task AoFechar(NumeroDoChamado chamado, DateTimeOffset fechadoEm, CancellationToken ct = default)
+    {
+        AnexosFechados.Add((chamado.Valor, fechadoEm));
+        foreach (var a in Anexos.Values.Where(a => a.ChamadoId == chamado.Valor).ToList())
+        {
+            Anexos[a.Id] = a with { ExpiraEm = Anexo.PrazoAoFechar(false, a.EnviadoEm, fechadoEm) };
+        }
+        return Task.CompletedTask;
+    }
+
+    public Task AoReabrir(NumeroDoChamado chamado, CancellationToken ct = default)
+    {
+        foreach (var a in Anexos.Values.Where(a => a.ChamadoId == chamado.Valor).ToList()) Anexos[a.Id] = a with { ExpiraEm = null };
+        return Task.CompletedTask;
+    }
+
     public Task Incluir(Anexo anexo, CancellationToken ct = default)
     {
         Anexos.Add(anexo.Id, anexo);
@@ -189,8 +210,14 @@ public sealed class SacEmMemoria : IChamados, INumeracao, ICanalDoChamado, IPess
 
     Task<Anexo?> IAnexos.Obter(string id, CancellationToken ct) => Task.FromResult(Anexos.GetValueOrDefault(id));
 
-    public Task<IReadOnlyList<Anexo>> NaoUsadosAte(DateTimeOffset agora, CancellationToken ct = default) =>
-        Task.FromResult<IReadOnlyList<Anexo>>([.. Anexos.Values.Where(a => a.Vencido(agora))]);
+    public Task<IReadOnlyList<Anexo>> VencidosAte(DateTimeOffset agora, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<Anexo>>([.. Anexos.Values.Where(a => a.RemovidoEm is null && a.ExpiraEm is { } e && agora >= e)]);
+
+    public Task MarcarRemovido(string id, DateTimeOffset agora, CancellationToken ct = default)
+    {
+        Anexos[id] = Anexos[id] with { RemovidoEm = agora };
+        return Task.CompletedTask;
+    }
 
     Task IAnexos.Apagar(string id, CancellationToken ct)
     {
@@ -198,18 +225,27 @@ public sealed class SacEmMemoria : IChamados, INumeracao, ICanalDoChamado, IPess
         return Task.CompletedTask;
     }
 
-    public Task Guardar(string objeto, byte[] conteudo, CancellationToken ct = default)
+    /// <summary>A tag "uso" de cada arquivo.</summary>
+    public Dictionary<string, UsoDoArquivo> Usos { get; } = [];
+
+    public Task<ArmazenamentoDoAnexo> Guardar(string objeto, byte[] conteudo, string tipo, CancellationToken ct = default)
     {
         Arquivos[objeto] = conteudo;
+        return Task.FromResult(ArmazenamentoDoAnexo.GridFs);
+    }
+
+    public Task<Stream?> Abrir(ArmazenamentoDoAnexo armazenamento, string objeto, CancellationToken ct = default) =>
+        Task.FromResult<Stream?>(Arquivos.TryGetValue(objeto, out var b) ? new MemoryStream(b) : null);
+
+    Task IArquivos.Apagar(ArmazenamentoDoAnexo armazenamento, string objeto, CancellationToken ct)
+    {
+        Arquivos.Remove(objeto);
         return Task.CompletedTask;
     }
 
-    public Task<Stream?> Abrir(string objeto, CancellationToken ct = default) =>
-        Task.FromResult<Stream?>(Arquivos.TryGetValue(objeto, out var b) ? new MemoryStream(b) : null);
-
-    Task IArquivos.Apagar(string objeto, CancellationToken ct)
+    public Task MarcarUso(ArmazenamentoDoAnexo armazenamento, string objeto, UsoDoArquivo uso, CancellationToken ct = default)
     {
-        Arquivos.Remove(objeto);
+        Usos[objeto] = uso;
         return Task.CompletedTask;
     }
 

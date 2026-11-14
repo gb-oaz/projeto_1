@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Hub.Sac.Anexos.UseCases;
 using Boaz.Core.Hub.Sac.Card.UseCases;
@@ -48,12 +49,12 @@ public sealed class Cenario
         Enviar = new(m, m, m, m, m, m, m, Relogio);
         Assumir = new(m, m, m, m, m, m, Relogio);
         Status = new(m, m, m, m, m, m, Relogio);
-        Reabrir = new(m, m, m, m, m, m, Relogio);
-        Encerrar = new(m, m, m, m, m, m, Relogio);
-        Avaliar = new(m, m, m, m, m, m, Relogio);
+        Reabrir = new(m, m, m, m, m, m, m, Relogio);
+        Encerrar = new(m, m, m, m, m, m, m, Relogio);
+        Avaliar = new(m, m, m, m, m, m, m, Relogio);
         AoVivo = new(m, m, m, m);
         PedidoDeSenha = new(m, m, m, m, m);
-        Prazos = new(m, m, m, m, m, m, Relogio);
+        Prazos = new(m, m, m, m, m, m, m, Relogio);
         EnviarAnexo = new(m, m, m, Relogio);
         LerAnexo = new(m, m, Relogio);
         Descartar = new(m, m, Relogio);
@@ -78,7 +79,7 @@ public sealed class Cenario
     public AplicarPrazos Prazos { get; }
     public EnviarAnexo EnviarAnexo { get; }
     public LerAnexo LerAnexo { get; }
-    public DescartarAnexosNaoUsados Descartar { get; }
+    public DescartarAnexosVencidos Descartar { get; }
     public LerPrazos LerPrazos { get; }
     public SalvarPrazos SalvarPrazos { get; }
     public LerCardDoSac Card { get; }

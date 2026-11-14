@@ -1,6 +1,6 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks;
 using static Boaz.Core.Commons.Tests.Usuario.Autorizacao.Mocks.Cenario;
-using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autorizacao.UseCases;
 

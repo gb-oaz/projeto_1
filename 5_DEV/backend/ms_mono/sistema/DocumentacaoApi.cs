@@ -2,6 +2,7 @@ using Boaz.MsMono.Primario.In.Commons;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Autenticacao;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Autorizacao;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Primario.In.Hub.Sac;
 using Microsoft.OpenApi;
 
 namespace Boaz.MsMono.Sistema;
@@ -25,6 +26,7 @@ public static class DocumentacaoApi
     public const string DocumentoAutenticacao = "autenticacao";
     public const string DocumentoUsuarios = "usuarios";
     public const string DocumentoAutorizacao = "autorizacao";
+    public const string DocumentoSac = "sac";
     public const string Versao = "v1";
     public const string Titulo = "deboaz · catálogo de APIs";
     public const string EsquemaBearer = "Bearer";
@@ -58,6 +60,13 @@ public static class DocumentacaoApi
             new(TempoDeSessaoController.Tag, TempoDeSessaoController.Descricao),
         ]),
         new(DocumentoAutorizacao, "Autorização", [new(PermissoesController.Tag, PermissoesController.Descricao)]),
+        new(DocumentoSac, "SAC",
+        [
+            new(ChamadosController.Tag, ChamadosController.Descricao),
+            new(AnexosController.Tag, AnexosController.Descricao),
+            new(ConfiguracaoDoSacController.Tag, ConfiguracaoDoSacController.Descricao),
+            new(CardDoSacController.Tag, CardDoSacController.Descricao),
+        ]),
     ];
 
     public static bool Habilitada(IConfiguration configuracao) => configuracao.GetValue<bool>("Swagger:Habilitado");

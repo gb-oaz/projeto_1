@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.Ports.Out;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
@@ -275,39 +277,10 @@ public sealed class GeracoesNoBanco(Armazenamento armazenamento) : IGeracoesDeSe
             .Set("resumoComprovante", Bson.Valor(geracao.ResumoComprovante)), cancellationToken: ct);
 }
 
-// Auditoria e erros (RN-178, RN-270: 5 anos, só inclusão) e o último
-// pagamento. Os pedidos de ajuda ficam no SAC (PedidosDeAjudaNoSac).
-public sealed class RegistrosNoBanco(Armazenamento armazenamento) : IAuditoria, IAuditoriaDeErros, IPagamentos
+// O último pagamento (RN-172). A auditoria e os erros ficam em AuditoriaNoBanco
+// (secundario/out/commons/auditoria); os pedidos de ajuda, no SAC (PedidosDeAjudaNoSac).
+public sealed class RegistrosNoBanco : IPagamentos
 {
-    public Task Registrar(RegistroDeAuditoria registro, CancellationToken ct = default) =>
-        armazenamento.Colecao(Colecoes.Auditoria).InsertOneAsync(new BsonDocument
-        {
-            ["_id"] = Guid.NewGuid().ToString("N"),
-            ["contaId"] = Bson.Valor(registro.ContaId),
-            ["quem"] = Bson.Valor(registro.Quem),
-            ["acao"] = registro.Acao.Texto(),
-            ["alvo"] = Bson.Valor(registro.Alvo),
-            ["traceId"] = registro.TraceId.Valor,
-            ["etapa"] = registro.Etapa.Texto(),
-            ["quando"] = Bson.Valor(registro.Quando),
-            ["guardarAte"] = Bson.Valor(registro.GuardarAte),
-        }, cancellationToken: ct);
-
-    public Task Registrar(RegistroDeErro registro, CancellationToken ct = default) =>
-        armazenamento.Colecao(Colecoes.AuditoriaErros).InsertOneAsync(new BsonDocument
-        {
-            ["_id"] = Guid.NewGuid().ToString("N"),
-            ["traceId"] = registro.TraceId.Valor,
-            ["contaId"] = Bson.Valor(registro.ContaId),
-            ["quem"] = Bson.Valor(registro.Quem),
-            ["acao"] = registro.Acao.Texto(),
-            ["alvo"] = Bson.Valor(registro.Alvo),
-            ["codigo"] = registro.Codigo,
-            ["nivel"] = registro.Nivel.Texto(),
-            ["quando"] = Bson.Valor(registro.Quando),
-            ["guardarAte"] = Bson.Valor(registro.GuardarAte),
-        }, cancellationToken: ct);
-
     // a cobrança ainda não existe: nenhuma conta tem pagamento registrado
     public Task<DateOnly?> UltimoPagamento(string contaId, CancellationToken ct = default) => Task.FromResult<DateOnly?>(null);
 }

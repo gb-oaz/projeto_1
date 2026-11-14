@@ -6,8 +6,11 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 
 namespace Boaz.Qa.Integracao.Hub.Sac;
 
-// Passos dos Cenários de API de 1_Requisitos/18_modulo-sac.md (v04), contrato
-// sac-contrato-api v01 e modelo sac-documentos v01. Os chamados, anexos e
+// Passos dos Cenários de API de 1_Requisitos/18_modulo-sac.md (v06), contrato
+// sac-contrato-api v03 e modelo sac-documentos v03. Os cenários que entraram
+// na v06 (RN-292 baixar, RN-293 sem login, RN-295 e RN-297 do contrato,
+// RF-181 sem prazos salvos, RNF-230 ping e RNF-232 a RNF-234) ficam em
+// SacContratoPassos.cs, AnexosGuardadosPassos.cs e PartidaDoSacPassos.cs. Os chamados, anexos e
 // mensagens dos exemplos vêm de ChamadosDoExemplo.cs.
 //
 // Reaproveitados: "o token da conta master da EBFGA, com …" e "o token do
@@ -21,7 +24,7 @@ namespace Boaz.Qa.Integracao.Hub.Sac;
 // preparado no estado de que o pedido precisa (se um Dado ainda não o criou) e
 // o resto da frase diz o corpo.
 [Binding]
-public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execucoes execucoes, AoVivo aoVivo)
+public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execucoes execucoes, AoVivo aoVivo, AnexosDoCenario anexos)
 {
     // quem pede ao SAC nas frases "<quem> envia <MÉTODO> /sac/…" (as duas expressões abaixo)
     static readonly TimeSpan CincoSegundos = TimeSpan.FromSeconds(5);
@@ -681,6 +684,28 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
 
     async Task Pedir(Pessoa pessoa, string quem, string metodo, string caminho, string resto, string? json)
     {
+        // RNF-233 na instância de Partida e RNF-234 "… em <data e hora>"
+        if (await anexos.Atender(pessoa, metodo, caminho, resto)) return;
+        // RN-297: o 500 não se provoca de fora (o banco caindo no meio do pedido)
+        if (resto == "com falha geral")
+        {
+            throw new PendingStepException(
+                "derrubar o banco no meio de um pedido não dá para provocar de fora, numa suíte caixa-preta: o 500 ERRO_INESPERADO " +
+                "com X-Trace-Id e auditoriaErros ERRO fica nos testes do backend (SacContratoApiTests, a porta de prazos falhando)");
+        }
+        // RN-297: o corpo que não é JSON vai como veio
+        if (CorpoCru().Match(resto) is { Success: true } cru)
+        {
+            await Executar(pessoa, metodo, await mundo.Traduzir(caminho), cru.Groups[1].Value);
+            return;
+        }
+        // RN-289-api: "… em 2026-11-12T16:00:00Z", o pedido sai nessa hora do relógio de teste
+        DateTimeOffset? naHora = null;
+        if (EmHoraUtc().Match(resto) is { Success: true } hora)
+        {
+            naHora = DateTimeOffset.Parse(hora.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
+            resto = "";
+        }
         var doTime = quem.StartsWith("o Caio", StringComparison.Ordinal);
         var partes = caminho.Split('?')[0].Split('/', StringSplitOptions.RemoveEmptyEntries);
         // /sac/chamados/{id}/{acao}/{m}
@@ -698,8 +723,11 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
 
         if (exemplo is not null) await Preparar(exemplo, acao, doTime, resto, partes.Length > 4 ? partes[4] : null);
         else if (caminho == "/sac/card" && doTime) await CincoEsperandoOTime();
-        else if (caminho.StartsWith("/sac/chamados?", StringComparison.Ordinal) && doTime && !caminho.Contains("categoria=")) await sac.MundoDaFila();
-        else if (caminho.StartsWith("/sac/anexos/", StringComparison.Ordinal)) await AnexoDoPedro();
+        else if (caminho.StartsWith("/sac/chamados?", StringComparison.Ordinal) && doTime && !caminho.Contains("categoria=") && !sac.FilaDoCenario)
+        {
+            await sac.MundoDaFila();
+        }
+        else if (caminho == "/sac/anexos/anx-55d0e2") await AnexoDoPedro();
         // RF-172 e RF-174: a conta lista os chamados do exemplo da EBFGA
         else if (metodo == "GET" && caminho.StartsWith("/sac/chamados", StringComparison.Ordinal) && !doTime) await sac.MundoDaEbfga();
 
@@ -721,6 +749,7 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
             corpo = ChamadosDoExemplo.Corpo("Chamado com anexo", "MODULO_COM_PROBLEMA", await AnexoQueNaoPodeSerUsado(resto)).ToJsonString();
         }
         if (corpo is not null) textoEnviado = TextoDo(corpo);
+        if (naHora is { } quando) await sac.Saltar(quando);
         await Executar(pessoa, metodo, alvo, corpo);
         Anotar(caminho, acao);
         if (resto == "com sucesso") Assert.True(mundo.Ultima.Status is >= 200 and < 300, $"o pedido devia dar certo: {mundo.Ultima}");
@@ -801,7 +830,7 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
             var corpo = ChamadosDoExemplo.Corpo();
             switch (resto)
             {
-                case "com sem a categoria": corpo.Remove("categoria"); break;
+                case "com sem a categoria" or "sem a categoria": corpo.Remove("categoria"); break;
                 case "com a categoria \"SENHA_CONTA_MASTER\"": corpo["categoria"] = "SENHA_CONTA_MASTER"; break;
                 case "com o assunto com 4 caracteres": corpo["assunto"] = "Erro"; break;
                 case "com a descrição com 5.001 caracteres": corpo["descricao"] = new string('a', 5001); break;
@@ -850,8 +879,9 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
         return null;
     }
 
-    // RN-292: "erro.png" de 2 MB, "foto.jpg" de 11 MB, "tela.mp4", "nota.pdf"
-    // com ameaça, e a verificação fora do ar
+    // RN-292: "erro.png" de 2 MB, "foto.jpg" de 11 MB, "tela.mp4", "boleto.pdf",
+    // um PDF com o nome "foto.png" (o tipo vem do conteúdo), "nota.jpg" com
+    // ameaça, e a verificação fora do ar
     async Task EnviarAnexo(Pessoa pessoa, string resto)
     {
         var (nome, conteudo) = resto switch
@@ -859,10 +889,13 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
             "com o arquivo \"erro.png\" de 2 MB" => ("erro.png", Arquivos.Png(2 * Arquivos.MB)),
             "com \"foto.jpg\" de 11 MB" => ("foto.jpg", Arquivos.Jpg(11 * Arquivos.MB)),
             "com \"tela.mp4\"" => ("tela.mp4", Arquivos.Mp4()),
-            "com \"nota.pdf\" com ameaça" => ("nota.pdf", Arquivos.PdfComAmeaca()),
+            "com \"boleto.pdf\"" => ("boleto.pdf", Arquivos.Pdf()),
+            "com um PDF chamado \"foto.png\"" => ("foto.png", Arquivos.Pdf()),
+            "com \"nota.jpg\" com ameaça" => ("nota.jpg", Arquivos.JpgComAmeaca()),
             _ => ("erro.png", Arquivos.Png(4096)),
         };
         if (resto == "com a verificação fora do ar") await sac.VerificacaoForaDoAr();
+        await mundo.SessaoParaPedido(pessoa);
         var r = await execucoes.Executar(() => sac.EnviarAnexo(pessoa, nome, conteudo));
         if (r.Status == 201 && r.Corpo?["id"]?.GetValue<string>() is { } id && Anexo().IsMatch(id))
         {
@@ -905,16 +938,27 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
         for (var i = 0; i < 5; i++) await sac.Abrir(master, assunto: $"Esperando o time número {i + 1}");
     }
 
+    // a abertura passa por Execucoes: o fluxo não é auditado (RN-297) e a
+    // resposta guarda os cabeçalhos dele (X-Trace-Id)
     async Task<Fluxo> AbrirAoVivo(Pessoa pessoa, string caminho, string? ultimoId = null)
     {
-        var fluxo = await aoVivo.Abrir(pessoa.Nome, caminho, await mundo.TokenDe(pessoa), ultimoId);
-        if (fluxo.Status != 200) await fluxo.EsperarFim(Folga);
-        mundo.Guardar(new Resposta(fluxo.Status, fluxo.Status == 200 ? "" : fluxo.Texto, []));
-        return fluxo;
+        var token = await mundo.TokenDe(pessoa);
+        Fluxo? fluxo = null;
+        await execucoes.Executar(async () =>
+        {
+            fluxo = await aoVivo.Abrir(pessoa.Nome, caminho, token, ultimoId);
+            if (fluxo.Status != 200) await fluxo.EsperarFim(Folga);
+            return mundo.Guardar(new Resposta(fluxo.Status, fluxo.Status == 200 ? "" : fluxo.Texto, [], fluxo.Cabecalhos));
+        });
+        return fluxo!;
     }
 
-    async Task Executar(Pessoa pessoa, string metodo, string caminho, string? corpo) =>
+    // o login (ENTRAR_HUB, auditado) vem antes da marca: só o pedido em teste conta
+    async Task Executar(Pessoa pessoa, string metodo, string caminho, string? corpo)
+    {
+        await mundo.SessaoParaPedido(pessoa);
         await execucoes.Executar(() => mundo.EnviarComo(pessoa, metodo, caminho, corpo));
+    }
 
     // número gerado de um chamado ou mensagem novos: o do exemplo vira o real
     void Anotar(string caminho, string acao)
@@ -955,6 +999,12 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
                 break;
         }
     }
+
+    [GeneratedRegex(@"^em ""?(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)""?$")]
+    private static partial Regex EmHoraUtc();
+
+    [GeneratedRegex(@"^com o corpo ""(.*)""$")]
+    private static partial Regex CorpoCru();
 
     [GeneratedRegex(@"^ajuda-\d{6}$")]
     private static partial Regex Pedido();

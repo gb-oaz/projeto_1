@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Hub.Sac.Chamados.Domain;
 using Boaz.Core.Hub.Sac.Chamados.Dtos;

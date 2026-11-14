@@ -1,10 +1,10 @@
 # language: pt
-# Respostas do contrato 2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg que
+# Respostas do contrato 2_Diagramas/usuarios-contrato-api_v18_20261113-0856.svg que
 # os requisitos ainda não trazem como cenário. Escritos pelo qa a partir do
 # contrato e propostos ao deboaz-po: quando o requisito os trouxer, saem daqui
 # e entram por cópia em usuarios.feature ou modulos.feature.
 Funcionalidade: Contrato do Usuários · card, ao vivo, preferências e relógio de teste
-  2_Diagramas/usuarios-contrato-api_v17_20261111-2327.svg · respostas sem cenário no requisito
+  2_Diagramas/usuarios-contrato-api_v18_20261113-0856.svg · respostas sem cenário no requisito
 
   @contrato-v15 @RN-189
   Esquema do Cenário: card sem sessão válida

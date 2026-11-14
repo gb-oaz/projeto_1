@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 
 namespace Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;

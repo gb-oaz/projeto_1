@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 10996" width="1392" height="10996">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392 11010" width="1392" height="11010">
   <title>Usuários · contrato de API</title>
-  <desc>Contrato dos endereços do módulo Usuários do ms_mono, do requisito 17 (Módulo Usuários): criar a conta, gerar a senha com o código de liberação, atendimento sem login, listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar, tempo de sessão, card do módulo e, no time deboaz, contas e código da conta master. v01: criação. v02: regras do core no quadro comum, mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam em cada endereço. v03: GET /usuarios com tipo opcional (sem tipo, busca em todos os tipos que quem pede pode listar) e o tipo em cada item. v04: POST /contas responde 422 SIGLA_INVALIDA para siglas iniciadas por QA em produção (RN-179); desativar, reativar e nova-geracao-senha respondem 403 ACESSO_NEGADO quando um administrador age sobre outro, como qaadmin e admin (RN-169). v05: GET /health (sistema, sem login): 200 sem corpo só depois da partida, com coleções e índices prontos (RNF-227); antes disso, ou se a partida parou (índice único não criado, segredo ausente, banco fora do ar), não há resposta. v06: requisito 17 v72 — quadro comum com a auditoria (RN-178, RN-270, RN-271): endereços auditados respondem o cabeçalho X-Trace-Id no sucesso e na recusa; GET não é auditado; 500 ERRO_INESPERADO para a falha inesperada, que grava nivel ERRO; desativar com 409 ESTADO_IGUAL (ALERTA) e 500 (ERRO). v07: requisito 17 v74 — 500 ERRO_INESPERADO confirmado ("Algo deu errado. Tente de novo mais tarde.", nivel ERRO); PUT /usuarios/{id}/permissoes entra nos auditados (EDITAR_PERMISSOES; o endereço fica no contrato de autorização); X-Trace-Id em toda resposta que passa pelo caso de uso; corpo que não é JSON é recusado com 422 antes do endpoint, sem traceId, registros nem X-Trace-Id. v08: requisito 17 v78 — POST /contas/esqueci-senha-master auditado (ESQUECI_SENHA_MASTER, RN-274), com X-Trace-Id, 429 LIMITE_ATENDIMENTO como ALERTA e 500 ERRO_INESPERADO (ERRO); CRIAR_USUARIO sem alvo no INICIADO e na recusa (RN-178); corpo que não é JSON responde 422 DADOS_INVALIDOS, "O campo \"corpo\" está faltando ou é inválido.", campo "corpo", sem X-Trace-Id (RN-271). v09: quem, contaId e alvo de cada auditoria — GERAR_SENHA sem login (INICIADO vazio; CONCLUIDO com contaId e o usuário, sem quem), MUDAR_ESTADO_CONTA e SALVAR_TEMPO_SESSAO da conta (contaId e alvo, a conta pedida; o mesmo estado responde 200 e grava INICIADO e CONCLUIDO), SALVAR_TEMPO_SESSAO do time (contaId de quem pede, alvo "time"), CODIGO_MASTER (contaId, a conta pedida; alvo, a master, só no CONCLUIDO) e EDITAR_PERMISSOES (contaId de quem pede) (RN-178). v10: 403 ACESSO_NEGADO sem o módulo (MOD-03 · U) recusado antes do caso de uso, como o 422 do corpo que não é JSON: sem traceId, registros nem X-Trace-Id (requisito 17 v83, RN-270). v11: 403 ACESSO_NEGADO sem o módulo em endereço auditado grava o INICIADO da ação e ALERTA em auditoriaErros, com X-Trace-Id (GET sem o módulo segue sem registro); ações internas ENCERRAR_SESSOES_DO_USUARIO e AVISAR_PERMISSOES_NOVAS no traceId, quem e contaId de quem chama, falha com 2 ERRO e sem CONCLUIDO (requisito 17 v85, RN-270, RN-271, RN-275). v12: requisito 17 v90 e 15_modulos v26 — GET /usuarios/card no formato comum (modulo, perfil, versao, atualizadoEm, vazio, selo, reduzida, normal, expandida e series de 12 números), lido pronto de cardUsuarios, 4 perfis e 403 do perfil fora da ficha (RN-189, RN-276 a RN-278, RN-280); GET /usuarios/card/ao-vivo por SSE com intervalo 5|15|30|60|300 (padrão 300), eventos card, : ping e encerrado (LIMITE_CONEXOES, SESSAO_TERMINADA, ACESSO_NEGADO), 401, 403 e 422, token só no cabeçalho por fetch (RN-279, RN-281); proposta pendente GET e PUT /usuarios/eu/preferencias (RF-133, RN-220). v13: requisito 17 v94 e 15_modulos v28 — GET e PUT /usuarios/eu/preferencias definitivo (qualquer pessoa logada, sem módulo, sem auditoria, 422 DADOS_INVALIDOS com o campo; RN-283); ao vivo com : ping a cada 30 s em qualquer intervalo (RN-279) e sem reconectar depois de encerrado, queda de rede em 1, 2, 4, 8, 16, 32 e 60 s (RN-282); Códigos vencidos 2 no exemplo. v14: GET /usuarios/card lista os nomes exatos do apoio e da lista de cada perfil (DEBOAZ, INSTITUICAO e STAFF, AUTONOMO) e Sem acesso há 30 dias conta quem tem criadoEm há mais de 30 dias e ultimoAcesso há mais de 30 dias ou nulo (na conta: criadaEm e ultimoAcessoMaster) (RN-280). v15: grupo Teste com PUT e DELETE /_teste/relogio (TimeProvider a partir de "agora", no ritmo real, e volta ao real) e POST /_teste/fechamento (roda o fechamento das 00:00 de Brasília e responde ao terminar), sem login, só com AMBIENTE=hml e Teste__Relogio=sim; fora disso, 404; ligado só no backend do CI que a suíte de qa usa. v16: PUT /_teste/relogio responde 422 DADOS_INVALIDOS com o campo "agora" ausente ou inválido; POST /_teste/fechamento fecha o dia do relógio mesmo que ele já tenha sido fechado (como no código). v17: requisito 17 v104 — a MASTER conta em "usuários ativos" (INSTITUICAO e AUTONOMO) e em "staff" (INSTITUICAO), não no STAFF; reduzida do AUTONOMO passa a "usuários ativos"; versao sobe também em gerar-senha e nova-geracao-senha (RN-280); ao vivo sem retomada nem Last-Event-ID: toda conexão começa pelo card inteiro.</desc>
+  <desc>Contrato dos endereços do módulo Usuários do ms_mono, do requisito 17 (Módulo Usuários): criar a conta, gerar a senha com o código de liberação, atendimento sem login, listar, ver, criar e editar staff, participantes e membros do time, nova geração de senha, novo código de acesso, desativar e reativar, tempo de sessão, card do módulo e, no time deboaz, contas e código da conta master. v01: criação. v02: regras do core no quadro comum, mensagens de erro com o texto exato e os códigos 403, 404 e 422 que faltavam em cada endereço. v03: GET /usuarios com tipo opcional (sem tipo, busca em todos os tipos que quem pede pode listar) e o tipo em cada item. v04: POST /contas responde 422 SIGLA_INVALIDA para siglas iniciadas por QA em produção (RN-179); desativar, reativar e nova-geracao-senha respondem 403 ACESSO_NEGADO quando um administrador age sobre outro, como qaadmin e admin (RN-169). v05: GET /health (sistema, sem login): 200 sem corpo só depois da partida, com coleções e índices prontos (RNF-227); antes disso, ou se a partida parou (índice único não criado, segredo ausente, banco fora do ar), não há resposta. v06: requisito 17 v72 — quadro comum com a auditoria (RN-178, RN-270, RN-271): endereços auditados respondem o cabeçalho X-Trace-Id no sucesso e na recusa; GET não é auditado; 500 ERRO_INESPERADO para a falha inesperada, que grava nivel ERRO; desativar com 409 ESTADO_IGUAL (ALERTA) e 500 (ERRO). v07: requisito 17 v74 — 500 ERRO_INESPERADO confirmado ("Algo deu errado. Tente de novo mais tarde.", nivel ERRO); PUT /usuarios/{id}/permissoes entra nos auditados (EDITAR_PERMISSOES; o endereço fica no contrato de autorização); X-Trace-Id em toda resposta que passa pelo caso de uso; corpo que não é JSON é recusado com 422 antes do endpoint, sem traceId, registros nem X-Trace-Id. v08: requisito 17 v78 — POST /contas/esqueci-senha-master auditado (ESQUECI_SENHA_MASTER, RN-274), com X-Trace-Id, 429 LIMITE_ATENDIMENTO como ALERTA e 500 ERRO_INESPERADO (ERRO); CRIAR_USUARIO sem alvo no INICIADO e na recusa (RN-178); corpo que não é JSON responde 422 DADOS_INVALIDOS, "O campo \"corpo\" está faltando ou é inválido.", campo "corpo", sem X-Trace-Id (RN-271). v09: quem, contaId e alvo de cada auditoria — GERAR_SENHA sem login (INICIADO vazio; CONCLUIDO com contaId e o usuário, sem quem), MUDAR_ESTADO_CONTA e SALVAR_TEMPO_SESSAO da conta (contaId e alvo, a conta pedida; o mesmo estado responde 200 e grava INICIADO e CONCLUIDO), SALVAR_TEMPO_SESSAO do time (contaId de quem pede, alvo "time"), CODIGO_MASTER (contaId, a conta pedida; alvo, a master, só no CONCLUIDO) e EDITAR_PERMISSOES (contaId de quem pede) (RN-178). v10: 403 ACESSO_NEGADO sem o módulo (MOD-03 · U) recusado antes do caso de uso, como o 422 do corpo que não é JSON: sem traceId, registros nem X-Trace-Id (requisito 17 v83, RN-270). v11: 403 ACESSO_NEGADO sem o módulo em endereço auditado grava o INICIADO da ação e ALERTA em auditoriaErros, com X-Trace-Id (GET sem o módulo segue sem registro); ações internas ENCERRAR_SESSOES_DO_USUARIO e AVISAR_PERMISSOES_NOVAS no traceId, quem e contaId de quem chama, falha com 2 ERRO e sem CONCLUIDO (requisito 17 v85, RN-270, RN-271, RN-275). v12: requisito 17 v90 e 15_modulos v26 — GET /usuarios/card no formato comum (modulo, perfil, versao, atualizadoEm, vazio, selo, reduzida, normal, expandida e series de 12 números), lido pronto de cardUsuarios, 4 perfis e 403 do perfil fora da ficha (RN-189, RN-276 a RN-278, RN-280); GET /usuarios/card/ao-vivo por SSE com intervalo 5|15|30|60|300 (padrão 300), eventos card, : ping e encerrado (LIMITE_CONEXOES, SESSAO_TERMINADA, ACESSO_NEGADO), 401, 403 e 422, token só no cabeçalho por fetch (RN-279, RN-281); proposta pendente GET e PUT /usuarios/eu/preferencias (RF-133, RN-220). v13: requisito 17 v94 e 15_modulos v28 — GET e PUT /usuarios/eu/preferencias definitivo (qualquer pessoa logada, sem módulo, sem auditoria, 422 DADOS_INVALIDOS com o campo; RN-283); ao vivo com : ping a cada 30 s em qualquer intervalo (RN-279) e sem reconectar depois de encerrado, queda de rede em 1, 2, 4, 8, 16, 32 e 60 s (RN-282); Códigos vencidos 2 no exemplo. v14: GET /usuarios/card lista os nomes exatos do apoio e da lista de cada perfil (DEBOAZ, INSTITUICAO e STAFF, AUTONOMO) e Sem acesso há 30 dias conta quem tem criadoEm há mais de 30 dias e ultimoAcesso há mais de 30 dias ou nulo (na conta: criadaEm e ultimoAcessoMaster) (RN-280). v15: grupo Teste com PUT e DELETE /_teste/relogio (TimeProvider a partir de "agora", no ritmo real, e volta ao real) e POST /_teste/fechamento (roda o fechamento das 00:00 de Brasília e responde ao terminar), sem login, só com AMBIENTE=hml e Teste__Relogio=sim; fora disso, 404; ligado só no backend do CI que a suíte de qa usa. v16: PUT /_teste/relogio responde 422 DADOS_INVALIDOS com o campo "agora" ausente ou inválido; POST /_teste/fechamento fecha o dia do relógio mesmo que ele já tenha sido fechado (como no código). v17: requisito 17 v104 — a MASTER conta em "usuários ativos" (INSTITUICAO e AUTONOMO) e em "staff" (INSTITUICAO), não no STAFF; reduzida do AUTONOMO passa a "usuários ativos"; versao sobe também em gerar-senha e nova-geracao-senha (RN-280); ao vivo sem retomada nem Last-Event-ID: toda conexão começa pelo card inteiro. v18: para os exemplos da documentação da API (exemplos-da-doc.py), o 200 de GET /usuarios/card traz o JSON inteiro, sem trechos resumidos (versao 7, atualizadoEm com o fuso, 12 números em cada série) e o 200 de GET /usuarios/card/ao-vivo traz o evento card (data: o corpo de GET /usuarios/card) e um evento encerrado por código, com o data em JSON expandido (LIMITE_CONEXOES, SESSAO_TERMINADA, ACESSO_NEGADO).</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -90,10 +90,10 @@
     <text class="title" x="40" y="72">Usuários · contas, staff, participantes e membros</text>
     <text class="subtitle" x="40" y="94">Criar conta, primeiro acesso, cadastro e ações sobre cada usuário, tempo de sessão, card, card ao vivo e preferências, time deboaz e /health</text>
     <text class="wm-meta-label" x="1104" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v17</text>
+    <rect class="wm-badge" x="1104" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1128" y="71" text-anchor="middle">v18</text>
     <line class="wm-sep" x1="1176" y1="32" x2="1176" y2="80"/>
     <text class="wm-meta-label" x="1200" y="44">DATA</text>
-    <text class="wm-meta-value" x="1200" y="72">2026-11-11 · 23:27</text>
+    <text class="wm-meta-value" x="1200" y="72">2026-11-13 · 08:56</text>
   </g>
   <g id="comum"><path class="node" d="M40,152 H1336 L1352,168 V1438 H40 Z"/><text class="boundary-label" x="64" y="180">COMUM A TODOS OS ENDEREÇOS</text>
     <text class="mono" x="64" y="204">Toda resposta de erro:</text>
@@ -570,7 +570,7 @@
     <text class="muted" x="56" y="4696">auditoria do PUT: SALVAR_TEMPO_SESSAO · contaId e alvo: a conta pedida</text>
   </g>
   <g id="ep-get-usuarios-card">
-    <g filter="url(#sombra)"><rect class="node" x="720" y="4110" width="632" height="1992" rx="10"/></g>
+    <g filter="url(#sombra)"><rect class="node" x="720" y="4110" width="632" height="2424" rx="10"/></g>
     <rect class="node-green" x="736" y="4126" width="40" height="24" rx="6"/><text class="label-strong" x="756.0" y="4143" text-anchor="middle">GET</text>
     <text class="label-strong" x="788" y="4143">/usuarios/card</text>
     <rect class="node-external" x="1257" y="4126" width="79" height="24" rx="12"/><text class="chip-text" x="1296.5" y="4142" text-anchor="middle">COM LOGIN</text>
@@ -588,8 +588,8 @@
     <text class="mono" x="788" y="4434" xml:space="preserve">{</text>
     <text class="mono" x="788" y="4452" xml:space="preserve">  &quot;modulo&quot;: &quot;MOD-03&quot;,</text>
     <text class="mono" x="788" y="4470" xml:space="preserve">  &quot;perfil&quot;: &quot;INSTITUICAO&quot;,</text>
-    <text class="mono" x="788" y="4488" xml:space="preserve">  &quot;versao&quot;: 418,</text>
-    <text class="mono" x="788" y="4506" xml:space="preserve">  &quot;atualizadoEm&quot;: &quot;2026-11-08T15:00:00Z&quot;,</text>
+    <text class="mono" x="788" y="4488" xml:space="preserve">  &quot;versao&quot;: 7,</text>
+    <text class="mono" x="788" y="4506" xml:space="preserve">  &quot;atualizadoEm&quot;: &quot;2026-11-09T14:32:05-03:00&quot;,</text>
     <text class="mono" x="788" y="4524" xml:space="preserve">  &quot;vazio&quot;: false,</text>
     <text class="mono" x="788" y="4542" xml:space="preserve">  &quot;selo&quot;: 2,</text>
     <text class="mono" x="788" y="4560" xml:space="preserve">  &quot;reduzida&quot;: {</text>
@@ -632,56 +632,80 @@
     <text class="mono" x="788" y="5226" xml:space="preserve">  },</text>
     <text class="mono" x="788" y="5244" xml:space="preserve">  &quot;series&quot;: {</text>
     <text class="mono" x="788" y="5262" xml:space="preserve">    &quot;dia&quot;: [</text>
-    <text class="mono" x="788" y="5280" xml:space="preserve">      … 10 números antes, do mais antigo</text>
-    <text class="mono" x="788" y="5298" xml:space="preserve">      333,</text>
-    <text class="mono" x="788" y="5316" xml:space="preserve">      335</text>
-    <text class="mono" x="788" y="5334" xml:space="preserve">    ],</text>
-    <text class="mono" x="788" y="5352" xml:space="preserve">    &quot;semana&quot;: [</text>
-    <text class="mono" x="788" y="5370" xml:space="preserve">      … 10 números antes</text>
-    <text class="mono" x="788" y="5388" xml:space="preserve">      325,</text>
-    <text class="mono" x="788" y="5406" xml:space="preserve">      335</text>
-    <text class="mono" x="788" y="5424" xml:space="preserve">    ],</text>
-    <text class="mono" x="788" y="5442" xml:space="preserve">    &quot;mes&quot;: [</text>
-    <text class="mono" x="788" y="5460" xml:space="preserve">      … 7 números antes</text>
-    <text class="mono" x="788" y="5478" xml:space="preserve">      301,</text>
-    <text class="mono" x="788" y="5496" xml:space="preserve">      310,</text>
-    <text class="mono" x="788" y="5514" xml:space="preserve">      318,</text>
-    <text class="mono" x="788" y="5532" xml:space="preserve">      323,</text>
-    <text class="mono" x="788" y="5550" xml:space="preserve">      335</text>
-    <text class="mono" x="788" y="5568" xml:space="preserve">    ]</text>
-    <text class="mono" x="788" y="5586" xml:space="preserve">  }</text>
-    <text class="mono" x="788" y="5604" xml:space="preserve">}</text>
-    <text class="muted" x="788" y="5622" xml:space="preserve">séries: 12 números cada, do mais antigo ao atual; normal usa os 5 últimos</text>
-    <rect class="node-red" x="736" y="5630" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="5644" text-anchor="middle">401</text>
-    <text class="mono" x="788" y="5644" xml:space="preserve">SESSAO_TERMINADA · sem token, token inválido ou sessão que terminou</text>
-    <rect class="node-red" x="736" y="5648" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="5662" text-anchor="middle">403</text>
-    <text class="mono" x="788" y="5662" xml:space="preserve">ACESSO_NEGADO · perfil fora da ficha (participante) ou staff sem o</text>
-    <text class="mono" x="788" y="5680" xml:space="preserve">   Usuários (MOD-03 · U)</text>
-    <text class="muted" x="736" y="5702" xml:space="preserve">lido pronto de cardUsuarios, por _id: card-&lt;sigla&gt;-&lt;PERFIL&gt;[-&lt;nomeCurto&gt;]</text>
-    <text class="muted" x="736" y="5720" xml:space="preserve">perfil: DEBOAZ (admin e membro do time, um card só) · INSTITUICAO (master) ·</text>
-    <text class="muted" x="736" y="5738" xml:space="preserve">   STAFF (só os usuários com criadoPor = ela) · AUTONOMO</text>
-    <text class="muted" x="736" y="5756" xml:space="preserve">reduzida: DEBOAZ &quot;contas ativas&quot; · INSTITUICAO, STAFF e AUTONOMO &quot;usuários ativos&quot;</text>
-    <text class="muted" x="736" y="5774" xml:space="preserve">a MASTER conta em &quot;usuários ativos&quot; e, na INSTITUICAO, em &quot;staff&quot;; no STAFF, não</text>
-    <text class="muted" x="736" y="5792" xml:space="preserve">refeitos na leitura, sem gravar: Sem acesso há 30 dias, Códigos vencidos e o selo;</text>
-    <text class="muted" x="736" y="5810" xml:space="preserve">   Sem acesso há 30 dias: ATIVO com criadoEm há mais de 30 dias e ultimoAcesso</text>
-    <text class="muted" x="736" y="5828" xml:space="preserve">   há mais de 30 dias ou nulo; DEBOAZ: criadaEm e ultimoAcessoMaster da conta</text>
-    <text class="muted" x="736" y="5846" xml:space="preserve">selo: códigos que vencem hoje (STAFF: só os pedidos por ela); DEBOAZ: contas</text>
-    <text class="muted" x="736" y="5864" xml:space="preserve">   com a master sem acesso há 30 dias · 0 sem nada a avisar</text>
-    <text class="muted" x="736" y="5882" xml:space="preserve">versao sobe na mesma execução de POST /contas, POST /contas/{id}/estado,</text>
-    <text class="muted" x="736" y="5900" xml:space="preserve">   POST /usuarios, desativar, reativar, gerar-senha e nova-geracao-senha</text>
-    <text class="muted" x="736" y="5918" xml:space="preserve">   (RN-280) e no fechamento da 00:00 de Brasília; atualizadoEm em UTC</text>
-    <text class="muted" x="736" y="5936" xml:space="preserve">recorte e tamanho escolhidos ficam no aparelho (RN-277), sem endereço</text>
-    <text class="muted" x="736" y="5954" xml:space="preserve">GET não é auditado</text>
-    <text class="mono" x="736" y="5972" xml:space="preserve">nomes do apoio (normal) e da lista (expandida), nesta ordem (RN-280):</text>
-    <text class="muted" x="736" y="5990" xml:space="preserve">DEBOAZ · apoio: &quot;instituições&quot;, &quot;autônomos&quot;, &quot;suspensas&quot;</text>
-    <text class="muted" x="736" y="6008" xml:space="preserve">   lista: &quot;Master sem acesso há 30 dias&quot;, &quot;Desativadas&quot;, &quot;Encerradas&quot;</text>
-    <text class="muted" x="736" y="6026" xml:space="preserve">INSTITUICAO e STAFF · apoio: &quot;staff&quot;, &quot;participantes&quot;, &quot;pendentes&quot;</text>
-    <text class="muted" x="736" y="6044" xml:space="preserve">   lista: &quot;Sem acesso há 30 dias&quot;, &quot;Desativados&quot;, &quot;Códigos vencidos&quot;</text>
-    <text class="muted" x="736" y="6062" xml:space="preserve">AUTONOMO · apoio: &quot;criados no mês&quot;, &quot;pendentes&quot;</text>
-    <text class="muted" x="736" y="6080" xml:space="preserve">   lista: &quot;Sem acesso há 30 dias&quot;, &quot;Desativados&quot;, &quot;Códigos vencidos&quot;</text>
+    <text class="mono" x="788" y="5280" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5298" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5316" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5334" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5352" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5370" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5388" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5406" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5424" xml:space="preserve">      326,</text>
+    <text class="mono" x="788" y="5442" xml:space="preserve">      330,</text>
+    <text class="mono" x="788" y="5460" xml:space="preserve">      333,</text>
+    <text class="mono" x="788" y="5478" xml:space="preserve">      335</text>
+    <text class="mono" x="788" y="5496" xml:space="preserve">    ],</text>
+    <text class="mono" x="788" y="5514" xml:space="preserve">    &quot;semana&quot;: [</text>
+    <text class="mono" x="788" y="5532" xml:space="preserve">      290,</text>
+    <text class="mono" x="788" y="5550" xml:space="preserve">      294,</text>
+    <text class="mono" x="788" y="5568" xml:space="preserve">      298,</text>
+    <text class="mono" x="788" y="5586" xml:space="preserve">      301,</text>
+    <text class="mono" x="788" y="5604" xml:space="preserve">      305,</text>
+    <text class="mono" x="788" y="5622" xml:space="preserve">      309,</text>
+    <text class="mono" x="788" y="5640" xml:space="preserve">      312,</text>
+    <text class="mono" x="788" y="5658" xml:space="preserve">      318,</text>
+    <text class="mono" x="788" y="5676" xml:space="preserve">      322,</text>
+    <text class="mono" x="788" y="5694" xml:space="preserve">      326,</text>
+    <text class="mono" x="788" y="5712" xml:space="preserve">      331,</text>
+    <text class="mono" x="788" y="5730" xml:space="preserve">      335</text>
+    <text class="mono" x="788" y="5748" xml:space="preserve">    ],</text>
+    <text class="mono" x="788" y="5766" xml:space="preserve">    &quot;mes&quot;: [</text>
+    <text class="mono" x="788" y="5784" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5802" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5820" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5838" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5856" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5874" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5892" xml:space="preserve">      0,</text>
+    <text class="mono" x="788" y="5910" xml:space="preserve">      301,</text>
+    <text class="mono" x="788" y="5928" xml:space="preserve">      310,</text>
+    <text class="mono" x="788" y="5946" xml:space="preserve">      318,</text>
+    <text class="mono" x="788" y="5964" xml:space="preserve">      323,</text>
+    <text class="mono" x="788" y="5982" xml:space="preserve">      335</text>
+    <text class="mono" x="788" y="6000" xml:space="preserve">    ]</text>
+    <text class="mono" x="788" y="6018" xml:space="preserve">  }</text>
+    <text class="mono" x="788" y="6036" xml:space="preserve">}</text>
+    <text class="muted" x="788" y="6054" xml:space="preserve">séries: 12 números cada, do mais antigo ao atual; normal usa os 5 últimos</text>
+    <rect class="node-red" x="736" y="6062" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="6076" text-anchor="middle">401</text>
+    <text class="mono" x="788" y="6076" xml:space="preserve">SESSAO_TERMINADA · sem token, token inválido ou sessão que terminou</text>
+    <rect class="node-red" x="736" y="6080" width="40" height="20" rx="4"/><text class="chip-text" x="756" y="6094" text-anchor="middle">403</text>
+    <text class="mono" x="788" y="6094" xml:space="preserve">ACESSO_NEGADO · perfil fora da ficha (participante) ou staff sem o</text>
+    <text class="mono" x="788" y="6112" xml:space="preserve">   Usuários (MOD-03 · U)</text>
+    <text class="muted" x="736" y="6134" xml:space="preserve">lido pronto de cardUsuarios, por _id: card-&lt;sigla&gt;-&lt;PERFIL&gt;[-&lt;nomeCurto&gt;]</text>
+    <text class="muted" x="736" y="6152" xml:space="preserve">perfil: DEBOAZ (admin e membro do time, um card só) · INSTITUICAO (master) ·</text>
+    <text class="muted" x="736" y="6170" xml:space="preserve">   STAFF (só os usuários com criadoPor = ela) · AUTONOMO</text>
+    <text class="muted" x="736" y="6188" xml:space="preserve">reduzida: DEBOAZ &quot;contas ativas&quot; · INSTITUICAO, STAFF e AUTONOMO &quot;usuários ativos&quot;</text>
+    <text class="muted" x="736" y="6206" xml:space="preserve">a MASTER conta em &quot;usuários ativos&quot; e, na INSTITUICAO, em &quot;staff&quot;; no STAFF, não</text>
+    <text class="muted" x="736" y="6224" xml:space="preserve">refeitos na leitura, sem gravar: Sem acesso há 30 dias, Códigos vencidos e o selo;</text>
+    <text class="muted" x="736" y="6242" xml:space="preserve">   Sem acesso há 30 dias: ATIVO com criadoEm há mais de 30 dias e ultimoAcesso</text>
+    <text class="muted" x="736" y="6260" xml:space="preserve">   há mais de 30 dias ou nulo; DEBOAZ: criadaEm e ultimoAcessoMaster da conta</text>
+    <text class="muted" x="736" y="6278" xml:space="preserve">selo: códigos que vencem hoje (STAFF: só os pedidos por ela); DEBOAZ: contas</text>
+    <text class="muted" x="736" y="6296" xml:space="preserve">   com a master sem acesso há 30 dias · 0 sem nada a avisar</text>
+    <text class="muted" x="736" y="6314" xml:space="preserve">versao sobe na mesma execução de POST /contas, POST /contas/{id}/estado,</text>
+    <text class="muted" x="736" y="6332" xml:space="preserve">   POST /usuarios, desativar, reativar, gerar-senha e nova-geracao-senha</text>
+    <text class="muted" x="736" y="6350" xml:space="preserve">   (RN-280) e no fechamento da 00:00 de Brasília</text>
+    <text class="muted" x="736" y="6368" xml:space="preserve">recorte e tamanho escolhidos ficam no aparelho (RN-277), sem endereço</text>
+    <text class="muted" x="736" y="6386" xml:space="preserve">GET não é auditado</text>
+    <text class="mono" x="736" y="6404" xml:space="preserve">nomes do apoio (normal) e da lista (expandida), nesta ordem (RN-280):</text>
+    <text class="muted" x="736" y="6422" xml:space="preserve">DEBOAZ · apoio: &quot;instituições&quot;, &quot;autônomos&quot;, &quot;suspensas&quot;</text>
+    <text class="muted" x="736" y="6440" xml:space="preserve">   lista: &quot;Master sem acesso há 30 dias&quot;, &quot;Desativadas&quot;, &quot;Encerradas&quot;</text>
+    <text class="muted" x="736" y="6458" xml:space="preserve">INSTITUICAO e STAFF · apoio: &quot;staff&quot;, &quot;participantes&quot;, &quot;pendentes&quot;</text>
+    <text class="muted" x="736" y="6476" xml:space="preserve">   lista: &quot;Sem acesso há 30 dias&quot;, &quot;Desativados&quot;, &quot;Códigos vencidos&quot;</text>
+    <text class="muted" x="736" y="6494" xml:space="preserve">AUTONOMO · apoio: &quot;criados no mês&quot;, &quot;pendentes&quot;</text>
+    <text class="muted" x="736" y="6512" xml:space="preserve">   lista: &quot;Sem acesso há 30 dias&quot;, &quot;Desativados&quot;, &quot;Códigos vencidos&quot;</text>
   </g>
   <g id="ep-get-usuarios-card-ao-vivo">
-    <g filter="url(#sombra)"><rect class="node" x="40" y="4760" width="632" height="1170" rx="10"/></g>
+    <g filter="url(#sombra)"><rect class="node" x="40" y="4760" width="632" height="1184" rx="10"/></g>
     <rect class="node-green" x="56" y="4776" width="40" height="24" rx="6"/><text class="label-strong" x="76.0" y="4793" text-anchor="middle">GET</text>
     <text class="label-strong" x="108" y="4793">/usuarios/card/ao-vivo</text>
     <rect class="node-external" x="577" y="4776" width="79" height="24" rx="12"/><text class="chip-text" x="616.5" y="4792" text-anchor="middle">COM LOGIN</text>
@@ -701,52 +725,53 @@
     <rect class="chip" x="56" y="5124" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5138" text-anchor="middle">200</text>
     <text class="mono" x="108" y="5138" xml:space="preserve">Content-Type: text/event-stream</text>
     <text class="mono" x="108" y="5156" xml:space="preserve">Cache-Control: no-store · a conexão fica aberta</text>
-    <text class="muted" x="108" y="5174" xml:space="preserve">1º evento logo ao abrir, com o corpo inteiro de GET /usuarios/card:</text>
-    <text class="mono" x="108" y="5192" xml:space="preserve">id: 418</text>
+    <text class="muted" x="108" y="5174" xml:space="preserve">evento &quot;card&quot;: logo ao abrir e, a cada intervalo, se a versao mudou</text>
+    <text class="mono" x="108" y="5192" xml:space="preserve">id: 7</text>
     <text class="mono" x="108" y="5210" xml:space="preserve">event: card</text>
-    <text class="mono" x="108" y="5228" xml:space="preserve">data: {</text>
-    <text class="mono" x="108" y="5246" xml:space="preserve">data:   &quot;modulo&quot;: &quot;MOD-03&quot;,</text>
-    <text class="mono" x="108" y="5264" xml:space="preserve">data:   &quot;perfil&quot;: &quot;INSTITUICAO&quot;,</text>
-    <text class="mono" x="108" y="5282" xml:space="preserve">data:   &quot;versao&quot;: 418,</text>
-    <text class="muted" x="108" y="5300" xml:space="preserve">data:   … os demais campos de GET /usuarios/card, um por linha</text>
-    <text class="mono" x="108" y="5318" xml:space="preserve">data: }</text>
-    <text class="mono" x="108" y="5336" xml:space="preserve"></text>
-    <text class="muted" x="108" y="5354" xml:space="preserve">a cada intervalo: evento &quot;card&quot; (id = versao), se a versao mudou;</text>
-    <text class="muted" x="108" y="5372" xml:space="preserve">a cada 30 s, em qualquer intervalo, o comentário de manutenção:</text>
-    <text class="mono" x="108" y="5390" xml:space="preserve">: ping</text>
-    <text class="mono" x="108" y="5408" xml:space="preserve"></text>
-    <text class="muted" x="108" y="5426" xml:space="preserve">fim pelo servidor: evento &quot;encerrado&quot; e a conexão fecha</text>
-    <text class="mono" x="108" y="5444" xml:space="preserve">event: encerrado</text>
-    <text class="mono" x="108" y="5462" xml:space="preserve">data: {</text>
-    <text class="mono" x="108" y="5480" xml:space="preserve">data:   &quot;codigo&quot;: &quot;LIMITE_CONEXOES&quot;</text>
-    <text class="mono" x="108" y="5498" xml:space="preserve">data: }</text>
-    <text class="mono" x="108" y="5520" xml:space="preserve">LIMITE_CONEXOES · 4ª conexão do usuário: ela abre e a mais antiga sai</text>
-    <text class="mono" x="108" y="5538" xml:space="preserve">SESSAO_TERMINADA · a sessão da conexão terminou</text>
-    <text class="mono" x="108" y="5556" xml:space="preserve">ACESSO_NEGADO · o MOD-03 saiu; chega em até 1 intervalo</text>
-    <rect class="node-red" x="56" y="5566" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5580" text-anchor="middle">401</text>
-    <text class="mono" x="108" y="5580" xml:space="preserve">SESSAO_TERMINADA · sem token ou token inválido; nada fica aberto</text>
-    <rect class="node-red" x="56" y="5584" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5598" text-anchor="middle">403</text>
-    <text class="mono" x="108" y="5598" xml:space="preserve">ACESSO_NEGADO · participante ou staff sem o Usuários; nada fica aberto</text>
-    <rect class="node-red" x="56" y="5602" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5616" text-anchor="middle">422</text>
-    <text class="mono" x="108" y="5616" xml:space="preserve">DADOS_INVALIDOS · intervalo fora da lista, como 10 ou 0</text>
-    <text class="mono" x="108" y="5634" xml:space="preserve">{</text>
-    <text class="mono" x="108" y="5652" xml:space="preserve">  &quot;codigo&quot;: &quot;DADOS_INVALIDOS&quot;,</text>
-    <text class="mono" x="108" y="5670" xml:space="preserve">  &quot;mensagem&quot;: &quot;O campo \&quot;intervalo\&quot; está faltando ou é inválido.&quot;,</text>
-    <text class="mono" x="108" y="5688" xml:space="preserve">  &quot;campo&quot;: &quot;intervalo&quot;</text>
-    <text class="mono" x="108" y="5706" xml:space="preserve">}</text>
-    <text class="muted" x="56" y="5728" xml:space="preserve">recusas (401, 403, 422) como JSON, antes de abrir o fluxo</text>
-    <text class="muted" x="56" y="5746" xml:space="preserve">a cada intervalo: confere a sessão (sessao:&lt;sid&gt; no Redis) e o MOD-03 e lê</text>
-    <text class="muted" x="56" y="5764" xml:space="preserve">   a versao de cardUsuarios por _id; o token só é conferido na abertura</text>
-    <text class="muted" x="56" y="5782" xml:space="preserve">até 3 conexões por usuário, entre todas as réplicas: aoVivo:&lt;usuarioId&gt;</text>
-    <text class="muted" x="56" y="5800" xml:space="preserve">   no Redis; a mais antiga recebe o encerrado pelo canal aoVivo:encerrar</text>
-    <text class="muted" x="56" y="5818" xml:space="preserve">depois de &quot;encerrado&quot;, 401 ou 403 o app não reconecta: o aparelho fica pausado</text>
-    <text class="muted" x="56" y="5836" xml:space="preserve">   em &quot;Na abertura&quot;, sem salvar nada (RN-282); a escolha salva não muda</text>
-    <text class="muted" x="56" y="5854" xml:space="preserve">queda de rede: reconecta em 1, 2, 4, 8, 16, 32 e 60 s, depois a cada 60 s;</text>
-    <text class="muted" x="56" y="5872" xml:space="preserve">   sem retomada nem Last-Event-ID: toda conexão começa pelo card inteiro</text>
-    <text class="muted" x="56" y="5890" xml:space="preserve">&quot;Na abertura&quot; marcado: o cliente fecha o fluxo (RN-279); GET não é auditado</text>
-    <text class="muted" x="56" y="5908" xml:space="preserve">proxy e gateway sem buffer; o ping de 30 s mantém a conexão aberta no gateway</text>
+    <text class="mono" x="108" y="5228" xml:space="preserve">data: o corpo de GET /usuarios/card</text>
+    <text class="muted" x="108" y="5246" xml:space="preserve">   no fluxo, data leva o JSON numa linha só; id = versao</text>
+    <text class="muted" x="108" y="5264" xml:space="preserve">a cada 30 s, em qualquer intervalo, o comentário de manutenção:</text>
+    <text class="mono" x="108" y="5282" xml:space="preserve">: ping</text>
+    <text class="muted" x="108" y="5300" xml:space="preserve">fim pelo servidor: evento &quot;encerrado&quot; com um destes data, e fecha</text>
+    <text class="mono" x="108" y="5318" xml:space="preserve">event: encerrado</text>
+    <text class="mono" x="108" y="5336" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="5354" xml:space="preserve">  &quot;codigo&quot;: &quot;LIMITE_CONEXOES&quot;</text>
+    <text class="mono" x="108" y="5372" xml:space="preserve">}</text>
+    <text class="muted" x="108" y="5390" xml:space="preserve">   4ª conexão do usuário: ela abre e a mais antiga sai</text>
+    <text class="mono" x="108" y="5408" xml:space="preserve">event: encerrado</text>
+    <text class="mono" x="108" y="5426" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="5444" xml:space="preserve">  &quot;codigo&quot;: &quot;SESSAO_TERMINADA&quot;</text>
+    <text class="mono" x="108" y="5462" xml:space="preserve">}</text>
+    <text class="muted" x="108" y="5480" xml:space="preserve">   a sessão da conexão terminou</text>
+    <text class="mono" x="108" y="5498" xml:space="preserve">event: encerrado</text>
+    <text class="mono" x="108" y="5516" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="5534" xml:space="preserve">  &quot;codigo&quot;: &quot;ACESSO_NEGADO&quot;</text>
+    <text class="mono" x="108" y="5552" xml:space="preserve">}</text>
+    <text class="muted" x="108" y="5570" xml:space="preserve">   o MOD-03 saiu; chega em até 1 intervalo</text>
+    <rect class="node-red" x="56" y="5580" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5594" text-anchor="middle">401</text>
+    <text class="mono" x="108" y="5594" xml:space="preserve">SESSAO_TERMINADA · sem token ou token inválido; nada fica aberto</text>
+    <rect class="node-red" x="56" y="5598" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5612" text-anchor="middle">403</text>
+    <text class="mono" x="108" y="5612" xml:space="preserve">ACESSO_NEGADO · participante ou staff sem o Usuários; nada fica aberto</text>
+    <rect class="node-red" x="56" y="5616" width="40" height="20" rx="4"/><text class="chip-text" x="76" y="5630" text-anchor="middle">422</text>
+    <text class="mono" x="108" y="5630" xml:space="preserve">DADOS_INVALIDOS · intervalo fora da lista, como 10 ou 0</text>
+    <text class="mono" x="108" y="5648" xml:space="preserve">{</text>
+    <text class="mono" x="108" y="5666" xml:space="preserve">  &quot;codigo&quot;: &quot;DADOS_INVALIDOS&quot;,</text>
+    <text class="mono" x="108" y="5684" xml:space="preserve">  &quot;mensagem&quot;: &quot;O campo \&quot;intervalo\&quot; está faltando ou é inválido.&quot;,</text>
+    <text class="mono" x="108" y="5702" xml:space="preserve">  &quot;campo&quot;: &quot;intervalo&quot;</text>
+    <text class="mono" x="108" y="5720" xml:space="preserve">}</text>
+    <text class="muted" x="56" y="5742" xml:space="preserve">recusas (401, 403, 422) como JSON, antes de abrir o fluxo</text>
+    <text class="muted" x="56" y="5760" xml:space="preserve">a cada intervalo: confere a sessão (sessao:&lt;sid&gt; no Redis) e o MOD-03 e lê</text>
+    <text class="muted" x="56" y="5778" xml:space="preserve">   a versao de cardUsuarios por _id; o token só é conferido na abertura</text>
+    <text class="muted" x="56" y="5796" xml:space="preserve">até 3 conexões por usuário, entre todas as réplicas: aoVivo:&lt;usuarioId&gt;</text>
+    <text class="muted" x="56" y="5814" xml:space="preserve">   no Redis; a mais antiga recebe o encerrado pelo canal aoVivo:encerrar</text>
+    <text class="muted" x="56" y="5832" xml:space="preserve">depois de &quot;encerrado&quot;, 401 ou 403 o app não reconecta: o aparelho fica pausado</text>
+    <text class="muted" x="56" y="5850" xml:space="preserve">   em &quot;Na abertura&quot;, sem salvar nada (RN-282); a escolha salva não muda</text>
+    <text class="muted" x="56" y="5868" xml:space="preserve">queda de rede: reconecta em 1, 2, 4, 8, 16, 32 e 60 s, depois a cada 60 s;</text>
+    <text class="muted" x="56" y="5886" xml:space="preserve">   sem retomada nem Last-Event-ID: toda conexão começa pelo card inteiro</text>
+    <text class="muted" x="56" y="5904" xml:space="preserve">&quot;Na abertura&quot; marcado: o cliente fecha o fluxo (RN-279); GET não é auditado</text>
+    <text class="muted" x="56" y="5922" xml:space="preserve">proxy e gateway sem buffer; o ping de 30 s mantém a conexão aberta no gateway</text>
   </g>
-  <g id="ep-get-put-usuarios-eu-preferencias" transform="translate(0,18)">
+  <g id="ep-get-put-usuarios-eu-preferencias" transform="translate(0,32)">
     <g filter="url(#sombra)"><rect class="node" x="40" y="5960" width="632" height="696" rx="10"/></g>
     <rect class="node-green" x="56" y="5976" width="40" height="24" rx="6"/><text class="label-strong" x="76.0" y="5993" text-anchor="middle">GET</text><rect class="node-blue" x="104" y="5976" width="40" height="24" rx="6"/><text class="label-strong" x="124" y="5993" text-anchor="middle">PUT</text>
     <text class="label-strong" x="156" y="5993">/usuarios/eu/preferencias</text>
@@ -785,7 +810,7 @@
     <text class="muted" x="56" y="6616" xml:space="preserve">guardado em usuarios.preferencias, pelo _id do token; o PUT troca o objeto inteiro</text>
     <text class="muted" x="56" y="6634" xml:space="preserve">a pausa depois do &quot;encerrado&quot; é só do aparelho, no cliente: nada é salvo (RN-282)</text>
   </g>
-  <g id="enderecos-apos-card" transform="translate(0,1874)">
+  <g id="enderecos-apos-card" transform="translate(0,1888)">
   <g id="grupo-time-deboaz"><text class="section" x="40" y="4842">TIME DEBOAZ</text><line class="divider" x1="40" y1="4854" x2="1352" y2="4854"/></g>
   <g id="ep-get-contas">
     <g filter="url(#sombra)"><rect class="node" x="40" y="4878" width="632" height="610" rx="10"/></g>
@@ -1031,7 +1056,7 @@
   </g>
   </g>
   </g>
-  <g id="marca-rodape" transform="translate(0,10828)">
+  <g id="marca-rodape" transform="translate(0,10842)">
     <rect class="wm-band" x="0" y="0" width="1392" height="168"/>
     <line class="wm-sep" x1="0" y1="0.5" x2="1392" y2="0.5"/>
     <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
@@ -1043,7 +1068,7 @@
     <rect class="chip" x="1092" y="47" width="14" height="14" rx="3"/><text class="label" x="1114" y="58">resposta de sucesso</text>
     <rect class="node" x="40" y="73" width="14" height="14" rx="3"/><text class="label" x="62" y="84">endereço e regra comum</text><rect class="node-purple" x="246" y="73" width="14" height="14" rx="3"/><text class="label" x="268" y="84">auditado: responde o cabeçalho X-Trace-Id</text>
     <line class="divider" x1="40" y1="114" x2="1352" y2="114"/>
-    <text class="footer" x="40" y="142">v17 · a MASTER entra nas contagens do card; gerar senha reconta o card; ao vivo sem retomada (sem Last-Event-ID)</text>
-    <text class="wm-file" x="1352" y="142" text-anchor="end">usuarios-contrato-api_v17_20261111-2327.svg</text>
+    <text class="footer" x="40" y="142">v18 · o card com o 200 inteiro (12 números por série) e o ao vivo com os eventos card e encerrado legíveis</text>
+    <text class="wm-file" x="1352" y="142" text-anchor="end">usuarios-contrato-api_v18_20261113-0856.svg</text>
   </g>
 </svg>

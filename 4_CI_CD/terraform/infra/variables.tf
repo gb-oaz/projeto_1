@@ -99,6 +99,42 @@ variable "redis_sku" {
   default     = "Balanced_B0"
 }
 
+# ── armazenamento de objetos dos anexos (RNF-235, RNF-236) ────────────────────
+
+variable "armazenamento_objetos" {
+  description = "Liga o armazenamento de objetos dos anexos do SAC; desligado, os anexos novos vão para o GridFS e a conta já criada continua, só para ler os antigos (RNF-235)"
+  type        = bool
+  default     = false
+}
+
+variable "armazenamento_redundancia" {
+  description = "Redundância da conta de armazenamento, Standard (RNF-235): LRS; mudar exige só o .tfvars"
+  type        = string
+  default     = "LRS"
+  validation {
+    condition     = contains(["LRS", "ZRS"], var.armazenamento_redundancia)
+    error_message = "armazenamento_redundancia deve ser LRS ou ZRS."
+  }
+}
+
+# ── verificação dos anexos (18 RN-292) ───────────────────────────────────────
+
+variable "verificacao_anexos" {
+  description = "Recursos do clamav (clamd) por ambiente; memória = 2 × vCPU, combinação aceita pelo Consumption"
+  type = object({
+    cpu     = number
+    memoria = string
+  })
+  default = {
+    cpu     = 1
+    memoria = "2Gi"
+  }
+  validation {
+    condition     = var.verificacao_anexos.memoria == "${var.verificacao_anexos.cpu * 2}Gi"
+    error_message = "verificacao_anexos.memoria deve ser o dobro da cpu (ex.: 0.5 e \"1Gi\", 1 e \"2Gi\")."
+  }
+}
+
 # ── borda de produção (RNF-74 a RNF-80) ───────────────────────────────────────
 
 variable "dominio" {

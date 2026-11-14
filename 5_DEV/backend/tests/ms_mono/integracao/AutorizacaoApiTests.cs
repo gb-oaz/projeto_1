@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using System.Net;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;

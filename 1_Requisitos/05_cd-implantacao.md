@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "05_cd-implantacao"
 tipo: "Transversal"
 titulo: "CD e implantação na Azure"
-versao: "v12"
-data: "2026-11-07 16:15"
+versao: "v13"
+data: "2026-11-13 14:16"
 status: "Em revisão"
 objetivo: "definir como as imagens publicadas pelo CI chegam, após aprovação manual, aos ambientes de homologação e produção na Azure, descritos em Terraform e com custo mínimo."
 ---
 
-> **boaz · Transversal** · `05_cd-implantacao` · **v12** · 2026-11-07 16:15 · **Em revisão**
+> **boaz · Transversal** · `05_cd-implantacao` · **v13** · 2026-11-13 14:16 · **Em revisão**
 
 # CD e implantação na Azure
 
@@ -205,8 +205,9 @@ Esquema do Cenário: ações manuais em homologação
 ```gherkin
 Cenário: desligar homologação
   Quando homologação é desligada
-  Então o Redis e os private endpoints são removidos e as aplicações vão a zero réplica
-  E Cosmos DB, Key Vault, Log Analytics e a rede continuam
+  Então o Redis e os private endpoints, com o pe-blob, são removidos
+  E as aplicações, com o clamav, vão a zero réplica
+  E Cosmos DB, a conta de anexos, Key Vault, Log Analytics e a rede continuam
 ```
 
 <a id="RNF-228"></a>
@@ -418,10 +419,11 @@ Esquema do Cenário: acesso privado
   Então as aplicações acessam <serviço> só por private endpoint, pela zona <zona>
 
   Exemplos:
-    | serviço   | zona                               |
-    | Cosmos DB | privatelink.mongo.cosmos.azure.com |
-    | Redis     | privatelink.redis.azure.net        |
-    | Key Vault | privatelink.vaultcore.azure.net    |
+    | serviço         | zona                               |
+    | Cosmos DB       | privatelink.mongo.cosmos.azure.com |
+    | Redis           | privatelink.redis.azure.net        |
+    | Key Vault       | privatelink.vaultcore.azure.net    |
+    | conta de anexos | privatelink.blob.core.windows.net  |
 ```
 
 <a id="RNF-62"></a>
@@ -430,7 +432,11 @@ Esquema do Cenário: acesso privado
 
 ```gherkin
 Cenário: banco e cache fechados
-  Então Cosmos DB e Redis têm o acesso público desligado
+  Então Cosmos DB, Redis e a conta de anexos têm o acesso público desligado
+
+Cenário: conta de anexos sem chave
+  Então a conta de anexos não aceita a chave de conta
+  E só a identidade da aplicação lê e grava os arquivos, pelo pe-blob
 ```
 
 <a id="RNF-63"></a>
@@ -452,6 +458,7 @@ Cenário: entrada de snet-appgw
 ```gherkin
 Cenário: quatro aplicações
   Então as quatro imagens rodam num ambiente do Container Apps Consumption, em snet-aca
+  E a aplicação interna clamav (RNF-237) roda no mesmo ambiente
 ```
 
 <a id="RNF-65"></a>
@@ -460,7 +467,7 @@ Cenário: quatro aplicações
 
 ```gherkin
 Cenário: tamanho em homologação
-  Então cada aplicação tem 1 a 2 réplicas de 0,25 vCPU e 0,5 GiB
+  Então cada aplicação, menos o clamav da RNF-237, tem 1 a 2 réplicas de 0,25 vCPU e 0,5 GiB
 ```
 
 <a id="RNF-66"></a>
@@ -534,6 +541,102 @@ Cenário: compatibilidade
 Cenário: SKU do cache
   Então o cache usa o Azure Managed Redis no menor SKU
   E o Azure Cache for Redis não é usado, porque está em aposentadoria
+```
+
+<a id="RNF-235"></a>
+
+### `RNF-235` Armazenamento de objetos
+
+> Anexos do SAC: [18_modulo-sac `RNF-233`](18_modulo-sac.md#RNF-233)
+
+```gherkin
+Esquema do Cenário: ligado ou desligado por variável
+  Dado o armazenamento de objetos <estado> na variável do .tfvars de <ambiente>
+  Quando a implantação roda
+  Então <conta>
+  E os arquivos novos dos anexos vão para <onde>
+
+  Exemplos:
+    | ambiente    | estado    | conta                                   | onde                 |
+    | homologação | ligado    | a conta de armazenamento existe         | o Azure Blob Storage |
+    | homologação | desligado | nenhuma conta de armazenamento é criada | o banco, no GridFS   |
+    | produção    | ligado    | a conta de armazenamento existe         | o Azure Blob Storage |
+
+Esquema do Cenário: conta de anexos em cada ambiente
+  Dado o armazenamento de objetos ligado em <ambiente>
+  Então a conta de anexos é Standard, com redundância LRS e camada Hot
+  E a exclusão reversível <exclusao>
+
+  Exemplos:
+    | ambiente    | exclusao                    |
+    | homologação | fica desligada              |
+    | produção    | guarda o arquivo por 7 dias |
+
+Cenário: desligar homologação
+  Dado o armazenamento de objetos ligado em homologação, com anexos guardados
+  Quando homologação é desligada pela RN-26
+  Então a conta de armazenamento e os arquivos continuam
+
+Cenário: desligar a variável com arquivos guardados
+  Dado o armazenamento de objetos ligado em produção, com o "erro.png" guardado nele
+  Quando a variável do armazenamento de objetos é desligada no .tfvars e a implantação roda
+  Então a conta de anexos continua, protegida por prevent_destroy no Terraform
+  E é reconhecida pela tag uso=anexos-sac
+  E os arquivos novos dos anexos vão para o banco, no GridFS
+  E o "erro.png" continua sendo lido da conta, até a RNF-236 esvaziá-la aos poucos
+  E apagar a conta exige uma remoção explícita, feita à parte da implantação
+```
+
+<a id="RNF-236"></a>
+
+### `RNF-236` Ciclo de vida dos arquivos
+
+> Prazos dos anexos: [18_modulo-sac `RNF-234`](18_modulo-sac.md#RNF-234)
+
+```gherkin
+Esquema do Cenário: regra de ciclo de vida
+  Dado a conta de armazenamento de <ambiente>, criada pelo Terraform
+  Então a regra de ciclo de vida remove <arquivo>
+  E a regra é aplicada pela implantação, nunca pelo portal
+
+  Exemplos:
+    | ambiente    | arquivo                                                      |
+    | homologação | o arquivo de anexo não usado num chamado ou mensagem em 24 h |
+    | homologação | todo arquivo 30 dias depois do envio                         |
+    | produção    | o arquivo de anexo não usado num chamado ou mensagem em 24 h |
+    | produção    | o arquivo do chamado fechado há 5 anos, vencido pela guarda  |
+
+Cenário: arquivo ainda dentro do prazo
+  Dado o "erro.png" enviado em homologação em 2026-11-12 10:00
+  Quando chega 2026-12-12 09:59
+  Então o arquivo continua guardado
+```
+
+<a id="RNF-237"></a>
+
+### `RNF-237` Verificação dos arquivos (clamav)
+
+> Verificação dos anexos: [18_modulo-sac `RN-292`](18_modulo-sac.md#RN-292) · imagem em [04_publicacao-imagens `RNF-27`](04_publicacao-imagens.md#RNF-27)
+
+```gherkin
+Cenário: aplicação interna
+  Então homologação e produção têm a aplicação interna clamav, da imagem clamav/clamav:1.5.4
+  E ela ouve TCP 3310, sem acesso de fora do ambiente do Container Apps
+  E o backend chega nela por Sac__ClamAv = "clamav:3310"
+
+Esquema do Cenário: tamanho e custo ocioso
+  Então em <ambiente> o clamav tem <cpu> e <memoria>
+  E custa cerca de <custo> por mês, mesmo sem uso
+
+  Exemplos:
+    | ambiente    | cpu       | memoria                         | custo     |
+    | homologação | 0,75 vCPU | 1,5 GiB, porque 1 GiB não cabe  | R$ 100,00 |
+    | produção    | 1 vCPU    | 2 GiB                           | R$ 130,00 |
+
+Cenário: assinaturas
+  Quando o freshclam baixa assinaturas novas
+  Então ele não as testa antes de usar
+  E o clamav as recarrega em série, sem duas cópias na memória
 ```
 
 <a id="RNF-72"></a>
@@ -700,6 +803,9 @@ Esquema do Cenário: nome em homologação
     | a VNet                  | deb-boaz-app-hml_vnet        |
     | o NSG dos endpoints     | deb-boaz-app-hml_nsg-pe      |
     | o endpoint do Key Vault | deb-boaz-app-hml_pe-kv       |
+    | o endpoint dos anexos   | deb-boaz-app-hml_pe-blob     |
+    | a conta de anexos       | debboazapphmlanexos          |
+    | o contêiner dos anexos  | anexos-sac                   |
     | o ambiente de apps      | deb-boaz-app-hml-cae         |
     | a identidade            | deb-boaz-app-hml_id          |
     | o Key Vault             | deb-boaz-app-hml-kv          |
@@ -723,6 +829,7 @@ Cenário: caracteres aceitos
 ```gherkin
 Cenário: limite de 32 caracteres
   Então as aplicações se chamam backend-mono, frontend-hub, frontend-landing-page e frontend-quest
+  E a aplicação interna de verificação dos arquivos se chama clamav
 ```
 
 <a id="RNF-90"></a>
@@ -746,13 +853,13 @@ Cenário: Key Vault aberto ao CD
 
 ## Diagramas
 
-**Implantação · homologação** — `3_Arquitetura/implantacao-hml_v06_20261107-0407.svg`
+**Implantação · homologação** — `3_Arquitetura/implantacao-hml_v09_20261113-1410.svg`
 
-[![Ambiente de homologação na Azure: assinatura deb-boaz-app-hml, grupo de recursos deb-boaz-app-hml_rg, com VNet 10.10.0.0/16; na subnet snet-aca, o ambiente externo do Container Apps com backend-mono e as três aplicações web, 1 a 2 réplicas, acessadas por HTTPS pelo usuário web, pela pessoa desenvolvedora via documentação da API em /doc/api e pelos apps móveis; na subnet snet-pe, private endpoints de Key Vault, Cosmos DB for MongoDB serverless e Azure Managed Redis, com zonas Private DNS; Log Analytics, Application Insights e orçamento; imagens baixadas do Docker Hub e infraestrutura aplicada pelo CD com Terraform; segredos das contas iniciais (admin, contas qa e módulos de teste) lidos do Key Vault pelo backend-mono](../3_Arquitetura/implantacao-hml_v06_20261107-0407.svg)](../3_Arquitetura/implantacao-hml_v06_20261107-0407.svg)
+[![Ambiente de homologação na Azure: assinatura deb-boaz-app-hml, grupo de recursos deb-boaz-app-hml_rg, com VNet 10.10.0.0/16; na subnet snet-aca, o ambiente externo do Container Apps com backend-mono e as três aplicações web, 1 a 2 réplicas, acessadas por HTTPS pelo usuário web, pela pessoa desenvolvedora via documentação da API em /doc/api e pelos apps móveis; na subnet snet-pe, private endpoints de Key Vault, Cosmos DB for MongoDB serverless e Azure Managed Redis, com zonas Private DNS; Log Analytics, Application Insights e orçamento; imagens baixadas do Docker Hub e infraestrutura aplicada pelo CD com Terraform; segredos das contas iniciais (admin, contas qa e módulos de teste) lidos do Key Vault pelo backend-mono](../3_Arquitetura/implantacao-hml_v09_20261113-1410.svg)](../3_Arquitetura/implantacao-hml_v09_20261113-1410.svg)
 
-**Implantação · produção** — `3_Arquitetura/implantacao-prd_v05_20261106-2318.svg`
+**Implantação · produção** — `3_Arquitetura/implantacao-prd_v08_20261113-1410.svg`
 
-[![Ambiente de produção na Azure: assinatura deb-boaz-app-prd, grupo de recursos deb-boaz-app-prd_rg, com VNet 10.20.0.0/16; Application Gateway WAF_v2 com IP público em snet-appgw como único ponto público, roteando a web para as aplicações web e /mobile/* para o backend, com política de WAF; ambiente interno do Container Apps em snet-aca com 1 a 5 réplicas, em que as aplicações web encaminham /api/* ao backend; private endpoints de Key Vault, Cosmos DB autoscale e Azure Managed Redis em snet-pe com zonas Private DNS; Log Analytics, Application Insights e orçamento](../3_Arquitetura/implantacao-prd_v05_20261106-2318.svg)](../3_Arquitetura/implantacao-prd_v05_20261106-2318.svg)
+[![Ambiente de produção na Azure: assinatura deb-boaz-app-prd, grupo de recursos deb-boaz-app-prd_rg, com VNet 10.20.0.0/16; Application Gateway WAF_v2 com IP público em snet-appgw como único ponto público, roteando a web para as aplicações web e /mobile/* para o backend, com política de WAF; ambiente interno do Container Apps em snet-aca com 1 a 5 réplicas, em que as aplicações web encaminham /api/* ao backend; private endpoints de Key Vault, Cosmos DB autoscale e Azure Managed Redis em snet-pe com zonas Private DNS; Log Analytics, Application Insights e orçamento](../3_Arquitetura/implantacao-prd_v08_20261113-1410.svg)](../3_Arquitetura/implantacao-prd_v08_20261113-1410.svg)
 
 **Pipeline de CD** — `3_Arquitetura/pipeline-cd_v07_20261107-1614.svg`
 
@@ -774,7 +881,8 @@ Cenário: Key Vault aberto ao CD
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v12** | 2026-11-07 16:15 | Esvaziar o banco de homologação pelo disparo manual (`RNF-228` incluído); diagrama `pipeline-cd` atualizado para v07 |
+| **v13** | 2026-11-13 14:16 | Conta de anexos por private endpoint pe-blob, sem acesso público nem chave de conta (`RNF-61`, `RNF-62`), nomes debboazapp<amb>anexos e anexos-sac (`RNF-88`), aplicação interna clamav em hml e prd (`RNF-237` incluído; `RNF-64`, `RNF-65`, `RNF-89`), desligar hml remove o pe-blob e leva o clamav a zero (`RNF-92`); armazenamento de objetos ligado ou desligado por variável, Standard LRS Hot nos dois ambientes e exclusão reversível de 7 dias em produção; desligar a variável com arquivos guardados mantém a conta, protegida por prevent_destroy e com a tag uso=anexos-sac, lida até esvaziar, e só a remoção explícita a apaga (`RNF-235` incluído); ciclo de vida dos arquivos: 24 h sem uso nos dois ambientes, 30 dias em homologação e fim da guarda em produção (`RNF-236` incluído); a conta de armazenamento continua ao desligar homologação (`RNF-92` alterado) |
+| v12 | 2026-11-07 16:15 | Esvaziar o banco de homologação pelo disparo manual (`RNF-228` incluído); diagrama `pipeline-cd` atualizado para v07 |
 | v11 | 2026-11-06 23:37 | Diagramas de implantação de homologação e de produção atualizados para v05 |
 | v10 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v09 | 2026-11-01 18:28 | Só Gherkin e diagramas: premissas, RN, RNF e nomes dos recursos viram cenários (mesmos IDs como âncora); Em aberto mantido; status → Em revisão |
@@ -783,8 +891,7 @@ Cenário: Key Vault aberto ao CD
 | v06 | 2026-10-15 23:58 | Ligar e desligar homologação sob demanda: `RN-26`, `RNF-91` e `RNF-92` incluídos, `RN-22` alterado; diagrama `pipeline-cd` atualizado para v06 |
 | v05 | 2026-10-15 01:16 | Estrutura do Terraform: módulo raiz em `infra/`, valores em `ambientes/<amb>/` e bootstrap em `scripts/`, sem IDs da Azure no repositório (`RNF-55` alterado); diagrama `pipeline-cd` atualizado para v05 |
 | v04 | 2026-10-15 01:00 | Ajustes da implementação: plano guardado só no executor, sem artefato (`RNF-48` e `RNF-51` alterados); environments `azure-hml` e `azure-prd` restritos à branch principal (`RNF-52` alterado); diagrama `pipeline-cd` atualizado para v04 |
-| v03 | 2026-10-14 23:15 | Assinaturas `deb-boaz-app-hml` e `deb-boaz-app-prd` e grupos `deb-boaz-app-<amb>_rg` (`RN-17` e `RNF-52` alterados); estado do Terraform em cada assinatura (`RNF-56` alterado); nomenclatura dos recursos (`RNF-88` a `RNF-90` incluídos); diagramas atualizados para v03 |
 
 ---
 
-<sub>boaz · v12 · 2026-11-07 16:15 · `1_Requisitos/05_cd-implantacao.md`</sub>
+<sub>boaz · v13 · 2026-11-13 14:16 · `1_Requisitos/05_cd-implantacao.md`</sub>

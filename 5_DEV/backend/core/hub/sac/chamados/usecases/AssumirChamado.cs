@@ -1,3 +1,6 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.Ports.Out;
+using Boaz.Core.Commons.Auditoria.UseCases;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 using Boaz.Core.Hub.Sac.Chamados.Dtos;
@@ -14,17 +17,19 @@ public sealed class AssumirChamado(
     IChamados chamados, INumeracao numeracao, ICanalDoChamado canal, IPessoasDoSac pessoas,
     IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio) : IAssumirChamado
 {
-    readonly AuditoriaDoSac auditada = new(auditoria, erros, relogio);
+    readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
     readonly Conversa conversa = new(chamados, numeracao, canal, pessoas);
 
     /// <inheritdoc />
     public Task<ResponsavelDto> Executar(string id, PedidoAssumir pedido, QuemPede quem, TraceId traceId, CancellationToken ct = default) =>
-        auditada.Auditar(new ExecucaoDoSac(traceId, AcaoAuditada.AssumirChamado, quem.ContaId, quem.UsuarioId, id), async () =>
+        auditada.Auditar(new Execucao(traceId, AcaoAuditada.AssumirChamado, quem.ContaId, quem.UsuarioId, id), async andamento =>
         {
             quem.SoTime();
             var autor = await conversa.Autor(quem, ct);
             var agora = relogio.GetUtcNow();
             var (chamado, _) = await conversa.Mudar(id, quem, c => c.Assumir(autor, pedido.Substituir ?? false, agora), ct);
-            return (ResponsavelDto.De(chamado.Dados), (string?)chamado.Dados.Id.Valor);
+            andamento.Alvejar(chamado.Dados.Id.Valor);
+            await auditada.Concluir(andamento.Atual, ct);
+            return ResponsavelDto.De(chamado.Dados);
         }, ct);
 }

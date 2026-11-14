@@ -5,7 +5,7 @@ namespace Boaz.Core.Hub.Sac.Chamados.Domain;
 /// <summary>
 /// O número do chamado, que vai no endereço: "SAC-" e 6 dígitos, como
 /// SAC-000042. O pedido de senha sem login tem o mesmo número em "ajuda-"
-/// (17 RN-274, sac-contrato-api v01 decisão 1).
+/// (17 RN-274, sac-contrato-api v02, POST /contas/esqueci-senha-master).
 /// </summary>
 /// <param name="Numero">O número da série contadores.chamados.</param>
 public readonly record struct NumeroDoChamado(long Numero)
