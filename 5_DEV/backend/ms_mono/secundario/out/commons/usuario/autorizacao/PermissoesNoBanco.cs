@@ -1,7 +1,7 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
-using ExecucaoDeQuemChama = Boaz.Core.Commons.Usuario.Usuarios.Domain.ExecucaoDeQuemChama;
 using MongoDB.Bson;
 using MongoDB.Driver;
 

@@ -1,12 +1,10 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
 using static Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks.Cenario;
-using AcaoAuditada = Boaz.Core.Commons.Usuario.Usuarios.Domain.AcaoAuditada;
-using EtapaDaExecucao = Boaz.Core.Commons.Usuario.Usuarios.Domain.EtapaDaExecucao;
-using NivelDoErro = Boaz.Core.Commons.Usuario.Usuarios.Domain.NivelDoErro;
-using RegistroDeAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Domain.RegistroDeAuditoria;
-using RegistroDeErro = Boaz.Core.Commons.Usuario.Usuarios.Domain.RegistroDeErro;
+using AcaoAuditada = Boaz.Core.Commons.Auditoria.Domain.AcaoAuditada;
+using EtapaDaExecucao = Boaz.Core.Commons.Auditoria.Domain.EtapaDaExecucao;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autenticacao.UseCases;
 

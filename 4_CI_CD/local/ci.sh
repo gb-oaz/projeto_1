@@ -329,6 +329,10 @@ if $VERDE && ! $SEM_QA && { $BACKEND || [ ${#APPS[@]} -gt 0 ]; }; then
   # (o pkcs8 -topk8 garante PKCS#8: o OpenSSL 3 grava "genpkey -outform DER" em PKCS#1)
   CHAVE_PRIVADA=$(openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 2>/dev/null \
     | openssl pkcs8 -topk8 -nocrypt -outform DER | base64 | tr -d '\n')
+  # Anexos do SAC no armazenamento de objetos ligado (05 RNF-235): o Azurite
+  # do compose.yml, com a conta e a chave públicas de desenvolvimento dele
+  # (não é segredo). A partida do qa usa outro contêiner, anexos-sac-partida.
+  AZURITE='DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;'
   # senha da RNF-202: 8+ caracteres, maiúscula, minúscula, número e especial
   senha_nova() {
     local letras
@@ -374,6 +378,9 @@ $($QA_MOBILE && echo '    ports: ["127.0.0.1:18080:8080"]')
       ConnectionStrings__Mongo: mongodb://mongodb:27017
       ConnectionStrings__MongoDb: mongodb://mongodb:27017
       ConnectionStrings__Redis: redis:6379
+      ConnectionStrings__Blob: "$AZURITE"
+      Sac__Arquivos__Destino: BLOB
+      Sac__Arquivos__Conteiner: anexos-sac
       Swagger__Habilitado: "true"
       Teste__Relogio: "sim"
       Autenticacao__ChaveId: deboaz-local
@@ -382,6 +389,7 @@ $(for v in "${USUARIOS[@]}"; do printf "      %s: '%s'\\n" "${v%%=*}" "${v#*=}";
     depends_on:
       mongodb: { condition: service_healthy }
       redis: { condition: service_healthy }
+      azurite: { condition: service_healthy }
 EOF
     fi
     for app in ${APPS_IMAGEM[@]+"${APPS_IMAGEM[@]}"}; do
@@ -440,11 +448,15 @@ DOCKERFILE
             IMAGEM_SUITE=boaz-ci-local/qa-backend-integracao-api:ci rodar_suite backend/integracao "qa · backend · integracao" \
               "API_URL=$API" "MONGO_URL=mongodb://mongodb:27017" "REDIS_URL=redis:6379" "QA_PODE_LIMPAR=sim" \
               "CHAVE_PRIVADA=$CHAVE_PRIVADA" "${USUARIOS[@]}" \
+              "BLOB_CONEXAO=$AZURITE" "BLOB_CONTEINER=anexos-sac" \
               "API_COMANDO=cd /api && exec dotnet Boaz.MsMono.dll" \
               "PARTIDA_ConnectionStrings__Mongo=mongodb://mongodb:27017" \
               "PARTIDA_ConnectionStrings__MongoDb=mongodb://mongodb:27017" \
               "PARTIDA_ConnectionStrings__Redis=redis:6379,defaultDatabase=1" \
               "PARTIDA_Mongo__Banco=boaz_partida" \
+              "PARTIDA_ConnectionStrings__Blob=$AZURITE" \
+              "PARTIDA_Sac__Arquivos__Destino=BLOB" \
+              "PARTIDA_Sac__Arquivos__Conteiner=anexos-sac-partida" \
               "PARTIDA_Autenticacao__ChaveId=deboaz-local" \
               "PARTIDA_Autenticacao__ChavePrivada=$CHAVE_PRIVADA"
           fi

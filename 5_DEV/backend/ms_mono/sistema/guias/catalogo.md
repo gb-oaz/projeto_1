@@ -12,6 +12,7 @@ Todas rodam no **ms_mono**, o backend único do deboaz (contextos `landing_page`
 | **Autenticação** | `/auth/*` | Entrar no hub, no quest e na sala, confirmar a senha, renovar o token, sair e os aparelhos conectados |
 | **Usuários** | `/contas`, `/usuarios`, `/time` | Contas assinantes, staff, participantes e membros do time, o card e o tempo de sessão |
 | **Autorização** | `/usuarios/{id}/permissoes` | Permissões por módulo e aba, com If-Match, e o registro de mudanças |
+| **SAC** | `/sac/chamados`, `/sac/anexos`, `/sac/configuracao`, `/sac/card` | Chamados da conta com o time deboaz: conversa (e ao vivo), anexos, atendimento, avaliação, prazos por categoria e o card |
 
 ### Por onde começar
 

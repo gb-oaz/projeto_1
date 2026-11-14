@@ -1189,11 +1189,37 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
         """);
 
     // ── time deboaz (RF-111, RN-169, RN-172) ──────────────────────────────
+    // a caixa do SAC é a fila do time (18 RF-179-api, contrato sac v01):
+    // GET /sac/chamados?categoria=SENHA_CONTA_MASTER pelo Caio, com o SAC
     [Then(@"^a resposta é 202 e a mensagem entra no SAC do time deboaz$")]
-    public void MensagemNoSac()
+    public async Task MensagemNoSac()
     {
         Respostas.Confere(acao, 202);
-        throw new PendingStepException("a caixa do SAC ainda não tem endereço no contrato");
+        var pedido = await PedidoNaFila();
+        Assert.True(pedido["instituicao"]?.GetValue<string>() == "Escola Bento Freitas"
+            && pedido["contato"]?.GetValue<string>() == "(51) 99999-0000", $"o chamado devia trazer a instituição e o contato do pedido: {pedido.ToJsonString()}");
+    }
+
+    // 17 v109: o pedido vira o chamado na hora (o número é gerado: vale a forma)
+    [Then(@"^entra como o chamado ""SAC-000087"" da categoria ""(\w+)"", já na criação$")]
+    public async Task ChamadoDoPedido(string categoria)
+    {
+        var pedido = await PedidoNaFila();
+        Assert.Matches("^SAC-[0-9]{6}$", pedido["id"]?.GetValue<string>() ?? "");
+        Assert.True(pedido["categoria"]?.GetValue<string>() == categoria && pedido["status"]?.GetValue<string>() == "ABERTO",
+            $"esperava o chamado {categoria} em ABERTO: {pedido.ToJsonString()}");
+    }
+
+    // o único pedido de senha na fila do time, logo depois do 202
+    async Task<JsonObject> PedidoNaFila()
+    {
+        var caio = await mundo.Caio();
+        await mundo.Conceder(caio, new() { ["MOD-02"] = "U" });
+        var fila = Exigir(await mundo.EnviarComo(caio, "GET", "/sac/chamados?categoria=SENHA_CONTA_MASTER"), 200,
+            "GET /sac/chamados?categoria=SENHA_CONTA_MASTER do Caio");
+        var itens = fila.Corpo?["itens"]?.AsArray() ?? [];
+        Assert.True(itens.Count == 1, $"esperava 1 pedido de senha na fila do time: {fila}");
+        return itens[0]!.AsObject();
     }
 
     [When(@"^o membro do time Caio envia POST (/contas/\S+/codigo-master)$")]

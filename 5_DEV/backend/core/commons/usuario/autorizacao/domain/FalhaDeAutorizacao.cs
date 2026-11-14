@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+
 namespace Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 
 /// <summary>
@@ -23,7 +25,7 @@ public enum GrupoDeFalha
 /// (autorizacao-contrato-api). O adaptador a transforma na resposta
 /// { "codigo", "mensagem" } com os campos extras (mod, abas, versao, campo).
 /// </summary>
-public sealed class FalhaDeAutorizacao : Exception
+public sealed class FalhaDeAutorizacao : Exception, IRecusaPrevista
 {
     FalhaDeAutorizacao(GrupoDeFalha grupo, string codigo, string mensagem) : base(mensagem) => (Grupo, Codigo) = (grupo, codigo);
 

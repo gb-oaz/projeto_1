@@ -23,6 +23,8 @@
     <!-- preparar o estado: tempo sem uso e bloqueios que a API não cria -->
     <PackageReference Include="MongoDB.Driver" Version="3.13.0" />
     <PackageReference Include="StackExchange.Redis" Version="3.4.29" />
+    <!-- conferir onde o anexo do SAC foi guardado e que saiu (18 RNF-233, RNF-234) -->
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.30.1" />
   </ItemGroup>
 
   <ItemGroup>

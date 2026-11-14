@@ -82,7 +82,8 @@ public sealed partial class IndicesPassos(Partida partida)
     {
         var esperados = new List<Indice>();
         var semExpiracao = false;
-        foreach (var parte in descricao.Split(", ", StringSplitOptions.TrimEntries))
+        // "; chamado": o índice novo depois do motivo (17 v109, pedidosAjuda)
+        foreach (var parte in descricao.Split([", ", "; "], StringSplitOptions.TrimEntries))
         {
             if (parte == "sem prazo de expiração")
             {
@@ -501,6 +502,16 @@ public sealed partial class IndicesPassos(Partida partida)
     }
 
     // ── apoio do log e do preparo ──────────────────────────────────────────
+    // o índice recusado da RNF-232 do SAC (hub/sac/PartidaDoSacPassos.cs): a
+    // coleção e o campo que o log tem de citar, e a partida que o "Quando
+    // envia GET /health" sobe antes
+    public void RecusaPreparada(string nome, string campo)
+    {
+        colecao = nome;
+        campoDoIndice = campo;
+        partir = () => partida.Iniciar();
+    }
+
     async Task Preparar(string nome)
     {
         partida.KeyVaultCompleto("hml");

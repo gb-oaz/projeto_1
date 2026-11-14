@@ -1,0 +1,144 @@
+using System.Security.Cryptography;
+
+namespace Boaz.Core.Commons.Auditoria.Domain;
+
+/// <summary>
+/// O identificador de uma execução que muda estado (RN-271): "trc-" e 8
+/// hexadecimais, como trc-7f3a9c21. Liga os registros "INICIADO" e
+/// "CONCLUIDO" da auditoria e o registro de erro, e volta no cabeçalho
+/// X-Trace-Id.
+/// </summary>
+/// <param name="Valor">O texto, como trc-7f3a9c21.</param>
+public readonly record struct TraceId(string Valor)
+{
+    /// <summary>O começo de todo traceId.</summary>
+    public const string Prefixo = "trc-";
+
+    /// <summary>Um traceId novo, sorteado para a execução.</summary>
+    public static TraceId Novo() => new(Prefixo + Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(4)));
+
+    /// <inheritdoc />
+    public override string ToString() => Valor;
+}
+
+/// <summary>
+/// A execução de quem chama um caso de uso interno (RN-275): o caso de uso
+/// interno grava os registros dele com o traceId, quem e a conta dela, entre o
+/// "INICIADO" e o "CONCLUIDO" de quem chama.
+/// </summary>
+/// <param name="TraceId">A execução de quem chama.</param>
+/// <param name="Quem">Quem pede na execução de quem chama, se há login.</param>
+/// <param name="ContaId">A conta da execução de quem chama, se há.</param>
+public sealed record ExecucaoDeQuemChama(TraceId TraceId, string? Quem, string? ContaId);
+
+/// <summary>A etapa da execução gravada na auditoria (RN-178).</summary>
+public enum EtapaDaExecucao
+{
+    /// <summary>Ao chegar, antes de aplicar a regra.</summary>
+    Iniciado,
+    /// <summary>Antes de responder com sucesso.</summary>
+    Concluido,
+}
+
+/// <summary>O nível de um registro de erro (RN-270).</summary>
+public enum NivelDoErro
+{
+    /// <summary>Recusa prevista pela regra (4xx).</summary>
+    Alerta,
+    /// <summary>Falha inesperada (5xx).</summary>
+    Erro,
+}
+
+/// <summary>Os textos do modelo de documentos para a etapa, o nível e a ação.</summary>
+public static class TextosDaAuditoria
+{
+    /// <summary>INICIADO ou CONCLUIDO.</summary>
+    public static string Texto(this EtapaDaExecucao etapa) => etapa == EtapaDaExecucao.Iniciado ? "INICIADO" : "CONCLUIDO";
+
+    /// <summary>ALERTA ou ERRO.</summary>
+    public static string Texto(this NivelDoErro nivel) => nivel == NivelDoErro.Alerta ? "ALERTA" : "ERRO";
+
+    /// <summary>A ação em MAIÚSCULAS com sublinhado, como CRIAR_USUARIO.</summary>
+    public static string Texto(this AcaoAuditada acao) => acao switch
+    {
+        AcaoAuditada.CriarConta => "CRIAR_CONTA",
+        AcaoAuditada.CriarUsuario => "CRIAR_USUARIO",
+        AcaoAuditada.EditarUsuario => "EDITAR_USUARIO",
+        AcaoAuditada.NovaGeracaoSenha => "NOVA_GERACAO_SENHA",
+        AcaoAuditada.GerarSenha => "GERAR_SENHA",
+        AcaoAuditada.NovoCodigoAcesso => "NOVO_CODIGO_ACESSO",
+        AcaoAuditada.DesativarUsuario => "DESATIVAR_USUARIO",
+        AcaoAuditada.ReativarUsuario => "REATIVAR_USUARIO",
+        AcaoAuditada.MudarEstadoConta => "MUDAR_ESTADO_CONTA",
+        AcaoAuditada.CodigoMaster => "CODIGO_MASTER",
+        AcaoAuditada.SalvarTempoSessao => "SALVAR_TEMPO_SESSAO",
+        AcaoAuditada.EditarPermissoes => "EDITAR_PERMISSOES",
+        AcaoAuditada.EntrarHub => "ENTRAR_HUB",
+        AcaoAuditada.EntrarQuest => "ENTRAR_QUEST",
+        AcaoAuditada.EntrarSala => "ENTRAR_SALA",
+        AcaoAuditada.ConfirmarSenha => "CONFIRMAR_SENHA",
+        AcaoAuditada.RenovarSessao => "RENOVAR_SESSAO",
+        AcaoAuditada.Sair => "SAIR",
+        AcaoAuditada.EncerrarSessao => "ENCERRAR_SESSAO",
+        AcaoAuditada.EncerrarSessoes => "ENCERRAR_SESSOES",
+        AcaoAuditada.EncerrarSessoesDoUsuario => "ENCERRAR_SESSOES_DO_USUARIO",
+        AcaoAuditada.AvisarPermissoesNovas => "AVISAR_PERMISSOES_NOVAS",
+        AcaoAuditada.AvisarContratacaoMudou => "AVISAR_CONTRATACAO_MUDOU",
+        AcaoAuditada.AbrirChamado => "ABRIR_CHAMADO",
+        AcaoAuditada.EnviarMensagem => "ENVIAR_MENSAGEM",
+        AcaoAuditada.AssumirChamado => "ASSUMIR_CHAMADO",
+        AcaoAuditada.MudarStatus => "MUDAR_STATUS",
+        AcaoAuditada.ReabrirChamado => "REABRIR_CHAMADO",
+        AcaoAuditada.EncerrarChamado => "ENCERRAR_CHAMADO",
+        AcaoAuditada.AvaliarChamado => "AVALIAR_CHAMADO",
+        AcaoAuditada.SalvarPrazosSac => "SALVAR_PRAZOS_SAC",
+        AcaoAuditada.FecharPorPrazo => "FECHAR_POR_PRAZO",
+        _ => "ESQUECI_SENHA_MASTER",
+    };
+}
+
+/// <summary>
+/// Um registro de auditoria (RN-178): a etapa da execução, com o traceId que
+/// liga as etapas (RN-271), quem, a ação, o alvo e a hora, guardado 5 anos e
+/// nunca alterado nem apagado (RNF-206). Sem login, vai sem quem; o que ainda
+/// não existe ao chegar (a conta criada) vai só no "CONCLUIDO".
+/// </summary>
+/// <param name="TraceId">A execução.</param>
+/// <param name="Etapa">INICIADO ou CONCLUIDO.</param>
+/// <param name="ContaId">Conta do alvo, se houver.</param>
+/// <param name="Quem">Quem fez, se houver login.</param>
+/// <param name="Acao">O que fez.</param>
+/// <param name="Alvo">Sobre quem ou o quê, se houver.</param>
+/// <param name="Quando">Quando.</param>
+public sealed record RegistroDeAuditoria(
+    TraceId TraceId, EtapaDaExecucao Etapa, string? ContaId, string? Quem, AcaoAuditada Acao, string? Alvo, DateTimeOffset Quando)
+{
+    /// <summary>Por quanto tempo fica guardado.</summary>
+    public static readonly int Anos = 5;
+
+    /// <summary>Até quando fica guardado.</summary>
+    public DateTimeOffset GuardarAte => Quando.AddYears(Anos);
+}
+
+/// <summary>
+/// Um registro de erro (RN-270): a recusa ou a falha de uma execução, com o
+/// mesmo traceId do "INICIADO", gravado antes de a recusa sair do caso de uso,
+/// guardado 5 anos como a auditoria e nunca alterado nem apagado (RNF-206).
+/// </summary>
+/// <param name="TraceId">A execução.</param>
+/// <param name="ContaId">Conta do alvo, se houver.</param>
+/// <param name="Quem">Quem fez, se houver login.</param>
+/// <param name="Acao">O que tentou fazer.</param>
+/// <param name="Alvo">Sobre quem ou o quê, se houver.</param>
+/// <param name="Codigo">O código da recusa, como SIGLA_EM_USO, ou ERRO_INESPERADO.</param>
+/// <param name="Nivel">ALERTA (recusa prevista) ou ERRO (falha inesperada).</param>
+/// <param name="Quando">Quando.</param>
+public sealed record RegistroDeErro(
+    TraceId TraceId, string? ContaId, string? Quem, AcaoAuditada Acao, string? Alvo, string Codigo, NivelDoErro Nivel, DateTimeOffset Quando)
+{
+    /// <summary>O código da falha inesperada, que responde 500 "Algo deu errado. Tente de novo mais tarde." (RN-270).</summary>
+    public const string ErroInesperado = "ERRO_INESPERADO";
+
+    /// <summary>Até quando fica guardado: 5 anos, como a auditoria (RN-178).</summary>
+    public DateTimeOffset GuardarAte => Quando.AddYears(RegistroDeAuditoria.Anos);
+}

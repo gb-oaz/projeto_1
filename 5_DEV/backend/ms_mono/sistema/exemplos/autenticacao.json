@@ -43,6 +43,15 @@
             "tentarEm": "2026-11-01T09:15:00Z"
           }
         }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": ""
+          }
+        }
       ]
     }
   },
@@ -93,6 +102,15 @@
             "tentarEm": "2026-11-01T09:15:00Z"
           }
         }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": ""
+          }
+        }
       ]
     }
   },
@@ -117,6 +135,24 @@
           "corpo": {
             "codigo": "COMPROVANTE_INVALIDO",
             "mensagem": "Comprovante inválido. Gere a senha de novo."
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_INDISPONIVEL",
+          "corpo": {
+            "codigo": "ACESSO_INDISPONIVEL",
+            "mensagem": "Acesso indisponível. Fale com quem administra a sua conta."
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": ""
           }
         }
       ]
@@ -145,6 +181,15 @@
             "mensagem": "Essa sala não está aberta."
           }
         }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": ""
+          }
+        }
       ]
     }
   },
@@ -171,6 +216,15 @@
             "mensagem": "Sua sessão terminou. Entre de novo."
           }
         }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": ""
+          }
+        }
       ]
     }
   },
@@ -190,6 +244,15 @@
           "corpo": {
             "codigo": "PERMISSOES_DESATUALIZADAS",
             "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": ""
           }
         }
       ]
@@ -256,6 +319,15 @@
             "mensagem": "Sessão não encontrada."
           }
         }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": ""
+          }
+        }
       ]
     }
   },
@@ -275,6 +347,15 @@
           "corpo": {
             "codigo": "PERMISSOES_DESATUALIZADAS",
             "mensagem": "Suas permissões mudaram. Renove a sessão."
+          }
+        }
+      ],
+      "500": [
+        {
+          "nome": "ERRO_INESPERADO",
+          "corpo": {
+            "codigo": "ERRO_INESPERADO",
+            "mensagem": ""
           }
         }
       ]

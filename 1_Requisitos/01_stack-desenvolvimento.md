@@ -302,9 +302,9 @@ Esquema do Cenário: imagem pronta
 
 ## Diagramas
 
-**Ambiente local de desenvolvimento** — `3_Arquitetura/ambiente-local_v02_20261011-0439.svg`
+**Ambiente local de desenvolvimento** — `3_Arquitetura/ambiente-local_v03_20261113-1339.svg`
 
-[![Ambiente local: navegador e emulador consomem as três aplicações web (Vite) e o backend (.NET) na IDE; Docker Compose sobe MongoDB, Redis e, opcionalmente, RabbitMQ](../3_Arquitetura/ambiente-local_v02_20261011-0439.svg)](../3_Arquitetura/ambiente-local_v02_20261011-0439.svg)
+[![Ambiente local: navegador e emulador consomem as três aplicações web (Vite) e o backend (.NET) na IDE; Docker Compose sobe MongoDB, Redis e, opcionalmente, RabbitMQ](../3_Arquitetura/ambiente-local_v03_20261113-1339.svg)](../3_Arquitetura/ambiente-local_v03_20261113-1339.svg)
 
 ---
 

@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.Ports.Out;
 using Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;

@@ -72,6 +72,27 @@ services:
       timeout: 5s
       retries: 20
 
+  # Armazenamento de objetos dos anexos do SAC (05 RNF-235, 18 RNF-233): o
+  # Azurite faz o papel do Azure Blob Storage, para o backend e o CI rodarem
+  # com o armazenamento ligado. Só o serviço de blob, em memória, como o banco
+  # e o cache. A conta e a chave são as públicas de desenvolvimento do Azurite
+  # (devstoreaccount1), não um segredo; o contêiner anexos-sac é criado pelo
+  # backend na partida, só quando a conexão vem por ConnectionStrings__Blob
+  # (na Azure, quem cria é o Terraform). O Azurite não tem ciclo de vida: o
+  # descarte local é só o do AgendamentoDoSac (expiraEm).
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:3.34.0
+    command: ["azurite-blob", "--blobHost", "0.0.0.0", "--inMemoryPersistence", "--skipApiVersionCheck", "--loose"]
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "require('net').connect(10000, '127.0.0.1').on('connect', () => process.exit(0)).on('error', () => process.exit(1))"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   # ── etapa 1 · verificação do backend: a solution de 5_DEV/backend/ ───────
   # docker compose run --rm backend-ci
   backend-ci:
@@ -93,9 +114,11 @@ services:
       DOTNET_CLI_TELEMETRY_OPTOUT: "true"
       ConnectionStrings__MongoDb: mongodb://mongodb:27017
       ConnectionStrings__Redis: redis:6379
+      ConnectionStrings__Blob: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
     depends_on:
       mongodb: { condition: service_healthy }
       redis: { condition: service_healthy }
+      azurite: { condition: service_healthy }
 
   # ── etapa 1 · verificação da web: o projeto de 5_DEV/frontend/web/ ──────
   # docker compose run --rm web-ci <app> [<app>…]

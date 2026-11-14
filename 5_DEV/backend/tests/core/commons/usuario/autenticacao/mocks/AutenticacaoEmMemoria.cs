@@ -1,14 +1,11 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.Ports.Out;
 using System.Security.Cryptography;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.Out;
 using Boaz.Core.Commons.Usuario.Autenticacao.UseCases;
-using EtapaDaExecucao = Boaz.Core.Commons.Usuario.Usuarios.Domain.EtapaDaExecucao;
-using IAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoria;
-using IAuditoriaDeErros = Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IAuditoriaDeErros;
-using NivelDoErro = Boaz.Core.Commons.Usuario.Usuarios.Domain.NivelDoErro;
-using RegistroDeAuditoria = Boaz.Core.Commons.Usuario.Usuarios.Domain.RegistroDeAuditoria;
-using RegistroDeErro = Boaz.Core.Commons.Usuario.Usuarios.Domain.RegistroDeErro;
+using EtapaDaExecucao = Boaz.Core.Commons.Auditoria.Domain.EtapaDaExecucao;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 

@@ -1,7 +1,6 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
-using ExecucaoDeQuemChama = Boaz.Core.Commons.Usuario.Usuarios.Domain.ExecucaoDeQuemChama;
-using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Tests.Usuario.Autenticacao.Mocks;
 

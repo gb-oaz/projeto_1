@@ -1,7 +1,7 @@
 # qa · backend · integração
 
 Testes de aceitação da API: os **Cenários de API** dos requisitos
-(`1_Requisitos/*.html`, seção `cenarios-api`) rodando contra o backend no ar.
+(`1_Requisitos/*.md`, seção `cenarios-api`) rodando contra o backend no ar.
 Cada cenário em Gherkin vira um teste xUnit que faz pedidos HTTP de verdade.
 
 Ferramentas: **Reqnroll** (Gherkin em português) sobre **xUnit** e o
@@ -73,6 +73,7 @@ integracao/
 │   ├── Relogio.cs                  relógio de teste do backend e fechamento sob demanda (15 RN-278)
 │   ├── CardGuardado.cs             leitura e histórico do card em "cardUsuarios" (17 RN-280, 15 RN-278)
 │   ├── AoVivo.cs                   conexão SSE de GET /<modulo>/card/ao-vivo: eventos "card", "encerrado" e ": ping"
+│   ├── ArquivosGuardados.cs        onde está o arquivo de um anexo do SAC: Blob ou GridFS (18 RNF-233, RNF-234)
 │   └── Ganchos.cs                  antes de cada cenário: limpa tudo
 ├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.md
 │   ├── autenticacao.feature
@@ -92,6 +93,14 @@ integracao/
     ├── CardPassos.cs               GET /usuarios/card (RN-189, RN-280; 15 RN-276, RN-278)
     ├── AoVivoPassos.cs             GET /usuarios/card/ao-vivo (RN-281; 15 RN-279)
     └── PreferenciasPassos.cs       GET e PUT /usuarios/eu/preferencias (RN-283)
+└── hub/sac/                        18_modulo-sac.md (chamados, anexos, configuração, card, conversa ao vivo)
+    ├── sac.feature
+    ├── SacPassos.cs                "<quem> envia <MÉTODO> /sac/…": prepara o chamado do caminho e monta o corpo
+    ├── SacContratoPassos.cs        baixar o anexo, 405 sem login, card e conversa ao vivo, X-Trace-Id, prazos padrão, prazoPerto, ganchos /_teste/sac
+    ├── AnexosGuardadosPassos.cs    Blob ou GridFS e o descarte pelo expiraEm (RNF-233, RNF-234)
+    ├── PartidaDoSacPassos.cs       coleções e índices do SAC na partida (RNF-232)
+    ├── AnexosDoCenario.cs          o "anx-7f3a21" do cenário; a instância de Partida com o destino dos arquivos
+    └── ChamadosDoExemplo.cs        chamados, anexos e mensagens dos exemplos; a fila do time; ganchos de teste do SAC
 ```
 
 A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
@@ -119,10 +128,12 @@ Os outros requisitos, do mesmo jeito:
 | `17_modulo-usuario-b-autorizacao.md` | `commons/autorizacao/autorizacao.feature` | `Autorização` |
 | `17_modulo-usuario.md` | `hub/usuarios/usuarios.feature` | `Usuários` |
 | `15_modulos.md` | `hub/usuarios/modulos.feature` | `Módulos · card do Usuários` |
+| `18_modulo-sac.md` | `hub/sac/sac.feature` | `SAC` |
 
 `hub/usuarios/contrato.feature` não é cópia: traz as respostas do contrato
 (`usuarios-contrato-api` v15) que o requisito ainda não tem como cenário, com a
-tag `@contrato-v15`. Quando o requisito as trouxer, saem de lá e entram por cópia.
+tag `@contrato-v15`. Quando o requisito as trouxer, saem de lá e entram por cópia
+(como as do SAC, que o 18 v06 trouxe para `hub/sac/sac.feature`).
 
 Dois cenários com o mesmo nome no requisito: o segundo ganha o ID no fim
 (`nome curto repetido · RF-153`), porque o Reqnroll não aceita nome repetido.
@@ -142,7 +153,7 @@ requisito.
 **Passo que ainda não dá para testar**: `throw new PendingStepException("motivo")`.
 O cenário sai como pulado, com o motivo na saída. Os casos de hoje: o
 contrato ainda não tem o endereço (sala ao vivo, troca de chave, os pedidos
-da Presença e do Quiz, a caixa do SAC), é tela (fica no qa do
+da Presença e do Quiz), é tela (fica no qa do
 frontend), só o banco mostra (fica nos testes do backend), é segredo do Key
 Vault ou é fora de escopo.
 
@@ -218,6 +229,7 @@ método. No TDD, enquanto o endpoint não existe, o vermelho esperado é o 404.
 | `API_COMANDO` | comando (por `/bin/sh -c`) que sobe o backend publicado, para os cenários de inicialização: primeira partida, segunda partida, produção, segredo ausente (RN-190, RN-266, RN-267, RNF-225, RNF-226). Sem ele, esses cenários ficam pendentes | vazia |
 | `PARTIDA_*` | repassadas sem o prefixo à instância do `API_COMANDO` (conexões, chave e **um banco próprio**, diferente do `MONGO_BANCO`) | — |
 | `CHAVE_PRIVADA` | a chave do token (PKCS#8 em base64), para montar os tokens recusados de RNF-216 | vazia |
+| `BLOB_CONEXAO`, `BLOB_CONTEINER` | a conexão do armazenamento de objetos e o contêiner dos anexos do backend de `API_URL` (18 RNF-233, RNF-234). A instância de Partida usa `PARTIDA_ConnectionStrings__Blob` e `PARTIDA_Sac__Arquivos__Conteiner`. Sem nenhuma conexão, os cenários que olham o Blob ficam pendentes | a de `PARTIDA_ConnectionStrings__Blob`, `anexos-sac` |
 
 **Como o CI entrega as variáveis** (`4_CI_CD/local/ci.sh`), no lugar do Key
 Vault e novas a cada execução:
@@ -275,6 +287,11 @@ ela.
   Quarta exceção: o módulo suspenso (17-b RN-285 a RN-287) não sai na API, e a
   RN-287 promete as permissões guardadas; `suporte/PermissoesGuardadas.cs` lê
   só o campo "permissoes" do usuário (versao, pv, mods, suspensos) pelo `_id`.
+  Quinta exceção: onde o arquivo de um anexo do SAC foi guardado e que ele
+  saiu (18 RNF-233, RNF-234) não sai na API (o GET responde 404 pelo
+  expiraEm, antes de o arquivo sair); `suporte/ArquivosGuardados.cs` só
+  pergunta se "sac/anexos/<id>" existe no Blob ou no GridFS, sem ler
+  documento nenhum.
 - **Valores dos exemplos**: `usr-ebfga-maria`, `3f9c2a71` (sessão da Maria no
   navegador) e `EBFGA-LUCAS-0412` são trocados pelos valores reais na hora do
   pedido (`Mundo.Apelidos`); a pessoa é criada pela API na primeira vez que
@@ -311,6 +328,27 @@ ela.
   daí), `DELETE /_teste/relogio` (volta ao real) e `POST /_teste/fechamento`
   (roda o fechamento da 00:00 de Brasília na hora, 204). Sem eles, 404. O
   relógio volta ao real no fim do cenário que o mudou.
+- **SAC** (`hub/sac/ChamadosDoExemplo.cs`, 18 v06, contrato sac v03): os
+  números dos exemplos (`SAC-000042`, `anx-7f3a21`, `msg-000318`, `ajuda-000087`)
+  viram os gerados pelo backend, pelo `Mundo.Apelidos`; o SAC-000045 é do
+  Pedro, os outros da EBFGA; o time é o Caio (e a Ana Lima) com "MOD-02" "U".
+  O tempo (7 dias de Aguardando cliente e de Resolvido, prazo de avaliação, 24 h
+  dos anexos, horas úteis) anda pelo relógio de teste; com o mesmo resguardo,
+  o backend expõe `POST /_teste/sac/agendamento` (roda na hora o
+  AgendamentoDoSac: prazos e descarte de anexos, 204), `PUT
+  /_teste/sac/verificacao` (`{"disponivel": false}`: verificação dos anexos
+  fora do ar, 204) e `DELETE /_teste/sac/verificacao` (volta, 204); a
+  verificação trata como ameaça o arquivo com a assinatura de teste EICAR. A
+  cada salto do relógio as pessoas entram de novo (o token vence pelo relógio
+  da aplicação). O pedido de senha (17 RF-111, RN-274) é conferido pela fila do
+  time; o campo `chamado` de "pedidosAjuda" só o banco mostra (testes do backend).
+  Anexos só PNG e JPG: a ameaça de teste vai num JPG. Os cenários de RNF-233
+  (armazenamento de objetos ligado ou desligado) sobem uma instância de
+  Partida com `Sac__Arquivos__Destino` BLOB ou GRIDFS e a conta master
+  inicial da QAINS; os de RNF-234 rodam no backend de `API_URL`, em
+  homologação. Produção não tem relógio de teste: as linhas de produção da
+  RNF-234 ficam pendentes e o expiraEm de produção é conferido nos testes do
+  backend.
 - **Card ao vivo** (`suporte/AoVivo.cs`): a conexão SSE fica aberta pela
   suíte e fecha no fim do cenário; os tempos (intervalo, ping de 30 s) são
   esperados de verdade, com 5 s de folga, por isso esses cenários levam até

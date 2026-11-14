@@ -114,8 +114,20 @@ public sealed class AoVivoPassos(Mundo mundo, AoVivo aoVivo)
     [When(@"^envia GET (/usuarios/card/ao-vivo\S*) com Accept ""text/event-stream""$")]
     public async Task SujeitoConecta(string caminho) => conexoes["conta master"] = await AbrirComo(mundo.Sujeito!, caminho, "conta master");
 
+    // a mesma frase na conversa do SAC (18 RNF-230-api): lá não há evento ao
+    // abrir, só o 200 em text/event-stream e a conexão que continua aberta
     [Then(@"^a resposta é 200 e a conexão fica aberta$")]
-    public async Task Aberta() => await PrimeiroCard(conexoes["conta master"]);
+    public async Task Aberta()
+    {
+        if (conexoes.TryGetValue("conta master", out var card))
+        {
+            await PrimeiroCard(card);
+            return;
+        }
+        var fluxo = aoVivo.Ultimo;
+        Assert.True(fluxo.Status == 200 && fluxo.TipoDoConteudo == "text/event-stream", $"esperava 200 em text/event-stream: {fluxo}");
+        Assert.False(await fluxo.EsperarFim(TimeSpan.FromSeconds(2)), $"a conexão devia ficar aberta: {fluxo}");
+    }
 
     [Then(@"^o primeiro evento ""card"" traz o mesmo corpo de GET /usuarios/card, com id igual à versao$")]
     public async Task PrimeiroIgualAoGet()

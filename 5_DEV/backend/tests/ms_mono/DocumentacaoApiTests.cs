@@ -19,6 +19,9 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     [InlineData("/doc/api/usuarios.json", "application/json")]
     [InlineData("/doc/api/autorizacao.json", "application/json")]
     [InlineData("/doc/api/diagramas/usuarios-contrato-api.svg", "image/svg+xml")]
+    // SAC (18_modulo-sac v05, sac-contrato-api v02): API própria, como o Usuários
+    [InlineData("/doc/api/sac.json", "application/json")]
+    [InlineData("/doc/api/diagramas/sac-contrato-api.svg", "image/svg+xml")]
     [InlineData("/doc/api/swagger.css", "text/css")]
     [InlineData("/doc/api/design/banner.svg", "image/svg+xml")]
     [InlineData("/doc/api/design/banner-parado.svg", "image/svg+xml")]
@@ -57,6 +60,31 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
         Assert.Equal(ordem.Order(), ordem);
     }
 
+    // SAC (MOD-02): entra no seletor depois da Autorização, como os módulos já construídos
+    [Fact]
+    public async Task Seletor_traz_o_sac_depois_da_autorizacao()
+    {
+        using var cliente = Cliente(true);
+
+        var configuracao = await cliente.GetStringAsync("/doc/api/index.js");
+
+        var autorizacao = configuracao.IndexOf("/doc/api/autorizacao.json", StringComparison.Ordinal);
+        var sac = configuracao.IndexOf("/doc/api/sac.json", StringComparison.Ordinal);
+        Assert.True(sac > autorizacao && autorizacao >= 0, "o seletor não traz /doc/api/sac.json depois de /doc/api/autorizacao.json");
+    }
+
+    // a capa lista o SAC na tabela das APIs do catálogo, como lista o Usuários
+    [Fact]
+    public async Task Capa_lista_o_sac()
+    {
+        using var cliente = Cliente(true);
+
+        var documento = await cliente.GetStringAsync("/doc/api/catalogo.json");
+
+        Assert.Contains("**SAC**", documento);
+        Assert.Contains("`/sac/", documento);
+    }
+
     [Fact]
     public async Task Sistema_documenta_so_o_health()
     {
@@ -76,6 +104,7 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     [InlineData("autenticacao", "/auth/hub/entrar", "/usuarios/{id}/permissoes", "autenticacao-sequencia.svg")]
     [InlineData("usuarios", "/contas", "/auth/hub/entrar", "usuarios-contrato-api.svg")]
     [InlineData("autorizacao", "/usuarios/{id}/permissoes", "/contas", "autorizacao-casos-de-uso.svg")]
+    [InlineData("sac", "/sac/chamados", "/contas", "sac-contrato-api.svg")]
     public async Task Cada_modulo_e_uma_api_com_guia_e_diagramas(string api, string tem, string naoTem, string diagrama)
     {
         using var cliente = Cliente(true);
@@ -97,6 +126,8 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     [InlineData("autenticacao", "autenticacao-casos-de-uso", "autenticacao-sequencia", "autenticacao-contrato-api", "autenticacao-classes", "autenticacao-documentos")]
     [InlineData("usuarios", "identidade-acesso", "usuarios-sequencia", "usuario-inicializacao-sequencia", "usuarios-contrato-api", "identidade-acesso-classes", "usuario-hexagonal", "identidade-acesso-documentos")]
     [InlineData("autorizacao", "autorizacao-casos-de-uso", "autorizacao-sequencia", "autorizacao-contrato-api", "autorizacao-classes", "autorizacao-documentos")]
+    // os 7 diagramas da seção Diagramas de 18_modulo-sac v05, na ordem do usuarios
+    [InlineData("sac", "sac-casos-de-uso", "sac-sequencia", "sac-inicializacao-sequencia", "sac-contrato-api", "sac-classes", "sac-hexagonal", "sac-documentos")]
     public async Task Guia_mostra_todos_os_diagramas_do_modulo_por_tipo(string api, params string[] legendas)
     {
         using var cliente = Cliente(true);
@@ -124,6 +155,8 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     [InlineData("usuarios", "/usuarios", "get", true)]
     [InlineData("usuarios", "/contas", "post", false)]
     [InlineData("autorizacao", "/usuarios/{id}/permissoes", "put", true)]
+    [InlineData("sac", "/sac/chamados", "post", true)]
+    [InlineData("sac", "/sac/configuracao", "put", true)]
     public async Task Cadeado_so_nos_enderecos_com_login(string api, string caminho, string metodo, bool comLogin)
     {
         using var cliente = Cliente(true);
@@ -140,6 +173,7 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     [InlineData("autenticacao")]
     [InlineData("usuarios")]
     [InlineData("autorizacao")]
+    [InlineData("sac")]
     public async Task Todo_endpoint_traz_os_exemplos_do_contrato(string api)
     {
         using var cliente = Cliente(true);

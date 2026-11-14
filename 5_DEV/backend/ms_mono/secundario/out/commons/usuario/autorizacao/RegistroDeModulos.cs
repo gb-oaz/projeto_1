@@ -13,6 +13,9 @@ namespace Boaz.MsMono.Secundario.Out.Commons.Usuario.Autorizacao;
 // um módulo gravado sem esse campo (pelo qa, por exemplo) também valer.
 public sealed class RegistroDeModulos(Armazenamento armazenamento) : IModulos
 {
+    // a frente, à frente do namespace Boaz.MsMono.Secundario.Out.Hub (hub/sac)
+    const FrenteDeUso Hub = FrenteDeUso.Hub;
+
     // Os módulos do 15_modulos.
     public static readonly IReadOnlyList<ModuloRegistrado> Todos =
     [

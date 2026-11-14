@@ -18,6 +18,10 @@
     <!-- Adaptadores de saída (secundario/out): banco e cache, nas versões do qa -->
     <PackageReference Include="MongoDB.Driver" Version="3.13.0" />
     <PackageReference Include="StackExchange.Redis" Version="3.4.29" />
+    <!-- os arquivos dos anexos do SAC no armazenamento de objetos (18 RNF-233):
+         conexão do Azurite ou endereço da conta com a identidade da aplicação -->
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.30.1" />
+    <PackageReference Include="Azure.Identity" Version="1.21.0" />
   </ItemGroup>
 
   <!--

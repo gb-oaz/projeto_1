@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "99_glossario"
 tipo: "Glossário"
 titulo: "Glossário"
-versao: "v46"
-data: "2026-11-08 23:33"
+versao: "v47"
+data: "2026-11-12 16:58"
 status: "Em revisão"
 objetivo: "dar um significado único aos termos do domínio usados nos documentos de requisito."
 ---
 
-> **boaz · Glossário** · `99_glossario` · **v46** · 2026-11-08 23:33 · **Em revisão**
+> **boaz · Glossário** · `99_glossario` · **v47** · 2026-11-12 16:58 · **Em revisão**
 
 # Glossário
 
@@ -32,6 +32,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="carteira"></a>**Carteira** | destino do quest com os módulos sempre disponíveis ao participante, em grade, até a instituição revogar; antes chamado Fixos |
 | <a id="catalogo-de-modulos"></a>**Catálogo de módulos** | lista dos módulos que uma escola ou empresa pode contratar, cada um com preço próprio controlado no hub; aparece na aba A contratar de Módulos |
 | <a id="catalogo"></a>**Catálogo** | módulo que existe só na conta do time deboaz, onde todo módulo do deboaz é catalogado com nome, tipo (da conta, contratável ou do time), custo, precificação e as instituições e os educadores autônomos que o contrataram; não confundir com o [catálogo de módulos](#catalogo-de-modulos), a vitrine da aba A contratar do hub |
+| <a id="chamado"></a>**Chamado** | pedido de ajuda aberto no [SAC](#sac) pela conta master ou pelo educador autônomo, com número (como SAC-000042), categoria, assunto, conversa com o time deboaz e status Aberto, Em atendimento, Aguardando cliente, Resolvido ou Fechado ([Módulo SAC](18_modulo-sac.md#RN-290)) |
 | <a id="classe-de-janela"></a>**Classe de janela** | faixa de largura disponível para a tela (compact, medium, expanded, large ou extra-large) que define margem, colunas, painéis e navegação |
 | <a id="codigo-da-sala"></a>**Código da sala** | código que o educador passa aos participantes para entrarem numa sala pelo quest |
 | <a id="codigo-de-acesso"></a>**Código de acesso** | código único que a instituição gera para cada participante, no formato `<SIGLA>-<NOME CURTO>-<4 números>` (`EBFGA-LUCAS-0412`, sempre em maiúsculas), e que abre o perfil dele no quest sem senha; vale para o participante e para os responsáveis, e cada ano tem o seu ([Módulo Usuários RN-184](17_modulo-usuario.md#RN-184)) |
@@ -49,6 +50,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="expressao"></a>**Expressão** | estado emocional mostrado pelo rosto do mascote (feliz, acertou, errou, dúvida, esperando…), escolhido conforme a situação da tela |
 | <a id="faixa-de-desconto"></a>**Faixa de desconto** | intervalo do total de usuários (staff + participantes) de uma conta com um percentual de desconto do módulo Usuários que vale só para os usuários dentro dele (desconto progressivo, como no imposto de renda); quanto mais usuários, maior ou igual o percentual |
 | <a id="feed"></a>**Feed** | destino da navegação do hub e do quest com as publicações dos módulos, cada uma para toda a instituição ou para uma turma ou equipe; a pessoa vê as do público em que está; a conta do time deboaz não tem Feed |
+| <a id="horas-uteis"></a>**Horas úteis** | horas de segunda a sexta, das 08:00 às 18:00 no horário de Brasília, sem feriados nacionais, em que corre o prazo de primeira resposta de um [chamado](#chamado) ([Módulo SAC](18_modulo-sac.md#RNF-229)) |
 | <a id="hub"></a>**Hub** | frente do produto onde o educador cria quizzes, conduz salas, acompanha relatórios e administra a conta |
 | <a id="identidade-da-instituicao"></a>**Identidade da instituição** | módulo que uma escola ou empresa contrata para ter a identidade dela no lugar da padrão do deboaz; o símbolo do deboaz continua, menor |
 | <a id="identidade-visual"></a>**Identidade visual** | temas de cor, tipografia, logos, ícones, imagens e animações que dão a cara do produto |
@@ -72,7 +74,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="ranking"></a>**Ranking** | classificação dos participantes de uma sala pela pontuação |
 | <a id="recorte"></a>**Recorte** | período de cada ponto da série do card: dia, semana ou mês, com Mês como padrão; a normal mostra os 5 últimos e a expandida os 12 últimos, e a escolha fica guardada em cada aparelho ([Módulos `RN-277`](15_modulos.md#RN-277)) |
 | <a id="registro-de-modulos"></a>**Registro de módulos** | tabela em que todo módulo entra, com um ID `MOD-NN`, antes de ter documento próprio: nome, tipo, cobrança, estado e, para cada perfil, a frente e o objetivo ([Módulos RN-202](15_modulos.md#RN-202)) |
-| <a id="sac"></a>**SAC** | módulo da conta que toda conta do hub tem para falar com o time deboaz (a conversa com pais e alunos é do [Mensagens](#mensagens)); o time atende pelo mesmo módulo, onde também chegam as mensagens enviadas sem login pela tela Entrar do hub, como o pedido de senha da conta master |
+| <a id="sac"></a>**SAC** | módulo da conta que toda conta do hub tem para falar com o time deboaz (a conversa com pais e alunos é do [Mensagens](#mensagens)); o time atende pelo mesmo módulo, onde também chegam as mensagens enviadas sem login pela tela Entrar do hub, como o pedido de senha da conta master; cada conversa é um [chamado](#chamado) ([Módulo SAC](18_modulo-sac.md)) |
 | <a id="sala"></a>**Sala** | sessão de um quiz aberta por um educador, em tempo real ou no ritmo de cada participante |
 | <a id="sequencia-de-movimentos"></a>**Sequência de movimentos** | vários movimentos do mascote em seguida, num único laço (por exemplo, pular, girar e comemorar) |
 | <a id="sessao"></a>**Sessão** | entrada de uma pessoa num aparelho, guardada no servidor, que termina depois do tempo sem uso, ao sair ou quando o usuário ou a conta muda de estado; é a fonte da verdade, e os tokens só provam que o aparelho é dono dela ([Autenticação `RN-225`](17_modulo-usuario-a-autenticacao.md#RN-225)) |
@@ -98,7 +100,8 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v46** | 2026-11-08 23:33 | Termos Card ao vivo (com na abertura, Módulos `RN-279`) e Recorte (dia, semana e mês do card, Módulos `RN-277`); status → Em revisão |
+| **v47** | 2026-11-12 16:58 | Termos Chamado e Horas úteis; SAC aponta o documento 18_modulo-sac (`RN-290`, `RNF-229`) |
+| v46 | 2026-11-08 23:33 | Termos Card ao vivo (com na abertura, Módulos `RN-279`) e Recorte (dia, semana e mês do card, Módulos `RN-277`); status → Em revisão |
 | v45 | 2026-11-07 02:55 | Status → Aprovado, junto com o Módulo Usuários v57; termos sem mudança |
 | v44 | 2026-11-07 02:38 | Termo Conta qa: administrador qa próprio, lista de módulos iniciais do Key Vault, dados fictícios, volta ao estado inicial a cada inicialização e siglas “QA” reservadas em produção (Módulo Usuários v56 `RN-265`, `RN-267`, `RN-268`, `RN-269`, `RN-179`) |
 | v43 | 2026-11-06 23:15 | Termo Conta qa (Módulo Usuários `RN-265`); status → Em revisão |
@@ -107,8 +110,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | v40 | 2026-11-01 18:32 | Casca v07 do tema (Gherkin quebra a linha); termos sem mudança; status → Em revisão |
 | v39 | 2026-11-01 12:35 | Aprovado |
 | v38 | 2026-11-01 12:19 | Termos da autenticação e da autorização: aparelho conectado, papel, sessão, token de acesso, token de renovação e versão das permissões |
-| v37 | 2026-11-01 03:57 | Aprovado |
 
 ---
 
-<sub>boaz · v46 · 2026-11-08 23:33 · `1_Requisitos/99_glossario.md`</sub>
+<sub>boaz · v47 · 2026-11-12 16:58 · `1_Requisitos/99_glossario.md`</sub>

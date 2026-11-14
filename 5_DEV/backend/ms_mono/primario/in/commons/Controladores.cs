@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
@@ -54,20 +55,24 @@ public static class Controladores
     }
 
     // A ligação recusada (corpo que não é JSON, com outro content-type ou com o
-    // tipo errado num campo): antes de qualquer outro filtro — inclusive o de
-    // acesso —, como a ligação do corpo que lança antes dos filtros. O
-    // UseRespostasDeErro a responde com 422 DADOS_INVALIDOS em "corpo" (RN-271).
-    sealed class CorpoInvalido : IActionFilter, IOrderedFilter
+    // tipo errado num campo): antes dos outros filtros, como a ligação do corpo
+    // que lança antes deles, mas depois do token. O 401 sai antes de tudo
+    // (RN-297-api): a rota com login confere o token (assinatura, sessão viva e
+    // pv atual) sem registro nem X-Trace-Id; só então o UseRespostasDeErro
+    // responde 422 DADOS_INVALIDOS em "corpo" (RN-271), também sem registro.
+    sealed class CorpoInvalido : IAsyncActionFilter, IOrderedFilter
     {
         public int Order => int.MinValue;
 
-        public void OnActionExecuting(ActionExecutingContext context)
+        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (context.ModelState.ErrorCount > 0) throw new BadHttpRequestException("O corpo do pedido não pôde ser lido.");
-        }
-
-        public void OnActionExecuted(ActionExecutedContext context)
-        {
+            if (context.ModelState.ErrorCount > 0)
+            {
+                if (context.ActionDescriptor.EndpointMetadata.OfType<IConfereOToken>().FirstOrDefault() is { } login)
+                    await login.ConferirToken(context.HttpContext);
+                throw new BadHttpRequestException("O corpo do pedido não pôde ser lido.");
+            }
+            await next();
         }
     }
 
@@ -105,6 +110,13 @@ public static class Controladores
 // (DocumentacaoApi). Quem confere o token é o filtro ([ComAcesso]) ou o caso de uso.
 public interface IMarcaDeLogin;
 
+// O filtro de login que sabe conferir só o token, sem módulo, registro nem
+// X-Trace-Id: o corpo ilegível espera o 401 sair antes (CorpoInvalido).
+public interface IConfereOToken
+{
+    Task<AcessoConferido> ConferirToken(HttpContext http);
+}
+
 // Ação com login cujo token o próprio caso de uso confere (sair, aparelhos).
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class ComLoginAttribute : Attribute, IMarcaDeLogin;
@@ -115,7 +127,7 @@ public sealed class ComLoginAttribute : Attribute, IMarcaDeLogin;
 // porque atributo não recebe struct. O módulo entre chaves ("{mod}") vem da
 // rota: o endereço de teste GET /_teste/modulo/{mod} (contrato autorizacao v11).
 [AttributeUsage(AttributeTargets.Method)]
-public sealed class ComAcessoAttribute(string modulo, string aba) : Attribute, IAsyncActionFilter, IMarcaDeLogin
+public sealed class ComAcessoAttribute(string modulo, string aba) : Attribute, IAsyncActionFilter, IMarcaDeLogin, IConfereOToken
 {
     public Frente Frente { get; init; } = Frente.Hub;
 
@@ -129,11 +141,16 @@ public sealed class ComAcessoAttribute(string modulo, string aba) : Attribute, I
 
     public ExigenciaDaRota Exigencia { get; } = Acesso.Exigencia(modulo, aba);
 
+    public Task<AcessoConferido> ConferirToken(HttpContext http)
+    {
+        var frente = FrenteDoToken ? Http.FrenteDoToken(Http.Token(http)) : Frente;
+        return SemSessaoValida ? Acesso.ConferirSessao(http, frente) : Acesso.Conferir(http, frente);
+    }
+
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var http = context.HttpContext;
-        var frente = FrenteDoToken ? Http.FrenteDoToken(Http.Token(http)) : Frente;
-        var acesso = SemSessaoValida ? await Acesso.ConferirSessao(http, frente) : await Acesso.Conferir(http, frente);
+        var acesso = await ConferirToken(http);
         http.RequestServices.GetRequiredService<IAutorizarPedido>()
             .Executar(Acesso.DaRota(Exigencia, http), new PedidoAutorizavelDto(acesso.Papel, acesso.Mods));
         http.Items[typeof(AcessoConferido)] = acesso;
@@ -145,12 +162,14 @@ public sealed class ComAcessoAttribute(string modulo, string aba) : Attribute, I
 // conferido (assinatura, sessão viva e pv atual), na frente dele, hub ou quest;
 // sem token ou com um token inválido, 401 SESSAO_TERMINADA (contrato usuarios v15).
 [AttributeUsage(AttributeTargets.Method)]
-public sealed class ComSessaoAttribute : Attribute, IAsyncActionFilter, IMarcaDeLogin
+public sealed class ComSessaoAttribute : Attribute, IAsyncActionFilter, IMarcaDeLogin, IConfereOToken
 {
+    public Task<AcessoConferido> ConferirToken(HttpContext http) => Acesso.ConferirSessao(http, Http.FrenteDoToken(Http.Token(http)));
+
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var http = context.HttpContext;
-        http.Items[typeof(AcessoConferido)] = await Acesso.ConferirSessao(http, Http.FrenteDoToken(Http.Token(http)));
+        http.Items[typeof(AcessoConferido)] = await ConferirToken(http);
         await next();
     }
 }
@@ -173,7 +192,8 @@ public enum AlvoAuditado
 // e o ALERTA ACESSO_NEGADO, com quem e a conta do token, o alvo do endereço e o
 // traceId do X-Trace-Id, que o caso de uso reaproveita quando a rota atende (RN-271).
 [AttributeUsage(AttributeTargets.Method)]
-public sealed class ComAcessoAuditadoAttribute(string modulo, string aba, AcaoAuditada acao) : Attribute, IAsyncActionFilter, IMarcaDeLogin
+public sealed class ComAcessoAuditadoAttribute(string modulo, string aba, AcaoAuditada acao) : Attribute, IAsyncActionFilter, IMarcaDeLogin,
+    IConfereOToken
 {
     public const string AlvoDoTime = "time";
 
@@ -185,10 +205,12 @@ public sealed class ComAcessoAuditadoAttribute(string modulo, string aba, AcaoAu
 
     public AcaoAuditada Acao { get; } = acao;
 
+    public Task<AcessoConferido> ConferirToken(HttpContext http) => Acesso.Conferir(http, Frente);
+
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var http = context.HttpContext;
-        var acesso = await Acesso.Conferir(http, Frente);
+        var acesso = await ConferirToken(http);
         var execucao = new ExecucaoDaRotaDto(http.NovoTraceId(), Acao, acesso.ContaId, acesso.Sub, AlvoDe(http));
         await http.RequestServices.GetRequiredService<IAutorizarPedidoAuditado>()
             .Executar(Exigencia, new PedidoAutorizavelDto(acesso.Papel, acesso.Mods), execucao, http.RequestAborted);

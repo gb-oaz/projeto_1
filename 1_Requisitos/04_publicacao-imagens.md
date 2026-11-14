@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "04_publicacao-imagens"
 tipo: "Transversal"
 titulo: "Publicação das imagens"
-versao: "v15"
-data: "2026-11-05 12:34"
-status: "Aprovado"
+versao: "v16"
+data: "2026-11-13 14:16"
+status: "Em revisão"
 objetivo: "definir quais imagens Docker o CI gera, quando e com quais tags elas são enviadas ao Docker Hub, quem aprova o envio e como o CI se autentica."
 ---
 
-> **boaz · Transversal** · `04_publicacao-imagens` · **v15** · 2026-11-05 12:34 · **Aprovado**
+> **boaz · Transversal** · `04_publicacao-imagens` · **v16** · 2026-11-13 14:16 · **Em revisão**
 
 # Publicação das imagens
 
@@ -36,6 +36,8 @@ Cenário: publicação com aprovação
 
 ### `RNF-27` Quatro imagens
 
+> Versão fixada: [01_stack-desenvolvimento `RNF-19`](01_stack-desenvolvimento.md#RNF-19) · download: [05_cd-implantacao `RNF-67`](05_cd-implantacao.md#RNF-67) · aplicação: [05 `RNF-237`](05_cd-implantacao.md#RNF-237)
+
 ```gherkin
 Esquema do Cenário: imagem de cada componente
   Então o componente <componente> gera a imagem <imagem>
@@ -46,6 +48,11 @@ Esquema do Cenário: imagem de cada componente
     | o hub web, estático do Vite      | frontend-hub          |
     | a landing page, estática do Vite | frontend-landing-page |
     | o quest web, estático do Vite    | frontend-quest        |
+
+Cenário: imagem pública do clamav
+  Então a aplicação clamav usa a imagem pública clamav/clamav:1.5.4, com a versão fixada
+  E a imagem não é gerada pelo CI e não entra nas quatro imagens
+  E é baixada com o token do Docker Hub, como as quatro
 ```
 
 <a id="RNF-28"></a>
@@ -198,7 +205,8 @@ Cenário: token restrito
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v15** | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
+| **v16** | 2026-11-13 14:16 | `RNF-27`: a aplicação clamav usa a imagem pública clamav/clamav:1.5.4 em versão fixada, baixada com o token do Docker Hub, fora das quatro imagens; status → Em revisão |
+| v15 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v14 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v13 | 2026-11-01 18:27 | Só Gherkin e diagramas: contexto e RNF viram cenários (mesmos IDs como âncora); status → Em revisão |
 | v12 | 2026-10-25 01:12 | Status → Aprovado |
@@ -207,8 +215,7 @@ Cenário: token restrito
 | v09 | 2026-10-11 22:24 | Status → Aprovado |
 | v08 | 2026-10-11 22:21 | Aprovação manual antes da publicação: `RNF-43` a `RNF-46` incluídos; `RNF-33` alterado (environment `dockerhub` também nas tags `v*`); diagrama atualizado para `pipeline-ci_v07`; status → Em revisão |
 | v07 | 2026-10-11 15:15 | Status → Aprovado |
-| v06 | 2026-10-11 15:02 | `RNF-29` alterado: tag de imagem `master` no lugar de `main`; diagrama atualizado para `pipeline-ci_v06` |
 
 ---
 
-<sub>boaz · v15 · 2026-11-05 12:34 · `1_Requisitos/04_publicacao-imagens.md`</sub>
+<sub>boaz · v16 · 2026-11-13 14:16 · `1_Requisitos/04_publicacao-imagens.md`</sub>

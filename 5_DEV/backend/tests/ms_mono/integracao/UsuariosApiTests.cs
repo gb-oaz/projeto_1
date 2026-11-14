@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
@@ -122,8 +123,17 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
     [InlineData("{ \"tipo\": \"STAFF\", \"nome\": ", "application/json")]
     public async Task RN_271_corpo_que_nao_e_json_nao_chega_ao_caso_de_uso(string corpo, string tipo)
     {
+        // Com o token da Maria, como no cenário: o 401 vem antes do 422 (18 RN-297-api).
+        // A chave de assinatura é de cada host, então entra pelo host de produção.
+        var (_, master) = await preparo.Conta(Sigla());
         using var producao = backend.WithWebHostBuilder(b => b.UseEnvironment("Production"));
         using var http = producao.CreateClient();
+        using (var api = new Cliente(producao.CreateClient()))
+        {
+            var sessao = await api.Enviar("POST", "/auth/hub/entrar", new { entrada = master.Entrada, senha = master.Senha, aparelho = "APP" });
+            Assert.Equal(HttpStatusCode.OK, sessao.Status);
+            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessao.Texto("tokenAcesso"));
+        }
         var auditoria = await backend.Banco.GetCollection<BsonDocument>("auditoria").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty);
         var erros = await backend.Banco.GetCollection<BsonDocument>("auditoriaErros").CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty);
 
@@ -345,13 +355,19 @@ public class UsuariosApiTests(Backend backend) : IClassFixture<Backend>
         Assert.All(respostas.Take(3), r => Assert.Equal(HttpStatusCode.Accepted, r.Status));
         Assert.Equal((HttpStatusCode.TooManyRequests, "LIMITE_ATENDIMENTO"), (respostas[3].Status, respostas[3].Codigo));
 
-        // RN-274: auditado sem quem nem contaId; o alvo do CONCLUIDO é o pedido gravado em "pedidosAjuda"
+        // RN-274: auditado sem quem nem contaId; o alvo do CONCLUIDO é o pedido gravado em "pedidosAjuda".
+        // 17 v109 e 18 RF-179 (sac-documentos v01, decisão 1): o pedido vira o chamado SENHA_CONTA_MASTER
+        // na criação, com o mesmo número ("ajuda-000087" = "SAC-000087") no campo "chamado"
         Assert.All(respostas, r => Assert.Matches("^trc-[0-9a-f]{8}$", r.TraceId));
         var etapas = (await Registros("auditoria", respostas[0].TraceId!)).ToDictionary(d => d["etapa"].AsString);
         Assert.All(etapas.Values, d => Assert.True(d["acao"].AsString == "ESQUECI_SENHA_MASTER" && d["quem"].IsBsonNull && d["contaId"].IsBsonNull));
         Assert.True(etapas["INICIADO"]["alvo"].IsBsonNull);
         var pedido = etapas["CONCLUIDO"]["alvo"].AsString;
-        Assert.Equal(1, await backend.Banco.GetCollection<BsonDocument>("pedidosAjuda").CountDocumentsAsync(Builders<BsonDocument>.Filter.Eq("_id", pedido)));
+        Assert.Matches("^ajuda-[0-9]{6}$", pedido);
+        var ajuda = await backend.Banco.GetCollection<BsonDocument>("pedidosAjuda").Find(Builders<BsonDocument>.Filter.Eq("_id", pedido)).SingleAsync();
+        Assert.Equal("SAC-" + pedido["ajuda-".Length..], ajuda["chamado"].AsString);
+        var chamado = await backend.Banco.GetCollection<BsonDocument>("chamados").Find(Builders<BsonDocument>.Filter.Eq("_id", ajuda["chamado"])).SingleAsync();
+        Assert.Equal(("SENHA_CONTA_MASTER", "ABERTO"), (chamado["categoria"].AsString, chamado["status"].AsString));
         Assert.Equal("INICIADO", Assert.Single(await Registros("auditoria", respostas[3].TraceId!))["etapa"].AsString);
         var erro = Assert.Single(await Registros("auditoriaErros", respostas[3].TraceId!));
         Assert.Equal(("LIMITE_ATENDIMENTO", "ALERTA"), (erro["codigo"].AsString, erro["nivel"].AsString));

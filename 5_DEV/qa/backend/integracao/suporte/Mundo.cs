@@ -107,6 +107,10 @@ public sealed partial class Mundo
     // pagamento): saem da comparação, e o passo que os põe aqui diz por quê
     public HashSet<string> CamposSemConferir { get; } = [];
 
+    // com o relógio de teste na hora do exemplo, as datas do JSON do exemplo
+    // valem de verdade, com esta folga (18 RF-171: abertoEm e prazoResposta)
+    public TimeSpan? FolgaDasDatas { get; set; }
+
     readonly Dictionary<string, Pessoa> pessoas = [];
     readonly Dictionary<string, (string Id, Pessoa Master)> contas = [];
     Pessoa? admin;
@@ -121,6 +125,17 @@ public sealed partial class Mundo
         Anotar(metodo, caminho, corpo, Ultima);
         return Ultima;
     }
+
+    // POST multipart com um arquivo, com a sessão da pessoa (18 RN-292)
+    public async Task<Resposta> EnviarArquivoComo(Pessoa pessoa, string caminho, string nome, byte[] conteudo, string tipo)
+    {
+        UltimoPedido = ("POST", caminho, null);
+        HoraDoPedido = DateTimeOffset.UtcNow;
+        return Ultima = await api.EnviarArquivo(caminho, "arquivo", nome, conteudo, tipo, (await SessaoParaPedido(pessoa)).Acesso);
+    }
+
+    // a resposta que não veio de Enviar (a recusa de uma conexão ao vivo, 18 RNF-230)
+    public Resposta Guardar(Resposta r) => Ultima = r;
 
     void Anotar(string metodo, string caminho, string? corpo, Resposta r)
     {
@@ -222,6 +237,9 @@ public sealed partial class Mundo
         ["dominio"] = dominio,
         ["sigla"] = sigla,
     }.ToJsonString();
+
+    // a conta master de outra escola dos exemplos (COLSA, EEJSA) ou do Pedro (PREIS)
+    public async Task<Pessoa> MasterDe(string sigla) { await ContaDe(sigla); return contas[sigla].Master; }
 
     // o educador autônomo Pedro Reis é a conta master da própria conta
     public async Task<Pessoa> Pedro() { await ContaDe("PREIS"); return contas["PREIS"].Master; }

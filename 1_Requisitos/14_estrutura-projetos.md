@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "14_estrutura-projetos"
 tipo: "Transversal"
 titulo: "Estrutura dos projetos"
-versao: "v18"
-data: "2026-11-12 02:03"
+versao: "v19"
+data: "2026-11-13 09:11"
 status: "Em revisão"
 objetivo: "definir uma organização de pastas e de dependências única para backend, web e mobile, que separa o domínio (core) dos adaptadores."
 ---
 
-> **boaz · Transversal** · `14_estrutura-projetos` · **v18** · 2026-11-12 02:03 · **Em revisão**
+> **boaz · Transversal** · `14_estrutura-projetos` · **v19** · 2026-11-13 09:11 · **Em revisão**
 
 # Estrutura dos projetos
 
@@ -97,6 +97,15 @@ Esquema do Cenário: import entre contextos
     | alvo          | resultado                          |
     | core/commons/ | aceito                             |
     | core/quest/   | recusado: o comum vai para commons |
+
+Esquema do Cenário: import entre features
+  Quando um caso de uso de core/hub/sac/chamados/ importa <alvo>
+  Então o import é <resultado>
+
+  Exemplos:
+    | alvo                                   | resultado                               |
+    | core/commons/auditoria/                | aceito                                  |
+    | core/commons/usuario/usuarios/usecases | recusado: usecases/ de outra feature    |
 ```
 
 <a id="RN-147"></a>
@@ -239,6 +248,12 @@ Cenário: features de um módulo
 
 Cenário: bibliotecas do core
   Então o core usa só as bibliotecas do próprio .NET, sem pacote de terceiros
+
+Cenário: auditoria comum
+  Então core/commons/auditoria/ tem domain/, ports/out/ e usecases/, sem ports/in/ nem dtos/
+  E ports/out/ tem IAuditoria e IAuditoriaDeErros
+  E usecases/ tem AuditoriaDaExecucao, usada pelos casos de uso de qualquer contexto
+  E o adaptador AuditoriaNoBanco fica em ms_mono/secundario/out/commons/auditoria/
 ```
 
 <a id="RNF-176"></a>
@@ -468,9 +483,9 @@ Cenário: rodar no emulador Android
 
 ## Diagramas
 
-**Estrutura dos projetos** — `2_Diagramas/estrutura-projetos_v08_20261112-0202.svg`
+**Estrutura dos projetos** — `2_Diagramas/estrutura-projetos_v09_20261113-0921.svg`
 
-[![Estrutura dos projetos: padrão de cada feature (infra/in, components, ports/in, usecases, domain, dtos, ports/out, infra/out), agrupada por módulo quando preciso e as pastas do backend (core e ms_mono com primario/in, primario/out, secundario/in e secundario/out), da web (core e apps landing_page, hub, quest) e do mobile (core e apps hub, quest), as suítes do qa por alvo e tipo (backend/integracao, backend/carga, frontend/web/funcional com Cypress, frontend/mobile/funcional com Appium) com o contrato de cada uma, e as regras de dependência](../2_Diagramas/estrutura-projetos_v08_20261112-0202.svg)](../2_Diagramas/estrutura-projetos_v08_20261112-0202.svg)
+[![Estrutura dos projetos: padrão de cada feature (infra/in, components, ports/in, usecases, domain, dtos, ports/out, infra/out), agrupada por módulo quando preciso e as pastas do backend (core e ms_mono com primario/in, primario/out, secundario/in e secundario/out), da web (core e apps landing_page, hub, quest) e do mobile (core e apps hub, quest), as suítes do qa por alvo e tipo (backend/integracao, backend/carga, frontend/web/funcional com Cypress, frontend/mobile/funcional com Appium) com o contrato de cada uma, e as regras de dependência](../2_Diagramas/estrutura-projetos_v09_20261113-0921.svg)](../2_Diagramas/estrutura-projetos_v09_20261113-0921.svg)
 
 ---
 
@@ -480,7 +495,8 @@ Cenário: rodar no emulador Android
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v18** | 2026-11-12 02:03 | Diagrama: estrutura-projetos v07 → v08 (ms_mono com primario/in, primario/out, secundario/in e secundario/out e o papel de cada um, `RNF-177`; regras de dependência com primario/secundario no backend e infra/in e infra/out na web e no mobile, `RN-143`, `RN-148`); cenários sem mudança |
+| **v19** | 2026-11-13 09:11 | Auditoria comum em core/commons/auditoria/ (domain/, ports/out/ com IAuditoria e IAuditoriaDeErros, usecases/ com AuditoriaDaExecucao, sem ports/in/ nem dtos/) e o adaptador AuditoriaNoBanco em ms_mono/secundario/out/commons/auditoria/ (`RNF-175`); import entre features: commons/auditoria aceito, usecases/ de outra feature recusado (`RN-146`) |
+| v18 | 2026-11-12 02:03 | Diagrama: estrutura-projetos v07 → v08 (ms_mono com primario/in, primario/out, secundario/in e secundario/out e o papel de cada um, `RNF-177`; regras de dependência com primario/secundario no backend e infra/in e infra/out na web e no mobile, `RN-143`, `RN-148`); cenários sem mudança |
 | v17 | 2026-11-12 01:58 | Adaptadores do backend em ms_mono/primario/{in,out} e ms_mono/secundario/{in,out}, sem infra/out no ms_mono (arquitetura hexagonal, `RN-143`, `RN-148`, `RNF-177`); web e mobile seguem com infra/in e infra/out |
 | v16 | 2026-11-11 23:18 | Adaptadores primários do backend em ms_mono/primario e infra/out só com os secundários (arquitetura hexagonal, `RN-143`, `RN-148`, `RNF-177`); web e mobile seguem com apps/<app>/infra/in; diagrama estrutura-projetos v06 → v07; status → Em revisão |
 | v15 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
@@ -489,9 +505,7 @@ Cenário: rodar no emulador Android
 | v12 | 2026-11-01 18:25 | Só Gherkin e diagramas: contexto, RN e RNF viram cenários (mesmos IDs como âncora); status → Em revisão |
 | v11 | 2026-10-27 00:49 | Status → Aprovado |
 | v10 | 2026-10-26 23:53 | `RNF-177` alterado: `ms_mono/sistema/` (endpoints de sistema e documentação da API) e `wwwroot/doc/api/design/` (cópia gerada do design system) |
-| v09 | 2026-10-25 03:57 | `RNF-187` e `RNF-198` alterados: as propriedades comuns do mobile ficam em `5_DEV/frontend/mobile/Directory.Build.props`; diagrama `estrutura-projetos_v05`; status: Aprovado |
-| v08 | 2026-10-25 01:12 | Status → Aprovado |
 
 ---
 
-<sub>boaz · v18 · 2026-11-12 02:03 · `1_Requisitos/14_estrutura-projetos.md`</sub>
+<sub>boaz · v19 · 2026-11-13 09:11 · `1_Requisitos/14_estrutura-projetos.md`</sub>

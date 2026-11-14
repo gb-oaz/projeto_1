@@ -164,13 +164,16 @@ resource "azurerm_container_app" "app" {
       }
 
       # Teste__Relogio fica sempre "nao" no Azure (hml e prd): os endereços
-      # /_teste/* (contrato usuarios v15) só ligam no backend do CI (ci.sh)
+      # /_teste/* (contrato usuarios v15) só ligam no backend do CI (ci.sh).
+      # Sac__Arquivos__* e AZURE_CLIENT_ID: os anexos do SAC (arquivos.tf)
+      # Sac__ClamAv: o clamd da verificação dos anexos (verificacao.tf)
       dynamic "env" {
-        for_each = each.key == "backend-mono" ? {
+        for_each = each.key == "backend-mono" ? merge({
           "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.appi.connection_string
           "Swagger__Habilitado"                   = local.prd ? "false" : "true"
           "Teste__Relogio"                        = "nao"
-        } : {}
+          "Sac__ClamAv"                           = local.clamav_endereco
+        }, local.arquivos_config) : {}
         content {
           name  = env.key
           value = env.value
@@ -200,7 +203,7 @@ resource "azurerm_container_app" "app" {
     }
   }
 
-  depends_on = [time_sleep.rbac_kv]
+  depends_on = [time_sleep.rbac_kv, azurerm_role_assignment.arquivos_aplicacoes]
 }
 
 # prd: o domínio interno do ambiente resolve para o IP estático dele (RNF-75)

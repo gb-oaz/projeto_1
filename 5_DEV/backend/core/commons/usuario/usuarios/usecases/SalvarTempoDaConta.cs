@@ -1,3 +1,6 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.Ports.Out;
+using Boaz.Core.Commons.Auditoria.UseCases;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Dtos;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;

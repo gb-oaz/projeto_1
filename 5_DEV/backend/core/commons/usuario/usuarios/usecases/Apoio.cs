@@ -1,3 +1,5 @@
+using Boaz.Core.Commons.Auditoria.Domain;
+using Boaz.Core.Commons.Auditoria.UseCases;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;

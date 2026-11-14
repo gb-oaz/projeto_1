@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using System.Globalization;
 using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
@@ -5,7 +6,7 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using Boaz.MsMono.Sistema;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using AcaoAuditada = Boaz.Core.Commons.Usuario.Usuarios.Domain.AcaoAuditada;
+using AcaoAuditada = Boaz.Core.Commons.Auditoria.Domain.AcaoAuditada;
 
 namespace Boaz.MsMono.Primario.In.Commons.Usuario.Autorizacao;
 

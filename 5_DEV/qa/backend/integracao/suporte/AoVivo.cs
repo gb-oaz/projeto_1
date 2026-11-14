@@ -44,6 +44,8 @@ public sealed class Fluxo : IDisposable
     public string? CacheControl { get; private set; }
     public int Status { get; private set; }
     public string? TipoDoConteudo { get; private set; }
+    // os cabeçalhos da resposta (X-Trace-Id, 18 RN-297: o fluxo não é auditado)
+    public IReadOnlyDictionary<string, string> Cabecalhos { get; private set; } = new Dictionary<string, string>();
     public DateTimeOffset Aberto { get; private set; }
     public bool Fechado { get; private set; }
 
@@ -60,12 +62,14 @@ public sealed class Fluxo : IDisposable
         }
     }
 
-    // sem token (null): a recusa 401 do contrato
-    public static async Task<Fluxo> Abrir(string nome, string caminho, string? token)
+    // sem token (null): a recusa 401 do contrato. ultimoId: o cabeçalho
+    // Last-Event-ID da reconexão (18 RNF-230)
+    public static async Task<Fluxo> Abrir(string nome, string caminho, string? token, string? ultimoId = null)
     {
         var fluxo = new Fluxo { Nome = nome, Caminho = caminho };
         using var pedido = new HttpRequestMessage(HttpMethod.Get, caminho.TrimStart('/'));
         if (token is not null) pedido.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        if (ultimoId is not null) pedido.Headers.TryAddWithoutValidation("Last-Event-ID", ultimoId);
         pedido.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
         using var cabecalhos = CancellationTokenSource.CreateLinkedTokenSource(fluxo.parar.Token);
         cabecalhos.CancelAfter(TimeSpan.FromSeconds(10));
@@ -73,6 +77,9 @@ public sealed class Fluxo : IDisposable
         fluxo.Status = (int)fluxo.resposta.StatusCode;
         fluxo.TipoDoConteudo = fluxo.resposta.Content.Headers.ContentType?.MediaType;
         fluxo.CacheControl = fluxo.resposta.Headers.CacheControl?.ToString();
+        fluxo.Cabecalhos = fluxo.resposta.Headers.Concat(fluxo.resposta.Content.Headers)
+            .GroupBy(c => c.Key, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => string.Join(",", g.SelectMany(c => c.Value)), StringComparer.OrdinalIgnoreCase);
         fluxo.Aberto = DateTimeOffset.UtcNow;
         _ = Task.Run(fluxo.Ler);
         return fluxo;
@@ -176,9 +183,9 @@ public sealed class AoVivo : IDisposable
 {
     public List<Fluxo> Fluxos { get; } = [];
 
-    public async Task<Fluxo> Abrir(string nome, string caminho, string? token)
+    public async Task<Fluxo> Abrir(string nome, string caminho, string? token, string? ultimoId = null)
     {
-        var fluxo = await Fluxo.Abrir(nome, caminho, token);
+        var fluxo = await Fluxo.Abrir(nome, caminho, token, ultimoId);
         Fluxos.Add(fluxo);
         return fluxo;
     }

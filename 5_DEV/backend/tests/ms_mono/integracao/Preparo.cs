@@ -1,10 +1,10 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Dtos;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Microsoft.Extensions.DependencyInjection;
-using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.MsMono.Tests.Integracao;
 

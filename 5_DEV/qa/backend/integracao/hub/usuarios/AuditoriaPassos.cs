@@ -550,6 +550,24 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         Assert.False(string.IsNullOrWhiteSpace(Auditoria.Texto(concluido, "alvo")), $"o CONCLUIDO veio sem alvo: {concluido.ToJson()}");
     }
 
+    // 17 v109: o id do pedido é "ajuda-" com o número do chamado (contrato sac
+    // v01, decisão 1). O campo "chamado" de "pedidosAjuda" só o banco mostra
+    // (conferido nos testes do backend); aqui, o chamado com esse número existe
+    // na fila do time e traz o pedido
+    [Then(@"^o id do pedido é ""ajuda-"" com o número do chamado, e o campo chamado é ""SAC-000087""$")]
+    public async Task PedidoComONumeroDoChamado()
+    {
+        var alvo = Auditoria.Texto(await execucoes.Etapa("CONCLUIDO", "ESQUECI_SENHA_MASTER"), "alvo") ?? "";
+        Assert.Matches("^ajuda-[0-9]{6}$", alvo);
+        var caio = await mundo.Caio();
+        await mundo.Conceder(caio, new() { ["MOD-02"] = "U" });
+        var numero = alvo["ajuda-".Length..];
+        var chamado = Exigir(await mundo.EnviarComo(caio, "GET", $"/sac/chamados/SAC-{numero}"), 200, $"GET /sac/chamados/SAC-{numero} do Caio");
+        Assert.True(chamado.Corpo?["categoria"]?.GetValue<string>() == "SENHA_CONTA_MASTER",
+            $"o chamado SAC-{numero} devia ser o pedido de senha: {chamado}");
+        Assert.True(chamado.Texto.Contains($"\"{alvo}\"", StringComparison.Ordinal), $"o chamado SAC-{numero} devia trazer o pedido {alvo}: {chamado}");
+    }
+
     // ── GERAR_SENHA, CODIGO_MASTER e SALVAR_TEMPO_SESSAO do time (RN-178) ──
     // a Maria pendente (RF-109): criada pela conta master, com o código ainda sem uso
     [When(@"^envia POST /usuarios/gerar-senha, sem login, com o código de liberação da Maria$")]

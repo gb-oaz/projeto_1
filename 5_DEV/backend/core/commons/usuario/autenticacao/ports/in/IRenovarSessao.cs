@@ -1,5 +1,5 @@
+using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Commons.Usuario.Autenticacao.Dtos;
-using TraceId = Boaz.Core.Commons.Usuario.Usuarios.Domain.TraceId;
 
 namespace Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 

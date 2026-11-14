@@ -52,6 +52,23 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
         (Colecoes.CardUsuarios, Unico(Chave.Ascending("contaId").Ascending("perfil").Ascending("usuarioId"), "contaId_perfil_usuarioId_unico")),
         // pedidos de ajuda (limite por aparelho, RNF-205)
         (Colecoes.PedidosAjuda, Comum(Chave.Ascending("aparelho").Ascending("quando"), "aparelho_quando")),
+        (Colecoes.PedidosAjuda, Comum(Chave.Ascending("chamado"), "chamado")),
+        // SAC (sac-documentos v01): Meus chamados, o limite de 10, a fila do
+        // time, o atrasado, os 7 dias do agendamento e a guarda de 5 anos
+        (Colecoes.Chamados, Comum(Chave.Ascending("contaId").Descending("atualizadoEm"), "contaId_atualizadoEm")),
+        (Colecoes.Chamados, Comum(Chave.Ascending("contaId").Ascending("status"), "contaId_status")),
+        (Colecoes.Chamados, Comum(Chave.Ascending("status").Ascending("ordemDaFila"), "status_ordemDaFila")),
+        (Colecoes.Chamados, Comum(Chave.Ascending("responsavel.usuarioId").Ascending("status"), "responsavel_status")),
+        (Colecoes.Chamados, Comum(Chave.Ascending("status").Ascending("prazoResposta"), "status_prazoResposta")),
+        (Colecoes.Chamados, Comum(Chave.Ascending("status").Ascending("aguardandoDesde"), "status_aguardandoDesde")),
+        (Colecoes.Chamados, Comum(Chave.Ascending("status").Ascending("resolvidoEm"), "status_resolvidoEm")),
+        (Colecoes.Chamados, Comum(Chave.Ascending("avaliacao.nota"), "avaliacao_nota")),
+        (Colecoes.Chamados, Comum(Chave.Ascending("guardarAte"), "guardarAte")),
+        (Colecoes.MensagensChamado, Comum(Chave.Ascending("chamadoId").Ascending("numero"), "chamadoId_numero")),
+        (Colecoes.AnexosSac, Comum(Chave.Ascending("chamadoId"), "chamadoId")),
+        (Colecoes.AnexosSac, Comum(Chave.Ascending("expiraEm"), "expiraEm")),
+        (Colecoes.AnexosSac, Comum(Chave.Ascending("enviadoPor").Ascending("enviadoEm"), "enviadoPor_enviadoEm")),
+        (Colecoes.CardSac, Unico(Chave.Ascending("escopo").Ascending("dia"), "escopo_dia_unico")),
     ];
 
     // Cria os índices; devolve quantos não únicos não puderam ser criados.
