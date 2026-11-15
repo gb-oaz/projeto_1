@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "19_modulo-pagamento"
 tipo: "Funcionalidade"
 titulo: "Pagamento"
-versao: "v05"
-data: "2026-11-15 00:34"
+versao: "v06"
+data: "2026-11-15 01:06"
 status: "Rascunho"
 objetivo: "permitir que a instituição e o educador autônomo paguem pelo hub a fatura mensal dos módulos contratados, com PIX, cartão de crédito, cartão de débito ou boleto, e que o deboaz acompanhe tudo o que recebeu, tem a receber e está vencido."
 ---
 
-> **boaz · Funcionalidade** · `19_modulo-pagamento` · **v05** · 2026-11-15 00:34 · **Rascunho**
+> **boaz · Funcionalidade** · `19_modulo-pagamento` · **v06** · 2026-11-15 01:06 · **Rascunho**
 
 # Pagamento
 
@@ -252,6 +252,17 @@ Cenário: endereço de quem paga o boleto
   E os campos "CEP", "Rua", "Número", "Bairro", "Cidade" e "UF", e o botão "Gerar boleto"
   E o boleto sai em nome da Escola Bento Freitas, com o CNPJ 12.345.678/0001-90 da conta
   E no próximo boleto da EBFGA os campos já vêm com o último endereço usado
+
+Esquema do Cenário: endereço do boleto com erro
+  Dado a Rita em "Endereço de quem paga" na FAT-000402
+  Quando informa <campo> "<valor>" e toca em "Gerar boleto"
+  Então vê "<erro>" abaixo do campo <campo>
+  E nenhum boleto é gerado
+
+  Exemplos:
+    | campo | valor    | erro          |
+    | "CEP" | 9601-500 | Confira o CEP |
+    | "UF"  | XX       | Confira a UF  |
 
 Cenário: boleto compensado
   Dado o boleto da FAT-000402 pago no banco em 2026-12-04
@@ -739,16 +750,16 @@ Esquema do Cenário: dados do card por perfil e tamanho
   Então mostra <dados>
 
   Exemplos:
-    | perfil      | data       | tamanho  | dados                                                  |
-    | deboaz      | 2026-11-14 | mínima   | o ícone e o selo "9": faturas vencidas                 |
-    | deboaz      | 2026-11-14 | reduzida | R$ 186k · recebido no mês                              |
-    | deboaz      | 2026-11-14 | normal   | R$ 186.400,00, "+3,1 % no mês" e os apoios             |
-    | instituição | 2026-12-03 | mínima   | o ícone e o selo "1": vencida ou vence em 5 dias úteis |
-    | instituição | 2026-12-03 | reduzida | R$ 3.698,33 · a pagar                                  |
-    | instituição | 2026-12-03 | normal   | R$ 3.698,33, "Vence em 10/12" e os apoios              |
-    | autônomo    | 2026-11-14 | mínima   | o ícone e o selo "1": a FAT-000371 vencida             |
-    | autônomo    | 2026-11-14 | reduzida | R$ 294,00 · vencido                                    |
-    | autônomo    | 2026-11-14 | normal   | R$ 294,00, "Venceu em 10/11" e os apoios               |
+    | perfil      | data       | tamanho  | dados                                      |
+    | deboaz      | 2026-11-14 | mínima   | o ícone e o selo "9": faturas vencidas     |
+    | deboaz      | 2026-11-14 | reduzida | R$ 186k · recebido no mês                  |
+    | deboaz      | 2026-11-14 | normal   | R$ 186.400,00, "+3,1 % no mês" e os apoios |
+    | instituição | 2026-12-03 | mínima   | o ícone e o selo "1": vencimento próximo   |
+    | instituição | 2026-12-03 | reduzida | R$ 3.698,33 · a pagar                      |
+    | instituição | 2026-12-03 | normal   | R$ 3.698,33, "Vence em 10/12" e os apoios  |
+    | autônomo    | 2026-11-14 | mínima   | o ícone e o selo "1": a FAT-000371 vencida |
+    | autônomo    | 2026-11-14 | reduzida | R$ 294,00 · vencido                        |
+    | autônomo    | 2026-11-14 | normal   | R$ 294,00, "Venceu em 10/11" e os apoios   |
 
 Esquema do Cenário: apoios da normal
   Dado o card Pagamento do perfil <perfil> na normal
@@ -769,6 +780,11 @@ Esquema do Cenário: lista da expandida de cada perfil
     | deboaz      | Vencido R$ 14.329,80   | A receber R$ 0,00    | Inadimplência 6,7 %       |
     | instituição | A pagar R$ 3.698,33    | Vencidas 0           | Pago no ano R$ 39.810,44  |
     | autônomo    | Vencido R$ 294,00      | Vencidas 1           | Pago no ano R$ 2.646,00   |
+
+Cenário: selo do card da instituição
+  Dado a FAT-000402 da EBFGA "A pagar", com vencimento em 10/12/2026
+  Quando a conta master vê o card Pagamento na mínima em 2026-12-03
+  Então o selo "1" conta a fatura a pagar em até 5 dias úteis ou vencida
 
 Cenário: deboaz sem recebido no mês anterior
   Dado nenhum valor recebido em outubro de 2026
@@ -2512,17 +2528,17 @@ Cenário: o que o Pagamento não faz
 
 ### Web
 
-**Hub · Pagamento · Faturas da conta · web · vista** — `2_Diagramas/vista-hub-pagamento-faturas-web_v02_20261114-0149.svg`
+**Hub · Pagamento · Faturas da conta · web · vista** — `2_Diagramas/vista-hub-pagamento-faturas-web_v03_20261115-0101.svg`
 
-[![Web, Faturas da conta: lista com A pagar e Próximo vencimento, filtros, sem faturas, aviso de atraso, detalhe a pagar, vencida sem e com juros, sem conexão, aguardando o banco, paga com tentativas, valor devolvido, em dobro, estorno de boleto pelo SAC, cancelada, não encontrada e o card do Pagamento da instituição e do autônomo](../2_Diagramas/vista-hub-pagamento-faturas-web_v02_20261114-0149.svg)](../2_Diagramas/vista-hub-pagamento-faturas-web_v02_20261114-0149.svg)
+[![Web, Faturas da conta: lista com A pagar e Próximo vencimento, filtros, sem faturas, aviso de atraso, detalhe a pagar, vencida sem e com juros, sem conexão, aguardando o banco, paga com tentativas, valor devolvido, em dobro, estorno de boleto pelo SAC, cancelada, não encontrada e o card do Pagamento da instituição e do autônomo](../2_Diagramas/vista-hub-pagamento-faturas-web_v03_20261115-0101.svg)](../2_Diagramas/vista-hub-pagamento-faturas-web_v03_20261115-0101.svg)
 
-**Hub · Pagamento · Pagar · web · vista** — `2_Diagramas/vista-hub-pagamento-pagar-web_v03_20261114-0153.svg`
+**Hub · Pagamento · Pagar · web · vista** — `2_Diagramas/vista-hub-pagamento-pagar-web_v05_20261115-0103.svg`
 
-[![Web, Pagar: Como você quer pagar?, boleto desligado, PIX gerado, pago e expirado, crédito com dados, dado inválido, aprovado e recusado, débito no app do banco, não chegou a tempo e recusado, boleto gerado, pagar de outra forma, boleto expirado e banco fora do ar](../2_Diagramas/vista-hub-pagamento-pagar-web_v03_20261114-0153.svg)](../2_Diagramas/vista-hub-pagamento-pagar-web_v03_20261114-0153.svg)
+[![Web, Pagar: Como você quer pagar?, boleto desligado, PIX gerado, pago e expirado, crédito com dados, dado inválido, aprovado e recusado, débito no app do banco, não chegou a tempo e recusado, boleto gerado, pagar de outra forma, boleto expirado e banco fora do ar](../2_Diagramas/vista-hub-pagamento-pagar-web_v05_20261115-0103.svg)](../2_Diagramas/vista-hub-pagamento-pagar-web_v05_20261115-0103.svg)
 
-**Hub · Pagamento · Recebimentos do deboaz · web · vista** — `2_Diagramas/vista-hub-pagamento-recebimentos-web_v01_20261114-0137.svg`
+**Hub · Pagamento · Recebimentos do deboaz · web · vista** — `2_Diagramas/vista-hub-pagamento-recebimentos-web_v02_20261115-0101.svg`
 
-[![Web, Recebimentos do administrador do deboaz: competência com Recebido, Faturado, A receber, Vencido e Inadimplência, por forma, por tipo de conta, por competência, pagamento em duplicidade e o card do deboaz](../2_Diagramas/vista-hub-pagamento-recebimentos-web_v01_20261114-0137.svg)](../2_Diagramas/vista-hub-pagamento-recebimentos-web_v01_20261114-0137.svg)
+[![Web, Recebimentos do administrador do deboaz: competência com Recebido, Faturado, A receber, Vencido e Inadimplência, por forma, por tipo de conta, por competência, pagamento em duplicidade e o card do deboaz](../2_Diagramas/vista-hub-pagamento-recebimentos-web_v02_20261115-0101.svg)](../2_Diagramas/vista-hub-pagamento-recebimentos-web_v02_20261115-0101.svg)
 
 **Hub · Pagamento · Faturas de todas as contas · web · vista** — `2_Diagramas/vista-hub-pagamento-recebimentos-faturas-web_v03_20261114-0152.svg`
 
@@ -2534,17 +2550,17 @@ Cenário: o que o Pagamento não faz
 
 ### PWA
 
-**Hub · Pagamento · Faturas da conta · pwa · vista** — `2_Diagramas/vista-hub-pagamento-faturas-pwa_v02_20261114-0149.svg`
+**Hub · Pagamento · Faturas da conta · pwa · vista** — `2_Diagramas/vista-hub-pagamento-faturas-pwa_v03_20261115-0101.svg`
 
-[![PWA, Faturas da conta: lista com A pagar e Próximo vencimento, filtros, sem faturas, aviso de atraso, detalhe a pagar, vencida sem e com juros, sem conexão, aguardando o banco, paga com tentativas, valor devolvido, em dobro, estorno de boleto pelo SAC, cancelada, não encontrada e o card do Pagamento da instituição e do autônomo](../2_Diagramas/vista-hub-pagamento-faturas-pwa_v02_20261114-0149.svg)](../2_Diagramas/vista-hub-pagamento-faturas-pwa_v02_20261114-0149.svg)
+[![PWA, Faturas da conta: lista com A pagar e Próximo vencimento, filtros, sem faturas, aviso de atraso, detalhe a pagar, vencida sem e com juros, sem conexão, aguardando o banco, paga com tentativas, valor devolvido, em dobro, estorno de boleto pelo SAC, cancelada, não encontrada e o card do Pagamento da instituição e do autônomo](../2_Diagramas/vista-hub-pagamento-faturas-pwa_v03_20261115-0101.svg)](../2_Diagramas/vista-hub-pagamento-faturas-pwa_v03_20261115-0101.svg)
 
-**Hub · Pagamento · Pagar · pwa · vista** — `2_Diagramas/vista-hub-pagamento-pagar-pwa_v03_20261114-0153.svg`
+**Hub · Pagamento · Pagar · pwa · vista** — `2_Diagramas/vista-hub-pagamento-pagar-pwa_v05_20261115-0103.svg`
 
-[![PWA, Pagar: Como você quer pagar?, boleto desligado, PIX gerado, pago e expirado, crédito com dados, dado inválido, aprovado e recusado, débito no app do banco, não chegou a tempo e recusado, boleto gerado, pagar de outra forma, boleto expirado e banco fora do ar](../2_Diagramas/vista-hub-pagamento-pagar-pwa_v03_20261114-0153.svg)](../2_Diagramas/vista-hub-pagamento-pagar-pwa_v03_20261114-0153.svg)
+[![PWA, Pagar: Como você quer pagar?, boleto desligado, PIX gerado, pago e expirado, crédito com dados, dado inválido, aprovado e recusado, débito no app do banco, não chegou a tempo e recusado, boleto gerado, pagar de outra forma, boleto expirado e banco fora do ar](../2_Diagramas/vista-hub-pagamento-pagar-pwa_v05_20261115-0103.svg)](../2_Diagramas/vista-hub-pagamento-pagar-pwa_v05_20261115-0103.svg)
 
-**Hub · Pagamento · Recebimentos do deboaz · pwa · vista** — `2_Diagramas/vista-hub-pagamento-recebimentos-pwa_v01_20261114-0137.svg`
+**Hub · Pagamento · Recebimentos do deboaz · pwa · vista** — `2_Diagramas/vista-hub-pagamento-recebimentos-pwa_v02_20261115-0101.svg`
 
-[![PWA, Recebimentos do administrador do deboaz: competência com Recebido, Faturado, A receber, Vencido e Inadimplência, por forma, por tipo de conta, por competência, pagamento em duplicidade e o card do deboaz](../2_Diagramas/vista-hub-pagamento-recebimentos-pwa_v01_20261114-0137.svg)](../2_Diagramas/vista-hub-pagamento-recebimentos-pwa_v01_20261114-0137.svg)
+[![PWA, Recebimentos do administrador do deboaz: competência com Recebido, Faturado, A receber, Vencido e Inadimplência, por forma, por tipo de conta, por competência, pagamento em duplicidade e o card do deboaz](../2_Diagramas/vista-hub-pagamento-recebimentos-pwa_v02_20261115-0101.svg)](../2_Diagramas/vista-hub-pagamento-recebimentos-pwa_v02_20261115-0101.svg)
 
 **Hub · Pagamento · Faturas de todas as contas · pwa · vista** — `2_Diagramas/vista-hub-pagamento-recebimentos-faturas-pwa_v03_20261114-0152.svg`
 
@@ -2556,17 +2572,17 @@ Cenário: o que o Pagamento não faz
 
 ### Mobile
 
-**Hub · Pagamento · Faturas da conta · mobile · vista** — `2_Diagramas/vista-hub-pagamento-faturas-mobile_v02_20261114-0149.svg`
+**Hub · Pagamento · Faturas da conta · mobile · vista** — `2_Diagramas/vista-hub-pagamento-faturas-mobile_v03_20261115-0101.svg`
 
-[![Mobile, Faturas da conta: lista com A pagar e Próximo vencimento, filtros, sem faturas, aviso de atraso, detalhe a pagar, vencida sem e com juros, sem conexão, aguardando o banco, paga com tentativas, valor devolvido, em dobro, estorno de boleto pelo SAC, cancelada, não encontrada e o card do Pagamento da instituição e do autônomo](../2_Diagramas/vista-hub-pagamento-faturas-mobile_v02_20261114-0149.svg)](../2_Diagramas/vista-hub-pagamento-faturas-mobile_v02_20261114-0149.svg)
+[![Mobile, Faturas da conta: lista com A pagar e Próximo vencimento, filtros, sem faturas, aviso de atraso, detalhe a pagar, vencida sem e com juros, sem conexão, aguardando o banco, paga com tentativas, valor devolvido, em dobro, estorno de boleto pelo SAC, cancelada, não encontrada e o card do Pagamento da instituição e do autônomo](../2_Diagramas/vista-hub-pagamento-faturas-mobile_v03_20261115-0101.svg)](../2_Diagramas/vista-hub-pagamento-faturas-mobile_v03_20261115-0101.svg)
 
-**Hub · Pagamento · Pagar · mobile · vista** — `2_Diagramas/vista-hub-pagamento-pagar-mobile_v03_20261114-0153.svg`
+**Hub · Pagamento · Pagar · mobile · vista** — `2_Diagramas/vista-hub-pagamento-pagar-mobile_v05_20261115-0103.svg`
 
-[![Mobile, Pagar: Como você quer pagar?, boleto desligado, PIX gerado, pago e expirado, crédito com dados, dado inválido, aprovado e recusado, débito no app do banco, não chegou a tempo e recusado, boleto gerado, pagar de outra forma, boleto expirado e banco fora do ar](../2_Diagramas/vista-hub-pagamento-pagar-mobile_v03_20261114-0153.svg)](../2_Diagramas/vista-hub-pagamento-pagar-mobile_v03_20261114-0153.svg)
+[![Mobile, Pagar: Como você quer pagar?, boleto desligado, PIX gerado, pago e expirado, crédito com dados, dado inválido, aprovado e recusado, débito no app do banco, não chegou a tempo e recusado, boleto gerado, pagar de outra forma, boleto expirado e banco fora do ar](../2_Diagramas/vista-hub-pagamento-pagar-mobile_v05_20261115-0103.svg)](../2_Diagramas/vista-hub-pagamento-pagar-mobile_v05_20261115-0103.svg)
 
-**Hub · Pagamento · Recebimentos do deboaz · mobile · vista** — `2_Diagramas/vista-hub-pagamento-recebimentos-mobile_v01_20261114-0137.svg`
+**Hub · Pagamento · Recebimentos do deboaz · mobile · vista** — `2_Diagramas/vista-hub-pagamento-recebimentos-mobile_v02_20261115-0101.svg`
 
-[![Mobile, Recebimentos do administrador do deboaz: competência com Recebido, Faturado, A receber, Vencido e Inadimplência, por forma, por tipo de conta, por competência, pagamento em duplicidade e o card do deboaz](../2_Diagramas/vista-hub-pagamento-recebimentos-mobile_v01_20261114-0137.svg)](../2_Diagramas/vista-hub-pagamento-recebimentos-mobile_v01_20261114-0137.svg)
+[![Mobile, Recebimentos do administrador do deboaz: competência com Recebido, Faturado, A receber, Vencido e Inadimplência, por forma, por tipo de conta, por competência, pagamento em duplicidade e o card do deboaz](../2_Diagramas/vista-hub-pagamento-recebimentos-mobile_v02_20261115-0101.svg)](../2_Diagramas/vista-hub-pagamento-recebimentos-mobile_v02_20261115-0101.svg)
 
 **Hub · Pagamento · Faturas de todas as contas · mobile · vista** — `2_Diagramas/vista-hub-pagamento-recebimentos-faturas-mobile_v03_20261114-0152.svg`
 
@@ -2615,7 +2631,6 @@ Cenário: o que o Pagamento não faz
 - Limites dos campos da Configuração (juros até 1 % ao dia, tolerância até 30 dias, PIX de 5 a 1.440 min, débito de 5 a 30 min, boleto de 1 a 30 dias úteis) e o selo Lento acima de 2 % de inadimplência (`RF-193`, `RN-308`): validar na revisão do usuário — **Produto**
 - X-Trace-Id: a [17 `RN-271`](17_modulo-usuario.md#RN-271) o põe só nas respostas auditadas e sem corpo; o Pagamento o põe em toda resposta e no corpo do erro (`RNF-243`): estender a todos os módulos? — **Arquitetura**
 - 12 ícones novos das vistas no catálogo do design system — **UX/UI**
-- Vistas de Pagar com o formulário "Endereço de quem paga" do boleto (`RF-188`), card do deboaz com "Sem recebido no mês anterior" e selo "a pagar em até 5 dias úteis ou vencida" (`RN-307`) — **UX/UI**
 
 ---
 
@@ -2625,7 +2640,8 @@ Cenário: o que o Pagamento não faz
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v05** | 2026-11-15 00:34 | Lacunas do qa e do backend: mensagem de cada código de erro no formato-comum; endereço de quem paga o boleto na tela e na API, em nome e CNPJ da conta, com o último endereço lembrado (`RF-188`, `RF-188-api`, `RF-184-api`); chave pública e intermediador do cartão em GET /pagamento/formas, cartão com metodo e emissor (`RF-186-api`, `RF-187-api`); QR Code desenhado pelo deboaz (`RF-185-api`); código de barras intercalado 2 de 5 e PDF de boleto de um PIX (`RF-188-api`); 404 em esquema (`RF-183-api`); detalhe da fatura e do pagamento para o recebedor, com os estornos (`RF-191-api`, `RF-192-api`); 428 VERSAO_AUSENTE e versão lida + 1 (`RF-193-api`, `RN-299-api`); 403 do participante e da staff sem permissão em pagar, cancelar e recebimentos (`RN-298-api`); fatura vencida aceita pagamento com juros (`RN-301-api`); resultado do aviso do banco e ocorrências (`RN-305-api`); séries, tendência "Sem recebido no mês anterior" e selo em dias úteis (`RN-307`, `RN-307-api`); juros da reativada e exclusão como encerramento, POST /contas/{id}/estado com "ENCERRADA", ligada ao 17 v110 (`RN-313`, `RN-313-api`); "MOD-01" com "U" no token do administrador só para o card (formato-comum, 17-b v35 `RN-233-api`); intermediador Mercado Pago em hml e prd, falso só fora de prd, aviso roteado pelo cabeçalho (`RNF-242`, decisão no 01_stack); `RNF-243`; novo `RNF-245` (card e recebimentos com muitas faturas); diagramas v03 (sequência, contrato, classes, documentos e hexagonal) |
+| **v06** | 2026-11-15 01:06 | Textos das vistas: erros de campo do endereço do boleto, "Confira o CEP" e "Confira a UF" (`RF-188`); selo do card da instituição "a pagar em até 5 dias úteis ou vencida", em cenário próprio (`RN-307`); vistas Pagar v05, Faturas v03 e Recebimentos v02; sai de Em aberto o pedido dessas vistas |
+| v05 | 2026-11-15 00:34 | Lacunas do qa e do backend: mensagem de cada código de erro no formato-comum; endereço de quem paga o boleto na tela e na API, em nome e CNPJ da conta, com o último endereço lembrado (`RF-188`, `RF-188-api`, `RF-184-api`); chave pública e intermediador do cartão em GET /pagamento/formas, cartão com metodo e emissor (`RF-186-api`, `RF-187-api`); QR Code desenhado pelo deboaz (`RF-185-api`); código de barras intercalado 2 de 5 e PDF de boleto de um PIX (`RF-188-api`); 404 em esquema (`RF-183-api`); detalhe da fatura e do pagamento para o recebedor, com os estornos (`RF-191-api`, `RF-192-api`); 428 VERSAO_AUSENTE e versão lida + 1 (`RF-193-api`, `RN-299-api`); 403 do participante e da staff sem permissão em pagar, cancelar e recebimentos (`RN-298-api`); fatura vencida aceita pagamento com juros (`RN-301-api`); resultado do aviso do banco e ocorrências (`RN-305-api`); séries, tendência "Sem recebido no mês anterior" e selo em dias úteis (`RN-307`, `RN-307-api`); juros da reativada e exclusão como encerramento, POST /contas/{id}/estado com "ENCERRADA", ligada ao 17 v110 (`RN-313`, `RN-313-api`); "MOD-01" com "U" no token do administrador só para o card (formato-comum, 17-b v35 `RN-233-api`); intermediador Mercado Pago em hml e prd, falso só fora de prd, aviso roteado pelo cabeçalho (`RNF-242`, decisão no 01_stack); `RNF-243`; novo `RNF-245` (card e recebimentos com muitas faturas); diagramas v03 (sequência, contrato, classes, documentos e hexagonal) |
 | v04 | 2026-11-14 04:32 | Rastreio: X-Trace-Id em toda resposta do Pagamento, traceId no corpo do erro e traceIdOrigem recebido no pedido (novo `RNF-243`); traceId gravado na fatura, no pagamento, no estorno e no aviso do banco, com histórico de status, levado ao intermediador e aos eventos (novo `RNF-244`); formato-comum com "traceId"; tentativas com traceId (`RN-304-api`); eventos com traceId (`RNF-238-api`); Em aberto: estender o X-Trace-Id da 17 `RN-271` aos outros módulos; Diagramas: sequência, contrato de API, classes, documentos e hexagonal v02 |
 | v03 | 2026-11-14 02:08 | Respostas do Produto: estorno de boleto pedido pela própria conta no SAC, o administrador só é orientado com "Voltar" (`RN-312`, `RF-192`, `RF-192-api`); conta desativada segue devendo, exclusão recusada com fatura em aberto e inadimplência sozinha não bloqueia (novo `RN-313` e `RN-313-api`; Fora de escopo); "Tentar de novo" em `RNF-241`; Em aberto: ajuste do 17 `RF-113`, limites da Configuração para a revisão do usuário e o intermediador por ADR; Telas: faturas e configuração v02, pagar v03, recebimentos-faturas v03 e recebimentos v01; Diagramas: casos de uso, sequência com as telas, contrato de API, classes, documentos e hexagonal v01 |
 | v02 | 2026-11-14 01:42 | Respostas do Produto: vencimento fixo no dia 10 (`RN-300`), juros ao dia configuráveis, padrão 0 % (novo `RN-310` e `RN-310-api`), prazos de PIX, débito e boleto configuráveis (`RN-302`, `RF-193` agora Configuração do Pagamento, com GET e PUT /pagamento/recebimentos/configuracao), aviso de atraso só no módulo, com tolerância, sem e-mail e sem desativar a conta (novo `RN-311` e `RN-311-api`; `RN-301`, `RN-301-api`), estorno de boleto pelo SAC com assuntos prontos (novo `RN-312`; `RF-192-api` com 409 ESTORNO_PELO_SAC), só a conta master concede o Pagamento (`RN-299`, `RN-299-api`); textos e dados das vistas v01 em `RF-182` a `RF-193`, `RN-298`, `RN-303` a `RN-308`, `RNF-239` e `RNF-241`; FAT-000402 com uma só história (crédito recusado, PIX expirado e crédito pago às 10:42 pelo PAG-000773), caminho do PIX com o PAG-000781 e o boleto PAG-000785/PAG-000790 (`RN-303-api`, `RN-304-api`, `RN-305-api`, `RNF-238-api`, `RNF-242`); FAT-000371 com Usuários e Quiz e juros (`RF-183`, `RF-183-api`); série dos cards (`RN-307`); 9 vencidas de outubro (`RF-191`, `RF-191-api`); Telas com as 15 vistas v01; diagramas a desenhar |
@@ -2633,4 +2649,4 @@ Cenário: o que o Pagamento não faz
 
 ---
 
-<sub>boaz · v05 · 2026-11-15 00:34 · `1_Requisitos/19_modulo-pagamento.md`</sub>
+<sub>boaz · v06 · 2026-11-15 01:06 · `1_Requisitos/19_modulo-pagamento.md`</sub>

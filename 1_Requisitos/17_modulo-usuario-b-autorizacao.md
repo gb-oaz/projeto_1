@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v35"
-data: "2026-11-15 00:48"
+versao: "v36"
+data: "2026-11-15 01:06"
 status: "Em revisão"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v35** · 2026-11-15 00:48 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v36** · 2026-11-15 01:06 · **Em revisão**
 
 # Módulo Usuários · Autorização
 
@@ -1046,15 +1046,15 @@ Cenário: o que este documento não trata
 
 ### PWA
 
-**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v06_20261115-0018.svg`
+**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v07_20261115-0059.svg`
 
-[![PWA: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v06_20261115-0018.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v06_20261115-0018.svg)
+[![PWA: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v07_20261115-0059.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v07_20261115-0059.svg)
 
 ### Mobile
 
-**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v06_20261115-0018.svg`
+**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v07_20261115-0059.svg`
 
-[![Mobile: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v06_20261115-0018.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v06_20261115-0018.svg)
+[![Mobile: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v07_20261115-0059.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v07_20261115-0059.svg)
 
 ---
 
@@ -1090,7 +1090,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v35** | 2026-11-15 00:48 | Pagamento ([19_modulo-pagamento](19_modulo-pagamento.md), `MOD-01`): só a conta master o concede, só com a aba Utilização (`RF-160`, `RF-160-api`), recusas 422 iguais às do 19 `RN-299-api` (`RF-161-api`), "MOD-01" com "U" no token do administrador, da conta master, do autônomo e da staff delegada (`RN-233-api`); vistas de Permissões v04 → v06 |
+| **v36** | 2026-11-15 01:06 | Vistas de Permissões pwa e mobile v06 → v07; a web segue na v06 |
+| v35 | 2026-11-15 00:48 | Pagamento ([19_modulo-pagamento](19_modulo-pagamento.md), `MOD-01`): só a conta master o concede, só com a aba Utilização (`RF-160`, `RF-160-api`), recusas 422 iguais às do 19 `RN-299-api` (`RF-161-api`), "MOD-01" com "U" no token do administrador, da conta master, do autônomo e da staff delegada (`RN-233-api`); vistas de Permissões v04 → v06 |
 | v34 | 2026-11-12 02:03 | Diagramas: contrato de API v10 → v11 (endereços de teste POST /_teste/contratacao, que roda o aviso de [17 `RN-275`](17_modulo-usuario.md#RN-275), e GET /_teste/modulo/{mod}, para o 401 e o 403 de `RN-285-api`; só com AMBIENTE=hml e Teste__Relogio=sim) e sequência v06 → v07 (nota do teste); cenários sem mudança |
 | v33 | 2026-11-12 01:59 | Dados explícitos nos cenários de API: `RN-286` "só a contratação suspende" com a Maria (versão 7) e o João, os dois com "MOD-06" com "U"; a Presença da Maria suspensa fica com "MOD-03" com "CU" e "MOD-05" com "U" em mods (`RN-285`, `RN-286`, `RN-287`) |
 | v32 | 2026-11-12 00:57 | Diagramas do módulo suspenso (`RN-285` a `RN-287`): sequência v05 → v06 (o aviso AVISAR_CONTRATACAO_MUDOU move a permissão entre mods e suspensos, sobe versao e pv, 401 e renovação, depois 403), contrato de API v09 → v10 (422 MODULO_NAO_CONTRATADO para o suspenso, "por" de quem descontratou), classes v01 → v02, documentos v03 → v04 (suspensos como [{mod, abas}]); cenários sem mudança |
@@ -1106,4 +1107,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v35 · 2026-11-15 00:48 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v36 · 2026-11-15 01:06 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
