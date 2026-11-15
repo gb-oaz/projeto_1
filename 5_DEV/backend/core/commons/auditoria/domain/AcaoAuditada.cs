@@ -1,7 +1,7 @@
 namespace Boaz.Core.Commons.Auditoria.Domain;
 
 // O catálogo das ações auditadas, de todos os módulos: as do 17 (Usuários,
-// Autenticação e Autorização) e as do SAC (18 RN-297).
+// Autenticação e Autorização), as do SAC (18 RN-297) e as do Pagamento (19 RN-309).
 
 /// <summary>Ação registrada na auditoria (RN-178).</summary>
 public enum AcaoAuditada
@@ -72,5 +72,19 @@ public enum AcaoAuditada
     SalvarPrazosSac,
     /// <summary>Sem quem: o agendamento do SAC muda o status pelos 7 dias (18 RN-290, RN-297).</summary>
     FecharPorPrazo,
+    /// <summary>POST /pagamento/faturas/{id}/pagamentos (19 RN-309).</summary>
+    PagamentoCriado,
+    /// <summary>POST /pagamento/pagamentos/{id}/cancelar (19 RN-309).</summary>
+    PagamentoCancelado,
+    /// <summary>POST /pagamento/recebimentos/faturas/{id}/cancelar (19 RN-309).</summary>
+    FaturaCancelada,
+    /// <summary>POST /pagamento/recebimentos/pagamentos/{id}/estornos (19 RN-309).</summary>
+    EstornoPedido,
+    /// <summary>PUT /pagamento/recebimentos/configuracao (19 RN-309).</summary>
+    ConfiguracaoSalva,
+    /// <summary>POST /pagamento/notificacoes: o aviso do banco, sem login (19 RN-305, RN-309).</summary>
+    AvisoDoBanco,
+    /// <summary>Sem quem: o agendamento do Pagamento vira a fatura vencida e abre o aviso de atraso (19 RN-301, RN-309, RN-311).</summary>
+    FaturaVencida,
 }
 

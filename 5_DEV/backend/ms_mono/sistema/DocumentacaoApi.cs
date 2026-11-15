@@ -2,6 +2,7 @@ using Boaz.MsMono.Primario.In.Commons;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Autenticacao;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Autorizacao;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Primario.In.Hub.Pagamento;
 using Boaz.MsMono.Primario.In.Hub.Sac;
 using Microsoft.OpenApi;
 
@@ -27,6 +28,7 @@ public static class DocumentacaoApi
     public const string DocumentoUsuarios = "usuarios";
     public const string DocumentoAutorizacao = "autorizacao";
     public const string DocumentoSac = "sac";
+    public const string DocumentoPagamento = "pagamento";
     public const string Versao = "v1";
     public const string Titulo = "deboaz · catálogo de APIs";
     public const string EsquemaBearer = "Bearer";
@@ -35,8 +37,10 @@ public static class DocumentacaoApi
     public sealed record Grupo(string Tag, string Descricao);
 
     // Uma API do seletor: o documento (/doc/api/<documento>.json), o rótulo no
-    // seletor e os grupos (um por controller), na ordem em que aparecem.
-    public sealed record Api(string Documento, string Rotulo, IReadOnlyList<Grupo> Grupos)
+    // seletor e os grupos (um por controller), na ordem em que aparecem. Com
+    // ComTraceId, todo endpoint mostra o X-Trace-Id que pode vir no pedido e o
+    // que vem em toda resposta (o Pagamento, 19 RNF-243).
+    public sealed record Api(string Documento, string Rotulo, IReadOnlyList<Grupo> Grupos, bool ComTraceId = false)
     {
         public string Titulo => $"deboaz · {Rotulo}";
     }
@@ -67,6 +71,14 @@ public static class DocumentacaoApi
             new(ConfiguracaoDoSacController.Tag, ConfiguracaoDoSacController.Descricao),
             new(CardDoSacController.Tag, CardDoSacController.Descricao),
         ]),
+        new(DocumentoPagamento, "Pagamento",
+        [
+            new(FaturasController.Tag, FaturasController.Descricao),
+            new(PagamentosController.Tag, PagamentosController.Descricao),
+            new(NotificacoesController.Tag, NotificacoesController.Descricao),
+            new(RecebimentosController.Tag, RecebimentosController.Descricao),
+            new(CardDoPagamentoController.Tag, CardDoPagamentoController.Descricao),
+        ], ComTraceId: true),
     ];
 
     public static bool Habilitada(IConfiguration configuracao) => configuracao.GetValue<bool>("Swagger:Habilitado");
@@ -127,11 +139,48 @@ public static class DocumentacaoApi
                     }
                     // o pedido e as respostas do contrato, dentro do endpoint
                     if (exemplos.TryGetValue(ExemplosDaApi.Chave(contexto), out var exemplo)) ExemplosDaApi.Aplicar(operacao, exemplo);
+                    // os cabeçalhos que a ação lê sem binding (If-Match, a assinatura do banco)
+                    foreach (var cabecalho in contexto.Description.ActionDescriptor.EndpointMetadata.OfType<CabecalhoDoPedidoAttribute>())
+                    {
+                        Cabecalho(operacao, cabecalho.Nome, cabecalho.Descricao, cabecalho.Obrigatorio);
+                    }
+                    if (api.ComTraceId) TraceIdEmTodas(operacao);
                     return Task.CompletedTask;
                 });
             });
         }
         return servicos;
+    }
+
+    // um cabeçalho do pedido, como parâmetro "in: header"
+    static void Cabecalho(OpenApiOperation operacao, string nome, string descricao, bool obrigatorio)
+    {
+        operacao.Parameters ??= [];
+        if (operacao.Parameters.Any(p => string.Equals(p.Name, nome, StringComparison.OrdinalIgnoreCase))) return;
+        operacao.Parameters.Add(new OpenApiParameter
+        {
+            Name = nome,
+            In = ParameterLocation.Header,
+            Required = obrigatorio,
+            Description = descricao,
+            Schema = new OpenApiSchema { Type = JsonSchemaType.String },
+        });
+    }
+
+    // RNF-243: o X-Trace-Id opcional do pedido (vira traceIdOrigem) e o da execução em toda resposta
+    static void TraceIdEmTodas(OpenApiOperation operacao)
+    {
+        Cabecalho(operacao, "X-Trace-Id", "Opcional: o traceId de uma execução anterior (\"trc-\" e 8 hexadecimais), gravado como " +
+            "traceIdOrigem; fora do formato, é ignorado. Nunca substitui o da execução.", false);
+        foreach (var resposta in (operacao.Responses ?? []).Values.OfType<OpenApiResponse>())
+        {
+            resposta.Headers ??= new Dictionary<string, IOpenApiHeader>();
+            resposta.Headers["X-Trace-Id"] = new OpenApiHeader
+            {
+                Description = "O traceId desta execução (\"trc-\" e 8 hexadecimais); no erro, o mesmo valor vem em \"traceId\" no corpo.",
+                Schema = new OpenApiSchema { Type = JsonSchemaType.String, Pattern = "^trc-[0-9a-f]{8}$" },
+            };
+        }
     }
 
     public static WebApplication UseDocumentacaoApi(this WebApplication app)
@@ -161,4 +210,15 @@ public static class DocumentacaoApi
         });
         return app;
     }
+}
+
+// Um cabeçalho que a ação lê de Request.Headers, sem binding, e que a
+// documentação mostra no endpoint (o If-Match da configuração do Pagamento,
+// a assinatura do aviso do banco).
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+public sealed class CabecalhoDoPedidoAttribute(string nome, string descricao) : Attribute
+{
+    public string Nome { get; } = nome;
+    public string Descricao { get; } = descricao;
+    public bool Obrigatorio { get; init; }
 }

@@ -101,6 +101,13 @@ integracao/
     ├── PartidaDoSacPassos.cs       coleções e índices do SAC na partida (RNF-232)
     ├── AnexosDoCenario.cs          o "anx-7f3a21" do cenário; a instância de Partida com o destino dos arquivos
     └── ChamadosDoExemplo.cs        chamados, anexos e mensagens dos exemplos; a fila do time; ganchos de teste do SAC
+└── hub/pagamento/                  19_modulo-pagamento.md (faturas, pagamentos, recebimentos, estorno, configuração, card, rastreio)
+    ├── pagamento.feature
+    ├── PagamentoPassos.cs          os Dados e "<quem> envia <MÉTODO> /pagamento/…": o pagador (RF-182 a RF-189, RN-298 a RN-313)
+    ├── RecebimentosPassos.cs       o recebedor: recebimentos, faturas de todas as contas, estorno, configuração e card ao vivo
+    ├── BancoPassos.cs              aviso do banco, pagamento ao vivo, auditoria e X-Trace-Id (RN-305, RN-309, RNF-238, RNF-242 a RNF-244)
+    ├── FaturasDoExemplo.cs         faturas, pagamentos e estornos dos exemplos; relógio e agendamento do Pagamento
+    └── BancoFalso.cs               o intermediador falso: ganchos /_teste/pagamento/banco e o aviso assinado
 ```
 
 A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
@@ -129,6 +136,7 @@ Os outros requisitos, do mesmo jeito:
 | `17_modulo-usuario.md` | `hub/usuarios/usuarios.feature` | `Usuários` |
 | `15_modulos.md` | `hub/usuarios/modulos.feature` | `Módulos · card do Usuários` |
 | `18_modulo-sac.md` | `hub/sac/sac.feature` | `SAC` |
+| `19_modulo-pagamento.md` | `hub/pagamento/pagamento.feature` | `Pagamento` |
 
 `hub/usuarios/contrato.feature` não é cópia: traz as respostas do contrato
 (`usuarios-contrato-api` v15) que o requisito ainda não tem como cenário, com a
@@ -229,6 +237,7 @@ método. No TDD, enquanto o endpoint não existe, o vermelho esperado é o 404.
 | `API_COMANDO` | comando (por `/bin/sh -c`) que sobe o backend publicado, para os cenários de inicialização: primeira partida, segunda partida, produção, segredo ausente (RN-190, RN-266, RN-267, RNF-225, RNF-226). Sem ele, esses cenários ficam pendentes | vazia |
 | `PARTIDA_*` | repassadas sem o prefixo à instância do `API_COMANDO` (conexões, chave e **um banco próprio**, diferente do `MONGO_BANCO`) | — |
 | `CHAVE_PRIVADA` | a chave do token (PKCS#8 em base64), para montar os tokens recusados de RNF-216 | vazia |
+| `PAGAMENTO_SEGREDO_DO_AVISO` | o segredo com que a suíte assina o aviso do banco (19 RN-305, `X-Assinatura: sha256=<HMAC-SHA256 do corpo>`), o mesmo que o backend do qa entrega ao intermediador falso | `segredo-do-intermediador-falso` |
 | `BLOB_CONEXAO`, `BLOB_CONTEINER` | a conexão do armazenamento de objetos e o contêiner dos anexos do backend de `API_URL` (18 RNF-233, RNF-234). A instância de Partida usa `PARTIDA_ConnectionStrings__Blob` e `PARTIDA_Sac__Arquivos__Conteiner`. Sem nenhuma conexão, os cenários que olham o Blob ficam pendentes | a de `PARTIDA_ConnectionStrings__Blob`, `anexos-sac` |
 
 **Como o CI entrega as variáveis** (`4_CI_CD/local/ci.sh`), no lugar do Key
@@ -259,8 +268,10 @@ e é isso mesmo que se quer: cada cenário começa com o cache dela vazio.
 aplicação sobem uma instância nova com o `API_COMANDO`, numa porta livre
 (`ASPNETCORE_HTTP_PORTS`), com `AMBIENTE` (`hml` ou `prd`) e um Key Vault do
 próprio cenário (entradas do requisito e senhas geradas na hora, RNF-202). Lê
-só o HTTP, o código de saída e o log. As `USUARIO_*` da suíte não passam para
-ela.
+só o HTTP, o código de saída e o log. As `USUARIO_*` e `MercadoPago__*` da
+suíte não passam para ela; em `prd`, o Key Vault sempre tem
+`MercadoPago__AccessToken` e `MercadoPago__SegredoDoWebhook` com valores de
+teste, sem os quais o backend não sobe (19 RNF-242).
 
 ## 6. Regras
 
@@ -349,6 +360,26 @@ ela.
   homologação. Produção não tem relógio de teste: as linhas de produção da
   RNF-234 ficam pendentes e o expiraEm de produção é conferido nos testes do
   backend.
+- **Pagamento** (`hub/pagamento/`, 19 v04, contrato pagamento v02): nenhum
+  cenário chama serviço externo; o banco é o intermediador falso do backend
+  (`BancoFalso.cs`). A API não cria fatura: a suíte grava as cobranças fechadas
+  do Catálogo (coleção `cobrancas`, `Estado.Cobranca`), leva o relógio de teste
+  ao dia 1 e roda `POST /_teste/pagamento/agendamento` (204, o que o
+  AgendamentoDoPagamento faz a cada 1 min); "VENCIDA", a expiração do PIX, do
+  débito e do boleto e o aviso de atraso saem do mesmo gancho, na hora do
+  relógio. O banco: `PUT /_teste/pagamento/banco {"comportamento": "RECUSAR" |
+  "EM_ANALISE" | "SEM_RESPOSTA"}` (204), `DELETE /_teste/pagamento/banco`
+  (volta ao normal, 204) e `GET /_teste/pagamento/banco/pedidos` (o que o falso
+  recebeu: idExterno, X-Trace-Id e metadados). O aviso do banco entra pelo
+  endereço do contrato (`POST /pagamento/notificacoes`), no formato do falso,
+  assinado com `PAGAMENTO_SEGREDO_DO_AVISO`. Os números (`FAT-000402`,
+  `PAG-000773`, `EST-000012`) e os traceId dos exemplos viram os reais pelo
+  `Mundo.Apelidos`. O que o banco gera (código PIX, linha do boleto, endereço
+  da confirmação do débito) é conferido pela forma, não pelo valor do exemplo.
+  O resumo do RF-190 monta as 128 contas de outubro pela API: é o cenário mais
+  demorado. Pendentes: RNF-242 (troca do intermediador), a exclusão de conta da
+  RN-313 (sem endereço) e a busca pelo traceId da RNF-244; o `historico`,
+  `avisosDoBanco` e o `traceIdOrigem` só o banco mostra (testes do backend).
 - **Card ao vivo** (`suporte/AoVivo.cs`): a conexão SSE fica aberta pela
   suíte e fecha no fim do cenário; os tempos (intervalo, ping de 30 s) são
   esperados de verdade, com 5 s de folga, por isso esses cenários levam até

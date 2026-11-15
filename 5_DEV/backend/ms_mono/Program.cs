@@ -6,6 +6,16 @@ using Boaz.Core.Commons.Usuario.Autorizacao.UseCases;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 using Boaz.Core.Commons.Usuario.Usuarios.UseCases;
+using Boaz.Core.Hub.Pagamento.Card.Ports.In;
+using Boaz.Core.Hub.Pagamento.Card.UseCases;
+using Boaz.Core.Hub.Pagamento.Configuracao.Ports.In;
+using Boaz.Core.Hub.Pagamento.Configuracao.UseCases;
+using Boaz.Core.Hub.Pagamento.Faturas.Ports.In;
+using Boaz.Core.Hub.Pagamento.Faturas.UseCases;
+using Boaz.Core.Hub.Pagamento.Pagamentos.Ports.In;
+using Boaz.Core.Hub.Pagamento.Pagamentos.UseCases;
+using Boaz.Core.Hub.Pagamento.Recebimentos.Ports.In;
+using Boaz.Core.Hub.Pagamento.Recebimentos.UseCases;
 using Boaz.Core.Hub.Sac.Anexos.Ports.In;
 using Boaz.Core.Hub.Sac.Anexos.UseCases;
 using Boaz.Core.Hub.Sac.Card.Ports.In;
@@ -15,9 +25,11 @@ using Boaz.Core.Hub.Sac.Chamados.UseCases;
 using Boaz.Core.Hub.Sac.Configuracao.Ports.In;
 using Boaz.Core.Hub.Sac.Configuracao.UseCases;
 using Boaz.MsMono.Primario.In.Commons;
+using Boaz.MsMono.Primario.In.Hub.Pagamento;
 using Boaz.MsMono.Primario.In.Hub.Sac;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Usuarios;
 using Boaz.MsMono.Secundario.In.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Secundario.In.Hub.Pagamento;
 using Boaz.MsMono.Secundario.In.Hub.Sac;
 using Boaz.MsMono.Secundario.Out.Commons;
 using Boaz.MsMono.Secundario.Out.Commons.Auditoria;
@@ -25,11 +37,15 @@ using Boaz.MsMono.Secundario.Out.Commons.Usuario;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autenticacao;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autorizacao;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Secundario.Out.Hub.Pagamento;
 using Boaz.MsMono.Secundario.Out.Hub.Sac;
 using Boaz.MsMono.Sistema;
 using Microsoft.Extensions.Options;
 using Autenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Ports.Out;
 using Autorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
+using PagConfiguracao = Boaz.Core.Hub.Pagamento.Configuracao.Ports.Out;
+using PagFaturas = Boaz.Core.Hub.Pagamento.Faturas.Ports.Out;
+using PagPagamentos = Boaz.Core.Hub.Pagamento.Pagamentos.Ports.Out;
 using SacAnexos = Boaz.Core.Hub.Sac.Anexos.Ports.Out;
 using SacCard = Boaz.Core.Hub.Sac.Card.Ports.Out;
 using SacChamados = Boaz.Core.Hub.Sac.Chamados.Ports.Out;
@@ -134,6 +150,47 @@ servicos.AddSingleton<SacCard.IContagemDoSac>(s => s.GetRequiredService<CardDoSa
 servicos.AddSingleton<SacCard.ISeriesDoSac>(s => s.GetRequiredService<CardDoSacNoBanco>());
 servicos.AddSingleton<TravaDoAgendamentoNoRedis>();
 
+// hub/pagamento (pagamento-documentos v02, pagamento-hexagonal v02): faturas,
+// pagamentos, estornos, configuração, avisos, as leituras de outros módulos e o canal ao vivo
+servicos.AddSingleton<FaturasNoBanco>();
+servicos.AddSingleton<PagFaturas.IFaturas>(s => s.GetRequiredService<FaturasNoBanco>());
+servicos.AddSingleton<PagFaturas.INumeracaoDoPagamento>(s => s.GetRequiredService<FaturasNoBanco>());
+servicos.AddSingleton<LeiturasDoPagamentoNoBanco>();
+servicos.AddSingleton<PagFaturas.ICobrancasDoMes>(s => s.GetRequiredService<LeiturasDoPagamentoNoBanco>());
+servicos.AddSingleton<PagFaturas.ICadastroDoPagamento>(s => s.GetRequiredService<LeiturasDoPagamentoNoBanco>());
+servicos.AddSingleton<PagFaturas.IAvisosDeAtraso, AvisosDeAtrasoNoBanco>();
+servicos.AddSingleton<PagamentosNoBanco>();
+servicos.AddSingleton<PagPagamentos.IPagamentos>(s => s.GetRequiredService<PagamentosNoBanco>());
+servicos.AddSingleton<PagPagamentos.IEstornos>(s => s.GetRequiredService<PagamentosNoBanco>());
+servicos.AddSingleton<PagPagamentos.IAvisosDoBanco, AvisosDoBancoNoBanco>();
+servicos.AddSingleton<PagConfiguracao.IConfiguracoesDoPagamento, ConfiguracoesDoPagamentoNoBanco>();
+servicos.AddSingleton<AvisosDoPagamentoPeloRedis>();
+servicos.AddSingleton<PagPagamentos.ICanalDoPagamento, CanalDoPagamentoNoRedis>();
+servicos.AddSingleton<TravaDoAgendamentoDoPagamentoNoRedis>();
+// o intermediador (RNF-242): em produção (AMBIENTE=prd), sempre o Mercado
+// Pago, com MercadoPago__AccessToken e MercadoPago__SegredoDoWebhook
+// obrigatórios na partida (conferidos depois dos segredos USUARIO_*, RNF-226);
+// fora dela, o falso com o relógio de teste, com Pagamento__Intermediador=Falso
+// ou sem Access Token (a máquina e o qa)
+servicos.AddOptions<OpcoesDoMercadoPago>().BindConfiguration(OpcoesDoMercadoPago.Secao);
+var emProducao = string.Equals(builder.Configuration[Boaz.Core.Commons.Usuario.Usuarios.Domain.ContasIniciais.VariavelDoAmbiente], "prd",
+    StringComparison.OrdinalIgnoreCase);
+var comFalso = !emProducao && (RelogioDaAplicacao.DeTesteLigado(builder.Configuration)
+    || string.Equals(builder.Configuration["Pagamento:Intermediador"], "Falso", StringComparison.OrdinalIgnoreCase)
+    || string.IsNullOrWhiteSpace(builder.Configuration["MercadoPago:AccessToken"]));
+if (comFalso)
+{
+    servicos.AddSingleton(s => new IntermediadorFalso(
+        s.GetRequiredService<IConfiguration>()["Pagamento:SegredoDoAviso"] is { Length: > 0 } segredo ? segredo : IntermediadorFalso.SegredoPadrao,
+        s.GetRequiredService<TimeProvider>()));
+    servicos.AddSingleton<PagPagamentos.IIntermediador>(s => s.GetRequiredService<IntermediadorFalso>());
+}
+else
+{
+    servicos.AddHttpClient<IntermediadorMercadoPago>(c => c.Timeout = IntermediadorMercadoPago.Prazo);
+    servicos.AddSingleton<PagPagamentos.IIntermediador>(s => s.GetRequiredService<IntermediadorMercadoPago>());
+}
+
 // ── core: cada porta de entrada ligada ao caso de uso dela ───────────────────
 // commons/usuario/autenticacao
 servicos.AddSingleton<IEntrarNoHub, EntrarNoHub>();
@@ -211,6 +268,28 @@ servicos.AddSingleton<ILerCardDoSac, LerCardDoSac>();
 servicos.AddSingleton<IAcompanharCardDoSac, AcompanharCardDoSac>();
 servicos.AddSingleton<IFecharCardDoSacDoDia, FecharCardDoSacDoDia>();
 
+// hub/pagamento
+servicos.AddSingleton<IListarFaturas, ListarFaturas>();
+servicos.AddSingleton<ILerFatura, LerFatura>();
+servicos.AddSingleton<ILerAvisos, LerAvisos>();
+servicos.AddSingleton<IRodarAgendamentoDoPagamento, RodarAgendamentoDoPagamento>();
+servicos.AddSingleton<ICriarPagamento, CriarPagamento>();
+servicos.AddSingleton<ILerPagamento, LerPagamento>();
+servicos.AddSingleton<ICancelarPagamento, CancelarPagamento>();
+servicos.AddSingleton<ILerDocumentoDoPagamento, LerDocumentoDoPagamento>();
+servicos.AddSingleton<IAcompanharPagamento, AcompanharPagamento>();
+servicos.AddSingleton<IReceberAvisoDoBanco, ReceberAvisoDoBanco>();
+servicos.AddSingleton<IExpirarPagamentos, ExpirarPagamentos>();
+servicos.AddSingleton<ILerRecebimentos, LerRecebimentos>();
+servicos.AddSingleton<IListarFaturasDoRecebedor, ListarFaturasDoRecebedor>();
+servicos.AddSingleton<ICancelarFatura, CancelarFatura>();
+servicos.AddSingleton<IPedirEstorno, PedirEstorno>();
+servicos.AddSingleton<ILerConfiguracao, LerConfiguracao>();
+servicos.AddSingleton<ISalvarConfiguracao, SalvarConfiguracao>();
+servicos.AddSingleton<ILerFormas, LerFormas>();
+servicos.AddSingleton<ILerCardDoPagamento, LerCardDoPagamento>();
+servicos.AddSingleton<IAcompanharCardDoPagamento, AcompanharCardDoPagamento>();
+
 // ── primario: a partida, antes do primeiro pedido ────────────────────────────
 servicos.AddSingleton<Partida>();
 // o fechamento da 00:00 de Brasília, em segundo plano (15 RN-278)
@@ -218,9 +297,15 @@ servicos.AddHostedService<FechamentoDosCards>();
 // os prazos, os anexos e o card do SAC, a cada 1 min (18 RN-290, RN-292, RN-295)
 servicos.AddHostedService<AgendamentoDoSac>();
 
+// o fechamento, a virada para vencida e a expiração do Pagamento, a cada 1 min (19 RN-300 a RN-302, RN-311)
+servicos.AddHostedService<AgendamentoDoPagamento>();
+
 var app = builder.Build();
 
 app.UseRespostasDeErro();
+
+// toda resposta de /pagamento/* com o X-Trace-Id da execução (19 RNF-243)
+app.UseTraceIdDoPagamento();
 
 // Documentação da API em /doc/api, só com Swagger:Habilitado (homologação e
 // máquina; nunca em produção, 05_cd-implantacao RNF-73)
@@ -247,6 +332,18 @@ catch (Exception erro) when (erro is MongoDB.Driver.MongoException or TimeoutExc
 {
     app.Logger.LogCritical("A aplicação não inicia: o banco não respondeu na partida ({Erro})", erro.GetType().Name);
     pronta = false;
+}
+// os segredos do Mercado Pago, depois dos da partida: o que faltar vai para o
+// log só pelo nome, e o processo termina como na RNF-226 (19 RNF-242)
+if (pronta && !comFalso)
+{
+    var faltam = new[] { ("MercadoPago:AccessToken", "MercadoPago__AccessToken"), ("MercadoPago:SegredoDoWebhook", "MercadoPago__SegredoDoWebhook") }
+        .Where(s => string.IsNullOrWhiteSpace(app.Configuration[s.Item1])).Select(s => s.Item2).ToList();
+    if (faltam.Count > 0)
+    {
+        app.Logger.LogCritical("A aplicação não inicia: Segredo ausente no Key Vault: defina {Variaveis} (19 RNF-242).", string.Join(", ", faltam));
+        pronta = false;
+    }
 }
 if (!pronta)
 {

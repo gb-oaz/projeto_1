@@ -81,6 +81,16 @@ public sealed class FalhaDeAutorizacao : Exception, IRecusaPrevista
     public static FalhaDeAutorizacao ModuloNaoUsado(string mod, string nome, string pessoa) =>
         new(GrupoDeFalha.DadosInvalidos, "DADOS_INVALIDOS", $"{pessoa} não usa o módulo {nome}.") { Campo = $"mods.{mod}" };
 
+    /// <summary>
+    /// A concessão do Pagamento (MOD-01) fora da regra (19 RN-299): DADOS_INVALIDOS
+    /// no campo <c>mods.MOD-01</c>, com a mensagem do motivo.
+    /// </summary>
+    public static FalhaDeAutorizacao PagamentoRecusado(string mensagem) =>
+        new(GrupoDeFalha.DadosInvalidos, "DADOS_INVALIDOS", mensagem) { Campo = $"mods.{ModuloDoPagamento}" };
+
+    /// <summary>O módulo Pagamento (19_modulo-pagamento).</summary>
+    public const string ModuloDoPagamento = "MOD-01";
+
     /// <summary>Um campo do pedido faltou ou veio com valor fora do contrato.</summary>
     public static FalhaDeAutorizacao DadosInvalidos(string campo) =>
         new(GrupoDeFalha.DadosInvalidos, "DADOS_INVALIDOS", $"O campo \"{campo}\" está faltando ou é inválido.") { Campo = campo };

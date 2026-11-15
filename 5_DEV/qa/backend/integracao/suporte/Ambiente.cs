@@ -45,6 +45,11 @@ public static class Ambiente
     public static string PartidaBlobConexao => Ler("PARTIDA_ConnectionStrings__Blob", BlobConexao);
     public static string PartidaBlobConteiner => Ler("PARTIDA_Sac__Arquivos__Conteiner", "anexos-sac-partida");
 
+    // segredo com que o intermediador falso do Pagamento assina o aviso do banco
+    // (19 RN-305, POST /pagamento/notificacoes): o mesmo que o backend do qa
+    // recebe. O padrão é o do IntermediadorFalso, que só existe fora de produção
+    public static string PagamentoSegredoDoAviso => Ler("PAGAMENTO_SEGREDO_DO_AVISO", "segredo-do-intermediador-falso");
+
     // valor de uma variável do Key Vault (USUARIO_*), ou vazio
     public static string Segredo(string nome) => Ler(nome, "");
 

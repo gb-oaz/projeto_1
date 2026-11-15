@@ -17,6 +17,16 @@ public readonly record struct TraceId(string Valor)
     /// <summary>Um traceId novo, sorteado para a execução.</summary>
     public static TraceId Novo() => new(Prefixo + Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(4)));
 
+    /// <summary>
+    /// O traceId recebido de fora, como o X-Trace-Id de um pedido ou o dos
+    /// metadados do aviso do banco (19 RNF-243, RNF-244); null fora do formato
+    /// "trc-" e 8 hexadecimais minúsculos.
+    /// </summary>
+    public static TraceId? Ler(string? texto) =>
+        texto is { Length: 12 } && texto.StartsWith(Prefixo, StringComparison.Ordinal) && texto[4..].All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f')
+            ? new TraceId(texto)
+            : null;
+
     /// <inheritdoc />
     public override string ToString() => Valor;
 }
@@ -93,6 +103,13 @@ public static class TextosDaAuditoria
         AcaoAuditada.AvaliarChamado => "AVALIAR_CHAMADO",
         AcaoAuditada.SalvarPrazosSac => "SALVAR_PRAZOS_SAC",
         AcaoAuditada.FecharPorPrazo => "FECHAR_POR_PRAZO",
+        AcaoAuditada.PagamentoCriado => "PAGAMENTO_CRIADO",
+        AcaoAuditada.PagamentoCancelado => "PAGAMENTO_CANCELADO",
+        AcaoAuditada.FaturaCancelada => "FATURA_CANCELADA",
+        AcaoAuditada.EstornoPedido => "ESTORNO_PEDIDO",
+        AcaoAuditada.ConfiguracaoSalva => "CONFIGURACAO_SALVA",
+        AcaoAuditada.AvisoDoBanco => "AVISO_DO_BANCO",
+        AcaoAuditada.FaturaVencida => "FATURA_VENCIDA",
         _ => "ESQUECI_SENHA_MASTER",
     };
 }

@@ -50,6 +50,7 @@ public sealed partial class Mundo
     // nome do módulo nos cenários → ID no registro de módulos (15_modulos)
     public static readonly Dictionary<string, string> ModuloPorNome = new()
     {
+        ["Pagamento"] = "MOD-01",
         ["SAC"] = "MOD-02",
         ["Usuários"] = "MOD-03",
         ["Sugestão"] = "MOD-04",
@@ -243,6 +244,9 @@ public sealed partial class Mundo
 
     // o educador autônomo Pedro Reis é a conta master da própria conta
     public async Task<Pessoa> Pedro() { await ContaDe("PREIS"); return contas["PREIS"].Master; }
+
+    // o id da conta do Pedro: "conta-pedro-reis" nos exemplos do 19
+    public Task<string> ContaDoPedro() => ContaDe("PREIS");
 
     // ── pessoas ─────────────────────────────────────────────────────────────
     // o administrador dos cenários é o qaadmin, conta qa com o papel

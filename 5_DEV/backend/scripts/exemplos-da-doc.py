@@ -12,6 +12,12 @@ ms_mono/sistema/exemplos/<modulo>.json, que o DocumentacaoApi põe dentro de cad
 endpoint. Rode ./5_DEV/backend/scripts/exemplos-da-doc.py depois de uma versão
 nova de um contrato ou de uma mensagem do core; o teste
 Todo_endpoint_traz_os_exemplos_do_contrato acusa endpoint sem exemplo.
+
+O Pagamento fica fora: o pagamento-contrato-api desenha os endereços sem os
+grupos <g id="ep-…"> e com corpos resumidos ("{ …, "status": … }"), que este
+leitor não monta. Os exemplos dele (sistema/exemplos/pagamento.json) são
+escritos à mão a partir do contrato e do 19_modulo-pagamento, com as mensagens
+de FalhaDoPagamento; mude-os junto com uma versão nova do contrato.
 """
 import json
 import re

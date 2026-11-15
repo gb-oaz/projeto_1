@@ -1,0 +1,1739 @@
+{
+  "GET pagamento/avisos": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "itens": [
+              {
+                "tipo": "FATURA_EM_ATRASO",
+                "faturaId": "FAT-000371",
+                "vencimento": "2026-11-10",
+                "valorFatura": 294.0,
+                "juros": 1.18,
+                "totalAPagar": 295.18,
+                "desde": "2026-11-11T03:00:00Z"
+              }
+            ],
+            "total": 1
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/card": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "modulo": "MOD-01",
+            "perfil": "INSTITUICAO",
+            "versao": 12,
+            "atualizadoEm": "2026-12-01T03:00:00Z",
+            "vazio": false,
+            "selo": 1,
+            "reduzida": {
+              "valor": 3698.33,
+              "rotulo": "a pagar"
+            },
+            "normal": {
+              "valor": 3698.33,
+              "rotulo": "Vence em 10/12",
+              "apoio": [
+                {
+                  "nome": "Vencidas",
+                  "valor": 0
+                },
+                {
+                  "nome": "Pago no ano",
+                  "valor": 39810.44
+                }
+              ]
+            },
+            "expandida": {
+              "lista": [
+                {
+                  "nome": "A pagar",
+                  "valor": 3698.33
+                },
+                {
+                  "nome": "Vencidas",
+                  "valor": 0
+                },
+                {
+                  "nome": "Pago no ano",
+                  "valor": 39810.44
+                }
+              ]
+            },
+            "series": {
+              "dia": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "semana": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "mes": [
+                3310.0,
+                3310.0,
+                3310.0,
+                3450.2,
+                3450.2,
+                3450.2,
+                3520.0,
+                3520.0,
+                3610.75,
+                3610.75,
+                3698.33,
+                3698.33
+              ]
+            }
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/card/ao-vivo": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "card",
+          "corpo": {
+            "modulo": "MOD-01",
+            "perfil": "INSTITUICAO",
+            "versao": 12,
+            "atualizadoEm": "2026-12-01T03:00:00Z",
+            "vazio": false,
+            "selo": 1,
+            "reduzida": {
+              "valor": 3698.33,
+              "rotulo": "a pagar"
+            },
+            "normal": {
+              "valor": 3698.33,
+              "rotulo": "Vence em 10/12",
+              "apoio": [
+                {
+                  "nome": "Vencidas",
+                  "valor": 0
+                },
+                {
+                  "nome": "Pago no ano",
+                  "valor": 39810.44
+                }
+              ]
+            },
+            "expandida": {
+              "lista": [
+                {
+                  "nome": "A pagar",
+                  "valor": 3698.33
+                },
+                {
+                  "nome": "Vencidas",
+                  "valor": 0
+                },
+                {
+                  "nome": "Pago no ano",
+                  "valor": 39810.44
+                }
+              ]
+            },
+            "series": {
+              "dia": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "semana": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "mes": [
+                3310.0,
+                3310.0,
+                3310.0,
+                3450.2,
+                3450.2,
+                3450.2,
+                3520.0,
+                3520.0,
+                3610.75,
+                3610.75,
+                3698.33,
+                3698.33
+              ]
+            }
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS (intervalo)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"intervalo\" está faltando ou é inválido.",
+            "campo": "intervalo",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/faturas": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "itens": [
+              {
+                "id": "FAT-000402",
+                "competencia": "2026-11",
+                "valor": 3698.33,
+                "vencimento": "2026-12-10",
+                "status": "A_PAGAR",
+                "pagamentoEmAberto": null
+              }
+            ],
+            "total": 1,
+            "resumo": {
+              "aPagar": 3698.33,
+              "vencidas": 0,
+              "proximoVencimento": "2026-12-10"
+            }
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS (situacao)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"situacao\" está faltando ou é inválido.",
+            "campo": "situacao",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (pagina)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"pagina\" está faltando ou é inválido.",
+            "campo": "pagina",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/faturas/{id}": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "A_PAGAR",
+          "corpo": {
+            "id": "FAT-000402",
+            "conta": {
+              "id": "conta-ebfga",
+              "sigla": "EBFGA",
+              "nome": "Escola Bento Freitas"
+            },
+            "competencia": "2026-11",
+            "emitidaEm": "2026-12-01T03:00:00Z",
+            "vencimento": "2026-12-10",
+            "status": "A_PAGAR",
+            "itens": [
+              {
+                "moduloId": "MOD-03",
+                "nome": "Usuários",
+                "cobrancaId": "cob-ebfga-MOD-03-2026-11",
+                "valor": 2224.41
+              },
+              {
+                "moduloId": "MOD-05",
+                "nome": "Quiz",
+                "cobrancaId": "cob-ebfga-MOD-05-2026-11",
+                "valor": 1473.92
+              }
+            ],
+            "valor": 3698.33,
+            "pagaEm": null,
+            "devolvido": 0.0,
+            "juros": null,
+            "totalAPagar": 3698.33,
+            "pagamentos": [
+              {
+                "id": "PAG-000773",
+                "forma": "CARTAO_CREDITO",
+                "status": "PAGO",
+                "criadoEm": "2026-12-03T13:42:00Z",
+                "pagoPor": "Rita Gomes",
+                "traceId": "trc-1d6e3f08",
+                "valor": 3698.33
+              },
+              {
+                "id": "PAG-000772",
+                "forma": "PIX",
+                "status": "EXPIRADO",
+                "criadoEm": "2026-12-03T13:00:00Z",
+                "pagoPor": null,
+                "traceId": "trc-83b5c1a9",
+                "valor": 3698.33
+              }
+            ],
+            "canceladaEm": null,
+            "motivo": null
+          }
+        },
+        {
+          "nome": "VENCIDA, com juros (RN-310)",
+          "corpo": {
+            "id": "FAT-000371",
+            "conta": {
+              "id": "conta-preis",
+              "sigla": "PREIS",
+              "nome": "Pedro Reis"
+            },
+            "competencia": "2026-10",
+            "emitidaEm": "2026-11-01T03:00:00Z",
+            "vencimento": "2026-11-10",
+            "status": "VENCIDA",
+            "itens": [
+              {
+                "moduloId": "MOD-03",
+                "nome": "Usuários",
+                "cobrancaId": "cob-preis-MOD-03-2026-10",
+                "valor": 294.0
+              }
+            ],
+            "valor": 294.0,
+            "pagaEm": null,
+            "devolvido": 0.0,
+            "juros": {
+              "taxaAoDia": 0.1,
+              "dias": 4,
+              "valor": 1.18
+            },
+            "totalAPagar": 295.18,
+            "pagamentos": [],
+            "canceladaEm": null,
+            "motivo": null
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "FATURA_INEXISTENTE",
+          "corpo": {
+            "codigo": "FATURA_INEXISTENTE",
+            "mensagem": "Fatura não encontrada.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/formas": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "formas": [
+              "PIX",
+              "CARTAO_CREDITO",
+              "CARTAO_DEBITO"
+            ]
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/pagamentos/{id}": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "PAGO",
+          "corpo": {
+            "faturaId": "FAT-000402",
+            "valor": 3698.33,
+            "valorFatura": 3698.33,
+            "juros": 0.0,
+            "expiraEm": null,
+            "pagoEm": "2026-12-03T13:42:00Z",
+            "motivo": null,
+            "duplicidade": false,
+            "pix": null,
+            "boleto": null,
+            "debito": null,
+            "cartao": {
+              "bandeira": "VISA",
+              "final": "4242"
+            },
+            "id": "PAG-000773",
+            "forma": "CARTAO_CREDITO",
+            "status": "PAGO",
+            "criadoEm": "2026-12-03T13:42:00Z"
+          }
+        },
+        {
+          "nome": "AGUARDANDO",
+          "corpo": {
+            "faturaId": "FAT-000402",
+            "valor": 3698.33,
+            "valorFatura": 3698.33,
+            "juros": 0.0,
+            "expiraEm": "2026-12-03T13:30:00Z",
+            "pagoEm": null,
+            "motivo": null,
+            "duplicidade": false,
+            "pix": {
+              "copiaECola": "00020101021226580014br.gov.bcb.pix0136pix_8c1e5d520400005303986540536.985802BR6304A1B2",
+              "qrCodeSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 33 33\">…</svg>"
+            },
+            "boleto": null,
+            "debito": null,
+            "cartao": null,
+            "id": "PAG-000772",
+            "forma": "PIX",
+            "status": "AGUARDANDO",
+            "criadoEm": "2026-12-03T13:00:00Z"
+          }
+        },
+        {
+          "nome": "PAGO em duplicidade",
+          "corpo": {
+            "faturaId": "FAT-000402",
+            "valor": 3698.33,
+            "valorFatura": 3698.33,
+            "juros": 0.0,
+            "expiraEm": null,
+            "pagoEm": "2026-12-03T13:42:00Z",
+            "motivo": null,
+            "duplicidade": true,
+            "pix": null,
+            "boleto": null,
+            "debito": null,
+            "cartao": {
+              "bandeira": "VISA",
+              "final": "4242"
+            },
+            "id": "PAG-000773",
+            "forma": "CARTAO_CREDITO",
+            "status": "PAGO",
+            "criadoEm": "2026-12-03T13:42:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "PAGAMENTO_INEXISTENTE",
+          "corpo": {
+            "codigo": "PAGAMENTO_INEXISTENTE",
+            "mensagem": "Pagamento não encontrado.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/pagamentos/{id}/ao-vivo": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "pagamento",
+          "corpo": {
+            "id": "PAG-000781",
+            "status": "PAGO",
+            "traceId": "trc-6b0c42f1"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "PAGAMENTO_INEXISTENTE",
+          "corpo": {
+            "codigo": "PAGAMENTO_INEXISTENTE",
+            "mensagem": "Pagamento não encontrado.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/pagamentos/{id}/boleto": {
+    "pedido": null,
+    "respostas": {
+      "200": [],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "PAGAMENTO_INEXISTENTE",
+          "corpo": {
+            "codigo": "PAGAMENTO_INEXISTENTE",
+            "mensagem": "Pagamento não encontrado.",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "BOLETO_INEXISTENTE",
+          "corpo": {
+            "codigo": "BOLETO_INEXISTENTE",
+            "mensagem": "Este pagamento não tem boleto.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/pagamentos/{id}/comprovante": {
+    "pedido": null,
+    "respostas": {
+      "200": [],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "PAGAMENTO_INEXISTENTE",
+          "corpo": {
+            "codigo": "PAGAMENTO_INEXISTENTE",
+            "mensagem": "Pagamento não encontrado.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "PAGAMENTO_NAO_CONFIRMADO",
+          "corpo": {
+            "codigo": "PAGAMENTO_NAO_CONFIRMADO",
+            "mensagem": "Este pagamento ainda não foi confirmado pelo banco.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/recebimentos/competencias": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "12 competências, a mais nova primeiro",
+          "corpo": [
+            {
+              "competencia": "2026-10",
+              "faturado": 212450.3,
+              "recebido": 198120.5,
+              "vencido": 14329.8,
+              "inadimplencia": 6.7
+            },
+            {
+              "competencia": "2026-09",
+              "faturado": 208310.0,
+              "recebido": 201905.4,
+              "vencido": 6404.6,
+              "inadimplencia": 3.1
+            }
+          ]
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS (ate)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"ate\" está faltando ou é inválido.",
+            "campo": "ate",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/recebimentos/configuracao": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "versao": 4,
+            "formas": {
+              "PIX": true,
+              "CARTAO_CREDITO": true,
+              "CARTAO_DEBITO": true,
+              "BOLETO": true
+            },
+            "jurosAoDia": 0,
+            "toleranciaAvisoDias": 0,
+            "diaVencimento": 10,
+            "prazos": {
+              "pixMinutos": 30,
+              "debitoMinutos": 10,
+              "boletoDiasUteis": 3
+            }
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/recebimentos/faturas": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "itens": [
+              {
+                "id": "FAT-000371",
+                "conta": {
+                  "id": "conta-preis",
+                  "nome": "Pedro Reis",
+                  "tipo": "AUTONOMO"
+                },
+                "competencia": "2026-10",
+                "valor": 294.0,
+                "vencimento": "2026-11-10",
+                "status": "VENCIDA",
+                "diasDeAtraso": 4
+              }
+            ],
+            "total": 9
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS (competencia)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"competencia\" está faltando ou é inválido.",
+            "campo": "competencia",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (situacao)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"situacao\" está faltando ou é inválido.",
+            "campo": "situacao",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (pagina)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"pagina\" está faltando ou é inválido.",
+            "campo": "pagina",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "GET pagamento/recebimentos/resumo": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "competencia": "2026-10",
+            "faturado": {
+              "valor": 212450.3,
+              "faturas": 128
+            },
+            "recebido": {
+              "valor": 198120.5,
+              "faturas": 119
+            },
+            "aReceber": {
+              "valor": 0.0,
+              "faturas": 0
+            },
+            "vencido": {
+              "valor": 14329.8,
+              "faturas": 9
+            },
+            "inadimplencia": 6.7,
+            "duplicidades": 0,
+            "porForma": [
+              {
+                "forma": "PIX",
+                "valor": 120300.0,
+                "faturas": 74
+              },
+              {
+                "forma": "CARTAO_CREDITO",
+                "valor": 41250.5,
+                "faturas": 25
+              },
+              {
+                "forma": "CARTAO_DEBITO",
+                "valor": 6570.0,
+                "faturas": 5
+              },
+              {
+                "forma": "BOLETO",
+                "valor": 30000.0,
+                "faturas": 15
+              }
+            ],
+            "porTipoDeConta": [
+              {
+                "tipo": "INSTITUICAO",
+                "recebido": 188920.5,
+                "pagas": 90,
+                "vencido": 13153.8,
+                "vencidas": 6
+              },
+              {
+                "tipo": "AUTONOMO",
+                "recebido": 9200.0,
+                "pagas": 29,
+                "vencido": 1176.0,
+                "vencidas": 3
+              }
+            ]
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS (competencia)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"competencia\" está faltando ou é inválido.",
+            "campo": "competencia",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "POST pagamento/faturas/{id}/pagamentos": {
+    "pedido": {
+      "forma": "CARTAO_CREDITO",
+      "cartao": {
+        "token": "tok_9f2c71"
+      }
+    },
+    "respostas": {
+      "201": [
+        {
+          "nome": "CARTAO_CREDITO aprovado",
+          "corpo": {
+            "faturaId": "FAT-000402",
+            "valor": 3698.33,
+            "valorFatura": 3698.33,
+            "juros": 0.0,
+            "expiraEm": null,
+            "pagoEm": "2026-12-03T13:42:00Z",
+            "motivo": null,
+            "duplicidade": false,
+            "pix": null,
+            "boleto": null,
+            "debito": null,
+            "cartao": {
+              "bandeira": "VISA",
+              "final": "4242"
+            },
+            "id": "PAG-000773",
+            "forma": "CARTAO_CREDITO",
+            "status": "PAGO",
+            "criadoEm": "2026-12-03T13:42:00Z"
+          }
+        },
+        {
+          "nome": "PIX",
+          "corpo": {
+            "faturaId": "FAT-000402",
+            "valor": 3698.33,
+            "valorFatura": 3698.33,
+            "juros": 0.0,
+            "expiraEm": "2026-12-03T13:30:00Z",
+            "pagoEm": null,
+            "motivo": null,
+            "duplicidade": false,
+            "pix": {
+              "copiaECola": "00020101021226580014br.gov.bcb.pix0136pix_8c1e5d520400005303986540536.985802BR6304A1B2",
+              "qrCodeSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 33 33\">…</svg>"
+            },
+            "boleto": null,
+            "debito": null,
+            "cartao": null,
+            "id": "PAG-000772",
+            "forma": "PIX",
+            "status": "AGUARDANDO",
+            "criadoEm": "2026-12-03T13:00:00Z"
+          }
+        },
+        {
+          "nome": "CARTAO_DEBITO",
+          "corpo": {
+            "faturaId": "FAT-000402",
+            "valor": 3698.33,
+            "valorFatura": 3698.33,
+            "juros": 0.0,
+            "expiraEm": "2026-12-03T13:20:00Z",
+            "pagoEm": null,
+            "motivo": null,
+            "duplicidade": false,
+            "pix": null,
+            "boleto": null,
+            "debito": {
+              "confirmacaoUrl": "https://banco.exemplo/confirmar/d41b07"
+            },
+            "cartao": {
+              "bandeira": "MASTERCARD",
+              "final": "5100"
+            },
+            "id": "PAG-000781",
+            "forma": "CARTAO_DEBITO",
+            "status": "AGUARDANDO",
+            "criadoEm": "2026-12-03T13:10:00Z"
+          }
+        },
+        {
+          "nome": "BOLETO",
+          "corpo": {
+            "faturaId": "FAT-000402",
+            "valor": 3698.33,
+            "valorFatura": 3698.33,
+            "juros": 0.0,
+            "expiraEm": "2026-12-16T03:00:00Z",
+            "pagoEm": null,
+            "motivo": null,
+            "duplicidade": false,
+            "pix": null,
+            "boleto": {
+              "vencimento": "2026-12-10",
+              "linhaDigitavel": "23793.38128 60000.000003 00000.000400 1 12960000369833",
+              "codigoBarras": "23791129600003698333381260000000000000000400",
+              "pdf": "/pagamento/pagamentos/PAG-000785/boleto"
+            },
+            "debito": null,
+            "cartao": null,
+            "id": "PAG-000785",
+            "forma": "BOLETO",
+            "status": "AGUARDANDO",
+            "criadoEm": "2026-12-03T14:00:00Z"
+          }
+        },
+        {
+          "nome": "CARTAO_CREDITO recusado",
+          "corpo": {
+            "faturaId": "FAT-000402",
+            "valor": 3698.33,
+            "valorFatura": 3698.33,
+            "juros": 0.0,
+            "expiraEm": null,
+            "pagoEm": null,
+            "motivo": "RECUSADO_PELO_EMISSOR",
+            "duplicidade": false,
+            "pix": null,
+            "boleto": null,
+            "debito": null,
+            "cartao": {
+              "bandeira": "VISA",
+              "final": "4242"
+            },
+            "id": "PAG-000771",
+            "forma": "CARTAO_CREDITO",
+            "status": "RECUSADO",
+            "criadoEm": "2026-12-03T12:40:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido.",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "FATURA_INEXISTENTE",
+          "corpo": {
+            "codigo": "FATURA_INEXISTENTE",
+            "mensagem": "Fatura não encontrada.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "FATURA_PAGA",
+          "corpo": {
+            "codigo": "FATURA_PAGA",
+            "mensagem": "Esta fatura já está paga.",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "FATURA_CANCELADA",
+          "corpo": {
+            "codigo": "FATURA_CANCELADA",
+            "mensagem": "Esta fatura foi cancelada.",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "PAGAMENTO_EM_ABERTO",
+          "corpo": {
+            "codigo": "PAGAMENTO_EM_ABERTO",
+            "mensagem": "Esta fatura já tem um pagamento em andamento. Cancele-o para trocar de forma.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS (forma)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"forma\" está faltando ou é inválido.",
+            "campo": "forma",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (cartao)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"cartao\" está faltando ou é inválido.",
+            "campo": "cartao",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (cartao.token)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"cartao.token\" está faltando ou é inválido.",
+            "campo": "cartao.token",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "FORMA_INDISPONIVEL",
+          "corpo": {
+            "codigo": "FORMA_INDISPONIVEL",
+            "mensagem": "Esta forma de pagamento não está disponível agora.",
+            "campo": "forma",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "503": [
+        {
+          "nome": "BANCO_INDISPONIVEL",
+          "corpo": {
+            "codigo": "BANCO_INDISPONIVEL",
+            "mensagem": "Não conseguimos falar com o banco agora. Nada foi cobrado.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "POST pagamento/notificacoes": {
+    "pedido": {
+      "action": "payment.updated",
+      "type": "payment",
+      "data": {
+        "id": "pix_8c1e5d"
+      }
+    },
+    "respostas": {
+      "200": [],
+      "401": [
+        {
+          "nome": "ASSINATURA_INVALIDA",
+          "corpo": {
+            "codigo": "ASSINATURA_INVALIDA",
+            "mensagem": "Assinatura do aviso inválida.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "POST pagamento/pagamentos/{id}/cancelar": {
+    "pedido": null,
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "faturaId": "FAT-000402",
+            "valor": 3698.33,
+            "valorFatura": 3698.33,
+            "juros": 0.0,
+            "expiraEm": "2026-12-03T13:30:00Z",
+            "pagoEm": null,
+            "motivo": null,
+            "duplicidade": false,
+            "pix": {
+              "copiaECola": "00020101021226580014br.gov.bcb.pix0136pix_8c1e5d520400005303986540536.985802BR6304A1B2",
+              "qrCodeSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 33 33\">…</svg>"
+            },
+            "boleto": null,
+            "debito": null,
+            "cartao": null,
+            "id": "PAG-000772",
+            "forma": "PIX",
+            "status": "CANCELADO",
+            "criadoEm": "2026-12-03T13:00:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "TOKEN_INVALIDO",
+          "corpo": {
+            "codigo": "TOKEN_INVALIDO",
+            "mensagem": "Token inválido.",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "PERMISSOES_DESATUALIZADAS",
+          "corpo": {
+            "codigo": "PERMISSOES_DESATUALIZADAS",
+            "mensagem": "Suas permissões mudaram. Renove a sessão.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "PAGAMENTO_INEXISTENTE",
+          "corpo": {
+            "codigo": "PAGAMENTO_INEXISTENTE",
+            "mensagem": "Pagamento não encontrado.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "PAGAMENTO_CONFIRMADO",
+          "corpo": {
+            "codigo": "PAGAMENTO_CONFIRMADO",
+            "mensagem": "Este pagamento já foi confirmado pelo banco e não pode ser cancelado.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "POST pagamento/recebimentos/faturas/{id}/cancelar": {
+    "pedido": {
+      "motivo": "Cobrança em dobro do Quiz"
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "id": "FAT-000371",
+            "conta": {
+              "id": "conta-preis",
+              "sigla": "PREIS",
+              "nome": "Pedro Reis"
+            },
+            "competencia": "2026-10",
+            "emitidaEm": "2026-11-01T03:00:00Z",
+            "vencimento": "2026-11-10",
+            "status": "CANCELADA",
+            "itens": [
+              {
+                "moduloId": "MOD-03",
+                "nome": "Usuários",
+                "cobrancaId": "cob-preis-MOD-03-2026-10",
+                "valor": 294.0
+              }
+            ],
+            "valor": 294.0,
+            "pagaEm": null,
+            "devolvido": 0.0,
+            "juros": null,
+            "totalAPagar": 0.0,
+            "pagamentos": [],
+            "canceladaEm": "2026-11-14T12:00:00Z",
+            "motivo": "Cobrança em dobro do Quiz"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "FATURA_INEXISTENTE",
+          "corpo": {
+            "codigo": "FATURA_INEXISTENTE",
+            "mensagem": "Fatura não encontrada.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "FATURA_PAGA",
+          "corpo": {
+            "codigo": "FATURA_PAGA",
+            "mensagem": "Esta fatura já está paga.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "DADOS_INVALIDOS (motivo)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"motivo\" está faltando ou é inválido.",
+            "campo": "motivo",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "POST pagamento/recebimentos/pagamentos/{id}/estornos": {
+    "pedido": {
+      "valor": 1473.92,
+      "motivo": "Quiz cancelado"
+    },
+    "respostas": {
+      "201": [
+        {
+          "nome": "201",
+          "corpo": {
+            "id": "EST-000012",
+            "pagamentoId": "PAG-000773",
+            "valor": 1473.92,
+            "motivo": "Quiz cancelado",
+            "status": "PENDENTE",
+            "pedidoEm": "2026-12-04T12:00:00Z"
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "404": [
+        {
+          "nome": "PAGAMENTO_INEXISTENTE",
+          "corpo": {
+            "codigo": "PAGAMENTO_INEXISTENTE",
+            "mensagem": "Pagamento não encontrado.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "409": [
+        {
+          "nome": "ESTORNO_EM_ANDAMENTO",
+          "corpo": {
+            "codigo": "ESTORNO_EM_ANDAMENTO",
+            "mensagem": "Aguarde o estorno em andamento.",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "ESTORNO_PELO_SAC",
+          "corpo": {
+            "codigo": "ESTORNO_PELO_SAC",
+            "mensagem": "O boleto é devolvido pelo atendimento: quem pagou abre um chamado no SAC.",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "PAGAMENTO_NAO_CONFIRMADO",
+          "corpo": {
+            "codigo": "PAGAMENTO_NAO_CONFIRMADO",
+            "mensagem": "Este pagamento ainda não foi confirmado pelo banco.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "ESTORNO_ACIMA_DO_SALDO",
+          "corpo": {
+            "codigo": "ESTORNO_ACIMA_DO_SALDO",
+            "mensagem": "Valor acima do saldo de R$ 2.224,41.",
+            "campo": "valor",
+            "saldo": 2224.41,
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (valor)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"valor\" está faltando ou é inválido.",
+            "campo": "valor",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (motivo)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"motivo\" está faltando ou é inválido.",
+            "campo": "motivo",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "503": [
+        {
+          "nome": "BANCO_INDISPONIVEL",
+          "corpo": {
+            "codigo": "BANCO_INDISPONIVEL",
+            "mensagem": "Não conseguimos falar com o banco agora. Nada foi cobrado.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  },
+  "PUT pagamento/recebimentos/configuracao": {
+    "pedido": {
+      "formas": {
+        "PIX": true,
+        "CARTAO_CREDITO": true,
+        "CARTAO_DEBITO": true,
+        "BOLETO": true
+      },
+      "jurosAoDia": 0.1,
+      "toleranciaAvisoDias": 0,
+      "diaVencimento": 10,
+      "prazos": {
+        "pixMinutos": 30,
+        "debitoMinutos": 10,
+        "boletoDiasUteis": 3
+      }
+    },
+    "respostas": {
+      "200": [
+        {
+          "nome": "200",
+          "corpo": {
+            "versao": 5,
+            "formas": {
+              "PIX": true,
+              "CARTAO_CREDITO": true,
+              "CARTAO_DEBITO": true,
+              "BOLETO": true
+            },
+            "jurosAoDia": 0.1,
+            "toleranciaAvisoDias": 0,
+            "diaVencimento": 10,
+            "prazos": {
+              "pixMinutos": 30,
+              "debitoMinutos": 10,
+              "boletoDiasUteis": 3
+            }
+          }
+        }
+      ],
+      "401": [
+        {
+          "nome": "SESSAO_TERMINADA",
+          "corpo": {
+            "codigo": "SESSAO_TERMINADA",
+            "mensagem": "Sua sessão terminou. Entre de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "403": [
+        {
+          "nome": "ACESSO_NEGADO",
+          "corpo": {
+            "codigo": "ACESSO_NEGADO",
+            "mensagem": "Você não tem permissão para esta ação.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "412": [
+        {
+          "nome": "CONFIGURACAO_MUDOU",
+          "corpo": {
+            "codigo": "CONFIGURACAO_MUDOU",
+            "mensagem": "A configuração mudou desde que você abriu. Recarregue e salve de novo.",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ],
+      "422": [
+        {
+          "nome": "FORMA_OBRIGATORIA",
+          "corpo": {
+            "codigo": "FORMA_OBRIGATORIA",
+            "mensagem": "Deixe ao menos uma forma de pagamento ligada.",
+            "campo": "formas",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (jurosAoDia)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"jurosAoDia\" está faltando ou é inválido.",
+            "campo": "jurosAoDia",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (toleranciaAvisoDias)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"toleranciaAvisoDias\" está faltando ou é inválido.",
+            "campo": "toleranciaAvisoDias",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (diaVencimento)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"diaVencimento\" está faltando ou é inválido.",
+            "campo": "diaVencimento",
+            "traceId": "trc-1d6e3f08"
+          }
+        },
+        {
+          "nome": "DADOS_INVALIDOS (prazos.pixMinutos)",
+          "corpo": {
+            "codigo": "DADOS_INVALIDOS",
+            "mensagem": "O campo \"prazos.pixMinutos\" está faltando ou é inválido.",
+            "campo": "prazos.pixMinutos",
+            "traceId": "trc-1d6e3f08"
+          }
+        }
+      ]
+    }
+  }
+}

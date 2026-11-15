@@ -564,7 +564,8 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
     public void ComOPerfil(string perfil)
     {
         Respostas.Confere(mundo.Ultima, 200);
-        Assert.True(Campo("perfil") == perfil && Campo("modulo") == "MOD-02", $"esperava o card MOD-02 do perfil {perfil}: {mundo.Ultima}");
+        var modulo = ModuloDoCard(mundo.UltimoPedido.Caminho);
+        Assert.True(Campo("perfil") == perfil && Campo("modulo") == modulo, $"esperava o card {modulo} do perfil {perfil}: {mundo.Ultima}");
     }
 
     [Then(@"^a resposta é 200 com o perfil ""(\w+)"" e o selo (\d+)$")]
@@ -583,9 +584,15 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
         Assert.True(fluxo.Status == 200 && fluxo.TipoDoConteudo == "text/event-stream", $"esperava 200 em text/event-stream: {fluxo}");
         var card = await fluxo.EsperarTipo("card", CincoSegundos + Folga);
         Assert.True(card is not null, $"esperava o primeiro evento \"card\": {fluxo}");
-        Assert.True(card.Corpo?["modulo"]?.GetValue<string>() == "MOD-02" && card.Id == card.Corpo?["versao"]?.ToJsonString(),
-            $"o \"card\" devia ser o do SAC, com id igual à versao: {card}");
+        var modulo = ModuloDoCard(fluxo.Caminho);
+        Assert.True(card.Corpo?["modulo"]?.GetValue<string>() == modulo && card.Id == card.Corpo?["versao"]?.ToJsonString(),
+            $"o \"card\" devia ser o {modulo}, com id igual à versao: {card}");
     }
+
+    // as frases do card são as mesmas no 18 e no 19 (15 RN-276, RN-279): o
+    // módulo sai do endereço pedido (/pagamento/card → MOD-01; /sac/card → MOD-02)
+    static string ModuloDoCard(string? caminho) =>
+        caminho?.StartsWith("/pagamento/", StringComparison.Ordinal) == true ? "MOD-01" : "MOD-02";
 
     // ── configuração (RF-181) ──────────────────────────────────────────────
     [Then(@"^a resposta é 200 e GET /sac/configuracao traz os prazos novos$")]

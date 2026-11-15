@@ -47,13 +47,15 @@ public sealed class Api : IDisposable
 
     public async Task<Resposta> Enviar(
         string metodo, string caminho, string? corpo = null, string? token = null,
-        string? cookie = null, string? ifMatch = null)
+        string? cookie = null, string? ifMatch = null, IReadOnlyDictionary<string, string>? doPedido = null)
     {
         using var pedido = new HttpRequestMessage(new HttpMethod(metodo), caminho.TrimStart('/'));
         if (corpo is not null) pedido.Content = new StringContent(corpo, Encoding.UTF8, "application/json");
         if (token is not null) pedido.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         if (cookie is not null) pedido.Headers.Add("Cookie", cookie);
         if (ifMatch is not null) pedido.Headers.TryAddWithoutValidation("If-Match", $"\"{ifMatch}\"");
+        // cabeçalhos do cenário: X-Trace-Id recebido (19 RNF-243) e a assinatura do aviso do banco (19 RN-305)
+        foreach (var (nome, valor) in doPedido ?? new Dictionary<string, string>()) pedido.Headers.TryAddWithoutValidation(nome, valor);
         using var resposta = await http.SendAsync(pedido);
         var cookies = resposta.Headers.TryGetValues("Set-Cookie", out var v) ? v.ToList() : [];
         var cabecalhos = resposta.Headers.Concat(resposta.Content.Headers)

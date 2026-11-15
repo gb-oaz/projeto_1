@@ -1,0 +1,553 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2560 2492" width="2560" height="2492">
+<title>Pagamento · classes</title>
+<desc>Diagrama de classes do módulo Pagamento (MOD-01, 1_Requisitos/19_modulo-pagamento.md) em core/hub/pagamento: o agregado Fatura (competência, itens das cobranças do 16, vencimento no dia 10, juros ao dia, cancelamento), o agregado Pagamento (formas, prazos, confirmação só pelo banco, duplicidade, estornos com saldo e boleto pelo SAC), a Configuração com versão e limites, o resumo dos recebimentos, o aviso do banco, o aviso de atraso, o card por perfil e as portas de entrada e saída. v01: criação. v02: TraceId (commons/auditoria), MudancaDeStatus com o traceId no histórico da fatura, do pagamento e do estorno, traceIdOrigem e traceId no aviso do banco, no intermediador e nos eventos (RNF-243, RNF-244).</desc>
+<style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+
+<defs>
+<!-- ── markers, filtro e gradiente da marca d'água: copie sempre ── -->
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+
+
+</defs>
+<rect class="bg" x="0" y="0" width="2560" height="2492"/>
+<text class="section" x="40" y="152">1 · FATURAS · core/hub/pagamento/faturas/domain/ · O AGREGADO DA FATURA DO MÊS (RF-182, RF-183, RF-191, RN-300, RN-301, RN-310, RN-313)</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="40" y="176" width="600" height="342" rx="6"/></g>
+<text class="uml-keyword" x="340.0" y="194" text-anchor="middle">«aggregate root»</text>
+<text class="label-strong" x="340.0" y="214" text-anchor="middle">Fatura</text>
+<line class="divider" x1="40" y1="224" x2="640" y2="224"/>
+<text class="mono" x="52" y="244" xml:space="preserve">- Dados: DadosDaFatura</text>
+<text class="mono" x="52" y="262" xml:space="preserve">+ VersaoLida: long  If-Match interno</text>
+<line class="divider" x1="40" y1="276" x2="640" y2="276"/>
+<text class="mono" x="52" y="296" xml:space="preserve">+ Abrir(id, conta, competencia, itens, diaVencimento, agora) «static»  RN-300</text>
+<text class="mono" x="52" y="314" xml:space="preserve">+ Vencer(agora)  A_PAGAR → VENCIDA; o valor não muda  RN-301</text>
+<text class="mono" x="52" y="332" xml:space="preserve">+ TotalAPagar(hoje, taxaDoVencimento): Dinheiro  valor + Juros  RN-310</text>
+<text class="mono" x="52" y="350" xml:space="preserve">+ AceitaPagamento()  PAGA / CANCELADA → FalhaDoPagamento</text>
+<text class="mono" x="52" y="368" xml:space="preserve">+ Quitar(pagamento, em)  → PAGA, uma vez só  RN-303</text>
+<text class="mono" x="52" y="386" xml:space="preserve">+ Devolver(valor, em)  soma em Devolvido  RF-192</text>
+<text class="mono" x="52" y="404" xml:space="preserve">+ Cancelar(motivo, por, agora)  PAGA → FATURA_PAGA  RF-191</text>
+<text class="mono" x="52" y="422" xml:space="preserve">+ EmAberto(): bool  A_PAGAR ou VENCIDA · impede excluir a conta  RN-313</text>
+<text class="mono" x="52" y="440" xml:space="preserve">+ DiasDeAtraso(hoje): int</text>
+<text class="muted" x="52" y="474" xml:space="preserve">cada operação recebe a Execucao (traceId) e grava uma</text>
+<text class="muted" x="52" y="492" xml:space="preserve">MudancaDeStatus; Versao + 1; a recusa lança</text>
+<text class="muted" x="52" y="510" xml:space="preserve">FalhaDoPagamento e não muda nada</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="688" y="176" width="520" height="316" rx="6"/></g>
+<text class="uml-keyword" x="948.0" y="194" text-anchor="middle">«record» · o estado guardado</text>
+<text class="label-strong" x="948.0" y="214" text-anchor="middle">DadosDaFatura</text>
+<line class="divider" x1="688" y1="224" x2="1208" y2="224"/>
+<text class="mono" x="700" y="244" xml:space="preserve">+ Id: NumeroDaFatura  FAT-000402</text>
+<text class="mono" x="700" y="262" xml:space="preserve">+ Versao: long</text>
+<text class="mono" x="700" y="280" xml:space="preserve">+ ContaId: Id  conta-ebfga</text>
+<text class="mono" x="700" y="298" xml:space="preserve">+ Competencia: Competencia</text>
+<text class="mono" x="700" y="316" xml:space="preserve">+ Itens: ItemDaFatura[1..*]</text>
+<text class="mono" x="700" y="334" xml:space="preserve">+ Valor: Dinheiro  soma dos itens</text>
+<text class="mono" x="700" y="352" xml:space="preserve">+ EmitidaEm: DateTime</text>
+<text class="mono" x="700" y="370" xml:space="preserve">+ Vencimento: DateOnly</text>
+<text class="mono" x="700" y="388" xml:space="preserve">+ Status: StatusDaFatura</text>
+<text class="mono" x="700" y="406" xml:space="preserve">+ PagaEm [0..1] · PagaPor: NumeroDoPagamento [0..1]</text>
+<text class="mono" x="700" y="424" xml:space="preserve">+ Devolvido: Dinheiro</text>
+<text class="mono" x="700" y="442" xml:space="preserve">+ Cancelamento: Cancelamento [0..1]</text>
+<text class="mono" x="700" y="460" xml:space="preserve">+ TraceId: TraceId  da emissão (RNF-244)</text>
+<text class="mono" x="700" y="478" xml:space="preserve">+ Historico: MudancaDeStatus[*]</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1256" y="176" width="400" height="164" rx="6"/></g>
+<text class="uml-keyword" x="1456.0" y="194" text-anchor="middle">«record»</text>
+<text class="label-strong" x="1456.0" y="214" text-anchor="middle">ItemDaFatura</text>
+<line class="divider" x1="1256" y1="224" x2="1656" y2="224"/>
+<text class="mono" x="1268" y="244" xml:space="preserve">+ ModuloId: "MOD-03"</text>
+<text class="mono" x="1268" y="262" xml:space="preserve">+ Nome: "Usuários"</text>
+<text class="mono" x="1268" y="280" xml:space="preserve">+ CobrancaId: cob-ebfga-MOD-03-2026-11</text>
+<text class="mono" x="1268" y="298" xml:space="preserve">+ Valor: Dinheiro</text>
+<text class="muted" x="1268" y="332" xml:space="preserve">uma linha por cobrança do 16 na competência</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1256" y="364" width="400" height="118" rx="6"/></g>
+<text class="uml-keyword" x="1456.0" y="382" text-anchor="middle">«record»</text>
+<text class="label-strong" x="1456.0" y="402" text-anchor="middle">Cancelamento</text>
+<line class="divider" x1="1256" y1="412" x2="1656" y2="412"/>
+<text class="mono" x="1268" y="432" xml:space="preserve">+ Motivo: Texto 5..300</text>
+<text class="mono" x="1268" y="450" xml:space="preserve">+ Por: Id  administrador</text>
+<text class="mono" x="1268" y="468" xml:space="preserve">+ Em: DateTime</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="1704" y="176" width="400" height="134" rx="6"/></g>
+<text class="uml-keyword" x="1904.0" y="194" text-anchor="middle">«value object»</text>
+<text class="label-strong" x="1904.0" y="214" text-anchor="middle">Competencia</text>
+<line class="divider" x1="1704" y1="224" x2="2104" y2="224"/>
+<text class="mono" x="1716" y="244" xml:space="preserve">+ Ano: int · Mes: int  "2026-11"</text>
+<line class="divider" x1="1704" y1="258" x2="2104" y2="258"/>
+<text class="mono" x="1716" y="278" xml:space="preserve">+ Vencimento(dia): DateOnly  dia 10 do mês seguinte</text>
+<text class="mono" x="1716" y="296" xml:space="preserve">+ Anterior() · Proxima()</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="1704" y="334" width="400" height="144" rx="6"/></g>
+<text class="uml-keyword" x="1904.0" y="352" text-anchor="middle">«value object»</text>
+<text class="label-strong" x="1904.0" y="372" text-anchor="middle">Dinheiro</text>
+<line class="divider" x1="1704" y1="382" x2="2104" y2="382"/>
+<text class="mono" x="1716" y="402" xml:space="preserve">+ Centavos: long  ≥ 0</text>
+<line class="divider" x1="1704" y1="416" x2="2104" y2="416"/>
+<text class="mono" x="1716" y="436" xml:space="preserve">+ Mais · Menos · Vezes(taxa)  arredonda em 2 casas</text>
+<text class="muted" x="1716" y="470" xml:space="preserve">3698.33 no JSON; nunca double</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="1704" y="502" width="400" height="180" rx="6"/></g>
+<text class="uml-keyword" x="1904.0" y="520" text-anchor="middle">«value object»</text>
+<text class="label-strong" x="1904.0" y="540" text-anchor="middle">Juros</text>
+<line class="divider" x1="1704" y1="550" x2="2104" y2="550"/>
+<text class="mono" x="1716" y="570" xml:space="preserve">+ TaxaAoDia: decimal 0..1 %</text>
+<text class="mono" x="1716" y="588" xml:space="preserve">+ Dias: int · Valor: Dinheiro</text>
+<line class="divider" x1="1704" y1="602" x2="2104" y2="602"/>
+<text class="mono" x="1716" y="622" xml:space="preserve">+ Calcular(valor, taxa, vencimento, hoje) «static»</text>
+<text class="muted" x="1716" y="656" xml:space="preserve">dias desde o dia seguinte ao vencimento</text>
+<text class="muted" x="1716" y="674" xml:space="preserve">294.00 × 0,1 % × 4 = 1.18</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="2152" y="176" width="368" height="136" rx="6"/></g>
+<text class="uml-keyword" x="2336.0" y="194" text-anchor="middle">«enumeration»</text>
+<text class="label-strong" x="2336.0" y="214" text-anchor="middle">StatusDaFatura</text>
+<line class="divider" x1="2152" y1="224" x2="2520" y2="224"/>
+<text class="mono" x="2164" y="244" xml:space="preserve">A_PAGAR</text>
+<text class="mono" x="2164" y="262" xml:space="preserve">VENCIDA</text>
+<text class="mono" x="2164" y="280" xml:space="preserve">PAGA</text>
+<text class="mono" x="2164" y="298" xml:space="preserve">CANCELADA</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="2152" y="336" width="368" height="110" rx="6"/></g>
+<text class="uml-keyword" x="2336.0" y="354" text-anchor="middle">«value object»</text>
+<text class="label-strong" x="2336.0" y="374" text-anchor="middle">NumeroDaFatura</text>
+<line class="divider" x1="2152" y1="384" x2="2520" y2="384"/>
+<text class="mono" x="2164" y="404" xml:space="preserve">+ Valor: "FAT-000402"</text>
+<text class="muted" x="2164" y="438" xml:space="preserve">contador "faturas" (IContadores)</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="2152" y="470" width="368" height="180" rx="6"/></g>
+<text class="uml-keyword" x="2336.0" y="488" text-anchor="middle">«value object» · commons/auditoria</text>
+<text class="label-strong" x="2336.0" y="508" text-anchor="middle">TraceId</text>
+<line class="divider" x1="2152" y1="518" x2="2520" y2="518"/>
+<text class="mono" x="2164" y="538" xml:space="preserve">+ Valor: "trc-1d6e3f08"</text>
+<line class="divider" x1="2152" y1="552" x2="2520" y2="552"/>
+<text class="mono" x="2164" y="572" xml:space="preserve">+ Novo() «static»  "trc-" + 8 hex</text>
+<text class="mono" x="2164" y="590" xml:space="preserve">+ Ler(texto): TraceId [0..1]</text>
+<text class="muted" x="2164" y="624" xml:space="preserve">um por execução (17 RN-271, RNF-243);</text>
+<text class="muted" x="2164" y="642" xml:space="preserve">fora do formato, Ler não devolve nada</text>
+<path class="edge" d="M640,334 H688" marker-start="url(#composicao)"/>
+<rect class="edge-label-bg" x="636.5" y="316.0" width="55.0" height="16"/>
+<text class="muted" x="664.0" y="328.0" text-anchor="middle">Dados 1</text>
+<path class="edge" d="M1208,258 H1256" marker-start="url(#composicao)"/>
+<rect class="edge-label-bg" x="1214.6" y="240.0" width="34.9" height="16"/>
+<text class="muted" x="1232.0" y="252.0" text-anchor="middle">1..*</text>
+<path class="edge" d="M1208,423 H1256" marker-start="url(#composicao)"/>
+<rect class="edge-label-bg" x="1214.6" y="405.0" width="34.9" height="16"/>
+<text class="muted" x="1232.0" y="417.0" text-anchor="middle">0..1</text>
+<text class="section" x="40" y="754">2 · PAGAMENTOS · core/hub/pagamento/pagamentos/domain/ · TENTATIVAS, CONFIRMAÇÃO PELO BANCO E ESTORNO (RF-184 A RF-189, RF-192, RN-302 A RN-306, RN-312)</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="40" y="778" width="600" height="396" rx="6"/></g>
+<text class="uml-keyword" x="340.0" y="796" text-anchor="middle">«aggregate root»</text>
+<text class="label-strong" x="340.0" y="816" text-anchor="middle">Pagamento</text>
+<line class="divider" x1="40" y1="826" x2="640" y2="826"/>
+<text class="mono" x="52" y="846" xml:space="preserve">- Dados: DadosDoPagamento</text>
+<text class="mono" x="52" y="864" xml:space="preserve">- Estornos: Estorno[*]</text>
+<line class="divider" x1="40" y1="878" x2="640" y2="878"/>
+<text class="mono" x="52" y="898" xml:space="preserve">+ Criar(id, fatura, forma, valor, prazos, agora) «static»</text>
+<text class="mono" x="52" y="916" xml:space="preserve">    PIX e débito: ExpiraEm pelos minutos; boleto: dias úteis  RN-302</text>
+<text class="mono" x="52" y="934" xml:space="preserve">+ Processando() · Confirmar(em, idExterno)  → PAGO  RN-305</text>
+<text class="mono" x="52" y="952" xml:space="preserve">+ Recusar(motivo)  → RECUSADO · Expirar(agora)  → EXPIRADO</text>
+<text class="mono" x="52" y="970" xml:space="preserve">+ Cancelar(agora)  PAGO → PAGAMENTO_CONFIRMADO</text>
+<text class="mono" x="52" y="988" xml:space="preserve">+ MarcarDuplicidade()  pagou fatura já PAGA  RN-303</text>
+<text class="mono" x="52" y="1006" xml:space="preserve">+ PedirEstorno(id, valor, motivo, por, agora): Estorno  RN-306</text>
+<text class="mono" x="52" y="1024" xml:space="preserve">    boleto → ESTORNO_PELO_SAC  RN-312 · PENDENTE → ESTORNO_EM_ANDAMENTO</text>
+<text class="mono" x="52" y="1042" xml:space="preserve">    valor &gt; Saldo → ESTORNO_ACIMA_DO_SALDO</text>
+<text class="mono" x="52" y="1060" xml:space="preserve">+ ConcluirEstorno(id, em) · RecusarEstorno(id)</text>
+<text class="mono" x="52" y="1078" xml:space="preserve">+ Saldo(): Dinheiro  Valor − estornado</text>
+<text class="mono" x="52" y="1096" xml:space="preserve">+ EmAberto(): bool  AGUARDANDO ou PROCESSANDO</text>
+<text class="mono" x="52" y="1114" xml:space="preserve">+ Final(): bool  PAGO, RECUSADO, EXPIRADO, CANCELADO</text>
+<text class="muted" x="52" y="1148" xml:space="preserve">um em aberto por fatura (índice abertoNaFatura); só o banco confirma;</text>
+<text class="muted" x="52" y="1166" xml:space="preserve">cada mudança grava MudancaDeStatus com o traceId (RNF-244)</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="688" y="778" width="520" height="370" rx="6"/></g>
+<text class="uml-keyword" x="948.0" y="796" text-anchor="middle">«record» · o estado guardado</text>
+<text class="label-strong" x="948.0" y="816" text-anchor="middle">DadosDoPagamento</text>
+<line class="divider" x1="688" y1="826" x2="1208" y2="826"/>
+<text class="mono" x="700" y="846" xml:space="preserve">+ Id: NumeroDoPagamento  PAG-000773</text>
+<text class="mono" x="700" y="864" xml:space="preserve">+ Versao: long</text>
+<text class="mono" x="700" y="882" xml:space="preserve">+ FaturaId · ContaId</text>
+<text class="mono" x="700" y="900" xml:space="preserve">+ Forma: FormaDePagamento</text>
+<text class="mono" x="700" y="918" xml:space="preserve">+ Valor: Dinheiro  fatura + juros do dia</text>
+<text class="mono" x="700" y="936" xml:space="preserve">+ ValorFatura · Juros: Dinheiro</text>
+<text class="mono" x="700" y="954" xml:space="preserve">+ Status: StatusDoPagamento</text>
+<text class="mono" x="700" y="972" xml:space="preserve">+ CriadoEm · CriadoPor: Id  Rita Gomes</text>
+<text class="mono" x="700" y="990" xml:space="preserve">+ ExpiraEm [0..1] · PagoEm [0..1]</text>
+<text class="mono" x="700" y="1008" xml:space="preserve">+ IdExterno: Texto [0..1]  pix_8c1e5d</text>
+<text class="mono" x="700" y="1026" xml:space="preserve">+ Pix: DadosPix [0..1]</text>
+<text class="mono" x="700" y="1044" xml:space="preserve">+ Boleto: DadosBoleto [0..1]</text>
+<text class="mono" x="700" y="1062" xml:space="preserve">+ Cartao: CartaoMascarado [0..1]</text>
+<text class="mono" x="700" y="1080" xml:space="preserve">+ Motivo [0..1]  RECUSADO_PELO_EMISSOR</text>
+<text class="mono" x="700" y="1098" xml:space="preserve">+ Duplicidade: bool</text>
+<text class="mono" x="700" y="1116" xml:space="preserve">+ TraceId · TraceIdOrigem [0..1]</text>
+<text class="mono" x="700" y="1134" xml:space="preserve">+ Historico: MudancaDeStatus[*]</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1256" y="778" width="400" height="100" rx="6"/></g>
+<text class="uml-keyword" x="1456.0" y="796" text-anchor="middle">«record»</text>
+<text class="label-strong" x="1456.0" y="816" text-anchor="middle">DadosPix</text>
+<line class="divider" x1="1256" y1="826" x2="1656" y2="826"/>
+<text class="mono" x="1268" y="846" xml:space="preserve">+ CopiaECola: Texto</text>
+<text class="mono" x="1268" y="864" xml:space="preserve">+ QrCodeSvg: Texto  SVG em texto</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1256" y="902" width="400" height="100" rx="6"/></g>
+<text class="uml-keyword" x="1456.0" y="920" text-anchor="middle">«record»</text>
+<text class="label-strong" x="1456.0" y="940" text-anchor="middle">DadosBoleto</text>
+<line class="divider" x1="1256" y1="950" x2="1656" y2="950"/>
+<text class="mono" x="1268" y="970" xml:space="preserve">+ Vencimento: DateOnly</text>
+<text class="mono" x="1268" y="988" xml:space="preserve">+ LinhaDigitavel: Texto</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1256" y="1026" width="400" height="110" rx="6"/></g>
+<text class="uml-keyword" x="1456.0" y="1044" text-anchor="middle">«record»</text>
+<text class="label-strong" x="1456.0" y="1064" text-anchor="middle">CartaoMascarado</text>
+<line class="divider" x1="1256" y1="1074" x2="1656" y2="1074"/>
+<text class="mono" x="1268" y="1094" xml:space="preserve">+ Bandeira: "VISA" · Final: "4242"</text>
+<text class="muted" x="1268" y="1128" xml:space="preserve">nunca número, validade nem CVV (RNF-239)</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1256" y="1160" width="400" height="190" rx="6"/></g>
+<text class="uml-keyword" x="1456.0" y="1178" text-anchor="middle">«entity»</text>
+<text class="label-strong" x="1456.0" y="1198" text-anchor="middle">Estorno</text>
+<line class="divider" x1="1256" y1="1208" x2="1656" y2="1208"/>
+<text class="mono" x="1268" y="1228" xml:space="preserve">+ Id: NumeroDoEstorno  EST-000012</text>
+<text class="mono" x="1268" y="1246" xml:space="preserve">+ PagamentoId</text>
+<text class="mono" x="1268" y="1264" xml:space="preserve">+ Valor: Dinheiro · Motivo: Texto</text>
+<text class="mono" x="1268" y="1282" xml:space="preserve">+ Status: StatusDoEstorno</text>
+<text class="mono" x="1268" y="1300" xml:space="preserve">+ PedidoEm · PedidoPor</text>
+<text class="mono" x="1268" y="1318" xml:space="preserve">+ ConcluidoEm [0..1]</text>
+<text class="mono" x="1268" y="1336" xml:space="preserve">+ TraceId · Historico: MudancaDeStatus[*]</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="1704" y="778" width="400" height="136" rx="6"/></g>
+<text class="uml-keyword" x="1904.0" y="796" text-anchor="middle">«enumeration»</text>
+<text class="label-strong" x="1904.0" y="816" text-anchor="middle">FormaDePagamento</text>
+<line class="divider" x1="1704" y1="826" x2="2104" y2="826"/>
+<text class="mono" x="1716" y="846" xml:space="preserve">PIX</text>
+<text class="mono" x="1716" y="864" xml:space="preserve">CARTAO_CREDITO</text>
+<text class="mono" x="1716" y="882" xml:space="preserve">CARTAO_DEBITO</text>
+<text class="mono" x="1716" y="900" xml:space="preserve">BOLETO</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="1704" y="938" width="400" height="136" rx="6"/></g>
+<text class="uml-keyword" x="1904.0" y="956" text-anchor="middle">«enumeration»</text>
+<text class="label-strong" x="1904.0" y="976" text-anchor="middle">StatusDoPagamento</text>
+<line class="divider" x1="1704" y1="986" x2="2104" y2="986"/>
+<text class="mono" x="1716" y="1006" xml:space="preserve">AGUARDANDO · PROCESSANDO</text>
+<text class="mono" x="1716" y="1024" xml:space="preserve">PAGO · RECUSADO · EXPIRADO · CANCELADO</text>
+<text class="mono" x="1716" y="1042" xml:space="preserve">ESTORNO_PENDENTE · ESTORNADO_PARCIAL</text>
+<text class="mono" x="1716" y="1060" xml:space="preserve">ESTORNADO</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="1704" y="1098" width="400" height="82" rx="6"/></g>
+<text class="uml-keyword" x="1904.0" y="1116" text-anchor="middle">«enumeration»</text>
+<text class="label-strong" x="1904.0" y="1136" text-anchor="middle">StatusDoEstorno</text>
+<line class="divider" x1="1704" y1="1146" x2="2104" y2="1146"/>
+<text class="mono" x="1716" y="1166" xml:space="preserve">PENDENTE · CONCLUIDO · RECUSADO</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="2152" y="778" width="368" height="254" rx="6"/></g>
+<text class="uml-keyword" x="2336.0" y="796" text-anchor="middle">«exception»</text>
+<text class="label-strong" x="2336.0" y="816" text-anchor="middle">FalhaDoPagamento</text>
+<line class="divider" x1="2152" y1="826" x2="2520" y2="826"/>
+<text class="mono" x="2164" y="846" xml:space="preserve">+ Codigo: Texto</text>
+<text class="mono" x="2164" y="864" xml:space="preserve">+ Campo: Texto [0..1]</text>
+<text class="mono" x="2164" y="882" xml:space="preserve">+ Saldo: Dinheiro [0..1]</text>
+<text class="muted" x="2164" y="916" xml:space="preserve">FATURA_PAGA, FATURA_CANCELADA,</text>
+<text class="muted" x="2164" y="934" xml:space="preserve">PAGAMENTO_EM_ABERTO, FORMA_INDISPONIVEL,</text>
+<text class="muted" x="2164" y="952" xml:space="preserve">PAGAMENTO_CONFIRMADO,</text>
+<text class="muted" x="2164" y="970" xml:space="preserve">PAGAMENTO_NAO_CONFIRMADO,</text>
+<text class="muted" x="2164" y="988" xml:space="preserve">ESTORNO_ACIMA_DO_SALDO, ESTORNO_EM_ANDAMENTO,</text>
+<text class="muted" x="2164" y="1006" xml:space="preserve">ESTORNO_PELO_SAC, DADOS_INVALIDOS</text>
+<text class="muted" x="2164" y="1024" xml:space="preserve">o controller traduz em 404/409/422</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="2152" y="1056" width="368" height="110" rx="6"/></g>
+<text class="uml-keyword" x="2336.0" y="1074" text-anchor="middle">«value object»</text>
+<text class="label-strong" x="2336.0" y="1094" text-anchor="middle">NumeroDoPagamento</text>
+<line class="divider" x1="2152" y1="1104" x2="2520" y2="1104"/>
+<text class="mono" x="2164" y="1124" xml:space="preserve">+ Valor: "PAG-000773"</text>
+<text class="muted" x="2164" y="1158" xml:space="preserve">NumeroDoEstorno: "EST-000012"</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="2152" y="1190" width="368" height="164" rx="6"/></g>
+<text class="uml-keyword" x="2336.0" y="1208" text-anchor="middle">«record»</text>
+<text class="label-strong" x="2336.0" y="1228" text-anchor="middle">MudancaDeStatus</text>
+<line class="divider" x1="2152" y1="1238" x2="2520" y2="1238"/>
+<text class="mono" x="2164" y="1258" xml:space="preserve">+ De · Para: status</text>
+<text class="mono" x="2164" y="1276" xml:space="preserve">+ Em: DateTime</text>
+<text class="mono" x="2164" y="1294" xml:space="preserve">+ TraceId: TraceId</text>
+<text class="mono" x="2164" y="1312" xml:space="preserve">+ Por: Id [0..1]  pessoa ou banco</text>
+<text class="muted" x="2164" y="1346" xml:space="preserve">fatura, pagamento e estorno (RNF-244)</text>
+<path class="edge" d="M640,963 H688" marker-start="url(#composicao)"/>
+<rect class="edge-label-bg" x="636.5" y="945.0" width="55.0" height="16"/>
+<text class="muted" x="664.0" y="957.0" text-anchor="middle">Dados 1</text>
+<path class="edge" d="M1208,828 H1256" marker-start="url(#composicao)"/>
+<path class="edge" d="M1208,952 H1256" marker-start="url(#composicao)"/>
+<path class="edge" d="M1208,1081 H1256" marker-start="url(#composicao)"/>
+<path class="edge" d="M600,1174 V1255 H1256" marker-start="url(#composicao)"/>
+<rect class="edge-label-bg" x="852.3" y="1237.0" width="95.4" height="16"/>
+<text class="muted" x="900" y="1249.0" text-anchor="middle">Estornos 0..*</text>
+<text class="section" x="40" y="1426">3 · CONFIGURAÇÃO, RECEBIMENTOS, AVISOS E CARD · configuracao/ · recebimentos/ · avisos/ · card/ (RF-190, RF-193, RN-305, RN-307 A RN-311)</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="40" y="1450" width="600" height="306" rx="6"/></g>
+<text class="uml-keyword" x="340.0" y="1468" text-anchor="middle">«aggregate root»</text>
+<text class="label-strong" x="340.0" y="1488" text-anchor="middle">ConfiguracaoDoPagamento</text>
+<line class="divider" x1="40" y1="1498" x2="640" y2="1498"/>
+<text class="mono" x="52" y="1518" xml:space="preserve">+ Versao: long  If-Match "4"</text>
+<text class="mono" x="52" y="1536" xml:space="preserve">+ Formas: FormasAceitas</text>
+<text class="mono" x="52" y="1554" xml:space="preserve">+ JurosAoDia: decimal  0..1 %, padrão 0</text>
+<text class="mono" x="52" y="1572" xml:space="preserve">+ ToleranciaAvisoDias: int  0..30</text>
+<text class="mono" x="52" y="1590" xml:space="preserve">+ DiaVencimento: int  10</text>
+<text class="mono" x="52" y="1608" xml:space="preserve">+ Prazos: Prazos</text>
+<text class="mono" x="52" y="1626" xml:space="preserve">+ VigenteDesde: DateTime</text>
+<line class="divider" x1="40" y1="1640" x2="640" y2="1640"/>
+<text class="mono" x="52" y="1660" xml:space="preserve">+ Alterar(nova, versaoLida, por, agora)  → CONFIGURACAO_MUDOU (412)</text>
+<text class="mono" x="52" y="1678" xml:space="preserve">+ Validar()  nenhuma forma → FORMA_OBRIGATORIA; fora do limite → DADOS_INVALIDOS</text>
+<text class="mono" x="52" y="1696" xml:space="preserve">+ Aceita(forma): bool  → FORMA_INDISPONIVEL</text>
+<text class="muted" x="52" y="1730" xml:space="preserve">as versões ficam guardadas: os juros usam a taxa</text>
+<text class="muted" x="52" y="1748" xml:space="preserve">vigente no dia do vencimento (RN-310)</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="688" y="1450" width="520" height="116" rx="6"/></g>
+<text class="uml-keyword" x="948.0" y="1468" text-anchor="middle">«value object»</text>
+<text class="label-strong" x="948.0" y="1488" text-anchor="middle">FormasAceitas</text>
+<line class="divider" x1="688" y1="1498" x2="1208" y2="1498"/>
+<text class="mono" x="700" y="1518" xml:space="preserve">+ Pix · CartaoCredito · CartaoDebito · Boleto: bool</text>
+<line class="divider" x1="688" y1="1532" x2="1208" y2="1532"/>
+<text class="mono" x="700" y="1552" xml:space="preserve">+ Ligadas(): FormaDePagamento[*]</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="688" y="1590" width="520" height="146" rx="6"/></g>
+<text class="uml-keyword" x="948.0" y="1608" text-anchor="middle">«value object»</text>
+<text class="label-strong" x="948.0" y="1628" text-anchor="middle">Prazos</text>
+<line class="divider" x1="688" y1="1638" x2="1208" y2="1638"/>
+<text class="mono" x="700" y="1658" xml:space="preserve">+ PixMinutos: int  5..1.440, padrão 30</text>
+<text class="mono" x="700" y="1676" xml:space="preserve">+ DebitoMinutos: int  5..30, padrão 10</text>
+<text class="mono" x="700" y="1694" xml:space="preserve">+ BoletoDiasUteis: int  1..30, padrão 3</text>
+<text class="muted" x="700" y="1728" xml:space="preserve">limites a validar na revisão do usuário</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1256" y="1450" width="400" height="206" rx="6"/></g>
+<text class="uml-keyword" x="1456.0" y="1468" text-anchor="middle">«read model»</text>
+<text class="label-strong" x="1456.0" y="1488" text-anchor="middle">ResumoDaCompetencia</text>
+<line class="divider" x1="1256" y1="1498" x2="1656" y2="1498"/>
+<text class="mono" x="1268" y="1518" xml:space="preserve">+ Competencia</text>
+<text class="mono" x="1268" y="1536" xml:space="preserve">+ Faturado · Recebido · AReceber: Total</text>
+<text class="mono" x="1268" y="1554" xml:space="preserve">+ Vencido: Total</text>
+<text class="mono" x="1268" y="1572" xml:space="preserve">+ Inadimplencia: decimal  %</text>
+<text class="mono" x="1268" y="1590" xml:space="preserve">+ Duplicidades: int</text>
+<text class="mono" x="1268" y="1608" xml:space="preserve">+ PorForma: Total[4]</text>
+<line class="divider" x1="1256" y1="1622" x2="1656" y2="1622"/>
+<text class="mono" x="1268" y="1642" xml:space="preserve">+ Selo(): Em dia | Lento (&gt; 2 %)  RN-308</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1256" y="1680" width="400" height="182" rx="6"/></g>
+<text class="uml-keyword" x="1456.0" y="1698" text-anchor="middle">«record»</text>
+<text class="label-strong" x="1456.0" y="1718" text-anchor="middle">AvisoDoBanco</text>
+<line class="divider" x1="1256" y1="1728" x2="1656" y2="1728"/>
+<text class="mono" x="1268" y="1748" xml:space="preserve">+ Id: Texto  id do aviso (idempotência)</text>
+<text class="mono" x="1268" y="1766" xml:space="preserve">+ IdExterno · Tipo · RecebidoEm</text>
+<text class="mono" x="1268" y="1784" xml:space="preserve">+ AssinaturaValida: bool</text>
+<text class="mono" x="1268" y="1802" xml:space="preserve">+ TraceId: TraceId  novo, ligado ao IdExterno</text>
+<text class="mono" x="1268" y="1820" xml:space="preserve">+ TraceIdOrigem [0..1]  dos metadados</text>
+<text class="muted" x="1268" y="1854" xml:space="preserve">repetido ou desconhecido: 200 sem efeito</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1704" y="1450" width="400" height="198" rx="6"/></g>
+<text class="uml-keyword" x="1904.0" y="1468" text-anchor="middle">«entity»</text>
+<text class="label-strong" x="1904.0" y="1488" text-anchor="middle">AvisoDeAtraso</text>
+<line class="divider" x1="1704" y1="1498" x2="2104" y2="1498"/>
+<text class="mono" x="1716" y="1518" xml:space="preserve">+ Tipo: FATURA_EM_ATRASO</text>
+<text class="mono" x="1716" y="1536" xml:space="preserve">+ FaturaId · ContaId</text>
+<text class="mono" x="1716" y="1554" xml:space="preserve">+ Vencimento · Desde</text>
+<line class="divider" x1="1704" y1="1568" x2="2104" y2="1568"/>
+<text class="mono" x="1716" y="1588" xml:space="preserve">+ Ativo(hoje, tolerancia): bool  RN-311</text>
+<text class="mono" x="1716" y="1606" xml:space="preserve">+ Encerrar()  fatura PAGA ou CANCELADA</text>
+<text class="muted" x="1716" y="1640" xml:space="preserve">só no módulo; sem e-mail; não bloqueia a conta</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1704" y="1672" width="400" height="180" rx="6"/></g>
+<text class="uml-keyword" x="1904.0" y="1690" text-anchor="middle">«read model»</text>
+<text class="label-strong" x="1904.0" y="1710" text-anchor="middle">CardDoPagamento</text>
+<line class="divider" x1="1704" y1="1720" x2="2104" y2="1720"/>
+<text class="mono" x="1716" y="1740" xml:space="preserve">+ Modulo: "MOD-01" · Perfil</text>
+<text class="mono" x="1716" y="1758" xml:space="preserve">+ Versao · AtualizadoEm · Selo</text>
+<text class="mono" x="1716" y="1776" xml:space="preserve">+ Serie: Ponto[12]</text>
+<line class="divider" x1="1704" y1="1790" x2="2104" y2="1790"/>
+<text class="mono" x="1716" y="1810" xml:space="preserve">+ MontarDoDia(perfil, faturas, pagamentos)</text>
+<text class="muted" x="1716" y="1844" xml:space="preserve">perfis DEBOAZ, INSTITUICAO e AUTONOMO (RN-307)</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="2152" y="1450" width="368" height="118" rx="6"/></g>
+<text class="uml-keyword" x="2336.0" y="1468" text-anchor="middle">«enumeration»</text>
+<text class="label-strong" x="2336.0" y="1488" text-anchor="middle">PerfilDoCard</text>
+<line class="divider" x1="2152" y1="1498" x2="2520" y2="1498"/>
+<text class="mono" x="2164" y="1518" xml:space="preserve">DEBOAZ</text>
+<text class="mono" x="2164" y="1536" xml:space="preserve">INSTITUICAO</text>
+<text class="mono" x="2164" y="1554" xml:space="preserve">AUTONOMO</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="2152" y="1592" width="368" height="218" rx="6"/></g>
+<text class="uml-keyword" x="2336.0" y="1610" text-anchor="middle">«enumeration»</text>
+<text class="label-strong" x="2336.0" y="1630" text-anchor="middle">AcaoAuditada</text>
+<line class="divider" x1="2152" y1="1640" x2="2520" y2="1640"/>
+<text class="mono" x="2164" y="1660" xml:space="preserve">PAGAMENTO_CRIADO</text>
+<text class="mono" x="2164" y="1678" xml:space="preserve">PAGAMENTO_CANCELADO</text>
+<text class="mono" x="2164" y="1696" xml:space="preserve">FATURA_CANCELADA</text>
+<text class="mono" x="2164" y="1714" xml:space="preserve">ESTORNO_PEDIDO</text>
+<text class="mono" x="2164" y="1732" xml:space="preserve">CONFIGURACAO_SALVA</text>
+<text class="mono" x="2164" y="1750" xml:space="preserve">AVISO_DO_BANCO</text>
+<text class="mono" x="2164" y="1768" xml:space="preserve">FATURA_VENCIDA</text>
+<text class="muted" x="2164" y="1802" xml:space="preserve">commons/auditoria (RN-309)</text>
+<path class="edge" d="M640,1508 H688" marker-start="url(#composicao)"/>
+<rect class="edge-label-bg" x="633.1" y="1490.0" width="61.8" height="16"/>
+<text class="muted" x="664.0" y="1502.0" text-anchor="middle">Formas 1</text>
+<path class="edge" d="M640,1663 H688" marker-start="url(#composicao)"/>
+<rect class="edge-label-bg" x="633.1" y="1645.0" width="61.8" height="16"/>
+<text class="muted" x="664.0" y="1657.0" text-anchor="middle">Prazos 1</text>
+<text class="section" x="40" y="1934">4 · PORTAS · ports/in (casos de uso, implementados em usecases/) · ports/out (adaptadores do ms_mono)</text>
+<g filter="url(#sombra)"><rect class="node-purple" x="40" y="1958" width="600" height="136" rx="6"/></g>
+<text class="uml-keyword" x="340.0" y="1976" text-anchor="middle">«interface» · faturas/ports/in</text>
+<text class="label-strong" x="340.0" y="1996" text-anchor="middle">portas de entrada</text>
+<line class="divider" x1="40" y1="2006" x2="640" y2="2006"/>
+<text class="mono" x="52" y="2026" xml:space="preserve">IListarFaturas · IVerFatura · IVerFormas</text>
+<text class="mono" x="52" y="2044" xml:space="preserve">IFecharCompetencia  agendamento, dia 1</text>
+<text class="mono" x="52" y="2062" xml:space="preserve">IVirarVencidas  agendamento, 03:00</text>
+<text class="mono" x="52" y="2080" xml:space="preserve">IContaTemFaturaEmAberto  usado pelo 17 (RN-313)</text>
+<g filter="url(#sombra)"><rect class="node-purple" x="664" y="1958" width="600" height="154" rx="6"/></g>
+<text class="uml-keyword" x="964.0" y="1976" text-anchor="middle">«interface» · pagamentos/ports/in</text>
+<text class="label-strong" x="964.0" y="1996" text-anchor="middle">portas de entrada</text>
+<line class="divider" x1="664" y1="2006" x2="1264" y2="2006"/>
+<text class="mono" x="676" y="2026" xml:space="preserve">IPagarFatura · IVerPagamento · ICancelarPagamento</text>
+<text class="mono" x="676" y="2044" xml:space="preserve">IBaixarBoleto · IBaixarComprovante</text>
+<text class="mono" x="676" y="2062" xml:space="preserve">IAcompanharPagamento  ao vivo</text>
+<text class="mono" x="676" y="2080" xml:space="preserve">IReceberAvisoDoBanco</text>
+<text class="mono" x="676" y="2098" xml:space="preserve">IExpirarPagamentos · IConsultarPendentes  agendamento</text>
+<g filter="url(#sombra)"><rect class="node-purple" x="1288" y="1958" width="600" height="118" rx="6"/></g>
+<text class="uml-keyword" x="1588.0" y="1976" text-anchor="middle">«interface» · recebimentos/ports/in</text>
+<text class="label-strong" x="1588.0" y="1996" text-anchor="middle">portas de entrada</text>
+<line class="divider" x1="1288" y1="2006" x2="1888" y2="2006"/>
+<text class="mono" x="1300" y="2026" xml:space="preserve">IVerRecebimentos · IListarCompetencias</text>
+<text class="mono" x="1300" y="2044" xml:space="preserve">IListarFaturasDeTodas · ICancelarFatura</text>
+<text class="mono" x="1300" y="2062" xml:space="preserve">IEstornarPagamento</text>
+<g filter="url(#sombra)"><rect class="node-purple" x="1912" y="1958" width="600" height="118" rx="6"/></g>
+<text class="uml-keyword" x="2212.0" y="1976" text-anchor="middle">«interface» · configuracao · avisos · card</text>
+<text class="label-strong" x="2212.0" y="1996" text-anchor="middle">portas de entrada</text>
+<line class="divider" x1="1912" y1="2006" x2="2512" y2="2006"/>
+<text class="mono" x="1924" y="2026" xml:space="preserve">IVerConfiguracao · ISalvarConfiguracao</text>
+<text class="mono" x="1924" y="2044" xml:space="preserve">IVerAvisos</text>
+<text class="mono" x="1924" y="2062" xml:space="preserve">IVerCard · IAcompanharCard · IMontarCardDoDia</text>
+<g filter="url(#sombra)"><rect class="node-green" x="40" y="2140" width="600" height="118" rx="6"/></g>
+<text class="uml-keyword" x="340.0" y="2158" text-anchor="middle">«interface» · ports/out · repositórios</text>
+<text class="label-strong" x="340.0" y="2178" text-anchor="middle">portas de saída</text>
+<line class="divider" x1="40" y1="2188" x2="640" y2="2188"/>
+<text class="mono" x="52" y="2208" xml:space="preserve">IFaturas  DaConta, DeTodas, Resumo, Criar, Salvar</text>
+<text class="mono" x="52" y="2226" xml:space="preserve">IPagamentos  Criar, Salvar, EmAberto, AguardandoAte</text>
+<text class="mono" x="52" y="2244" xml:space="preserve">IEstornos · IContadores  FAT, PAG, EST</text>
+<g filter="url(#sombra)"><rect class="node-green" x="664" y="2140" width="600" height="154" rx="6"/></g>
+<text class="uml-keyword" x="964.0" y="2158" text-anchor="middle">«interface» · ports/out · fora do core</text>
+<text class="label-strong" x="964.0" y="2178" text-anchor="middle">portas de saída</text>
+<line class="divider" x1="664" y1="2188" x2="1264" y2="2188"/>
+<text class="mono" x="676" y="2208" xml:space="preserve">IIntermediador  CobrarCartao, GerarPix, EmitirBoleto,</text>
+<text class="mono" x="676" y="2226" xml:space="preserve">  Estornar, Consultar, ValidarAssinatura</text>
+<text class="mono" x="676" y="2244" xml:space="preserve">  todas com o TraceId (cabeçalho e metadados)</text>
+<text class="mono" x="676" y="2262" xml:space="preserve">ICobrancasDoMes  lê as cobrancas do 16</text>
+<text class="mono" x="676" y="2280" xml:space="preserve">IGeradorDePdf  comprovante</text>
+<g filter="url(#sombra)"><rect class="node-green" x="1288" y="2140" width="600" height="100" rx="6"/></g>
+<text class="uml-keyword" x="1588.0" y="2158" text-anchor="middle">«interface» · ports/out · apoio</text>
+<text class="label-strong" x="1588.0" y="2178" text-anchor="middle">portas de saída</text>
+<line class="divider" x1="1288" y1="2188" x2="1888" y2="2188"/>
+<text class="mono" x="1300" y="2208" xml:space="preserve">IConfiguracaoDoPagamento  Atual, VigenteEm(data), Salvar</text>
+<text class="mono" x="1300" y="2226" xml:space="preserve">IAvisosDoBanco · IAvisos · ICardDoPagamento</text>
+<g filter="url(#sombra)"><rect class="node-green" x="1912" y="2140" width="600" height="118" rx="6"/></g>
+<text class="uml-keyword" x="2212.0" y="2158" text-anchor="middle">«interface» · ports/out · tempo real e comuns</text>
+<text class="label-strong" x="2212.0" y="2178" text-anchor="middle">portas de saída</text>
+<line class="divider" x1="1912" y1="2188" x2="2512" y2="2188"/>
+<text class="mono" x="1924" y="2208" xml:space="preserve">ICanalDoPagamento  Publicar(evento com traceId), Assinar</text>
+<text class="mono" x="1924" y="2226" xml:space="preserve">IRelogio · IAuditoria  commons/auditoria</text>
+<text class="mono" x="1924" y="2244" xml:space="preserve">Execucao (traceId, quem, conta) chega a cada caso de uso</text>
+<g id="marca-topo"><rect class="wm-band" x="0" y="0" width="2560" height="112"/><rect class="wm-accent" x="0" y="110" width="2560" height="2"/>
+<text class="wm-eyebrow" x="40" y="40">BOAZ · DIAGRAMA DE CLASSES</text>
+<text class="title" x="40" y="72">Pagamento · classes</text>
+<text class="subtitle" x="40" y="94">Domínio do core/hub/pagamento: Fatura e Pagamento (agregados), Estorno, Configuração, recebimentos, avisos, card e as portas</text>
+<text class="wm-meta-label" x="2248" y="44">VERSÃO</text>
+<rect class="wm-badge" x="2248" y="56" width="48" height="22" rx="11"/>
+<text class="wm-badge-text" x="2272" y="71" text-anchor="middle">v02</text>
+<line class="wm-sep" x1="2344" y1="32" x2="2344" y2="80"/>
+<text class="wm-meta-label" x="2368" y="44">DATA</text>
+<text class="wm-meta-value" x="2368" y="72">2026-11-14 · 02:29</text>
+</g>
+<g id="marca-rodape" transform="translate(0,2376)">
+<rect class="wm-band" x="0" y="0" width="2560" height="116"/>
+<line class="wm-sep" x1="0" y1="0.5" x2="2560" y2="0.5"/>
+<text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+<rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/>
+<text class="label" x="62" y="58">classe do domínio</text>
+<rect class="node-orange" x="213" y="47" width="14" height="14" rx="3"/>
+<text class="label" x="235.76000000000002" y="58">valor, enumeração ou falha</text>
+<rect class="node-purple" x="453" y="47" width="14" height="14" rx="3"/>
+<text class="label" x="475.0400000000001" y="58">porta de entrada (ports/in)</text>
+<rect class="node-green" x="699" y="47" width="14" height="14" rx="3"/>
+<text class="label" x="721.6000000000001" y="58">porta de saída (ports/out)</text>
+<line class="edge" x1="938" y1="54" x2="966" y2="54"/>
+<text class="label" x="978.8800000000001" y="58">composição (losango no todo)</text>
+<line class="divider" x1="40" y1="76" x2="2520" y2="76"/>
+<text class="footer" x="40" y="100">v02 · TraceId, MudancaDeStatus e traceId nas transações (19 v04, RNF-243, RNF-244); estrutura de 14_estrutura-projetos; core só .NET nativo</text>
+<text class="wm-file" x="2520" y="100" text-anchor="end">pagamento-classes_v02_20261114-0229.svg</text>
+</g>
+</svg>
