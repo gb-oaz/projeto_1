@@ -81,6 +81,22 @@ read -rs VALOR && az keyvault secret set --vault-name deb-boaz-app-hml-kv \
   --name usuario-admin-senha --value "$VALOR" --output none && unset VALOR
 ```
 
+### Mercado Pago no Key Vault (19: RNF-242)
+
+O intermediador de pagamento segue o mesmo caminho: grave à mão, no Key Vault
+de **hml e de prd**, as credenciais da conta do Mercado Pago do ambiente (de
+teste em hml, de produção em prd). O Terraform só referencia o nome; nenhum
+valor vai para o repositório, a imagem, o pipeline nem o log. Com o Access
+Token presente, o `backend-mono` usa o Mercado Pago; em prd, segredo ausente
+impede a revisão de subir. O CI local (`4_CI_CD/local/ci.sh`) não recebe esses
+segredos e roda com o intermediador falso e o relógio de teste.
+
+| Segredo | Variável de ambiente | hml | prd |
+|---|---|---|---|
+| `mercadopago-public-key` | `MercadoPago__PublicKey` | sim | sim |
+| `mercadopago-access-token` | `MercadoPago__AccessToken` | sim | sim |
+| `mercadopago-segredo-webhook` | `MercadoPago__SegredoDoWebhook` (assinatura das notificações) | sim | sim |
+
 ## Rodar localmente
 
 O CD é o caminho normal (`.github/workflows/cd.yml`). Para conferir um plano:

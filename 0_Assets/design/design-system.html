@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Design system · boaz · v45</title>
+<title>Design system · boaz · v46</title>
 <meta name="design:projeto" content="boaz">
-<meta name="design:versao" content="v45">
-<meta name="design:data" content="2026-11-09 01:10">
+<meta name="design:versao" content="v46">
+<meta name="design:data" content="2026-11-15 00:12">
 <meta name="design:status" content="Identidade provisória">
 <!-- design:tokens:inicio — gerado por scripts/gerar.mjs (pnpm run gerar); não edite este bloco à mão -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;700&display=swap">
@@ -25533,8 +25533,8 @@ tr.atual td { background: var(--md-sys-color-secondary-container); color: var(--
       <h1 class="md-typescale-display-small">Identidade visual e componentes</h1>
       <p class="objetivo md-typescale-body-large">Uma única fonte de cores, tipografia, formas, layout e componentes para as aplicações web e o aplicativo, no padrão do Material Design 3, pronta para receber a identidade da marca.</p>
       <div class="carimbo">
-        <span class="md-chip">Versão&nbsp;<b>v45</b></span>
-        <span class="md-chip">Data&nbsp;<b>2026-11-09 01:10</b></span>
+        <span class="md-chip">Versão&nbsp;<b>v46</b></span>
+        <span class="md-chip">Data&nbsp;<b>2026-11-15 00:12</b></span>
         <span class="md-chip" aria-pressed="true"><span class="material-symbols">pending</span>Identidade provisória</span>
       </div>
     </header>
@@ -26356,6 +26356,7 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
       <div class="tabela"><table>
         <thead><tr><th>Versão</th><th>Data</th><th>Mudança</th></tr></thead>
         <tbody>
+          <tr><td>v46</td><td>2026-11-15 00:12</td><td>Ícones do módulo Pagamento (Material Symbols): <code>cartao</code> (credit_card), <code>copiar</code> (content_copy), <code>baixar</code> (download), <code>qr</code> (qr_code), <code>recibo</code> (receipt), <code>sem-rede</code> (cloud_off), <code>celular</code> (smartphone), <code>banco</code> (account_balance), <code>estorno</code> (undo), <code>bloquear</code> (block), <code>info</code> (info) e <code>cadeado</code> (lock), usados nas vistas de faturas, pagar, recebimentos e configuração</td></tr>
           <tr><td>v45</td><td>2026-11-09 01:10</td><td>Card de módulo com o seletor do recorte Dia | Semana | Mês (botão segmentado cheio, <code>md.comp.segmented-button</code>) quando o módulo tem série: o toque no seletor troca a série e a tendência sem abrir o módulo (o card abre por um botão que o cobre, classe <code>abrir</code>, e o seletor <code>recorte</code> fica por cima); normal com os 5 últimos pontos e expandida com a série longa de 12 pontos rotulada (meses dez a nov, S1 a S12 ou dias), classe <code>serie-longa</code> (15 RN-277)</td></tr>
           <tr><td>v44</td><td>2026-11-01 13:05</td><td>Componente comum Aviso de ação (<code>md.comp.action-notice</code>, classe <code>cx-aviso-acao</code>): toda ação confirmada mostra o resultado, bom ou ruim, com o selo de status animado e a cor do tom — concluído (Voltou!), informação (Operacional), recusado (Instabilidade), indisponível (Fora do ar) e espera (Manutenção), na tela ou flutuante; selos e ilustrações de status sempre animados, parados só com movimento reduzido</td></tr>
           <tr><td>v43</td><td>2026-10-31 23:44</td><td>Ícones <code>pessoas</code> (Material group), do módulo Usuários, e <code>loja</code> (Material store), do módulo Catálogo, para a ficha do módulo (RN-217, RN-219)</td></tr>
@@ -26365,11 +26366,9 @@ img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);</code><
           <tr><td>v39</td><td>2026-10-31 18:36</td><td>Barra lateral em acordeão (<code>md.comp.navigation-drawer.side-*</code>, <code>subitem-*</code>, <code>expand-icon-size</code>) para a navegação do hub e do quest no medium e no expanded, com os subníveis dentro dos destinos; ícones <code>expandir</code> e <code>recolher</code>; navegação da casca com abas primárias para os subníveis no compact e os destinos novos (Módulos, Feed, Conta; Tarefas, Feed, Carteira, Perfil)</td></tr>
           <tr><td>v38</td><td>2026-10-31 16:23</td><td>Ícones <code>feed</code> (Material dynamic_feed) e <code>carteira</code> (Material account_balance_wallet), para os destinos Feed do hub e do quest e Carteira do quest nas barras de navegação e no trilho</td></tr>
           <tr><td>v37</td><td>2026-10-29 02:50</td><td>Componente Barra de busca (<code>md.comp.search-bar</code>, classe <code>md-busca</code>): pesquisa numa lista, em surface-container-high e canto full, com ícone de busca e botão de limpar; usada nas listas de staff, participantes, contas e SAC do requisito 15</td></tr>
-          <tr><td>v36</td><td>2026-10-28 02:35</td><td>App (MAUI): splash nativa também no escuro (<code>plataformas/maui/splash/splash_&lt;frente&gt;_escuro.svg</code> para o Android em modo noturno e o catálogo <code>Splash.xcassets</code>, com fundo e símbolo claro/escuro, para o <code>UILaunchScreen</code> do iOS) e o mascote da abertura da frente parado (<code>mascote_&lt;frente&gt;.svg</code>), que o app anima</td></tr>
-          <tr><td>v35</td><td>2026-10-28 01:37</td><td>App (MAUI): ícone oficial (<code>plataformas/maui/icones/appicon.svg</code> + <code>appiconfg[_curto].svg</code>, para o <code>MauiIcon</code>) e ícone da splash nativa no claro (<code>plataformas/maui/splash/splash_&lt;frente&gt;.svg</code>, para o <code>MauiSplashScreen</code>), copiados para <code>core/commons/Resources/Styles/Design/</code> do mobile; em <code>Marca.xaml</code>, o nome passa a <code>FillRule="Nonzero"</code> (no EvenOdd, a sobreposição da barriga com a haste do d e do b virava um risco vazado)</td></tr>
 </tbody>
       </table></div>
-      <div class="linha-final"><span>boaz · v45 · 2026-11-09 01:10</span><span class="mono">0_Assets/design/design-system.html</span></div>
+      <div class="linha-final"><span>boaz · v46 · 2026-11-15 00:12</span><span class="mono">0_Assets/design/design-system.html</span></div>
     </footer>
   </div>
 </main>

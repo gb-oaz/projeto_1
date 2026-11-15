@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "19_modulo-pagamento"
 tipo: "Funcionalidade"
 titulo: "Pagamento"
-versao: "v04"
-data: "2026-11-14 04:32"
+versao: "v05"
+data: "2026-11-15 00:34"
 status: "Rascunho"
 objetivo: "permitir que a instituição e o educador autônomo paguem pelo hub a fatura mensal dos módulos contratados, com PIX, cartão de crédito, cartão de débito ou boleto, e que o deboaz acompanhe tudo o que recebeu, tem a receber e está vencido."
 ---
 
-> **boaz · Funcionalidade** · `19_modulo-pagamento` · **v04** · 2026-11-14 04:32 · **Rascunho**
+> **boaz · Funcionalidade** · `19_modulo-pagamento` · **v05** · 2026-11-15 00:34 · **Rascunho**
 
 # Pagamento
 
@@ -244,6 +244,14 @@ Cenário: boleto gerado
   E a linha digitável "23793.38128 60000.000003 00000.000400 1 12960000369833"
   E os botões "Copiar linha digitável" e "Baixar boleto (PDF)"
   E o apoio "Pagamentos com boleto levam até 3 dias úteis para serem confirmados."
+
+Cenário: endereço de quem paga o boleto
+  Dado a EBFGA sem nenhum boleto gerado antes
+  Quando a Rita escolhe "Boleto" na FAT-000402
+  Então vê "Endereço de quem paga", com o apoio "O banco exige o endereço no boleto."
+  E os campos "CEP", "Rua", "Número", "Bairro", "Cidade" e "UF", e o botão "Gerar boleto"
+  E o boleto sai em nome da Escola Bento Freitas, com o CNPJ 12.345.678/0001-90 da conta
+  E no próximo boleto da EBFGA os campos já vêm com o último endereço usado
 
 Cenário: boleto compensado
   Dado o boleto da FAT-000402 pago no banco em 2026-12-04
@@ -735,7 +743,7 @@ Esquema do Cenário: dados do card por perfil e tamanho
     | deboaz      | 2026-11-14 | mínima   | o ícone e o selo "9": faturas vencidas                 |
     | deboaz      | 2026-11-14 | reduzida | R$ 186k · recebido no mês                              |
     | deboaz      | 2026-11-14 | normal   | R$ 186.400,00, "+3,1 % no mês" e os apoios             |
-    | instituição | 2026-12-03 | mínima   | o ícone e o selo "1": a pagar em até 5 dias ou vencida |
+    | instituição | 2026-12-03 | mínima   | o ícone e o selo "1": vencida ou vence em 5 dias úteis |
     | instituição | 2026-12-03 | reduzida | R$ 3.698,33 · a pagar                                  |
     | instituição | 2026-12-03 | normal   | R$ 3.698,33, "Vence em 10/12" e os apoios              |
     | autônomo    | 2026-11-14 | mínima   | o ícone e o selo "1": a FAT-000371 vencida             |
@@ -761,6 +769,11 @@ Esquema do Cenário: lista da expandida de cada perfil
     | deboaz      | Vencido R$ 14.329,80   | A receber R$ 0,00    | Inadimplência 6,7 %       |
     | instituição | A pagar R$ 3.698,33    | Vencidas 0           | Pago no ano R$ 39.810,44  |
     | autônomo    | Vencido R$ 294,00      | Vencidas 1           | Pago no ano R$ 2.646,00   |
+
+Cenário: deboaz sem recebido no mês anterior
+  Dado nenhum valor recebido em outubro de 2026
+  Quando o administrador vê o card na normal em 2026-11-14
+  Então a tendência mostra "Sem recebido no mês anterior"
 
 Cenário: série de 5 pontos do deboaz, no recorte "Mês"
   Quando o administrador vê o card na normal
@@ -984,7 +997,7 @@ Cenário: a cobrança espera a volta
 
 Cenário: conta com fatura em aberto não se exclui
   Dado a conta do Pedro com a FAT-000371 "Vencida"
-  Quando o administrador do deboaz pede para excluir a conta do Pedro
+  Quando o administrador do deboaz encerra a conta do Pedro na lista Contas
   Então vê "Esta conta tem fatura em aberto e não pode ser excluída."
   E a conta e a fatura seguem como estavam
 
@@ -1075,7 +1088,42 @@ Cenário: identificadores, datas e valores
   E todo valor vai em reais, com duas casas, como 3698.33
   E status e forma vão em maiúsculas, como "A_PAGAR" e "CARTAO_CREDITO"
   E o pagador usa "MOD-01" com "U"; o recebedor é só o papel "ADMINISTRADOR"
+  E o "MOD-01" com "U" do administrador só abre o card; as rotas do recebedor checam o papel
   E toda resposta do Pagamento, de sucesso ou de erro, traz o cabeçalho X-Trace-Id
+
+Esquema do Cenário: mensagem de cada código de erro
+  Quando a resposta do Pagamento é <resposta>
+  Então a "mensagem" do corpo é "<mensagem>"
+
+  Exemplos:
+    | resposta                     | mensagem                                                    |
+    | 403 ACESSO_NEGADO            | Você não tem permissão para esta ação.                      |
+    | 404 FATURA_INEXISTENTE       | Fatura não encontrada.                                      |
+    | 404 PAGAMENTO_INEXISTENTE    | Pagamento não encontrado.                                   |
+    | 404 BOLETO_INEXISTENTE       | Este pagamento não tem boleto.                              |
+    | 409 FATURA_PAGA              | Esta fatura já está paga.                                   |
+    | 409 FATURA_CANCELADA         | Fatura cancelada não recebe pagamento.                      |
+    | 409 PAGAMENTO_EM_ABERTO      | Esta fatura já tem um pagamento em andamento.               |
+    | 409 PAGAMENTO_CONFIRMADO     | Pagamento já confirmado pelo banco: não pode ser cancelado. |
+    | 409 PAGAMENTO_NAO_CONFIRMADO | Este pagamento ainda não foi confirmado pelo banco.         |
+    | 409 ESTORNO_EM_ANDAMENTO     | Aguarde o estorno em andamento.                             |
+    | 409 ESTORNO_PELO_SAC         | O estorno de boleto é pedido pela própria conta no SAC.     |
+    | 412 CONFIGURACAO_MUDOU       | A configuração mudou. Recarregue e salve de novo.           |
+    | 422 FORMA_INDISPONIVEL       | Esta forma de pagamento não está disponível agora.          |
+    | 422 FORMA_OBRIGATORIA        | Mantenha ao menos uma forma ligada.                         |
+    | 428 VERSAO_AUSENTE           | Envie a versão lida da configuração no If-Match.            |
+    | 401 ASSINATURA_INVALIDA      | Assinatura do aviso inválida.                               |
+    | 503 BANCO_INDISPONIVEL       | Não conseguimos falar com o banco agora. Nada foi cobrado.  |
+
+Esquema do Cenário: mensagens com valor
+  Quando a resposta do Pagamento é <caso>
+  Então a "mensagem" do corpo é "<mensagem>"
+
+  Exemplos:
+    | caso                                | mensagem                                            |
+    | 422 DADOS_INVALIDOS, campo "forma"  | O campo "forma" está faltando ou é inválido.        |
+    | 422 ESTORNO_ACIMA_DO_SALDO, 2698.33 | Valor acima do saldo de R$ 2.698,33.                |
+    | 409 FATURA_PAGA, ao cancelar        | Fatura paga não pode ser cancelada. Faça o estorno. |
 ```
 
 <a id="RF-182-api"></a>
@@ -1190,9 +1238,14 @@ Cenário: fatura cancelada
   Então a resposta é 200 com o status "CANCELADA", "canceladaEm" e o motivo
   E "motivo" é "Cobrança em dobro do Quiz"
 
-Cenário: fatura de outra conta ou que não existe
+Esquema do Cenário: fatura de outra conta ou que não existe
   Quando a conta master da EBFGA envia GET /pagamento/faturas/<id>
-  Então a resposta é 404 FATURA_INEXISTENTE, seja do Pedro, a FAT-000371, ou a FAT-999999
+  Então a resposta é 404 FATURA_INEXISTENTE, sem dizer se a fatura existe
+
+  Exemplos:
+    | id         | fatura                   |
+    | FAT-000371 | do Pedro Reis            |
+    | FAT-999999 | que não existe           |
 ```
 
 <a id="RF-184-api"></a>
@@ -1210,7 +1263,29 @@ Cenário: formas aceitas
         "PIX",
         "CARTAO_CREDITO",
         "CARTAO_DEBITO"
-      ]
+      ],
+      "cartao": {
+        "intermediador": "MERCADO_PAGO",
+        "chavePublica": "APP_USR-3f1c…"
+      },
+      "enderecoDoBoleto": null
+    }
+    """
+  E "chavePublica" é a chave pública do intermediador, que a tela usa para gerar o token
+  E fora de produção, com o intermediador falso, vem "intermediador": "FALSO"
+
+Cenário: último endereço do boleto da conta
+  Dado o boleto PAG-000785 da EBFGA gerado com o endereço da Rua Sete
+  Quando a Rita envia GET /pagamento/formas
+  Então "enderecoDoBoleto" traz:
+    """
+    {
+      "cep": "96015-000",
+      "logradouro": "Rua Sete de Setembro",
+      "numero": "1020",
+      "bairro": "Centro",
+      "cidade": "Pelotas",
+      "uf": "RS"
     }
     """
 
@@ -1262,6 +1337,10 @@ Cenário: código PIX gerado
     }
     """
 
+Cenário: QR Code desenhado pelo deboaz
+  Então "qrCodeSvg" é o QR Code do "copiaECola" desenhado em vetor, com quadrados do SVG
+  E não é a imagem do banco embrulhada no SVG
+
 Cenário: consultar o PIX
   Quando a Rita envia GET /pagamento/pagamentos/PAG-000772
   Então a resposta é 200 com o mesmo corpo e o status atual
@@ -1287,10 +1366,13 @@ Cenário: crédito aprovado
     {
       "forma": "CARTAO_CREDITO",
       "cartao": {
-        "token": "tok_9f2c71"
+        "token": "tok_9f2c71",
+        "metodo": "visa",
+        "emissor": "25"
       }
     }
     """
+  E "metodo" e "emissor" vêm do intermediador junto com o token; "emissor" pode faltar
   Então a resposta é 201 com:
     """
     {
@@ -1320,6 +1402,7 @@ Esquema do Cenário: cartão em análise ou inválido
     | cartao                               | resposta                                       |
     | um cartão em análise no banco        | 201 com o status "PROCESSANDO"                 |
     | o token "tok_vencido", já usado      | 422 DADOS_INVALIDOS com o campo "cartao.token" |
+    | o token sem o "metodo"               | 422 DADOS_INVALIDOS com o campo "cartao.metodo" |
     | sem o cartao                         | 422 DADOS_INVALIDOS com o campo "cartao"       |
 ```
 
@@ -1334,7 +1417,8 @@ Cenário: débito aguardando a confirmação
     {
       "forma": "CARTAO_DEBITO",
       "cartao": {
-        "token": "tok_d41b07"
+        "token": "tok_d41b07",
+        "metodo": "debmaster"
       }
     }
     """
@@ -1378,7 +1462,15 @@ Cenário: boleto gerado
   Quando a Rita envia POST /pagamento/faturas/FAT-000402/pagamentos em 2026-12-03T13:00:00Z com:
     """
     {
-      "forma": "BOLETO"
+      "forma": "BOLETO",
+      "endereco": {
+        "cep": "96015-000",
+        "logradouro": "Rua Sete de Setembro",
+        "numero": "1020",
+        "bairro": "Centro",
+        "cidade": "Pelotas",
+        "uf": "RS"
+      }
     }
     """
   Então a resposta é 201 com:
@@ -1397,11 +1489,23 @@ Cenário: boleto gerado
       }
     }
     """
+  E o boleto sai em nome da conta, "Escola Bento Freitas", com o documento 12.345.678/0001-90
 
 Cenário: PDF do boleto
   Quando a Rita envia GET /pagamento/pagamentos/PAG-000785/boleto
   Então a resposta é 200 com Content-Type "application/pdf"
   E Content-Disposition "attachment; filename=\"boleto-FAT-000402.pdf\""
+  E o PDF traz a linha digitável e o código de barras desenhado, no padrão intercalado 2 de 5
+
+Esquema do Cenário: endereço do boleto recusado
+  Quando a Rita envia o boleto da FAT-000402 <endereco>
+  Então a resposta é 422 DADOS_INVALIDOS com o campo "<campo>"
+
+  Exemplos:
+    | endereco                    | campo        |
+    | sem o endereco              | endereco     |
+    | com o CEP "9601-500"        | endereco.cep |
+    | com a UF "XX"               | endereco.uf  |
 
 Esquema do Cenário: fim do boleto
   Dado o PAG-000785 "AGUARDANDO", com vencimento em 2026-12-10
@@ -1412,7 +1516,11 @@ Esquema do Cenário: fim do boleto
     | evento                                           | resultado                               |
     | o banco confirma a compensação de 2026-12-04     | o status "PAGO" e pagoEm de 2026-12-04  |
     | chega 2026-12-16 sem compensação                 | o status "EXPIRADO"                     |
-    | a Rita envia GET .../boleto do PAG-000772, PIX   | 404 BOLETO_INEXISTENTE                  |
+
+Cenário: PDF de boleto de um PIX
+  Dado o PIX PAG-000772 da FAT-000402, já "EXPIRADO", sem boleto em aberto
+  Quando a Rita envia GET /pagamento/pagamentos/PAG-000772/boleto
+  Então a resposta é 404 BOLETO_INEXISTENTE
 ```
 
 <a id="RF-189-api"></a>
@@ -1526,7 +1634,7 @@ Esquema do Cenário: quem pede os recebimentos
 Cenário: vencidas de outubro
   Dado o token do administrador do deboaz, em 2026-11-14
   Quando envia GET /pagamento/recebimentos/faturas?competencia=2026-10&situacao=VENCIDA&pagina=1
-  Então a resposta é 200 com 9 itens, o vencimento mais antigo primeiro
+  Então a resposta é 200 só com faturas "VENCIDA" de "2026-10" e total com quantas são
   E o item da FAT-000371 é:
     """
     {
@@ -1550,9 +1658,15 @@ Cenário: busca
   E a busca vale para a sigla, o nome da conta e o número da fatura
 
 Cenário: ordem das vencidas
-  Então os 9 itens vêm do vencimento mais antigo e, no mesmo vencimento, do menor número:
-  E FAT-000352, FAT-000358, FAT-000364, FAT-000371, FAT-000377
-  E FAT-000383, FAT-000389, FAT-000394 e FAT-000398
+  Dado três faturas vencidas de "2026-10": A, com vencimento em 2026-11-08
+  E B e C, com vencimento em 2026-11-10, B emitida antes de C e com número menor
+  Quando o administrador pede as vencidas de "2026-10", como no cenário acima
+  Então A vem antes de B, e B antes de C
+
+Cenário: detalhe de uma fatura para o recebedor
+  Quando o administrador envia GET /pagamento/recebimentos/faturas/FAT-000402
+  Então a resposta é 200 com o mesmo corpo de GET /pagamento/faturas/FAT-000402 da conta
+  E a FAT-999999 dá 404 FATURA_INEXISTENTE
 
 Cenário: cancelar uma fatura
   Quando o administrador envia POST /pagamento/recebimentos/faturas/FAT-000371/cancelar com:
@@ -1600,11 +1714,51 @@ Cenário: estornar parte de um pagamento
       "pedidoEm": "2026-12-04T12:00:00Z"
     }
     """
-  E GET /pagamento/pagamentos/PAG-000773 traz o status "ESTORNO_PENDENTE"
+  E GET /pagamento/recebimentos/pagamentos/PAG-000773 traz o status "ESTORNO_PENDENTE"
+
+Cenário: pagamento com os estornos, para o recebedor
+  Dado o EST-000012 confirmado pelo banco em 2026-12-04T15:10:00Z
+  Quando o administrador envia GET /pagamento/recebimentos/pagamentos/PAG-000773
+  Então a resposta é 200 com:
+    """
+    {
+      "id": "PAG-000773",
+      "faturaId": "FAT-000402",
+      "conta": {
+        "id": "conta-ebfga",
+        "sigla": "EBFGA",
+        "nome": "Escola Bento Freitas"
+      },
+      "forma": "CARTAO_CREDITO",
+      "valor": 3698.33,
+      "status": "ESTORNADO_PARCIAL",
+      "pagoEm": "2026-12-03T13:42:00Z",
+      "pagoPor": "Rita Gomes",
+      "cartao": {
+        "bandeira": "VISA",
+        "final": "4242"
+      },
+      "estornado": 1473.92,
+      "saldo": 2224.41,
+      "estornos": [
+        {
+          "id": "EST-000012",
+          "valor": 1473.92,
+          "motivo": "Quiz cancelado",
+          "status": "CONCLUIDO",
+          "pedidoEm": "2026-12-04T12:00:00Z",
+          "concluidoEm": "2026-12-04T15:10:00Z"
+        }
+      ],
+      "traceId": "trc-1d6e3f08"
+    }
+    """
+  E GET /pagamento/pagamentos/PAG-000773 da conta traz a mesma lista "estornos"
 
 Esquema do Cenário: resposta do banco ao estorno
   Quando o banco <resposta do banco> o EST-000012
-  Então o PAG-000773 fica "<status>" e o estorno fica "<estorno>"
+  Então GET /pagamento/recebimentos/pagamentos/PAG-000773 traz o status "<status>"
+  E o EST-000012 em "estornos" com o status "<estorno>"
 
   Exemplos:
     | resposta do banco | status            | estorno   |
@@ -1652,9 +1806,10 @@ Cenário: configuração atual
     """
 
 Cenário: desligar o boleto
-  Quando o administrador envia PUT /pagamento/recebimentos/configuracao com If-Match "4"
+  Dado a configuração lida pelo administrador, como a versão 4 acima
+  Quando ele envia PUT /pagamento/recebimentos/configuracao com If-Match da versão lida, "4"
   E o mesmo corpo, com "BOLETO": false
-  Então a resposta é 200 com a versão 5 e o boleto false
+  Então a resposta é 200 com a versão lida + 1, a 5, e o boleto false
   E GET /pagamento/formas da conta master deixa de trazer "BOLETO"
   E os boletos "AGUARDANDO" seguem válidos até pagos ou expirados
 
@@ -1670,7 +1825,8 @@ Esquema do Cenário: configuração recusada
     | o admin        | "toleranciaAvisoDias": 31 | 422 DADOS_INVALIDOS, "toleranciaAvisoDias" |
     | o admin        | "prazos.pixMinutos": 4    | 422 DADOS_INVALIDOS, "prazos.pixMinutos" |
     | o admin        | "diaVencimento": 15       | 422 DADOS_INVALIDOS, "diaVencimento"     |
-    | o admin        | If-Match "3", já na 4     | 412 CONFIGURACAO_MUDOU                   |
+    | o admin        | If-Match da lida - 1      | 412 CONFIGURACAO_MUDOU                   |
+    | o admin        | sem If-Match              | 428 VERSAO_AUSENTE                       |
     | a conta master | o corpo válido            | 403 ACESSO_NEGADO                        |
 ```
 
@@ -1692,6 +1848,18 @@ Esquema do Cenário: quem usa cada parte
     | o participante Lucas                 | /pagamento/faturas               | 403 ACESSO_NEGADO |
     | a staff Rita                         | /pagamento/recebimentos/faturas  | 403 ACESSO_NEGADO |
 
+Esquema do Cenário: pedidos de quem não pode
+  Quando <quem> envia <pedido>
+  Então a resposta é 403 ACESSO_NEGADO e nada muda
+
+  Exemplos:
+    | quem                 | pedido                                                   |
+    | o participante Lucas | POST /pagamento/faturas/FAT-000402/pagamentos com "PIX"  |
+    | o participante Lucas | POST /pagamento/pagamentos/PAG-000785/cancelar           |
+    | a staff Maria        | POST /pagamento/pagamentos/PAG-000785/cancelar           |
+    | a staff Rita         | GET /pagamento/recebimentos/faturas/FAT-000402           |
+    | a staff Rita         | GET /pagamento/recebimentos/pagamentos/PAG-000773        |
+
 Cenário: sem sessão válida
   Quando alguém envia GET /pagamento/faturas sem o cabeçalho Authorization
   Então a resposta é 401 SESSAO_TERMINADA
@@ -1705,7 +1873,8 @@ Cenário: sem sessão válida
 
 ```gherkin
 Cenário: conta master delega à Rita
-  Quando a conta master envia PUT /usuarios/usr-ebfga-rita/permissoes com If-Match "1" e:
+  Dado as permissões da Rita lidas pela conta master, na versão que estiverem
+  Quando a conta master envia PUT /usuarios/usr-ebfga-rita/permissoes com If-Match dessa versão e:
     """
     {
       "mods": {
@@ -1713,7 +1882,7 @@ Cenário: conta master delega à Rita
       }
     }
     """
-  Então a resposta é 200 com a versão 2 e "MOD-01" com "U"
+  Então a resposta é 200 com a versão lida + 1 e "MOD-01" com "U"
   E o token novo da Rita tem "MOD-01" com "U"
 
 Esquema do Cenário: concessões recusadas
@@ -1740,14 +1909,19 @@ Esquema do Cenário: concessões recusadas
 
 ```gherkin
 Esquema do Cenário: pagamento de fatura que não aceita
+  Dado a <id>, da conta dona, com o status <fatura>
   Quando a conta dona envia POST /pagamento/faturas/<id>/pagamentos com "PIX"
-  Então a resposta é <resposta>
+  Então a resposta é <resposta> e a fatura segue <fatura>
 
   Exemplos:
-    | id         | fatura      | resposta                                    |
-    | FAT-000318 | "PAGA"      | 409 FATURA_PAGA                             |
-    | FAT-000371 | "CANCELADA" | 409 FATURA_CANCELADA                        |
-    | FAT-000371 | "VENCIDA"   | 201, com o valor da fatura mais os juros    |
+    | id         | fatura      | resposta             |
+    | FAT-000318 | "PAGA"      | 409 FATURA_PAGA      |
+    | FAT-000371 | "CANCELADA" | 409 FATURA_CANCELADA |
+
+Cenário: fatura vencida aceita pagamento, com os juros
+  Dado a FAT-000371, do Pedro, "VENCIDA" desde 2026-11-11, de 294.00, com 0,1 % ao dia
+  Quando o Pedro envia POST /pagamento/faturas/FAT-000371/pagamentos com "PIX" em 2026-11-14
+  Então a resposta é 201 com o valor 295.18: 294.00 da fatura e 1.18 de juros de 4 dias
 
 Cenário: virada para vencida
   Dado a FAT-000402 "A_PAGAR" com vencimento em 2026-12-10
@@ -1832,13 +2006,18 @@ Cenário: aviso do banco com assinatura válida
 Esquema do Cenário: avisos que não mudam nada
   Quando chega POST /pagamento/notificacoes <caso>
   Então a resposta é <resposta> e nenhum pagamento ou fatura muda
-  E <efeito>
+  E a coleção "avisosDoBanco" guarda o aviso com o "resultado" "<resultado>" e o traceId
 
   Exemplos:
-    | caso                              | resposta                | efeito                        |
-    | com a assinatura inválida         | 401 ASSINATURA_INVALIDA | a tentativa fica registrada   |
-    | repetido, já processado           | 200                     | nada é somado em dobro        |
-    | de pagamento externo desconhecido | 200                     | a ocorrência fica para o time |
+    | caso                              | resposta                | resultado    |
+    | com a assinatura inválida         | 401 ASSINATURA_INVALIDA | RECUSADO     |
+    | repetido, já processado           | 200                     | REPETIDO     |
+    | de pagamento externo desconhecido | 200                     | DESCONHECIDO |
+
+Cenário: ocorrências para o time
+  Então os avisos "RECUSADO" e "DESCONHECIDO" de "avisosDoBanco" são o que o time deboaz confere
+  E o 401 ASSINATURA_INVALIDA também vai a "auditoriaErros", como na 17 RN-270
+  E o aviso repetido não soma nada em dobro
 
 Cenário: o pagador não confirma
   Quando a Rita envia POST /pagamento/pagamentos/PAG-000781/confirmar
@@ -1909,7 +2088,42 @@ Cenário: card da instituição
       }
     }
     """
-  E traz também a expandida e as series de dia, semana e mes, 12 números cada
+  E traz também a expandida e as séries "dia", "semana" e "mes", 12 números cada
+  E a cada mudança de uma fatura que o card lê, "versao" passa à versão lida + 1
+
+Esquema do Cenário: pontos de cada série
+  Quando <perfil> lê a série "<serie>" do card
+  Então cada ponto é <ponto>, do mais antigo ao atual
+
+  Exemplos:
+    | perfil         | serie  | ponto                                                     |
+    | o deboaz       | dia    | o recebido no dia, pela data do pagamento                 |
+    | o deboaz       | semana | o recebido nos 7 dias que terminam no dia do ponto        |
+    | o deboaz       | mes    | o recebido no mês                                         |
+    | a instituição  | dia    | o pago pela conta no dia                                  |
+    | a instituição  | semana | o pago pela conta nos 7 dias que terminam no dia do ponto |
+    | a instituição  | mes    | o valor da fatura da competência, sem as canceladas       |
+
+Esquema do Cenário: tendência do deboaz na normal
+  Dado o recebido de <atual> no mês e de <anterior> no mês anterior
+  Quando o administrador envia GET /pagamento/card
+  Então "normal.rotulo" é "<rotulo>"
+
+  Exemplos:
+    | atual     | anterior  | rotulo                       |
+    | 186400.00 | 180800.00 | +3,1 % no mês                |
+    | 170000.00 | 180800.00 | -6,0 % no mês                |
+    | 186400.00 | 0.00      | Sem recebido no mês anterior |
+
+Esquema do Cenário: selo da instituição
+  Dado a FAT-000402 "A_PAGAR" com vencimento em 2026-12-10, sem fatura vencida
+  Quando a Rita envia GET /pagamento/card em <dia>
+  Então "selo" é <selo>, porque conta a pagar em até 5 dias úteis
+
+  Exemplos:
+    | dia        | selo |
+    | 2026-12-02 | 0    |
+    | 2026-12-03 | 1    |
 
 Esquema do Cenário: quem pede o card
   Quando <quem> envia GET /pagamento/card
@@ -1940,7 +2154,7 @@ Esquema do Cenário: ações auditadas
 
   Exemplos:
     | quem    | pedido                                                      | acao                |
-    | a Rita  | POST /pagamento/faturas/FAT-000402/pagamentos               | PAGAMENTO_CRIADO    |
+    | a Rita  | POST /pagamento/faturas/FAT-000402/pagamentos com "PIX"     | PAGAMENTO_CRIADO    |
     | a Rita  | POST /pagamento/pagamentos/PAG-000785/cancelar              | PAGAMENTO_CANCELADO |
     | o admin | POST /pagamento/recebimentos/faturas/FAT-000371/cancelar    | FATURA_CANCELADA    |
     | o admin | POST /pagamento/recebimentos/pagamentos/PAG-000773/estornos | ESTORNO_PEDIDO      |
@@ -2046,9 +2260,10 @@ Cenário: desativada, a fatura segue devida
     """
 
 Cenário: reativada, o aviso volta com os juros até hoje
-  Dado a conta-pedro-reis desativada com a FAT-000371 "VENCIDA"
+  Dado a conta-pedro-reis desativada com a FAT-000371 "VENCIDA" de 294.00
+  E os juros de 0,1 % ao dia, vigentes no vencimento, em 2026-11-10
   Quando a conta volta ao estado "ATIVA" e o Pedro envia GET /pagamento/avisos em 2026-11-20
-  Então a resposta é 200 com total 1 e o item:
+  Então a resposta é 200 com total 1 e o item, com 10 dias de juros, de 11/11 a 20/11:
     """
     {
       "tipo": "FATURA_EM_ATRASO",
@@ -2063,7 +2278,7 @@ Cenário: reativada, o aviso volta com os juros até hoje
 
 Cenário: exclusão recusada com fatura em aberto
   Dado a conta-pedro-reis com a FAT-000371 "VENCIDA"
-  Quando o pedido de exclusão da conta-pedro-reis chega
+  Quando o administrador do deboaz envia POST /contas/conta-pedro-reis/estado com "ENCERRADA"
   Então a resposta é 409 com:
     """
     {
@@ -2127,11 +2342,29 @@ Cenário: banco sem resposta
 
 ```gherkin
 Cenário: o deboaz troca o intermediador de pagamento
-  Dado o PAG-000785, boleto "AGUARDANDO", gerado pelo intermediador anterior
-  Quando o deboaz passa a usar outro intermediador
+  Dado o PAG-000785, boleto "AGUARDANDO", que guarda "intermediador": "MERCADO_PAGO"
+  Quando uma nova implantação do ambiente liga outro intermediador
   Então faturas, status, códigos de erro e endereços do Pagamento não mudam
-  E os novos pagamentos vão ao intermediador novo
-  E o PAG-000785 segue confirmado pelo anterior até ficar "PAGO" ou "EXPIRADO"
+  E os novos pagamentos vão ao intermediador ligado e guardam o nome dele
+  E o PAG-000785 segue com o Mercado Pago: avisos e consultas dele vão a ele
+  E isso vale até o PAG-000785 ficar "PAGO", "EXPIRADO" ou "CANCELADO"
+
+Cenário: intermediador de cada ambiente
+  Então em produção o intermediador é sempre o "MERCADO_PAGO", com as chaves do Key Vault
+  E fora de produção é o "MERCADO_PAGO" de teste, ou o "FALSO" com o relógio de teste ligado
+  E o "FALSO" também vale quando o ambiente não tem a chave de acesso do Mercado Pago
+  E em produção, sem as chaves, a aplicação não inicia
+
+Esquema do Cenário: de qual intermediador é o aviso
+  Quando chega POST /pagamento/notificacoes com <cabecalho>
+  Então o aviso é conferido como do <intermediador>
+  E o pagamento é achado pelo id externo e pelo intermediador que o gerou
+
+  Exemplos:
+    | cabecalho                                         | intermediador                     |
+    | x-signature "ts=…,v1=…" e x-request-id            | "MERCADO_PAGO"                    |
+    | X-Assinatura "sha256=…"                           | "FALSO", só fora de produção      |
+    | nenhum dos dois                                   | nenhum: 401 ASSINATURA_INVALIDA   |
 ```
 
 <a id="RNF-243"></a>
@@ -2142,6 +2375,7 @@ Cenário: o deboaz troca o intermediador de pagamento
 
 ```gherkin
 Esquema do Cenário: X-Trace-Id em toda resposta do Pagamento
+  Dado que "…/" abrevia "/pagamento/faturas/" nos exemplos
   Quando <quem> envia <pedido>
   Então a resposta é <resposta>, com o cabeçalho X-Trace-Id
   E o valor segue o formato "trc-" mais 8 hexadecimais, como "trc-1d6e3f08"
@@ -2150,8 +2384,8 @@ Esquema do Cenário: X-Trace-Id em toda resposta do Pagamento
   Exemplos:
     | quem    | pedido                                               | resposta                |
     | a Rita  | GET /pagamento/faturas?situacao=A_PAGAR              | 200                     |
-    | a Rita  | POST /pagamento/faturas/FAT-000402/pagamentos        | 201                     |
-    | a Rita  | POST /pagamento/faturas/FAT-000318/pagamentos        | 409 FATURA_PAGA         |
+    | a Rita  | POST …/FAT-000402/pagamentos com "forma": "PIX"      | 201                     |
+    | a Rita  | POST …/FAT-000318/pagamentos com "forma": "PIX"      | 409 FATURA_PAGA         |
     | a Rita  | POST …/FAT-000402/pagamentos com o corpo "forma=PIX" | 422 DADOS_INVALIDOS     |
     | alguém  | GET /pagamento/faturas sem Authorization             | 401 SESSAO_TERMINADA    |
     | o banco | POST /pagamento/notificacoes com assinatura inválida | 401 ASSINATURA_INVALIDA |
@@ -2234,6 +2468,23 @@ Cenário: achar uma transação pelo traceId
   Dado o traceId "trc-1d6e3f08"
   Quando o time deboaz procura o que aconteceu nessa execução
   Então encontra o PAG-000773, a FAT-000402, a auditoria e os erros com esse traceId
+```
+
+<a id="RNF-245"></a>
+
+### `RNF-245` Card e Recebimentos com muitas faturas
+
+```gherkin
+Cenário: números somados sem ler fatura por fatura
+  Dado 20.000 faturas de 800 contas, em 24 competências
+  Quando o administrador envia GET /pagamento/card ou GET /pagamento/recebimentos/resumo
+  Então a resposta 200 chega em até 1 segundo, com competencia=2026-10 no resumo
+  E os valores e as contagens são somados no banco de dados, sem trazer as faturas à aplicação
+
+Cenário: card da conta
+  Dado a EBFGA com 24 faturas entre as 20.000
+  Quando a Rita envia GET /pagamento/card
+  Então a resposta 200 chega em até 1 segundo e só as faturas da EBFGA são lidas
 ```
 
 <a id="fora-de-escopo"></a>
@@ -2335,25 +2586,25 @@ Cenário: o que o Pagamento não faz
 
 [![Casos de uso do Pagamento: o pagador (conta master, educador autônomo ou staff com MOD-01 U) vê e paga a fatura com PIX, crédito, débito ou boleto, acompanha ao vivo, baixa comprovante, vê o aviso de atraso, pede o estorno do boleto no SAC e concede o Pagamento; o administrador do deboaz vê recebimentos e faturas de todas as contas, cancela, estorna e configura; o relógio fecha a competência, vira vencida e expira; o banco confirma](../2_Diagramas/pagamento-casos-de-uso_v01_20261114-0149.svg)](../2_Diagramas/pagamento-casos-de-uso_v01_20261114-0149.svg)
 
-**Pagamento · sequência com as telas** — `2_Diagramas/pagamento-sequencia_v02_20261114-0229.svg`
+**Pagamento · sequência com as telas** — `2_Diagramas/pagamento-sequencia_v03_20261115-0023.svg`
 
-[![Sequência do Pagamento com as telas pwa: fechamento da competência, fatura com juros, crédito recusado, PIX expirado ao vivo, crédito aprovado e PIX confirmado pelo aviso assinado do banco, comprovante, boleto e pagamento em dobro, vencida com aviso de atraso sem bloquear a conta, recebimentos, estorno parcial e configuração com If-Match](../2_Diagramas/pagamento-sequencia_v02_20261114-0229.svg)](../2_Diagramas/pagamento-sequencia_v02_20261114-0229.svg)
+[![Sequência do Pagamento com as telas pwa: fechamento da competência, fatura com juros, crédito recusado, PIX expirado ao vivo, crédito aprovado e PIX confirmado pelo aviso assinado do banco, comprovante, boleto e pagamento em dobro, vencida com aviso de atraso sem bloquear a conta, recebimentos, estorno parcial e configuração com If-Match](../2_Diagramas/pagamento-sequencia_v03_20261115-0023.svg)](../2_Diagramas/pagamento-sequencia_v03_20261115-0023.svg)
 
-**Pagamento · contrato de API** — `2_Diagramas/pagamento-contrato-api_v02_20261114-0229.svg`
+**Pagamento · contrato de API** — `2_Diagramas/pagamento-contrato-api_v03_20261115-0022.svg`
 
-[![Contrato de API do Pagamento: formato comum, endereços do pagador (faturas, formas, pagamentos, cancelar, boleto, comprovante, ao vivo, avisos e card), o aviso assinado do banco, os do recebedor (resumo, competências, faturas de todas as contas, cancelar, estornos e configuração) e os de outros módulos (permissões e estado da conta)](../2_Diagramas/pagamento-contrato-api_v02_20261114-0229.svg)](../2_Diagramas/pagamento-contrato-api_v02_20261114-0229.svg)
+[![Contrato de API do Pagamento: formato comum, endereços do pagador (faturas, formas, pagamentos, cancelar, boleto, comprovante, ao vivo, avisos e card), o aviso assinado do banco (Mercado Pago e falso), os do recebedor (resumo, competências, faturas de todas as contas, detalhe da fatura e do pagamento, cancelar, estornos e configuração), os de teste e as mensagens de cada código de erro](../2_Diagramas/pagamento-contrato-api_v03_20261115-0022.svg)](../2_Diagramas/pagamento-contrato-api_v03_20261115-0022.svg)
 
-**Pagamento · classes** — `2_Diagramas/pagamento-classes_v02_20261114-0229.svg`
+**Pagamento · classes** — `2_Diagramas/pagamento-classes_v03_20261115-0022.svg`
 
-[![Classes do Pagamento em core/hub/pagamento: agregados Fatura e Pagamento com valores, enumerações e a FalhaDoPagamento, Estorno, Configuração com formas e prazos, resumo dos recebimentos, aviso do banco, aviso de atraso, card por perfil e as portas de entrada e saída](../2_Diagramas/pagamento-classes_v02_20261114-0229.svg)](../2_Diagramas/pagamento-classes_v02_20261114-0229.svg)
+[![Classes do Pagamento em core/hub/pagamento: agregados Fatura e Pagamento com valores, enumerações e a FalhaDoPagamento, Estorno, Configuração com formas e prazos, resumo dos recebimentos, aviso do banco, aviso de atraso, card por perfil e as portas de entrada e saída](../2_Diagramas/pagamento-classes_v03_20261115-0022.svg)](../2_Diagramas/pagamento-classes_v03_20261115-0022.svg)
 
-**Pagamento · documentos** — `2_Diagramas/pagamento-documentos_v02_20261114-0229.svg`
+**Pagamento · documentos** — `2_Diagramas/pagamento-documentos_v03_20261115-0022.svg`
 
-[![Modelo de documentos do Pagamento: faturas, pagamentos, estornos, configuracaoPagamento, avisosDoBanco, avisosPagamento e cardPagamento com exemplos e índices, as coleções lidas do 16 e do 17, contadores, auditoria e as chaves do Redis](../2_Diagramas/pagamento-documentos_v02_20261114-0229.svg)](../2_Diagramas/pagamento-documentos_v02_20261114-0229.svg)
+[![Modelo de documentos do Pagamento: faturas, pagamentos, estornos, configuracaoPagamento, avisosDoBanco e avisosPagamento com exemplos e índices, o card calculado na leitura, as coleções lidas do 16 e do 17, contadores, auditoria e as chaves do Redis](../2_Diagramas/pagamento-documentos_v03_20261115-0022.svg)](../2_Diagramas/pagamento-documentos_v03_20261115-0022.svg)
 
-**Pagamento · hexagonal** — `2_Diagramas/pagamento-hexagonal_v02_20261114-0229.svg`
+**Pagamento · hexagonal** — `2_Diagramas/pagamento-hexagonal_v03_20261115-0023.svg`
 
-[![Arquitetura hexagonal do Pagamento: controllers, agendamento e eventos SSE no primário do ms_mono, as features do core/hub/pagamento, os adaptadores do MongoDB, do Redis e do intermediador no secundário e a cadeia de cada fluxo da porta ao adaptador](../2_Diagramas/pagamento-hexagonal_v02_20261114-0229.svg)](../2_Diagramas/pagamento-hexagonal_v02_20261114-0229.svg)
+[![Arquitetura hexagonal do Pagamento: controllers, agendamento e eventos SSE no primário do ms_mono, as features do core/hub/pagamento, os adaptadores do MongoDB, do Redis, do Mercado Pago, do intermediador falso e do desenho do QR Code no secundário e a cadeia de cada fluxo da porta ao adaptador](../2_Diagramas/pagamento-hexagonal_v03_20261115-0023.svg)](../2_Diagramas/pagamento-hexagonal_v03_20261115-0023.svg)
 
 ---
 
@@ -2361,14 +2612,10 @@ Cenário: o que o Pagamento não faz
 
 ## Em aberto
 
-- Ajuste do [17 `RF-113`](17_modulo-usuario.md#RF-113) e `RF-113-api` (outra sessão): a conta master (e o autônomo) também desativa a própria conta, a desativação deixa de ser "por falta de pagamento", a fatura em aberto segue devida e a exclusão de conta com fatura em aberto é recusada com 409 FATURA_EM_ABERTO, no endereço de exclusão que o 17 definir (`RN-313`) — **Arquitetura**
 - Limites dos campos da Configuração (juros até 1 % ao dia, tolerância até 30 dias, PIX de 5 a 1.440 min, débito de 5 a 30 min, boleto de 1 a 30 dias úteis) e o selo Lento acima de 2 % de inadimplência (`RF-193`, `RN-308`): validar na revisão do usuário — **Produto**
 - X-Trace-Id: a [17 `RN-271`](17_modulo-usuario.md#RN-271) o põe só nas respostas auditadas e sem corpo; o Pagamento o põe em toda resposta e no corpo do erro (`RNF-243`): estender a todos os módulos? — **Arquitetura**
-- Intermediador de pagamento (PIX, cartões e boleto) a escolher por ADR; o desenho usa a porta `IIntermediador` com o adaptador HTTP e o falso dos testes (`RNF-242`) — **Arquitetura**
-- Registro de módulos: `MOD-01` passa de Contas a Pagamento, com este documento, a staff delegada e o administrador do deboaz como recebedor ([15_modulos `MOD-01`](15_modulos.md#MOD-01)) — **Arquitetura**
-- Autorização: `MOD-01` no token do administrador, o Pagamento só com Utilização e só concedido pela conta master (`RN-299-api`) e a vista de Permissões com linha só de Utilização ([17-b `RN-233`](17_modulo-usuario-b-autorizacao.md#RN-233-api)) — **Arquitetura** e **UX/UI**
-- Glossário: Fatura, Competência, Pagamento, Estorno, Juros por atraso, Tolerância, Intermediador de pagamento e Inadimplência — **Arquitetura**
 - 12 ícones novos das vistas no catálogo do design system — **UX/UI**
+- Vistas de Pagar com o formulário "Endereço de quem paga" do boleto (`RF-188`), card do deboaz com "Sem recebido no mês anterior" e selo "a pagar em até 5 dias úteis ou vencida" (`RN-307`) — **UX/UI**
 
 ---
 
@@ -2378,11 +2625,12 @@ Cenário: o que o Pagamento não faz
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v04** | 2026-11-14 04:32 | Rastreio: X-Trace-Id em toda resposta do Pagamento, traceId no corpo do erro e traceIdOrigem recebido no pedido (novo `RNF-243`); traceId gravado na fatura, no pagamento, no estorno e no aviso do banco, com histórico de status, levado ao intermediador e aos eventos (novo `RNF-244`); formato-comum com "traceId"; tentativas com traceId (`RN-304-api`); eventos com traceId (`RNF-238-api`); Em aberto: estender o X-Trace-Id da 17 `RN-271` aos outros módulos; Diagramas: sequência, contrato de API, classes, documentos e hexagonal v02 |
+| **v05** | 2026-11-15 00:34 | Lacunas do qa e do backend: mensagem de cada código de erro no formato-comum; endereço de quem paga o boleto na tela e na API, em nome e CNPJ da conta, com o último endereço lembrado (`RF-188`, `RF-188-api`, `RF-184-api`); chave pública e intermediador do cartão em GET /pagamento/formas, cartão com metodo e emissor (`RF-186-api`, `RF-187-api`); QR Code desenhado pelo deboaz (`RF-185-api`); código de barras intercalado 2 de 5 e PDF de boleto de um PIX (`RF-188-api`); 404 em esquema (`RF-183-api`); detalhe da fatura e do pagamento para o recebedor, com os estornos (`RF-191-api`, `RF-192-api`); 428 VERSAO_AUSENTE e versão lida + 1 (`RF-193-api`, `RN-299-api`); 403 do participante e da staff sem permissão em pagar, cancelar e recebimentos (`RN-298-api`); fatura vencida aceita pagamento com juros (`RN-301-api`); resultado do aviso do banco e ocorrências (`RN-305-api`); séries, tendência "Sem recebido no mês anterior" e selo em dias úteis (`RN-307`, `RN-307-api`); juros da reativada e exclusão como encerramento, POST /contas/{id}/estado com "ENCERRADA", ligada ao 17 v110 (`RN-313`, `RN-313-api`); "MOD-01" com "U" no token do administrador só para o card (formato-comum, 17-b v35 `RN-233-api`); intermediador Mercado Pago em hml e prd, falso só fora de prd, aviso roteado pelo cabeçalho (`RNF-242`, decisão no 01_stack); `RNF-243`; novo `RNF-245` (card e recebimentos com muitas faturas); diagramas v03 (sequência, contrato, classes, documentos e hexagonal) |
+| v04 | 2026-11-14 04:32 | Rastreio: X-Trace-Id em toda resposta do Pagamento, traceId no corpo do erro e traceIdOrigem recebido no pedido (novo `RNF-243`); traceId gravado na fatura, no pagamento, no estorno e no aviso do banco, com histórico de status, levado ao intermediador e aos eventos (novo `RNF-244`); formato-comum com "traceId"; tentativas com traceId (`RN-304-api`); eventos com traceId (`RNF-238-api`); Em aberto: estender o X-Trace-Id da 17 `RN-271` aos outros módulos; Diagramas: sequência, contrato de API, classes, documentos e hexagonal v02 |
 | v03 | 2026-11-14 02:08 | Respostas do Produto: estorno de boleto pedido pela própria conta no SAC, o administrador só é orientado com "Voltar" (`RN-312`, `RF-192`, `RF-192-api`); conta desativada segue devendo, exclusão recusada com fatura em aberto e inadimplência sozinha não bloqueia (novo `RN-313` e `RN-313-api`; Fora de escopo); "Tentar de novo" em `RNF-241`; Em aberto: ajuste do 17 `RF-113`, limites da Configuração para a revisão do usuário e o intermediador por ADR; Telas: faturas e configuração v02, pagar v03, recebimentos-faturas v03 e recebimentos v01; Diagramas: casos de uso, sequência com as telas, contrato de API, classes, documentos e hexagonal v01 |
 | v02 | 2026-11-14 01:42 | Respostas do Produto: vencimento fixo no dia 10 (`RN-300`), juros ao dia configuráveis, padrão 0 % (novo `RN-310` e `RN-310-api`), prazos de PIX, débito e boleto configuráveis (`RN-302`, `RF-193` agora Configuração do Pagamento, com GET e PUT /pagamento/recebimentos/configuracao), aviso de atraso só no módulo, com tolerância, sem e-mail e sem desativar a conta (novo `RN-311` e `RN-311-api`; `RN-301`, `RN-301-api`), estorno de boleto pelo SAC com assuntos prontos (novo `RN-312`; `RF-192-api` com 409 ESTORNO_PELO_SAC), só a conta master concede o Pagamento (`RN-299`, `RN-299-api`); textos e dados das vistas v01 em `RF-182` a `RF-193`, `RN-298`, `RN-303` a `RN-308`, `RNF-239` e `RNF-241`; FAT-000402 com uma só história (crédito recusado, PIX expirado e crédito pago às 10:42 pelo PAG-000773), caminho do PIX com o PAG-000781 e o boleto PAG-000785/PAG-000790 (`RN-303-api`, `RN-304-api`, `RN-305-api`, `RNF-238-api`, `RNF-242`); FAT-000371 com Usuários e Quiz e juros (`RF-183`, `RF-183-api`); série dos cards (`RN-307`); 9 vencidas de outubro (`RF-191`, `RF-191-api`); Telas com as 15 vistas v01; diagramas a desenhar |
 | v01 | 2026-11-14 01:06 | Criação: fatura mensal dos módulos paga pela conta master, pelo autônomo e pela staff delegada com PIX, crédito, débito ou boleto, e recebimentos do administrador do deboaz, não delegáveis (`RF-182` a `RF-193`), regras (`RN-298` a `RN-309`) e medidas (`RNF-238` a `RNF-242`), com as âncoras -api; telas e diagramas a desenhar |
 
 ---
 
-<sub>boaz · v04 · 2026-11-14 04:32 · `1_Requisitos/19_modulo-pagamento.md`</sub>
+<sub>boaz · v05 · 2026-11-15 00:34 · `1_Requisitos/19_modulo-pagamento.md`</sub>

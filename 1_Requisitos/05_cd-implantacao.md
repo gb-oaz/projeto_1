@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "05_cd-implantacao"
 tipo: "Transversal"
 titulo: "CD e implantação na Azure"
-versao: "v13"
-data: "2026-11-13 14:16"
+versao: "v14"
+data: "2026-11-15 00:38"
 status: "Em revisão"
 objetivo: "definir como as imagens publicadas pelo CI chegam, após aprovação manual, aos ambientes de homologação e produção na Azure, descritos em Terraform e com custo mínimo."
 ---
 
-> **boaz · Transversal** · `05_cd-implantacao` · **v13** · 2026-11-13 14:16 · **Em revisão**
+> **boaz · Transversal** · `05_cd-implantacao` · **v14** · 2026-11-15 00:38 · **Em revisão**
 
 # CD e implantação na Azure
 
@@ -853,13 +853,13 @@ Cenário: Key Vault aberto ao CD
 
 ## Diagramas
 
-**Implantação · homologação** — `3_Arquitetura/implantacao-hml_v09_20261113-1410.svg`
+**Implantação · homologação** — `3_Arquitetura/implantacao-hml_v10_20261115-0035.svg`
 
-[![Ambiente de homologação na Azure: assinatura deb-boaz-app-hml, grupo de recursos deb-boaz-app-hml_rg, com VNet 10.10.0.0/16; na subnet snet-aca, o ambiente externo do Container Apps com backend-mono e as três aplicações web, 1 a 2 réplicas, acessadas por HTTPS pelo usuário web, pela pessoa desenvolvedora via documentação da API em /doc/api e pelos apps móveis; na subnet snet-pe, private endpoints de Key Vault, Cosmos DB for MongoDB serverless e Azure Managed Redis, com zonas Private DNS; Log Analytics, Application Insights e orçamento; imagens baixadas do Docker Hub e infraestrutura aplicada pelo CD com Terraform; segredos das contas iniciais (admin, contas qa e módulos de teste) lidos do Key Vault pelo backend-mono](../3_Arquitetura/implantacao-hml_v09_20261113-1410.svg)](../3_Arquitetura/implantacao-hml_v09_20261113-1410.svg)
+[![Ambiente de homologação na Azure: assinatura deb-boaz-app-hml, grupo de recursos deb-boaz-app-hml_rg, com VNet 10.10.0.0/16; na subnet snet-aca, o ambiente externo do Container Apps com backend-mono e as três aplicações web, 1 a 2 réplicas, acessadas por HTTPS pelo usuário web, pela pessoa desenvolvedora via documentação da API em /doc/api e pelos apps móveis; na subnet snet-pe, private endpoints de Key Vault, Cosmos DB for MongoDB serverless e Azure Managed Redis, com zonas Private DNS; Log Analytics, Application Insights e orçamento; imagens baixadas do Docker Hub e infraestrutura aplicada pelo CD com Terraform; segredos das contas iniciais (admin, contas qa e módulos de teste) lidos do Key Vault pelo backend-mono; Mercado Pago como intermediador de pagamento, com cobranças e estornos por HTTPS, aviso assinado e segredos mercadopago-* no cofre](../3_Arquitetura/implantacao-hml_v10_20261115-0035.svg)](../3_Arquitetura/implantacao-hml_v10_20261115-0035.svg)
 
-**Implantação · produção** — `3_Arquitetura/implantacao-prd_v08_20261113-1410.svg`
+**Implantação · produção** — `3_Arquitetura/implantacao-prd_v09_20261115-0035.svg`
 
-[![Ambiente de produção na Azure: assinatura deb-boaz-app-prd, grupo de recursos deb-boaz-app-prd_rg, com VNet 10.20.0.0/16; Application Gateway WAF_v2 com IP público em snet-appgw como único ponto público, roteando a web para as aplicações web e /mobile/* para o backend, com política de WAF; ambiente interno do Container Apps em snet-aca com 1 a 5 réplicas, em que as aplicações web encaminham /api/* ao backend; private endpoints de Key Vault, Cosmos DB autoscale e Azure Managed Redis em snet-pe com zonas Private DNS; Log Analytics, Application Insights e orçamento](../3_Arquitetura/implantacao-prd_v08_20261113-1410.svg)](../3_Arquitetura/implantacao-prd_v08_20261113-1410.svg)
+[![Ambiente de produção na Azure: assinatura deb-boaz-app-prd, grupo de recursos deb-boaz-app-prd_rg, com VNet 10.20.0.0/16; Application Gateway WAF_v2 com IP público em snet-appgw como único ponto público, roteando a web para as aplicações web e /mobile/* para o backend, com política de WAF; ambiente interno do Container Apps em snet-aca com 1 a 5 réplicas, em que as aplicações web encaminham /api/* ao backend; private endpoints de Key Vault, Cosmos DB autoscale e Azure Managed Redis em snet-pe com zonas Private DNS; Log Analytics, Application Insights e orçamento; Mercado Pago como intermediador de pagamento, com cobranças e estornos por HTTPS de saída, aviso assinado pelo Application Gateway e segredos mercadopago-* no cofre](../3_Arquitetura/implantacao-prd_v09_20261115-0035.svg)](../3_Arquitetura/implantacao-prd_v09_20261115-0035.svg)
 
 **Pipeline de CD** — `3_Arquitetura/pipeline-cd_v07_20261107-1614.svg`
 
@@ -881,7 +881,8 @@ Cenário: Key Vault aberto ao CD
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v13** | 2026-11-13 14:16 | Conta de anexos por private endpoint pe-blob, sem acesso público nem chave de conta (`RNF-61`, `RNF-62`), nomes debboazapp<amb>anexos e anexos-sac (`RNF-88`), aplicação interna clamav em hml e prd (`RNF-237` incluído; `RNF-64`, `RNF-65`, `RNF-89`), desligar hml remove o pe-blob e leva o clamav a zero (`RNF-92`); armazenamento de objetos ligado ou desligado por variável, Standard LRS Hot nos dois ambientes e exclusão reversível de 7 dias em produção; desligar a variável com arquivos guardados mantém a conta, protegida por prevent_destroy e com a tag uso=anexos-sac, lida até esvaziar, e só a remoção explícita a apaga (`RNF-235` incluído); ciclo de vida dos arquivos: 24 h sem uso nos dois ambientes, 30 dias em homologação e fim da guarda em produção (`RNF-236` incluído); a conta de armazenamento continua ao desligar homologação (`RNF-92` alterado) |
+| **v14** | 2026-11-15 00:38 | Diagramas de implantação com o Mercado Pago, intermediador de pagamento (decisão de 2026-11-15 no 01_stack; 19 `RNF-242`): chamadas de saída do backend-mono, aviso assinado pela entrada do ambiente (em produção, pelo Application Gateway) e segredos mercadopago-* gravados à mão no cofre (implantação hml v10 e prd v09) |
+| v13 | 2026-11-13 14:16 | Conta de anexos por private endpoint pe-blob, sem acesso público nem chave de conta (`RNF-61`, `RNF-62`), nomes debboazapp<amb>anexos e anexos-sac (`RNF-88`), aplicação interna clamav em hml e prd (`RNF-237` incluído; `RNF-64`, `RNF-65`, `RNF-89`), desligar hml remove o pe-blob e leva o clamav a zero (`RNF-92`); armazenamento de objetos ligado ou desligado por variável, Standard LRS Hot nos dois ambientes e exclusão reversível de 7 dias em produção; desligar a variável com arquivos guardados mantém a conta, protegida por prevent_destroy e com a tag uso=anexos-sac, lida até esvaziar, e só a remoção explícita a apaga (`RNF-235` incluído); ciclo de vida dos arquivos: 24 h sem uso nos dois ambientes, 30 dias em homologação e fim da guarda em produção (`RNF-236` incluído); a conta de armazenamento continua ao desligar homologação (`RNF-92` alterado) |
 | v12 | 2026-11-07 16:15 | Esvaziar o banco de homologação pelo disparo manual (`RNF-228` incluído); diagrama `pipeline-cd` atualizado para v07 |
 | v11 | 2026-11-06 23:37 | Diagramas de implantação de homologação e de produção atualizados para v05 |
 | v10 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
@@ -894,4 +895,4 @@ Cenário: Key Vault aberto ao CD
 
 ---
 
-<sub>boaz · v13 · 2026-11-13 14:16 · `1_Requisitos/05_cd-implantacao.md`</sub>
+<sub>boaz · v14 · 2026-11-15 00:38 · `1_Requisitos/05_cd-implantacao.md`</sub>

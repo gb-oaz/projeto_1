@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "99_glossario"
 tipo: "Glossário"
 titulo: "Glossário"
-versao: "v47"
-data: "2026-11-12 16:58"
+versao: "v48"
+data: "2026-11-15 00:50"
 status: "Em revisão"
 objetivo: "dar um significado único aos termos do domínio usados nos documentos de requisito."
 ---
 
-> **boaz · Glossário** · `99_glossario` · **v47** · 2026-11-12 16:58 · **Em revisão**
+> **boaz · Glossário** · `99_glossario` · **v48** · 2026-11-15 00:50 · **Em revisão**
 
 # Glossário
 
@@ -37,6 +37,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="codigo-da-sala"></a>**Código da sala** | código que o educador passa aos participantes para entrarem numa sala pelo quest |
 | <a id="codigo-de-acesso"></a>**Código de acesso** | código único que a instituição gera para cada participante, no formato `<SIGLA>-<NOME CURTO>-<4 números>` (`EBFGA-LUCAS-0412`, sempre em maiúsculas), e que abre o perfil dele no quest sem senha; vale para o participante e para os responsáveis, e cada ano tem o seu ([Módulo Usuários RN-184](17_modulo-usuario.md#RN-184)) |
 | <a id="codigo-de-liberacao"></a>**Código de liberação** | código de 6 números que acompanha cada geração de senha; quem pediu a geração o entrega pessoalmente, e a senha só aparece a quem informa a entrada e esse código |
+| <a id="competencia"></a>**Competência** | mês de uso cobrado numa [fatura](#fatura), como "2026-11"; a fatura dela sai no dia 1 do mês seguinte e vence no dia 10 ([Pagamento RN-300](19_modulo-pagamento.md#RN-300)) |
 | <a id="componente"></a>**Componente** | elemento de tela reutilizável do design system, como botão, campo de texto ou card, construído só com tokens |
 | <a id="componente-comum"></a>**Componente comum** | componente usado por mais de um módulo, com uma única implementação compartilhada por frente |
 | <a id="componente-composto"></a>**Componente composto** | bloco reutilizável que junta componentes e elementos de identidade visual, como uma barra de navegação com o logo, botões e imagens da marca |
@@ -47,13 +48,18 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="depoimento"></a>**Depoimento** | texto curto de uma instituição ou de um educador autônomo sobre o deboaz, escrito no hub e mostrado na landing page só com a autorização do autor |
 | <a id="design-system"></a>**Design system** | conjunto da identidade visual, dos tokens e dos componentes do projeto, mantido em `0_Assets/design/` |
 | <a id="educador"></a>**Educador** | quem cria quizzes e conduz salas no hub: professor, instrutor ou responsável por um treinamento; contrata pela instituição ou como autônomo, gerenciando só a própria conta, o conteúdo e os custos |
+| <a id="estorno"></a>**Estorno** | devolução, total ou parcial, de um pagamento já confirmado pelo banco, feita pelo administrador do deboaz até o saldo pago; o de boleto é pedido pela própria conta no [SAC](#sac) ([Pagamento RN-312](19_modulo-pagamento.md#RN-312)) |
 | <a id="expressao"></a>**Expressão** | estado emocional mostrado pelo rosto do mascote (feliz, acertou, errou, dúvida, esperando…), escolhido conforme a situação da tela |
 | <a id="faixa-de-desconto"></a>**Faixa de desconto** | intervalo do total de usuários (staff + participantes) de uma conta com um percentual de desconto do módulo Usuários que vale só para os usuários dentro dele (desconto progressivo, como no imposto de renda); quanto mais usuários, maior ou igual o percentual |
+| <a id="fatura"></a>**Fatura** | cobrança mensal de uma conta, uma por [competência](#competencia), com um item por módulo contratado; tem número como "FAT-000402" e fica A pagar, Vencida, Paga ou Cancelada ([Pagamento RN-300](19_modulo-pagamento.md#RN-300)) |
 | <a id="feed"></a>**Feed** | destino da navegação do hub e do quest com as publicações dos módulos, cada uma para toda a instituição ou para uma turma ou equipe; a pessoa vê as do público em que está; a conta do time deboaz não tem Feed |
 | <a id="horas-uteis"></a>**Horas úteis** | horas de segunda a sexta, das 08:00 às 18:00 no horário de Brasília, sem feriados nacionais, em que corre o prazo de primeira resposta de um [chamado](#chamado) ([Módulo SAC](18_modulo-sac.md#RNF-229)) |
 | <a id="hub"></a>**Hub** | frente do produto onde o educador cria quizzes, conduz salas, acompanha relatórios e administra a conta |
 | <a id="identidade-da-instituicao"></a>**Identidade da instituição** | módulo que uma escola ou empresa contrata para ter a identidade dela no lugar da padrão do deboaz; o símbolo do deboaz continua, menor |
 | <a id="identidade-visual"></a>**Identidade visual** | temas de cor, tipografia, logos, ícones, imagens e animações que dão a cara do produto |
+| <a id="inadimplencia"></a>**Inadimplência** | o valor vencido de uma competência dividido pelo faturado, em % com uma casa, visto pelo administrador do deboaz; sozinha não bloqueia a conta ([Pagamento RN-308](19_modulo-pagamento.md#RN-308)) |
+| <a id="intermediador-de-pagamento"></a>**Intermediador de pagamento** | serviço externo que cobra o PIX, o cartão de crédito, o cartão de débito e o boleto e avisa o deboaz do resultado por um aviso assinado; hoje o Mercado Pago, com um falso fora de produção ([Stack](01_stack-desenvolvimento.md#intermediador-de-pagamento), [Pagamento RNF-242](19_modulo-pagamento.md#RNF-242)) |
+| <a id="juros-por-atraso"></a>**Juros por atraso** | percentual ao dia, definido pelo administrador do deboaz (padrão 0 %), somado à [fatura](#fatura) vencida a partir do dia seguinte ao vencimento até o dia do pagamento ([Pagamento RN-310](19_modulo-pagamento.md#RN-310)) |
 | <a id="landing-page"></a>**Landing page** | frente do produto que apresenta o deboaz a quem ainda não o usa |
 | <a id="mascote"></a>**Mascote** | personagem da identidade visual com rosto expressivo, que reforça uma mensagem da tela; combina expressão, forma, proporção, movimento e cor |
 | <a id="mascote-padrinho"></a>**Mascote padrinho** | mascote (expressão e forma) que representa um módulo, definido no documento dele e mostrado no card do catálogo, no destaque e na página do módulo |
@@ -64,6 +70,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="modulo-usuarios"></a>**Módulo Usuários** | módulo da conta em que a instituição cria o staff e os participantes e decide as permissões, o educador autônomo cria os participantes e o time deboaz cria os membros do time e cuida das contas de instituição e de educador autônomo ([Módulo Usuários](17_modulo-usuario.md)) |
 | <a id="modulos-da-conta"></a>**Módulos da conta** | módulos que são requisito de toda conta: entram sozinhos quando a conta é criada, sem contratação, e não podem ser retirados (Contas, Perfil, SAC, Turmas, Usuários e, para quem trabalha numa instituição, Sugestão; lista no [registro de módulos](15_modulos.md#RN-203)), mostrados depois dos contratados; podem ter custo, como o Usuários |
 | <a id="nova-geracao-de-senha"></a>**Nova geração de senha** | pedido de um usuário superior para que o sistema gere uma senha nova para quem está abaixo dele; a senha aparece uma única vez, só para o próprio usuário, no próximo acesso |
+| <a id="pagamento"></a>**Pagamento** | módulo da conta (`MOD-01`) em que a conta master, o educador autônomo e a staff delegada pagam as faturas e o administrador do deboaz acompanha os recebimentos; também cada tentativa de pagar uma fatura, com número como "PAG-000771" ([Pagamento](19_modulo-pagamento.md)) |
 | <a id="pagina-do-modulo"></a>**Página do módulo** | página da landing page que apresenta um módulo do catálogo, com estrutura fixa que o documento do módulo preenche |
 | <a id="papel"></a>**Papel** | o que a pessoa é para a autorização — administrador do deboaz, membro do time, conta master, educador autônomo, staff, participante ou acesso anônimo — e que vai no token de acesso ([Autorização `RN-232`](17_modulo-usuario-b-autorizacao.md#RN-232)) |
 | <a id="participante"></a>**Participante** | quem responde aos quizzes pelo quest: estudante ou colaborador de empresa |
@@ -88,6 +95,7 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 | <a id="token"></a>**Token** | valor nomeado do design system (cor, tamanho, fonte, canto, sombra ou tempo) que telas e componentes usam no lugar de valores soltos |
 | <a id="token-de-acesso"></a>**Token de acesso** | credencial assinada, de 15 min, que o aparelho envia em cada pedido; leva a identidade da sessão, o papel e os módulos com as abas, para a web e o mobile montarem a casca ([Autenticação `RNF-215`](17_modulo-usuario-a-autenticacao.md#RNF-215), [Autorização `RNF-219`](17_modulo-usuario-b-autorizacao.md#RNF-219)) |
 | <a id="token-de-renovacao"></a>**Token de renovação** | valor aleatório de uso único que troca o token de acesso vencido por um novo sem pedir a senha; cada uso o substitui, e usar um já trocado encerra a sessão ([Autenticação `RNF-213`](17_modulo-usuario-a-autenticacao.md#RNF-213)) |
+| <a id="tolerancia"></a>**Tolerância** | dias depois do vencimento, definidos pelo administrador do deboaz, antes de o aviso "Fatura em atraso" aparecer no Pagamento ([Pagamento RN-311](19_modulo-pagamento.md#RN-311)) |
 | <a id="usuario-superior"></a>**Usuário superior** | quem pede a nova geração de senha, desativa e reativa os usuários abaixo dele; a ordem é time deboaz, conta master, staff com o módulo Usuários, demais staff e participantes |
 | <a id="versao-das-permissoes"></a>**Versão das permissões** | número da sessão que sobe a cada mudança nas permissões da pessoa; o token com a versão anterior é recusado e o aparelho renova para receber as permissões novas ([Autorização `RN-239`](17_modulo-usuario-b-autorizacao.md#RN-239)) |
 | <a id="vista"></a>**Vista** | desenho de uma tela, feito e aprovado antes do código, mostrando os componentes e os elementos de identidade que ela vai apresentar |
@@ -100,7 +108,8 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v47** | 2026-11-12 16:58 | Termos Chamado e Horas úteis; SAC aponta o documento 18_modulo-sac (`RN-290`, `RNF-229`) |
+| **v48** | 2026-11-15 00:50 | Termos do Pagamento ([19_modulo-pagamento](19_modulo-pagamento.md)): Competência, Estorno, Fatura, Inadimplência, Intermediador de pagamento, Juros por atraso, Pagamento e Tolerância |
+| v47 | 2026-11-12 16:58 | Termos Chamado e Horas úteis; SAC aponta o documento 18_modulo-sac (`RN-290`, `RNF-229`) |
 | v46 | 2026-11-08 23:33 | Termos Card ao vivo (com na abertura, Módulos `RN-279`) e Recorte (dia, semana e mês do card, Módulos `RN-277`); status → Em revisão |
 | v45 | 2026-11-07 02:55 | Status → Aprovado, junto com o Módulo Usuários v57; termos sem mudança |
 | v44 | 2026-11-07 02:38 | Termo Conta qa: administrador qa próprio, lista de módulos iniciais do Key Vault, dados fictícios, volta ao estado inicial a cada inicialização e siglas “QA” reservadas em produção (Módulo Usuários v56 `RN-265`, `RN-267`, `RN-268`, `RN-269`, `RN-179`) |
@@ -113,4 +122,4 @@ objetivo: "dar um significado único aos termos do domínio usados nos documento
 
 ---
 
-<sub>boaz · v47 · 2026-11-12 16:58 · `1_Requisitos/99_glossario.md`</sub>
+<sub>boaz · v48 · 2026-11-15 00:50 · `1_Requisitos/99_glossario.md`</sub>

@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "16_modulo-catalogo"
 tipo: "Funcionalidade"
 titulo: "Catálogo"
-versao: "v29"
-data: "2026-11-08 23:16"
+versao: "v30"
+data: "2026-11-15 00:42"
 status: "Em revisão"
 objetivo: "catalogar, só na conta do time deboaz, todo módulo do deboaz, com nome, tipo, custo, precificação e as instituições e os educadores autônomos que o contrataram, começando pelo preço do módulo Usuários, cobrado por staff e por participante, e a vitrine de cada módulo contratável, que a instituição e o educador autônomo veem em A contratar, simulam e incluem na conta."
 ---
 
-> **boaz · Funcionalidade** · `16_modulo-catalogo` · **v29** · 2026-11-08 23:16 · **Em revisão**
+> **boaz · Funcionalidade** · `16_modulo-catalogo` · **v30** · 2026-11-15 00:42 · **Em revisão**
 
 # Catálogo
 
@@ -1900,7 +1900,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v29** | 2026-11-08 23:16 | Em aberto: card do Catálogo (`RF-116`) passa ao card comum de 15_modulos (`RN-276`, `RN-277`, `RN-279`) numa tarefa à parte; status → Em revisão |
+| **v30** | 2026-11-15 00:42 | Módulo Contas passa a Pagamento ([19_modulo-pagamento](19_modulo-pagamento.md), `MOD-01`): `RNF-210` e Fora de escopo |
+| v29 | 2026-11-08 23:16 | Em aberto: card do Catálogo (`RF-116`) passa ao card comum de 15_modulos (`RN-276`, `RN-277`, `RN-279`) numa tarefa à parte; status → Em revisão |
 | v28 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v27 | 2026-11-04 01:06 | Aprovado, sem pendências em aberto |
 | v26 | 2026-11-04 01:05 | Catalogar módulo com Dados, Preço, Desconto e Vitrine, já Ativo ao salvar (`RF-123`), ativar e desativar, com as contas que já têm o módulo usando e pagando (`RF-169`), situação no Catálogo (`RF-170`), configuração mínima (`RN-263`), só o administrador do deboaz (`RN-264`); sem a data Vale a partir de: preço e desconto valem ao salvar (`RN-194`, `RF-118`); sem custo não pede valores e com custo os declara, sem Com custo sem preço (`RN-199`, `RF-116`, `RN-257`); vistas catalogar-modulo v01 e catalogo-deboaz Web v02, PWA v04 e Mobile v04; catalogar-sequencia v01, sequência v05, casos de uso v04, contrato v05, classes v06 e documentos v06 |
@@ -1913,4 +1914,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v29 · 2026-11-08 23:16 · `1_Requisitos/16_modulo-catalogo.md`</sub>
+<sub>boaz · v30 · 2026-11-15 00:42 · `1_Requisitos/16_modulo-catalogo.md`</sub>

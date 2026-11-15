@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3720 748" width="3720" height="748">
   <title>Hub · usuários · Web · vista</title>
-  <desc>Hub · usuários · vista (requisito 17_modulo-usuario). v01 a v05: listas, formulários, permissões, participantes e tempo de sessão. v06: staff e participante selecionados com as opções (editar dados, permissões, nova geração de senha, novo código de acesso e desativar), edição do staff e do participante; card do módulo Usuários nos quatro tamanhos (mínima, reduzida, normal e expandida) com os dados da Ficha do módulo, no compact, no medium e no expanded, sem os outros módulos; telas do módulo dentro da área da carcaça do módulo aberto (topo, abas Configuração | Utilização e navegação do hub-ui), com lista e detalhe no expanded. v07: avisos de ação ao salvar as permissões (concluído e as recusas acima do que tem e mudou ao editar), registro de mudanças só para quem administra as permissões e o card novo com o aviso para quem recebe. v08: textos neutros nas recusas ao salvar as permissões (RF-161, RF-162). Plataforma Web — v01: separada de vista-hub-usuarios v08 pela regra de uma vista por plataforma (06 RNF-103 v17): medium e expanded (escala 0,5), no navegador. v02: card comum (15 RN-276) com a alternância Dia, Semana e Mês, 5 pontos na normal e 12 na expandida (RN-277, RN-218); expanded também com os cards da staff Maria (Semana) e do autônomo Pedro (Dia) pela RN-189 (17 v90). v03: números de exemplo da RN-189 (17 v93), rótulos dos pontos e tendências da RN-277 (15 v27); staff só com a aba Contratados (12 RN-284 v40). v04: no card do autônomo o macro passa a "usuários ativos" (31 participantes e a conta master, 17 v105).</desc>
+  <desc>Hub · usuários · vista (requisito 17_modulo-usuario). v01 a v05: listas, formulários, permissões, participantes e tempo de sessão. v06: staff e participante selecionados com as opções (editar dados, permissões, nova geração de senha, novo código de acesso e desativar), edição do staff e do participante; card do módulo Usuários nos quatro tamanhos (mínima, reduzida, normal e expandida) com os dados da Ficha do módulo, no compact, no medium e no expanded, sem os outros módulos; telas do módulo dentro da área da carcaça do módulo aberto (topo, abas Configuração | Utilização e navegação do hub-ui), com lista e detalhe no expanded. v07: avisos de ação ao salvar as permissões (concluído e as recusas acima do que tem e mudou ao editar), registro de mudanças só para quem administra as permissões e o card novo com o aviso para quem recebe. v08: textos neutros nas recusas ao salvar as permissões (RF-161, RF-162). Plataforma Web — v01: separada de vista-hub-usuarios v08 pela regra de uma vista por plataforma (06 RNF-103 v17): medium e expanded (escala 0,5), no navegador. v02: card comum (15 RN-276) com a alternância Dia, Semana e Mês, 5 pontos na normal e 12 na expandida (RN-277, RN-218); expanded também com os cards da staff Maria (Semana) e do autônomo Pedro (Dia) pela RN-189 (17 v90). v03: números de exemplo da RN-189 (17 v93), rótulos dos pontos e tendências da RN-277 (15 v27); staff só com a aba Contratados (12 RN-284 v40). v04: no card do autônomo o macro passa a "usuários ativos" (31 participantes e a conta master, 17 v105). v05: acompanha a v05 do pwa e do mobile, em que as Permissões ganham o Pagamento (MOD-01) só com a Utilização (19_modulo-pagamento RN-299); a web não tem a tela Permissões, sem mudança de desenho. v06: acompanha a v06 do pwa e do mobile (aviso de ação acima do Salvar); sem mudança de desenho na web.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -125,10 +125,10 @@
     <text class="title" x="40" y="72">Hub · usuários · Web · vista</text>
     <text class="subtitle" x="40" y="94">Card do módulo Usuários nos quatro tamanhos, por perfil e recorte, e telas do módulo dentro da carcaça do hub</text>
     <text class="wm-meta-label" x="3432" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="3432" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="3456" y="71" text-anchor="middle">v04</text>
+    <rect class="wm-badge" x="3432" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="3456" y="71" text-anchor="middle">v06</text>
     <line class="wm-sep" x1="3504" y1="32" x2="3504" y2="80"/>
     <text class="wm-meta-label" x="3528" y="44">DATA</text>
-    <text class="wm-meta-value" x="3528" y="72">2026-11-11 · 23:29</text>
+    <text class="wm-meta-value" x="3528" y="72">2026-11-15 · 00:18</text>
   </g>
 
 
@@ -487,7 +487,7 @@
     <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
     <text class="label" x="40" y="58">Medium e expanded em escala 0,5; as anotações dos blocos estão na vista pwa</text>
     <line class="divider" x1="40" y1="76" x2="3680" y2="76"/>
-    <text class="footer" x="40" y="100">v04 · Web: card do autônomo com "usuários ativos" (a conta master entra nas contagens, 17 v105 RN-189)</text>
-    <text class="wm-file" x="3680" y="100" text-anchor="end">vista-hub-usuarios-web_v04_20261111-2329.svg</text>
+    <text class="footer" x="40" y="100">v06 · sem mudança de desenho: acompanha a v06 do pwa e do mobile</text>
+    <text class="wm-file" x="3680" y="100" text-anchor="end">vista-hub-usuarios-web_v06_20261115-0018.svg</text>
   </g>
 </svg>

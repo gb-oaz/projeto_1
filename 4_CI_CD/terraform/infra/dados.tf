@@ -4,12 +4,12 @@
 
 # Cosmos DB for MongoDB (RU): serverless em hml, autoscale no banco em prd
 resource "azurerm_cosmosdb_account" "cosmos" {
-  name                          = "${local.n}-cosmos"
-  location                      = var.regiao
-  resource_group_name           = data.azurerm_resource_group.rg.name
-  offer_type                    = "Standard"
-  kind                          = "MongoDB"
-  mongo_server_version          = var.mongo_versao
+  name                 = "${local.n}-cosmos"
+  location             = var.regiao
+  resource_group_name  = data.azurerm_resource_group.rg.name
+  offer_type           = "Standard"
+  kind                 = "MongoDB"
+  mongo_server_version = var.mongo_versao
   # RNF-62: rede de dados fechada, só o private endpoint em snet-pe. O CD não
   # abre a rede nem com filtro de IP: o esvaziamento de hml (RNF-227) apaga as
   # coleções pelo plano de controle (ARM), em cd-ambiente.yml
