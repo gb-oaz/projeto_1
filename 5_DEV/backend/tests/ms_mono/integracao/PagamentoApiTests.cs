@@ -117,7 +117,19 @@ public class PagamentoApiTests(Backend backend) : IClassFixture<Backend>
         var estorno = await api.Enviar("POST", $"/pagamento/recebimentos/pagamentos/{pagamentoId}/estornos",
             new { valor = 47.00m, motivo = "Módulo cancelado" }, admin.Token);
         Assert.Equal((HttpStatusCode.Created, "PENDENTE"), (estorno.Status, estorno.Texto("status")));
-        Assert.Equal("ESTORNO_PENDENTE", (await api.Enviar("GET", $"/pagamento/pagamentos/{pagamentoId}", token: master.Token)).Texto("status"));
+        var comEstorno = await api.Enviar("GET", $"/pagamento/pagamentos/{pagamentoId}", token: master.Token);
+        Assert.Equal(("ESTORNO_PENDENTE", "PENDENTE"), (comEstorno.Texto("status"), comEstorno.Corpo!["estornos"]![0]!["status"]!.GetValue<string>()));
+
+        // RF-191-api, RF-192-api: o detalhe da fatura e do pagamento para o recebedor
+        var faturaDoRecebedor = await api.Enviar("GET", $"/pagamento/recebimentos/faturas/{faturaId}", token: admin.Token);
+        Assert.Equal((HttpStatusCode.OK, "PAGA"), (faturaDoRecebedor.Status, faturaDoRecebedor.Texto("status")));
+        var pagamentoDoRecebedor = await api.Enviar("GET", $"/pagamento/recebimentos/pagamentos/{pagamentoId}", token: admin.Token);
+        Assert.Equal((HttpStatusCode.OK, contaId), (pagamentoDoRecebedor.Status, pagamentoDoRecebedor.Corpo!["conta"]!["id"]!.GetValue<string>()));
+        Assert.Equal(HttpStatusCode.Forbidden, (await api.Enviar("GET", $"/pagamento/recebimentos/faturas/{faturaId}", token: master.Token)).Status);
+
+        // RN-298-api: o administrador tem MOD-01 · U só para o card
+        var doAdmin = await api.Enviar("GET", "/pagamento/faturas", token: admin.Token);
+        Assert.Equal((HttpStatusCode.Forbidden, "ACESSO_NEGADO"), (doAdmin.Status, doAdmin.Codigo));
     }
 
     [Fact]
@@ -141,6 +153,6 @@ public class PagamentoApiTests(Backend backend) : IClassFixture<Backend>
         var mudou = await api.Enviar("PUT", "/pagamento/recebimentos/configuracao", corpo, admin.Token, ifMatch: $"\"{versao}\"");
         Assert.Equal((HttpStatusCode.PreconditionFailed, "CONFIGURACAO_MUDOU"), (mudou.Status, mudou.Codigo));
         var semIfMatch = await api.Enviar("PUT", "/pagamento/recebimentos/configuracao", corpo, admin.Token);
-        Assert.Equal(HttpStatusCode.PreconditionFailed, semIfMatch.Status);
+        Assert.Equal(((HttpStatusCode)428, "VERSAO_AUSENTE"), (semIfMatch.Status, semIfMatch.Codigo));
     }
 }

@@ -12,9 +12,11 @@ namespace Boaz.MsMono.Secundario.Out.Hub.Pagamento;
 // dentro do namespace: "Pagamento" sozinho seria o namespace deste adaptador
 using Pagamento = Boaz.Core.Hub.Pagamento.Pagamentos.Domain.Pagamento;
 
-// As coleções pagamentos e estornos (pagamento-documentos v02). Cada documento
+// As coleções pagamentos e estornos (pagamento-documentos v03). Cada documento
 // guarda a versão (+1 a cada gravação): Salvar só vale se a versão guardada
-// ainda é a lida. Nunca número, validade nem CVV do cartão (RNF-239).
+// ainda é a lida. O aviso acha o pagamento ou o estorno pelo id externo e pelo
+// intermediador que o gerou (RNF-242); o documento de antes do campo
+// "intermediador" vale para qualquer um. Nunca número, validade nem CVV do cartão (RNF-239).
 public sealed class PagamentosNoBanco(Armazenamento armazenamento) : IPagamentos, IEstornos
 {
     static readonly string[] Abertos = [StatusDoPagamento.Aguardando.Texto(), StatusDoPagamento.Processando.Texto()];
@@ -29,11 +31,44 @@ public sealed class PagamentosNoBanco(Armazenamento armazenamento) : IPagamentos
         return d is null ? null : Documentos.PagamentoDe(d);
     }
 
-    public async Task<Pagamento?> PorIdExterno(string idExterno, CancellationToken ct = default)
+    public async Task<Pagamento?> PorIdExterno(string intermediador, string idExterno, CancellationToken ct = default)
     {
-        var d = await Pagamentos.Find(Bson.Filtro.Eq("idExterno", idExterno)).FirstOrDefaultAsync(ct);
+        var d = await Pagamentos.Find(DoIntermediador(intermediador, idExterno)).FirstOrDefaultAsync(ct);
         return d is null ? null : Documentos.PagamentoDe(d);
     }
+
+    // o boleto mais novo da conta (índice contaId, forma, criadoEm), para lembrar o endereço (RF-184-api)
+    public async Task<EnderecoDoPagador?> UltimoEnderecoDoBoleto(string contaId, CancellationToken ct = default)
+    {
+        var d = await Pagamentos.Find(Bson.Filtro.Eq("contaId", contaId) & Bson.Filtro.Eq("forma", FormaDePagamento.Boleto.Texto())
+                & Bson.Filtro.Ne("boleto.endereco", BsonNull.Value))
+            .Sort(Builders<BsonDocument>.Sort.Descending("criadoEm")).FirstOrDefaultAsync(ct);
+        return d?.Documento("boleto")?.Documento("endereco") is { } e ? Documentos.EnderecoDe(e) : null;
+    }
+
+    // os confirmados em duplicidade (poucos), ligados à fatura da competência
+    public async Task<int> Duplicidades(Competencia competencia, CancellationToken ct = default)
+    {
+        var etapas = new BsonDocument[]
+        {
+            new("$match", new BsonDocument { ["duplicidade"] = true, ["pagoEm"] = new BsonDocument("$ne", BsonNull.Value) }),
+            new("$lookup", new BsonDocument
+            {
+                ["from"] = Colecoes.Faturas,
+                ["localField"] = "faturaId",
+                ["foreignField"] = "_id",
+                ["as"] = "fatura",
+            }),
+            new("$match", new BsonDocument("fatura.competencia", competencia.ToString())),
+            new("$count", "quantos"),
+        };
+        var r = await Pagamentos.Aggregate<BsonDocument>(etapas, cancellationToken: ct).FirstOrDefaultAsync(ct);
+        return r?.Inteiro("quantos") ?? 0;
+    }
+
+    static FilterDefinition<BsonDocument> DoIntermediador(string intermediador, string idExterno) =>
+        Bson.Filtro.Eq("idExterno", idExterno)
+        & (Bson.Filtro.Eq("intermediador", intermediador) | Bson.Filtro.Exists("intermediador", false) | Bson.Filtro.Eq("intermediador", ""));
 
     public async Task<IReadOnlyList<Pagamento>> DasFaturas(IEnumerable<string> faturaIds, CancellationToken ct = default)
     {
@@ -59,11 +94,15 @@ public sealed class PagamentosNoBanco(Armazenamento armazenamento) : IPagamentos
 
     public Task Remover(string id, CancellationToken ct = default) => Pagamentos.DeleteOneAsync(Bson.Filtro.Eq("_id", id), ct);
 
-    async Task<Estorno?> IEstornos.PorIdExterno(string idExterno, CancellationToken ct)
+    async Task<Estorno?> IEstornos.PorIdExterno(string intermediador, string idExterno, CancellationToken ct)
     {
-        var d = await Estornos.Find(Bson.Filtro.Eq("idExterno", idExterno)).FirstOrDefaultAsync(ct);
+        var d = await Estornos.Find(DoIntermediador(intermediador, idExterno)).FirstOrDefaultAsync(ct);
         return d is null ? null : Documentos.EstornoDe(d);
     }
+
+    public async Task<IReadOnlyList<Estorno>> DoPagamento(string pagamentoId, CancellationToken ct = default) =>
+        [.. (await Estornos.Find(Bson.Filtro.Eq("pagamentoId", pagamentoId)).Sort(Builders<BsonDocument>.Sort.Ascending("pedidoEm")).ToListAsync(ct))
+            .Select(Documentos.EstornoDe)];
 
     public Task Incluir(Estorno estorno, CancellationToken ct = default) =>
         Estornos.InsertOneAsync(Documentos.Estorno(estorno, estorno.Versao), cancellationToken: ct);
@@ -93,6 +132,7 @@ public sealed class AvisosDoBancoNoBanco(Armazenamento armazenamento) : IAvisosD
             await Avisos.InsertOneAsync(new BsonDocument
             {
                 ["_id"] = aviso.Id,
+                ["intermediador"] = Bson.Valor(aviso.Intermediador),
                 ["idExterno"] = Bson.Valor(aviso.IdExterno),
                 ["tipo"] = Bson.Valor(aviso.Tipo),
                 ["recebidoEm"] = Bson.Valor(aviso.RecebidoEm),

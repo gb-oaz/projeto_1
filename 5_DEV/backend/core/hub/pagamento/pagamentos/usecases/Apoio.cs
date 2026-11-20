@@ -18,10 +18,11 @@ using Pagamento = Boaz.Core.Hub.Pagamento.Pagamentos.Domain.Pagamento;
 /// </summary>
 public sealed class Baixas(IPagamentos pagamentos, IFaturas faturas, ICanalDoPagamento canal)
 {
-    /// <summary>O pagamento da conta de quem pede.</summary>
-    /// <exception cref="FalhaDoPagamento">PAGAMENTO_INEXISTENTE.</exception>
+    /// <summary>O pagamento da conta de quem paga (RN-298).</summary>
+    /// <exception cref="FalhaDoPagamento">ACESSO_NEGADO ou PAGAMENTO_INEXISTENTE.</exception>
     public async Task<Pagamento> Carregar(string id, QuemPede quem, CancellationToken ct)
     {
+        quem.SoQuemPaga();
         var pagamento = await pagamentos.Obter(id, ct);
         return pagamento is null || pagamento.ContaId != quem.ContaId ? throw FalhaDoPagamento.PagamentoInexistente() : pagamento;
     }

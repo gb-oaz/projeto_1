@@ -1,5 +1,6 @@
 using Boaz.Core.Hub.Pagamento.Configuracao.Domain;
 using Boaz.Core.Hub.Pagamento.Faturas.Domain;
+using Boaz.Core.Hub.Pagamento.Pagamentos.Dtos;
 
 namespace Boaz.Core.Hub.Pagamento.Configuracao.Dtos;
 
@@ -58,6 +59,13 @@ public sealed record PedidoDeConfiguracao(IReadOnlyDictionary<string, bool?>? Fo
     }
 }
 
-/// <summary>200 de GET /pagamento/formas (RF-184): as formas ligadas, na ordem da tela.</summary>
+/// <summary>O intermediador do cartão em GET /pagamento/formas (RF-184-api): a tela gera o token direto nele.</summary>
+/// <param name="Intermediador">MERCADO_PAGO; fora de produção, com o falso, FALSO.</param>
+/// <param name="ChavePublica">A chave pública do intermediador, como "APP_USR-3f1c…".</param>
+public sealed record CartaoDasFormasDto(string Intermediador, string ChavePublica);
+
+/// <summary>200 de GET /pagamento/formas (RF-184): as formas ligadas, na ordem da tela, o cartão e o último endereço do boleto.</summary>
 /// <param name="Formas">PIX, CARTAO_CREDITO…</param>
-public sealed record FormasDto(IReadOnlyList<string> Formas);
+/// <param name="Cartao">O intermediador e a chave pública do cartão.</param>
+/// <param name="EnderecoDoBoleto">O endereço do último boleto da conta; null se nenhum.</param>
+public sealed record FormasDto(IReadOnlyList<string> Formas, CartaoDasFormasDto Cartao, EnderecoDto? EnderecoDoBoleto);

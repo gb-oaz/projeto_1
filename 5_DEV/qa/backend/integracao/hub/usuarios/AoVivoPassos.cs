@@ -22,7 +22,8 @@ public sealed class AoVivoPassos(Mundo mundo, AoVivo aoVivo)
     static readonly TimeSpan Abertura = TimeSpan.FromSeconds(10);
 
     readonly Dictionary<string, Fluxo> conexoes = [];
-    DateTimeOffset retirada;
+    // o instante da retirada no relógio monotônico (Cronometro)
+    TimeSpan retirada;
     int mudancas;
 
     // ── RN-281 · quem não conecta ──────────────────────────────────────────
@@ -84,14 +85,14 @@ public sealed class AoVivoPassos(Mundo mundo, AoVivo aoVivo)
         var mods = (await mundo.Permissoes(maria))["mods"]!.AsObject()
             .Where(m => m.Key != mod).ToDictionary(m => m.Key, m => m.Value!.GetValue<string>());
         await mundo.Definir(maria, mods);
-        retirada = DateTimeOffset.UtcNow;
+        retirada = Cronometro.Agora;
     }
 
     [Then(@"^em até (\d+) s ela recebe ""encerrado"" com o código ""(\w+)""$")]
     public async Task EncerradaEmAte(int segundos, string codigo)
     {
         var limite = TimeSpan.FromSeconds(segundos);
-        var evento = await Encerrado(conexoes["Maria"], codigo, limite - (DateTimeOffset.UtcNow - retirada) + Folga);
+        var evento = await Encerrado(conexoes["Maria"], codigo, limite - (Cronometro.Agora - retirada) + Folga);
         Assert.True(evento.Quando - retirada <= limite + Folga,
             $"o \"encerrado\" devia chegar em até {segundos} s, chegou em {(evento.Quando - retirada).TotalSeconds:0.0} s");
     }
@@ -249,7 +250,7 @@ public sealed class AoVivoPassos(Mundo mundo, AoVivo aoVivo)
         var primeiro = await PrimeiroCard(fluxo);
         var desde = fluxo.Eventos.Count;
         await MudarAVersao();
-        var mudanca = DateTimeOffset.UtcNow;
+        var mudanca = Cronometro.Agora;
         var novo = await fluxo.Esperar(e => e.Tipo == "card" && e.Id != primeiro.Id, TimeSpan.FromSeconds(segundos) + Folga, desde);
         Assert.True(novo is not null, $"depois da mudança, um \"card\" novo devia chegar em até {segundos} s: {fluxo}");
         Assert.True(CardPassos.Versao(novo.Corpo!) > CardPassos.Versao(primeiro.Corpo!), $"o \"card\" novo devia trazer a versao nova: {novo}");
@@ -261,7 +262,7 @@ public sealed class AoVivoPassos(Mundo mundo, AoVivo aoVivo)
     // o ": ping" chega em até o seu intervalo depois de abrir
     static async Task<Evento> Ping(Fluxo fluxo, int segundos)
     {
-        var ping = await fluxo.EsperarTipo("ping", TimeSpan.FromSeconds(segundos) + Folga - (DateTimeOffset.UtcNow - fluxo.Aberto));
+        var ping = await fluxo.EsperarTipo("ping", TimeSpan.FromSeconds(segundos) + Folga - (Cronometro.Agora - fluxo.Aberto));
         Assert.True(ping is not null && ping.Quando - fluxo.Aberto <= TimeSpan.FromSeconds(segundos) + Folga,
             $"um \": ping\" devia chegar em até {segundos} s: {fluxo}");
         return ping;

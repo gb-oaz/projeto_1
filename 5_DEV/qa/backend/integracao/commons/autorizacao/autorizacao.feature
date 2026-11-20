@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.md (v34), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.md (v35), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Autorização
   1_Requisitos/17_modulo-usuario-b-autorizacao.md · Cenários de API
@@ -75,6 +75,20 @@ Funcionalidade: Autorização
       """
 
   @RF-160
+  Cenário: Pagamento só para a conta master conceder
+    Dado a staff Rita sem permissões, na versão 1
+    Quando a conta master envia GET /usuarios/usr-ebfga-rita/permissoes
+    Então a resposta é 200 e "concediveis" traz o Pagamento só com a Utilização:
+      """
+      {
+        "mod": "MOD-01",
+        "nome": "Pagamento",
+        "abas": "U"
+      }
+      """
+    E o mesmo GET do João, para a Ana, não traz "MOD-01" em "concediveis"
+
+  @RF-160
   Cenário: pessoa que não está abaixo
     Quando o João envia GET /usuarios/usr-ebfga-rui/permissoes, de um par dele
     Então a resposta é 403 ACESSO_NEGADO
@@ -140,6 +154,25 @@ Funcionalidade: Autorização
       }
       """
 
+  @RF-161
+  Esquema do Cenário: Pagamento recusado
+    Quando <quem> envia PUT /usuarios/<id>/permissoes com "MOD-01" com "<abas>"
+    Então a resposta é 422 com:
+      """
+      {
+        "codigo": "DADOS_INVALIDOS",
+        "mensagem": "<mensagem>",
+        "campo": "mods.MOD-01"
+      }
+      """
+    E as permissões de <id> não mudam
+
+    Exemplos:
+      | quem             | id             | abas | mensagem                                |
+      | a conta master   | usr-ebfga-rita | CU   | O Pagamento só tem a aba Utilização.    |
+      | a Rita, com Adm. | usr-ebfga-bia  | U    | Só a conta master concede o Pagamento.  |
+      | o administrador  | usr-dboaz-caio | U    | O módulo MOD-01 não pode ser concedido. |
+
   @RF-162
   Cenário: duas pessoas salvando
     Dado as permissões da Maria lidas na versão 6 pela conta master e pelo João
@@ -177,7 +210,7 @@ Funcionalidade: Autorização
 
     Exemplos:
       | quem           | frente | módulos                                               | abas     |
-      | administrador  | hub    | SAC, Usuários e Catálogo                              | C e U    |
+      | administrador  | hub    | SAC, Usuários, Catálogo e Pagamento                   | C e U    |
       | membro do time | hub    | os marcados entre SAC, Usuários e Catálogo            | marcadas |
       | conta master   | hub    | todos os da conta e os contratados usados no hub      | C e U    |
       | autônomo       | hub    | todos os da conta e os contratados usados no hub      | C e U    |
@@ -185,6 +218,20 @@ Funcionalidade: Autorização
       | participante   | quest  | Tarefas, Perfil e os do participante e do responsável | U        |
       | responsável    | quest  | os mesmos do participante                             | U        |
       | anônimo        | quest  | só o módulo da sala                                   | U        |
+
+  @RN-233
+  Esquema do Cenário: Pagamento no token
+    Quando <quem> entra no hub
+    Então o token <traz>
+
+    Exemplos:
+      | quem                        | traz                                       |
+      | o administrador do deboaz   | tem "MOD-01" só com "U", para o card       |
+      | a conta master da EBFGA     | tem "MOD-01" só com "U"                    |
+      | o autônomo Pedro Reis       | tem "MOD-01" só com "U"                    |
+      | a staff Rita, com Pagamento | tem "MOD-01" com "U"                       |
+      | a staff Maria, sem ele      | não tem "MOD-01"                           |
+      | o membro do time Caio       | não tem "MOD-01"                           |
 
   @RN-235
   Cenário: registro de outra conta

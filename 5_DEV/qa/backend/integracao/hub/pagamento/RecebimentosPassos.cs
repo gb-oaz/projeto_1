@@ -8,23 +8,25 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 namespace Boaz.Qa.Integracao.Hub.Pagamento;
 
 // O recebedor (o administrador do deboaz) nos Cenários de API de
-// 1_Requisitos/19_modulo-pagamento.md (v04): recebimentos (RF-190), faturas de
-// todas as contas (RF-191), estorno (RF-192, RN-306), configuração (RF-193) e
-// o card ao vivo (RN-307). Os pedidos do Quando são os de PagamentoPassos.cs.
+// 1_Requisitos/19_modulo-pagamento.md (v05): recebimentos (RF-190), faturas de
+// todas as contas (RF-191), pagamento e estornos (RF-192, RN-306),
+// configuração (RF-193) e o card ao vivo (RN-307). Os pedidos do Quando são os
+// de PagamentoPassos.cs; os números do card, de CardDoPagamentoPassos.cs.
 public sealed partial class PagamentoPassos
 {
-    const string VencidasDeOutubro = "/pagamento/recebimentos/faturas?competencia=2026-10&situacao=VENCIDA&pagina=1";
-
-    // quantos itens da ordem das vencidas as frases já conferiram (RF-191)
-    int conferidos;
+    // RF-191, ordem das vencidas: A, B e C, pelos números reais
+    readonly List<string> ordem = [];
 
     // ── Quando ─────────────────────────────────────────────────────────────
     // RF-193: o corpo do GET com o boleto desligado, no If-Match da versão lida (a "4" do exemplo)
+    [Given(@"^a configuração lida pelo administrador, como a versão 4 acima$")]
+    public async Task ConfiguracaoLida() => configuracaoLida = await fat.Configuracao();
+
     [When(@"^o mesmo corpo, com ""BOLETO"": false$")]
     public async Task MesmoCorpoSemBoleto()
     {
         var (quem, metodo, caminho) = pendente ?? throw new InvalidOperationException("nenhum PUT da configuração à espera do corpo");
-        var lida = await fat.Configuracao();
+        var lida = configuracaoLida ?? await fat.Configuracao();
         versaoEnviada = lida["versao"]!.GetValue<int>();
         await Executar(quem, metodo, caminho, FaturasDoExemplo.CorpoDaConfiguracao(lida, c => c["formas"]!["BOLETO"] = false).ToJsonString(),
             versaoEnviada.ToString(CultureInfo.InvariantCulture));
@@ -53,6 +55,55 @@ public sealed partial class PagamentoPassos
         Respostas.Confere(await Avisar(BancoFalso.Aviso(tipo, await banco.IdExterno(estorno), fat.Agora())), 200);
     }
 
+    // RF-192: o crédito pago às 13:42 de 2026-12-03 pela Rita (a execução
+    // "trc-1d6e3f08"), o estorno pedido ao meio-dia de 2026-12-04 e
+    // confirmado pelo banco às 15:10
+    [Given(@"^o EST-000012 confirmado pelo banco em (\S+)$")]
+    public async Task EstornoConfirmado(string quando)
+    {
+        await fat.Fat402();
+        await fat.Saltar("2026-12-03T13:42:00Z");
+        Execucao("trc-1d6e3f08", await fat.CreditoPago("PAG-000773"));
+        await fat.Saltar("2026-12-04T12:00:00Z");
+        var estorno = await fat.Estornar(fat.Real("PAG-000773"), exemplo: "EST-000012");
+        var em = FaturasDoExemplo.Hora(quando);
+        await fat.Saltar(em);
+        Exigir(await banco.Avisar(estorno, BancoFalso.EstornoConcluido, em), 200, $"POST /pagamento/notificacoes (estorno {estorno} concluído)");
+    }
+
+    // RF-191: A da EBFGA, B e C do Pedro e da COLSA; os três emitidos no mesmo
+    // fechamento. O vencimento é sempre dia 10 (RF-193): o de A, dia 8, só se
+    // prepara no documento da fatura (modelo pagamento-documentos v03)
+    [Given(@"^três faturas vencidas de ""(\d{4}-\d{2})"": A, com vencimento em (\d{4}-\d{2}-\d{2})$")]
+    public async Task TresVencidas(string competencia, string vencimentoDeA)
+    {
+        await fat.Saltar($"{competencia}-28T12:00:00Z");
+        var donos = new List<(Pessoa Dono, string Conta, string Sigla)>
+        {
+            (await mundo.Master(), await mundo.Conta(), "EBFGA"),
+            (await mundo.Pedro(), await mundo.ContaDoPedro(), "PREIS"),
+            (await mundo.MasterDe("COLSA"), await mundo.IdDaConta("COLSA"), "COLSA"),
+        };
+        foreach (var (_, conta, sigla) in donos) await Estado.Cobranca(conta, sigla, "MOD-03", competencia, 500.00m);
+        await fat.Fechar(competencia);
+        var ids = new List<string>();
+        foreach (var (dono, _, _) in donos) ids.Add(await fat.FaturaDa(dono, competencia));
+        await Estado.Atualizar("faturas", ids[0], "vencimento", vencimentoDeA);
+        ordem.Add(ids[0]);
+        ordem.AddRange(ids.Skip(1).Order(StringComparer.Ordinal));
+    }
+
+    [Given(@"^B e C, com vencimento em 2026-11-10, B emitida antes de C e com número menor$")]
+    public async Task BeCVencidas()
+    {
+        await fat.Vencer("2026-10");
+        await fat.Saltar("2026-11-14");
+    }
+
+    [When(@"^o administrador pede as vencidas de ""(\d{4}-\d{2})"", como no cenário acima$")]
+    public async Task PedeAsVencidas(string competencia) =>
+        await Executar(mundo.Admin(), "GET", $"/pagamento/recebimentos/faturas?competencia={competencia}&situacao=VENCIDA&pagina=1", null);
+
     // ── Então · RF-190 recebimentos ────────────────────────────────────────
     [Then(@"^a resposta é 200 com as 12 competências de ""(\d{4}-\d{2})"" a ""(\d{4}-\d{2})"", a mais nova primeiro$")]
     public void DozeCompetencias(string primeira, string ultima)
@@ -72,46 +123,38 @@ public sealed partial class PagamentoPassos
                 $"esperava competencia, faturado, recebido, vencido e inadimplencia: {c.ToJsonString()}"));
 
     // ── Então · RF-191 faturas de todas as contas ──────────────────────────
-    [Then(@"^a resposta é 200 com (\d+) itens, o vencimento mais antigo primeiro$")]
-    public void ItensPeloVencimento(int quantos)
+    // as 9 vencidas de outubro do exemplo (FaturasDoExemplo.Outubro), e nada mais
+    [Then(@"^a resposta é 200 só com faturas ""(\w+)"" de ""(\d{4}-\d{2})"" e total com quantas são$")]
+    public void SoAsDaSituacao(string situacao, string competencia)
     {
         Respostas.Confere(mundo.Ultima, 200);
         var itens = Itens();
-        Assert.True(itens.Count == quantos && mundo.Ultima.Corpo?["total"]?.GetValue<int>() == quantos, $"esperava {quantos} itens: {mundo.Ultima}");
-        PeloVencimentoEPeloNumero(itens);
+        Assert.True(itens.Count == 9 && mundo.Ultima.Corpo?["total"]?.GetValue<int>() == itens.Count
+            && itens.All(i => Campo(i, "status") == situacao && Campo(i, "competencia") == competencia),
+            $"esperava as 9 faturas {situacao} de {competencia} e o total delas: {mundo.Ultima}");
     }
 
-    // os números reais não são os do exemplo: vale a ordem
-    static void PeloVencimentoEPeloNumero(List<JsonObject> itens)
+    [Then(@"^A vem antes de B, e B antes de C$")]
+    public void ABeC()
     {
-        var ordem = itens.Select(i => (Vencimento: Campo(i, "vencimento"), Id: Campo(i, "id"))).ToList();
-        var esperada = ordem.OrderBy(i => i.Vencimento, StringComparer.Ordinal).ThenBy(i => i.Id, StringComparer.Ordinal).ToList();
-        Assert.True(ordem.SequenceEqual(esperada),
-            $"esperava do vencimento mais antigo e, no mesmo vencimento, do menor número, vieram {string.Join(", ", ordem)}");
+        Respostas.Confere(mundo.Ultima, 200);
+        var vieram = Itens().Select(i => Campo(i, "id")).ToList();
+        Assert.True(vieram.SequenceEqual(ordem), $"esperava {string.Join(", ", ordem)} (A, B e C), vieram {string.Join(", ", vieram)}");
     }
 
-    // o cenário só tem Então: as 9 vencidas de outubro e o pedido do administrador
-    [Then(@"^os 9 itens vêm do vencimento mais antigo e, no mesmo vencimento, do menor número:$")]
-    public async Task OrdemDasVencidas()
+    // RF-191: o detalhe do recebedor é o mesmo do pagador
+    [Then(@"^a resposta é 200 com o mesmo corpo de GET /pagamento/faturas/(FAT-\d{6}) da conta$")]
+    public async Task MesmoCorpoDaConta(string exemplo)
     {
-        await fat.Outubro(inteiro: false);
-        await Executar(mundo.Admin(), "GET", VencidasDeOutubro, null);
-        ItensPeloVencimento(9);
+        Respostas.Confere(mundo.Ultima, 200);
+        var doRecebedor = mundo.Ultima.Corpo;
+        var daConta = await fat.Fatura(fat.Real(exemplo));
+        Assert.True(JsonNode.DeepEquals(daConta, doRecebedor), $"esperava o corpo da conta {daConta.ToJsonString()}, veio {doRecebedor?.ToJsonString()}");
     }
 
-    // as duas linhas de números do exemplo: 5 e 4 itens, todos vencidos, a FAT-000371 entre eles
-    [Then(@"^((?:FAT-\d{6}, )+FAT-\d{6})$")]
-    [Then(@"^((?:FAT-\d{6}, )+FAT-\d{6} e FAT-\d{6})$")]
-    public void NumerosDaOrdem(string numeros)
-    {
-        var quantos = numeros.Split("FAT-").Length - 1;
-        var itens = Itens();
-        var trecho = itens.Skip(conferidos).Take(quantos).ToList();
-        Assert.True(trecho.Count == quantos && trecho.All(i => Campo(i, "status") == "VENCIDA"),
-            $"esperava mais {quantos} faturas vencidas depois das {conferidos} primeiras: {mundo.Ultima}");
-        conferidos += quantos;
-        if (conferidos == itens.Count) Assert.Contains(fat.Real("FAT-000371"), itens.Select(i => Campo(i, "id")));
-    }
+    [Then(@"^a FAT-999999 dá 404 FATURA_INEXISTENTE$")]
+    public async Task DetalheQueNaoExiste() =>
+        Respostas.Confere(await fat.Ler(mundo.Admin(), "/pagamento/recebimentos/faturas/FAT-999999"), 404, "FATURA_INEXISTENTE");
 
     [Then(@"^a resposta é 200 com a FAT-000402, a FAT-000318 e a FAT-000247$")]
     public void AsTresDaEbfga()
@@ -143,17 +186,29 @@ public sealed partial class PagamentoPassos
     }
 
     // ── Então · RF-192 e RN-306 estorno ────────────────────────────────────
-    // o contrato não tem endereço que mostre o estorno: o "CONCLUIDO" aparece
-    // no "devolvido" da fatura; o "RECUSADO", no devolvido que não muda
-    [Then(@"^o PAG-000773 fica ""(\w+)"" e o estorno fica ""(CONCLUIDO|RECUSADO)""$")]
-    public async Task DepoisDoBanco(string status, string estorno)
+    [Then(@"^GET /pagamento/recebimentos/pagamentos/(PAG-\d{6}) traz o status ""(\w+)""$")]
+    public async Task StatusParaORecebedor(string exemplo, string status)
     {
-        var id = fat.Real("PAG-000773");
-        var pagamento = await fat.Pagamento(id);
-        Assert.True(Campo(pagamento, "status") == status, $"esperava o PAG-000773 em {status}: {pagamento.ToJsonString()}");
-        var fatura = await fat.Fatura(fat.FaturaDo(id));
-        var devolvido = estorno == "CONCLUIDO" ? 1473.92m : 0m;
-        Assert.True(Valor(fatura, "devolvido") == devolvido, $"esperava a fatura com devolvido {devolvido}: {fatura.ToJsonString()}");
+        var pagamento = await fat.PagamentoDoRecebedor(fat.Real(exemplo));
+        Assert.True(Campo(pagamento, "status") == status, $"esperava o {exemplo} em {status}: {pagamento.ToJsonString()}");
+    }
+
+    [Then(@"^o (EST-\d{6}) em ""estornos"" com o status ""(\w+)""$")]
+    public async Task EstornoNaLista(string exemplo, string status)
+    {
+        var pagamento = await fat.PagamentoDoRecebedor(fat.Real("PAG-000773"));
+        var estorno = (pagamento["estornos"]?.AsArray() ?? []).FirstOrDefault(e => Campo(e, "id") == fat.Real(exemplo));
+        Assert.True(estorno is not null && Campo(estorno, "status") == status,
+            $"esperava o {exemplo} em \"estornos\" com o status {status}: {pagamento.ToJsonString()}");
+    }
+
+    [Then(@"^GET /pagamento/pagamentos/(PAG-\d{6}) da conta traz a mesma lista ""estornos""$")]
+    public async Task MesmosEstornosParaAConta(string exemplo)
+    {
+        var id = fat.Real(exemplo);
+        var (doRecebedor, daConta) = (await fat.PagamentoDoRecebedor(id), await fat.Pagamento(id));
+        Assert.True(daConta["estornos"] is JsonArray && JsonNode.DeepEquals(doRecebedor["estornos"], daConta["estornos"]),
+            $"esperava os mesmos \"estornos\": {doRecebedor["estornos"]?.ToJsonString()} e {daConta["estornos"]?.ToJsonString()}");
     }
 
     [Then(@"^a resposta é 422 ESTORNO_ACIMA_DO_SALDO, com o saldo (\d+\.\d{2})$")]
@@ -188,8 +243,8 @@ public sealed partial class PagamentoPassos
             ChamadosDoExemplo.Corpo("Estorno do boleto da fatura", "COBRANCA").ToJsonString()), 403);
 
     // ── Então · RF-193 configuração ────────────────────────────────────────
-    // "a versão 5" do exemplo é a seguinte à que foi lida e enviada no If-Match
-    [Then(@"^a resposta é 200 com a versão 5 e o boleto false$")]
+    // "a 5" do exemplo é a seguinte à que foi lida e enviada no If-Match
+    [Then(@"^a resposta é 200 com a versão lida \+ 1, a 5, e o boleto false$")]
     public void BoletoDesligadoNaVersaoNova()
     {
         Respostas.Confere(mundo.Ultima, 200);

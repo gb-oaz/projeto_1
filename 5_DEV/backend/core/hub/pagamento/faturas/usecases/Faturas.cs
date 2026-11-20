@@ -22,6 +22,7 @@ public sealed class ListarFaturas(IFaturas faturas, IPagamentos pagamentos, ICon
     /// <inheritdoc />
     public async Task<ListaDeFaturasDto> Executar(string? situacao, int? pagina, QuemPede quem, CancellationToken ct = default)
     {
+        quem.SoQuemPaga();
         Func<StatusDaFatura, bool> naSituacao = situacao switch
         {
             null or "A_PAGAR" => s => s is StatusDaFatura.APagar or StatusDaFatura.Vencida,
@@ -72,6 +73,7 @@ public sealed class LerFatura(IFaturas faturas, IPagamentos pagamentos, ICadastr
     /// <inheritdoc />
     public async Task<FaturaDto> Executar(string id, QuemPede quem, CancellationToken ct = default)
     {
+        quem.SoQuemPaga();
         var fatura = await faturas.Obter(id, ct);
         if (fatura is null || fatura.Conta.Id != quem.ContaId) throw FalhaDoPagamento.FaturaInexistente();
         return await Detalhe(fatura, pagamentos, cadastro, new TaxaDoVencimento(configuracoes), Calendario.Dia(relogio.GetUtcNow()), ct);
@@ -100,6 +102,7 @@ public sealed class LerAvisos(IAvisosDeAtraso avisos, IFaturas faturas, IConfigu
     /// <inheritdoc />
     public async Task<ListaDeAvisosDto> Executar(QuemPede quem, CancellationToken ct = default)
     {
+        quem.SoQuemPaga();
         var hoje = Calendario.Dia(relogio.GetUtcNow());
         var taxas = new TaxaDoVencimento(configuracoes);
         var itens = new List<AvisoDto>();
@@ -113,4 +116,15 @@ public sealed class LerAvisos(IAvisosDeAtraso avisos, IFaturas faturas, IConfigu
         }
         return new ListaDeAvisosDto(itens, itens.Count);
     }
+}
+
+/// <summary>
+/// A conta tem fatura em aberto (A_PAGAR ou VENCIDA)? O 17 pergunta antes de
+/// encerrar a conta (RN-173): com fatura em aberto, 409 FATURA_EM_ABERTO (RN-313).
+/// </summary>
+public sealed class ContaTemFaturaEmAberto(IFaturas faturas) : IContaTemFaturaEmAberto
+{
+    /// <inheritdoc />
+    public async Task<bool> Executar(string contaId, CancellationToken ct = default) =>
+        (await faturas.Listar(new FiltroDeFaturas(contaId, [StatusDaFatura.APagar, StatusDaFatura.Vencida]), ct)).Count > 0;
 }

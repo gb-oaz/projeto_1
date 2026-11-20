@@ -7,7 +7,8 @@ namespace Boaz.Qa.Integracao.Suporte;
 // Um evento do fluxo SSE de GET /<modulo>/card/ao-vivo (15 RN-279, 17 RN-281):
 // "card" (id = versao, data = o corpo de GET /<modulo>/card), "encerrado"
 // (data = {"codigo": …}) e o comentário de manutenção ": ping", aqui com o tipo "ping".
-public sealed record Evento(string Tipo, string? Id, string Dados, DateTimeOffset Quando)
+// Quando: o instante da chegada no relógio monotônico (Cronometro)
+public sealed record Evento(string Tipo, string? Id, string Dados, TimeSpan Quando)
 {
     public JsonNode? Corpo
     {
@@ -18,7 +19,7 @@ public sealed record Evento(string Tipo, string? Id, string Dados, DateTimeOffse
         }
     }
 
-    public override string ToString() => Tipo == "ping" ? $": ping ({Quando:HH:mm:ss})" : $"{Tipo} id={Id} ({Quando:HH:mm:ss}) {Dados}";
+    public override string ToString() => Tipo == "ping" ? $": ping ({Quando.TotalSeconds:0.0} s)" : $"{Tipo} id={Id} ({Quando.TotalSeconds:0.0} s) {Dados}";
 }
 
 // Uma conexão ao vivo aberta pela suíte: lê o corpo em fluxo, como o hub faz
@@ -46,7 +47,8 @@ public sealed class Fluxo : IDisposable
     public string? TipoDoConteudo { get; private set; }
     // os cabeçalhos da resposta (X-Trace-Id, 18 RN-297: o fluxo não é auditado)
     public IReadOnlyDictionary<string, string> Cabecalhos { get; private set; } = new Dictionary<string, string>();
-    public DateTimeOffset Aberto { get; private set; }
+    // o instante da abertura no relógio monotônico (Cronometro)
+    public TimeSpan Aberto { get; private set; }
     public bool Fechado { get; private set; }
 
     public string Texto { get { lock (trava) return texto.ToString(); } }
@@ -80,7 +82,7 @@ public sealed class Fluxo : IDisposable
         fluxo.Cabecalhos = fluxo.resposta.Headers.Concat(fluxo.resposta.Content.Headers)
             .GroupBy(c => c.Key, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(g => g.Key, g => string.Join(",", g.SelectMany(c => c.Value)), StringComparer.OrdinalIgnoreCase);
-        fluxo.Aberto = DateTimeOffset.UtcNow;
+        fluxo.Aberto = Cronometro.Agora;
         _ = Task.Run(fluxo.Ler);
         return fluxo;
     }
@@ -98,13 +100,13 @@ public sealed class Fluxo : IDisposable
                 lock (trava) texto.AppendLine(linha);
                 if (linha.Length == 0)
                 {
-                    if (tipo is not null || dados.Length > 0) Guardar(new Evento(tipo ?? "message", id, dados.ToString(), DateTimeOffset.UtcNow));
+                    if (tipo is not null || dados.Length > 0) Guardar(new Evento(tipo ?? "message", id, dados.ToString(), Cronometro.Agora));
                     (tipo, id) = (null, null);
                     dados.Clear();
                 }
                 else if (linha.StartsWith(':'))
                 {
-                    if (linha[1..].Trim() == "ping") Guardar(new Evento("ping", null, "", DateTimeOffset.UtcNow));
+                    if (linha[1..].Trim() == "ping") Guardar(new Evento("ping", null, "", Cronometro.Agora));
                 }
                 else if (Campo(linha, "event") is { } e) tipo = e;
                 else if (Campo(linha, "id") is { } i) id = i;
@@ -139,12 +141,12 @@ public sealed class Fluxo : IDisposable
     // se o tempo acabou ou o fluxo terminou antes
     public async Task<Evento?> Esperar(Func<Evento, bool> criterio, TimeSpan limite, int desde = 0)
     {
-        var ate = DateTimeOffset.UtcNow + limite;
+        var ate = Cronometro.Agora + limite;
         while (true)
         {
             var achado = Eventos.Skip(desde).FirstOrDefault(criterio);
             if (achado is not null) return achado;
-            var resta = ate - DateTimeOffset.UtcNow;
+            var resta = ate - Cronometro.Agora;
             if (Fechado || resta <= TimeSpan.Zero) return null;
             await sinal.WaitAsync(resta);
         }
@@ -155,10 +157,10 @@ public sealed class Fluxo : IDisposable
     // true se o fluxo terminou dentro do limite
     public async Task<bool> EsperarFim(TimeSpan limite)
     {
-        var ate = DateTimeOffset.UtcNow + limite;
+        var ate = Cronometro.Agora + limite;
         while (!Fechado)
         {
-            var resta = ate - DateTimeOffset.UtcNow;
+            var resta = ate - Cronometro.Agora;
             if (resta <= TimeSpan.Zero) return false;
             await sinal.WaitAsync(resta);
         }

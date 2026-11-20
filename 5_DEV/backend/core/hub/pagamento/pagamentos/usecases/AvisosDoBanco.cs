@@ -14,19 +14,30 @@ using Pagamento = Boaz.Core.Hub.Pagamento.Pagamentos.Domain.Pagamento;
 
 /// <summary>
 /// POST /pagamento/notificacoes (RN-305): só o aviso do banco (ou a consulta
-/// do agendamento) confirma um pagamento; o pagador nunca confirma. A
-/// assinatura errada responde 401 e a tentativa fica registrada; o aviso
+/// do agendamento) confirma um pagamento; o pagador nunca confirma. O dono do
+/// aviso sai do cabeçalho de assinatura e o pagamento é achado pelo id externo
+/// e pelo intermediador que o gerou (RNF-242). Sem cabeçalho conhecido ou com a
+/// assinatura errada, responde 401 e a tentativa fica registrada; o aviso
 /// repetido (mesmo id) e o de pagamento desconhecido respondem 200 sem efeito.
 /// A execução tem traceId novo, ligado ao id externo em avisosDoBanco; o
 /// traceId da criação, se o banco o devolve, fica como traceIdOrigem (RNF-244).
 /// Auditado como AVISO_DO_BANCO, com quem = "banco" (RN-309).
 /// </summary>
 public sealed class ReceberAvisoDoBanco(
-    IIntermediador intermediador, IAvisosDoBanco avisos, IPagamentos pagamentos, IEstornos estornos, IFaturas faturas, ICanalDoPagamento canal,
+    IIntermediadores intermediadores, IAvisosDoBanco avisos, IPagamentos pagamentos, IEstornos estornos, IFaturas faturas, ICanalDoPagamento canal,
     IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio) : IReceberAvisoDoBanco
 {
     /// <summary>Quem fez a mudança, no histórico e na auditoria.</summary>
     public const string Banco = "banco";
+
+    /// <summary>O resultado do aviso sem dono ou com a assinatura errada (RN-305-api).</summary>
+    public const string Recusado = "RECUSADO";
+
+    /// <summary>O resultado do aviso que já chegou antes, ou que não muda mais nada (RN-305-api).</summary>
+    public const string Repetido = "REPETIDO";
+
+    /// <summary>O resultado do aviso de pagamento que o intermediador não gerou aqui (RN-305-api).</summary>
+    public const string Desconhecido = "DESCONHECIDO";
 
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
     readonly Baixas baixas = new(pagamentos, faturas, canal);
@@ -36,11 +47,27 @@ public sealed class ReceberAvisoDoBanco(
         auditada.Auditar(new Execucao(traceId, AcaoAuditada.AvisoDoBanco, null, Banco, null), async andamento =>
         {
             var agora = relogio.GetUtcNow();
-            var leitura = await intermediador.LerAviso(recebido, ct);
+            var dono = intermediadores.DoAviso(recebido);
+            var conferencia = dono?.Conferir(recebido) ?? new ConferenciaDoAviso(false, null);
+            if (dono is null || !conferencia.AssinaturaValida)
+            {
+                await avisos.Registrar(new RegistroDoAviso($"recusado:{traceId.Valor}", dono?.Nome, null, null, agora, false, Recusado, null,
+                    traceId.Valor, null), ct);
+                throw FalhaDoPagamento.AssinaturaInvalida();
+            }
+            // o pagamento que o intermediador não gerou aqui: sem efeito, e sem consultar o serviço dele
+            if (conferencia.IdDoPagamento is { } idDoPagamento && await pagamentos.PorIdExterno(dono.Nome, idDoPagamento, ct) is null)
+            {
+                await avisos.Registrar(new RegistroDoAviso($"desconhecido:{traceId.Valor}", dono.Nome, idDoPagamento, null, agora, true, Desconhecido,
+                    null, traceId.Valor, null), ct);
+                await auditada.Concluir(andamento.Atual, ct);
+                return true;
+            }
+            var leitura = await dono.LerAviso(recebido, ct);
             if (!leitura.AssinaturaValida)
             {
-                await avisos.Registrar(new RegistroDoAviso($"recusado:{traceId.Valor}", null, null, agora, false, "RECUSADO", null, traceId.Valor,
-                    null), ct);
+                await avisos.Registrar(new RegistroDoAviso($"recusado:{traceId.Valor}", dono.Nome, null, null, agora, false, Recusado, null,
+                    traceId.Valor, null), ct);
                 throw FalhaDoPagamento.AssinaturaInvalida();
             }
             if (leitura.Aviso is not { } aviso)
@@ -50,15 +77,21 @@ public sealed class ReceberAvisoDoBanco(
             }
 
             var origem = TraceId.Ler(aviso.TraceIdOrigem)?.Valor;
-            if (!await avisos.Registrar(new RegistroDoAviso(aviso.Id, aviso.IdExterno, Texto(aviso.Tipo), agora, true, "RECEBIDO", null, traceId.Valor,
-                origem), ct))
+            if (!await avisos.Registrar(new RegistroDoAviso(aviso.Id, dono.Nome, aviso.IdExterno, Texto(aviso.Tipo), agora, true, "RECEBIDO", null,
+                traceId.Valor, origem), ct))
             {
+                // o mesmo aviso de novo: sem efeito, e a chegada fica registrada com o traceId dela (RN-305-api)
+                var doAviso = aviso.Tipo is TipoDoAviso.PagamentoConfirmado or TipoDoAviso.PagamentoRecusado
+                    ? (await pagamentos.PorIdExterno(dono.Nome, aviso.IdExterno, ct))?.Id
+                    : null;
+                await avisos.Registrar(new RegistroDoAviso($"{Repetido.ToLowerInvariant()}:{traceId.Valor}", dono.Nome, aviso.IdExterno,
+                    Texto(aviso.Tipo), agora, true, Repetido, doAviso, traceId.Valor, origem), ct);
                 await auditada.Concluir(andamento.Atual, ct);
                 return true;
             }
             try
             {
-                var (resultado, pagamentoId) = await Aplicar(aviso, traceId.Valor, ct);
+                var (resultado, pagamentoId) = await Aplicar(dono.Nome, aviso, traceId.Valor, ct);
                 await avisos.Concluir(aviso.Id, resultado, pagamentoId, ct);
                 if (pagamentoId is not null) andamento.Alvejar(pagamentoId);
             }
@@ -71,17 +104,17 @@ public sealed class ReceberAvisoDoBanco(
             return true;
         }, ct);
 
-    /// <summary>Aplica o aviso; devolve APLICADO, REPETIDO ou DESCONHECIDO e o pagamento ligado.</summary>
-    async Task<(string Resultado, string? PagamentoId)> Aplicar(AvisoDoBanco aviso, string traceId, CancellationToken ct)
+    /// <summary>Aplica o aviso do intermediador; devolve APLICADO, REPETIDO ou DESCONHECIDO e o pagamento ligado.</summary>
+    async Task<(string Resultado, string? PagamentoId)> Aplicar(string intermediador, AvisoDoBanco aviso, string traceId, CancellationToken ct)
     {
-        if (aviso.Tipo is TipoDoAviso.EstornoConcluido or TipoDoAviso.EstornoRecusado) return await AplicarEstorno(aviso, traceId, ct);
+        if (aviso.Tipo is TipoDoAviso.EstornoConcluido or TipoDoAviso.EstornoRecusado) return await AplicarEstorno(intermediador, aviso, traceId, ct);
 
-        var pagamento = await pagamentos.PorIdExterno(aviso.IdExterno, ct);
-        if (pagamento is null) return ("DESCONHECIDO", null);
+        var pagamento = await pagamentos.PorIdExterno(intermediador, aviso.IdExterno, ct);
+        if (pagamento is null) return (Desconhecido, null);
         var mudou = aviso.Tipo == TipoDoAviso.PagamentoConfirmado
             ? await baixas.Confirmar(pagamento, aviso.Em, traceId, Banco, ct)
             : await baixas.Encerrar(pagamento, p => p.Recusar(Pagamento.RecusadoPeloEmissor, aviso.Em, traceId, Banco), ct);
-        return (mudou ? "APLICADO" : "REPETIDO", pagamento.Id);
+        return (mudou ? "APLICADO" : Repetido, pagamento.Id);
     }
 
     /// <summary>
@@ -89,14 +122,14 @@ public sealed class ReceberAvisoDoBanco(
     /// pagamento em duplicidade não muda a fatura); o recusado volta o
     /// pagamento ao status de antes (RF-192).
     /// </summary>
-    async Task<(string Resultado, string? PagamentoId)> AplicarEstorno(AvisoDoBanco aviso, string traceId, CancellationToken ct)
+    async Task<(string Resultado, string? PagamentoId)> AplicarEstorno(string intermediador, AvisoDoBanco aviso, string traceId, CancellationToken ct)
     {
-        var estorno = await estornos.PorIdExterno(aviso.IdExterno, ct);
-        if (estorno is null) return ("DESCONHECIDO", null);
+        var estorno = await estornos.PorIdExterno(intermediador, aviso.IdExterno, ct);
+        if (estorno is null) return (Desconhecido, null);
         var pagamento = await pagamentos.Obter(estorno.PagamentoId, ct);
-        if (pagamento is null) return ("DESCONHECIDO", null);
+        if (pagamento is null) return (Desconhecido, null);
         var concluido = aviso.Tipo == TipoDoAviso.EstornoConcluido;
-        if (!(concluido ? estorno.Concluir(aviso.Em, traceId) : estorno.Recusar(aviso.Em, traceId))) return ("REPETIDO", pagamento.Id);
+        if (!(concluido ? estorno.Concluir(aviso.Em, traceId) : estorno.Recusar(aviso.Em, traceId))) return (Repetido, pagamento.Id);
         if (!await estornos.Salvar(estorno, ct)) throw Baixas.Concorrencia(estorno.Id);
         await AplicarNoPagamento(estorno, pagamento, concluido, aviso.Em, traceId, ct);
         return ("APLICADO", pagamento.Id);
@@ -133,10 +166,11 @@ public sealed class ReceberAvisoDoBanco(
 /// Parte do agendamento (RN-302): cada pagamento em aberto que passou do prazo,
 /// ou que está em análise, é consultado no banco antes de mudar. Pago no
 /// banco: confirma; recusado: recusa; ainda à espera e vencido: expira, e a
-/// fatura fica livre para um novo pagamento. Cada mudança leva o traceId da
+/// fatura fica livre para um novo pagamento. A consulta vai ao intermediador
+/// que gerou o pagamento (RNF-242). Cada mudança leva o traceId da
 /// execução do agendamento (RNF-244).
 /// </summary>
-public sealed class ExpirarPagamentos(IPagamentos pagamentos, IFaturas faturas, ICanalDoPagamento canal, IIntermediador intermediador,
+public sealed class ExpirarPagamentos(IPagamentos pagamentos, IFaturas faturas, ICanalDoPagamento canal, IIntermediadores intermediadores,
     TimeProvider relogio) : IExpirarPagamentos
 {
     readonly Baixas baixas = new(pagamentos, faturas, canal);
@@ -149,7 +183,9 @@ public sealed class ExpirarPagamentos(IPagamentos pagamentos, IFaturas faturas, 
         {
             var vencido = pagamento.ExpiraEm is { } expira && expira <= agora;
             if (!vencido && pagamento.Status != StatusDoPagamento.Processando) continue;
-            var consulta = pagamento.IdExterno is { } externo ? await intermediador.Consultar(externo, ct) : new ConsultaNoBanco(SituacaoNoBanco.Aguardando);
+            var consulta = pagamento.IdExterno is { } externo
+                ? await intermediadores.Do(pagamento.Intermediador).Consultar(externo, ct)
+                : new ConsultaNoBanco(SituacaoNoBanco.Aguardando);
             switch (consulta.Situacao)
             {
                 case SituacaoNoBanco.Paga:

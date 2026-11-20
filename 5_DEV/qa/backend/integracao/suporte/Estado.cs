@@ -145,6 +145,14 @@ public static class Estado
             new ReplaceOptions { IsUpsert = true });
     }
 
+    // um campo de um documento do Pagamento que a API não deixa preparar
+    // (modelo pagamento-documentos v03): o vencimento fora do dia 10 (19
+    // RF-191, ordem das vencidas) e o intermediador de um pagamento gerado
+    // antes da troca (RNF-242). Só preparo: a suíte não lê essas coleções
+    public static Task Atualizar(string colecao, string id, string campo, BsonValue valor) =>
+        Banco.GetCollection<BsonDocument>(colecao).UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", id), Builders<BsonDocument>.Update.Set(campo, valor));
+
     // "cob-ebfga-MOD-03-2026-11", como no exemplo do 19 RF-183
     public static string IdDaCobranca(string sigla, string moduloId, string competencia) =>
         $"cob-{sigla.ToLowerInvariant()}-{moduloId}-{competencia}";

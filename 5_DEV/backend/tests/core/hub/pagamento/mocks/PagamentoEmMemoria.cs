@@ -28,7 +28,8 @@ public sealed class RelogioDoPagamento : TimeProvider
 /// é conferida em Salvar, como no banco.
 /// </summary>
 public sealed class PagamentoEmMemoria : IFaturas, INumeracaoDoPagamento, ICobrancasDoMes, ICadastroDoPagamento, IAvisosDeAtraso,
-    IConfiguracoesDoPagamento, IPagamentos, IEstornos, ICanalDoPagamento, IAvisosDoBanco, IIntermediador, IAuditoria, IAuditoriaDeErros
+    IConfiguracoesDoPagamento, IPagamentos, IEstornos, ICanalDoPagamento, IAvisosDoBanco, IIntermediador, IIntermediadores, IDesenhoDoQrCode, IAuditoria,
+    IAuditoriaDeErros
 {
     readonly Dictionary<string, long> versoes = [];
     readonly Dictionary<string, long> contadores = [];
@@ -82,7 +83,7 @@ public sealed class PagamentoEmMemoria : IFaturas, INumeracaoDoPagamento, ICobra
         FormaDePagamento.CartaoDebito => new(SituacaoDaCobranca.Aguardando, "deb_1", ConfirmacaoUrl: "https://banco.exemplo/confirmar/1",
             Cartao: new CartaoMascarado("MASTERCARD", "5100")),
         FormaDePagamento.Boleto => new(SituacaoDaCobranca.Aguardando, "bol_1", LinhaDigitavel: "23793.38128", CodigoBarras: "2379112960"),
-        _ => new(SituacaoDaCobranca.Aguardando, "pix_1", new DadosDoPix("000201", "<svg></svg>")),
+        _ => new(SituacaoDaCobranca.Aguardando, "pix_1", "000201"),
     };
 
     /// <summary>As cobranças pedidas.</summary>
@@ -99,6 +100,12 @@ public sealed class PagamentoEmMemoria : IFaturas, INumeracaoDoPagamento, ICobra
 
     /// <summary>Os ids externos cancelados no banco.</summary>
     public List<string> CanceladosNoBanco { get; } = [];
+
+    /// <summary>Sem dono: o aviso não é de nenhum intermediador do ambiente (401).</summary>
+    public bool AvisoSemDono { get; set; }
+
+    /// <summary>Os e-mails de quem paga, por conta; sem um, o da conta master de exemplo.</summary>
+    public Dictionary<string, Pagador> Pagadores { get; } = [];
 
     // ── IFaturas ─────────────────────────────────────────────────────────────
     Task<Fatura?> IFaturas.Obter(string id, CancellationToken ct) => Task.FromResult(Faturas.GetValueOrDefault(id));
@@ -145,6 +152,30 @@ public sealed class PagamentoEmMemoria : IFaturas, INumeracaoDoPagamento, ICobra
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
+    public Task<VersaoDasFaturas> Versao(string? contaId, CancellationToken ct = default)
+    {
+        var faturas = Faturas.Values.Where(f => contaId is null || f.Conta.Id == contaId).ToList();
+        if (faturas.Count == 0) return Task.FromResult(new VersaoDasFaturas(0, 0, 0, null));
+        var atualizadoEm = faturas.Select(f => f.Historico.Count == 0 ? f.EmitidaEm : f.Historico.Max(h => h.Em)).Max();
+        return Task.FromResult(new VersaoDasFaturas(faturas.Sum(f => f.Versao + 1), faturas.Count, faturas.Count(f => f.Status == StatusDaFatura.Vencida),
+            atualizadoEm));
+    }
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<SomaDeFaturas>> Somas(IReadOnlyCollection<Competencia> competencias, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<SomaDeFaturas>>([.. Faturas.Values.Where(f => competencias.Contains(f.Competencia))
+            .GroupBy(f => (f.Competencia, f.Status, f.Conta.Tipo, Forma: f.PagaPor is { } id && Pagamentos.TryGetValue(id, out var p) ? p.Forma : (FormaDePagamento?)null))
+            .Select(g => new SomaDeFaturas(g.Key.Competencia, g.Key.Status, g.Key.Tipo, g.Key.Forma, g.Count(), Dinheiro.Somar(g.Select(f => f.Valor)),
+                Dinheiro.Somar(g.Select(f => f.ValorPago - f.Devolvido))))]);
+
+    /// <inheritdoc />
+    public Task<IReadOnlyDictionary<DateOnly, Dinheiro>> RecebidoPorDia(DateOnly de, DateOnly ate, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyDictionary<DateOnly, Dinheiro>>(Faturas.Values
+            .Where(f => f.Status == StatusDaFatura.Paga && f.PagaEm is { } em && Calendario.Dia(em) >= de && Calendario.Dia(em) <= ate)
+            .GroupBy(f => Calendario.Dia(f.PagaEm!.Value))
+            .ToDictionary(g => g.Key, g => Dinheiro.Somar(g.Select(f => f.ValorPago - f.Devolvido))));
+
     // ── numeração, cobranças, cadastro ───────────────────────────────────────
     /// <inheritdoc />
     public Task<long> Proximo(string serie, CancellationToken ct = default)
@@ -159,6 +190,11 @@ public sealed class PagamentoEmMemoria : IFaturas, INumeracaoDoPagamento, ICobra
 
     /// <inheritdoc />
     public Task<ContaDaFatura?> Conta(string contaId, CancellationToken ct = default) => Task.FromResult(Contas.GetValueOrDefault(contaId));
+
+    /// <inheritdoc />
+    public Task<Pagador?> Pagador(string contaId, CancellationToken ct = default) =>
+        Task.FromResult(Pagadores.GetValueOrDefault(contaId)
+            ?? (Contas.GetValueOrDefault(contaId) is { } c ? new Pagador(c.Nome, "12345678000190", $"master@{c.Sigla.ToLowerInvariant()}.exemplo") : null));
 
     /// <inheritdoc />
     public Task<IReadOnlyDictionary<string, string>> Nomes(IEnumerable<string> usuarioIds, CancellationToken ct = default) =>
@@ -212,8 +248,21 @@ public sealed class PagamentoEmMemoria : IFaturas, INumeracaoDoPagamento, ICobra
     // ── pagamentos e estornos ────────────────────────────────────────────────
     Task<Pagamento?> IPagamentos.Obter(string id, CancellationToken ct) => Task.FromResult(Pagamentos.GetValueOrDefault(id));
 
-    Task<Pagamento?> IPagamentos.PorIdExterno(string idExterno, CancellationToken ct) =>
-        Task.FromResult(Pagamentos.Values.FirstOrDefault(p => p.IdExterno == idExterno));
+    Task<Pagamento?> IPagamentos.PorIdExterno(string intermediador, string idExterno, CancellationToken ct) =>
+        Task.FromResult(Pagamentos.Values.FirstOrDefault(p => p.IdExterno == idExterno && p.Intermediador == intermediador));
+
+    /// <inheritdoc />
+    public Task<EnderecoDoPagador?> UltimoEnderecoDoBoleto(string contaId, CancellationToken ct = default) =>
+        Task.FromResult(Pagamentos.Values
+            .Where(p => p.ContaId == contaId && p.Boleto?.Endereco is not null)
+            .OrderByDescending(p => p.CriadoEm)
+            .Select(p => p.Boleto!.Endereco)
+            .FirstOrDefault());
+
+    /// <inheritdoc />
+    public Task<int> Duplicidades(Competencia competencia, CancellationToken ct = default) =>
+        Task.FromResult(Pagamentos.Values.Count(p => p.Duplicidade && p.PagoEm is not null
+            && Faturas.TryGetValue(p.FaturaId, out var f) && f.Competencia == competencia));
 
     /// <inheritdoc />
     public Task<IReadOnlyList<Pagamento>> DasFaturas(IEnumerable<string> faturaIds, CancellationToken ct = default)
@@ -244,8 +293,12 @@ public sealed class PagamentoEmMemoria : IFaturas, INumeracaoDoPagamento, ICobra
         return Task.CompletedTask;
     }
 
-    Task<Estorno?> IEstornos.PorIdExterno(string idExterno, CancellationToken ct) =>
-        Task.FromResult(Estornos.Values.FirstOrDefault(e => e.IdExterno == idExterno));
+    Task<Estorno?> IEstornos.PorIdExterno(string intermediador, string idExterno, CancellationToken ct) =>
+        Task.FromResult(Estornos.Values.FirstOrDefault(e => e.IdExterno == idExterno && e.Intermediador == intermediador));
+
+    /// <inheritdoc />
+    public Task<IReadOnlyList<Estorno>> DoPagamento(string pagamentoId, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<Estorno>>([.. Estornos.Values.Where(e => e.PagamentoId == pagamentoId).OrderByDescending(e => e.PedidoEm)]);
 
     /// <inheritdoc />
     public Task Incluir(Estorno estorno, CancellationToken ct = default)
@@ -294,6 +347,24 @@ public sealed class PagamentoEmMemoria : IFaturas, INumeracaoDoPagamento, ICobra
 
     // ── intermediador ────────────────────────────────────────────────────────
     /// <inheritdoc />
+    public string Nome => NomeDoIntermediador.Falso;
+
+    /// <inheritdoc />
+    public string ChavePublica => "chave-publica-de-teste";
+
+    /// <inheritdoc />
+    public IIntermediador Ligado => this;
+
+    /// <inheritdoc />
+    public IIntermediador Do(string? nome) => this;
+
+    /// <inheritdoc />
+    public IIntermediador? DoAviso(AvisoRecebido recebido) => AvisoSemDono ? null : this;
+
+    /// <inheritdoc />
+    public string Svg(string texto) => $"<svg viewBox=\"0 0 33 33\"><desc>{texto}</desc></svg>";
+
+    /// <inheritdoc />
     public Task<ResultadoDaCobranca> Cobrar(PedidoDeCobranca pedido, CancellationToken ct = default)
     {
         Cobrancas_.Add(pedido);
@@ -313,8 +384,21 @@ public sealed class PagamentoEmMemoria : IFaturas, INumeracaoDoPagamento, ICobra
     /// <inheritdoc />
     public Task<ResultadoDoEstorno> Estornar(PedidoDeEstorno pedido, CancellationToken ct = default) => Task.FromResult(Estorno);
 
+    /// <summary>O id do pagamento que a conferência acha no aviso (o data.id do Mercado Pago); null como no falso.</summary>
+    public string? IdDoPagamentoNoAviso { get; set; }
+
+    /// <summary>Quantas vezes o aviso foi lido no banco.</summary>
+    public int LeiturasDoAviso { get; private set; }
+
     /// <inheritdoc />
-    public Task<LeituraDoAviso> LerAviso(AvisoRecebido recebido, CancellationToken ct = default) => Task.FromResult(Leitura);
+    public ConferenciaDoAviso Conferir(AvisoRecebido recebido) => new(Leitura.AssinaturaValida, IdDoPagamentoNoAviso);
+
+    /// <inheritdoc />
+    public Task<LeituraDoAviso> LerAviso(AvisoRecebido recebido, CancellationToken ct = default)
+    {
+        LeiturasDoAviso++;
+        return Task.FromResult(Leitura);
+    }
 
     // ── auditoria ────────────────────────────────────────────────────────────
     /// <inheritdoc />

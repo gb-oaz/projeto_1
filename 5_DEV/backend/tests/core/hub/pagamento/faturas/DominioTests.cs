@@ -100,7 +100,7 @@ public sealed class DominioTests
     {
         var fatura = Nova();
         var pagamento = Pagamento.Novo("PAG-000773", fatura, FormaDePagamento.CartaoCredito, Dinheiro.Zero, DateTimeOffset.UtcNow, "usr", "trc-00000005",
-            null);
+            null, "FALSO");
         Assert.Equal("PAGAMENTO_NAO_CONFIRMADO",
             Assert.Throws<FalhaDoPagamento>(() => pagamento.PedirEstorno(Dinheiro.De(1m), DateTimeOffset.UtcNow, "t", "admin")).Codigo);
         pagamento.Nascer(StatusDoPagamento.Pago, "card_1", null, DateTimeOffset.UtcNow, null, null, null, new CartaoMascarado("VISA", "4242"), null);
@@ -122,7 +122,7 @@ public sealed class DominioTests
     [Fact]
     public void RF_192_boleto_se_estorna_pelo_sac()
     {
-        var pagamento = Pagamento.Novo("PAG-000790", Nova(), FormaDePagamento.Boleto, Dinheiro.Zero, DateTimeOffset.UtcNow, "usr", "t", null);
+        var pagamento = Pagamento.Novo("PAG-000790", Nova(), FormaDePagamento.Boleto, Dinheiro.Zero, DateTimeOffset.UtcNow, "usr", "t", null, "FALSO");
         Assert.Equal("ESTORNO_PELO_SAC",
             Assert.Throws<FalhaDoPagamento>(() => pagamento.PedirEstorno(Dinheiro.De(1m), DateTimeOffset.UtcNow, "t", "admin")).Codigo);
     }
@@ -130,7 +130,7 @@ public sealed class DominioTests
     [Fact]
     public void RN_302_e_RN_303_fim_do_pagamento_em_aberto()
     {
-        var pix = Pagamento.Novo("PAG-1", Nova(), FormaDePagamento.Pix, Dinheiro.Zero, DateTimeOffset.UtcNow, "usr", "t", null);
+        var pix = Pagamento.Novo("PAG-1", Nova(), FormaDePagamento.Pix, Dinheiro.Zero, DateTimeOffset.UtcNow, "usr", "t", null, "FALSO");
         pix.Nascer(StatusDoPagamento.Aguardando, "pix_1", DateTimeOffset.UtcNow, null, new DadosDoPix("000201", "<svg/>"), null, null, null, null);
         Assert.True(pix.EmAberto);
         Assert.True(pix.Expirar(DateTimeOffset.UtcNow, "t"));
@@ -139,7 +139,7 @@ public sealed class DominioTests
         Assert.True(pix.Duplicidade);
         Assert.Equal("PAGAMENTO_CONFIRMADO", Assert.Throws<FalhaDoPagamento>(() => pix.Cancelar(DateTimeOffset.UtcNow, "t", "usr")).Codigo);
 
-        var debito = Pagamento.Novo("PAG-2", Nova(), FormaDePagamento.CartaoDebito, Dinheiro.Zero, DateTimeOffset.UtcNow, "usr", "t", null);
+        var debito = Pagamento.Novo("PAG-2", Nova(), FormaDePagamento.CartaoDebito, Dinheiro.Zero, DateTimeOffset.UtcNow, "usr", "t", null, "FALSO");
         Assert.True(debito.Recusar(Pagamento.RecusadoPeloEmissor, DateTimeOffset.UtcNow, "t", "banco"));
         Assert.False(debito.Cancelar(DateTimeOffset.UtcNow, "t", "usr"));
     }

@@ -82,6 +82,9 @@ public sealed partial class Mundo
         Apelidos["usr-dboaz-caio"] = async () => (await Caio()).Id;
         Apelidos["usr-colsa-bruno"] = async () => (await Bruno()).Id;
         Apelidos["usr-ebfga-paulo"] = async () => (await Paulo()).Id;
+        // 19_modulo-pagamento e 17-b RF-160, RF-161: a Rita, do financeiro, e a conta do Pedro
+        Apelidos["usr-ebfga-rita"] = async () => (await Rita()).Id;
+        Apelidos["conta-pedro-reis"] = ContaDoPedro;
         Apelidos["EBFGA-LUCAS-0412"] = CodigoDoLucas;
         // sessões da Maria nos exemplos: 3f9c2a71 no navegador, 7d20b9e4 no app
         Apelidos["3f9c2a71"] = async () => (await SessaoDe(await Maria(), Navegador)).Sid;
@@ -107,6 +110,11 @@ public sealed partial class Mundo
     // campos do JSON do exemplo que a API não deixa reproduzir (histórico,
     // pagamento): saem da comparação, e o passo que os põe aqui diz por quê
     public HashSet<string> CamposSemConferir { get; } = [];
+
+    // "a resposta é … e nada muda" (Respostas.cs): o Quando de cada módulo diz
+    // aqui o que conferir depois, com o que leu antes do pedido (17 RN-160 no
+    // Usuários, 19 RN-298 no Pagamento); a última vale
+    public Func<Task>? NadaMudou { get; set; }
 
     // com o relógio de teste na hora do exemplo, as datas do JSON do exemplo
     // valem de verdade, com esta folga (18 RF-171: abertoEm e prazoResposta)
@@ -242,11 +250,19 @@ public sealed partial class Mundo
     // a conta master de outra escola dos exemplos (COLSA, EEJSA) ou do Pedro (PREIS)
     public async Task<Pessoa> MasterDe(string sigla) { await ContaDe(sigla); return contas[sigla].Master; }
 
+    // o id de uma das contas dos exemplos (EBFGA, COLSA, EEJSA, PREIS)
+    public Task<string> IdDaConta(string sigla) => ContaDe(sigla);
+
     // o educador autônomo Pedro Reis é a conta master da própria conta
     public async Task<Pessoa> Pedro() { await ContaDe("PREIS"); return contas["PREIS"].Master; }
 
     // o id da conta do Pedro: "conta-pedro-reis" nos exemplos do 19
     public Task<string> ContaDoPedro() => ContaDe("PREIS");
+
+    // a Rita Gomes, do setor financeiro: staff da EBFGA criada pela conta
+    // master, ainda sem o Pagamento (19 RN-299, 17-b RF-160)
+    public async Task<Pessoa> Rita() =>
+        pessoas.GetValueOrDefault("rita") ?? await NovoStaff("rita", "Rita Gomes", await Master());
 
     // ── pessoas ─────────────────────────────────────────────────────────────
     // o administrador dos cenários é o qaadmin, conta qa com o papel
@@ -521,8 +537,13 @@ public sealed partial class Mundo
         por ??= DoTime(pessoa) ? Admin() : await Master();
         var r = Exigir(await EnviarComo(por, "GET", $"/usuarios/{pessoa.Id}/permissoes"),
             200, $"GET /usuarios/{{id}}/permissoes de {pessoa.Nome}");
+        PermissoesLidas[pessoa.Id] = (por, r.Corpo!.AsObject());
         return r.Corpo!.AsObject();
     }
+
+    // a última leitura das permissões de cada usuário (id), e por quem: "as
+    // permissões de … não mudam" (17-b RF-161) compara com ela
+    public Dictionary<string, (Pessoa Por, JsonObject Corpo)> PermissoesLidas { get; } = [];
 
     // soma os módulos aos que a pessoa já tem e salva (PUT substitui tudo)
     public async Task Conceder(Pessoa pessoa, Dictionary<string, string> mods, Pessoa? por = null)

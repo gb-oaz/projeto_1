@@ -173,7 +173,7 @@ public sealed class SacContratoPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
     public async Task PingDaConversa()
     {
         var fluxo = conversa ?? aoVivo.Ultimo;
-        var resta = TimeSpan.FromSeconds(30) + Folga - (DateTimeOffset.UtcNow - fluxo.Aberto);
+        var resta = TimeSpan.FromSeconds(30) + Folga - (Cronometro.Agora - fluxo.Aberto);
         var ping = await fluxo.EsperarTipo("ping", resta > TimeSpan.Zero ? resta : TimeSpan.Zero);
         Assert.True(ping is not null, $"nenhum \": ping\" em 30 s: {fluxo}");
         Assert.False(fluxo.Fechado, $"a conexão devia continuar aberta: {fluxo}");

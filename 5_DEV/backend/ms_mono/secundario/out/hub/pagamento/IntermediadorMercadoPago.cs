@@ -12,8 +12,8 @@ using Microsoft.Extensions.Options;
 
 namespace Boaz.MsMono.Secundario.Out.Hub.Pagamento;
 
-// Seção "MercadoPago": o intermediador de produção (RNF-242). Os segredos vêm
-// do Key Vault como variáveis de ambiente, nunca do repositório.
+// Seção "MercadoPago": o intermediador de produção e de homologação (RNF-242).
+// Os segredos vêm do Key Vault como variáveis de ambiente, nunca do repositório.
 public sealed class OpcoesDoMercadoPago
 {
     public const string Secao = "MercadoPago";
@@ -32,14 +32,14 @@ public sealed class OpcoesDoMercadoPago
 
     // O endereço público do POST /pagamento/notificacoes (MercadoPago__UrlDeNotificacao); vazio: o do painel.
     public string UrlDeNotificacao { get; set; } = "";
-
-    // O e-mail do pagador que o Mercado Pago exige (MercadoPago__EmailDoPagador).
-    public string EmailDoPagador { get; set; } = "";
 }
 
-// O Mercado Pago pela API REST v1 de pagamentos (pagamento-hexagonal v02):
-// PIX (point_of_interaction), cartão de crédito e débito só pelo token gerado
-// na tela (RNF-239), boleto, estorno total ou parcial e o aviso conferido pelo
+// O Mercado Pago pela API REST v1 de pagamentos (pagamento-hexagonal v03):
+// PIX (point_of_interaction: só o copia e cola; o QR Code é do deboaz),
+// cartão de crédito e débito só pelo token, com o payment_method_id e o
+// issuer_id gerados na tela (RNF-239), boleto em nome e documento da conta com
+// o endereço de quem paga (RF-188), o e-mail do pagador = o login da conta
+// master ou do autônomo, estorno total ou parcial e o aviso conferido pelo
 // x-signature (ts e v1, HMAC-SHA256 do "id:…;request-id:…;ts:…;") e pelo
 // x-request-id. Toda chamada leva X-Idempotency-Key, o X-Trace-Id e o traceId
 // em metadata e external_reference (RNF-244). Os status do banco viram os do
@@ -50,7 +50,15 @@ public sealed class IntermediadorMercadoPago(HttpClient http, IOptions<OpcoesDoM
 {
     public static readonly TimeSpan Prazo = TimeSpan.FromSeconds(15);
 
+    // o cabeçalho do aviso do Mercado Pago (o roteamento do aviso, RNF-242)
+    public const string Assinatura = "x-signature";
+    public const string Pedido = "x-request-id";
+
     readonly OpcoesDoMercadoPago mp = opcoes.Value;
+
+    public string Nome => NomeDoIntermediador.MercadoPago;
+
+    public string ChavePublica => mp.PublicKey;
 
     public async Task<ResultadoDaCobranca> Cobrar(PedidoDeCobranca pedido, CancellationToken ct = default)
     {
@@ -60,7 +68,7 @@ public sealed class IntermediadorMercadoPago(HttpClient http, IOptions<OpcoesDoM
             ["description"] = $"Fatura {pedido.FaturaId}",
             ["external_reference"] = $"{pedido.PagamentoId}|{pedido.TraceId}",
             ["metadata"] = new JsonObject { ["pagamento"] = pedido.PagamentoId, ["fatura"] = pedido.FaturaId, ["trace_id"] = pedido.TraceId },
-            ["payer"] = new JsonObject { ["email"] = mp.EmailDoPagador },
+            ["payer"] = new JsonObject { ["email"] = pedido.Pagador.Email },
         };
         if (mp.UrlDeNotificacao.Length > 0) corpo["notification_url"] = mp.UrlDeNotificacao;
         switch (pedido.Forma)
@@ -72,9 +80,12 @@ public sealed class IntermediadorMercadoPago(HttpClient http, IOptions<OpcoesDoM
             case FormaDePagamento.Boleto:
                 corpo["payment_method_id"] = "bolbradesco";
                 if (pedido.VencimentoDoBoleto is { } vencimento) corpo["date_of_expiration"] = Data(Calendario.InicioDoDia(vencimento.AddDays(1)).AddSeconds(-1));
+                corpo["payer"] = PagadorDoBoleto(pedido.Pagador, pedido.Endereco);
                 break;
             default:
-                corpo["token"] = pedido.TokenDoCartao;
+                corpo["token"] = pedido.Cartao?.Token;
+                corpo["payment_method_id"] = pedido.Cartao?.Metodo;
+                if (pedido.Cartao?.Emissor is { } emissor) corpo["issuer_id"] = emissor;
                 corpo["installments"] = 1;
                 break;
         }
@@ -88,6 +99,34 @@ public sealed class IntermediadorMercadoPago(HttpClient http, IOptions<OpcoesDoM
                 : new ResultadoDaCobranca(SituacaoDaCobranca.Indisponivel);
         }
         return Resultado(resposta.Value.Corpo);
+    }
+
+    // o boleto sai em nome e documento da conta (CNPJ com 14 dígitos, CPF com 11),
+    // com o endereço de quem paga (RF-188)
+    static JsonObject PagadorDoBoleto(Pagador pagador, EnderecoDoPagador? endereco)
+    {
+        var digitos = new string([.. pagador.Documento.Where(char.IsAsciiDigit)]);
+        var nomes = pagador.Nome.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var payer = new JsonObject
+        {
+            ["email"] = pagador.Email,
+            ["first_name"] = nomes.Length > 0 ? nomes[0] : pagador.Nome,
+            ["last_name"] = nomes.Length > 1 ? nomes[1] : "",
+            ["identification"] = new JsonObject { ["type"] = digitos.Length == 11 ? "CPF" : "CNPJ", ["number"] = digitos },
+        };
+        if (endereco is not null)
+        {
+            payer["address"] = new JsonObject
+            {
+                ["zip_code"] = endereco.CepNumeros,
+                ["street_name"] = endereco.Logradouro,
+                ["street_number"] = endereco.Numero,
+                ["neighborhood"] = endereco.Bairro,
+                ["city"] = endereco.Cidade,
+                ["federal_unit"] = endereco.Uf,
+            };
+        }
+        return payer;
     }
 
     public async Task<ConsultaNoBanco> Consultar(string idExterno, CancellationToken ct = default)
@@ -124,16 +163,26 @@ public sealed class IntermediadorMercadoPago(HttpClient http, IOptions<OpcoesDoM
     // O aviso do Mercado Pago só diz qual pagamento mudou: a situação é lida
     // na API. Assinatura: x-signature "ts=…,v1=…", com v1 = HMAC-SHA256 em hex
     // de "id:<data.id>;request-id:<x-request-id>;ts:<ts>;" com o segredo.
+    // a assinatura e o data.id do aviso de pagamento, sem chamar a API (RN-305, RNF-242)
+    public ConferenciaDoAviso Conferir(AvisoRecebido recebido)
+    {
+        var dataId = DataId(recebido);
+        if (!AssinaturaValida(recebido, dataId)) return new ConferenciaDoAviso(false, null);
+        return new ConferenciaDoAviso(true, Texto(Json(recebido.Corpo), "type") is "payment" or null ? dataId : null);
+    }
+
+    static string? DataId(AvisoRecebido recebido) => recebido.Query.GetValueOrDefault("data.id") ?? Texto(Json(recebido.Corpo)?["data"], "id");
+
     public async Task<LeituraDoAviso> LerAviso(AvisoRecebido recebido, CancellationToken ct = default)
     {
-        var dataId = recebido.Query.GetValueOrDefault("data.id") ?? Texto(Json(recebido.Corpo)?["data"], "id");
+        var dataId = DataId(recebido);
         if (!AssinaturaValida(recebido, dataId)) return new LeituraDoAviso(false, null);
         if (dataId is null || Texto(Json(recebido.Corpo), "type") is not ("payment" or null)) return new LeituraDoAviso(true, null);
 
         var resposta = await Enviar(HttpMethod.Get, $"/v1/payments/{Uri.EscapeDataString(dataId)}", null, null, null, ct);
         if (resposta is not { Status: < 300 } r) throw new HttpRequestException("Mercado Pago sem resposta à consulta do aviso.");
         var origem = Texto(r.Corpo?["metadata"], "trace_id");
-        var avisoId = $"mp_{dataId}_{recebido.Cabecalhos.GetValueOrDefault("x-request-id") ?? Texto(r.Corpo, "date_last_updated")}";
+        var avisoId = $"mp_{dataId}_{recebido.Cabecalhos.GetValueOrDefault(Pedido) ?? Texto(r.Corpo, "date_last_updated")}";
 
         // um estorno aprovado: o mais novo da lista de refunds
         if (r.Corpo?["refunds"] is JsonArray { Count: > 0 } refunds && refunds[^1] is JsonObject estorno)
@@ -164,13 +213,13 @@ public sealed class IntermediadorMercadoPago(HttpClient http, IOptions<OpcoesDoM
 
     bool AssinaturaValida(AvisoRecebido recebido, string? dataId)
     {
-        if (mp.SegredoDoWebhook.Length == 0 || recebido.Cabecalhos.GetValueOrDefault("x-signature") is not { } assinatura) return false;
+        if (mp.SegredoDoWebhook.Length == 0 || recebido.Cabecalhos.GetValueOrDefault(Assinatura) is not { } assinatura) return false;
         var partes = assinatura.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .Select(p => p.Split('=', 2)).Where(p => p.Length == 2).ToDictionary(p => p[0], p => p[1], StringComparer.Ordinal);
         if (!partes.TryGetValue("ts", out var ts) || !partes.TryGetValue("v1", out var v1)) return false;
         var manifesto = new StringBuilder();
         if (dataId is not null) manifesto.Append(CultureInfo.InvariantCulture, $"id:{dataId.ToLowerInvariant()};");
-        if (recebido.Cabecalhos.GetValueOrDefault("x-request-id") is { } requestId) manifesto.Append(CultureInfo.InvariantCulture, $"request-id:{requestId};");
+        if (recebido.Cabecalhos.GetValueOrDefault(Pedido) is { } requestId) manifesto.Append(CultureInfo.InvariantCulture, $"request-id:{requestId};");
         manifesto.Append(CultureInfo.InvariantCulture, $"ts:{ts};");
         var esperada = Convert.ToHexStringLower(HMACSHA256.HashData(Encoding.UTF8.GetBytes(mp.SegredoDoWebhook),
             Encoding.UTF8.GetBytes(manifesto.ToString())));
@@ -188,17 +237,13 @@ public sealed class IntermediadorMercadoPago(HttpClient http, IOptions<OpcoesDoM
             "rejected" or "cancelled" => SituacaoDaCobranca.Recusada,
             _ => SituacaoDaCobranca.Aguardando,
         };
-        var transacao = corpo?["point_of_interaction"]?["transaction_data"];
-        var pix = Texto(transacao, "qr_code") is { } copiaECola
-            ? new DadosDoPix(copiaECola, Texto(transacao, "qr_code_base64") is { } png
-                ? $"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 33 33\"><image width=\"33\" height=\"33\" href=\"data:image/png;base64,{png}\"/></svg>"
-                : "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 33 33\"/>")
-            : null;
+        // só o copia e cola: a imagem do banco (qr_code_base64) não é usada, o QR Code é desenhado pelo deboaz
+        var copiaECola = Texto(corpo?["point_of_interaction"]?["transaction_data"], "qr_code");
         var detalhes = corpo?["transaction_details"];
         var cartao = corpo?["card"] is JsonObject c && Texto(c, "last_four_digits") is { } final
             ? new CartaoMascarado(Bandeira(Texto(corpo, "payment_method_id")), final)
             : null;
-        return new ResultadoDaCobranca(situacao, id, pix, Texto(detalhes, "digitable_line"), Texto(corpo?["barcode"], "content"),
+        return new ResultadoDaCobranca(situacao, id, copiaECola, Texto(detalhes, "digitable_line"), Texto(corpo?["barcode"], "content"),
             Texto(corpo?["three_ds_info"], "external_resource_url"), cartao, situacao == SituacaoDaCobranca.Aprovada ? DataDe(corpo, "date_approved") : null);
     }
 

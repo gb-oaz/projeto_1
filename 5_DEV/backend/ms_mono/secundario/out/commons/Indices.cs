@@ -69,7 +69,7 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
         (Colecoes.AnexosSac, Comum(Chave.Ascending("expiraEm"), "expiraEm")),
         (Colecoes.AnexosSac, Comum(Chave.Ascending("enviadoPor").Ascending("enviadoEm"), "enviadoPor_enviadoEm")),
         (Colecoes.CardSac, Unico(Chave.Ascending("escopo").Ascending("dia"), "escopo_dia_unico")),
-        // Pagamento (pagamento-documentos v02): uma fatura por conta e mês (RN-300),
+        // Pagamento (pagamento-documentos v03): uma fatura por conta e mês (RN-300),
         // as listas do pagador e do recebedor, o agendamento e o traceId (RNF-244)
         (Colecoes.Faturas, Unico(Chave.Ascending("conta.id").Ascending("competencia"), "conta_competencia_unica")),
         (Colecoes.Faturas, Comum(Chave.Ascending("conta.id").Ascending("status").Descending("competencia"), "conta_status_competencia")),
@@ -79,12 +79,17 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
         (Colecoes.Faturas, Comum(Chave.Ascending("conta.nome"), "conta_nome")),
         (Colecoes.Faturas, Comum(Chave.Ascending("historico.traceId"), "historico_traceId")),
         (Colecoes.Pagamentos, Comum(Chave.Ascending("faturaId").Descending("criadoEm"), "faturaId_criadoEm")),
-        (Colecoes.Pagamentos, Comum(Chave.Ascending("idExterno"), "idExterno")),
+        // o aviso acha o pagamento pelo intermediador e pelo id externo (RNF-242); o
+        // índice é único só entre os que já têm o id externo do banco
+        (Colecoes.Pagamentos, UnicoParcial(Chave.Ascending("intermediador").Ascending("idExterno"), "intermediador_idExterno_unico",
+            new BsonDocument("idExterno", new BsonDocument("$type", "string")))),
+        // o último endereço do boleto da conta (RF-184-api)
+        (Colecoes.Pagamentos, Comum(Chave.Ascending("contaId").Ascending("forma").Descending("criadoEm"), "contaId_forma_criadoEm")),
         (Colecoes.Pagamentos, Comum(Chave.Ascending("status").Ascending("expiraEm"), "status_expiraEm")),
         (Colecoes.Pagamentos, Comum(Chave.Ascending("traceId"), "traceId")),
         (Colecoes.Pagamentos, Comum(Chave.Ascending("historico.traceId"), "historico_traceId")),
         (Colecoes.Estornos, Comum(Chave.Ascending("pagamentoId").Descending("pedidoEm"), "pagamentoId_pedidoEm")),
-        (Colecoes.Estornos, Comum(Chave.Ascending("idExterno"), "idExterno")),
+        (Colecoes.Estornos, Comum(Chave.Ascending("intermediador").Ascending("idExterno"), "intermediador_idExterno")),
         (Colecoes.ConfiguracaoPagamento, Unico(Chave.Ascending("versao"), "versao_unica")),
         (Colecoes.ConfiguracaoPagamento, Comum(Chave.Descending("vigenteDesde"), "vigenteDesde")),
         (Colecoes.AvisosDoBanco, Comum(Chave.Ascending("resultado").Descending("recebidoEm"), "resultado_recebidoEm")),
@@ -119,6 +124,9 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
 
     static CreateIndexModel<BsonDocument> Unico(IndexKeysDefinition<BsonDocument> chave, string nome) =>
         new(chave, new CreateIndexOptions { Name = nome, Unique = true });
+
+    static CreateIndexModel<BsonDocument> UnicoParcial(IndexKeysDefinition<BsonDocument> chave, string nome, BsonDocument quando) =>
+        new(chave, new CreateIndexOptions<BsonDocument> { Name = nome, Unique = true, PartialFilterExpression = quando });
 
     static CreateIndexModel<BsonDocument> Comum(IndexKeysDefinition<BsonDocument> chave, string nome) =>
         new(chave, new CreateIndexOptions { Name = nome });

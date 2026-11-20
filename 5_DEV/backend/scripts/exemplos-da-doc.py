@@ -5,19 +5,14 @@ Lê a versão mais recente de <modulo>-contrato-api em 2_Diagramas/ e, de cada
 endereço (<g id="ep-…">), o JSON do PEDIDO e o de cada resposta. Erro que o
 contrato descreve só pelo código ganha a mensagem exata da falha do core
 (core/commons/usuario/<modulo>/domain/Falha*.cs; no SAC,
-core/hub/sac/chamados/domain/FalhaDoSac.cs). Do contrato de um módulo só entram
+core/hub/sac/chamados/domain/FalhaDoSac.cs; no Pagamento,
+core/hub/pagamento/faturas/domain/FalhaDoPagamento.cs). Do contrato de um módulo só entram
 os endereços dele (o SAC também desenha o POST /contas/esqueci-senha-master do
 Usuários e os ganchos /_teste, que ficam fora). Grava
 ms_mono/sistema/exemplos/<modulo>.json, que o DocumentacaoApi põe dentro de cada
 endpoint. Rode ./5_DEV/backend/scripts/exemplos-da-doc.py depois de uma versão
 nova de um contrato ou de uma mensagem do core; o teste
 Todo_endpoint_traz_os_exemplos_do_contrato acusa endpoint sem exemplo.
-
-O Pagamento fica fora: o pagamento-contrato-api desenha os endereços sem os
-grupos <g id="ep-…"> e com corpos resumidos ("{ …, "status": … }"), que este
-leitor não monta. Os exemplos dele (sistema/exemplos/pagamento.json) são
-escritos à mão a partir do contrato e do 19_modulo-pagamento, com as mensagens
-de FalhaDoPagamento; mude-os junto com uma versão nova do contrato.
 """
 import json
 import re
@@ -26,11 +21,17 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[3]
 BACKEND = RAIZ / "5_DEV" / "backend"
-MODULOS = ["autenticacao", "usuarios", "autorizacao", "sac"]
+MODULOS = ["autenticacao", "usuarios", "autorizacao", "sac", "pagamento"]
 METODOS = ("GET", "POST", "PUT", "PATCH", "DELETE")
+# os módulos cujo corpo de erro traz o traceId da execução (19 RNF-243), e o do exemplo
+COM_TRACE = ("pagamento",)
+TRACE_DO_EXEMPLO = "trc-6b0c42f1"
 
 # onde ficam as falhas do core de cada módulo (o padrão: core/commons/usuario/<modulo>/domain)
-FALHAS = {"sac": BACKEND / "core" / "hub" / "sac" / "chamados" / "domain"}
+FALHAS = {
+    "sac": BACKEND / "core" / "hub" / "sac" / "chamados" / "domain",
+    "pagamento": BACKEND / "core" / "hub" / "pagamento" / "faturas" / "domain",
+}
 
 # os endereços que a API de cada módulo documenta: o contrato também desenha
 # endereços de outras APIs (GET /health do Sistema no Usuários, o pedido de
@@ -40,6 +41,7 @@ ROTAS = {
     "usuarios": ("contas", "usuarios", "time/"),
     "autorizacao": ("usuarios/",),
     "sac": ("sac/",),
+    "pagamento": ("pagamento/",),
 }
 
 # valores de exemplo para os trechos variáveis das mensagens do core
@@ -369,6 +371,14 @@ def exemplos_do_modulo(modulo, textos):
         irma = next((e for k, e in exemplos.items() if k.split(" ", 1)[1] == rota and "404" in e["respostas"]), None)
         if irma:
             exemplo["respostas"]["404"] = irma["respostas"]["404"]
+    # RNF-243 do Pagamento: todo corpo de erro traz o traceId da execução, o mesmo do X-Trace-Id
+    if modulo in COM_TRACE:
+        for exemplo in exemplos.values():
+            for status, lista in exemplo["respostas"].items():
+                for item in lista:
+                    corpo = item.get("corpo")
+                    if int(status) >= 400 and isinstance(corpo, dict) and "codigo" in corpo:
+                        corpo.setdefault("traceId", TRACE_DO_EXEMPLO)
     return {k: {"pedido": e["pedido"], "respostas": dict(sorted(e["respostas"].items()))} for k, e in exemplos.items()}
 
 

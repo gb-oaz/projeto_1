@@ -18,7 +18,8 @@ public sealed class CasosDeUsoTests
     PagamentoEmMemoria Mock => mundo.Mock;
 
     static PedidoDePagamento Forma(string forma, string? token = null) =>
-        new(forma, token is null ? null : new PedidoDoCartao(token, null, null, null));
+        new(forma, token is null ? null : new PedidoDoCartao(token, forma == "CARTAO_DEBITO" ? "debmaster" : "visa", "25", null, null, null),
+            forma == "BOLETO" ? new EnderecoDto("96015-000", "Rua Gonçalves Chaves", "3218", "Centro", "Pelotas", "RS") : null);
 
     async Task<Fatura> Fat402()
     {
@@ -76,6 +77,9 @@ public sealed class CasosDeUsoTests
         await mundo.Aviso.Executar(new AvisoRecebido("{}", new Dictionary<string, string>(), new Dictionary<string, string>()), MundoDoPagamento.Trace);
         Assert.Equal(StatusDaFatura.Paga, fatura.Status);
         Assert.Equal("APLICADO", Mock.AvisosDoBanco["evt_1"].Resultado);
+        // RN-305-api: a segunda chegada fica registrada como REPETIDO, com o traceId dela
+        var repetido = Assert.Single(Mock.AvisosDoBanco.Values, a => a.Resultado == "REPETIDO");
+        Assert.Equal(("pix_1", pix.Id, $"repetido:{repetido.TraceId}"), (repetido.IdExterno, repetido.PagamentoId, repetido.Id));
         Assert.Equal("PAGO", (await mundo.LerPagamento.Executar(pix.Id, MundoDoPagamento.Rita)).Status);
         Assert.Equal("PAGO", (await mundo.AoVivo.Proximo(evento, TimeSpan.Zero))!.Status);
 
@@ -268,6 +272,7 @@ public sealed class CasosDeUsoTests
         Assert.DoesNotContain("BOLETO", (await mundo.Formas.Executar(MundoDoPagamento.Rita)).Formas);
         Assert.Equal("CONFIGURACAO_MUDOU", await Falha(() => mundo.SalvarConfiguracao.Executar(pedido, 1, MundoDoPagamento.Admin, MundoDoPagamento.Trace)));
         Assert.Equal("ACESSO_NEGADO", await Falha(() => mundo.SalvarConfiguracao.Executar(pedido, 2, MundoDoPagamento.Rita, MundoDoPagamento.Trace)));
+        Assert.Equal("VERSAO_AUSENTE", await Falha(() => mundo.SalvarConfiguracao.Executar(pedido, null, MundoDoPagamento.Admin, MundoDoPagamento.Trace)));
 
         var todasDesligadas = formas.ToDictionary(f => f.Key, _ => (bool?)false);
         Assert.Equal("FORMA_OBRIGATORIA", await Falha(() =>

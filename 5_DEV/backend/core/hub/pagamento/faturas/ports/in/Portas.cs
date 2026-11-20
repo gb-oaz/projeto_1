@@ -34,3 +34,13 @@ public interface IRodarAgendamentoDoPagamento
     /// <summary>Roda tudo, agora, pelo relógio da aplicação.</summary>
     Task Executar(CancellationToken ct = default);
 }
+
+/// <summary>
+/// A conta tem fatura em aberto (A_PAGAR ou VENCIDA)? Usado pelo 17 (RN-173):
+/// a conta assim não se encerra (19 RN-313).
+/// </summary>
+public interface IContaTemFaturaEmAberto
+{
+    /// <summary>true se a conta tem fatura A_PAGAR ou VENCIDA.</summary>
+    Task<bool> Executar(string contaId, CancellationToken ct = default);
+}

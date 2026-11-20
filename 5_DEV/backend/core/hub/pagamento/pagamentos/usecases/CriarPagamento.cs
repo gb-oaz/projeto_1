@@ -18,17 +18,22 @@ namespace Boaz.Core.Hub.Pagamento.Pagamentos.UseCases;
 using Pagamento = Boaz.Core.Hub.Pagamento.Pagamentos.Domain.Pagamento;
 
 /// <summary>
-/// POST /pagamento/faturas/{id}/pagamentos (RF-184 a RF-188). Ordem: o corpo
-/// (RNF-239: só o token do cartão), a fatura da conta de quem pede, o status
+/// POST /pagamento/faturas/{id}/pagamentos (RF-184 a RF-188). Ordem: quem paga
+/// (RN-298), o corpo (RNF-239: só o token, o método e o emissor do cartão; o
+/// endereço no boleto), a fatura da conta de quem pede, o status
 /// dela (RN-301), a forma ligada na Configuração (RF-193), um só pagamento em
 /// aberto por fatura, ocupada numa só operação (RN-303), e a cobrança ao banco
-/// com o traceId da execução (RNF-244). O valor é a fatura e os juros do dia,
+/// com o traceId da execução (RNF-244), ao intermediador ligado, cujo nome fica
+/// no pagamento (RNF-242), em nome e documento da conta, com o e-mail da conta
+/// master ou do autônomo; o QR Code do PIX é desenhado pelo deboaz (RF-185-api).
+/// O valor é a fatura e os juros do dia,
 /// fixo depois de gerado (RN-310). Sem resposta do banco em 15 s, nada fica
 /// "AGUARDANDO" (RNF-241). Auditado como PAGAMENTO_CRIADO (RN-309).
 /// </summary>
 public sealed class CriarPagamento(
-    IFaturas faturas, IPagamentos pagamentos, INumeracaoDoPagamento numeracao, IIntermediador intermediador, ICanalDoPagamento canal,
-    IConfiguracoesDoPagamento configuracoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio) : ICriarPagamento
+    IFaturas faturas, IPagamentos pagamentos, INumeracaoDoPagamento numeracao, IIntermediadores intermediadores, ICadastroDoPagamento cadastro,
+    IDesenhoDoQrCode desenho, ICanalDoPagamento canal, IConfiguracoesDoPagamento configuracoes, IAuditoria auditoria, IAuditoriaDeErros erros,
+    TimeProvider relogio) : ICriarPagamento
 {
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
     readonly Baixas baixas = new(pagamentos, faturas, canal);
@@ -41,7 +46,8 @@ public sealed class CriarPagamento(
         CancellationToken ct = default) =>
         auditada.Auditar(new Execucao(traceId, AcaoAuditada.PagamentoCriado, quem.ContaId, quem.UsuarioId, faturaId), async andamento =>
         {
-            var (forma, token) = pedido.Validar();
+            quem.SoQuemPaga();
+            var (forma, cartao, endereco) = pedido.Validar();
             var fatura = await faturas.Obter(faturaId, ct);
             if (fatura is null || fatura.Conta.Id != quem.ContaId) throw FalhaDoPagamento.FaturaInexistente();
             if (fatura.Status == StatusDaFatura.Paga) throw FalhaDoPagamento.FaturaPaga();
@@ -52,16 +58,19 @@ public sealed class CriarPagamento(
             var agora = relogio.GetUtcNow();
             var hoje = Calendario.Dia(agora);
             var juros = await new TaxaDoVencimento(configuracoes).Juros(fatura, hoje, ct);
+            var pagador = await cadastro.Pagador(fatura.Conta.Id, ct) ?? new Pagador(fatura.Conta.Nome, "", "");
+            var intermediador = intermediadores.Ligado;
             var id = Numeros.De(Numeros.Pagamentos, await numeracao.Proximo(Numeros.Pagamentos, ct));
             await Ocupar(fatura.Id, id, ct);
-            var pagamento = Pagamento.Novo(id, fatura, forma, juros?.Valor ?? Dinheiro.Zero, agora, quem.UsuarioId, traceId.Valor, traceIdOrigem?.Valor);
+            var pagamento = Pagamento.Novo(id, fatura, forma, juros?.Valor ?? Dinheiro.Zero, agora, quem.UsuarioId, traceId.Valor, traceIdOrigem?.Valor,
+                intermediador.Nome);
             var (expiraEm, vencimentoDoBoleto) = Prazos(forma, fatura, configuracao.Prazos, agora, hoje);
 
             ResultadoDaCobranca resultado;
             try
             {
-                resultado = await intermediador.Cobrar(
-                    new PedidoDeCobranca(id, fatura.Id, forma, pagamento.Valor, token, expiraEm, vencimentoDoBoleto, traceId.Valor), ct);
+                resultado = await intermediador.Cobrar(new PedidoDeCobranca(id, fatura.Id, forma, pagamento.Valor, cartao, expiraEm, vencimentoDoBoleto,
+                    traceId.Valor, pagador, endereco), ct);
             }
             catch
             {
@@ -76,7 +85,7 @@ public sealed class CriarPagamento(
                     : FalhaDoPagamento.DadosInvalidos("cartao.token");
             }
 
-            Nascer(pagamento, resultado, expiraEm, vencimentoDoBoleto, agora);
+            Nascer(pagamento, resultado, expiraEm, vencimentoDoBoleto, endereco, agora);
             await pagamentos.Incluir(pagamento, ct);
             if (pagamento.Status == StatusDoPagamento.Pago) await baixas.Quitar(fatura, pagamento, traceId.Valor, quem.UsuarioId, ct);
             if (!pagamento.EmAberto) await baixas.Liberar(pagamento, ct);
@@ -124,8 +133,9 @@ public sealed class CriarPagamento(
         }
     }
 
-    /// <summary>O status que o banco deu à cobrança (RF-185 a RF-188).</summary>
-    static void Nascer(Pagamento pagamento, ResultadoDaCobranca r, DateTimeOffset? expiraEm, DateOnly? vencimentoDoBoleto, DateTimeOffset agora)
+    /// <summary>O status que o banco deu à cobrança (RF-185 a RF-188), com o QR Code do PIX desenhado pelo deboaz.</summary>
+    void Nascer(Pagamento pagamento, ResultadoDaCobranca r, DateTimeOffset? expiraEm, DateOnly? vencimentoDoBoleto, EnderecoDoPagador? endereco,
+        DateTimeOffset agora)
     {
         var status = r.Situacao switch
         {
@@ -134,9 +144,10 @@ public sealed class CriarPagamento(
             SituacaoDaCobranca.EmAnalise => StatusDoPagamento.Processando,
             _ => StatusDoPagamento.Aguardando,
         };
-        var boleto = vencimentoDoBoleto is { } v ? new DadosDoBoleto(v, r.LinhaDigitavel ?? "", r.CodigoBarras ?? "") : null;
+        var boleto = vencimentoDoBoleto is { } v ? new DadosDoBoleto(v, r.LinhaDigitavel ?? "", r.CodigoBarras ?? "", endereco) : null;
+        var pix = r.PixCopiaECola is { Length: > 0 } copiaECola ? new DadosDoPix(copiaECola, desenho.Svg(copiaECola)) : null;
         pagamento.Nascer(status, r.IdExterno, status == StatusDoPagamento.Aguardando ? expiraEm : null,
-            status == StatusDoPagamento.Pago ? r.PagoEm ?? agora : null, r.Pix, boleto, r.ConfirmacaoUrl, r.Cartao,
+            status == StatusDoPagamento.Pago ? r.PagoEm ?? agora : null, pix, boleto, r.ConfirmacaoUrl, r.Cartao,
             status == StatusDoPagamento.Recusado ? Pagamento.RecusadoPeloEmissor : null);
     }
 }

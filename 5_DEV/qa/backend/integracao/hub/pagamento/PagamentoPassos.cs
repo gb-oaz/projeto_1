@@ -8,8 +8,8 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 
 namespace Boaz.Qa.Integracao.Hub.Pagamento;
 
-// Passos dos Cenários de API de 1_Requisitos/19_modulo-pagamento.md (v04),
-// contrato pagamento-contrato-api v02 e modelo pagamento-documentos v02. Este
+// Passos dos Cenários de API de 1_Requisitos/19_modulo-pagamento.md (v05),
+// contrato pagamento-contrato-api v03 e modelo pagamento-documentos v03. Este
 // arquivo traz os Dados e o pagador (RF-182 a RF-189, RN-298, RN-299, RN-301,
 // RN-303, RN-304, RN-310, RN-311, RN-313, RNF-239, RNF-241); o recebedor e o
 // card ficam em RecebimentosPassos.cs e o aviso do banco, o ao vivo e o
@@ -29,7 +29,7 @@ namespace Boaz.Qa.Integracao.Hub.Pagamento;
 // criou) e o resto da frase diz o corpo, a hora ou o estado.
 [Binding]
 public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemplo fat, BancoFalso banco, Execucoes execucoes,
-    AoVivo aoVivo, ScenarioContext cenario)
+    AoVivo aoVivo, Partida partida, ScenarioContext cenario)
 {
     const string Configuracao = "/pagamento/recebimentos/configuracao";
     static readonly TimeSpan CincoSegundos = TimeSpan.FromSeconds(5);
@@ -38,10 +38,12 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
 
     // o pedido que espera a frase seguinte ("E o valor 2698.33", "E o mesmo corpo, com …")
     (Pessoa Quem, string Metodo, string Caminho)? pendente;
-    // a versão enviada no If-Match do PUT da configuração (RF-193: "com a versão 5")
+    // a versão enviada no If-Match do PUT da configuração (RF-193: "a versão lida + 1")
     int versaoEnviada;
-    // o endereço de "<id>" do RF-183: os dois pedidos são do Então
-    bool deOutraConta;
+    // a configuração lida pelo administrador antes do PUT (RF-193)
+    JsonObject? configuracaoLida;
+    // as permissões da Rita lidas pela conta master antes do PUT (RN-299)
+    int versaoDasPermissoes;
 
     // ── Dado · quem pede ───────────────────────────────────────────────────
     // a Rita com a FAT-000402 da EBFGA a pagar, em 2026-12-03 (exemplo-pagamento)
@@ -103,9 +105,28 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
         await fat.Fat371(resto.Contains("0,1 % ao dia", StringComparison.Ordinal) ? 0.1m : 0m, tolerancia);
     }
 
+    // RN-301: a fatura do Pedro vencida em 2026-11-10, com a taxa salva antes do vencimento
+    [Given(@"^a FAT-000371, do Pedro, ""VENCIDA"" desde 2026-11-11, de 294\.00, com 0,1 % ao dia$")]
+    public async Task Fat371VencidaComJuros() => await fat.Fat371(0.1m);
+
     [Given(@"^a FAT-000402 ""A_PAGAR"" com vencimento em 2026-12-10$")]
+    [Given(@"^a FAT-000402 ""A_PAGAR"" com vencimento em 2026-12-10, sem fatura vencida$")]
     [Given(@"^a FAT-000402 sem pagamento em aberto$")]
     public async Task Fat402APagar() => await fat.Fat402();
+
+    // RN-301: a fatura que não aceita pagamento, no status da linha
+    [Given(@"^a (FAT-000318|FAT-000371), da conta dona, com o status ""(PAGA|CANCELADA)""$")]
+    public async Task FaturaQueNaoAceita(string exemplo, string status)
+    {
+        if (exemplo == "FAT-000318")
+        {
+            await fat.Fat318();
+            return;
+        }
+        var fatura = await fat.Fat371();
+        await fat.Saltar("2026-11-14");
+        await fat.Cancelar(fatura);
+    }
 
     // RN-303: o boleto cancelado para trocar de forma e o PIX que quitou a fatura
     [Given(@"^a FAT-000402 ""PAGA"" pelo PIX PAG-000781 e o boleto PAG-000790 ""CANCELADO""$")]
@@ -140,11 +161,22 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
     [Given(@"^a conta-pedro-reis com a FAT-000371 ""VENCIDA"" de 294\.00 e juros de 0,1 % ao dia$")]
     public async Task ContaDoPedroDevendoComJuros() => await fat.Fat371(0.1m);
 
-    [Given(@"^a conta-pedro-reis desativada com a FAT-000371 ""VENCIDA""$")]
+    // RN-313: a taxa de 0,1 % ao dia vem na frase seguinte, salva antes do vencimento
+    [Given(@"^a conta-pedro-reis desativada com a FAT-000371 ""VENCIDA"" de 294\.00$")]
     public async Task ContaDoPedroDesativada()
     {
         await fat.Fat371(0.1m);
         await EstadoDaContaDoPedro("DESATIVADA");
+    }
+
+    // a taxa já foi salva antes da emissão (RN-310: vale a do vencimento): confere
+    [Given(@"^os juros de 0,1 % ao dia, vigentes no vencimento, em 2026-11-10$")]
+    public async Task JurosVigentesNoVencimento()
+    {
+        // a conta está desativada: quem lê é o recebedor, com o mesmo corpo do pagador (RF-191)
+        var fatura = await fat.FaturaDoRecebedor(fat.Real("FAT-000371"));
+        Assert.True(fatura["juros"] is JsonObject juros && Valor(juros, "taxaAoDia") == 0.1m,
+            $"preparo: esperava a FAT-000371 com a taxa de 0,1 % ao dia: {fatura.ToJsonString()}");
     }
 
     [Given(@"^a conta-pedro-reis ""ATIVA"" com a FAT-000371 ""VENCIDA"" há 30 dias$")]
@@ -157,7 +189,13 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
     // ── Dado · pagamentos ──────────────────────────────────────────────────
     [Given(@"^o boleto PAG-000785 da FAT-000402 ""AGUARDANDO""$")]
     [Given(@"^o PAG-000785 ""AGUARDANDO"", com vencimento em 2026-12-10$")]
+    // RF-184: o boleto leva o endereço da Rua Sete (FaturasDoExemplo.Corpo)
+    [Given(@"^o boleto PAG-000785 da EBFGA gerado com o endereço da Rua Sete$")]
     public async Task BoletoAguardando() => await fat.Boleto("PAG-000785");
+
+    // RF-188: o PIX gerado às 13:00 e expirado às 13:30, sem boleto na fatura
+    [Given(@"^o PIX PAG-000772 da FAT-000402, já ""EXPIRADO"", sem boleto em aberto$")]
+    public async Task PixExpirado() => await PixSemPagamento();
 
     [Given(@"^o PAG-000774 ""AGUARDANDO""$")]
     public async Task DebitoAguardando() => await fat.Debito("PAG-000774");
@@ -195,7 +233,7 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
     public async Task BoletoDesligado() => await fat.Forma("BOLETO", false);
 
     // ── Quando · o pedido do cenário ───────────────────────────────────────
-    [When(@"^(a Rita|a staff Rita, com ""MOD-01"" com ""U""|a staff Rita|o Pedro Reis, sem faturas,|o Pedro Reis|o Pedro|a conta master da EBFGA|a conta master|a conta dona|o administrador do deboaz|o administrador, com ""2026-13""|o administrador|o admin|o membro do time Caio|o participante Lucas|a staff Maria, sem ""MOD-01""|alguém) envia (GET|POST|PUT) (/pagamento/[^\s,]+)(.*(?<!com:))$")]
+    [When(@"^(a Rita|a staff Rita, com ""MOD-01"" com ""U""|a staff Rita|o Pedro Reis, sem faturas,|o Pedro Reis|o Pedro|a conta master da EBFGA|a conta master|a conta dona|o administrador do deboaz|o administrador, com ""2026-13""|o administrador|o admin|o membro do time Caio|o participante Lucas|a staff Maria, sem ""MOD-01""|a staff Maria|ele|alguém) envia (GET|POST|PUT) (/pagamento/[^\s,]+)(.*(?<!com:))$")]
     public async Task Envia(string quem, string metodo, string caminho, string resto) =>
         await Pedir(quem, metodo, caminho, resto.TrimStart(',', ' ').Trim(), null);
 
@@ -228,29 +266,24 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
             await execucoes.Executar(() => mundo.Enviar(metodo, caminho));
             return;
         }
-        // RF-183: "<id>" é a fatura do Pedro ou a que não existe; o Então pede as duas
-        if (caminho.Contains("<id>", StringComparison.Ordinal))
-        {
-            await fat.Fat371();
-            await mundo.Master();
-            deOutraConta = true;
-            return;
-        }
-
         await Preparar(quem, metodo, caminho, resto);
         var pessoa = await QuemPede(quem, caminho);
 
         // "em 2026-11-14", "em 2026-11-13T12:00:00Z": o relógio vai para a hora
         // dita; o aviso de atraso é criado pelo agendamento (RN-311)
+        // RN-301: "com "PIX" em 2026-11-14", a hora no fim da frase
+        if (EmNoFim().Match(resto) is { Success: true } fim) resto = $"em {fim.Groups[2].Value} {fim.Groups[1].Value}".Trim();
         if (Em().Match(resto) is { Success: true } em)
         {
             await fat.Saltar(em.Groups[1].Value);
             resto = resto[em.Length..].TrimStart(',', ' ');
             if (resto == "já paga") await fat.Pagar(pessoa, fat.Real("FAT-000371"), "CARTAO_CREDITO", status: "PAGO");
-            if (caminho == "/pagamento/avisos") await fat.Agendamento();
+            // o aviso de atraso (RN-311) e o card do dia (RN-307) são do agendamento
+            if (caminho is "/pagamento/avisos" or "/pagamento/card") await fat.Agendamento();
         }
         if (quem.EndsWith("com \"2026-13\"", StringComparison.Ordinal)) caminho = caminho.Replace("competencia=2026-10", "competencia=2026-13");
         var alvo = await mundo.Traduzir(caminho);
+        await GuardarParaNadaMuda(caminho);
 
         if (metodo == "GET")
         {
@@ -260,7 +293,7 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
         }
         // RF-193: "com If-Match "4"" e, na frase seguinte, o corpo
         // RN-306: o pedido de estorno e, na frase seguinte, o valor
-        if (caminho == Configuracao && resto.StartsWith("com If-Match \"4\"", StringComparison.Ordinal)
+        if (caminho == Configuracao && resto.StartsWith("com If-Match da versão lida", StringComparison.Ordinal)
             || caminho.EndsWith("/estornos", StringComparison.Ordinal) && cenario.ScenarioInfo.Title == "valor do estorno")
         {
             pendente = (pessoa, metodo, alvo);
@@ -269,6 +302,31 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
         (string? Corpo, string? IfMatch) pedido = json is not null ? (await mundo.Traduzir(json), null) : await CorpoDoPedido(caminho, resto);
         await Executar(pessoa, metodo, alvo, pedido.Corpo, pedido.IfMatch);
         if (sucesso) Assert.True(mundo.Ultima.Status is >= 200 and < 300, $"esperava sucesso, veio {mundo.Ultima}");
+    }
+
+    // RN-298, "a resposta é 403 ACESSO_NEGADO e nada muda" (suporte/Respostas.cs):
+    // a fatura e o pagamento que o caminho cita, vistos pelo administrador
+    // antes do pedido, comparados depois. Só os pedidos de quem não pode
+    // (participante, staff sem o papel do recebedor) leem antes, para não
+    // somar leituras aos outros cenários
+    async Task GuardarParaNadaMuda(string caminho)
+    {
+        if (cenario.ScenarioInfo.Title != "pedidos de quem não pode") return;
+        var vistos = new List<(string Caminho, string Antes)>();
+        foreach (Match m in Regex.Matches(caminho, @"(FAT|PAG)-\d{6}"))
+        {
+            var real = fat.Real(m.Value);
+            var ver = m.Groups[1].Value == "FAT" ? $"/pagamento/recebimentos/faturas/{real}" : $"/pagamento/recebimentos/pagamentos/{real}";
+            vistos.Add((ver, Exigir(await fat.Ler(mundo.Admin(), ver), 200, $"GET {ver}").Texto));
+        }
+        mundo.NadaMudou = async () =>
+        {
+            foreach (var (ver, antes) in vistos)
+            {
+                var agora = Exigir(await fat.Ler(mundo.Admin(), ver), 200, $"GET {ver}");
+                Assert.True(JsonNode.DeepEquals(JsonNode.Parse(antes), agora.Corpo), $"{ver} mudou: era {antes}, ficou {agora.Texto}");
+            }
+        };
     }
 
     async Task<Pessoa> QuemPede(string quem, string caminho) => quem switch
@@ -302,13 +360,6 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
             await fat.Fat371();
             await fat.Fat402();
         }
-        // RN-301: a fatura do Pedro cancelada, ou vencida com juros de 0,1 % ao dia, vista em 2026-11-14
-        if (cenario.ScenarioInfo.Arguments["fatura"] is string estado && caminho.Contains("FAT-000371", StringComparison.Ordinal))
-        {
-            var fatura = await fat.Fat371(estado == "\"VENCIDA\"" ? 0.1m : 0m);
-            await fat.Saltar("2026-11-14");
-            if (estado == "\"CANCELADA\"") await fat.Cancelar(fatura);
-        }
         // RF-183: a fatura do Pedro cancelada pelo administrador em 2026-11-14
         if (resto == "cancelada em 2026-11-14")
         {
@@ -316,8 +367,10 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
             await fat.Saltar("2026-11-14");
             await fat.Cancelar(fatura);
         }
+        // RF-184: "cartao" depende do intermediador do ambiente; as frases seguintes o conferem
+        if (caminho == "/pagamento/formas") mundo.CamposSemConferir.Add("cartao");
         // RF-193: o boleto que já estava aguardando quando a forma é desligada
-        if (metodo == "PUT" && caminho == Configuracao && resto.StartsWith("com If-Match \"4\"", StringComparison.Ordinal)) await fat.Boleto("PAG-000785");
+        if (metodo == "PUT" && caminho == Configuracao && resto.StartsWith("com If-Match da versão lida", StringComparison.Ordinal)) await fat.Boleto("PAG-000785");
         await fat.Garantir(caminho);
     }
 
@@ -379,7 +432,7 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
     // If-Match é a versão lida (a "4" do exemplo)
     async Task<(string? Corpo, string? IfMatch)> CorpoDaConfiguracao(string resto)
     {
-        if (resto == "com If-Match \"3\", já na 4")
+        if (resto == "com If-Match da lida - 1")
         {
             // uma versão a mais, para a anterior existir
             await fat.Configurar(_ => { });
@@ -387,6 +440,8 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
             return (FaturasDoExemplo.CorpoDaConfiguracao(atual).ToJsonString(), (atual["versao"]!.GetValue<int>() - 1).ToString(CultureInfo.InvariantCulture));
         }
         var lida = await fat.Configuracao();
+        // RF-193: o corpo válido sem o cabeçalho If-Match (428 VERSAO_AUSENTE)
+        if (resto == "com sem If-Match") return (FaturasDoExemplo.CorpoDaConfiguracao(lida).ToJsonString(), null);
         Action<JsonObject>? mudar = resto switch
         {
             "" or "com o corpo válido" => null,
@@ -497,24 +552,35 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
         await Pedir("a Rita", "POST", "/pagamento/faturas/FAT-000402/pagamentos", "", FaturasDoExemplo.Corpo("CARTAO_CREDITO").ToJsonString());
     }
 
-    [When(@"^a Rita envia o pagamento com (um cartão em análise no banco|o token ""tok_vencido"", já usado|sem o cartao)$")]
+    [When(@"^a Rita envia o pagamento com (um cartão em análise no banco|o token ""tok_vencido"", já usado|o token sem o ""metodo""|sem o cartao)$")]
     public async Task PagamentoComCartao(string cartao)
     {
         var corpo = FaturasDoExemplo.Corpo("CARTAO_CREDITO");
         if (cartao.StartsWith("um cartão em análise", StringComparison.Ordinal)) await banco.Proximo(BancoFalso.EmAnalise);
         else if (cartao == "sem o cartao") corpo.Remove("cartao");
+        else if (cartao == "o token sem o \"metodo\"") corpo["cartao"]!.AsObject().Remove("metodo");
         else corpo["cartao"]!["token"] = "tok_vencido";
         await Pedir("a Rita", "POST", "/pagamento/faturas/FAT-000402/pagamentos", "", corpo.ToJsonString());
     }
 
-    // RF-188: o PAG-000772 é PIX. A fatura só tem um pagamento em aberto
-    // (RN-303): o boleto do Dado é cancelado para o PIX nascer
-    [When(@"^a Rita envia GET \.\.\./boleto do PAG-000772, PIX$")]
-    public async Task BoletoDoPix()
+    // RF-186: o token vem do intermediador com "metodo" e "emissor", e o
+    // corpo do pedido já os leva (FaturasDoExemplo.Corpo); a suíte não gera
+    // token: o banco falso aceita os do exemplo
+    [When(@"^""metodo"" e ""emissor"" vêm do intermediador junto com o token; ""emissor"" pode faltar$")]
+    public void MetodoEEmissor() =>
+        Assert.True(mundo.UltimoPedido.Corpo?.Contains("\"metodo\"", StringComparison.Ordinal) == true,
+            $"o pedido devia levar o \"metodo\" do cartão: {mundo.UltimoPedido.Corpo}");
+
+    // RF-188: o boleto da FAT-000402 com o endereço da linha
+    [When(@"^a Rita envia o boleto da FAT-000402 (sem o endereco|com o CEP ""(?:[^""]+)""|com a UF ""(?:[^""]+)"")$")]
+    public async Task BoletoComEndereco(string endereco)
     {
-        if (fat.Conhecido("PAG-000785")) await fat.CancelarPagamento(fat.Real("PAG-000785"));
-        var pix = await fat.Pix("PAG-000772");
-        await Executar(await fat.Rita(), "GET", $"/pagamento/pagamentos/{pix}/boleto", null);
+        var corpo = FaturasDoExemplo.Corpo("BOLETO");
+        var valor = endereco.Split('"') is { Length: 3 } partes ? partes[1] : "";
+        if (endereco == "sem o endereco") corpo.Remove("endereco");
+        else if (endereco.StartsWith("com o CEP", StringComparison.Ordinal)) corpo["endereco"]!["cep"] = valor;
+        else corpo["endereco"]!["uf"] = valor;
+        await Pedir("a Rita", "POST", "/pagamento/faturas/FAT-000402/pagamentos", "", corpo.ToJsonString());
     }
 
     // RN-303: os dois pedidos saem juntos, cada um com a sua sessão
@@ -529,11 +595,27 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
 
     Resposta[] juntas = [];
 
-    // RN-299: "a conta master envia PUT /usuarios/usr-ebfga-rita/permissoes com
-    // If-Match "1" e:" é o passo do 17-b (commons/autorizacao/SuspensoPassos.cs)
-    // e a linha do administrador é a de hub/usuarios; "usr-ebfga-rita" é a Rita
-    // ainda sem o Pagamento (FaturasDoExemplo). Aqui, as permissões que a pessoa
-    // já tem, mais o "MOD-01" com as abas da linha
+    // RN-299: as permissões da Rita lidas antes, e o PUT com a versão lida
+    [Given(@"^as permissões da Rita lidas pela conta master, na versão que estiverem$")]
+    public async Task PermissoesDaRitaLidas() =>
+        versaoDasPermissoes = (await mundo.Permissoes(await fat.RitaSemPagamento(), await mundo.Master()))["versao"]!.GetValue<int>();
+
+    [When(@"^a conta master envia PUT /usuarios/usr-ebfga-rita/permissoes com If-Match dessa versão e:$")]
+    public async Task DelegaARita(string json) =>
+        await Executar(await mundo.Master(), "PUT", $"/usuarios/{(await fat.RitaSemPagamento()).Id}/permissoes", await mundo.Traduzir(json),
+            versaoDasPermissoes.ToString(CultureInfo.InvariantCulture));
+
+    [Then(@"^a resposta é 200 com a versão lida \+ 1 e ""MOD-01"" com ""U""$")]
+    public void DelegadaNaVersaoSeguinte()
+    {
+        Respostas.Confere(mundo.Ultima, 200);
+        Assert.Equal(versaoDasPermissoes + 1, mundo.Ultima.Corpo?["versao"]?.GetValue<int>());
+        Assert.True(Campo(mundo.Ultima.Corpo?["mods"], "MOD-01") == "U", $"esperava \"MOD-01\" com \"U\": {mundo.Ultima}");
+    }
+
+    // RN-299 e 17-b RF-161: a linha do administrador é a de hub/usuarios;
+    // "usr-ebfga-rita" é a Rita ainda sem o Pagamento. Aqui, as permissões que
+    // a pessoa já tem, mais o "MOD-01" com as abas da linha
     [When(@"^(a conta master|a Rita, com Adm\.) envia PUT /usuarios/(usr-[\w-]+)/permissoes com ""MOD-01"" com ""(\w+)""$")]
     public async Task ConcessaoRecusada(string quem, string id, string abas)
     {
@@ -587,11 +669,10 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
         }.ToJsonString());
     }
 
-    // RN-313: o 17 ainda não tem o endereço de exclusão de conta (19 Em aberto, RF-113)
-    [When(@"^o pedido de exclusão da conta-pedro-reis chega$")]
-    public static void ExclusaoDaConta() => throw new PendingStepException(
-        "o endereço de exclusão de conta ainda não existe no contrato (19 Em aberto: ajuste do 17 RF-113); " +
-        "o 409 FATURA_EM_ABERTO fica para quando o 17 o definir");
+    // RN-313: a exclusão é o estado "ENCERRADA" do 17 RF-113 (409 FATURA_EM_ABERTO)
+    [When(@"^o administrador do deboaz envia POST (/contas/conta-pedro-reis/estado) com ""(\w+)""$")]
+    public async Task EstadoDaContaDoPedroPedido(string caminho, string estado) =>
+        await Executar(mundo.Admin(), "POST", await mundo.Traduzir(caminho), new JsonObject { ["estado"] = estado }.ToJsonString());
 
     // RF-187, RF-188, RN-301: a hora chega e o agendamento roda
     [When(@"^chega (\S+) sem (?:a confirmação|compensação|pagamento)$")]
@@ -815,14 +896,16 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
     public void Motivo(string motivo) =>
         Assert.True(Campo(mundo.Ultima.Corpo, "motivo") == motivo, $"esperava o motivo \"{motivo}\": {mundo.Ultima}");
 
-    // a fatura de outra conta responde como a que não existe: 404, e não 403
-    [Then(@"^a resposta é 404 FATURA_INEXISTENTE, seja do Pedro, a FAT-000371, ou a FAT-999999$")]
-    public async Task DeOutraContaOuInexistente()
+    // a fatura de outra conta responde como a que não existe: o mesmo 404 e a
+    // mesma mensagem, sem campo a mais que diga se ela existe
+    [Then(@"^a resposta é 404 FATURA_INEXISTENTE, sem dizer se a fatura existe$")]
+    public void DeOutraContaOuInexistente()
     {
-        Assert.True(deOutraConta, "o Quando deste cenário é o de \"<id>\"");
-        var master = await mundo.Master();
-        Respostas.Confere(await mundo.EnviarComo(master, "GET", $"/pagamento/faturas/{fat.Real("FAT-000371")}"), 404, "FATURA_INEXISTENTE");
-        Respostas.Confere(await mundo.EnviarComo(master, "GET", "/pagamento/faturas/FAT-999999"), 404, "FATURA_INEXISTENTE");
+        Respostas.Confere(mundo.Ultima, 404, "FATURA_INEXISTENTE");
+        var corpo = mundo.Ultima.Corpo as JsonObject;
+        Assert.True(Campo(corpo, "mensagem") == "Fatura não encontrada."
+            && corpo!.Select(c => c.Key).All(c => c is "codigo" or "mensagem" or "traceId"),
+            $"esperava só o código, a mensagem \"Fatura não encontrada.\" e o traceId: {mundo.Ultima}");
     }
 
     // ── Então · pagamentos (RF-184 a RF-189) ───────────────────────────────
@@ -904,10 +987,6 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
             $"esperava o {exemplo} PAGO com \"duplicidade\": true: {pagamento.ToJsonString()}");
     }
 
-    // RF-188: a resposta é a do pedido do Quando (o /boleto do PIX)
-    [Then(@"^GET /pagamento/pagamentos/PAG-000785 traz 404 BOLETO_INEXISTENTE$")]
-    public void BoletoInexistente() => Respostas.Confere(mundo.Ultima, 404, "BOLETO_INEXISTENTE");
-
     [Then(@"^a resposta é 200 com Content-Type ""([^""]+)""$")]
     public void ComOTipo(string tipo)
     {
@@ -932,14 +1011,6 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
     }
 
     // ── Então · RN-299 delegação ───────────────────────────────────────────
-    [Then(@"^a resposta é 200 com a versão (\d+) e ""MOD-01"" com ""U""$")]
-    public void Delegado(int versao)
-    {
-        Respostas.Confere(mundo.Ultima, 200);
-        Assert.True(mundo.Ultima.Corpo?["versao"]?.GetValue<int>() == versao && Campo(mundo.Ultima.Corpo?["mods"], "MOD-01") == "U",
-            $"esperava a versão {versao} e \"MOD-01\" com \"U\": {mundo.Ultima}");
-    }
-
     [Then(@"^o token novo da Rita tem ""MOD-01"" com ""U""$")]
     public async Task TokenNovoDaRita()
     {
@@ -949,12 +1020,24 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
     }
 
     // ── Então · RN-301 status da fatura ────────────────────────────────────
-    [Then(@"^a resposta é 201, com o valor da fatura mais os juros$")]
-    public void ValorComJuros()
+    [Then(@"^a resposta é 201 com o valor (\d+\.\d{2}): (\d+\.\d{2}) da fatura e (\d+\.\d{2}) de juros de \d+ dias$")]
+    public void ValorComJuros(string valor, string daFatura, string juros)
     {
         Respostas.Confere(mundo.Ultima, 201);
-        var (valor, daFatura, juros) = (Valor(mundo.Ultima.Corpo, "valor"), Valor(mundo.Ultima.Corpo, "valorFatura"), Valor(mundo.Ultima.Corpo, "juros"));
-        Assert.True(daFatura == 294.00m && juros > 0m && valor == daFatura + juros, $"esperava o valor da fatura (294.00) mais os juros: {mundo.Ultima}");
+        static decimal D(string v) => decimal.Parse(v, CultureInfo.InvariantCulture);
+        Assert.True(Valor(mundo.Ultima.Corpo, "valor") == D(valor) && Valor(mundo.Ultima.Corpo, "valorFatura") == D(daFatura)
+            && Valor(mundo.Ultima.Corpo, "juros") == D(juros), $"esperava o valor {valor} = {daFatura} da fatura + {juros} de juros: {mundo.Ultima}");
+    }
+
+    // RN-301: a recusa não mexe na fatura
+    [Then(@"^a resposta é (\d{3}) ([A-Z_]+) e a fatura segue ""(\w+)""$")]
+    public async Task RecusaSemMudarAFatura(int status, string codigo, string situacao)
+    {
+        Respostas.Confere(mundo.Ultima, status, codigo);
+        var exemplo = cenario.ScenarioInfo.Arguments["id"] as string ?? throw new InvalidOperationException("o exemplo não diz a fatura");
+        var fatura = await fat.Fatura(fat.Real(exemplo));
+        Assert.True(Campo(fatura, "status") == situacao && fatura["pagamentoEmAberto"] is null,
+            $"esperava a {exemplo} \"{situacao}\", sem pagamento em aberto: {fatura.ToJsonString()}");
     }
 
     [Then(@"^GET /pagamento/faturas/(FAT-\d{6}) traz o status ""VENCIDA"" e o mesmo valor (\d+\.\d{2})$")]
@@ -1052,7 +1135,7 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
         Assert.True(mundo.Ultima.Corpo?["total"]?.GetValue<int>() == total, $"esperava total {total}: {mundo.Ultima}");
     }
 
-    [Then(@"^a resposta é 200 com total (\d+) e o item:$")]
+    [Then(@"^a resposta é 200 com total (\d+) e o item(?:, com \d+ dias de juros, de \d{2}/\d{2} a \d{2}/\d{2})?:$")]
     public async Task TotalEItem(int total, string json)
     {
         Total(total);
@@ -1133,6 +1216,9 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
 
     [GeneratedRegex(@"^em (\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}Z)?)")]
     private static partial Regex Em();
+
+    [GeneratedRegex(@"^(com .+) em (\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}Z)?)$")]
+    private static partial Regex EmNoFim();
 
     [GeneratedRegex(@"tolerância de (\d+) dias")]
     private static partial Regex ToleranciaDe();

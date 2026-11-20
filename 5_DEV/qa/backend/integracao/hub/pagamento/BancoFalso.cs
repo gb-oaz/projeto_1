@@ -127,6 +127,42 @@ public sealed class BancoFalso(Api api)
     public async Task<Resposta> Avisar(string id, string tipo, DateTimeOffset em, string? traceId = null) =>
         await Avisar(Aviso(tipo, await IdExterno(id), em, traceId));
 
+    // RNF-242: o aviso sem cabeçalho de assinatura nenhum (nem X-Assinatura, nem x-signature)
+    public async Task<Resposta> AvisarSemAssinatura(JsonObject aviso)
+    {
+        UltimoAviso = aviso;
+        return RespostaDoAviso = await api.Enviar("POST", "/pagamento/notificacoes", aviso.ToJsonString());
+    }
+
+    // RNF-242: o aviso no formato do Mercado Pago (contrato v03), para a
+    // instância que tem o segredo do webhook: x-signature "ts=…,v1=…", com o
+    // HMAC-SHA256 em hexadecimal de "id:<data.id>;request-id:<x-request-id>;ts:<ts>;"
+    public static async Task<Resposta> AvisoDoMercadoPago(Api destino, string dataId, string segredo)
+    {
+        var ts = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var requestId = Guid.NewGuid().ToString();
+        var manifesto = $"id:{dataId};request-id:{requestId};ts:{ts};";
+        var v1 = Convert.ToHexStringLower(HMACSHA256.HashData(Encoding.UTF8.GetBytes(segredo), Encoding.UTF8.GetBytes(manifesto)));
+        var corpo = new JsonObject
+        {
+            ["action"] = "payment.updated",
+            ["type"] = "payment",
+            ["data"] = new JsonObject { ["id"] = dataId },
+        };
+        return await destino.Enviar("POST", $"/pagamento/notificacoes?data.id={dataId}&type=payment", corpo.ToJsonString(), doPedido: new Dictionary<string, string>
+        {
+            ["x-signature"] = $"ts={ts},v1={v1}",
+            ["x-request-id"] = requestId,
+        });
+    }
+
+    // RNF-242: o aviso no formato do falso, assinado, para outra instância (a de produção)
+    public static async Task<Resposta> AvisoDoFalso(Api destino, JsonObject aviso)
+    {
+        var corpo = aviso.ToJsonString();
+        return await destino.Enviar("POST", "/pagamento/notificacoes", corpo, doPedido: new Dictionary<string, string> { ["X-Assinatura"] = Assinar(corpo) });
+    }
+
     static string Assinar(string corpo) =>
         "sha256=" + Convert.ToHexStringLower(HMACSHA256.HashData(Encoding.UTF8.GetBytes(Ambiente.PagamentoSegredoDoAviso), Encoding.UTF8.GetBytes(corpo)));
 

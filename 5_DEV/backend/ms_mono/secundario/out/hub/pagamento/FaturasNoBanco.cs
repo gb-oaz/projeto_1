@@ -1,19 +1,26 @@
+using System.Globalization;
 using Boaz.Core.Hub.Pagamento.Faturas.Domain;
 using Boaz.Core.Hub.Pagamento.Faturas.Ports.Out;
+using Boaz.Core.Hub.Pagamento.Pagamentos.Domain;
 using Boaz.MsMono.Secundario.Out.Commons;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Boaz.MsMono.Secundario.Out.Hub.Pagamento;
 
-// A coleção faturas (pagamento-documentos v02) e a numeração em contadores.
+// A coleção faturas (pagamento-documentos v03) e a numeração em contadores.
 // A fatura guarda a versão (+1 a cada gravação): Salvar só vale se a versão
 // guardada ainda é a lida. "emAberto" é o pagamento em aberto que ocupa a
 // fatura (RN-303): Ocupar e Liberar o mudam numa só operação, sem depender de
-// índice; Salvar nunca mexe nele.
+// índice; Salvar nunca mexe nele. A versão do card, as somas dos recebimentos
+// e o recebido por dia saem de agregações no banco ($group), sem trazer fatura
+// por fatura à aplicação (RNF-245).
 public sealed class FaturasNoBanco(Armazenamento armazenamento) : IFaturas, INumeracaoDoPagamento
 {
     const string Ocupacao = "emAberto";
+
+    // o dia de Brasília (UTC-3, sem horário de verão), como o Calendario do core
+    const string FusoDeBrasilia = "-03:00";
 
     IMongoCollection<BsonDocument> Faturas => armazenamento.Colecao(Colecoes.Faturas);
 
@@ -92,11 +99,109 @@ public sealed class FaturasNoBanco(Armazenamento armazenamento) : IFaturas, INum
     public Task Liberar(string faturaId, string pagamentoId, CancellationToken ct = default) =>
         Faturas.UpdateOneAsync(Bson.Filtro.Eq("_id", faturaId) & Bson.Filtro.Eq(Ocupacao, pagamentoId), Bson.Mudar.Set(Ocupacao, BsonNull.Value),
             cancellationToken: ct);
+
+    public async Task<VersaoDasFaturas> Versao(string? contaId, CancellationToken ct = default)
+    {
+        var onde = contaId is null ? new BsonDocument() : new BsonDocument("conta.id", contaId);
+        var grupo = new BsonDocument
+        {
+            ["_id"] = BsonNull.Value,
+            ["versao"] = new BsonDocument("$sum", new BsonDocument("$add", new BsonArray { new BsonDocument("$ifNull", new BsonArray { "$versao", 0 }), 1 })),
+            ["quantas"] = new BsonDocument("$sum", 1),
+            ["vencidas"] = Contar(new BsonDocument("$eq", new BsonArray { "$status", StatusDaFatura.Vencida.Texto() })),
+            ["emitida"] = new BsonDocument("$max", "$emitidaEm"),
+            ["mudou"] = new BsonDocument("$max", new BsonDocument("$max", "$historico.em")),
+        };
+        var r = await Faturas.Aggregate<BsonDocument>(new BsonDocument[] { new("$match", onde), new("$group", grupo) }, cancellationToken: ct)
+            .FirstOrDefaultAsync(ct);
+        if (r is null) return new VersaoDasFaturas(0, 0, 0, null);
+        DateTimeOffset? emitida = r.Data("emitida"), mudou = r.Data("mudou");
+        var atualizadoEm = emitida is null ? mudou : mudou is null ? emitida : emitida > mudou ? emitida : mudou;
+        return new VersaoDasFaturas(r.Longo("versao"), r.Inteiro("quantas"), r.Inteiro("vencidas"), atualizadoEm);
+    }
+
+    public async Task<IReadOnlyList<SomaDeFaturas>> Somas(IReadOnlyCollection<Competencia> competencias, CancellationToken ct = default)
+    {
+        if (competencias.Count == 0) return [];
+        var etapas = new BsonDocument[]
+        {
+            new("$match", new BsonDocument("competencia", new BsonDocument("$in", new BsonArray(competencias.Select(c => c.ToString()))))),
+            // a forma do pagamento que quitou (pelo _id, indexado), só para as pagas
+            new("$lookup", new BsonDocument
+            {
+                ["from"] = Colecoes.Pagamentos,
+                ["localField"] = "pagaPor",
+                ["foreignField"] = "_id",
+                ["as"] = "quitou",
+            }),
+            new("$group", new BsonDocument
+            {
+                ["_id"] = new BsonDocument
+                {
+                    ["competencia"] = "$competencia",
+                    ["status"] = "$status",
+                    ["tipo"] = "$conta.tipo",
+                    ["forma"] = new BsonDocument("$arrayElemAt", new BsonArray { "$quitou.forma", 0 }),
+                },
+                ["quantas"] = new BsonDocument("$sum", 1),
+                ["valor"] = new BsonDocument("$sum", "$valor"),
+                ["recebido"] = new BsonDocument("$sum", Recebido),
+            }),
+        };
+        var lidas = await Faturas.Aggregate<BsonDocument>(etapas, cancellationToken: ct).ToListAsync(ct);
+        return [.. lidas.Select(r =>
+        {
+            var chave = r.Documento("_id") ?? [];
+            return new SomaDeFaturas(Competencia.Ler(chave.Texto("competencia")) ?? default, TextosDoPagamento.LerStatusDaFatura(chave.Texto("status")),
+                chave.Texto("tipo") ?? "INSTITUICAO", TextosDoPagamento.LerForma(chave.Texto("forma")), r.Inteiro("quantas"), r.DinheiroEm("valor"),
+                r.DinheiroEm("recebido"));
+        })];
+    }
+
+    public async Task<IReadOnlyDictionary<DateOnly, Dinheiro>> RecebidoPorDia(DateOnly de, DateOnly ate, CancellationToken ct = default)
+    {
+        var etapas = new BsonDocument[]
+        {
+            new("$match", new BsonDocument
+            {
+                ["status"] = StatusDaFatura.Paga.Texto(),
+                ["pagaEm"] = new BsonDocument
+                {
+                    ["$gte"] = Bson.Valor(Calendario.InicioDoDia(de)),
+                    ["$lt"] = Bson.Valor(Calendario.InicioDoDia(ate.AddDays(1))),
+                },
+            }),
+            new("$group", new BsonDocument
+            {
+                ["_id"] = new BsonDocument("$dateToString", new BsonDocument
+                {
+                    ["format"] = "%Y-%m-%d",
+                    ["date"] = "$pagaEm",
+                    ["timezone"] = FusoDeBrasilia,
+                }),
+                ["recebido"] = new BsonDocument("$sum", Recebido),
+            }),
+        };
+        var lidas = await Faturas.Aggregate<BsonDocument>(etapas, cancellationToken: ct).ToListAsync(ct);
+        return lidas.ToDictionary(
+            r => DateOnly.ParseExact(r["_id"].AsString, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+            r => r.DinheiroEm("recebido"));
+    }
+
+    // o pago com juros menos o estornado (RN-308)
+    static BsonDocument Recebido => new("$subtract", new BsonArray
+    {
+        new BsonDocument("$ifNull", new BsonArray { "$valorPago", 0 }),
+        new BsonDocument("$ifNull", new BsonArray { "$devolvido", 0 }),
+    });
+
+    static BsonDocument Contar(BsonDocument condicao) => new("$sum", new BsonDocument("$cond", new BsonArray { condicao, 1, 0 }));
 }
 
-// O que o Pagamento lê de outros módulos, só leitura (pagamento-documentos v02):
-// as cobranças fechadas do Catálogo (cobrancas), a conta (contas), o nome de
-// quem pagou (usuarios) e o nome dos módulos (modulos).
+// O que o Pagamento lê de outros módulos, só leitura (pagamento-documentos v03):
+// as cobranças fechadas do Catálogo (cobrancas), a conta (contas) com o
+// documento, o nome de quem pagou e o login da conta master ou do autônomo
+// (usuarios) e o nome dos módulos (modulos).
 public sealed class LeiturasDoPagamentoNoBanco(Armazenamento armazenamento) : ICobrancasDoMes, ICadastroDoPagamento
 {
     public async Task<IReadOnlyList<CobrancaFechada>> Fechadas(Competencia competencia, CancellationToken ct = default) =>
@@ -108,6 +213,17 @@ public sealed class LeiturasDoPagamentoNoBanco(Armazenamento armazenamento) : IC
     {
         var d = await armazenamento.Colecao(Colecoes.Contas).Find(Bson.Filtro.Eq("_id", contaId)).FirstOrDefaultAsync(ct);
         return d is null ? null : new ContaDaFatura(contaId, d.Texto("sigla") ?? "", d.Texto("nome") ?? "", d.Texto("tipo") ?? "INSTITUICAO");
+    }
+
+    // o boleto sai em nome e documento da conta; o e-mail do pagador é o login
+    // da conta master ou do autônomo (o usuário "MASTER" da conta)
+    public async Task<Pagador?> Pagador(string contaId, CancellationToken ct = default)
+    {
+        var conta = await armazenamento.Colecao(Colecoes.Contas).Find(Bson.Filtro.Eq("_id", contaId)).FirstOrDefaultAsync(ct);
+        if (conta is null) return null;
+        var master = await armazenamento.Colecao(Colecoes.Usuarios).Find(Bson.Filtro.Eq("contaId", contaId) & Bson.Filtro.Eq("tipo", "MASTER"))
+            .FirstOrDefaultAsync(ct);
+        return new Pagador(conta.Texto("nome") ?? "", conta.Texto("documento") ?? "", master?.Texto("login") ?? "");
     }
 
     public async Task<IReadOnlyDictionary<string, string>> Nomes(IEnumerable<string> usuarioIds, CancellationToken ct = default)

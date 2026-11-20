@@ -4,6 +4,7 @@ using Boaz.Core.Hub.Pagamento.Card.Ports.In;
 using Boaz.Core.Hub.Pagamento.Configuracao.Dtos;
 using Boaz.Core.Hub.Pagamento.Configuracao.Ports.In;
 using Boaz.Core.Hub.Pagamento.Faturas.Dtos;
+using Boaz.Core.Hub.Pagamento.Pagamentos.Dtos;
 using Boaz.Core.Hub.Pagamento.Recebimentos.Dtos;
 using Boaz.Core.Hub.Pagamento.Recebimentos.Ports.In;
 using Boaz.MsMono.Primario.In.Commons;
@@ -96,6 +97,48 @@ public sealed class RecebimentosController : ControllerBase
         [FromQuery] string? pagina, [FromServices] IListarFaturasDoRecebedor listar, CancellationToken ct) =>
         Ok(await listar.Executar(competencia, situacao, busca, PagamentoHttp.Pagina(pagina), HttpContext.QuemPedeAoPagamento(), ct));
 
+    /// <summary>Ler uma fatura de qualquer conta</summary>
+    /// <remarks>
+    /// O detalhe da fatura para o recebedor (RF-191): o mesmo corpo do GET /pagamento/faturas/{id} da conta, com os
+    /// itens, os juros de hoje e as tentativas de pagamento.
+    /// </remarks>
+    /// <param name="id">O número da fatura, como FAT-000371.</param>
+    /// <param name="ler">Caso de uso LerFaturaDoRecebedor.</param>
+    /// <param name="ct">Cancelamento do pedido.</param>
+    /// <response code="200">A fatura.</response>
+    /// <response code="401">SESSAO_TERMINADA: sem token, token inválido, vencido ou sessão encerrada.</response>
+    /// <response code="403">ACESSO_NEGADO: quem pede não é o administrador do deboaz (RN-298).</response>
+    /// <response code="404">FATURA_INEXISTENTE.</response>
+    [HttpGet("faturas/{id}", Name = "faturaDoRecebedor")]
+    [ComSessao]
+    [ProducesResponseType<FaturaDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<Erro>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<Erro>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<Erro>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Fatura([FromRoute] string id, [FromServices] ILerFaturaDoRecebedor ler, CancellationToken ct) =>
+        Ok(await ler.Executar(id, HttpContext.QuemPedeAoPagamento(), ct));
+
+    /// <summary>Ler um pagamento de qualquer conta</summary>
+    /// <remarks>
+    /// O detalhe do pagamento para o recebedor (RF-192): a conta, quem pagou, a forma, o valor, o saldo que ainda se
+    /// estorna e os estornos, do mais novo ao mais antigo.
+    /// </remarks>
+    /// <param name="id">O número do pagamento, como PAG-000773.</param>
+    /// <param name="ler">Caso de uso LerPagamentoDoRecebedor.</param>
+    /// <param name="ct">Cancelamento do pedido.</param>
+    /// <response code="200">O pagamento.</response>
+    /// <response code="401">SESSAO_TERMINADA: sem token, token inválido, vencido ou sessão encerrada.</response>
+    /// <response code="403">ACESSO_NEGADO: quem pede não é o administrador do deboaz (RN-298).</response>
+    /// <response code="404">PAGAMENTO_INEXISTENTE.</response>
+    [HttpGet("pagamentos/{id}", Name = "pagamentoDoRecebedor")]
+    [ComSessao]
+    [ProducesResponseType<PagamentoDoRecebedorDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType<Erro>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<Erro>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<Erro>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Pagamento([FromRoute] string id, [FromServices] ILerPagamentoDoRecebedor ler, CancellationToken ct) =>
+        Ok(await ler.Executar(id, HttpContext.QuemPedeAoPagamento(), ct));
+
     /// <summary>Cancelar uma fatura em aberto</summary>
     /// <remarks>
     /// Cancela a fatura A_PAGAR ou VENCIDA com o motivo (RF-191, RN-301): o pagamento que esperava é cancelado no banco
@@ -179,7 +222,8 @@ public sealed class RecebimentosController : ControllerBase
     /// <summary>Salvar a configuração</summary>
     /// <remarks>
     /// Salva a configuração inteira (o corpo do GET, sem "versao") com a versão lida no If-Match (RF-193, RN-309, RN-310):
-    /// vale para os próximos pagamentos e faturas. Sem If-Match ou com outra versão, 412 CONFIGURACAO_MUDOU. Limites:
+    /// vale para os próximos pagamentos e faturas. Sem If-Match, 428 VERSAO_AUSENTE; com outra versão, 412
+    /// CONFIGURACAO_MUDOU. A resposta traz a versão lida + 1. Limites:
     /// jurosAoDia de 0 a 1 (% ao dia), toleranciaAvisoDias de 0 a 30, diaVencimento 10, pixMinutos de 5 a 1440,
     /// debitoMinutos de 5 a 30, boletoDiasUteis de 1 a 30; ao menos uma forma ligada. Auditado como CONFIGURACAO_SALVA,
     /// com o antes e o depois.
@@ -190,8 +234,9 @@ public sealed class RecebimentosController : ControllerBase
     /// <response code="200">A configuração salva, com a versão nova.</response>
     /// <response code="401">SESSAO_TERMINADA: sem token, token inválido, vencido ou sessão encerrada.</response>
     /// <response code="403">ACESSO_NEGADO: quem pede não é o administrador do deboaz (RN-298).</response>
-    /// <response code="412">CONFIGURACAO_MUDOU: If-Match ausente ou de uma versão antiga.</response>
+    /// <response code="412">CONFIGURACAO_MUDOU: If-Match de uma versão antiga.</response>
     /// <response code="422">FORMA_OBRIGATORIA (as quatro desligadas) ou DADOS_INVALIDOS no campo fora do limite.</response>
+    /// <response code="428">VERSAO_AUSENTE: sem If-Match.</response>
     [HttpPut("configuracao", Name = "salvarConfiguracaoDoPagamento")]
     [ComSessao]
     [CabecalhoDoPedido("If-Match", "A versão lida em GET /pagamento/recebimentos/configuracao, como \"4\" (aceita também 4 e W/\"4\").",
@@ -201,12 +246,13 @@ public sealed class RecebimentosController : ControllerBase
     [ProducesResponseType<Erro>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<Erro>(StatusCodes.Status412PreconditionFailed)]
     [ProducesResponseType<Erro>(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType<Erro>(StatusCodes.Status428PreconditionRequired)]
     public async Task<IActionResult> Salvar([FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] PedidoDeConfiguracao? corpo,
         [FromServices] ISalvarConfiguracao salvar, CancellationToken ct) =>
         Ok(await salvar.Executar(corpo ?? new PedidoDeConfiguracao(null, null, null, null, null), VersaoLida(), HttpContext.QuemPedeAoPagamento(),
             HttpContext.NovoTraceId(), ct));
 
-    // o If-Match: "4", 4 ou W/"4"; o que não é número é como ausente
+    // o If-Match: "4", 4 ou W/"4"; o que não é número é como ausente (428)
     int? VersaoLida()
     {
         var texto = Request.Headers.IfMatch.ToString().Trim();

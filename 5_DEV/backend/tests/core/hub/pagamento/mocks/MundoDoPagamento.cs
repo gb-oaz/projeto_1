@@ -24,8 +24,8 @@ public sealed class MundoDoPagamento
     /// <summary>O Pedro Reis, autônomo.</summary>
     public static readonly QuemPede Pedro = new("usr-preis-pedro", "AUTONOMO", "conta-preis");
 
-    /// <summary>O administrador do deboaz.</summary>
-    public static readonly QuemPede Admin = new("usr-deboaz-admin", QuemPede.Administrador, "conta-dboaz", false);
+    /// <summary>O administrador do deboaz, com MOD-01 · U no token só para o card (17-b RN-233-api).</summary>
+    public static readonly QuemPede Admin = new("usr-deboaz-admin", QuemPede.Administrador, "conta-dboaz");
 
     /// <summary>A staff Maria, sem MOD-01.</summary>
     public static readonly QuemPede Maria = new("usr-ebfga-maria", "STAFF", "conta-ebfga", false);
@@ -48,19 +48,21 @@ public sealed class MundoDoPagamento
         Listar = new(m, m, m, Relogio);
         LerFatura = new(m, m, m, m, Relogio);
         LerAvisos = new(m, m, m, Relogio);
-        Criar = new(m, m, m, m, m, m, m, m, Relogio);
-        LerPagamento = new(m, m, m);
+        Criar = new(m, m, m, m, m, m, m, m, m, m, Relogio);
+        LerPagamento = new(m, m, m, m);
         Cancelar = new(m, m, m, m, m, m, Relogio);
-        Documento = new(m, m, m);
+        Documento = new(m, m, m, m);
         AoVivo = new(m, m, m);
         Aviso = new(m, m, m, m, m, m, m, m, Relogio);
         Recebimentos = new(m, m, Relogio);
         ListarDoRecebedor = new(m, Relogio);
+        FaturaDoRecebedor = new(m, m, m, m, Relogio);
+        PagamentoDoRecebedor = new(m, m, m, m);
         CancelarFatura = new(m, m, m, m, m, m, m, m, m, Relogio);
         Estornar = new(m, m, m, m, m, m, m, m, Relogio);
         LerConfiguracao = new(m);
         SalvarConfiguracao = new(m, m, m, Relogio);
-        Formas = new(m);
+        Formas = new(m, m, m);
         Card = new(m, Relogio);
         CardAoVivo = new(Card);
     }
@@ -103,6 +105,12 @@ public sealed class MundoDoPagamento
 
     /// <summary>ListarFaturasDoRecebedor.</summary>
     public ListarFaturasDoRecebedor ListarDoRecebedor { get; }
+
+    /// <summary>LerFaturaDoRecebedor.</summary>
+    public LerFaturaDoRecebedor FaturaDoRecebedor { get; }
+
+    /// <summary>LerPagamentoDoRecebedor.</summary>
+    public LerPagamentoDoRecebedor PagamentoDoRecebedor { get; }
 
     /// <summary>CancelarFatura.</summary>
     public CancelarFatura CancelarFatura { get; }

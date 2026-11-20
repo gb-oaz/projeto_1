@@ -7,20 +7,22 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 namespace Boaz.Qa.Integracao.Hub.Pagamento;
 
 // O banco e o rastreio nos Cenários de API de 1_Requisitos/19_modulo-pagamento.md
-// (v04): o aviso do banco (RN-305, RF-187, RF-188, RN-303), o pagamento ao
-// vivo (RNF-238), a auditoria (RN-309), a troca do intermediador (RNF-242) e
-// o traceId (RNF-243, RNF-244). O banco é sempre o intermediador falso
-// (BancoFalso.cs); o aviso entra pelo endereço do contrato.
+// (v05): o aviso do banco (RN-305, RF-187, RF-188, RN-303), o pagamento ao
+// vivo (RNF-238), a auditoria (RN-309) e o traceId (RNF-243, RNF-244). O
+// banco é sempre o intermediador falso (BancoFalso.cs); o aviso entra pelo
+// endereço do contrato. "avisosDoBanco" e o intermediador de cada ambiente
+// (RNF-242) ficam em IntermediadorPassos.cs.
 //
-// O que só o banco de dados mostra (avisosDoBanco, traceIdOrigem e o
-// historico de cada documento) fica nos testes do backend: aqui a frase
-// confere o que a API, o fluxo ao vivo, o intermediador falso e a coleção
-// "auditoria" (suporte/Auditoria.cs) mostram.
+// O traceIdOrigem e o historico de cada documento só o banco de dados
+// mostra, sem o requisito os nomear como coleção: ficam nos testes do
+// backend. Aqui a frase confere o que a API, o fluxo ao vivo, o
+// intermediador falso e as coleções "auditoria" e "avisosDoBanco" mostram.
 public sealed partial class PagamentoPassos
 {
     // pagamento e fatura antes do aviso (RN-305: "nenhum pagamento ou fatura muda")
     (string Id, JsonObject Pagamento, JsonObject Fatura)? antes;
-    DateTimeOffset avisoEnviadoEm;
+    // no relógio monotônico (Cronometro), para medir a chegada do evento ao vivo
+    TimeSpan avisoEnviadoEm;
     // o X-Trace-Id recebido no pedido (RNF-243) e a marca da execução do Dado (RNF-244)
     string origem = "";
     int execucaoDoPagamento = -1;
@@ -40,7 +42,7 @@ public sealed partial class PagamentoPassos
     // o aviso é o pedido do cenário; "trc-6b0c42f1" do exemplo é o X-Trace-Id da resposta dele
     async Task<Resposta> Avisar(JsonObject aviso, bool assinaturaValida = true)
     {
-        avisoEnviadoEm = DateTimeOffset.UtcNow;
+        avisoEnviadoEm = Cronometro.Agora;
         var r = await execucoes.Executar(async () => mundo.Guardar(await banco.Avisar(aviso, assinaturaValida)));
         mundo.Apelidos["trc-6b0c42f1"] = () => Task.FromResult(r.Cabecalho("X-Trace-Id") ?? "sem X-Trace-Id");
         return r;
@@ -88,19 +90,6 @@ public sealed partial class PagamentoPassos
         mundo.Apelidos["trc-9a20d5be"] = () => Task.FromResult(origem);
         await banco.Normal();
     }
-
-    // RNF-242: o modelo de documentos não guarda qual intermediador gerou o
-    // pagamento, e o contrato tem um só endereço de aviso: não há como trocar
-    // o intermediador de fora nem ver quem confirmou
-    [Given(@"^o PAG-000785, boleto ""AGUARDANDO"", gerado pelo intermediador anterior$")]
-    [When(@"^o deboaz passa a usar outro intermediador$")]
-    [Then(@"^faturas, status, códigos de erro e endereços do Pagamento não mudam$")]
-    [Then(@"^os novos pagamentos vão ao intermediador novo$")]
-    [Then(@"^o PAG-000785 segue confirmado pelo anterior até ficar ""PAGO"" ou ""EXPIRADO""$")]
-    public static void TrocaDoIntermediador() => throw new PendingStepException(
-        "a troca do intermediador é da composição do backend (Program.cs) e não se provoca de fora; o contrato e o modelo de documentos " +
-        "não dizem como o aviso do intermediador anterior é reconhecido depois da troca (lacuna para o deboaz-arc). Os dois adaptadores " +
-        "atrás da mesma porta IIntermediador ficam nos testes do backend");
 
     // RNF-244: a busca do time pelo traceId é no banco de dados (índices do modelo de documentos), sem endereço no contrato
     [Given(@"^o traceId ""trc-1d6e3f08""$")]
@@ -242,17 +231,8 @@ public sealed partial class PagamentoPassos
         Assert.True(JsonNode.DeepEquals(fatura, faturaAgora), $"a fatura mudou: era {fatura.ToJsonString()}, ficou {faturaAgora.ToJsonString()}");
     }
 
-    // a tentativa recusada e a ocorrência do pagamento desconhecido ficam em
-    // avisosDoBanco, sem endereço no contrato que as mostre
-    [Then(@"^a tentativa fica registrada$")]
-    [Then(@"^a ocorrência fica para o time$")]
-    public static void SoNoBanco()
-    {
-        // só o banco de dados mostra: conferido nos testes do backend
-    }
-
-    [Then(@"^nada é somado em dobro$")]
-    public async Task NadaEmDobro()
+    // RN-305: o aviso repetido não soma a fatura recebida duas vezes
+    async Task NadaEmDobro()
     {
         var r = Exigir(await fat.Ler(mundo.Admin(), "/pagamento/recebimentos/resumo?competencia=2026-11"), 200, "GET /pagamento/recebimentos/resumo");
         var recebido = r.Corpo?["recebido"];
@@ -396,7 +376,6 @@ public sealed partial class PagamentoPassos
     // o historico de cada documento, avisosDoBanco e o traceIdOrigem
     [Then(@"^cada mudança de status do PAG-000773 entra no histórico com o traceId de quem a fez$")]
     [Then(@"^o mesmo vale para a fatura, o estorno e o aviso do banco$")]
-    [Then(@"^""trc-2e7d90aa"", da criação, fica como traceIdOrigem$")]
     public static void HistoricoSoNoBanco()
     {
         // só o banco de dados mostra: conferido nos testes do backend
@@ -444,13 +423,27 @@ public sealed partial class PagamentoPassos
         Assert.True(traceId != fat.ExecucaoDe(fat.Real("PAG-000781")), $"o aviso devia ter um traceId novo, veio o da criação ({traceId})");
     }
 
-    // avisosDoBanco só o banco mostra; a auditoria do aviso leva o mesmo traceId
+    // avisosDoBanco (IntermediadorPassos.cs) e a auditoria do aviso levam o traceId da resposta
     [Then(@"^avisosDoBanco guarda ""trc-6b0c42f1"", o id externo ""pix_8c1e5d"" e o ""PAG-000781""$")]
     public async Task AvisoGuardado()
     {
+        var pix = fat.Real("PAG-000781");
+        var aviso = await AvisoGuardado(DoBackend(AvisosDoBanco), mundo.Ultima);
+        Assert.True(Auditoria.Texto(aviso, "idExterno") == await banco.IdExterno(pix) && Auditoria.Texto(aviso, "pagamentoId") == pix,
+            $"esperava o aviso com o id externo do {pix} e o pagamentoId {pix}: {aviso.ToJson()}");
         var registros = await DaAcao("AVISO_DO_BANCO");
         Assert.True(registros.Count > 0 && registros.All(d => Auditoria.TraceId(d) == Auditoria.TraceIdDoCabecalho(mundo.Ultima)),
             $"esperava a auditoria AVISO_DO_BANCO com o traceId do aviso, vieram {Auditoria.Resumo(registros)}");
+    }
+
+    // o traceId da criação, devolvido pelo banco nos metadados, vira o traceIdOrigem do aviso
+    [Then(@"^""trc-2e7d90aa"", da criação, fica como traceIdOrigem$")]
+    public async Task TraceIdOrigemDoAviso()
+    {
+        var pix = fat.Real("PAG-000781");
+        var aviso = await AvisoGuardado(DoBackend(AvisosDoBanco), mundo.Ultima);
+        Assert.True(Auditoria.Texto(aviso, "traceIdOrigem") == fat.ExecucaoDe(pix),
+            $"esperava em \"avisosDoBanco\" o traceIdOrigem {fat.ExecucaoDe(pix)}, o da criação do {pix}: {aviso.ToJson()}");
     }
 
     // a ligação entre o id externo e o traceId fica no historico; a API mostra o pagamento confirmado pelo aviso

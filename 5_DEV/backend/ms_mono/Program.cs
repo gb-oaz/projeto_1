@@ -171,25 +171,34 @@ servicos.AddSingleton<TravaDoAgendamentoDoPagamentoNoRedis>();
 // Pago, com MercadoPago__AccessToken e MercadoPago__SegredoDoWebhook
 // obrigatórios na partida (conferidos depois dos segredos USUARIO_*, RNF-226);
 // fora dela, o falso com o relógio de teste, com Pagamento__Intermediador=Falso
-// ou sem Access Token (a máquina e o qa)
+// ou sem Access Token (a máquina e o qa). O ligado cobra os pagamentos novos;
+// os disponíveis (o Mercado Pago com Access Token, o falso fora de produção)
+// seguem atendendo os pagamentos que geraram e os avisos deles.
 servicos.AddOptions<OpcoesDoMercadoPago>().BindConfiguration(OpcoesDoMercadoPago.Secao);
 var emProducao = string.Equals(builder.Configuration[Boaz.Core.Commons.Usuario.Usuarios.Domain.ContasIniciais.VariavelDoAmbiente], "prd",
     StringComparison.OrdinalIgnoreCase);
+var comMercadoPago = emProducao || !string.IsNullOrWhiteSpace(builder.Configuration["MercadoPago:AccessToken"]);
 var comFalso = !emProducao && (RelogioDaAplicacao.DeTesteLigado(builder.Configuration)
     || string.Equals(builder.Configuration["Pagamento:Intermediador"], "Falso", StringComparison.OrdinalIgnoreCase)
-    || string.IsNullOrWhiteSpace(builder.Configuration["MercadoPago:AccessToken"]));
-if (comFalso)
+    || !comMercadoPago);
+if (!emProducao)
 {
     servicos.AddSingleton(s => new IntermediadorFalso(
         s.GetRequiredService<IConfiguration>()["Pagamento:SegredoDoAviso"] is { Length: > 0 } segredo ? segredo : IntermediadorFalso.SegredoPadrao,
         s.GetRequiredService<TimeProvider>()));
-    servicos.AddSingleton<PagPagamentos.IIntermediador>(s => s.GetRequiredService<IntermediadorFalso>());
 }
-else
+if (comMercadoPago) servicos.AddHttpClient<IntermediadorMercadoPago>(c => c.Timeout = IntermediadorMercadoPago.Prazo);
+servicos.AddSingleton<PagPagamentos.IIntermediadores>(s =>
 {
-    servicos.AddHttpClient<IntermediadorMercadoPago>(c => c.Timeout = IntermediadorMercadoPago.Prazo);
-    servicos.AddSingleton<PagPagamentos.IIntermediador>(s => s.GetRequiredService<IntermediadorMercadoPago>());
-}
+    var disponiveis = new List<PagPagamentos.IIntermediador>();
+    if (comMercadoPago) disponiveis.Add(s.GetRequiredService<IntermediadorMercadoPago>());
+    if (!emProducao) disponiveis.Add(s.GetRequiredService<IntermediadorFalso>());
+    var ligado = comFalso ? s.GetRequiredService<IntermediadorFalso>() : (PagPagamentos.IIntermediador)s.GetRequiredService<IntermediadorMercadoPago>();
+    return new IntermediadoresDoPagamento(ligado, disponiveis);
+});
+servicos.AddSingleton<PagPagamentos.IDesenhoDoQrCode, DesenhoDoQrCode>();
+// a conta com fatura em aberto não é encerrada (17 RN-173, 19 RN-313): o 17 pergunta ao Pagamento
+servicos.AddSingleton<Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IContaTemFaturaEmAberto, ContaTemFaturaEmAbertoNoPagamento>();
 
 // ── core: cada porta de entrada ligada ao caso de uso dela ───────────────────
 // commons/usuario/autenticacao
@@ -282,6 +291,9 @@ servicos.AddSingleton<IReceberAvisoDoBanco, ReceberAvisoDoBanco>();
 servicos.AddSingleton<IExpirarPagamentos, ExpirarPagamentos>();
 servicos.AddSingleton<ILerRecebimentos, LerRecebimentos>();
 servicos.AddSingleton<IListarFaturasDoRecebedor, ListarFaturasDoRecebedor>();
+servicos.AddSingleton<ILerFaturaDoRecebedor, LerFaturaDoRecebedor>();
+servicos.AddSingleton<ILerPagamentoDoRecebedor, LerPagamentoDoRecebedor>();
+servicos.AddSingleton<Boaz.Core.Hub.Pagamento.Faturas.Ports.In.IContaTemFaturaEmAberto, ContaTemFaturaEmAberto>();
 servicos.AddSingleton<ICancelarFatura, CancelarFatura>();
 servicos.AddSingleton<IPedirEstorno, PedirEstorno>();
 servicos.AddSingleton<ILerConfiguracao, LerConfiguracao>();

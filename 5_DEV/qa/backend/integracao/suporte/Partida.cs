@@ -45,6 +45,15 @@ public sealed class Partida : IDisposable
 
     public string AmbienteDaPartida { get; set; } = "hml";
 
+    // os segredos do Mercado Pago de teste (19 RNF-242): os de produção e os
+    // que o cenário põe no Key Vault de homologação; nenhum paga nada
+    public static readonly IReadOnlyDictionary<string, string> ChavesDoMercadoPago = new Dictionary<string, string>
+    {
+        ["MercadoPago__AccessToken"] = "TEST-token-da-partida",
+        ["MercadoPago__PublicKey"] = "TEST-chave-publica-da-partida",
+        ["MercadoPago__SegredoDoWebhook"] = "segredo-do-webhook-da-partida",
+    };
+
     // o Key Vault do cenário: nome da variável → valor (null = segredo ausente)
     public Dictionary<string, string?> KeyVault { get; } = [];
 
@@ -155,8 +164,7 @@ public sealed class Partida : IDisposable
         // pelo KeyVault (null = ausente)
         if (AmbienteDaPartida == "prd")
         {
-            inicio.Environment["MercadoPago__AccessToken"] = "TEST-token-da-partida";
-            inicio.Environment["MercadoPago__SegredoDoWebhook"] = "segredo-do-webhook-da-partida";
+            foreach (var (nome, valor) in ChavesDoMercadoPago) inicio.Environment[nome] = valor;
         }
         foreach (var (nome, valor) in KeyVault)
         {
@@ -179,8 +187,8 @@ public sealed class Partida : IDisposable
     {
         if (processo is null) throw new InvalidOperationException("a instância não foi lançada");
         using var saude = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
-        var limite = DateTime.UtcNow + LimiteDaPartida;
-        while (DateTime.UtcNow < limite)
+        var limite = Cronometro.Agora + LimiteDaPartida;
+        while (Cronometro.Agora < limite)
         {
             if (processo.HasExited)
             {

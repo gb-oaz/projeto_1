@@ -15,6 +15,8 @@ public enum GrupoDaFalhaDoPagamento
     Conflito,
     /// <summary>412: a Configuração mudou desde a leitura (RF-193).</summary>
     VersaoDesatualizada,
+    /// <summary>428: o PUT da Configuração sem If-Match (RF-193-api).</summary>
+    VersaoAusente,
     /// <summary>422: a forma do pedido.</summary>
     DadosInvalidos,
     /// <summary>503: o banco não respondeu (RNF-241).</summary>
@@ -23,7 +25,7 @@ public enum GrupoDaFalhaDoPagamento
 
 /// <summary>
 /// Uma recusa do Pagamento, com o código e a mensagem do contrato
-/// (pagamento-contrato-api v02). O adaptador de entrada a transforma na
+/// (pagamento-contrato-api v03, formato-comum do 19). O adaptador de entrada a transforma na
 /// resposta { codigo, mensagem, campo, saldo, traceId } (RNF-243).
 /// </summary>
 public sealed class FalhaDoPagamento : Exception, IRecusaPrevista
@@ -64,15 +66,15 @@ public sealed class FalhaDoPagamento : Exception, IRecusaPrevista
 
     /// <summary>A fatura foi cancelada (RN-301).</summary>
     public static FalhaDoPagamento FaturaCancelada() =>
-        new(GrupoDaFalhaDoPagamento.Conflito, "FATURA_CANCELADA", "Esta fatura foi cancelada.");
+        new(GrupoDaFalhaDoPagamento.Conflito, "FATURA_CANCELADA", "Fatura cancelada não recebe pagamento.");
 
     /// <summary>Já há um pagamento AGUARDANDO ou PROCESSANDO na fatura (RN-303).</summary>
     public static FalhaDoPagamento PagamentoEmAberto() => new(GrupoDaFalhaDoPagamento.Conflito, "PAGAMENTO_EM_ABERTO",
-        "Esta fatura já tem um pagamento em andamento. Cancele-o para trocar de forma.");
+        "Esta fatura já tem um pagamento em andamento.");
 
     /// <summary>O pagamento já foi confirmado pelo banco: não se cancela (RN-303).</summary>
     public static FalhaDoPagamento PagamentoConfirmado() => new(GrupoDaFalhaDoPagamento.Conflito, "PAGAMENTO_CONFIRMADO",
-        "Este pagamento já foi confirmado pelo banco e não pode ser cancelado.");
+        "Pagamento já confirmado pelo banco: não pode ser cancelado.");
 
     /// <summary>O pagamento ainda não foi confirmado: sem comprovante nem estorno (RF-189, RF-192).</summary>
     public static FalhaDoPagamento PagamentoNaoConfirmado() => new(GrupoDaFalhaDoPagamento.Conflito, "PAGAMENTO_NAO_CONFIRMADO",
@@ -84,11 +86,15 @@ public sealed class FalhaDoPagamento : Exception, IRecusaPrevista
 
     /// <summary>O boleto não se estorna pelo Pagamento: quem pagou pede no SAC (RN-312).</summary>
     public static FalhaDoPagamento EstornoPeloSac() => new(GrupoDaFalhaDoPagamento.Conflito, "ESTORNO_PELO_SAC",
-        "O boleto é devolvido pelo atendimento: quem pagou abre um chamado no SAC.");
+        "O estorno de boleto é pedido pela própria conta no SAC.");
 
     /// <summary>O If-Match não é a versão atual da Configuração (RF-193).</summary>
     public static FalhaDoPagamento ConfiguracaoMudou() => new(GrupoDaFalhaDoPagamento.VersaoDesatualizada, "CONFIGURACAO_MUDOU",
-        "A configuração mudou desde que você abriu. Recarregue e salve de novo.");
+        "A configuração mudou. Recarregue e salve de novo.");
+
+    /// <summary>O PUT da Configuração sem If-Match (RF-193-api, RN-299-api).</summary>
+    public static FalhaDoPagamento VersaoAusente() => new(GrupoDaFalhaDoPagamento.VersaoAusente, "VERSAO_AUSENTE",
+        "Envie a versão lida da configuração no If-Match.");
 
     /// <summary>Um campo do pedido está faltando ou é inválido.</summary>
     public static FalhaDoPagamento DadosInvalidos(string campo) =>
@@ -101,7 +107,7 @@ public sealed class FalhaDoPagamento : Exception, IRecusaPrevista
 
     /// <summary>A Configuração com as quatro formas desligadas (RF-193).</summary>
     public static FalhaDoPagamento FormaObrigatoria() => new(GrupoDaFalhaDoPagamento.DadosInvalidos, "FORMA_OBRIGATORIA",
-        "Deixe ao menos uma forma de pagamento ligada.")
+        "Mantenha ao menos uma forma ligada.")
     { Campo = "formas" };
 
     /// <summary>O estorno passa do que ainda pode ser devolvido (RN-306).</summary>

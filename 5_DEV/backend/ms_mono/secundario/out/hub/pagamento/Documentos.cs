@@ -7,7 +7,7 @@ using MongoDB.Bson;
 
 namespace Boaz.MsMono.Secundario.Out.Hub.Pagamento;
 
-// Os documentos do Pagamento como o pagamento-documentos v02 especifica: valores
+// Os documentos do Pagamento como o pagamento-documentos v03 especifica: valores
 // em Decimal128, datas em UTC, dias ("vencimento") como "2026-12-10", status
 // com os textos do contrato e o histórico com o traceId de cada mudança (RNF-244).
 static class Documentos
@@ -101,6 +101,7 @@ static class Documentos
         ["versao"] = versao,
         ["faturaId"] = p.FaturaId,
         ["contaId"] = p.ContaId,
+        ["intermediador"] = p.Intermediador,
         ["forma"] = p.Forma.Texto(),
         ["valor"] = Valor(p.Valor),
         ["valorFatura"] = Valor(p.ValorFatura),
@@ -113,14 +114,19 @@ static class Documentos
         ["idExterno"] = Bson.Valor(p.IdExterno),
         ["pix"] = p.Pix is { } pix ? new BsonDocument { ["copiaECola"] = pix.CopiaECola, ["qrCodeSvg"] = pix.QrCodeSvg } : BsonNull.Value,
         ["boleto"] = p.Boleto is { } b
-            ? new BsonDocument { ["vencimento"] = Dia(b.Vencimento), ["linhaDigitavel"] = b.LinhaDigitavel, ["codigoBarras"] = b.CodigoBarras }
+            ? new BsonDocument
+            {
+                ["vencimento"] = Dia(b.Vencimento),
+                ["linhaDigitavel"] = b.LinhaDigitavel,
+                ["codigoBarras"] = b.CodigoBarras,
+                ["endereco"] = b.Endereco is { } e ? Endereco(e) : BsonNull.Value,
+            }
             : BsonNull.Value,
         ["confirmacaoUrl"] = Bson.Valor(p.ConfirmacaoUrl),
         ["cartao"] = p.Cartao is { } c ? new BsonDocument { ["bandeira"] = c.Bandeira, ["final"] = c.Final } : BsonNull.Value,
         ["motivo"] = Bson.Valor(p.Motivo),
         ["duplicidade"] = p.Duplicidade,
         ["estornado"] = Valor(p.Estornado),
-        ["abertoNaFatura"] = p.EmAberto ? p.FaturaId : BsonNull.Value,
         ["traceId"] = p.TraceId,
         ["traceIdOrigem"] = Bson.Valor(p.TraceIdOrigem),
         ["historico"] = Historico(p.Historico),
@@ -130,7 +136,8 @@ static class Documentos
     {
         var pix = d.Documento("pix") is { } x ? new DadosDoPix(x.Texto("copiaECola") ?? "", x.Texto("qrCodeSvg") ?? "") : null;
         var boleto = d.Documento("boleto") is { } b
-            ? new DadosDoBoleto(b.DiaDe("vencimento") ?? DateOnly.MinValue, b.Texto("linhaDigitavel") ?? "", b.Texto("codigoBarras") ?? "")
+            ? new DadosDoBoleto(b.DiaDe("vencimento") ?? DateOnly.MinValue, b.Texto("linhaDigitavel") ?? "", b.Texto("codigoBarras") ?? "",
+                b.Documento("endereco") is { } e ? EnderecoDe(e) : null)
             : null;
         var cartao = d.Documento("cartao") is { } c ? new CartaoMascarado(c.Texto("bandeira") ?? "", c.Texto("final") ?? "") : null;
         return new Core.Hub.Pagamento.Pagamentos.Domain.Pagamento(d["_id"].AsString, d.Texto("faturaId") ?? "", d.Texto("contaId") ?? "",
@@ -138,8 +145,25 @@ static class Documentos
             TextosDoPagamento.LerStatusDoPagamento(d.Texto("status")), d.Data("criadoEm") ?? DateTimeOffset.MinValue,
             d.Texto("criadoPor") ?? "", d.Data("expiraEm"), d.Data("pagoEm"), d.Texto("idExterno"), pix, boleto, d.Texto("confirmacaoUrl"), cartao,
             d.Texto("motivo"), d.Logico("duplicidade"), d.DinheiroEm("estornado"), d.Texto("traceId") ?? "", d.Texto("traceIdOrigem"), HistoricoDe(d),
-            d.Longo("versao"));
+            d.Longo("versao"))
+        {
+            Intermediador = d.Texto("intermediador") ?? "",
+        };
     }
+
+    // o endereço de quem paga o boleto (RF-188)
+    public static BsonDocument Endereco(EnderecoDoPagador e) => new()
+    {
+        ["cep"] = e.Cep,
+        ["logradouro"] = e.Logradouro,
+        ["numero"] = e.Numero,
+        ["bairro"] = e.Bairro,
+        ["cidade"] = e.Cidade,
+        ["uf"] = e.Uf,
+    };
+
+    public static EnderecoDoPagador EnderecoDe(BsonDocument e) => new(e.Texto("cep") ?? "", e.Texto("logradouro") ?? "", e.Texto("numero") ?? "",
+        e.Texto("bairro") ?? "", e.Texto("cidade") ?? "", e.Texto("uf") ?? "");
 
     // ── estornos ─────────────────────────────────────────────────────────────
     public static BsonDocument Estorno(Estorno e, long versao) => new()
@@ -154,6 +178,7 @@ static class Documentos
         ["pedidoEm"] = Bson.Valor(e.PedidoEm),
         ["pedidoPor"] = e.PedidoPor,
         ["concluidoEm"] = Bson.Valor(e.ConcluidoEm),
+        ["intermediador"] = e.Intermediador,
         ["idExterno"] = Bson.Valor(e.IdExterno),
         ["traceId"] = e.TraceId,
         ["historico"] = Historico(e.Historico),
@@ -162,7 +187,10 @@ static class Documentos
     public static Estorno EstornoDe(BsonDocument d) =>
         new(d["_id"].AsString, d.Texto("pagamentoId") ?? "", d.Texto("faturaId") ?? "", d.DinheiroEm("valor"), d.Texto("motivo") ?? "",
             TextosDoPagamento.LerStatusDoEstorno(d.Texto("status")), d.Data("pedidoEm") ?? DateTimeOffset.MinValue,
-            d.Texto("pedidoPor") ?? "", d.Data("concluidoEm"), d.Texto("idExterno"), d.Texto("traceId") ?? "", HistoricoDe(d), d.Longo("versao"));
+            d.Texto("pedidoPor") ?? "", d.Data("concluidoEm"), d.Texto("idExterno"), d.Texto("traceId") ?? "", HistoricoDe(d), d.Longo("versao"))
+        {
+            Intermediador = d.Texto("intermediador") ?? "",
+        };
 
     // ── configuração ─────────────────────────────────────────────────────────
     public static BsonDocument Configuracao(ConfiguracaoDoPagamento c) => new()

@@ -6,8 +6,8 @@ using static Boaz.Qa.Integracao.Suporte.Mundo;
 namespace Boaz.Qa.Integracao.Hub.Pagamento;
 
 // As faturas, os pagamentos e os estornos dos exemplos de
-// 1_Requisitos/19_modulo-pagamento.md (v04), contrato pagamento-contrato-api
-// v02 e modelo pagamento-documentos v02, criados só quando um passo os cita.
+// 1_Requisitos/19_modulo-pagamento.md (v05), contrato pagamento-contrato-api
+// v03 e modelo pagamento-documentos v03, criados só quando um passo os cita.
 // Os números são gerados pelo backend (contadores): "FAT-000402",
 // "PAG-000773" e "EST-000012" do exemplo viram o número real pelo
 // Mundo.Apelidos, como "SAC-000042" no 18.
@@ -33,9 +33,10 @@ namespace Boaz.Qa.Integracao.Hub.Pagamento;
 //
 //   POST /_teste/pagamento/agendamento                               → 204
 //       roda agora, com o relógio da aplicação, o que o AgendamentoDoPagamento
-//       faz a cada 1 min (no dia 1, IFecharCompetencia da competência
-//       anterior; IVirarVencidas; IExpirarPagamentos; IConsultarPendentes;
-//       IMontarCardDoDia; os avisos de atraso) e só responde ao terminar
+//       faz (no dia 1, o fechamento da competência anterior; virar vencidas;
+//       expirar e consultar pendentes; o card do dia; os avisos de atraso) e
+//       só responde ao terminar. Com Teste__Relogio=sim o agendamento só roda
+//       por aqui (contrato v03, grupo TESTE)
 //
 // O tempo (vencimento, juros, validade do PIX, do débito e do boleto,
 // tolerância do aviso) anda pelo relógio de teste; a cada salto as pessoas
@@ -58,15 +59,13 @@ public sealed partial class FaturasDoExemplo
     // o corpo do 201 e o X-Trace-Id da execução que criou cada pagamento
     readonly Dictionary<string, JsonObject> criados = [];
     readonly Dictionary<string, string?> execucoes = [];
-    Pessoa? rita, bia;
+    Pessoa? bia;
     bool ritaComPagamento, outubro, outubroInteiro;
     DateTimeOffset? relogioEm, relogioReal;
 
     public FaturasDoExemplo(Mundo mundo, Api api, Relogio relogio, BancoFalso banco)
     {
         (this.mundo, this.api, this.relogio, this.banco) = (mundo, api, relogio, banco);
-        mundo.Apelidos["conta-pedro-reis"] = mundo.ContaDoPedro;
-        mundo.Apelidos["usr-ebfga-rita"] = async () => (await RitaSemPagamento()).Id;
         mundo.Apelidos["usr-ebfga-bia"] = async () => (await Bia()).Id;
         // o número que o pedido do cenário acabou de gerar: "PAG-000772" e
         // "EST-000012" do JSON do exemplo viram o id do 201, se um Dado ainda
@@ -82,7 +81,7 @@ public sealed partial class FaturasDoExemplo
 
     // ── pessoas ────────────────────────────────────────────────────────────
     // a Rita Gomes, do setor financeiro: staff da EBFGA, ainda sem o Pagamento (RN-299)
-    public async Task<Pessoa> RitaSemPagamento() => rita ??= await mundo.NovoStaff("rita", "Rita Gomes", await mundo.Master());
+    public Task<Pessoa> RitaSemPagamento() => mundo.Rita();
 
     // a conta master delega o Pagamento à Rita: "MOD-01" com "U" (RN-299)
     public async Task<Pessoa> Rita()
@@ -301,11 +300,29 @@ public sealed partial class FaturasDoExemplo
         await Preparo(mundo.Admin(), "POST", $"/pagamento/recebimentos/faturas/{fatura}/cancelar", new JsonObject { ["motivo"] = motivo }, 200);
 
     // ── pagamentos ─────────────────────────────────────────────────────────
+    // o cartão vai como o intermediador o entrega à tela: token, "metodo" e,
+    // no crédito, "emissor" (RF-186, RF-187); o boleto leva o endereço do
+    // pagador (RF-188), o da Rua Sete dos exemplos
     public static JsonObject Corpo(string forma) => forma switch
     {
-        "CARTAO_CREDITO" => new() { ["forma"] = forma, ["cartao"] = new JsonObject { ["token"] = TokenDeCredito } },
-        "CARTAO_DEBITO" => new() { ["forma"] = forma, ["cartao"] = new JsonObject { ["token"] = TokenDeDebito } },
+        "CARTAO_CREDITO" => new()
+        {
+            ["forma"] = forma,
+            ["cartao"] = new JsonObject { ["token"] = TokenDeCredito, ["metodo"] = "visa", ["emissor"] = "25" },
+        },
+        "CARTAO_DEBITO" => new() { ["forma"] = forma, ["cartao"] = new JsonObject { ["token"] = TokenDeDebito, ["metodo"] = "debmaster" } },
+        "BOLETO" => new() { ["forma"] = forma, ["endereco"] = EnderecoDaRuaSete() },
         _ => new() { ["forma"] = forma },
+    };
+
+    public static JsonObject EnderecoDaRuaSete() => new()
+    {
+        ["cep"] = "96015-000",
+        ["logradouro"] = "Rua Sete de Setembro",
+        ["numero"] = "1020",
+        ["bairro"] = "Centro",
+        ["cidade"] = "Pelotas",
+        ["uf"] = "RS",
     };
 
     // o pagamento da fatura (número real) na forma pedida; o status que o preparo espera
@@ -402,6 +419,15 @@ public sealed partial class FaturasDoExemplo
 
     public async Task<JsonObject> Fatura(string id, Pessoa? quem = null) =>
         Exigir(await Ler(quem ?? Pagador(id), $"/pagamento/faturas/{id}"), 200, $"GET /pagamento/faturas/{id}").Corpo!.AsObject();
+
+    // o mesmo pagamento visto pelo recebedor, com os estornos (RF-192)
+    public async Task<JsonObject> PagamentoDoRecebedor(string id) =>
+        Exigir(await Ler(mundo.Admin(), $"/pagamento/recebimentos/pagamentos/{id}"), 200,
+            $"GET /pagamento/recebimentos/pagamentos/{id}").Corpo!.AsObject();
+
+    public async Task<JsonObject> FaturaDoRecebedor(string id) =>
+        Exigir(await Ler(mundo.Admin(), $"/pagamento/recebimentos/faturas/{id}"), 200,
+            $"GET /pagamento/recebimentos/faturas/{id}").Corpo!.AsObject();
 
     public async Task<JsonObject> Pagamento(string id, Pessoa? quem = null) =>
         Exigir(await Ler(quem ?? Pagador(id), $"/pagamento/pagamentos/{id}"), 200, $"GET /pagamento/pagamentos/{id}").Corpo!.AsObject();

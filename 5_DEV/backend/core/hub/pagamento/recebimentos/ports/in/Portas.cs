@@ -1,5 +1,6 @@
 using Boaz.Core.Commons.Auditoria.Domain;
 using Boaz.Core.Hub.Pagamento.Faturas.Dtos;
+using Boaz.Core.Hub.Pagamento.Pagamentos.Dtos;
 using Boaz.Core.Hub.Pagamento.Recebimentos.Dtos;
 
 namespace Boaz.Core.Hub.Pagamento.Recebimentos.Ports.In;
@@ -20,6 +21,20 @@ public interface IListarFaturasDoRecebedor
     /// <summary>As faturas do filtro, do vencimento mais antigo e, no mesmo vencimento, do menor número.</summary>
     Task<FaturasDoRecebedorDto> Executar(string? competencia, string? situacao, string? busca, int? pagina, QuemPede quem,
         CancellationToken ct = default);
+}
+
+/// <summary>GET /pagamento/recebimentos/faturas/{id} (RF-191-api): a fatura de qualquer conta, só para o ADMINISTRADOR.</summary>
+public interface ILerFaturaDoRecebedor
+{
+    /// <summary>O mesmo corpo do GET da conta: itens, juros de hoje e tentativas.</summary>
+    Task<FaturaDto> Executar(string id, QuemPede quem, CancellationToken ct = default);
+}
+
+/// <summary>GET /pagamento/recebimentos/pagamentos/{id} (RF-192-api): o pagamento de qualquer conta com os estornos, só para o ADMINISTRADOR.</summary>
+public interface ILerPagamentoDoRecebedor
+{
+    /// <summary>O pagamento, a conta, quem pagou, o saldo e os estornos.</summary>
+    Task<PagamentoDoRecebedorDto> Executar(string id, QuemPede quem, CancellationToken ct = default);
 }
 
 /// <summary>POST /pagamento/recebimentos/faturas/{id}/cancelar (RF-191).</summary>

@@ -548,6 +548,7 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
 
     // ── card (RN-295) ──────────────────────────────────────────────────────
     [Then(@"^traz também a expandida e as series de dia, semana e mes, (\d+) números cada$")]
+    [Then(@"^traz também a expandida e as séries ""dia"", ""semana"" e ""mes"", (\d+) números cada$")]
     public void ExpandidaESeries(int pontos)
     {
         var corpo = mundo.Ultima.Corpo!;
@@ -633,7 +634,7 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
         var fluxo = conversa ?? throw new InvalidOperationException("nenhuma conversa ao vivo aberta");
         var desde = fluxo.Eventos.Count;
         mensagemDoCaio = await sac.Mensagem(sac.Real("SAC-000042"), await sac.Caio(), "Pode tentar de novo agora?");
-        var enviada = DateTimeOffset.UtcNow;
+        var enviada = Cronometro.Agora;
         var evento = await fluxo.Esperar(e => e.Tipo == "mensagem", TimeSpan.FromSeconds(segundos) + Folga, desde);
         Assert.True(evento is not null && evento.Quando - enviada <= TimeSpan.FromSeconds(segundos) + Folga,
             $"o evento \"mensagem\" devia chegar em até {segundos} s: {fluxo}");

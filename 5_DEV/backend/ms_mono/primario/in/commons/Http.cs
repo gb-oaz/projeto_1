@@ -187,6 +187,7 @@ public static class Http
         GrupoDaFalhaDoPagamento.NaoEncontrado => StatusCodes.Status404NotFound,
         GrupoDaFalhaDoPagamento.Conflito => StatusCodes.Status409Conflict,
         GrupoDaFalhaDoPagamento.VersaoDesatualizada => StatusCodes.Status412PreconditionFailed,
+        GrupoDaFalhaDoPagamento.VersaoAusente => StatusCodes.Status428PreconditionRequired,
         GrupoDaFalhaDoPagamento.DadosInvalidos => StatusCodes.Status422UnprocessableEntity,
         _ => StatusCodes.Status503ServiceUnavailable,
     };

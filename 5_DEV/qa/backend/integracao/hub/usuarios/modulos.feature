@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/15_modulos.md (v30), copiados do requisito:
+# Cenários de API de 1_Requisitos/15_modulos.md (v32), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Módulos · card do Usuários
   1_Requisitos/15_modulos.md · Cenários de API

@@ -54,7 +54,7 @@ static class PagamentoHttp
 }
 
 /// <summary>
-/// O lado de quem paga (19_modulo-pagamento, pagamento-contrato-api v02), com
+/// O lado de quem paga (19_modulo-pagamento, pagamento-contrato-api v03), com
 /// MOD-01 · U: as faturas da conta, o detalhe, o novo pagamento, os avisos de
 /// atraso e as formas aceitas. O administrador do deboaz recebe 403 (RN-298),
 /// e o participante também: o token do quest é conferido na frente dele e
@@ -123,14 +123,16 @@ public sealed class FaturasController : ControllerBase
     /// <remarks>
     /// Cria o pagamento na forma escolhida (RF-184 a RF-188, RN-303, RNF-239): PIX (AGUARDANDO, com o copia e cola e o
     /// QR em SVG), cartão de crédito (PAGO na hora, RECUSADO ou PROCESSANDO), cartão de débito (AGUARDANDO, com a
-    /// confirmacaoUrl do banco) ou boleto (AGUARDANDO, com a linha digitável e o PDF). O cartão vai só como o token
-    /// gerado pela tela no intermediador; número, CVV ou validade no corpo são recusados. Um pagamento em aberto por
+    /// confirmacaoUrl do banco) ou boleto (AGUARDANDO, com a linha digitável e o PDF, em nome e CPF/CNPJ da conta, com o
+    /// endereço de quem paga no corpo). O cartão vai só como o token gerado pela tela com a chave pública de GET
+    /// /pagamento/formas, com o método (bandeira) e o emissor; número, CVV ou validade no corpo são recusados. O e-mail
+    /// de quem paga, para o banco, é o login da conta master ou do autônomo. Um pagamento em aberto por
     /// fatura: para trocar de forma, cancele o que espera. Sem resposta do banco em 15 s, 503 e nada foi cobrado
     /// (RNF-241); o traceId do corpo do erro, mandado no X-Trace-Id da nova tentativa, vira o traceIdOrigem.
     /// Auditado como PAGAMENTO_CRIADO (RN-309).
     /// </remarks>
     /// <param name="id">O número da fatura, como FAT-000402.</param>
-    /// <param name="corpo">A forma e, no cartão, o token.</param>
+    /// <param name="corpo">A forma; no cartão, o token, o método e o emissor; no boleto, o endereço.</param>
     /// <param name="criar">Caso de uso CriarPagamento.</param>
     /// <param name="ct">Cancelamento do pedido.</param>
     /// <response code="201">O pagamento criado, com o Location dele.</response>
@@ -138,10 +140,11 @@ public sealed class FaturasController : ControllerBase
     /// <response code="403">ACESSO_NEGADO: sem MOD-01 · U, o administrador do deboaz, o time ou o participante (RN-298).</response>
     /// <response code="404">FATURA_INEXISTENTE, inclusive a de outra conta.</response>
     /// <response code="409">FATURA_PAGA, FATURA_CANCELADA ou PAGAMENTO_EM_ABERTO.</response>
-    /// <response code="422">DADOS_INVALIDOS em "forma", "cartao" ou "cartao.token", ou FORMA_INDISPONIVEL.</response>
+    /// <response code="422">DADOS_INVALIDOS em "forma", "cartao", "cartao.token", "cartao.metodo", "endereco" ou "endereco.*", ou FORMA_INDISPONIVEL.</response>
     /// <response code="503">BANCO_INDISPONIVEL: o banco não respondeu em 15 s; nada foi cobrado.</response>
     [HttpPost("faturas/{id}/pagamentos", Name = "criarPagamento")]
-    [ComAcessoAuditado(PagamentoHttp.Modulo, U, AcaoAuditada.PagamentoCriado, Alvo = AlvoAuditado.IdDaRota)]
+    [ComAcessoAuditado(PagamentoHttp.Modulo, U, AcaoAuditada.PagamentoCriado, Alvo = AlvoAuditado.IdDaRota, FrenteDoToken = true,
+        SemSessaoValida = true)]
     [ProducesResponseType<PagamentoDto>(StatusCodes.Status201Created)]
     [ProducesResponseType<Erro>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<Erro>(StatusCodes.Status403Forbidden)]
@@ -176,7 +179,11 @@ public sealed class FaturasController : ControllerBase
         Ok(await ler.Executar(HttpContext.QuemPedeAoPagamento(), ct));
 
     /// <summary>Ler as formas de pagamento ligadas</summary>
-    /// <remarks>As formas ligadas agora na configuração, na ordem da tela de pagar (RF-184, RF-193).</remarks>
+    /// <remarks>
+    /// As formas ligadas agora na configuração, na ordem da tela de pagar (RF-184, RF-193); o intermediador ligado e a
+    /// chave pública dele, com que a tela gera o token do cartão (RF-186, RF-187); e o último endereço usado num boleto
+    /// da conta, para a tela preencher (RF-188), ou null.
+    /// </remarks>
     /// <param name="ler">Caso de uso LerFormas.</param>
     /// <param name="ct">Cancelamento do pedido.</param>
     /// <response code="200">As formas ligadas.</response>
@@ -213,6 +220,7 @@ public sealed class PagamentosController : ControllerBase
     /// <remarks>
     /// O estado atual (RN-302, RN-303, RF-187): AGUARDANDO, PROCESSANDO, PAGO, RECUSADO, EXPIRADO, CANCELADO,
     /// ESTORNO_PENDENTE, ESTORNADO_PARCIAL ou ESTORNADO. "duplicidade": true quando pagou uma fatura que já estava paga.
+    /// "estornos": os estornos pedidos pelo deboaz, do mais novo ao mais antigo (RF-192).
     /// </remarks>
     /// <param name="id">O número do pagamento, como PAG-000773.</param>
     /// <param name="ler">Caso de uso LerPagamento.</param>
@@ -244,7 +252,8 @@ public sealed class PagamentosController : ControllerBase
     /// <response code="404">PAGAMENTO_INEXISTENTE, inclusive o de outra conta.</response>
     /// <response code="409">PAGAMENTO_CONFIRMADO: o banco já confirmou.</response>
     [HttpPost("{id}/cancelar", Name = "cancelarPagamento")]
-    [ComAcessoAuditado(PagamentoHttp.Modulo, U, AcaoAuditada.PagamentoCancelado, Alvo = AlvoAuditado.IdDaRota)]
+    [ComAcessoAuditado(PagamentoHttp.Modulo, U, AcaoAuditada.PagamentoCancelado, Alvo = AlvoAuditado.IdDaRota, FrenteDoToken = true,
+        SemSessaoValida = true)]
     [ProducesResponseType<PagamentoDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<Erro>(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType<Erro>(StatusCodes.Status403Forbidden)]
@@ -375,8 +384,9 @@ public sealed class NotificacoesController : ControllerBase
     /// O webhook do intermediador (RN-305, RN-303, RF-187, RF-192). Sem token: vale a assinatura, e quem paga nunca
     /// confirma o próprio pagamento. Mercado Pago (produção): x-signature "ts=…,v1=…", com v1 = HMAC-SHA256 em hex de
     /// "id:&lt;data.id&gt;;request-id:&lt;x-request-id&gt;;ts:&lt;ts&gt;;" com o segredo do webhook; o corpo só diz qual
-    /// pagamento mudou, e a situação é lida na API do banco. Intermediador falso (máquina e qa): x-assinatura
-    /// "sha256=&lt;HMAC-SHA256 do corpo em hex&gt;". Idempotente pelo id do aviso: repetido ou de pagamento desconhecido
+    /// pagamento mudou, e a situação é lida na API do banco. Intermediador falso (só fora de produção): x-assinatura
+    /// "sha256=&lt;HMAC-SHA256 do corpo em hex&gt;". O cabeçalho diz de qual intermediador é o aviso (RNF-242); sem
+    /// nenhum dos dois, 401. O pagamento é achado pelo id externo e pelo intermediador que o gerou. Idempotente pelo id do aviso: repetido ou de pagamento desconhecido
     /// responde 200 sem efeito. O traceId da criação, nos metadados do banco, vira o traceIdOrigem; a execução ganha um
     /// novo. Auditado como AVISO_DO_BANCO (RN-309).
     /// </remarks>

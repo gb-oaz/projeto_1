@@ -182,6 +182,9 @@ public sealed class TesteController(RelogioDaAplicacao relogio) : ControllerBase
                 valor = p.Valor,
                 traceId = p.TraceId,
                 metadados = new { pagamento = p.Pagamento, estorno = p.Estorno, traceId = p.TraceId },
+                cartao = p.Cartao is { } c ? new { token = c.Token, metodo = c.Metodo, emissor = c.Emissor } : null,
+                pagador = p.Pagador is { } quem ? new { nome = quem.Nome, documento = quem.Documento, email = quem.Email } : null,
+                endereco = p.Endereco,
             }),
         })
         : NotFound();

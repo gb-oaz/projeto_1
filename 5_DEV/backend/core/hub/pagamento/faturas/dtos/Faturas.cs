@@ -19,6 +19,16 @@ public sealed record QuemPede(string UsuarioId, string Papel, string ContaId, bo
     /// <summary>O administrador do deboaz.</summary>
     public bool Recebedor => Papel == Administrador;
 
+    /// <summary>
+    /// Só quem paga: o token com MOD-01 · U e não o administrador, cujo MOD-01 só
+    /// abre o card (RN-298, formato-comum).
+    /// </summary>
+    /// <exception cref="FalhaDoPagamento">ACESSO_NEGADO.</exception>
+    public void SoQuemPaga()
+    {
+        if (Recebedor || !UsaPagamento) throw FalhaDoPagamento.AcessoNegado();
+    }
+
     /// <summary>Só o administrador do deboaz (RF-190 a RF-193).</summary>
     /// <exception cref="FalhaDoPagamento">ACESSO_NEGADO.</exception>
     public void SoRecebedor()

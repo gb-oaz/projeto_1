@@ -7,6 +7,7 @@ using Boaz.Core.Hub.Pagamento.Faturas.Dtos;
 using Boaz.Core.Hub.Pagamento.Faturas.Ports.Out;
 using Boaz.Core.Hub.Pagamento.Faturas.UseCases;
 using Boaz.Core.Hub.Pagamento.Pagamentos.Domain;
+using Boaz.Core.Hub.Pagamento.Pagamentos.Dtos;
 using Boaz.Core.Hub.Pagamento.Pagamentos.Ports.Out;
 using Boaz.Core.Hub.Pagamento.Pagamentos.UseCases;
 using Boaz.Core.Hub.Pagamento.Recebimentos.Dtos;
@@ -19,7 +20,8 @@ using Pagamento = Boaz.Core.Hub.Pagamento.Pagamentos.Domain.Pagamento;
 
 /// <summary>
 /// GET /pagamento/recebimentos/resumo e …/competencias (RF-190, RN-308), só do
-/// ADMINISTRADOR (RN-298). Os números saem das faturas da competência:
+/// ADMINISTRADOR (RN-298). Os números saem das somas das faturas da
+/// competência, feitas no banco, sem trazer fatura por fatura (RNF-245):
 /// faturado sem as canceladas; recebido = o pago com juros menos o estornado;
 /// a receber = "A_PAGAR"; vencido = "VENCIDA", sem os juros; inadimplência =
 /// vencido ÷ faturado, em %, com uma casa.
@@ -37,29 +39,26 @@ public sealed class LerRecebimentos(IFaturas faturas, IPagamentos pagamentos, Ti
     {
         quem.SoRecebedor();
         var mes = Ler(competencia, "competencia");
-        var daCompetencia = await faturas.Listar(new FiltroDeFaturas(null, [], mes), ct);
-        var numeros = Separadas.De(daCompetencia);
-
-        var tentativas = await pagamentos.DasFaturas(daCompetencia.Select(f => f.Id), ct);
-        var pagaram = tentativas.ToDictionary(p => p.Id);
+        var numeros = new Somadas(await faturas.Somas([mes], ct));
         var porForma = TextosDoPagamento.Formas.Select(forma =>
         {
-            var pagas = numeros.Pagas.Where(f => f.PagaPor is { } id && pagaram.TryGetValue(id, out var p) && p.Forma == forma).ToList();
-            return new PorFormaDto(forma.Texto(), Separadas.Recebido(pagas).Reais, pagas.Count);
+            var pagas = numeros.Com(StatusDaFatura.Paga).Where(s => s.FormaPaga == forma).ToList();
+            return new PorFormaDto(forma.Texto(), Somadas.Recebido(pagas).Reais, Somadas.Quantas(pagas));
         }).ToList();
         var porTipo = Tipos.Select(tipo =>
         {
-            var doTipo = Separadas.De(daCompetencia.Where(f => f.Conta.Tipo == tipo).ToList());
-            return new PorTipoDeContaDto(tipo, Separadas.Recebido(doTipo.Pagas).Reais, doTipo.Pagas.Count, Separadas.Valor(doTipo.Vencidas).Reais,
-                doTipo.Vencidas.Count);
+            var pagas = numeros.Com(StatusDaFatura.Paga).Where(s => s.TipoDaConta == tipo).ToList();
+            var vencidas = numeros.Com(StatusDaFatura.Vencida).Where(s => s.TipoDaConta == tipo).ToList();
+            return new PorTipoDeContaDto(tipo, Somadas.Recebido(pagas).Reais, Somadas.Quantas(pagas), Somadas.Valor(vencidas).Reais,
+                Somadas.Quantas(vencidas));
         }).ToList();
 
         return new ResumoDosRecebimentosDto(mes.ToString(),
-            new NumeroDto(Separadas.Valor(numeros.Faturadas).Reais, numeros.Faturadas.Count),
-            new NumeroDto(Separadas.Recebido(numeros.Pagas).Reais, numeros.Pagas.Count),
-            new NumeroDto(Separadas.Valor(numeros.APagar).Reais, numeros.APagar.Count),
-            new NumeroDto(Separadas.Valor(numeros.Vencidas).Reais, numeros.Vencidas.Count),
-            numeros.Inadimplencia, tentativas.Count(p => p.Duplicidade && p.Confirmado), porForma, porTipo);
+            numeros.Numero(numeros.Faturadas),
+            new NumeroDto(Somadas.Recebido(numeros.Com(StatusDaFatura.Paga)).Reais, Somadas.Quantas(numeros.Com(StatusDaFatura.Paga))),
+            numeros.Numero(numeros.Com(StatusDaFatura.APagar)),
+            numeros.Numero(numeros.Com(StatusDaFatura.Vencida)),
+            numeros.Inadimplencia, await pagamentos.Duplicidades(mes, ct), porForma, porTipo);
     }
 
     /// <inheritdoc />
@@ -67,44 +66,94 @@ public sealed class LerRecebimentos(IFaturas faturas, IPagamentos pagamentos, Ti
     {
         quem.SoRecebedor();
         var mes = Ler(ate, "ate");
-        var lista = new List<CompetenciaDto>(Meses);
-        for (var i = 0; i < Meses; i++, mes = mes.Anterior)
+        var meses = new List<Competencia>(Meses);
+        for (var i = 0; i < Meses; i++, mes = mes.Anterior) meses.Add(mes);
+        var somas = await faturas.Somas(meses, ct);
+        return [.. meses.Select(m =>
         {
-            var numeros = Separadas.De(await faturas.Listar(new FiltroDeFaturas(null, [], mes), ct));
-            lista.Add(new CompetenciaDto(mes.ToString(), Separadas.Valor(numeros.Faturadas).Reais, Separadas.Recebido(numeros.Pagas).Reais,
-                Separadas.Valor(numeros.Vencidas).Reais, numeros.Inadimplencia));
-        }
-        return lista;
+            var numeros = new Somadas([.. somas.Where(s => s.Competencia == m)]);
+            return new CompetenciaDto(m.ToString(), Somadas.Valor(numeros.Faturadas).Reais, Somadas.Recebido(numeros.Com(StatusDaFatura.Paga)).Reais,
+                Somadas.Valor(numeros.Com(StatusDaFatura.Vencida)).Reais, numeros.Inadimplencia);
+        })];
     }
 
     // a competência pedida; sem ela, a anterior à de hoje (a última fechada, RN-300)
     Competencia Ler(string? texto, string campo) =>
         texto is null ? Competencia.Do(Calendario.Dia(relogio.GetUtcNow())).Anterior
             : Competencia.Ler(texto) ?? throw FalhaDoPagamento.DadosInvalidos(campo);
+}
 
-    /// <summary>As faturas de uma competência separadas pelo status (RN-308).</summary>
-    sealed record Separadas(List<Fatura> Faturadas, List<Fatura> APagar, List<Fatura> Vencidas, List<Fatura> Pagas)
+/// <summary>As somas de uma competência separadas pelo status (RN-308), também para o card do deboaz (RN-307).</summary>
+public sealed class Somadas(IReadOnlyList<SomaDeFaturas> somas)
+{
+    /// <summary>As de um status.</summary>
+    public IReadOnlyList<SomaDeFaturas> Com(StatusDaFatura status) => [.. somas.Where(s => s.Status == status)];
+
+    /// <summary>As faturadas: todas menos as canceladas.</summary>
+    public IReadOnlyList<SomaDeFaturas> Faturadas => [.. somas.Where(s => s.Status != StatusDaFatura.Cancelada)];
+
+    /// <summary>A soma do valor das faturas.</summary>
+    public static Dinheiro Valor(IEnumerable<SomaDeFaturas> somas) => Dinheiro.Somar(somas.Select(s => s.Valor));
+
+    /// <summary>O pago com juros, menos o já estornado (RN-308).</summary>
+    public static Dinheiro Recebido(IEnumerable<SomaDeFaturas> somas) => Dinheiro.Somar(somas.Select(s => s.Recebido));
+
+    /// <summary>Quantas faturas.</summary>
+    public static int Quantas(IEnumerable<SomaDeFaturas> somas) => somas.Sum(s => s.Quantas);
+
+    /// <summary>O valor e quantas.</summary>
+    public NumeroDto Numero(IEnumerable<SomaDeFaturas> somas)
     {
-        public static Separadas De(IReadOnlyList<Fatura> faturas) => new(
-            [.. faturas.Where(f => f.Status != StatusDaFatura.Cancelada)],
-            [.. faturas.Where(f => f.Status == StatusDaFatura.APagar)],
-            [.. faturas.Where(f => f.Status == StatusDaFatura.Vencida)],
-            [.. faturas.Where(f => f.Status == StatusDaFatura.Paga)]);
+        var lista = somas.ToList();
+        return new NumeroDto(Valor(lista).Reais, Quantas(lista));
+    }
 
-        public static Dinheiro Valor(IEnumerable<Fatura> faturas) => Dinheiro.Somar(faturas.Select(f => f.Valor));
-
-        // o pago com juros, menos o já estornado (RN-308)
-        public static Dinheiro Recebido(IEnumerable<Fatura> faturas) => Dinheiro.Somar(faturas.Select(f => f.ValorPago - f.Devolvido));
-
-        public decimal Inadimplencia
+    /// <summary>Vencido ÷ faturado, em %, com uma casa.</summary>
+    public decimal Inadimplencia
+    {
+        get
         {
-            get
-            {
-                var faturado = Valor(Faturadas);
-                return faturado.Centavos == 0 ? 0m
-                    : Math.Round((decimal)Valor(Vencidas).Centavos * 100m / faturado.Centavos, 1, MidpointRounding.AwayFromZero);
-            }
+            var faturado = Valor(Faturadas);
+            return faturado.Centavos == 0 ? 0m
+                : Math.Round((decimal)Valor(Com(StatusDaFatura.Vencida)).Centavos * 100m / faturado.Centavos, 1, MidpointRounding.AwayFromZero);
         }
+    }
+}
+
+/// <summary>
+/// GET /pagamento/recebimentos/faturas/{id} (RF-191-api): a fatura de qualquer
+/// conta, com o mesmo corpo do GET da conta, só para o ADMINISTRADOR (RN-298).
+/// </summary>
+public sealed class LerFaturaDoRecebedor(IFaturas faturas, IPagamentos pagamentos, ICadastroDoPagamento cadastro,
+    IConfiguracoesDoPagamento configuracoes, TimeProvider relogio) : ILerFaturaDoRecebedor
+{
+    /// <inheritdoc />
+    public async Task<FaturaDto> Executar(string id, QuemPede quem, CancellationToken ct = default)
+    {
+        quem.SoRecebedor();
+        var fatura = await faturas.Obter(id, ct) ?? throw FalhaDoPagamento.FaturaInexistente();
+        return await LerFatura.Detalhe(fatura, pagamentos, cadastro, new TaxaDoVencimento(configuracoes), Calendario.Dia(relogio.GetUtcNow()), ct);
+    }
+}
+
+/// <summary>
+/// GET /pagamento/recebimentos/pagamentos/{id} (RF-192-api): o pagamento de
+/// qualquer conta, com a conta, quem pagou, o estornado, o saldo e os
+/// estornos, só para o ADMINISTRADOR (RN-298).
+/// </summary>
+public sealed class LerPagamentoDoRecebedor(IPagamentos pagamentos, IEstornos estornos, IFaturas faturas, ICadastroDoPagamento cadastro)
+    : ILerPagamentoDoRecebedor
+{
+    /// <inheritdoc />
+    public async Task<PagamentoDoRecebedorDto> Executar(string id, QuemPede quem, CancellationToken ct = default)
+    {
+        quem.SoRecebedor();
+        var pagamento = await pagamentos.Obter(id, ct) ?? throw FalhaDoPagamento.PagamentoInexistente();
+        var conta = (await faturas.Obter(pagamento.FaturaId, ct))?.Conta ?? await cadastro.Conta(pagamento.ContaId, ct);
+        var nomes = await cadastro.Nomes([pagamento.CriadoPor], ct);
+        return PagamentoDoRecebedorDto.De(pagamento,
+            new ContaDoPagamentoDto(pagamento.ContaId, conta?.Sigla ?? "", conta?.Nome ?? ""),
+            nomes.GetValueOrDefault(pagamento.CriadoPor), await estornos.DoPagamento(pagamento.Id, ct));
     }
 }
 
@@ -152,7 +201,7 @@ public sealed class ListarFaturasDoRecebedor(IFaturas faturas, TimeProvider relo
 /// </summary>
 public sealed class CancelarFatura(
     IFaturas faturas, IPagamentos pagamentos, ICadastroDoPagamento cadastro, IAvisosDeAtraso avisos, IConfiguracoesDoPagamento configuracoes,
-    ICanalDoPagamento canal, IIntermediador intermediador, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio) : ICancelarFatura
+    ICanalDoPagamento canal, IIntermediadores intermediadores, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio) : ICancelarFatura
 {
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
 
@@ -171,7 +220,7 @@ public sealed class CancelarFatura(
             {
                 if (!pagamento.Cancelar(agora, traceId.Valor, quem.UsuarioId) || !await pagamentos.Salvar(pagamento, ct)) continue;
                 await faturas.Liberar(fatura.Id, pagamento.Id, ct);
-                if (pagamento.IdExterno is { } externo) await intermediador.Cancelar(externo, ct);
+                if (pagamento.IdExterno is { } externo) await intermediadores.Do(pagamento.Intermediador).Cancelar(externo, ct);
                 await canal.Publicar(pagamento.Id, ct);
             }
             await avisos.Encerrar(fatura.Id, agora, ct);
@@ -190,7 +239,7 @@ public sealed class CancelarFatura(
 /// </summary>
 public sealed class PedirEstorno(
     IPagamentos pagamentos, IEstornos estornos, IFaturas faturas, INumeracaoDoPagamento numeracao, ICanalDoPagamento canal,
-    IIntermediador intermediador, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio) : IPedirEstorno
+    IIntermediadores intermediadores, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio) : IPedirEstorno
 {
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
 
@@ -237,7 +286,7 @@ public sealed class PedirEstorno(
     {
         try
         {
-            return await intermediador.Estornar(
+            return await intermediadores.Do(pagamento.Intermediador).Estornar(
                 new PedidoDeEstorno(estorno.Id, pagamento.Id, pagamento.IdExterno ?? string.Empty, estorno.Valor, estorno.TraceId), ct);
         }
         catch (Exception falha) when (falha is not OperationCanceledException)

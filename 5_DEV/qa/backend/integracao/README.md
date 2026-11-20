@@ -74,18 +74,22 @@ integracao/
 │   ├── CardGuardado.cs             leitura e histórico do card em "cardUsuarios" (17 RN-280, 15 RN-278)
 │   ├── AoVivo.cs                   conexão SSE de GET /<modulo>/card/ao-vivo: eventos "card", "encerrado" e ": ping"
 │   ├── ArquivosGuardados.cs        onde está o arquivo de um anexo do SAC: Blob ou GridFS (18 RNF-233, RNF-234)
+│   ├── Cronometro.cs               relógio monotônico (Stopwatch) para prazos e esperas; o de parede pode saltar
+│   ├── PdfLido.cs                  texto e traços de um PDF da API, sem biblioteca (19 RF-188)
 │   └── Ganchos.cs                  antes de cada cenário: limpa tudo
 ├── commons/autenticacao/           17_modulo-usuario-a-autenticacao.md
 │   ├── autenticacao.feature
 │   └── AutenticacaoPassos.cs
 ├── commons/autorizacao/            17_modulo-usuario-b-autorizacao.md
 │   ├── autorizacao.feature
-│   └── AutorizacaoPassos.cs
+│   ├── AutorizacaoPassos.cs
+│   └── PagamentoNaAutorizacaoPassos.cs  o "MOD-01": só a conta master concede, só "U", e o token de cada papel (RF-160, RF-161, RN-233)
 └── hub/usuarios/                   17_modulo-usuario.md (contas, staff, participantes, time)
     ├── usuarios.feature
     ├── UsuariosPassos.cs
     ├── ContasIniciaisPassos.cs     contas iniciais (RN-179, RN-190, RN-265 a RN-268, RNF-225, RNF-226)
     ├── AuditoriaPassos.cs          auditoria do que muda estado, erros e alertas, traceId (RN-178, RN-270, RN-271)
+    ├── EstadoDaContaPassos.cs      a própria conta se desativa e a fatura em aberto (RF-113, com as faturas do 19)
     ├── IndicesPassos.cs            coleções e índices prontos na partida e GET /health (RNF-227, RNF-227-api)
     ├── modulos.feature             15_modulos.md: card comum, pela instância do Usuários (RN-276, RN-278, RN-279)
     ├── contrato.feature            respostas do contrato usuarios v15 sem cenário no requisito (propostas ao deboaz-arc)
@@ -105,7 +109,10 @@ integracao/
     ├── pagamento.feature
     ├── PagamentoPassos.cs          os Dados e "<quem> envia <MÉTODO> /pagamento/…": o pagador (RF-182 a RF-189, RN-298 a RN-313)
     ├── RecebimentosPassos.cs       o recebedor: recebimentos, faturas de todas as contas, estorno, configuração e card ao vivo
-    ├── BancoPassos.cs              aviso do banco, pagamento ao vivo, auditoria e X-Trace-Id (RN-305, RN-309, RNF-238, RNF-242 a RNF-244)
+    ├── BancoPassos.cs              aviso do banco, pagamento ao vivo, auditoria e X-Trace-Id (RN-305, RN-309, RNF-238, RNF-243, RNF-244)
+    ├── IntermediadorPassos.cs      formas, QR Code e PDF do boleto, "avisosDoBanco", intermediador de cada ambiente (RF-184, RF-185, RF-188, RN-305, RNF-242, RNF-245)
+    ├── MensagensPassos.cs          a "mensagem" de cada código de erro e o "MOD-01" do administrador (formato comum)
+    ├── CardDoPagamentoPassos.cs    a versão e as séries do card (RN-307)
     ├── FaturasDoExemplo.cs         faturas, pagamentos e estornos dos exemplos; relógio e agendamento do Pagamento
     └── BancoFalso.cs               o intermediador falso: ganchos /_teste/pagamento/banco e o aviso assinado
 ```
@@ -270,8 +277,12 @@ aplicação sobem uma instância nova com o `API_COMANDO`, numa porta livre
 próprio cenário (entradas do requisito e senhas geradas na hora, RNF-202). Lê
 só o HTTP, o código de saída e o log. As `USUARIO_*` e `MercadoPago__*` da
 suíte não passam para ela; em `prd`, o Key Vault sempre tem
-`MercadoPago__AccessToken` e `MercadoPago__SegredoDoWebhook` com valores de
-teste, sem os quais o backend não sobe (19 RNF-242).
+`MercadoPago__AccessToken`, `MercadoPago__PublicKey` e
+`MercadoPago__SegredoDoWebhook` com valores de teste
+(`Partida.ChavesDoMercadoPago`), sem os quais o backend não sobe (19
+RNF-242). Os cenários da RNF-242 sobem também uma de `hml` sem o relógio de
+teste, com e sem esses segredos, e só leem `GET /pagamento/formas` ou mandam
+um aviso a ela: nenhum chama o Mercado Pago.
 
 ## 6. Regras
 
@@ -303,6 +314,13 @@ teste, sem os quais o backend não sobe (19 RNF-242).
   expiraEm, antes de o arquivo sair); `suporte/ArquivosGuardados.cs` só
   pergunta se "sac/anexos/<id>" existe no Blob ou no GridFS, sem ler
   documento nenhum.
+  Sexta exceção: o aviso do banco (19 RN-305, RNF-242, RNF-244) promete a
+  coleção "avisosDoBanco" (intermediador, idExterno, assinaturaValida,
+  resultado, pagamentoId, traceId, traceIdOrigem), e a RNF-242 o
+  "intermediador" que cada pagamento guarda; `hub/pagamento/IntermediadorPassos.cs`
+  lê o aviso pelo traceId da resposta e o pagamento pelo `_id`. Para fazer de
+  conta que um boleto veio do intermediador anterior, o Dado grava
+  `"intermediador": "MERCADO_PAGO"` nele (`Estado.Atualizar`).
 - **Valores dos exemplos**: `usr-ebfga-maria`, `3f9c2a71` (sessão da Maria no
   navegador) e `EBFGA-LUCAS-0412` são trocados pelos valores reais na hora do
   pedido (`Mundo.Apelidos`); a pessoa é criada pela API na primeira vez que
@@ -360,7 +378,7 @@ teste, sem os quais o backend não sobe (19 RNF-242).
   homologação. Produção não tem relógio de teste: as linhas de produção da
   RNF-234 ficam pendentes e o expiraEm de produção é conferido nos testes do
   backend.
-- **Pagamento** (`hub/pagamento/`, 19 v04, contrato pagamento v02): nenhum
+- **Pagamento** (`hub/pagamento/`, 19 v05, contrato pagamento v03): nenhum
   cenário chama serviço externo; o banco é o intermediador falso do backend
   (`BancoFalso.cs`). A API não cria fatura: a suíte grava as cobranças fechadas
   do Catálogo (coleção `cobrancas`, `Estado.Cobranca`), leva o relógio de teste
@@ -377,9 +395,14 @@ teste, sem os quais o backend não sobe (19 RNF-242).
   `Mundo.Apelidos`. O que o banco gera (código PIX, linha do boleto, endereço
   da confirmação do débito) é conferido pela forma, não pelo valor do exemplo.
   O resumo do RF-190 monta as 128 contas de outubro pela API: é o cenário mais
-  demorado. Pendentes: RNF-242 (troca do intermediador), a exclusão de conta da
-  RN-313 (sem endereço) e a busca pelo traceId da RNF-244; o `historico`,
-  `avisosDoBanco` e o `traceIdOrigem` só o banco mostra (testes do backend).
+  demorado. O aviso no formato do Mercado Pago (`x-signature`, `x-request-id`)
+  vai só à instância de Partida com o segredo de teste do webhook. O PDF do
+  boleto é lido por `suporte/PdfLido.cs` (texto em fonte padrão, barras como
+  retângulos ou segmentos); o QR Code é conferido pela forma do SVG, sem
+  decodificar. Pendentes: o fim do boleto do intermediador anterior (RNF-242,
+  viria do Mercado Pago), a busca pelo traceId da RNF-244 (sem endereço) e a
+  RNF-245 (carga, sem suíte de carga); o `historico` de cada documento só o
+  banco mostra (testes do backend).
 - **Card ao vivo** (`suporte/AoVivo.cs`): a conexão SSE fica aberta pela
   suíte e fecha no fim do cenário; os tempos (intervalo, ping de 30 s) são
   esperados de verdade, com 5 s de folga, por isso esses cenários levam até

@@ -14,25 +14,28 @@ namespace Boaz.Core.Hub.Pagamento.Pagamentos.UseCases;
 // dentro do namespace: "Pagamento" sozinho seria o namespace Boaz.Core.Hub.Pagamento
 using Pagamento = Boaz.Core.Hub.Pagamento.Pagamentos.Domain.Pagamento;
 
-/// <summary>GET /pagamento/pagamentos/{id}: o pagamento da conta de quem pede, com o status atual (RN-302, RN-303).</summary>
-public sealed class LerPagamento(IPagamentos pagamentos, IFaturas faturas, ICanalDoPagamento canal) : ILerPagamento
+/// <summary>GET /pagamento/pagamentos/{id}: o pagamento da conta de quem pede, com o status atual e os estornos (RN-302, RN-303, RF-192-api).</summary>
+public sealed class LerPagamento(IPagamentos pagamentos, IEstornos estornos, IFaturas faturas, ICanalDoPagamento canal) : ILerPagamento
 {
     readonly Baixas baixas = new(pagamentos, faturas, canal);
 
     /// <inheritdoc />
-    public async Task<PagamentoDto> Executar(string id, QuemPede quem, CancellationToken ct = default) =>
-        PagamentoDto.De(await baixas.Carregar(id, quem, ct));
+    public async Task<PagamentoDto> Executar(string id, QuemPede quem, CancellationToken ct = default)
+    {
+        var pagamento = await baixas.Carregar(id, quem, ct);
+        return PagamentoDto.De(pagamento, await estornos.DoPagamento(pagamento.Id, ct));
+    }
 }
 
 /// <summary>
 /// POST /pagamento/pagamentos/{id}/cancelar (RF-184, RN-303): quem paga
 /// desiste do pagamento em aberto para trocar de forma; o confirmado não se
 /// cancela (409 PAGAMENTO_CONFIRMADO) e o já encerrado volta como está. A
-/// cobrança é cancelada no banco quando ele aceita. Auditado como
+/// cobrança é cancelada no intermediador que a gerou (RNF-242), quando ele aceita. Auditado como
 /// PAGAMENTO_CANCELADO (RN-309).
 /// </summary>
 public sealed class CancelarPagamento(
-    IPagamentos pagamentos, IFaturas faturas, ICanalDoPagamento canal, IIntermediador intermediador, IAuditoria auditoria,
+    IPagamentos pagamentos, IFaturas faturas, ICanalDoPagamento canal, IIntermediadores intermediadores, IAuditoria auditoria,
     IAuditoriaDeErros erros, TimeProvider relogio) : ICancelarPagamento
 {
     readonly AuditoriaDaExecucao auditada = new(auditoria, erros, relogio);
@@ -46,7 +49,7 @@ public sealed class CancelarPagamento(
             var agora = relogio.GetUtcNow();
             if (await baixas.Encerrar(pagamento, p => p.Cancelar(agora, traceId.Valor, quem.UsuarioId), ct) && pagamento.IdExterno is { } externo)
             {
-                await intermediador.Cancelar(externo, ct);
+                await intermediadores.Do(pagamento.Intermediador).Cancelar(externo, ct);
             }
             await auditada.Concluir(andamento.Atual, ct);
             return PagamentoDto.De(pagamento);
@@ -55,11 +58,13 @@ public sealed class CancelarPagamento(
 
 /// <summary>
 /// GET /pagamento/pagamentos/{id}/boleto (RF-188) e …/comprovante (RF-189): o
-/// que vai em cada PDF. Só o boleto tem PDF de boleto (404
+/// que vai em cada PDF. O boleto sai em nome e documento da conta, com o
+/// endereço de quem paga. Só o boleto tem PDF de boleto (404
 /// BOLETO_INEXISTENTE); só o confirmado pelo banco tem comprovante (409
 /// PAGAMENTO_NAO_CONFIRMADO).
 /// </summary>
-public sealed class LerDocumentoDoPagamento(IPagamentos pagamentos, IFaturas faturas, ICanalDoPagamento canal) : ILerDocumentoDoPagamento
+public sealed class LerDocumentoDoPagamento(IPagamentos pagamentos, IFaturas faturas, ICadastroDoPagamento cadastro, ICanalDoPagamento canal)
+    : ILerDocumentoDoPagamento
 {
     readonly Baixas baixas = new(pagamentos, faturas, canal);
 
@@ -69,8 +74,10 @@ public sealed class LerDocumentoDoPagamento(IPagamentos pagamentos, IFaturas fat
         var pagamento = await baixas.Carregar(id, quem, ct);
         if (pagamento.Boleto is not { } boleto) throw FalhaDoPagamento.BoletoInexistente();
         var fatura = await Fatura(pagamento, ct);
-        return new DocumentoDoPagamentoDto(fatura.Id, pagamento.Id, fatura.Conta.Nome, fatura.Competencia.ToString(), pagamento.Forma.Texto(),
-            pagamento.Valor.Reais, boleto.Vencimento, boleto.LinhaDigitavel, boleto.CodigoBarras, null, pagamento.IdExterno, null);
+        var pagador = await cadastro.Pagador(fatura.Conta.Id, ct);
+        return new DocumentoDoPagamentoDto(fatura.Id, pagamento.Id, pagador?.Nome ?? fatura.Conta.Nome, fatura.Competencia.ToString(),
+            pagamento.Forma.Texto(), pagamento.Valor.Reais, boleto.Vencimento, boleto.LinhaDigitavel, boleto.CodigoBarras, null, pagamento.IdExterno,
+            null, pagador?.Documento, boleto.Endereco is { } e ? EnderecoDto.De(e) : null);
     }
 
     /// <inheritdoc />

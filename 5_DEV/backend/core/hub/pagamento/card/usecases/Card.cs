@@ -4,13 +4,17 @@ using Boaz.Core.Hub.Pagamento.Card.Ports.In;
 using Boaz.Core.Hub.Pagamento.Faturas.Domain;
 using Boaz.Core.Hub.Pagamento.Faturas.Dtos;
 using Boaz.Core.Hub.Pagamento.Faturas.Ports.Out;
+using Boaz.Core.Hub.Pagamento.Recebimentos.UseCases;
 
 namespace Boaz.Core.Hub.Pagamento.Card.UseCases;
 
 /// <summary>
 /// GET /pagamento/card (RN-307, card comum de 15 RN-276): calculado das
 /// faturas na leitura, pelo perfil de quem pede (RN-298: o ADMINISTRADOR ou
-/// quem tem MOD-01 com "U"; os demais, 403).
+/// quem tem MOD-01 com "U"; os demais, 403). O do deboaz sai das somas feitas
+/// no banco, sem trazer fatura por fatura; o da conta lê só as faturas dela
+/// (RNF-245). A versão é a soma das versões das faturas lidas: cada mudança
+/// de uma delas a sobe em 1.
 /// <list type="bullet">
 /// <item>DEBOAZ: selo = faturas vencidas; o recebido no mês (pela data do
 /// pagamento) e a variação contra o mês anterior; apoios e lista com a
@@ -36,36 +40,36 @@ public sealed class LerCardDoPagamento(IFaturas faturas, TimeProvider relogio) :
     public async Task<CardDoPagamentoDto> Executar(QuemPede quem, CancellationToken ct = default)
     {
         if (!quem.Recebedor && !quem.UsaPagamento) throw FalhaDoPagamento.AcessoNegado();
-        var hoje = Calendario.Dia(relogio.GetUtcNow());
-        var todas = await faturas.Listar(new FiltroDeFaturas(quem.Recebedor ? null : quem.ContaId, []), ct);
-        var versao = todas.Sum(f => f.Versao + 1);
-        var atualizadoEm = todas.Count == 0 ? relogio.GetUtcNow() : todas.Max(f => f.AtualizadaEm);
-        return quem.Recebedor ? Deboaz(todas, hoje, versao, atualizadoEm) : DoPagador(quem, todas, hoje, versao, atualizadoEm);
+        var agora = relogio.GetUtcNow();
+        var hoje = Calendario.Dia(agora);
+        if (quem.Recebedor) return await Deboaz(hoje, agora, ct);
+        var daConta = await faturas.Listar(new FiltroDeFaturas(quem.ContaId, []), ct);
+        var versao = daConta.Sum(f => f.Versao + 1);
+        var atualizadoEm = daConta.Count == 0 ? agora : daConta.Max(f => f.AtualizadaEm);
+        return DoPagador(quem, daConta, hoje, versao, atualizadoEm);
     }
 
-    static CardDoPagamentoDto Deboaz(IReadOnlyList<Fatura> todas, DateOnly hoje, long versao, DateTimeOffset atualizadoEm)
+    async Task<CardDoPagamentoDto> Deboaz(DateOnly hoje, DateTimeOffset agora, CancellationToken ct)
     {
-        var pagas = todas.Where(f => f.Status == StatusDaFatura.Paga && f.PagaEm is not null).ToList();
-        Dinheiro RecebidoEntre(DateOnly de, DateOnly ate) =>
-            Dinheiro.Somar(pagas.Where(f => Calendario.Dia(f.PagaEm!.Value) is var d && d >= de && d <= ate).Select(f => f.ValorPago - f.Devolvido));
-
+        var versao = await faturas.Versao(null, ct);
         var mes = Competencia.Do(hoje);
+        var desde = new[] { Mes(mes, Pontos - 1).PrimeiroDia, hoje.AddDays(-7 * (Pontos - 1) - 6), mes.Anterior.PrimeiroDia }.Min();
+        var porDia = await faturas.RecebidoPorDia(desde, hoje, ct);
+        Dinheiro RecebidoEntre(DateOnly de, DateOnly ate) => Dinheiro.Somar(porDia.Where(d => d.Key >= de && d.Key <= ate).Select(d => d.Value));
+
         var noMes = RecebidoEntre(mes.PrimeiroDia, mes.Proxima.PrimeiroDia.AddDays(-1));
         var mesAnterior = RecebidoEntre(mes.Anterior.PrimeiroDia, mes.PrimeiroDia.AddDays(-1));
 
-        var daAnterior = todas.Where(f => f.Competencia == mes.Anterior && f.Status != StatusDaFatura.Cancelada).ToList();
-        var faturado = Valor(daAnterior);
-        var vencido = Valor(daAnterior.Where(f => f.Status == StatusDaFatura.Vencida));
-        var aReceber = new LinhaDoCardDto("A receber", Valor(daAnterior.Where(f => f.Status == StatusDaFatura.APagar)).Reais);
-        var vencidoLinha = new LinhaDoCardDto("Vencido", vencido.Reais);
-        var inadimplencia = new LinhaDoCardDto("Inadimplência", faturado.Centavos == 0 ? 0m
-            : Math.Round((decimal)vencido.Centavos * 100m / faturado.Centavos, 1, MidpointRounding.AwayFromZero));
+        var daAnterior = new Somadas(await faturas.Somas([mes.Anterior], ct));
+        var vencidoLinha = new LinhaDoCardDto("Vencido", Somadas.Valor(daAnterior.Com(StatusDaFatura.Vencida)).Reais);
+        var aReceber = new LinhaDoCardDto("A receber", Somadas.Valor(daAnterior.Com(StatusDaFatura.APagar)).Reais);
+        var inadimplencia = new LinhaDoCardDto("Inadimplência", daAnterior.Inadimplencia);
 
         var series = new SeriesDoCardDto(
             Serie(i => RecebidoEntre(hoje.AddDays(-i), hoje.AddDays(-i))),
             Serie(i => RecebidoEntre(hoje.AddDays(-7 * i - 6), hoje.AddDays(-7 * i))),
             Serie(i => Mes(mes, i) is var m ? RecebidoEntre(m.PrimeiroDia, m.Proxima.PrimeiroDia.AddDays(-1)) : Dinheiro.Zero));
-        return new CardDoPagamentoDto(Modulo, "DEBOAZ", versao, atualizadoEm, todas.Count == 0, todas.Count(f => f.Status == StatusDaFatura.Vencida),
+        return new CardDoPagamentoDto(Modulo, "DEBOAZ", versao.Versao, versao.AtualizadoEm ?? agora, versao.Quantas == 0, versao.Vencidas,
             new ReduzidaDoCardDto(noMes.Reais, "recebido no mês"),
             new NormalDoCardDto(noMes.Reais, Variacao(noMes, mesAnterior), [aReceber, vencidoLinha, inadimplencia]),
             new ExpandidaDoCardDto([vencidoLinha, aReceber, inadimplencia]), series);
@@ -113,10 +117,10 @@ public sealed class LerCardDoPagamento(IFaturas faturas, TimeProvider relogio) :
 
     static string DiaMes(DateOnly dia) => dia.ToString("dd/MM", CultureInfo.InvariantCulture);
 
-    // "+3,1 % no mês": o recebido no mês contra o do mês anterior
+    // "+3,1 % no mês": o recebido no mês contra o do mês anterior (RN-307-api)
     static string Variacao(Dinheiro atual, Dinheiro anterior)
     {
-        if (anterior.Centavos == 0) return "sem o mês anterior";
+        if (anterior.Centavos == 0) return "Sem recebido no mês anterior";
         var pct = Math.Round((decimal)(atual.Centavos - anterior.Centavos) * 100m / anterior.Centavos, 1, MidpointRounding.AwayFromZero);
         return $"{(pct >= 0 ? "+" : "-")}{Math.Abs(pct).ToString("0.0", CultureInfo.InvariantCulture).Replace('.', ',')} % no mês";
     }

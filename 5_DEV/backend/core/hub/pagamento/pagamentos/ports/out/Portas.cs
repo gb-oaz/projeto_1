@@ -12,11 +12,17 @@ public interface IPagamentos
     /// <summary>O pagamento; null se não existe.</summary>
     Task<Pagamento?> Obter(string id, CancellationToken ct = default);
 
-    /// <summary>O pagamento da cobrança no banco; null se nenhum (RN-305).</summary>
-    Task<Pagamento?> PorIdExterno(string idExterno, CancellationToken ct = default);
+    /// <summary>O pagamento da cobrança no intermediador que a gerou; null se nenhum (RN-305, RNF-242).</summary>
+    Task<Pagamento?> PorIdExterno(string intermediador, string idExterno, CancellationToken ct = default);
+
+    /// <summary>O endereço do último boleto da conta, para lembrar na próxima vez (RF-184-api); null se nenhum.</summary>
+    Task<EnderecoDoPagador?> UltimoEnderecoDoBoleto(string contaId, CancellationToken ct = default);
 
     /// <summary>As tentativas das faturas dadas (RN-304, RN-308).</summary>
     Task<IReadOnlyList<Pagamento>> DasFaturas(IEnumerable<string> faturaIds, CancellationToken ct = default);
+
+    /// <summary>Quantos pagamentos confirmados em duplicidade há nas faturas da competência (RN-303, RN-308), contados no banco.</summary>
+    Task<int> Duplicidades(Competencia competencia, CancellationToken ct = default);
 
     /// <summary>Os "AGUARDANDO" e "PROCESSANDO" (agendamento: expirar e consultar o banco, RN-302).</summary>
     Task<IReadOnlyList<Pagamento>> EmAberto(CancellationToken ct = default);
@@ -34,8 +40,11 @@ public interface IPagamentos
 /// <summary>A coleção estornos (pagamento-documentos v02).</summary>
 public interface IEstornos
 {
-    /// <summary>O estorno do banco; null se nenhum (RN-305).</summary>
-    Task<Estorno?> PorIdExterno(string idExterno, CancellationToken ct = default);
+    /// <summary>O estorno no intermediador que o recebeu; null se nenhum (RN-305, RNF-242).</summary>
+    Task<Estorno?> PorIdExterno(string intermediador, string idExterno, CancellationToken ct = default);
+
+    /// <summary>Os estornos do pagamento, o mais antigo primeiro (RF-192-api).</summary>
+    Task<IReadOnlyList<Estorno>> DoPagamento(string pagamentoId, CancellationToken ct = default);
 
     /// <summary>Grava o estorno novo.</summary>
     Task Incluir(Estorno estorno, CancellationToken ct = default);
@@ -59,6 +68,7 @@ public interface ICanalDoPagamento
 
 /// <summary>Um aviso recebido do banco, guardado em avisosDoBanco (RN-305, RNF-244).</summary>
 /// <param name="Id">O id do aviso no banco: garante a idempotência.</param>
+/// <param name="Intermediador">De quem é o aviso, pelo cabeçalho (RNF-242); null se nenhum confere.</param>
 /// <param name="IdExterno">A cobrança ou o estorno no banco.</param>
 /// <param name="Tipo">PAGAMENTO_CONFIRMADO, PAGAMENTO_RECUSADO, ESTORNO_CONCLUIDO ou ESTORNO_RECUSADO.</param>
 /// <param name="RecebidoEm">Quando chegou.</param>
@@ -67,8 +77,8 @@ public interface ICanalDoPagamento
 /// <param name="PagamentoId">O pagamento ligado, se achado.</param>
 /// <param name="TraceId">A execução do aviso, nova.</param>
 /// <param name="TraceIdOrigem">O traceId da criação, se o banco o devolveu.</param>
-public sealed record RegistroDoAviso(string Id, string? IdExterno, string? Tipo, DateTimeOffset RecebidoEm, bool AssinaturaValida, string Resultado,
-    string? PagamentoId, string TraceId, string? TraceIdOrigem);
+public sealed record RegistroDoAviso(string Id, string? Intermediador, string? IdExterno, string? Tipo, DateTimeOffset RecebidoEm,
+    bool AssinaturaValida, string Resultado, string? PagamentoId, string TraceId, string? TraceIdOrigem);
 
 /// <summary>A coleção avisosDoBanco: o _id é o id do aviso (repetido não soma em dobro, RN-305).</summary>
 public interface IAvisosDoBanco
@@ -90,12 +100,14 @@ public interface IAvisosDoBanco
 /// <param name="FaturaId">A fatura, na descrição.</param>
 /// <param name="Forma">A forma.</param>
 /// <param name="Valor">O valor, com os juros.</param>
-/// <param name="TokenDoCartao">O token gerado pela tela direto no banco (RNF-239).</param>
+/// <param name="Cartao">O token, o método e o emissor gerados pela tela direto no banco (RNF-239).</param>
 /// <param name="ExpiraEm">A validade do PIX ou do débito.</param>
 /// <param name="VencimentoDoBoleto">O vencimento do boleto.</param>
 /// <param name="TraceId">A execução: cabeçalho X-Trace-Id e metadados (RNF-244).</param>
-public sealed record PedidoDeCobranca(string PagamentoId, string FaturaId, FormaDePagamento Forma, Dinheiro Valor, string? TokenDoCartao,
-    DateTimeOffset? ExpiraEm, DateOnly? VencimentoDoBoleto, string TraceId);
+/// <param name="Pagador">O nome e o documento da conta e o e-mail da conta master ou do autônomo.</param>
+/// <param name="Endereco">O endereço de quem paga o boleto (RF-188).</param>
+public sealed record PedidoDeCobranca(string PagamentoId, string FaturaId, FormaDePagamento Forma, Dinheiro Valor, CartaoTokenizado? Cartao,
+    DateTimeOffset? ExpiraEm, DateOnly? VencimentoDoBoleto, string TraceId, Pagador Pagador, EnderecoDoPagador? Endereco = null);
 
 /// <summary>O que o banco disse da cobrança.</summary>
 public enum SituacaoDaCobranca
@@ -117,13 +129,13 @@ public enum SituacaoDaCobranca
 /// <summary>A resposta do banco à cobrança.</summary>
 /// <param name="Situacao">O que o banco disse.</param>
 /// <param name="IdExterno">O id da cobrança no banco.</param>
-/// <param name="Pix">O código PIX.</param>
+/// <param name="PixCopiaECola">O código PIX copia e cola; o QR Code é desenhado pelo deboaz (IDesenhoDoQrCode).</param>
 /// <param name="LinhaDigitavel">A linha do boleto.</param>
 /// <param name="CodigoBarras">O código de barras do boleto.</param>
 /// <param name="ConfirmacaoUrl">Onde quem paga confirma o débito (https).</param>
 /// <param name="Cartao">A bandeira e o final do cartão.</param>
 /// <param name="PagoEm">Quando o banco aprovou.</param>
-public sealed record ResultadoDaCobranca(SituacaoDaCobranca Situacao, string? IdExterno = null, DadosDoPix? Pix = null, string? LinhaDigitavel = null,
+public sealed record ResultadoDaCobranca(SituacaoDaCobranca Situacao, string? IdExterno = null, string? PixCopiaECola = null, string? LinhaDigitavel = null,
     string? CodigoBarras = null, string? ConfirmacaoUrl = null, CartaoMascarado? Cartao = null, DateTimeOffset? PagoEm = null);
 
 /// <summary>O que o banco diz de uma cobrança já feita, na consulta do agendamento.</summary>
@@ -201,12 +213,28 @@ public sealed record AvisoDoBanco(string Id, TipoDoAviso Tipo, string IdExterno,
 public sealed record LeituraDoAviso(bool AssinaturaValida, AvisoDoBanco? Aviso);
 
 /// <summary>
+/// A conferência do aviso, sem ir ao banco (RN-305, RNF-242): a assinatura e o
+/// id externo do pagamento de que o aviso trata, quando o intermediador o diz
+/// no próprio aviso (Mercado Pago: data.id). O pagamento desconhecido fica
+/// DESCONHECIDO sem consultar o serviço do intermediador.
+/// </summary>
+/// <param name="AssinaturaValida">A assinatura do intermediador confere.</param>
+/// <param name="IdDoPagamento">O id externo do pagamento; null quando só a leitura do aviso o diz.</param>
+public sealed record ConferenciaDoAviso(bool AssinaturaValida, string? IdDoPagamento);
+
+/// <summary>
 /// O intermediador de pagamento (RNF-242): a única porta para o banco. O
 /// adaptador traduz os status dele para os do Pagamento; trocar de
 /// intermediador não muda fatura, status, códigos de erro nem endereços.
 /// </summary>
 public interface IIntermediador
 {
+    /// <summary>O nome guardado no pagamento: MERCADO_PAGO ou FALSO (NomeDoIntermediador).</summary>
+    string Nome { get; }
+
+    /// <summary>A chave pública com que a tela gera o token do cartão (RF-184-api).</summary>
+    string ChavePublica { get; }
+
     /// <summary>Pede a cobrança, com a chave de idempotência = o id do pagamento.</summary>
     Task<ResultadoDaCobranca> Cobrar(PedidoDeCobranca pedido, CancellationToken ct = default);
 
@@ -219,6 +247,37 @@ public interface IIntermediador
     /// <summary>Pede o estorno (RF-192).</summary>
     Task<ResultadoDoEstorno> Estornar(PedidoDeEstorno pedido, CancellationToken ct = default);
 
+    /// <summary>Confere a assinatura e acha o id do pagamento no aviso, sem ir ao banco (RN-305).</summary>
+    ConferenciaDoAviso Conferir(AvisoRecebido recebido);
+
     /// <summary>Confere a assinatura e lê o aviso (RN-305).</summary>
     Task<LeituraDoAviso> LerAviso(AvisoRecebido recebido, CancellationToken ct = default);
+}
+
+/// <summary>
+/// Os intermediadores do ambiente (RNF-242): o ligado, que cobra os
+/// pagamentos novos, e o de cada pagamento, que recebe os avisos, as
+/// consultas, os cancelamentos e os estornos dele até o fim.
+/// </summary>
+public interface IIntermediadores
+{
+    /// <summary>O ligado agora: cobra os pagamentos novos e dá a chave pública da tela.</summary>
+    IIntermediador Ligado { get; }
+
+    /// <summary>O intermediador pelo nome guardado no pagamento; o ligado se o nome falta (pagamento de antes do campo).</summary>
+    IIntermediador Do(string? nome);
+
+    /// <summary>
+    /// O dono do aviso, pelo cabeçalho de assinatura (x-signature ou X-Assinatura);
+    /// sem cabeçalho conhecido, ou o de um intermediador que o ambiente não tem,
+    /// o ligado, que recusa a assinatura (401); null só se não houver nenhum.
+    /// </summary>
+    IIntermediador? DoAviso(AvisoRecebido recebido);
+}
+
+/// <summary>O QR Code do PIX desenhado pelo deboaz, em SVG vetorial, a partir do copia e cola (RF-185-api).</summary>
+public interface IDesenhoDoQrCode
+{
+    /// <summary>O SVG do QR Code do texto, com um quadrado por módulo escuro.</summary>
+    string Svg(string texto);
 }

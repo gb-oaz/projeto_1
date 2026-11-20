@@ -16,7 +16,7 @@ namespace Boaz.Core.Commons.Tests.Usuario.Usuarios.Mocks;
 /// conferências do SAC, pedidos de ajuda e contas apagadas.
 /// </summary>
 public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, ITentativasDeLiberacao, ISessoesDosUsuarios,
-    IAuditoria, IAuditoriaDeErros, IPedidosDeAjuda, IPagamentos
+    IAuditoria, IAuditoriaDeErros, IPedidosDeAjuda, IPagamentos, IContaTemFaturaEmAberto
 {
     readonly Dictionary<string, UsuarioCadastrado> usuarios = [];
     readonly Dictionary<string, ContaAssinante> contas = [];
@@ -50,7 +50,7 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
         PedirAjudaDaMaster = new PedirAjudaDaMaster(this, this, this, Relogio);
         ListarContas = new ListarContas(this, this, Relogio);
         LerConta = new LerConta(this, this, this, Relogio);
-        MudarEstadoDaConta = new MudarEstadoDaConta(this, this, this, this, this, Relogio, AtualizarCardUsuarios);
+        MudarEstadoDaConta = new MudarEstadoDaConta(this, this, this, this, this, Relogio, AtualizarCardUsuarios, this);
         GerarCodigoDaMaster = new GerarCodigoDaMaster(this, this, this, this, this, this, this, Relogio);
         LerTempoDaConta = new LerTempoDaConta(this, this, Relogio);
         SalvarTempoDaConta = new SalvarTempoDaConta(this, this, this, this, Relogio);
@@ -421,6 +421,11 @@ public sealed class UsuariosEmMemoria : IUsuarios, IContas, IGeracoesDeSenha, IT
 
     Task<DateOnly?> IPagamentos.UltimoPagamento(string contaId, CancellationToken ct) =>
         Task.FromResult(pagamentos.TryGetValue(contaId, out var data) ? data : (DateOnly?)null);
+
+    /// <summary>As contas com fatura em aberto no Pagamento (19 RN-313).</summary>
+    public HashSet<string> ContasComFaturaEmAberto { get; } = [];
+
+    Task<bool> IContaTemFaturaEmAberto.Executar(string contaId, CancellationToken ct) => Task.FromResult(ContasComFaturaEmAberto.Contains(contaId));
 
     static bool Contem(string texto, string busca) => texto.Contains(busca, StringComparison.OrdinalIgnoreCase);
 

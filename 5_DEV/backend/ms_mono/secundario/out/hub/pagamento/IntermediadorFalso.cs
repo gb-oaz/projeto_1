@@ -25,11 +25,13 @@ public enum ComportamentoDoBanco
     SemResposta,
 }
 
-// Um pedido que o falso recebeu do deboaz (GET /_teste/pagamento/banco/pedidos).
-public sealed record PedidoAoBancoFalso(string Tipo, string? IdExterno, string? Forma, decimal Valor, string TraceId, string? Pagamento, string? Estorno);
+// Um pedido que o falso recebeu do deboaz (GET /_teste/pagamento/banco/pedidos):
+// na cobrança, também o cartão (método e emissor), quem paga e o endereço do boleto.
+public sealed record PedidoAoBancoFalso(string Tipo, string? IdExterno, string? Forma, decimal Valor, string TraceId, string? Pagamento, string? Estorno,
+    CartaoTokenizado? Cartao = null, Pagador? Pagador = null, EnderecoDoPagador? Endereco = null);
 
-// O intermediador falso (pagamento-hexagonal v02, RNF-242): fora de produção,
-// nos testes e na máquina, nunca chama serviço externo. Os tokens dos
+// O intermediador falso (pagamento-hexagonal v03, RNF-242): "FALSO", só fora
+// de produção, nos testes e na máquina; nunca chama serviço externo. Os tokens dos
 // exemplos: "tok_9f2c71" é um VISA de final 4242, "tok_d41b07" um MASTERCARD de
 // final 5100 e "tok_vencido" um token já usado. O aviso do banco vem com
 // X-Assinatura: sha256=<HMAC-SHA256 do corpo, em hexadecimal> e o corpo
@@ -39,8 +41,16 @@ public sealed class IntermediadorFalso(string segredo, TimeProvider relogio) : I
     // o segredo padrão do falso, o mesmo do qa (PAGAMENTO_SEGREDO_DO_AVISO); nunca vale em produção
     public const string SegredoPadrao = "segredo-do-intermediador-falso";
 
-    const string Assinatura = "x-assinatura";
-    const string PrefixoDaAssinatura = "sha256=";
+    // o cabeçalho do aviso do falso: X-Assinatura: sha256=… (o roteamento do aviso, RNF-242)
+    public const string Assinatura = "x-assinatura";
+    public const string PrefixoDaAssinatura = "sha256=";
+
+    // a "chave pública" do falso em GET /pagamento/formas: a tela de teste não gera token nele
+    public const string ChavePublicaDoFalso = "FALSO-chave-publica";
+
+    public string Nome => NomeDoIntermediador.Falso;
+
+    public string ChavePublica => ChavePublicaDoFalso;
 
     static readonly Dictionary<string, CartaoMascarado> Cartoes = new(StringComparer.Ordinal)
     {
@@ -58,11 +68,12 @@ public sealed class IntermediadorFalso(string segredo, TimeProvider relogio) : I
     public Task<ResultadoDaCobranca> Cobrar(PedidoDeCobranca pedido, CancellationToken ct = default)
     {
         var idExterno = $"{Prefixo(pedido.Forma)}{Aleatorio()}";
-        pedidos.Enqueue(new PedidoAoBancoFalso("COBRANCA", idExterno, pedido.Forma.Texto(), pedido.Valor.Reais, pedido.TraceId, pedido.PagamentoId, null));
+        pedidos.Enqueue(new PedidoAoBancoFalso("COBRANCA", idExterno, pedido.Forma.Texto(), pedido.Valor.Reais, pedido.TraceId, pedido.PagamentoId, null,
+            pedido.Cartao, pedido.Pagador, pedido.Endereco));
         if (Comportamento == ComportamentoDoBanco.SemResposta) return Task.FromResult(new ResultadoDaCobranca(SituacaoDaCobranca.Indisponivel));
         return Task.FromResult(pedido.Forma switch
         {
-            FormaDePagamento.Pix => new ResultadoDaCobranca(SituacaoDaCobranca.Aguardando, idExterno, Pix: Pix(pedido)),
+            FormaDePagamento.Pix => new ResultadoDaCobranca(SituacaoDaCobranca.Aguardando, idExterno, PixCopiaECola: CopiaECola(pedido)),
             FormaDePagamento.Boleto => new ResultadoDaCobranca(SituacaoDaCobranca.Aguardando, idExterno,
                 LinhaDigitavel: LinhaDigitavel(pedido), CodigoBarras: CodigoBarras(pedido)),
             _ => Cartao(pedido, idExterno),
@@ -83,15 +94,20 @@ public sealed class IntermediadorFalso(string segredo, TimeProvider relogio) : I
             : new ResultadoDoEstorno(SituacaoDoEstorno.Pendente, idExterno));
     }
 
-    public Task<LeituraDoAviso> LerAviso(AvisoRecebido recebido, CancellationToken ct = default)
+    // o aviso do falso traz o id externo do pagamento ou do estorno: quem diz qual é a leitura
+    public ConferenciaDoAviso Conferir(AvisoRecebido recebido) => new(AssinaturaConfere(recebido), null);
+
+    bool AssinaturaConfere(AvisoRecebido recebido)
     {
         var esperada = PrefixoDaAssinatura + Convert.ToHexStringLower(HMACSHA256.HashData(Encoding.UTF8.GetBytes(segredo),
             Encoding.UTF8.GetBytes(recebido.Corpo)));
         var veio = recebido.Cabecalhos.GetValueOrDefault(Assinatura) ?? "";
-        if (!CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(esperada), Encoding.UTF8.GetBytes(veio)))
-        {
-            return Task.FromResult(new LeituraDoAviso(false, null));
-        }
+        return CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(esperada), Encoding.UTF8.GetBytes(veio));
+    }
+
+    public Task<LeituraDoAviso> LerAviso(AvisoRecebido recebido, CancellationToken ct = default)
+    {
+        if (!AssinaturaConfere(recebido)) return Task.FromResult(new LeituraDoAviso(false, null));
         return Task.FromResult(new LeituraDoAviso(true, Ler(recebido.Corpo)));
     }
 
@@ -126,7 +142,7 @@ public sealed class IntermediadorFalso(string segredo, TimeProvider relogio) : I
 
     ResultadoDaCobranca Cartao(PedidoDeCobranca pedido, string idExterno)
     {
-        if (pedido.TokenDoCartao is not { } token || !Cartoes.TryGetValue(token, out var cartao))
+        if (pedido.Cartao?.Token is not { } token || !Cartoes.TryGetValue(token, out var cartao))
         {
             return new ResultadoDaCobranca(SituacaoDaCobranca.TokenInvalido);
         }
@@ -151,11 +167,9 @@ public sealed class IntermediadorFalso(string segredo, TimeProvider relogio) : I
 
     static string Aleatorio() => Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(3));
 
-    // o "copia e cola" no formato EMV do PIX (começa com 000201) e um QR em SVG, só de exemplo
-    static DadosDoPix Pix(PedidoDeCobranca pedido) =>
-        new($"00020101021226{pedido.PagamentoId}5204000053039865406{pedido.Valor.Reais.ToString("0.00", CultureInfo.InvariantCulture)}6304A1B2",
-            "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 33 33\"><rect width=\"33\" height=\"33\" fill=\"#fff\"/>" +
-            "<path d=\"M1 1h7v7H1zM25 1h7v7h-7zM1 25h7v7H1z\"/></svg>");
+    // o "copia e cola" no formato EMV do PIX (começa com 000201), só de exemplo; o QR Code é do deboaz
+    static string CopiaECola(PedidoDeCobranca pedido) =>
+        $"00020101021226{pedido.PagamentoId}5204000053039865406{pedido.Valor.Reais.ToString("0.00", CultureInfo.InvariantCulture)}6304A1B2";
 
     static string Valor10(PedidoDeCobranca pedido) => pedido.Valor.Centavos.ToString("D10", CultureInfo.InvariantCulture);
 

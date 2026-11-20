@@ -435,7 +435,8 @@ public sealed partial class AutorizacaoPassos(Mundo mundo, Execucoes execucoes)
         switch (quemEntrou)
         {
             case "administrador":
-                Comparacao.Confere(ComoJson(new() { ["MOD-02"] = "CU", ["MOD-03"] = "CU", ["MOD-14"] = "CU" }), mods, exato: true);
+                // SAC, Usuários e Catálogo com as duas abas; o Pagamento só com "U", para o card (RN-233)
+                Comparacao.Confere(ComoJson(new() { ["MOD-01"] = "U", ["MOD-02"] = "CU", ["MOD-03"] = "CU", ["MOD-14"] = "CU" }), mods, exato: true);
                 break;
             case "membro do time":
                 Comparacao.Confere(ComoJson(new() { ["MOD-02"] = "U" }), mods, exato: true);
@@ -445,7 +446,9 @@ public sealed partial class AutorizacaoPassos(Mundo mundo, Execucoes execucoes)
                 Assert.Equal("CU", mods["MOD-03"]?.GetValue<string>());
                 if (quemEntrou == "conta master") Assert.Equal("CU", mods["MOD-05"]?.GetValue<string>());
                 Assert.False(mods.ContainsKey("MOD-06"), $"a Presença não foi contratada: {mods}");
-                Assert.All(mods, m => Assert.Equal("CU", m.Value?.GetValue<string>()));
+                // o Pagamento, só com "U" (RN-233, "Pagamento no token")
+                Assert.Equal("U", mods["MOD-01"]?.GetValue<string>());
+                Assert.All(mods.Where(m => m.Key != "MOD-01"), m => Assert.Equal("CU", m.Value?.GetValue<string>()));
                 break;
             case "staff":
                 Comparacao.Confere(ComoJson(new() { ["MOD-04"] = "U" }), mods, exato: true);
@@ -634,10 +637,10 @@ public sealed partial class AutorizacaoPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^a versão nova chega às sessões da Maria em até 1 s depois da resposta$")]
     public async Task ChegaEmUmSegundo()
     {
-        var limite = DateTimeOffset.UtcNow.AddSeconds(1);
+        var limite = Cronometro.Agora + TimeSpan.FromSeconds(1);
         Resposta r;
         do r = await mundo.Enviar("GET", "/auth/sessoes", token: mundo.TokenGuardado);
-        while (r.Status != 401 && DateTimeOffset.UtcNow < limite);
+        while (r.Status != 401 && Cronometro.Agora < limite);
         Respostas.Confere(r, 401, "PERMISSOES_DESATUALIZADAS");
     }
 
