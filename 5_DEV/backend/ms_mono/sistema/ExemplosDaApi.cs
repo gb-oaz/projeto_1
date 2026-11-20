@@ -13,6 +13,7 @@ namespace Boaz.MsMono.Sistema;
 public static class ExemplosDaApi
 {
     const string Json = "application/json";
+    const string FluxoDeEventos = "text/event-stream";
 
     // Os exemplos do documento, ou nenhum se o módulo não tem arquivo (sistema).
     public static IReadOnlyDictionary<string, JsonObject> Do(string documento)
@@ -51,7 +52,9 @@ public static class ExemplosDaApi
             }
             if (existente is not OpenApiResponse resposta || lista is not JsonArray itens || itens.Count == 0) continue;
             resposta.Content ??= new Dictionary<string, OpenApiMediaType>();
-            if (!resposta.Content.TryGetValue(Json, out var tipo)) resposta.Content[Json] = tipo = new OpenApiMediaType();
+            // o fluxo ao vivo mostra os eventos no tipo dele (text/event-stream), se o endpoint o declara
+            var midia = resposta.Content.ContainsKey(FluxoDeEventos) ? FluxoDeEventos : Json;
+            if (!resposta.Content.TryGetValue(midia, out var tipo)) resposta.Content[midia] = tipo = new OpenApiMediaType();
             tipo.Examples ??= new Dictionary<string, IOpenApiExample>();
             foreach (var item in itens.OfType<JsonObject>())
             {

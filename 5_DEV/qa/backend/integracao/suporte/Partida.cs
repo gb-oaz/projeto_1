@@ -19,7 +19,8 @@ namespace Boaz.Qa.Integracao.Suporte;
 //   - as variáveis PARTIDA_* do ambiente da suíte, sem o prefixo (conexões,
 //     chave, um banco próprio, diferente do MONGO_BANCO do backend principal);
 //   - AMBIENTE (hml ou prd) e o "Key Vault" do cenário: as variáveis USUARIO_*,
-//     com entradas do requisito e senhas geradas na hora (RNF-202);
+//     com entradas do requisito e senhas geradas na hora (RNF-202), e, em prd,
+//     os segredos MercadoPago__* com valores de teste (19 RNF-242);
 //   - a porta, em ASPNETCORE_HTTP_PORTS.
 // As USUARIO_* e o AMBIENTE herdados da suíte não passam: cada cenário diz o
 // que o Key Vault tem. O banco da instância é limpo antes de cada cenário com
@@ -43,6 +44,15 @@ public sealed class Partida : IDisposable
     public bool Rodando => processo is { HasExited: false };
 
     public string AmbienteDaPartida { get; set; } = "hml";
+
+    // os segredos do Mercado Pago de teste (19 RNF-242): os de produção e os
+    // que o cenário põe no Key Vault de homologação; nenhum paga nada
+    public static readonly IReadOnlyDictionary<string, string> ChavesDoMercadoPago = new Dictionary<string, string>
+    {
+        ["MercadoPago__AccessToken"] = "TEST-token-da-partida",
+        ["MercadoPago__PublicKey"] = "TEST-chave-publica-da-partida",
+        ["MercadoPago__SegredoDoWebhook"] = "segredo-do-webhook-da-partida",
+    };
 
     // o Key Vault do cenário: nome da variável → valor (null = segredo ausente)
     public Dictionary<string, string?> KeyVault { get; } = [];
@@ -139,6 +149,7 @@ public sealed class Partida : IDisposable
         foreach (var nome in inicio.Environment.Keys.ToList())
         {
             if (nome.StartsWith("USUARIO_", StringComparison.Ordinal) || nome.StartsWith("PARTIDA_", StringComparison.Ordinal)
+                || nome.StartsWith("MercadoPago__", StringComparison.Ordinal)
                 || nome is "AMBIENTE" or "ADMIN_ENTRADA" or "ADMIN_SENHA" or "ASPNETCORE_URLS")
             {
                 inicio.Environment.Remove(nome);
@@ -147,9 +158,18 @@ public sealed class Partida : IDisposable
         foreach (var (nome, valor) in Ambiente.DaPartida()) inicio.Environment[nome] = valor;
         inicio.Environment["AMBIENTE"] = AmbienteDaPartida;
         inicio.Environment["ASPNETCORE_HTTP_PORTS"] = porta.ToString();
+        // em produção o backend exige os segredos do intermediador (19 RNF-242) e
+        // não sobe sem eles: o Key Vault de prd sempre os tem, com valores de
+        // teste (nenhum cenário de partida paga nada). O cenário pode trocá-los
+        // pelo KeyVault (null = ausente)
+        if (AmbienteDaPartida == "prd")
+        {
+            foreach (var (nome, valor) in ChavesDoMercadoPago) inicio.Environment[nome] = valor;
+        }
         foreach (var (nome, valor) in KeyVault)
         {
             if (valor is not null) inicio.Environment[nome] = valor;
+            else inicio.Environment.Remove(nome);
         }
 
         processo = new Process { StartInfo = inicio, EnableRaisingEvents = true };
@@ -167,8 +187,8 @@ public sealed class Partida : IDisposable
     {
         if (processo is null) throw new InvalidOperationException("a instância não foi lançada");
         using var saude = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
-        var limite = DateTime.UtcNow + LimiteDaPartida;
-        while (DateTime.UtcNow < limite)
+        var limite = Cronometro.Agora + LimiteDaPartida;
+        while (Cronometro.Agora < limite)
         {
             if (processo.HasExited)
             {

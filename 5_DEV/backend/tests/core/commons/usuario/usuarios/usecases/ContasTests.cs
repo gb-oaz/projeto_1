@@ -213,6 +213,36 @@ public class ContasTests
         Assert.Equal(EstadoConta.Encerrada, Mock.Conta("conta-ebfga")!.Estado);
     }
 
+    [Theory]
+    [InlineData("usr-ebfga-master", "conta-ebfga")]
+    [InlineData("usr-preis-pedro", "conta-preis")]
+    public async Task RF_113_a_propria_conta_se_desativa(string quem, string conta)
+    {
+        Mock.ContasComFaturaEmAberto.Add(conta);
+        Assert.Equal("DESATIVADA", (await Mock.MudarEstadoDaConta.Executar(new(quem, conta, "DESATIVADA"), TraceId.Novo())).Estado);
+        Assert.Contains((conta, MotivoFim.ContaIndisponivel), Mock.ContasSemSessao);
+    }
+
+    [Theory]
+    [InlineData("usr-ebfga-master", "conta-ebfga", "SUSPENSA")]
+    [InlineData("usr-ebfga-master", "conta-ebfga", "ENCERRADA")]
+    [InlineData("usr-ebfga-master", "conta-preis", "DESATIVADA")]
+    [InlineData("usr-ebfga-maria", "conta-ebfga", "DESATIVADA")]
+    public async Task RF_113_o_que_a_propria_conta_nao_pode(string quem, string conta, string estado)
+    {
+        await Falha("ACESSO_NEGADO", () => Mock.MudarEstadoDaConta.Executar(new(quem, conta, estado), TraceId.Novo()));
+        Assert.Equal(EstadoConta.Ativa, Mock.Conta(conta)!.Estado);
+    }
+
+    [Fact]
+    public async Task RN_173_encerramento_recusado_com_fatura_em_aberto()
+    {
+        Mock.ContasComFaturaEmAberto.Add("conta-ebfga");
+        await Falha("FATURA_EM_ABERTO", () => Mock.MudarEstadoDaConta.Executar(new("usr-dboaz-caio", "conta-ebfga", "ENCERRADA"), TraceId.Novo()));
+        Assert.Equal(EstadoConta.Ativa, Mock.Conta("conta-ebfga")!.Estado);
+        Assert.Empty(Mock.ContasApagadas);
+    }
+
     [Fact]
     public async Task RN_169_so_o_time_muda_o_estado()
     {

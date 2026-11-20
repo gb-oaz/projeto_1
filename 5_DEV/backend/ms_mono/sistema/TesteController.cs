@@ -5,8 +5,11 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Commons.Usuario.Usuarios.Ports.In;
+using Boaz.Core.Hub.Pagamento.Faturas.Domain;
+using Boaz.Core.Hub.Pagamento.Faturas.Ports.In;
 using Boaz.MsMono.Primario.In.Commons;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autorizacao;
+using Boaz.MsMono.Secundario.Out.Hub.Pagamento;
 using Boaz.MsMono.Secundario.Out.Hub.Sac;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -21,6 +24,10 @@ public sealed record RelogioDeTesteCorpo(string? Agora);
 /// <summary>O corpo de PUT /_teste/sac/verificacao.</summary>
 /// <param name="Disponivel">false derruba a verificação de segurança dos anexos.</param>
 public sealed record VerificacaoDeTesteCorpo(bool? Disponivel);
+
+// PUT /_teste/pagamento/banco: o que o intermediador falso responde às próximas
+// cobranças, até o DELETE: "RECUSAR", "EM_ANALISE" ou "SEM_RESPOSTA" (19 RNF-242).
+public sealed record BancoDeTesteCorpo(string? Comportamento);
 
 /// <summary>O corpo de POST /_teste/contratacao (contrato autorizacao v11).</summary>
 /// <param name="Conta">A conta cuja contratação muda.</param>
@@ -127,6 +134,63 @@ public sealed class TesteController(RelogioDaAplicacao relogio) : ControllerBase
         interruptor.Disponivel = true;
         return NoContent();
     }
+
+    /// <summary>Uma rodada do agendamento do Pagamento agora (19 RN-300 a RN-302, RN-311).</summary>
+    [HttpPost("pagamento/agendamento")]
+    public async Task<IActionResult> AgendamentoDoPagamento([FromServices] IRodarAgendamentoDoPagamento rodar, CancellationToken ct)
+    {
+        await rodar.Executar(ct);
+        return NoContent();
+    }
+
+    /// <summary>O que o intermediador falso responde às próximas cobranças.</summary>
+    [HttpPut("pagamento/banco")]
+    public IActionResult Banco([FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] BancoDeTesteCorpo? corpo)
+    {
+        var falso = BancoFalso();
+        if (falso is null) return NotFound();
+        falso.Comportamento = corpo?.Comportamento switch
+        {
+            "RECUSAR" => ComportamentoDoBanco.Recusar,
+            "EM_ANALISE" => ComportamentoDoBanco.EmAnalise,
+            "SEM_RESPOSTA" => ComportamentoDoBanco.SemResposta,
+            "NORMAL" => ComportamentoDoBanco.Normal,
+            _ => throw FalhaDoPagamento.DadosInvalidos("comportamento"),
+        };
+        return NoContent();
+    }
+
+    /// <summary>O intermediador falso volta ao normal.</summary>
+    [HttpDelete("pagamento/banco")]
+    public IActionResult BancoNormal()
+    {
+        if (BancoFalso() is not { } falso) return NotFound();
+        falso.Comportamento = ComportamentoDoBanco.Normal;
+        return NoContent();
+    }
+
+    /// <summary>O que o intermediador falso recebeu do deboaz, na ordem de chegada.</summary>
+    [HttpGet("pagamento/banco/pedidos")]
+    public IActionResult PedidosAoBanco() => BancoFalso() is { } falso
+        ? Ok(new
+        {
+            itens = falso.Pedidos.Select(p => new
+            {
+                tipo = p.Tipo,
+                idExterno = p.IdExterno,
+                forma = p.Forma,
+                valor = p.Valor,
+                traceId = p.TraceId,
+                metadados = new { pagamento = p.Pagamento, estorno = p.Estorno, traceId = p.TraceId },
+                cartao = p.Cartao is { } c ? new { token = c.Token, metodo = c.Metodo, emissor = c.Emissor } : null,
+                pagador = p.Pagador is { } quem ? new { nome = quem.Nome, documento = quem.Documento, email = quem.Email } : null,
+                endereco = p.Endereco,
+            }),
+        })
+        : NotFound();
+
+    // o intermediador falso, se é ele que está em uso (Program.cs)
+    IntermediadorFalso? BancoFalso() => HttpContext.RequestServices.GetService<IntermediadorFalso>();
 
     /// <summary>
     /// Um pedido de módulo sem endereço próprio (contrato autorizacao v11, RN-285):

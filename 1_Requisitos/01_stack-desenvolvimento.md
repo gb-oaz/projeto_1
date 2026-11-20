@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "01_stack-desenvolvimento"
 tipo: "Transversal"
 titulo: "Stack de desenvolvimento"
-versao: "v19"
-data: "2026-11-05 12:34"
-status: "Aprovado"
+versao: "v20"
+data: "2026-11-15 00:39"
+status: "Em revisão"
 objetivo: "listar, antes de escrever código, as ferramentas e versões do ambiente de desenvolvimento, para que o ambiente local e o CI sejam configurados iguais."
 ---
 
-> **boaz · Transversal** · `01_stack-desenvolvimento` · **v19** · 2026-11-05 12:34 · **Aprovado**
+> **boaz · Transversal** · `01_stack-desenvolvimento` · **v20** · 2026-11-15 00:39 · **Em revisão**
 
 # Stack de desenvolvimento
 
@@ -40,6 +40,42 @@ Esquema do Cenário: tecnologia de cada frente (decisão de 2026-10-11)
     | contêineres | Docker com Docker Compose |
     | CI          | GitHub Actions            |
     | mensageria  | RabbitMQ, quando houver   |
+```
+
+<a id="intermediador-de-pagamento"></a>
+
+### Intermediador de pagamento
+
+```gherkin
+Cenário: Mercado Pago como intermediador (decisão de 2026-11-15)
+  Quando o Pagamento cobra PIX, cartão de crédito, cartão de débito ou boleto
+  Então a cobrança, o estorno e o aviso passam pelo Mercado Pago em hml e em prd
+  E o core fala só com a porta IIntermediador; o adaptador IntermediadorMercadoPago fica no ms_mono
+  E o número do cartão é tokenizado no navegador com a chave pública e nunca chega ao backend
+  E o aviso do banco só vale com x-signature conferida pelo segredo do aviso
+
+Cenário: segredos do intermediador (decisão de 2026-11-15)
+  Então a chave pública, o token de acesso e o segredo do aviso ficam no cofre de cada ambiente
+  E chegam ao backend como MercadoPago__PublicKey, MercadoPago__AccessToken
+  E MercadoPago__SegredoDoWebhook
+  E nenhum valor entra no repositório, na imagem, no pipeline ou no log
+
+Esquema do Cenário: intermediador de cada lugar (decisão de 2026-11-15)
+  Quando o backend sobe em <lugar>
+  Então usa o intermediador <intermediador>
+
+  Exemplos:
+    | lugar                                     | intermediador |
+    | prd                                       | Mercado Pago  |
+    | hml                                       | Mercado Pago  |
+    | máquina local com o token de acesso       | Mercado Pago  |
+    | máquina local sem o token de acesso       | falso         |
+    | CI local e testes, com o relógio de teste | falso         |
+
+Cenário: trocar de intermediador (decisão de 2026-11-15)
+  Quando outro intermediador substituir o Mercado Pago
+  Então entra um novo adaptador da porta IIntermediador, sem mudar o core nem o contrato da API
+  E pagamentos antigos guardam "intermediador": "MERCADO_PAGO" e seguem atendidos por ele
 ```
 
 <a id="RN-01"></a>
@@ -314,7 +350,8 @@ Esquema do Cenário: imagem pronta
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v19** | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
+| **v20** | 2026-11-15 00:39 | Decisão de 2026-11-15: Mercado Pago como intermediador de pagamento do 19 (PIX, crédito, débito e boleto), atrás da porta `IIntermediador`, com o intermediador falso fora de produção e os segredos no cofre de cada ambiente (novo cenário `intermediador-de-pagamento`) |
+| v19 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v18 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v17 | 2026-11-01 18:26 | Só Gherkin e diagramas: contexto, RN e RNF viram cenários (mesmos IDs como âncora); status → Em revisão |
 | v16 | 2026-10-25 03:57 | `RNF-173` alterado: a checagem do Xcode fica em `5_DEV/frontend/mobile/Directory.Build.props`, que reúne as propriedades comuns do mobile; status: Aprovado |
@@ -327,4 +364,4 @@ Esquema do Cenário: imagem pronta
 
 ---
 
-<sub>boaz · v19 · 2026-11-05 12:34 · `1_Requisitos/01_stack-desenvolvimento.md`</sub>
+<sub>boaz · v20 · 2026-11-15 00:39 · `1_Requisitos/01_stack-desenvolvimento.md`</sub>

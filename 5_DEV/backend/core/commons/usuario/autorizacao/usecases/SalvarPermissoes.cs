@@ -11,7 +11,8 @@ namespace Boaz.Core.Commons.Usuario.Autorizacao.UseCases;
 
 /// <summary>
 /// Salva o conjunto inteiro das permissões, tudo ou nada (RF-161, RN-254). Ordem
-/// das conferências: alvo visível (RN-235) → quem pode conceder (RN-252) →
+/// das conferências: o Pagamento só pela conta master (19 RN-299) → alvo
+/// visível (RN-235) → quem pode conceder (RN-252) →
 /// If-Match (RNF-222) → campos → versão (RF-162) → módulos contratados
 /// (RN-166) → só o que quem concede tem (RN-241). Com mudança, grava as
 /// permissões, o registro e a versão juntos (RNF-223) e avisa as sessões.
@@ -61,6 +62,7 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
     /// <summary>A regra do PUT, de quem pede ao "CONCLUIDO".</summary>
     async Task<PermissoesSalvasDto> Salvar(SalvamentoDePermissoesDto pedido, Execucao execucao, CancellationToken ct)
     {
+        await ConferirPagamento(pedido, ct);
         var (quem, modsDeQuem, alvo) = await concessao.Conferir(pedido.QuemPede, pedido.UsuarioId, ct);
         var versaoLida = pedido.VersaoLida();
         var novos = pedido.ModsLidos();
@@ -72,6 +74,38 @@ public sealed class SalvarPermissoes : ISalvarPermissoes
         await Gravar(alvo, permissoes, novos, modulos, quem.Id, versaoLida, execucao, ct);
         await auditada.Concluir(execucao, ct);
         return new PermissoesSalvasDto(permissoes.Versao, Textos.Mods(permissoes.Visiveis(modulos.Disponiveis)));
+    }
+
+    /// <summary>
+    /// O Pagamento (MOD-01) só a conta master (ou o autônomo) concede, só com a
+    /// aba Utilização, e nunca ao time do deboaz (19 RN-299). Vale só quando o
+    /// MOD-01 do corpo muda as abas do alvo: o resto do conjunto segue as
+    /// conferências de sempre. Vem antes de "quem pode conceder" para a recusa
+    /// sair com o motivo (422), e não como 403.
+    /// </summary>
+    /// <exception cref="FalhaDeAutorizacao">DADOS_INVALIDOS em <c>mods.MOD-01</c>.</exception>
+    async Task ConferirPagamento(SalvamentoDePermissoesDto pedido, CancellationToken ct)
+    {
+        const string mod = FalhaDeAutorizacao.ModuloDoPagamento;
+        IReadOnlyDictionary<string, Abas> novos;
+        try
+        {
+            novos = pedido.ModsLidos();
+        }
+        catch (FalhaDeAutorizacao)
+        {
+            return; // o corpo inválido sai pela conferência dos campos, na ordem de sempre
+        }
+        if (!novos.TryGetValue(mod, out var abas)) return;
+        var quem = await leitor.Usuario(pedido.QuemPede, ct);
+        var alvo = await leitor.Usuario(pedido.UsuarioId, ct);
+        if (quem is null || alvo is null || (alvo.ContaId != quem.ContaId && !quem.Papel.DoTime())) return;
+        var antes = (await leitor.Guardadas(alvo.Id, ct)).Visiveis((await leitor.ModulosDe(alvo, ct)).Disponiveis);
+        if (antes.TryGetValue(mod, out var atuais) && atuais == abas) return;
+
+        if (alvo.Papel.DoTime() || quem.Papel.DoTime()) throw FalhaDeAutorizacao.PagamentoRecusado("O módulo MOD-01 não pode ser concedido.");
+        if (quem.Papel is not (Papel.Master or Papel.Autonomo)) throw FalhaDeAutorizacao.PagamentoRecusado("Só a conta master concede o Pagamento.");
+        if (abas != Abas.U) throw FalhaDeAutorizacao.PagamentoRecusado("O Pagamento só tem a aba Utilização.");
     }
 
     /// <summary>As permissões guardadas do alvo, se ainda estão na versão lida (RF-162).</summary>

@@ -21,6 +21,15 @@ public sealed class Respostas(Mundo mundo)
         Assert.Equal(mensagem, mundo.Ultima.Corpo?["mensagem"]?.GetValue<string>());
     }
 
+    // a última resposta, venha de onde vier, e o "nada muda" que o Quando deixou em Mundo.NadaMudou
+    [Then(@"^a resposta é (\d{3}) ([A-Z_]+) e nada muda$")]
+    public async Task NadaMuda(int status, string codigo)
+    {
+        Confere(mundo.Ultima, status, codigo);
+        var conferir = mundo.NadaMudou ?? throw new InvalidOperationException("o Quando não disse o que conferir em \"nada muda\" (Mundo.NadaMudou)");
+        await conferir();
+    }
+
     [Then(@"^a mensagem é ""(.*)""$")]
     public void Mensagem(string mensagem) =>
         Assert.True(mundo.Ultima.Corpo?["mensagem"]?.GetValue<string>() == mensagem, $"esperava a mensagem \"{mensagem}\", veio {mundo.Ultima}");

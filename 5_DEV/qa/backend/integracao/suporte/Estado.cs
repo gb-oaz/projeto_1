@@ -73,7 +73,7 @@ public static class Estado
     // (15_modulos): da conta, contratáveis e do time
     static readonly (string Id, string Nome, string Tipo)[] Modulos =
     [
-        ("MOD-02", "SAC", "DA_CONTA"), ("MOD-03", "Usuários", "DA_CONTA"), ("MOD-04", "Sugestão", "DA_CONTA"),
+        ("MOD-01", "Pagamento", "DA_CONTA"), ("MOD-02", "SAC", "DA_CONTA"), ("MOD-03", "Usuários", "DA_CONTA"), ("MOD-04", "Sugestão", "DA_CONTA"),
         ("MOD-05", "Quiz", "CONTRATAVEL"), ("MOD-06", "Presença", "CONTRATAVEL"), ("MOD-07", "Carteirinha", "CONTRATAVEL"),
         ("MOD-08", "Turmas", "DA_CONTA"), ("MOD-09", "Tarefas", "DA_CONTA"), ("MOD-12", "Agenda", "CONTRATAVEL"),
         ("MOD-13", "Perfil", "DA_CONTA"), ("MOD-14", "Catálogo", "DO_TIME"),
@@ -123,6 +123,39 @@ public static class Estado
             ["ate"] = BsonNull.Value,
             ["automatica"] = false,
         });
+
+    // a cobrança de um módulo fechada na competência (16_modulo-catalogo, coleção
+    // cobrancas, modelo pagamento-documentos v02): o Pagamento só a lê, no
+    // fechamento do dia 1, e ela vira um item da fatura (19 RN-300). O Catálogo
+    // ainda não tem endereço que a crie. Valor em Decimal128, data em UTC
+    public static Task Cobranca(string contaId, string sigla, string moduloId, string competencia, decimal total)
+    {
+        var mes = DateTime.SpecifyKind(DateTime.Parse($"{competencia}-01T00:00:00"), DateTimeKind.Utc);
+        return Banco.GetCollection<BsonDocument>("cobrancas").ReplaceOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", IdDaCobranca(sigla, moduloId, competencia)),
+            new BsonDocument
+            {
+                ["_id"] = IdDaCobranca(sigla, moduloId, competencia),
+                ["contaId"] = contaId,
+                ["moduloId"] = moduloId,
+                ["competencia"] = competencia,
+                ["fechadaEm"] = mes.AddMonths(1).AddSeconds(-1),
+                ["total"] = new BsonDecimal128(total),
+            },
+            new ReplaceOptions { IsUpsert = true });
+    }
+
+    // um campo de um documento do Pagamento que a API não deixa preparar
+    // (modelo pagamento-documentos v03): o vencimento fora do dia 10 (19
+    // RF-191, ordem das vencidas) e o intermediador de um pagamento gerado
+    // antes da troca (RNF-242). Só preparo: a suíte não lê essas coleções
+    public static Task Atualizar(string colecao, string id, string campo, BsonValue valor) =>
+        Banco.GetCollection<BsonDocument>(colecao).UpdateOneAsync(
+            Builders<BsonDocument>.Filter.Eq("_id", id), Builders<BsonDocument>.Update.Set(campo, valor));
+
+    // "cob-ebfga-MOD-03-2026-11", como no exemplo do 19 RF-183
+    public static string IdDaCobranca(string sigla, string moduloId, string competencia) =>
+        $"cob-{sigla.ToLowerInvariant()}-{moduloId}-{competencia}";
 
     // a contratação em vigor termina agora
     public static Task Descontratar(string contaId, string moduloId) =>

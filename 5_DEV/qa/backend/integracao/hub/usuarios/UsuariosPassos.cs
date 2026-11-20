@@ -167,9 +167,14 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
     public async Task CaioReativa(string caminho, string estado)
     {
         var caio = await CaioComUsuarios();
-        modsAntes = Mods(Jwt.Carga((await mundo.Entrar(await mundo.Maria(), Navegador)).Acesso));
         var conta = await mundo.Traduzir(caminho);
-        Exigir(await mundo.EnviarComo(caio, "POST", conta, """{ "estado": "DESATIVADA" }"""), 200, "POST /contas/{id}/estado");
+        // reativar: a conta sai do ar antes, com as permissões da Maria guardadas;
+        // o encerramento recusado (FATURA_EM_ABERTO) parte da conta ativa
+        if (estado == "ATIVA")
+        {
+            modsAntes = Mods(Jwt.Carga((await mundo.Entrar(await mundo.Maria(), Navegador)).Acesso));
+            Exigir(await mundo.EnviarComo(caio, "POST", conta, """{ "estado": "DESATIVADA" }"""), 200, "POST /contas/{id}/estado");
+        }
         acao = await mundo.EnviarComo(caio, "POST", conta, new JsonObject { ["estado"] = estado }.ToJsonString());
     }
 
@@ -222,7 +227,7 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
     }
 
     // a Carla usa o passo de RN-232 (Autorização), que também não exige 200
-    [When(@"^(a staff Maria|o Lucas|o Paulo) envia POST (\S+)$")]
+    [When(@"^(a staff Maria|o Lucas|o Paulo) envia POST ((?!/pagamento/)\S+)$")]
     public async Task TentaEntrar(string quem, string _)
     {
         if (quem == "o Lucas") await mundo.TentarQuest(App, new JsonObject { ["tipo"] = "PARTICIPANTE" });
@@ -851,14 +856,14 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
         var lido = await Ler(alvo);
         antes = lido.Corpo?.AsObject();
         loginAntes = antes?["login"]?.GetValue<string>() ?? "";
+        // "a resposta é … e nada muda" (suporte/Respostas.cs): nome curto, login e matrícula como antes
+        mundo.NadaMudou = NadaMudaNoCadastro;
         acao = await mundo.EnviarComo(await mundo.Master(), "PATCH", alvo,
             new JsonObject { [campo == "o nome curto" ? "nomeCurto" : "matricula"] = valor }.ToJsonString());
     }
 
-    [Then(@"^a resposta é (\d{3}) ([A-Z_]+) e nada muda$")]
-    public async Task NadaMuda(int status, string codigo)
+    async Task NadaMudaNoCadastro()
     {
-        Respostas.Confere(acao, status, codigo);
         var agora = (await Ler(alvo)).Corpo!;
         foreach (var campo in new[] { "nomeCurto", "login", "matricula" }) Assert.Equal(antes?[campo]?.ToJsonString(), agora[campo]?.ToJsonString());
     }
@@ -950,7 +955,10 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
     public async Task AdminConcede(string caminho, string mod, string abas)
     {
         var alvo = await mundo.Traduzir(caminho);
-        var versao = Exigir(await mundo.EnviarComo(mundo.Admin(), "GET", alvo), 200, caminho).Corpo!["versao"]!.GetValue<int>();
+        var lidas = Exigir(await mundo.EnviarComo(mundo.Admin(), "GET", alvo), 200, caminho).Corpo!.AsObject();
+        // 17-b RF-161: "as permissões de … não mudam" compara com esta leitura
+        mundo.PermissoesLidas[alvo.Split('/')[2]] = (mundo.Admin(), lidas);
+        var versao = lidas["versao"]!.GetValue<int>();
         await mundo.EnviarComo(mundo.Admin(), "PUT", alvo, new JsonObject { ["mods"] = new JsonObject { [mod] = abas } }.ToJsonString(), versao.ToString());
     }
 
@@ -992,7 +1000,9 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
         Respostas.Confere(mundo.Ultima, 200);
         var concediveis = Concediveis();
         Assert.Equal(abas, concediveis.GetValueOrDefault("MOD-05"));
-        Assert.All(concediveis.Values, a => Assert.Equal(abas, a));
+        // o Pagamento não é contratado pelo Catálogo: a conta master o concede só com "U" (17-b RF-160, 19 RN-299)
+        Assert.Equal("U", concediveis.GetValueOrDefault("MOD-01"));
+        Assert.All(concediveis.Where(c => c.Key != "MOD-01"), c => Assert.Equal(abas, c.Value));
         Assert.DoesNotContain("MOD-06", concediveis.Keys);
     }
 

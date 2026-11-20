@@ -10,15 +10,19 @@ using Boaz.Core.Commons.Usuario.Usuarios.Ports.Out;
 namespace Boaz.Core.Commons.Usuario.Usuarios.UseCases;
 
 /// <summary>
-/// POST /contas/{id}/estado (RF-113, RN-173 a RN-175): fora de ATIVA, as sessões
-/// da conta terminam; ENCERRADA apaga os dados e não volta. Auditado com o
+/// POST /contas/{id}/estado (RF-113, RN-173 a RN-175): o time deboaz muda o
+/// estado de qualquer conta; a conta master e o autônomo só desativam a própria
+/// conta (o resto, 403). Fora de ATIVA, as sessões da conta terminam; a fatura
+/// em aberto segue devida no Pagamento, e a conta com fatura em aberto não se
+/// encerra (409 FATURA_EM_ABERTO, 19 RN-313); ENCERRADA apaga os dados e não
+/// volta. Auditado com o
 /// traceId recebido: "INICIADO" com quem e a conta pedida (contaId e alvo),
 /// "CONCLUIDO" antes de responder e, na recusa ou na falha, o registro de erro
 /// antes de a exceção sair (RN-178, RN-270, RN-271).
 /// </summary>
 public sealed class MudarEstadoDaConta(
     IUsuarios usuarios, IContas contas, ISessoesDosUsuarios sessoes, IAuditoria auditoria, IAuditoriaDeErros erros, TimeProvider relogio,
-    IAtualizarCardUsuarios cardsDoModulo)
+    IAtualizarCardUsuarios cardsDoModulo, IContaTemFaturaEmAberto faturasEmAberto)
     : IMudarEstadoDaConta
 {
     readonly Apoio apoio = new(usuarios, contas, relogio);
@@ -35,6 +39,10 @@ public sealed class MudarEstadoDaConta(
     async Task<ContaComEstadoDto> Mudar(EstadoDaContaDto pedido, Execucao execucao, CancellationToken ct)
     {
         var (conta, novo) = await ContaEEstadoPedidos(pedido, ct);
+        if (novo == EstadoConta.Encerrada && conta.Estado != EstadoConta.Encerrada && await faturasEmAberto.Executar(conta.Id, ct))
+        {
+            throw FalhaDeUsuarios.FaturaEmAberto();
+        }
         if (conta.MudarEstado(novo))
         {
             await Gravar(conta, novo, execucao, ct);
@@ -44,12 +52,18 @@ public sealed class MudarEstadoDaConta(
         return new(conta.Id, conta.Estado.Texto());
     }
 
-    /// <summary>A conta assinante e o estado pedido, se quem pede é do time deboaz (RN-173).</summary>
+    /// <summary>
+    /// A conta assinante e o estado pedido (RN-173): o time deboaz pede qualquer
+    /// estado; a conta master e o autônomo só "DESATIVADA" da própria conta.
+    /// </summary>
     /// <exception cref="FalhaDeUsuarios">ACESSO_NEGADO, DADOS_INVALIDOS ou CONTA_INEXISTENTE.</exception>
     async Task<(ContaAssinante Conta, EstadoConta Novo)> ContaEEstadoPedidos(EstadoDaContaDto pedido, CancellationToken ct)
     {
-        await apoio.DoTime(pedido.QuemPede, ct);
+        var quem = await apoio.Quem(pedido.QuemPede, ct);
+        var daPropria = quem.Tipo == TipoUsuario.Master && quem.ContaId == pedido.ContaId;
+        if (!quem.Tipo.DoTime() && !daPropria) throw FalhaDeUsuarios.AcessoNegado();
         var novo = pedido.Validar();
+        if (!quem.Tipo.DoTime() && novo != EstadoConta.Desativada) throw FalhaDeUsuarios.AcessoNegado();
         return (await apoio.Assinante(pedido.ContaId, ct), novo);
     }
 

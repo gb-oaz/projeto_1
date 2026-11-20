@@ -17,6 +17,7 @@ public class CalculoDePermissoesTests
         new("MOD-06", "Presença", TipoDeModulo.Contratavel, new HashSet<(Perfil, FrenteDeUso)> { (Staff, Hub), (Responsavel, Quest) }),
         new("MOD-13", "Perfil", TipoDeModulo.DaConta, new HashSet<(Perfil, FrenteDeUso)> { (Participante, Quest) }),
         new("MOD-14", "Catálogo", TipoDeModulo.DoTime, new HashSet<(Perfil, FrenteDeUso)> { (Administrador, Hub), (MembroTime, Hub) }),
+        new("MOD-01", "Pagamento", TipoDeModulo.DaConta, new HashSet<(Perfil, FrenteDeUso)> { (Master, Hub), (Autonomo, Hub), (Staff, Hub) }),
     ];
 
     static ModulosDaConta Escola(params string[] contratados) => new(Registro, contratados.ToHashSet(), contaDoTime: false);
@@ -27,9 +28,9 @@ public class CalculoDePermissoesTests
     [Fact]
     public void RN_203_modulos_da_conta()
     {
-        Assert.Equal(["MOD-02", "MOD-03", "MOD-13"], Escola().Disponiveis.Order());
-        Assert.Equal(["MOD-02", "MOD-03", "MOD-05", "MOD-13"], Escola("MOD-05").Disponiveis.Order());
-        Assert.Equal(["MOD-02", "MOD-03", "MOD-13", "MOD-14"], Time().Disponiveis.Order());
+        Assert.Equal(["MOD-01", "MOD-02", "MOD-03", "MOD-13"], Escola().Disponiveis.Order());
+        Assert.Equal(["MOD-01", "MOD-02", "MOD-03", "MOD-05", "MOD-13"], Escola("MOD-05").Disponiveis.Order());
+        Assert.Equal(["MOD-01", "MOD-02", "MOD-03", "MOD-13", "MOD-14"], Time().Disponiveis.Order());
         Assert.Null(Escola().Registrado("MOD-99"));
     }
 
@@ -37,7 +38,8 @@ public class CalculoDePermissoesTests
     public void RN_233_administrador_tem_os_do_time_com_as_duas_abas()
     {
         var token = CalculoDePermissoes.Calcular(Pessoa("adm", Papel.Administrador, "conta-dboaz"), Guardadas(), Time());
-        Assert.Equal(Mods(("MOD-02", "CU"), ("MOD-03", "CU"), ("MOD-14", "CU")), token.Mods);
+        // MOD-01 só com "U", para o card do Pagamento (17-b RN-233-api, 19 RN-298)
+        Assert.Equal(Mods(("MOD-01", "U"), ("MOD-02", "CU"), ("MOD-03", "CU"), ("MOD-14", "CU")), token.Mods);
         Assert.Equal((Papel.Administrador, 9), (token.Papel, token.Pv));
     }
 
@@ -47,7 +49,7 @@ public class CalculoDePermissoesTests
     public void RN_233_conta_master_e_autonomo_tem_os_da_conta_e_os_contratados_do_hub(Papel papel)
     {
         var token = CalculoDePermissoes.Calcular(Pessoa("m", papel), Guardadas(), Escola("MOD-05"));
-        Assert.Equal(Mods(("MOD-02", "CU"), ("MOD-03", "CU"), ("MOD-05", "CU")), token.Mods);
+        Assert.Equal(Mods(("MOD-01", "U"), ("MOD-02", "CU"), ("MOD-03", "CU"), ("MOD-05", "CU")), token.Mods);
     }
 
     [Fact]
@@ -112,14 +114,16 @@ public class CalculoDePermissoesTests
     public void RF_160_conta_master_concede_tudo_que_o_staff_usa()
     {
         var concediveis = CalculoDePermissoes.Concediveis(Pessoa("m", Papel.Master), Mods(), Pessoa("s", Papel.Staff), Escola("MOD-05", "MOD-06"));
-        Assert.Equal(Mods(("MOD-03", "CU"), ("MOD-05", "CU"), ("MOD-06", "CU")), concediveis);
+        // o Pagamento só com a Utilização, e só a conta master o concede (17-b RF-160-api)
+        Assert.Equal(Mods(("MOD-01", "U"), ("MOD-03", "CU"), ("MOD-05", "CU"), ("MOD-06", "CU")), concediveis);
     }
 
     [Fact]
     public void RF_160_staff_concede_so_o_que_tem_inclusive_administrar_usuarios()
     {
-        var concediveis = CalculoDePermissoes.Concediveis(Pessoa("j", Papel.Staff), Mods(("MOD-03", "CU"), ("MOD-05", "U")),
+        var concediveis = CalculoDePermissoes.Concediveis(Pessoa("j", Papel.Staff), Mods(("MOD-01", "U"), ("MOD-03", "CU"), ("MOD-05", "U")),
             Pessoa("a", Papel.Staff), Escola("MOD-05", "MOD-06"));
+        // a staff com o Pagamento não o concede (17-b RF-160-api)
         Assert.Equal(Mods(("MOD-03", "CU"), ("MOD-05", "U")), concediveis);
     }
 

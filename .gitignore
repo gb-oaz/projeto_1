@@ -83,6 +83,10 @@ DerivedData/
 .gradle/
 local.properties
 
+# ── Python (scripts de apoio, como 5_DEV/backend/scripts/) ──────────────────
+__pycache__/
+*.pyc
+
 # ── sistema e editores ───────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db

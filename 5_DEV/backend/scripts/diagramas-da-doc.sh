@@ -20,6 +20,7 @@ legendas=(
   identidade-acesso usuarios-sequencia usuario-inicializacao-sequencia usuarios-contrato-api identidade-acesso-classes usuario-hexagonal identidade-acesso-documentos
   autorizacao-casos-de-uso autorizacao-sequencia autorizacao-contrato-api autorizacao-classes autorizacao-documentos
   sac-casos-de-uso sac-sequencia sac-inicializacao-sequencia sac-contrato-api sac-classes sac-hexagonal sac-documentos
+  pagamento-casos-de-uso pagamento-sequencia pagamento-contrato-api pagamento-classes pagamento-hexagonal pagamento-documentos
 )
 
 mkdir -p "$destino"

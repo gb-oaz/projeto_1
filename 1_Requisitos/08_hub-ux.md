@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "08_hub-ux"
 tipo: "Funcionalidade"
 titulo: "Hub · UX base"
-versao: "v28"
-data: "2026-11-05 12:34"
-status: "Aprovado"
+versao: "v29"
+data: "2026-11-15 00:42"
+status: "Em revisão"
 objetivo: "definir como o hub se organiza no celular e na web — entrada, navegação, módulos (contratados, da conta e a contratar), feed, módulo aberto e conta — com espaços fixos para cada módulo trabalhar."
 ---
 
-> **boaz · Funcionalidade** · `08_hub-ux` · **v28** · 2026-11-05 12:34 · **Aprovado**
+> **boaz · Funcionalidade** · `08_hub-ux` · **v29** · 2026-11-15 00:42 · **Em revisão**
 
 # Hub · UX base
 
@@ -538,7 +538,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v28** | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
+| **v29** | 2026-11-15 00:42 | Fora de escopo: cobrança e pagamento ficam no módulo Pagamento ([19_modulo-pagamento](19_modulo-pagamento.md), `MOD-01`), não mais no Contas |
+| v28 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md` |
 | v27 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
 | v26 | 2026-11-01 18:23 | Só Gherkin, telas e diagramas: contexto e exemplo da presença, tabelas de RF, RN e RNF e fora de escopo viram cenários (mesmos IDs como âncora); blueprints em Telas; status → Em revisão |
 | v25 | 2026-11-01 03:57 | Aprovado |
@@ -551,4 +552,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v28 · 2026-11-05 12:34 · `1_Requisitos/08_hub-ux.md`</sub>
+<sub>boaz · v29 · 2026-11-15 00:42 · `1_Requisitos/08_hub-ux.md`</sub>

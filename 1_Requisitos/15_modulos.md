@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "15_modulos"
 tipo: "Funcionalidade"
 titulo: "Módulos"
-versao: "v31"
-data: "2026-11-12 16:58"
+versao: "v32"
+data: "2026-11-15 00:41"
 status: "Em revisão"
 objetivo: "definir como um módulo do deboaz é construído, para que todo módulo siga o mesmo molde antes de entrar no catálogo."
 ---
 
-> **boaz · Funcionalidade** · `15_modulos` · **v31** · 2026-11-12 16:58 · **Em revisão**
+> **boaz · Funcionalidade** · `15_modulos` · **v32** · 2026-11-15 00:41 · **Em revisão**
 
 # Módulos
 
@@ -609,16 +609,19 @@ Cenário: sessão terminada com o ao vivo aberto
 
 <a id="MOD-01"></a>
 
-### `MOD-01` Contas
+### `MOD-01` Pagamento
 
 ```gherkin
-Esquema do Cenário: registro do Contas
-  Dado o módulo "MOD-01" Contas, da conta, sem custo, sem documento, Registrado
+Esquema do Cenário: registro do Pagamento
+  Dado o módulo "MOD-01" Pagamento, da conta, sem custo, Especificado
+  E o documento 19_modulo-pagamento
   Então <perfil> o usa no <frente> para <objetivo>
 
   Exemplos:
-    | perfil                      | frente | objetivo                                  |
-    | a conta master e o autônomo | hub    | ver e pagar a cobrança mensal dos módulos |
+    | perfil                        | frente | objetivo                                            |
+    | a conta master e o autônomo   | hub    | ver e pagar a fatura mensal dos módulos             |
+    | a staff com Pagamento U       | hub    | pagar a fatura da conta, por delegação da master    |
+    | o administrador do deboaz     | hub    | ver recebimentos, cancelar, estornar e configurar   |
 ```
 
 <a id="MOD-02"></a>
@@ -998,7 +1001,8 @@ Cenário: quarta conexão do mesmo usuário
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v31** | 2026-11-12 16:58 | `MOD-02` SAC Especificado, com o documento [18_modulo-sac](18_modulo-sac.md) |
+| **v32** | 2026-11-15 00:41 | `MOD-01` passa de Contas a Pagamento, Especificado, com o documento [19_modulo-pagamento](19_modulo-pagamento.md): a conta master, o autônomo e a staff delegada pagam a fatura; o administrador do deboaz acompanha os recebimentos |
+| v31 | 2026-11-12 16:58 | `MOD-02` SAC Especificado, com o documento [18_modulo-sac](18_modulo-sac.md) |
 | v30 | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Dado, Então ou E (`RF-129`, `RF-133`, `RN-278`, `RN-279`, `RN-282`), sem mudar o comportamento |
 | v29 | 2026-11-09 03:21 | `RN-279`: a linha "Intervalo" só aparece com "Ao vivo" marcado; `RN-282`: aviso em snackbar sem ação que some sozinho, com "Na abertura" visível no seletor; "reconectando…" nos cards sem travar a tela; SESSAO_TERMINADA leva à tela de entrada, sem aviso de pausa |
 | v28 | 2026-11-09 00:53 | `RN-282`: a pausa depois do "encerrado" é só daquele aparelho e não muda o "Ao vivo" salvo; reabrir o app não religa, só marcar "Ao vivo" de novo no aparelho, sem salvar nada novo; Em aberto respondido e seção removida |
@@ -1011,4 +1015,4 @@ Cenário: quarta conexão do mesmo usuário
 
 ---
 
-<sub>boaz · v31 · 2026-11-12 16:58 · `1_Requisitos/15_modulos.md`</sub>
+<sub>boaz · v32 · 2026-11-15 00:41 · `1_Requisitos/15_modulos.md`</sub>

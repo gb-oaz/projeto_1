@@ -39,8 +39,10 @@ public class LerPermissoesTests
     {
         var lidas = await mundo.Ler("usr-ebfga-master", "usr-ebfga-maria");
         Assert.Equal(7, lidas.Versao);
-        Assert.Equal(["MOD-03", "MOD-04", "MOD-05", "MOD-06", "MOD-08", "MOD-09"], lidas.Concediveis.Select(c => c.Mod));
-        Assert.All(lidas.Concediveis, c => Assert.Equal("CU", c.Abas));
+        Assert.Equal(["MOD-01", "MOD-03", "MOD-04", "MOD-05", "MOD-06", "MOD-08", "MOD-09"], lidas.Concediveis.Select(c => c.Mod));
+        // o Pagamento só com a Utilização (17-b RF-160-api)
+        Assert.Equal(new ConcedivelDto("MOD-01", "Pagamento", "U"), lidas.Concediveis[0]);
+        Assert.All(lidas.Concediveis.Skip(1), c => Assert.Equal("CU", c.Abas));
     }
 
     [Fact]

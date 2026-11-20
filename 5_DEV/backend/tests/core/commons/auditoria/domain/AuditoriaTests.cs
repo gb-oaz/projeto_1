@@ -39,6 +39,9 @@ public class AuditoriaTests
             "ESQUECI_SENHA_MASTER", "ENCERRAR_SESSOES_DO_USUARIO", "AVISAR_PERMISSOES_NOVAS", "AVISAR_CONTRATACAO_MUDOU",
             // 18 RN-297: as ações do SAC
             "ABRIR_CHAMADO", "ENVIAR_MENSAGEM", "ASSUMIR_CHAMADO", "MUDAR_STATUS", "REABRIR_CHAMADO", "ENCERRAR_CHAMADO", "AVALIAR_CHAMADO",
-            "SALVAR_PRAZOS_SAC", "FECHAR_POR_PRAZO"],
+            "SALVAR_PRAZOS_SAC", "FECHAR_POR_PRAZO",
+            // 19 RN-309: as ações do Pagamento
+            "PAGAMENTO_CRIADO", "PAGAMENTO_CANCELADO", "FATURA_CANCELADA", "ESTORNO_PEDIDO", "CONFIGURACAO_SALVA", "AVISO_DO_BANCO",
+            "FATURA_VENCIDA"],
             Enum.GetValues<AcaoAuditada>().Select(a => a.Texto()));
 }

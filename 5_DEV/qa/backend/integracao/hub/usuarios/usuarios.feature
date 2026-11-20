@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v109), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario.md (v110), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Usuários
   1_Requisitos/17_modulo-usuario.md · Cenários de API
@@ -178,8 +178,9 @@ Funcionalidade: Usuários
     Então a resposta é 409 ESTADO_IGUAL
 
   @RF-113
-  Cenário: falta de pagamento
+  Cenário: o time deboaz desativa a conta
     Dado o token do membro do time Caio, com "MOD-03" com "U"
+    E a conta-ebfga com a FAT-000402 "A_PAGAR"
     Quando envia POST /contas/conta-ebfga/estado com:
       """
       {
@@ -189,11 +190,51 @@ Funcionalidade: Usuários
     Então a resposta é 200 com o estado "DESATIVADA"
     E POST /auth/hub/entrar da Maria e POST /auth/quest/entrar do Lucas recebem 403
     E GET /contas?estado=DESATIVADA traz a EBFGA
+    E GET /pagamento/recebimentos/faturas/FAT-000402 segue com o status "A_PAGAR"
 
   @RF-113
-  Cenário: pagamento regularizado
+  Esquema do Cenário: a própria conta se desativa
+    Dado o token de <quem>
+    Quando envia POST /contas/<conta>/estado com o estado "DESATIVADA"
+    Então a resposta é 200 com o estado "DESATIVADA"
+    E o próximo pedido com esse token recebe 401 SESSAO_TERMINADA
+    E a fatura em aberto da <conta> segue devida
+
+    Exemplos:
+      | quem                    | conta            |
+      | a conta master da EBFGA | conta-ebfga      |
+      | o autônomo Pedro Reis   | conta-pedro-reis |
+
+  @RF-113
+  Esquema do Cenário: o que a própria conta não pode
+    Dado o token de <quem>
+    Quando envia POST /contas/<conta>/estado com o estado "<estado>"
+    Então a resposta é 403 ACESSO_NEGADO e o estado da <conta> não muda
+
+    Exemplos:
+      | quem                                 | conta            | estado     |
+      | a conta master da EBFGA              | conta-ebfga      | SUSPENSA   |
+      | a conta master da EBFGA              | conta-ebfga      | ENCERRADA  |
+      | a conta master da EBFGA              | conta-pedro-reis | DESATIVADA |
+      | a staff Maria, com "MOD-03" com "CU" | conta-ebfga      | DESATIVADA |
+
+  @RF-113
+  Cenário: reativar · RF-113
     Quando o Caio envia POST /contas/conta-ebfga/estado com o estado "ATIVA"
     Então a resposta é 200 e a Maria e o Lucas voltam a entrar com as mesmas permissões
+
+  @RF-113
+  Cenário: encerramento recusado com fatura em aberto
+    Dado a conta-ebfga com a FAT-000402 "A_PAGAR"
+    Quando o Caio envia POST /contas/conta-ebfga/estado com o estado "ENCERRADA"
+    Então a resposta é 409 com:
+      """
+      {
+        "codigo": "FATURA_EM_ABERTO",
+        "mensagem": "Esta conta tem fatura em aberto e não pode ser excluída."
+      }
+      """
+    E a conta-ebfga e a FAT-000402 seguem como estavam
 
   @RF-114
   Cenário: ler e salvar o tempo da escola
@@ -441,11 +482,11 @@ Funcionalidade: Usuários
     Então a resposta é 200 e o estado significa <motivo>
 
     Exemplos:
-      | estado     | motivo                                        |
-      | ATIVA      | uso normal                                    |
-      | SUSPENSA   | decisão temporária do time deboaz             |
-      | DESATIVADA | falta de pagamento, volta com a regularização |
-      | ENCERRADA  | pedido do cliente                             |
+      | estado     | motivo                                                  |
+      | ATIVA      | uso normal                                              |
+      | SUSPENSA   | decisão temporária do time deboaz                       |
+      | DESATIVADA | pausa pelo time ou pela própria conta, volta reativada  |
+      | ENCERRADA  | pedido do cliente, só sem fatura em aberto              |
 
   @RN-173
   Cenário: conta encerrada não volta

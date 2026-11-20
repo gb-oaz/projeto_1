@@ -22,6 +22,9 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     // SAC (18_modulo-sac v05, sac-contrato-api v02): API própria, como o Usuários
     [InlineData("/doc/api/sac.json", "application/json")]
     [InlineData("/doc/api/diagramas/sac-contrato-api.svg", "image/svg+xml")]
+    // Pagamento (19_modulo-pagamento v04, pagamento-contrato-api v02): API própria, como o SAC
+    [InlineData("/doc/api/pagamento.json", "application/json")]
+    [InlineData("/doc/api/diagramas/pagamento-contrato-api.svg", "image/svg+xml")]
     [InlineData("/doc/api/swagger.css", "text/css")]
     [InlineData("/doc/api/design/banner.svg", "image/svg+xml")]
     [InlineData("/doc/api/design/banner-parado.svg", "image/svg+xml")]
@@ -73,6 +76,31 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
         Assert.True(sac > autorizacao && autorizacao >= 0, "o seletor não traz /doc/api/sac.json depois de /doc/api/autorizacao.json");
     }
 
+    // Pagamento (MOD-01): entra no seletor depois do SAC
+    [Fact]
+    public async Task Seletor_traz_o_pagamento_depois_do_sac()
+    {
+        using var cliente = Cliente(true);
+
+        var configuracao = await cliente.GetStringAsync("/doc/api/index.js");
+
+        var sac = configuracao.IndexOf("/doc/api/sac.json", StringComparison.Ordinal);
+        var pagamento = configuracao.IndexOf("/doc/api/pagamento.json", StringComparison.Ordinal);
+        Assert.True(pagamento > sac && sac >= 0, "o seletor não traz /doc/api/pagamento.json depois de /doc/api/sac.json");
+    }
+
+    // a capa lista o Pagamento na tabela das APIs do catálogo
+    [Fact]
+    public async Task Capa_lista_o_pagamento()
+    {
+        using var cliente = Cliente(true);
+
+        var documento = await cliente.GetStringAsync("/doc/api/catalogo.json");
+
+        Assert.Contains("**Pagamento**", documento);
+        Assert.Contains("`/pagamento/", documento);
+    }
+
     // a capa lista o SAC na tabela das APIs do catálogo, como lista o Usuários
     [Fact]
     public async Task Capa_lista_o_sac()
@@ -105,6 +133,7 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     [InlineData("usuarios", "/contas", "/auth/hub/entrar", "usuarios-contrato-api.svg")]
     [InlineData("autorizacao", "/usuarios/{id}/permissoes", "/contas", "autorizacao-casos-de-uso.svg")]
     [InlineData("sac", "/sac/chamados", "/contas", "sac-contrato-api.svg")]
+    [InlineData("pagamento", "/pagamento/faturas", "/_teste/pagamento/agendamento", "pagamento-contrato-api.svg")]
     public async Task Cada_modulo_e_uma_api_com_guia_e_diagramas(string api, string tem, string naoTem, string diagrama)
     {
         using var cliente = Cliente(true);
@@ -128,6 +157,8 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     [InlineData("autorizacao", "autorizacao-casos-de-uso", "autorizacao-sequencia", "autorizacao-contrato-api", "autorizacao-classes", "autorizacao-documentos")]
     // os 7 diagramas da seção Diagramas de 18_modulo-sac v05, na ordem do usuarios
     [InlineData("sac", "sac-casos-de-uso", "sac-sequencia", "sac-inicializacao-sequencia", "sac-contrato-api", "sac-classes", "sac-hexagonal", "sac-documentos")]
+    // os 6 diagramas da seção Diagramas de 19_modulo-pagamento v04
+    [InlineData("pagamento", "pagamento-casos-de-uso", "pagamento-sequencia", "pagamento-contrato-api", "pagamento-classes", "pagamento-hexagonal", "pagamento-documentos")]
     public async Task Guia_mostra_todos_os_diagramas_do_modulo_por_tipo(string api, params string[] legendas)
     {
         using var cliente = Cliente(true);
@@ -157,6 +188,9 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     [InlineData("autorizacao", "/usuarios/{id}/permissoes", "put", true)]
     [InlineData("sac", "/sac/chamados", "post", true)]
     [InlineData("sac", "/sac/configuracao", "put", true)]
+    [InlineData("pagamento", "/pagamento/faturas", "get", true)]
+    [InlineData("pagamento", "/pagamento/recebimentos/configuracao", "put", true)]
+    [InlineData("pagamento", "/pagamento/notificacoes", "post", false)]
     public async Task Cadeado_so_nos_enderecos_com_login(string api, string caminho, string metodo, bool comLogin)
     {
         using var cliente = Cliente(true);
@@ -174,6 +208,7 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
     [InlineData("usuarios")]
     [InlineData("autorizacao")]
     [InlineData("sac")]
+    [InlineData("pagamento")]
     public async Task Todo_endpoint_traz_os_exemplos_do_contrato(string api)
     {
         using var cliente = Cliente(true);
@@ -213,6 +248,41 @@ public class DocumentacaoApiTests(WebApplicationFactory<Program> fabrica) : ICla
         var bloqueada = entrar["responses"]!["429"]!["content"]!["application/json"]!["examples"]!["ENTRADA_BLOQUEADA"]!["value"]!;
         Assert.Equal("ENTRADA_BLOQUEADA", bloqueada["codigo"]!.GetValue<string>());
         Assert.NotNull(bloqueada["tentarEm"]);
+    }
+
+    // 19 RNF-243: toda resposta de /pagamento/* traz o X-Trace-Id, e o pedido pode mandar o de origem;
+    // o PUT da configuração pede o If-Match; o ao vivo é text/event-stream e os documentos, PDF
+    [Fact]
+    public async Task Pagamento_mostra_o_trace_o_if_match_o_fluxo_e_os_pdfs()
+    {
+        using var cliente = Cliente(true);
+
+        var documento = System.Text.Json.Nodes.JsonNode.Parse(await cliente.GetStringAsync("/doc/api/pagamento.json"))!;
+        var caminhos = documento["paths"]!.AsObject();
+
+        Assert.DoesNotContain(caminhos, p => p.Key.StartsWith("/_teste", StringComparison.Ordinal));
+        foreach (var (caminho, metodos) in caminhos)
+        {
+            foreach (var (metodo, operacao) in metodos!.AsObject())
+            {
+                var parametros = operacao!["parameters"]!.AsArray().Select(p => p!["name"]!.GetValue<string>());
+                Assert.Contains("X-Trace-Id", parametros);
+                foreach (var (status, resposta) in operacao["responses"]!.AsObject())
+                {
+                    Assert.True(resposta!["headers"]?["X-Trace-Id"] is not null, $"{metodo} {caminho} {status} sem o X-Trace-Id");
+                }
+            }
+        }
+        var salvar = caminhos["/pagamento/recebimentos/configuracao"]!["put"]!;
+        Assert.Contains(salvar["parameters"]!.AsArray(), p => p!["name"]!.GetValue<string>() == "If-Match" && p["required"]!.GetValue<bool>());
+        Assert.NotNull(caminhos["/pagamento/pagamentos/{id}/ao-vivo"]!["get"]!["responses"]!["200"]!["content"]!["text/event-stream"]);
+        Assert.NotNull(caminhos["/pagamento/pagamentos/{id}/boleto"]!["get"]!["responses"]!["200"]!["content"]!["application/pdf"]);
+        Assert.NotNull(caminhos["/pagamento/pagamentos/{id}/comprovante"]!["get"]!["responses"]!["200"]!["content"]!["application/pdf"]);
+        var aviso = caminhos["/pagamento/notificacoes"]!["post"]!["parameters"]!.AsArray().Select(p => p!["name"]!.GetValue<string>());
+        Assert.Contains("x-signature", aviso);
+        var erro = caminhos["/pagamento/faturas/{id}"]!["get"]!["responses"]!["404"]!["content"]!["application/json"]!["examples"]!
+            ["FATURA_INEXISTENTE"]!["value"]!;
+        Assert.StartsWith("trc-", erro["traceId"]!.GetValue<string>(), StringComparison.Ordinal);
     }
 
     [Theory]

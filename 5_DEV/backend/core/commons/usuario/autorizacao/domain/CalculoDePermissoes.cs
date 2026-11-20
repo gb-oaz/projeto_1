@@ -15,12 +15,15 @@ public static class CalculoDePermissoes
     /// <summary>"Administrar usuários" é este módulo com as duas abas (RN-251).</summary>
     public const string Usuarios = "MOD-03";
 
+    /// <summary>O Pagamento: só com a aba Utilização, para quem o tem (17-b RN-233-api, 19 RN-298).</summary>
+    public const string Pagamento = FalhaDeAutorizacao.ModuloDoPagamento;
+
     /// <summary>
     /// As permissões de alguém (RF-145, RF-150, RN-233, RN-238):
     /// <list type="bullet">
-    /// <item>administrador: os módulos do time no hub, C e U;</item>
+    /// <item>administrador: os módulos do time no hub, C e U, e o Pagamento só com U, para o card;</item>
     /// <item>membro do time e staff: os marcados que a conta tem;</item>
-    /// <item>conta master e autônomo: os da conta e os contratados usados no hub, C e U;</item>
+    /// <item>conta master e autônomo: os da conta e os contratados usados no hub, C e U, e o Pagamento só com U;</item>
     /// <item>participante (e o responsável, com o código dele): os da conta e os contratados que o participante ou o responsável usam no quest, só U.</item>
     /// </list>
     /// </summary>
@@ -28,8 +31,8 @@ public static class CalculoDePermissoes
     {
         IReadOnlyDictionary<string, Abas> mods = usuario.Papel switch
         {
-            Papel.Administrador => Todas(modulos.Onde(DoTimeNoHub), Abas.CU),
-            Papel.Master or Papel.Autonomo => Todas(modulos.Onde(m => m.TemUsoNo(FrenteDeUso.Hub)), Abas.CU),
+            Papel.Administrador => ComPagamento(Todas(modulos.Onde(DoTimeNoHub), Abas.CU)),
+            Papel.Master or Papel.Autonomo => ComPagamento(Todas(modulos.Onde(m => m.TemUsoNo(FrenteDeUso.Hub)), Abas.CU)),
             Papel.Participante => Todas(modulos.Onde(m => m.Usa(Perfil.Participante, FrenteDeUso.Quest)
                 || m.Usa(Perfil.Responsavel, FrenteDeUso.Quest)), Abas.U),
             _ => guardadas.Visiveis(modulos.Disponiveis),
@@ -71,15 +74,26 @@ public static class CalculoDePermissoes
     /// O que quem concede pode dar ao alvo (RF-160, RN-167): o administrador e a
     /// conta master, todos os módulos que o alvo usa no hub, com as duas abas; o
     /// staff, só os que ele mesmo tem, com as abas dele, inclusive Administrar
-    /// usuários (RN-252).
+    /// usuários (RN-252). O Pagamento só a conta master (ou o autônomo) concede,
+    /// só com a Utilização (17-b RF-160, 19 RN-299).
     /// </summary>
     public static IReadOnlyDictionary<string, Abas> Concediveis(UsuarioAutorizado quem, IReadOnlyDictionary<string, Abas> modsDeQuem,
         UsuarioAutorizado alvo, ModulosDaConta modulos)
     {
         var doAlvo = modulos.Onde(m => alvo.Papel == Papel.MembroTime ? DoTimeNoHub(m) : m.Usa(Perfil.Staff, FrenteDeUso.Hub));
-        return quem.Papel == Papel.Staff
+        var concediveis = quem.Papel == Papel.Staff
             ? doAlvo.Where(m => modsDeQuem.ContainsKey(m.Id)).ToDictionary(m => m.Id, m => modsDeQuem[m.Id])
             : Todas(doAlvo, Abas.CU);
+        if (quem.Papel is (Papel.Master or Papel.Autonomo) && concediveis.ContainsKey(Pagamento)) concediveis[Pagamento] = Abas.U;
+        else concediveis.Remove(Pagamento);
+        return concediveis;
+    }
+
+    /// <summary>O Pagamento entra só com a Utilização (17-b RN-233-api).</summary>
+    static Dictionary<string, Abas> ComPagamento(Dictionary<string, Abas> mods)
+    {
+        mods[Pagamento] = Abas.U;
+        return mods;
     }
 
     /// <summary>O alvo pode receber o módulo: ele o usa no hub (staff) ou é do time (membro).</summary>

@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v34"
-data: "2026-11-12 02:03"
+versao: "v36"
+data: "2026-11-15 01:06"
 status: "Em revisão"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v34** · 2026-11-12 02:03 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v36** · 2026-11-15 01:06 · **Em revisão**
 
 # Módulo Usuários · Autorização
 
@@ -88,7 +88,11 @@ Cenário: staff com Administrar usuários
   Dado o João com Administrar usuários e só a Utilização do Quiz
   Quando ele abre Permissões da Ana, staff abaixo dele
   Então vê Usuários com as duas abas e o Quiz só com a aba Utilização para marcar
-  E não vê a Presença nem a Agenda
+  E não vê a Presença, a Agenda nem o Pagamento
+
+Cenário: conta master concede o Pagamento
+  Quando a conta master abre Permissões da staff Rita
+  Então vê o Pagamento só com a aba Utilização para marcar
 
 Cenário: membro do time
   Quando o administrador do deboaz abre Permissões do Caio
@@ -365,6 +369,19 @@ Cenário: staff com Administrar usuários
     }
     """
 
+Cenário: Pagamento só para a conta master conceder
+  Dado a staff Rita sem permissões, na versão 1
+  Quando a conta master envia GET /usuarios/usr-ebfga-rita/permissoes
+  Então a resposta é 200 e "concediveis" traz o Pagamento só com a Utilização:
+    """
+    {
+      "mod": "MOD-01",
+      "nome": "Pagamento",
+      "abas": "U"
+    }
+    """
+  E o mesmo GET do João, para a Ana, não traz "MOD-01" em "concediveis"
+
 Cenário: pessoa que não está abaixo
   Quando o João envia GET /usuarios/usr-ebfga-rui/permissoes, de um par dele
   Então a resposta é 403 ACESSO_NEGADO
@@ -432,6 +449,24 @@ Cenário: módulo que não existe
       "campo": "mods.MOD-99"
     }
     """
+
+Esquema do Cenário: Pagamento recusado
+  Quando <quem> envia PUT /usuarios/<id>/permissoes com "MOD-01" com "<abas>"
+  Então a resposta é 422 com:
+    """
+    {
+      "codigo": "DADOS_INVALIDOS",
+      "mensagem": "<mensagem>",
+      "campo": "mods.MOD-01"
+    }
+    """
+  E as permissões de <id> não mudam
+
+  Exemplos:
+    | quem             | id             | abas | mensagem                                |
+    | a conta master   | usr-ebfga-rita | CU   | O Pagamento só tem a aba Utilização.    |
+    | a Rita, com Adm. | usr-ebfga-bia  | U    | Só a conta master concede o Pagamento.  |
+    | o administrador  | usr-dboaz-caio | U    | O módulo MOD-01 não pode ser concedido. |
 ```
 
 <a id="RF-162-api"></a>
@@ -485,7 +520,7 @@ Esquema do Cenário: módulos de cada papel
 
   Exemplos:
     | quem           | frente | módulos                                               | abas     |
-    | administrador  | hub    | SAC, Usuários e Catálogo                              | C e U    |
+    | administrador  | hub    | SAC, Usuários, Catálogo e Pagamento                   | C e U    |
     | membro do time | hub    | os marcados entre SAC, Usuários e Catálogo            | marcadas |
     | conta master   | hub    | todos os da conta e os contratados usados no hub      | C e U    |
     | autônomo       | hub    | todos os da conta e os contratados usados no hub      | C e U    |
@@ -493,6 +528,19 @@ Esquema do Cenário: módulos de cada papel
     | participante   | quest  | Tarefas, Perfil e os do participante e do responsável | U        |
     | responsável    | quest  | os mesmos do participante                             | U        |
     | anônimo        | quest  | só o módulo da sala                                   | U        |
+
+Esquema do Cenário: Pagamento no token
+  Quando <quem> entra no hub
+  Então o token <traz>
+
+  Exemplos:
+    | quem                        | traz                                       |
+    | o administrador do deboaz   | tem "MOD-01" só com "U", para o card       |
+    | a conta master da EBFGA     | tem "MOD-01" só com "U"                    |
+    | o autônomo Pedro Reis       | tem "MOD-01" só com "U"                    |
+    | a staff Rita, com Pagamento | tem "MOD-01" com "U"                       |
+    | a staff Maria, sem ele      | não tem "MOD-01"                           |
+    | o membro do time Caio       | não tem "MOD-01"                           |
 ```
 
 <a id="RN-235"></a>
@@ -992,21 +1040,21 @@ Cenário: o que este documento não trata
 
 ### Web
 
-**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg`
+**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v06_20261115-0018.svg`
 
-[![Web: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg)
+[![Web: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-web_v06_20261115-0018.svg)](../2_Diagramas/vista-hub-usuarios-web_v06_20261115-0018.svg)
 
 ### PWA
 
-**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg`
+**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v07_20261115-0059.svg`
 
-[![PWA: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg)
+[![PWA: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v07_20261115-0059.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v07_20261115-0059.svg)
 
 ### Mobile
 
-**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg`
+**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v07_20261115-0059.svg`
 
-[![Mobile: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg)
+[![Mobile: vista do módulo Usuários com as permissões: conceder, salvar, recusas ao salvar, registro de mudanças e o aviso de quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v07_20261115-0059.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v07_20261115-0059.svg)
 
 ---
 
@@ -1042,7 +1090,9 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v34** | 2026-11-12 02:03 | Diagramas: contrato de API v10 → v11 (endereços de teste POST /_teste/contratacao, que roda o aviso de [17 `RN-275`](17_modulo-usuario.md#RN-275), e GET /_teste/modulo/{mod}, para o 401 e o 403 de `RN-285-api`; só com AMBIENTE=hml e Teste__Relogio=sim) e sequência v06 → v07 (nota do teste); cenários sem mudança |
+| **v36** | 2026-11-15 01:06 | Vistas de Permissões pwa e mobile v06 → v07; a web segue na v06 |
+| v35 | 2026-11-15 00:48 | Pagamento ([19_modulo-pagamento](19_modulo-pagamento.md), `MOD-01`): só a conta master o concede, só com a aba Utilização (`RF-160`, `RF-160-api`), recusas 422 iguais às do 19 `RN-299-api` (`RF-161-api`), "MOD-01" com "U" no token do administrador, da conta master, do autônomo e da staff delegada (`RN-233-api`); vistas de Permissões v04 → v06 |
+| v34 | 2026-11-12 02:03 | Diagramas: contrato de API v10 → v11 (endereços de teste POST /_teste/contratacao, que roda o aviso de [17 `RN-275`](17_modulo-usuario.md#RN-275), e GET /_teste/modulo/{mod}, para o 401 e o 403 de `RN-285-api`; só com AMBIENTE=hml e Teste__Relogio=sim) e sequência v06 → v07 (nota do teste); cenários sem mudança |
 | v33 | 2026-11-12 01:59 | Dados explícitos nos cenários de API: `RN-286` "só a contratação suspende" com a Maria (versão 7) e o João, os dois com "MOD-06" com "U"; a Presença da Maria suspensa fica com "MOD-03" com "CU" e "MOD-05" com "U" em mods (`RN-285`, `RN-286`, `RN-287`) |
 | v32 | 2026-11-12 00:57 | Diagramas do módulo suspenso (`RN-285` a `RN-287`): sequência v05 → v06 (o aviso AVISAR_CONTRATACAO_MUDOU move a permissão entre mods e suspensos, sobe versao e pv, 401 e renovação, depois 403), contrato de API v09 → v10 (422 MODULO_NAO_CONTRATADO para o suspenso, "por" de quem descontratou), classes v01 → v02, documentos v03 → v04 (suspensos como [{mod, abas}]); cenários sem mudança |
 | v31 | 2026-11-12 00:44 | Módulo suspenso (`permissoes.suspensos`): `RN-285` e `RN-285-api` (descontratação suspende, recontratação devolve; 401 PERMISSOES_DESATUALIZADAS e depois 403 ACESSO_NEGADO), `RN-286` e `RN-286-api` (só a contratação suspende e reativa; PUT com o suspenso é 422 MODULO_NAO_CONTRATADO), `RN-287` (suspenso guardado com as abas, salvar não o apaga, desmarcado não volta); status → Em revisão |
@@ -1057,4 +1107,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v34 · 2026-11-12 02:03 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v36 · 2026-11-15 01:06 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>

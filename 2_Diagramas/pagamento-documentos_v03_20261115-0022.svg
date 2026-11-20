@@ -1,0 +1,350 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2080 1990" width="2080" height="1990">
+<title>Pagamento · documentos</title>
+<desc>Modelo de documentos do módulo Pagamento (MOD-01, 1_Requisitos/19_modulo-pagamento.md): faturas (uma por conta e competência, itens das cobranças do 16), pagamentos (um em aberto por fatura, idExterno do banco, cartão só bandeira e final), estornos (um pendente por pagamento), avisosDoBanco (idempotência), avisosPagamento, configuracaoPagamento (versões), as coleções lidas do 16 e do 17, contadores, auditoria e as chaves do Redis. v01: criação. v02: traceId da execução, traceIdOrigem e historico de status com traceId em faturas, pagamentos, estornos e avisosDoBanco, índices por traceId e traceId no canal do Redis (RNF-243, RNF-244). v03: emAberto atômico na fatura no lugar do índice abertoNaFatura (RN-303), intermediador em pagamentos, estornos e avisosDoBanco (RNF-242), endereço e código de barras do boleto (RF-188), índice do último endereço, 428 sem If-Match, sem a coleção cardPagamento: card e resumo somados no banco (RN-307, RNF-245).</desc>
+<style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+
+<defs>
+<!-- ── markers, filtro e gradiente da marca d'água: copie sempre ── -->
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+
+
+</defs>
+<rect class="bg" x="0" y="0" width="2080" height="1990"/>
+<text class="section" x="40" y="152">1 · COLEÇÕES DO PAGAMENTO · ms_mono/secundario/out/hub/pagamento (…NoBanco) · índices em Indices.cs, criados na partida</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="40" y="176" width="640" height="756" rx="6"/></g>
+<text class="uml-keyword" x="360.0" y="194" text-anchor="middle">«coleção»</text>
+<text class="label-strong" x="360.0" y="214" text-anchor="middle">faturas</text>
+<line class="divider" x1="40" y1="224" x2="680" y2="224"/>
+<text class="mono" x="52" y="244" xml:space="preserve">{</text>
+<text class="mono" x="52" y="262" xml:space="preserve">  "_id": "FAT-000402",</text>
+<text class="mono" x="52" y="280" xml:space="preserve">  "versao": 3,</text>
+<text class="mono" x="52" y="298" xml:space="preserve">  "conta": { "id": "conta-ebfga", "sigla": "EBFGA",</text>
+<text class="mono" x="52" y="316" xml:space="preserve">             "nome": "Escola Bento Freitas", "tipo": "INSTITUICAO" },</text>
+<text class="mono" x="52" y="334" xml:space="preserve">  "competencia": "2026-11",</text>
+<text class="mono" x="52" y="352" xml:space="preserve">  "itens": [</text>
+<text class="mono" x="52" y="370" xml:space="preserve">    { "moduloId": "MOD-03", "nome": "Usuários",</text>
+<text class="mono" x="52" y="388" xml:space="preserve">      "cobrancaId": "cob-ebfga-MOD-03-2026-11", "valor": 2224.41 },</text>
+<text class="mono" x="52" y="406" xml:space="preserve">    { "moduloId": "MOD-05", "nome": "Quiz",</text>
+<text class="mono" x="52" y="424" xml:space="preserve">      "cobrancaId": "cob-ebfga-MOD-05-2026-11", "valor": 1473.92 }</text>
+<text class="mono" x="52" y="442" xml:space="preserve">  ],</text>
+<text class="mono" x="52" y="460" xml:space="preserve">  "valor": 3698.33,  Decimal128</text>
+<text class="mono" x="52" y="478" xml:space="preserve">  "emitidaEm": "2026-12-01T03:00:00Z",</text>
+<text class="mono" x="52" y="496" xml:space="preserve">  "vencimento": "2026-12-10",</text>
+<text class="mono" x="52" y="514" xml:space="preserve">  "status": "PAGA",</text>
+<text class="mono" x="52" y="532" xml:space="preserve">  "pagaEm": "2026-12-03T13:42:00Z", "pagaPor": "PAG-000773",</text>
+<text class="mono" x="52" y="550" xml:space="preserve">  "devolvido": 1473.92,</text>
+<text class="mono" x="52" y="568" xml:space="preserve">  "emAberto": null,  "PAG-000785" enquanto há pagamento</text>
+<text class="mono" x="52" y="586" xml:space="preserve">                      AGUARDANDO ou PROCESSANDO (RN-303)</text>
+<text class="mono" x="52" y="604" xml:space="preserve">  "cancelamento": null,  { motivo, por, em }</text>
+<text class="mono" x="52" y="622" xml:space="preserve">  "guardarAte": "2031-12-03T13:42:00Z",  RNF-240</text>
+<text class="mono" x="52" y="640" xml:space="preserve">  "traceId": "trc-a41c9e03",  execução que emitiu</text>
+<text class="mono" x="52" y="658" xml:space="preserve">  "historico": [</text>
+<text class="mono" x="52" y="676" xml:space="preserve">    { "de": "A_PAGAR", "para": "PAGA",</text>
+<text class="mono" x="52" y="694" xml:space="preserve">      "em": "2026-12-03T13:42:00Z", "traceId": "trc-1d6e3f08" }</text>
+<text class="mono" x="52" y="712" xml:space="preserve">  ]</text>
+<text class="mono" x="52" y="730" xml:space="preserve">}</text>
+<line class="divider" x1="40" y1="744" x2="680" y2="744"/>
+<text class="mono" x="52" y="764" xml:space="preserve">índice único { "conta.id": 1, "competencia": 1 }  uma fatura por conta e mês (RN-300)</text>
+<text class="mono" x="52" y="782" xml:space="preserve">índice { "conta.id": 1, "status": 1, "competencia": -1 }  lista do pagador</text>
+<text class="mono" x="52" y="800" xml:space="preserve">índice { "competencia": 1, "status": 1, "vencimento": 1 }  recebimentos e vencidas</text>
+<text class="mono" x="52" y="818" xml:space="preserve">índice { "status": 1, "vencimento": 1 }  agendamento: virar vencida</text>
+<text class="mono" x="52" y="836" xml:space="preserve">índice { "conta.sigla": 1 } · { "conta.nome": 1 }  busca do administrador</text>
+<text class="mono" x="52" y="854" xml:space="preserve">índice { "historico.traceId": 1 }  achar pelo traceId (RNF-244)</text>
+<text class="muted" x="52" y="888" xml:space="preserve">a conta vai copiada na emissão: a busca não junta com contas</text>
+<text class="muted" x="52" y="906" xml:space="preserve">emAberto: update atômico só se null (senão 409 PAGAMENTO_EM_ABERTO)</text>
+<text class="muted" x="52" y="924" xml:space="preserve">card e resumo: $group por status e competência no banco (RNF-245)</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="720" y="176" width="640" height="720" rx="6"/></g>
+<text class="uml-keyword" x="1040.0" y="194" text-anchor="middle">«coleção»</text>
+<text class="label-strong" x="1040.0" y="214" text-anchor="middle">pagamentos</text>
+<line class="divider" x1="720" y1="224" x2="1360" y2="224"/>
+<text class="mono" x="732" y="244" xml:space="preserve">{</text>
+<text class="mono" x="732" y="262" xml:space="preserve">  "_id": "PAG-000773",</text>
+<text class="mono" x="732" y="280" xml:space="preserve">  "versao": 2,</text>
+<text class="mono" x="732" y="298" xml:space="preserve">  "faturaId": "FAT-000402",</text>
+<text class="mono" x="732" y="316" xml:space="preserve">  "contaId": "conta-ebfga",</text>
+<text class="mono" x="732" y="334" xml:space="preserve">  "intermediador": "MERCADO_PAGO",  ou "FALSO" (RNF-242)</text>
+<text class="mono" x="732" y="352" xml:space="preserve">  "forma": "CARTAO_CREDITO",</text>
+<text class="mono" x="732" y="370" xml:space="preserve">  "valor": 3698.33, "valorFatura": 3698.33, "juros": 0.00,</text>
+<text class="mono" x="732" y="388" xml:space="preserve">  "status": "ESTORNADO_PARCIAL",</text>
+<text class="mono" x="732" y="406" xml:space="preserve">  "criadoEm": "2026-12-03T13:41:00Z", "criadoPor": "usr-ebfga-rita",</text>
+<text class="mono" x="732" y="424" xml:space="preserve">  "expiraEm": null,</text>
+<text class="mono" x="732" y="442" xml:space="preserve">  "pagoEm": "2026-12-03T13:42:00Z",</text>
+<text class="mono" x="732" y="460" xml:space="preserve">  "idExterno": "card_5a90e2",</text>
+<text class="mono" x="732" y="478" xml:space="preserve">  "pix": null,  { copiaECola, qrCodeSvg }</text>
+<text class="mono" x="732" y="496" xml:space="preserve">  "boleto": null,  { vencimento, linhaDigitavel, codigoBarras,</text>
+<text class="mono" x="732" y="514" xml:space="preserve">                   endereco { cep, logradouro, numero, bairro, cidade, uf } }</text>
+<text class="mono" x="732" y="532" xml:space="preserve">  "cartao": { "bandeira": "VISA", "final": "4242" },</text>
+<text class="mono" x="732" y="550" xml:space="preserve">  "motivo": null,</text>
+<text class="mono" x="732" y="568" xml:space="preserve">  "duplicidade": false,</text>
+<text class="mono" x="732" y="586" xml:space="preserve">  "estornado": 1473.92,</text>
+<text class="mono" x="732" y="604" xml:space="preserve">  "traceId": "trc-1d6e3f08",  execução que criou</text>
+<text class="mono" x="732" y="622" xml:space="preserve">  "traceIdOrigem": null,  X-Trace-Id recebido no pedido</text>
+<text class="mono" x="732" y="640" xml:space="preserve">  "historico": [</text>
+<text class="mono" x="732" y="658" xml:space="preserve">    { "de": null, "para": "PAGO", "em": "2026-12-03T13:42:00Z",</text>
+<text class="mono" x="732" y="676" xml:space="preserve">      "traceId": "trc-1d6e3f08", "por": "usr-ebfga-rita" },</text>
+<text class="mono" x="732" y="694" xml:space="preserve">    { "de": "PAGO", "para": "ESTORNADO_PARCIAL", "em": "2026-12-04T15:10:00Z",</text>
+<text class="mono" x="732" y="712" xml:space="preserve">      "traceId": "trc-e2a7b915", "por": "banco" }</text>
+<text class="mono" x="732" y="730" xml:space="preserve">  ]</text>
+<text class="mono" x="732" y="748" xml:space="preserve">}</text>
+<line class="divider" x1="720" y1="762" x2="1360" y2="762"/>
+<text class="mono" x="732" y="782" xml:space="preserve">índice único parcial { "intermediador": 1, "idExterno": 1 }  aviso acha o pagamento</text>
+<text class="mono" x="732" y="800" xml:space="preserve">índice { "contaId": 1, "forma": 1, "criadoEm": -1 }  último endereço do boleto</text>
+<text class="mono" x="732" y="818" xml:space="preserve">índice { "faturaId": 1, "criadoEm": -1 }  tentativas da fatura (RN-304)</text>
+<text class="mono" x="732" y="836" xml:space="preserve">índice { "status": 1, "expiraEm": 1 }  agendamento: expirar e consultar</text>
+<text class="mono" x="732" y="854" xml:space="preserve">índice { "traceId": 1 } · { "historico.traceId": 1 }  achar pelo traceId (RNF-244)</text>
+<text class="muted" x="732" y="888" xml:space="preserve">nunca número, validade nem CVV do cartão (RNF-239)</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1400" y="176" width="640" height="368" rx="6"/></g>
+<text class="uml-keyword" x="1720.0" y="194" text-anchor="middle">«coleção»</text>
+<text class="label-strong" x="1720.0" y="214" text-anchor="middle">estornos</text>
+<line class="divider" x1="1400" y1="224" x2="2040" y2="224"/>
+<text class="mono" x="1412" y="244" xml:space="preserve">{</text>
+<text class="mono" x="1412" y="262" xml:space="preserve">  "_id": "EST-000012",</text>
+<text class="mono" x="1412" y="280" xml:space="preserve">  "pagamentoId": "PAG-000773",</text>
+<text class="mono" x="1412" y="298" xml:space="preserve">  "faturaId": "FAT-000402",</text>
+<text class="mono" x="1412" y="316" xml:space="preserve">  "valor": 1473.92,</text>
+<text class="mono" x="1412" y="334" xml:space="preserve">  "motivo": "Quiz cancelado",</text>
+<text class="mono" x="1412" y="352" xml:space="preserve">  "status": "CONCLUIDO",</text>
+<text class="mono" x="1412" y="370" xml:space="preserve">  "pedidoEm": "2026-12-04T12:00:00Z", "pedidoPor": "usr-deboaz-admin",</text>
+<text class="mono" x="1412" y="388" xml:space="preserve">  "concluidoEm": "2026-12-04T15:10:00Z",</text>
+<text class="mono" x="1412" y="406" xml:space="preserve">  "intermediador": "MERCADO_PAGO",</text>
+<text class="mono" x="1412" y="424" xml:space="preserve">  "idExterno": "ref_31c7aa",</text>
+<text class="mono" x="1412" y="442" xml:space="preserve">  "traceId": "trc-c58d2f40",</text>
+<text class="mono" x="1412" y="460" xml:space="preserve">  "historico": [ { "de", "para", "em", "traceId" } ]</text>
+<text class="mono" x="1412" y="478" xml:space="preserve">}</text>
+<line class="divider" x1="1400" y1="492" x2="2040" y2="492"/>
+<text class="mono" x="1412" y="512" xml:space="preserve">índice { "pagamentoId": 1, "pedidoEm": -1 }</text>
+<text class="mono" x="1412" y="530" xml:space="preserve">índice único parcial { "pagamentoId": 1 } se PENDENTE  um em andamento (RN-306)</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="1400" y="568" width="640" height="378" rx="6"/></g>
+<text class="uml-keyword" x="1720.0" y="586" text-anchor="middle">«coleção»</text>
+<text class="label-strong" x="1720.0" y="606" text-anchor="middle">configuracaoPagamento</text>
+<line class="divider" x1="1400" y1="616" x2="2040" y2="616"/>
+<text class="mono" x="1412" y="636" xml:space="preserve">{</text>
+<text class="mono" x="1412" y="654" xml:space="preserve">  "_id": "cfg-000005",</text>
+<text class="mono" x="1412" y="672" xml:space="preserve">  "versao": 5,</text>
+<text class="mono" x="1412" y="690" xml:space="preserve">  "vigenteDesde": "2026-11-14T12:00:00Z",</text>
+<text class="mono" x="1412" y="708" xml:space="preserve">  "formas": { "PIX": true, "CARTAO_CREDITO": true,</text>
+<text class="mono" x="1412" y="726" xml:space="preserve">             "CARTAO_DEBITO": true, "BOLETO": false },</text>
+<text class="mono" x="1412" y="744" xml:space="preserve">  "jurosAoDia": 0.1,</text>
+<text class="mono" x="1412" y="762" xml:space="preserve">  "toleranciaAvisoDias": 0,</text>
+<text class="mono" x="1412" y="780" xml:space="preserve">  "diaVencimento": 10,</text>
+<text class="mono" x="1412" y="798" xml:space="preserve">  "prazos": { "pixMinutos": 30, "debitoMinutos": 10,</text>
+<text class="mono" x="1412" y="816" xml:space="preserve">              "boletoDiasUteis": 3 },</text>
+<text class="mono" x="1412" y="834" xml:space="preserve">  "salvaPor": "usr-deboaz-admin"</text>
+<text class="mono" x="1412" y="852" xml:space="preserve">}</text>
+<line class="divider" x1="1400" y1="866" x2="2040" y2="866"/>
+<text class="mono" x="1412" y="886" xml:space="preserve">índice único { "versao": 1 }  If-Match: 412 CONFIGURACAO_MUDOU · sem ele 428</text>
+<text class="mono" x="1412" y="904" xml:space="preserve">índice { "vigenteDesde": -1 }  taxa vigente no vencimento (RN-310)</text>
+<text class="muted" x="1412" y="938" xml:space="preserve">uma versão por documento, nunca apagada</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="720" y="920" width="640" height="350" rx="6"/></g>
+<text class="uml-keyword" x="1040.0" y="938" text-anchor="middle">«coleção»</text>
+<text class="label-strong" x="1040.0" y="958" text-anchor="middle">avisosDoBanco</text>
+<line class="divider" x1="720" y1="968" x2="1360" y2="968"/>
+<text class="mono" x="732" y="988" xml:space="preserve">{</text>
+<text class="mono" x="732" y="1006" xml:space="preserve">  "_id": "evt_7d02c4",  id do aviso; "recusado:&lt;traceId&gt;" se inválido</text>
+<text class="mono" x="732" y="1024" xml:space="preserve">  "intermediador": "MERCADO_PAGO",  pelo cabeçalho: x-signature · X-Assinatura</text>
+<text class="mono" x="732" y="1042" xml:space="preserve">  "idExterno": "pix_8c1e5d",</text>
+<text class="mono" x="732" y="1060" xml:space="preserve">  "tipo": "PAGAMENTO_CONFIRMADO",</text>
+<text class="mono" x="732" y="1078" xml:space="preserve">  "recebidoEm": "2026-12-03T13:12:02Z",</text>
+<text class="mono" x="732" y="1096" xml:space="preserve">  "assinaturaValida": true,</text>
+<text class="mono" x="732" y="1114" xml:space="preserve">  "resultado": "APLICADO",  REPETIDO · DESCONHECIDO · RECUSADO</text>
+<text class="mono" x="732" y="1132" xml:space="preserve">  "pagamentoId": "PAG-000781",</text>
+<text class="mono" x="732" y="1150" xml:space="preserve">  "traceId": "trc-6b0c42f1",  novo, ligado ao idExterno</text>
+<text class="mono" x="732" y="1168" xml:space="preserve">  "traceIdOrigem": null  o dos metadados, se vier</text>
+<text class="mono" x="732" y="1186" xml:space="preserve">}</text>
+<line class="divider" x1="720" y1="1200" x2="1360" y2="1200"/>
+<text class="mono" x="732" y="1220" xml:space="preserve">índice o _id garante a idempotência: repetido → 200 sem efeito (RN-305)</text>
+<text class="mono" x="732" y="1238" xml:space="preserve">índice { "resultado": 1, "recebidoEm": -1 }  ocorrências para o time</text>
+<text class="mono" x="732" y="1256" xml:space="preserve">índice { "idExterno": 1 } · { "traceId": 1 }  ligar banco e execução (RNF-244)</text>
+<g filter="url(#sombra)"><rect class="node-blue" x="40" y="956" width="640" height="288" rx="6"/></g>
+<text class="uml-keyword" x="360.0" y="974" text-anchor="middle">«coleção»</text>
+<text class="label-strong" x="360.0" y="994" text-anchor="middle">avisosPagamento</text>
+<line class="divider" x1="40" y1="1004" x2="680" y2="1004"/>
+<text class="mono" x="52" y="1024" xml:space="preserve">{</text>
+<text class="mono" x="52" y="1042" xml:space="preserve">  "_id": "avs-FAT-000371-FATURA_EM_ATRASO",</text>
+<text class="mono" x="52" y="1060" xml:space="preserve">  "tipo": "FATURA_EM_ATRASO",</text>
+<text class="mono" x="52" y="1078" xml:space="preserve">  "faturaId": "FAT-000371",</text>
+<text class="mono" x="52" y="1096" xml:space="preserve">  "contaId": "conta-pedro-reis",</text>
+<text class="mono" x="52" y="1114" xml:space="preserve">  "vencimento": "2026-11-10",</text>
+<text class="mono" x="52" y="1132" xml:space="preserve">  "desde": "2026-11-11T03:00:00Z",</text>
+<text class="mono" x="52" y="1150" xml:space="preserve">  "encerradoEm": null</text>
+<text class="mono" x="52" y="1168" xml:space="preserve">}</text>
+<line class="divider" x1="40" y1="1182" x2="680" y2="1182"/>
+<text class="mono" x="52" y="1202" xml:space="preserve">índice { "contaId": 1, "encerradoEm": 1 }  GET /pagamento/avisos</text>
+<text class="muted" x="52" y="1236" xml:space="preserve">juros e total calculados na leitura (RN-310, RN-311)</text>
+<text class="section" x="40" y="1342">2 · LIDAS DE OUTROS MÓDULOS (SÓ LEITURA) · COMUNS · REDIS</text>
+<g filter="url(#sombra)"><rect class="node-external" x="40" y="1366" width="640" height="254" rx="6"/></g>
+<text class="uml-keyword" x="360.0" y="1384" text-anchor="middle">«coleção» · 16 · catálogo</text>
+<text class="label-strong" x="360.0" y="1404" text-anchor="middle">cobrancas</text>
+<line class="divider" x1="40" y1="1414" x2="680" y2="1414"/>
+<text class="mono" x="52" y="1434" xml:space="preserve">{</text>
+<text class="mono" x="52" y="1452" xml:space="preserve">  "_id": "cob-ebfga-MOD-03-2026-11",</text>
+<text class="mono" x="52" y="1470" xml:space="preserve">  "contaId": "conta-ebfga",</text>
+<text class="mono" x="52" y="1488" xml:space="preserve">  "moduloId": "MOD-03",</text>
+<text class="mono" x="52" y="1506" xml:space="preserve">  "competencia": "2026-11",</text>
+<text class="mono" x="52" y="1524" xml:space="preserve">  "fechadaEm": "2026-11-30T23:59:59Z",</text>
+<text class="mono" x="52" y="1542" xml:space="preserve">  "total": 2224.41</text>
+<text class="mono" x="52" y="1560" xml:space="preserve">}</text>
+<text class="muted" x="52" y="1594" xml:space="preserve">ICobrancasDoMes lê as fechadas da competência no dia 1</text>
+<text class="muted" x="52" y="1612" xml:space="preserve">e vira os itens da fatura (RN-300)</text>
+<g filter="url(#sombra)"><rect class="node-external" x="720" y="1366" width="640" height="164" rx="6"/></g>
+<text class="uml-keyword" x="1040.0" y="1384" text-anchor="middle">«coleção» · 17 · usuários</text>
+<text class="label-strong" x="1040.0" y="1404" text-anchor="middle">contas · usuarios</text>
+<line class="divider" x1="720" y1="1414" x2="1360" y2="1414"/>
+<text class="mono" x="732" y="1434" xml:space="preserve">contas { "_id": "conta-ebfga", "sigla", "nome", "tipo", "estado" }</text>
+<text class="mono" x="732" y="1452" xml:space="preserve">usuarios { "_id": "usr-ebfga-rita", "contaId", "papel",</text>
+<text class="mono" x="732" y="1470" xml:space="preserve">           "mods": { "MOD-01": "U" } }</text>
+<text class="muted" x="732" y="1504" xml:space="preserve">desativar não mexe nas faturas; excluir pergunta</text>
+<text class="muted" x="732" y="1522" xml:space="preserve">IContaTemFaturaEmAberto → 409 FATURA_EM_ABERTO (RN-313)</text>
+<g filter="url(#sombra)"><rect class="node-purple" x="1400" y="1366" width="640" height="200" rx="6"/></g>
+<text class="uml-keyword" x="1720.0" y="1384" text-anchor="middle">«coleção» · comum</text>
+<text class="label-strong" x="1720.0" y="1404" text-anchor="middle">contadores · auditoria</text>
+<line class="divider" x1="1400" y1="1414" x2="2040" y2="1414"/>
+<text class="mono" x="1412" y="1434" xml:space="preserve">contadores { "_id": "faturas", "valor": 402 }</text>
+<text class="mono" x="1412" y="1452" xml:space="preserve">           { "_id": "pagamentos", "valor": 790 }</text>
+<text class="mono" x="1412" y="1470" xml:space="preserve">           { "_id": "estornos", "valor": 12 }</text>
+<text class="mono" x="1412" y="1488" xml:space="preserve">auditoria  { "acao": "ESTORNO_PEDIDO", "alvo": "PAG-000773",</text>
+<text class="mono" x="1412" y="1506" xml:space="preserve">             "traceId": "trc-c58d2f40", … }</text>
+<text class="mono" x="1412" y="1524" xml:space="preserve">auditoriaErros  { "codigo": "FATURA_PAGA", "traceId": … } (17 RN-270)</text>
+<text class="muted" x="1412" y="1558" xml:space="preserve">$inc atômico (findOneAndUpdate) · commons/auditoria (RN-309)</text>
+<g filter="url(#sombra)"><rect class="node-orange" x="40" y="1644" width="640" height="182" rx="6"/></g>
+<text class="uml-keyword" x="360.0" y="1662" text-anchor="middle">«redis» · ms_mono</text>
+<text class="label-strong" x="360.0" y="1682" text-anchor="middle">chaves do Pagamento</text>
+<line class="divider" x1="40" y1="1692" x2="680" y2="1692"/>
+<text class="mono" x="52" y="1712" xml:space="preserve">pagamento:pagamento:&lt;id&gt;   canal PUBLISH/SUBSCRIBE do ao vivo (RNF-238)</text>
+<text class="mono" x="52" y="1730" xml:space="preserve">                           mensagem { id, status, traceId } (RNF-244)</text>
+<text class="mono" x="52" y="1748" xml:space="preserve">pagamento:agendamento     trava SET NX EX 55: uma réplica por minuto</text>
+<text class="mono" x="52" y="1766" xml:space="preserve">                           desligado com Teste__Relogio=sim (o qa usa /_teste)</text>
+<text class="muted" x="52" y="1800" xml:space="preserve">nada de estado só no Redis: o MongoDB é a fonte</text>
+<text class="muted" x="52" y="1818" xml:space="preserve">sem cardPagamento: o card é calculado na leitura (RN-307, RNF-245)</text>
+<g id="marca-topo"><rect class="wm-band" x="0" y="0" width="2080" height="112"/><rect class="wm-accent" x="0" y="110" width="2080" height="2"/>
+<text class="wm-eyebrow" x="40" y="40">BOAZ · MODELO DE DOCUMENTOS</text>
+<text class="title" x="40" y="72">Pagamento · documentos</text>
+<text class="subtitle" x="40" y="94">Coleções do MongoDB do Pagamento com documentos de exemplo, índices, coleções lidas de outros módulos e chaves do Redis</text>
+<text class="wm-meta-label" x="1768" y="44">VERSÃO</text>
+<rect class="wm-badge" x="1768" y="56" width="48" height="22" rx="11"/>
+<text class="wm-badge-text" x="1792" y="71" text-anchor="middle">v03</text>
+<line class="wm-sep" x1="1864" y1="32" x2="1864" y2="80"/>
+<text class="wm-meta-label" x="1888" y="44">DATA</text>
+<text class="wm-meta-value" x="1888" y="72">2026-11-15 · 00:22</text>
+</g>
+<g id="marca-rodape" transform="translate(0,1874)">
+<rect class="wm-band" x="0" y="0" width="2080" height="116"/>
+<line class="wm-sep" x1="0" y1="0.5" x2="2080" y2="0.5"/>
+<text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+<rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/>
+<text class="label" x="62" y="58">coleção do Pagamento</text>
+<rect class="node-external" x="235" y="47" width="14" height="14" rx="3"/>
+<text class="label" x="257.6" y="58">coleção de outro módulo (só leitura)</text>
+<rect class="node-purple" x="547" y="47" width="14" height="14" rx="3"/>
+<text class="label" x="569.6800000000001" y="58">coleção comum</text>
+<rect class="node-orange" x="692" y="47" width="14" height="14" rx="3"/>
+<text class="label" x="714.32" y="58">Redis</text>
+<line class="divider" x1="40" y1="76" x2="2040" y2="76"/>
+<text class="footer" x="40" y="100">v03 · emAberto na fatura, intermediador por pagamento, endereço do boleto, sem cardPagamento (19 v05); valores em Decimal128; UTC</text>
+<text class="wm-file" x="2040" y="100" text-anchor="end">pagamento-documentos_v03_20261115-0022.svg</text>
+</g>
+</svg>

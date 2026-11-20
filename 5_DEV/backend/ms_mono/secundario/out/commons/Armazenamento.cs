@@ -89,6 +89,15 @@ public static class Colecoes
     public const string ConfiguracaoSac = "configuracaoSac";
     public const string CardSac = "cardSac";
     public const string Contadores = "contadores";
+
+    // Pagamento (pagamento-documentos v02); cobrancas é do Catálogo, só lida
+    public const string Faturas = "faturas";
+    public const string Pagamentos = "pagamentos";
+    public const string Estornos = "estornos";
+    public const string ConfiguracaoPagamento = "configuracaoPagamento";
+    public const string AvisosDoBanco = "avisosDoBanco";
+    public const string AvisosPagamento = "avisosPagamento";
+    public const string Cobrancas = "cobrancas";
 }
 
 // Leitura e escrita de campos de BsonDocument com nulos e datas.

@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários"
-versao: "v109"
-data: "2026-11-12 17:21"
+versao: "v111"
+data: "2026-11-15 01:06"
 status: "Em revisão"
 objetivo: "definir quem são os usuários do deboaz, quem cria cada um, que permissões recebem, como entram, como recuperam o acesso sem e-mail e quanto tempo a sessão dura, na landing page, no hub e no quest."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario` · **v109** · 2026-11-12 17:21 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario` · **v111** · 2026-11-15 01:06 · **Em revisão**
 
 # Módulo Usuários
 
@@ -187,16 +187,45 @@ Cenário: professor que saiu da escola
 ### `RF-113` Contas no módulo Usuários do time deboaz
 
 ```gherkin
-Cenário: falta de pagamento
-  Dado uma escola ativa com o pagamento em atraso
+Cenário: o time deboaz desativa uma conta
+  Dado a EBFGA ativa, com a FAT-000402 "A pagar"
   Quando o time deboaz desativa a conta na lista Contas do módulo Usuários
   Então o staff e os participantes da escola não entram mais
   E a conta continua na lista Contas, como desativada, com os dados guardados
+  E a FAT-000402 segue devida no Pagamento
 
-Cenário: pagamento regularizado
-  Dado a mesma escola desativada
+Esquema do Cenário: a própria conta se desativa
+  Dado <quem> na Configuração do módulo Usuários
+  Quando toca em "Desativar a conta", com o apoio "Ninguém entra mais; o time deboaz reativa"
+  Então vê o diálogo "Desativar a conta?" com os botões "Cancelar" e "Desativar a conta"
+  E o texto "A sessão termina e ninguém da conta entra mais."
+  E "Só o time deboaz reativa a conta, e a fatura em aberto segue devida no Pagamento."
+  E ao tocar em "Desativar a conta" a sessão termina e ninguém da conta entra mais
+
+  Exemplos:
+    | quem                    |
+    | a conta master da EBFGA |
+    | o autônomo Pedro Reis   |
+
+Cenário: desistir de desativar
+  Dado a conta master da EBFGA no diálogo "Desativar a conta?"
+  Quando toca em "Cancelar"
+  Então o diálogo fecha e a conta segue ativa
+
+Cenário: staff não vê o item
+  Dado a staff Maria, com "MOD-03" com "CU", na Configuração do módulo Usuários
+  Então não vê "Desativar a conta"
+
+Cenário: conta reativada
+  Dado a EBFGA desativada
   Quando o time deboaz reativa a conta
   Então o staff e os participantes voltam a entrar com as mesmas permissões
+
+Cenário: conta com fatura em aberto não se encerra
+  Dado a EBFGA com a FAT-000402 "A pagar"
+  Quando o administrador do deboaz encerra a EBFGA na lista Contas
+  Então vê o aviso "Esta conta tem fatura em aberto e não pode ser excluída."
+  E a conta e a fatura seguem como estavam
 ```
 
 <a id="RF-114"></a>
@@ -926,8 +955,9 @@ Cenário: já desativado
 ### `RF-113` Contas no módulo Usuários do time deboaz
 
 ```gherkin
-Cenário: falta de pagamento
+Cenário: o time deboaz desativa a conta
   Dado o token do membro do time Caio, com "MOD-03" com "U"
+  E a conta-ebfga com a FAT-000402 "A_PAGAR"
   Quando envia POST /contas/conta-ebfga/estado com:
     """
     {
@@ -937,10 +967,47 @@ Cenário: falta de pagamento
   Então a resposta é 200 com o estado "DESATIVADA"
   E POST /auth/hub/entrar da Maria e POST /auth/quest/entrar do Lucas recebem 403
   E GET /contas?estado=DESATIVADA traz a EBFGA
+  E GET /pagamento/recebimentos/faturas/FAT-000402 segue com o status "A_PAGAR"
 
-Cenário: pagamento regularizado
+Esquema do Cenário: a própria conta se desativa
+  Dado o token de <quem>
+  Quando envia POST /contas/<conta>/estado com o estado "DESATIVADA"
+  Então a resposta é 200 com o estado "DESATIVADA"
+  E o próximo pedido com esse token recebe 401 SESSAO_TERMINADA
+  E a fatura em aberto da <conta> segue devida
+
+  Exemplos:
+    | quem                    | conta            |
+    | a conta master da EBFGA | conta-ebfga      |
+    | o autônomo Pedro Reis   | conta-pedro-reis |
+
+Esquema do Cenário: o que a própria conta não pode
+  Dado o token de <quem>
+  Quando envia POST /contas/<conta>/estado com o estado "<estado>"
+  Então a resposta é 403 ACESSO_NEGADO e o estado da <conta> não muda
+
+  Exemplos:
+    | quem                                 | conta            | estado     |
+    | a conta master da EBFGA              | conta-ebfga      | SUSPENSA   |
+    | a conta master da EBFGA              | conta-ebfga      | ENCERRADA  |
+    | a conta master da EBFGA              | conta-pedro-reis | DESATIVADA |
+    | a staff Maria, com "MOD-03" com "CU" | conta-ebfga      | DESATIVADA |
+
+Cenário: reativar
   Quando o Caio envia POST /contas/conta-ebfga/estado com o estado "ATIVA"
   Então a resposta é 200 e a Maria e o Lucas voltam a entrar com as mesmas permissões
+
+Cenário: encerramento recusado com fatura em aberto
+  Dado a conta-ebfga com a FAT-000402 "A_PAGAR"
+  Quando o Caio envia POST /contas/conta-ebfga/estado com o estado "ENCERRADA"
+  Então a resposta é 409 com:
+    """
+    {
+      "codigo": "FATURA_EM_ABERTO",
+      "mensagem": "Esta conta tem fatura em aberto e não pode ser excluída."
+    }
+    """
+  E a conta-ebfga e a FAT-000402 seguem como estavam
 ```
 
 <a id="RF-114-api"></a>
@@ -1255,11 +1322,11 @@ Esquema do Cenário: estado da conta
   Então a resposta é 200 e o estado significa <motivo>
 
   Exemplos:
-    | estado     | motivo                                        |
-    | ATIVA      | uso normal                                    |
-    | SUSPENSA   | decisão temporária do time deboaz             |
-    | DESATIVADA | falta de pagamento, volta com a regularização |
-    | ENCERRADA  | pedido do cliente                             |
+    | estado     | motivo                                                  |
+    | ATIVA      | uso normal                                              |
+    | SUSPENSA   | decisão temporária do time deboaz                       |
+    | DESATIVADA | pausa pelo time ou pela própria conta, volta reativada  |
+    | ENCERRADA  | pedido do cliente, só sem fatura em aberto              |
 
 Cenário: conta encerrada não volta
   Dado a conta da EBFGA encerrada
@@ -2660,13 +2727,13 @@ Cenário: o que este documento não trata
 
 [![Web: vista do acesso ao hub: criar conta com domínio e sigla, igual para escola, empresa e autônomo, que só troca o CNPJ pelo CPF, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha](../2_Diagramas/vista-hub-acesso-web_v01_20261103-1229.svg)](../2_Diagramas/vista-hub-acesso-web_v01_20261103-1229.svg)
 
-**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg`
+**Hub · usuários · web · vista** — `2_Diagramas/vista-hub-usuarios-web_v06_20261115-0018.svg`
 
-[![Web: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-web_v04_20261111-2329.svg)
+[![Web: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-web_v06_20261115-0018.svg)](../2_Diagramas/vista-hub-usuarios-web_v06_20261115-0018.svg)
 
-**Hub · time deboaz · usuários · web · vista** — `2_Diagramas/vista-hub-time-deboaz-web_v03_20261109-0048.svg`
+**Hub · time deboaz · usuários · web · vista** — `2_Diagramas/vista-hub-time-deboaz-web_v04_20261115-0104.svg`
 
-[![Web: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-web_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-time-deboaz-web_v03_20261109-0048.svg)
+[![Web: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-web_v04_20261115-0104.svg)](../2_Diagramas/vista-hub-time-deboaz-web_v04_20261115-0104.svg)
 
 **Quest · sala anônima · web · vista** — `2_Diagramas/vista-quest-sala-anonima-web_v01_20261103-1229.svg`
 
@@ -2678,13 +2745,13 @@ Cenário: o que este documento não trata
 
 [![PWA: vista do acesso ao hub: criar conta com domínio e sigla, igual para escola, empresa e autônomo, que só troca o CNPJ pelo CPF, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha](../2_Diagramas/vista-hub-acesso-pwa_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-acesso-pwa_v01_20261103-1139.svg)
 
-**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg`
+**Hub · usuários · pwa · vista** — `2_Diagramas/vista-hub-usuarios-pwa_v07_20261115-0059.svg`
 
-[![PWA: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v04_20261111-2329.svg)
+[![PWA: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-pwa_v07_20261115-0059.svg)](../2_Diagramas/vista-hub-usuarios-pwa_v07_20261115-0059.svg)
 
-**Hub · time deboaz · usuários · pwa · vista** — `2_Diagramas/vista-hub-time-deboaz-pwa_v03_20261109-0048.svg`
+**Hub · time deboaz · usuários · pwa · vista** — `2_Diagramas/vista-hub-time-deboaz-pwa_v04_20261115-0059.svg`
 
-[![PWA: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-pwa_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-time-deboaz-pwa_v03_20261109-0048.svg)
+[![PWA: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-pwa_v04_20261115-0059.svg)](../2_Diagramas/vista-hub-time-deboaz-pwa_v04_20261115-0059.svg)
 
 **Quest · sala anônima · pwa · vista** — `2_Diagramas/vista-quest-sala-anonima-pwa_v01_20261103-1139.svg`
 
@@ -2696,13 +2763,13 @@ Cenário: o que este documento não trata
 
 [![Mobile: vista do acesso ao hub: criar conta com domínio e sigla, igual para escola, empresa e autônomo, que só troca o CNPJ pelo CPF, senha gerada mostrada uma vez, entrar, código de liberação e esqueci a senha](../2_Diagramas/vista-hub-acesso-mobile_v01_20261103-1139.svg)](../2_Diagramas/vista-hub-acesso-mobile_v01_20261103-1139.svg)
 
-**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg`
+**Hub · usuários · mobile · vista** — `2_Diagramas/vista-hub-usuarios-mobile_v07_20261115-0059.svg`
 
-[![Mobile: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v04_20261111-2329.svg)
+[![Mobile: vista do módulo Usuários: card do módulo nos quatro tamanhos por perfil (instituição, staff e autônomo), com a alternância Dia, Semana e Mês e os 12 pontos na expandida, no compact, no medium e no expanded, telas do módulo dentro da carcaça do módulo aberto, staff e participante selecionados com as opções, edição e novo código de acesso, staff e participantes com busca, estado, ordem alfabética, matrícula e último acesso, novo staff, código de liberação, permissões, novo participante com responsáveis e tempo de sessão; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-usuarios-mobile_v07_20261115-0059.svg)](../2_Diagramas/vista-hub-usuarios-mobile_v07_20261115-0059.svg)
 
-**Hub · time deboaz · usuários · mobile · vista** — `2_Diagramas/vista-hub-time-deboaz-mobile_v03_20261109-0048.svg`
+**Hub · time deboaz · usuários · mobile · vista** — `2_Diagramas/vista-hub-time-deboaz-mobile_v04_20261115-0059.svg`
 
-[![Mobile: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-mobile_v03_20261109-0048.svg)](../2_Diagramas/vista-hub-time-deboaz-mobile_v03_20261109-0048.svg)
+[![Mobile: vista do módulo Usuários da conta do time deboaz, dentro da carcaça do hub e sem Feed: card do perfil deboaz nos quatro tamanhos com as contas ativas, a alternância Dia, Semana e Mês e os 12 pontos na expandida, membros, novo membro, código de liberação, membro pendente com as opções, permissões do membro por módulo, contas de instituição e de autônomo com ações, dados da conta, nova geração do código da conta master e configuração do tempo de sessão, com lista e detalhe no expanded; avisos de ação ao salvar as permissões, registro de mudanças e o aviso para quem recebe](../2_Diagramas/vista-hub-time-deboaz-mobile_v04_20261115-0059.svg)](../2_Diagramas/vista-hub-time-deboaz-mobile_v04_20261115-0059.svg)
 
 **Quest · sala anônima · mobile · vista** — `2_Diagramas/vista-quest-sala-anonima-mobile_v01_20261103-1139.svg`
 
@@ -2750,7 +2817,9 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v109** | 2026-11-12 17:21 | Pedido de senha da conta master vira chamado "SENHA_CONTA_MASTER" do SAC na criação, id "ajuda-" com o número do chamado e campo chamado em "pedidosAjuda" (`RF-111-api`, `RN-274`, índices; [18_modulo-sac `RF-179`](18_modulo-sac.md#RF-179-api)) |
+| **v111** | 2026-11-15 01:06 | Textos das vistas no `RF-113`: item "Desativar a conta" com o apoio "Ninguém entra mais; o time deboaz reativa", só para a conta master e o autônomo, diálogo "Desativar a conta?" e a recusa do encerramento com fatura em aberto na lista Contas do administrador; vistas Usuários pwa e mobile v07 e Time deboaz v04 |
+| v110 | 2026-11-15 00:45 | Desativar a conta (com o [19_modulo-pagamento](19_modulo-pagamento.md) `RN-313`): deixa de ser "por falta de pagamento", a conta master e o autônomo também desativam a própria conta, a fatura em aberto segue devida e o encerramento com fatura em aberto é recusado com 409 FATURA_EM_ABERTO (`RF-113`, `RF-113-api`, `RN-173`); vistas do módulo Usuários v04 → v06 |
+| v109 | 2026-11-12 17:21 | Pedido de senha da conta master vira chamado "SENHA_CONTA_MASTER" do SAC na criação, id "ajuda-" com o número do chamado e campo chamado em "pedidosAjuda" (`RF-111-api`, `RN-274`, índices; [18_modulo-sac `RF-179`](18_modulo-sac.md#RF-179-api)) |
 | v108 | 2026-11-12 02:31 | `RN-189`: o card fica sem dados ("vazio" true) enquanto a conta não tem staff nem participantes; a conta master não conta para o "vazio", mesmo entrando nos usuários ativos; `RN-189-api`: cenário "só a conta master" |
 | v107 | 2026-11-12 00:57 | Diagramas: adaptadores do ms_mono em primario/{in,out} e secundario/{in,out} (infra/out passa a secundario/out): pacotes hexagonal v02 → v03, inicialização v04 → v05, documentos v19 → v20 (também permissoes.suspensos como [{mod, abas}], 17-b `RN-287`); cenários sem mudança |
 | v106 | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", a conta master nas contagens, `RN-189`) |
@@ -2763,4 +2832,4 @@ Cenário: o que este documento não trata
 
 ---
 
-<sub>boaz · v109 · 2026-11-12 17:21 · `1_Requisitos/17_modulo-usuario.md`</sub>
+<sub>boaz · v111 · 2026-11-15 01:06 · `1_Requisitos/17_modulo-usuario.md`</sub>

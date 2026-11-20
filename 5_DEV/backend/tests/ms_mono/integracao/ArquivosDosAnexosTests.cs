@@ -78,6 +78,11 @@ public sealed class HostsDosAnexos : IAsyncLifetime
                 {
                     foreach (var (nome, valor) in ContasQa) b.UseSetting(nome, valor);
                 }
+                else
+                {
+                    // em produção o Pagamento exige o Mercado Pago na partida (19 RNF-242); valores de teste, sem chamada
+                    b.UseSetting("MercadoPago:AccessToken", "token-de-teste").UseSetting("MercadoPago:SegredoDoWebhook", "segredo-de-teste");
+                }
             });
             hosts[(destino, ambiente)] = host;
             return host;

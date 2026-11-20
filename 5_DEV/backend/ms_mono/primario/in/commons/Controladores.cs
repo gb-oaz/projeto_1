@@ -141,11 +141,7 @@ public sealed class ComAcessoAttribute(string modulo, string aba) : Attribute, I
 
     public ExigenciaDaRota Exigencia { get; } = Acesso.Exigencia(modulo, aba);
 
-    public Task<AcessoConferido> ConferirToken(HttpContext http)
-    {
-        var frente = FrenteDoToken ? Http.FrenteDoToken(Http.Token(http)) : Frente;
-        return SemSessaoValida ? Acesso.ConferirSessao(http, frente) : Acesso.Conferir(http, frente);
-    }
+    public Task<AcessoConferido> ConferirToken(HttpContext http) => Acesso.Conferir(http, Frente, FrenteDoToken, SemSessaoValida);
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -199,13 +195,20 @@ public sealed class ComAcessoAuditadoAttribute(string modulo, string aba, AcaoAu
 
     public Frente Frente { get; init; } = Frente.Hub;
 
+    // como em [ComAcesso]: a frente do próprio token, para o participante que
+    // entra pelo quest receber o 403 do módulo (19 RN-298), e o 401
+    // SESSAO_TERMINADA no lugar do TOKEN_INVALIDO
+    public bool FrenteDoToken { get; init; }
+
+    public bool SemSessaoValida { get; init; }
+
     public AlvoAuditado Alvo { get; init; } = AlvoAuditado.Nenhum;
 
     public ExigenciaDaRota Exigencia { get; } = Acesso.Exigencia(modulo, aba);
 
     public AcaoAuditada Acao { get; } = acao;
 
-    public Task<AcessoConferido> ConferirToken(HttpContext http) => Acesso.Conferir(http, Frente);
+    public Task<AcessoConferido> ConferirToken(HttpContext http) => Acesso.Conferir(http, Frente, FrenteDoToken, SemSessaoValida);
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -238,6 +241,14 @@ static class Acesso
         exigencia.Modulo is ['{', .. var nome, '}']
             ? exigencia with { Modulo = http.Request.RouteValues[nome]?.ToString() }
             : exigencia;
+
+    // O token conferido como o atributo pede: na frente dada ou na do próprio
+    // token, com o 401 de sempre ou o SESSAO_TERMINADA.
+    public static Task<AcessoConferido> Conferir(HttpContext http, Frente frente, bool frenteDoToken, bool semSessaoValida)
+    {
+        var naFrente = frenteDoToken ? Http.FrenteDoToken(Http.Token(http)) : frente;
+        return semSessaoValida ? ConferirSessao(http, naFrente) : Conferir(http, naFrente);
+    }
 
     // O token do pedido, conferido pela Autenticação (assinatura, sessão viva e pv atual).
     public static Task<AcessoConferido> Conferir(HttpContext http, Frente frente) =>

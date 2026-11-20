@@ -59,6 +59,20 @@ locals {
     "usuario-qa-participante-codigo" = "USUARIO_QA_PARTICIPANTE_CODIGO"
     "usuario-qa-modulos"             = "USUARIO_QA_MODULOS"
   })
+
+  # Intermediador de pagamento (19: RNF-242), também
+  # gravados à mão no Key Vault de hml e de prd (README), nunca no repositório.
+  # Com o Access Token presente e o relógio de teste desligado, o backend usa o
+  # Mercado Pago; em prd, segredo ausente impede a revisão de subir. O CI local
+  # (ci.sh) não os recebe e segue com o intermediador falso.
+  segredos_mercadopago = {
+    "mercadopago-public-key"      = "MercadoPago__PublicKey"
+    "mercadopago-access-token"    = "MercadoPago__AccessToken"
+    "mercadopago-segredo-webhook" = "MercadoPago__SegredoDoWebhook"
+  }
+
+  # Segredos gravados à mão que o backend-mono recebe como variável de ambiente
+  segredos_manuais = merge(local.segredos_usuarios, local.segredos_mercadopago)
 }
 
 resource "azurerm_container_app" "app" {
@@ -98,10 +112,10 @@ resource "azurerm_container_app" "app" {
     }
   }
 
-  # Contas iniciais: referência sem versão ao segredo gravado à mão no Key
-  # Vault, para a troca de senha valer no próximo start (RN-267)
+  # Contas iniciais e Mercado Pago: referência sem versão ao segredo gravado à
+  # mão no Key Vault, para a troca valer no próximo start (RN-267, 19 RNF-242)
   dynamic "secret" {
-    for_each = each.key == "backend-mono" ? keys(local.segredos_usuarios) : []
+    for_each = each.key == "backend-mono" ? keys(local.segredos_manuais) : []
     content {
       name                = secret.value
       identity            = azurerm_user_assigned_identity.id.id
@@ -154,9 +168,9 @@ resource "azurerm_container_app" "app" {
         }
       }
 
-      # Contas iniciais: cada segredo vira a variável de ambiente do start
+      # Contas iniciais e Mercado Pago: cada segredo vira a variável de ambiente
       dynamic "env" {
-        for_each = each.key == "backend-mono" ? local.segredos_usuarios : {}
+        for_each = each.key == "backend-mono" ? local.segredos_manuais : {}
         content {
           name        = env.value
           secret_name = env.key

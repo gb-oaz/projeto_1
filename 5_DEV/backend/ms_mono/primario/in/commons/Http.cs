@@ -9,6 +9,7 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
+using Boaz.Core.Hub.Pagamento.Faturas.Domain;
 using Boaz.Core.Hub.Sac.Chamados.Domain;
 using GrupoAutenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Domain.GrupoDeFalha;
 using GrupoAutorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Domain.GrupoDeFalha;
@@ -18,7 +19,8 @@ namespace Boaz.MsMono.Primario.In.Commons;
 
 // O corpo de toda resposta de erro (contratos *-contrato-api): o código, a
 // mensagem e, quando a falha tem, o campo, o tentarEm, os limites, o módulo,
-// as abas e a versão. Os ausentes não vão no JSON.
+// as abas, a versão, o saldo do estorno e, no Pagamento, o traceId da execução
+// (19 RNF-243). Os ausentes não vão no JSON.
 public sealed record Erro(
     string Codigo, string Mensagem,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Campo = null,
@@ -28,7 +30,9 @@ public sealed record Erro(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Mod = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Abas = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? Versao = null,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Responsavel = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Responsavel = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] decimal? Saldo = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? TraceId = null);
 
 public static class Http
 {
@@ -63,8 +67,9 @@ public static class Http
                 if (contexto.Response.StatusCode == StatusCodes.Status415UnsupportedMediaType && !contexto.Response.HasStarted)
                 {
                     contexto.Response.Clear();
+                    if (DoPagamento(contexto)) ManterTraceId(contexto);
                     contexto.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
-                    await contexto.Response.WriteAsJsonAsync(CorpoInvalido);
+                    await contexto.Response.WriteAsJsonAsync(ComTraceId(contexto, CorpoInvalido));
                 }
             }
             catch (Exception falha) when (Traduzir(falha) is { } traduzida && !contexto.Response.HasStarted)
@@ -72,7 +77,7 @@ public static class Http
                 contexto.Response.Clear();
                 ManterTraceId(contexto);
                 contexto.Response.StatusCode = traduzida.Status;
-                await contexto.Response.WriteAsJsonAsync(traduzida.Erro);
+                await contexto.Response.WriteAsJsonAsync(ComTraceId(contexto, traduzida.Erro));
             }
         });
         return app;
@@ -100,6 +105,37 @@ public static class Http
         return traceId;
     }
 
+    // O Pagamento abre a execução já na chegada (19 RNF-243): toda resposta de
+    // /pagamento/*, de sucesso ou de erro, traz o X-Trace-Id, e o corpo de erro
+    // traz o mesmo traceId. O X-Trace-Id recebido no formato "trc-" + 8 hex é o
+    // traceId de origem da execução; fora do formato, é ignorado.
+    public static WebApplication UseTraceIdDoPagamento(this WebApplication app)
+    {
+        app.Use(async (contexto, proximo) =>
+        {
+            if (contexto.Request.Path.StartsWithSegments(RaizDoPagamento, StringComparison.Ordinal))
+            {
+                contexto.Items[MarcaDoPagamento] = TraceId.Ler(contexto.Request.Headers[CabecalhoDoTraceId].ToString());
+                contexto.NovoTraceId();
+            }
+            await proximo(contexto);
+        });
+        return app;
+    }
+
+    // a raiz dos endereços do Pagamento e a marca da execução dele (o traceId de origem, ou null)
+    const string RaizDoPagamento = "/pagamento";
+    const string MarcaDoPagamento = "pagamento:traceIdOrigem";
+
+    static bool DoPagamento(HttpContext contexto) => contexto.Items.ContainsKey(MarcaDoPagamento);
+
+    // O traceId de origem recebido no X-Trace-Id do pedido do Pagamento (RNF-243); null sem ele ou fora do formato.
+    public static TraceId? TraceIdDeOrigem(this HttpContext contexto) => contexto.Items[MarcaDoPagamento] as TraceId?;
+
+    // o corpo de erro do Pagamento leva o traceId da execução (RNF-243)
+    static Erro ComTraceId(HttpContext contexto, Erro erro) =>
+        DoPagamento(contexto) && contexto.Items[typeof(TraceId)] is TraceId traceId ? erro with { TraceId = traceId.Valor } : erro;
+
     // Response.Clear() apaga os cabeçalhos: a recusa repõe o X-Trace-Id da execução.
     static void ManterTraceId(HttpContext contexto)
     {
@@ -116,6 +152,7 @@ public static class Http
         FalhaDeAutenticacao f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, f.TentarEm)),
         FalhaDeAutorizacao f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Mod: f.Mod, Abas: f.Abas, Versao: f.Versao)),
         FalhaDoSac f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Minimo: f.Minimo, Maximo: f.Maximo, Responsavel: f.Responsavel)),
+        FalhaDoPagamento f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Saldo: f.Saldo)),
         BadHttpRequestException => (StatusCodes.Status422UnprocessableEntity, CorpoInvalido),
         OperationCanceledException => null,
         _ => (StatusCodes.Status500InternalServerError, ErroInesperado),
@@ -140,6 +177,18 @@ public static class Http
         GrupoDaFalha.MuitoGrande => StatusCodes.Status413PayloadTooLarge,
         GrupoDaFalha.TipoNaoAceito => StatusCodes.Status415UnsupportedMediaType,
         GrupoDaFalha.DadosInvalidos => StatusCodes.Status422UnprocessableEntity,
+        _ => StatusCodes.Status503ServiceUnavailable,
+    };
+
+    static int Status(GrupoDaFalhaDoPagamento grupo) => grupo switch
+    {
+        GrupoDaFalhaDoPagamento.NaoAutenticado => StatusCodes.Status401Unauthorized,
+        GrupoDaFalhaDoPagamento.Proibido => StatusCodes.Status403Forbidden,
+        GrupoDaFalhaDoPagamento.NaoEncontrado => StatusCodes.Status404NotFound,
+        GrupoDaFalhaDoPagamento.Conflito => StatusCodes.Status409Conflict,
+        GrupoDaFalhaDoPagamento.VersaoDesatualizada => StatusCodes.Status412PreconditionFailed,
+        GrupoDaFalhaDoPagamento.VersaoAusente => StatusCodes.Status428PreconditionRequired,
+        GrupoDaFalhaDoPagamento.DadosInvalidos => StatusCodes.Status422UnprocessableEntity,
         _ => StatusCodes.Status503ServiceUnavailable,
     };
 

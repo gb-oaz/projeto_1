@@ -123,6 +123,10 @@ public sealed class FalhaDeUsuarios : Exception, IRecusaPrevista
     public static FalhaDeUsuarios TransicaoInvalida() =>
         new(GrupoDeFalha.Conflito, "TRANSICAO_INVALIDA", "Conta encerrada não volta.");
 
+    /// <summary>A conta com fatura em aberto no Pagamento não se encerra (RN-173, 19 RN-313).</summary>
+    public static FalhaDeUsuarios FaturaEmAberto() =>
+        new(GrupoDeFalha.Conflito, "FATURA_EM_ABERTO", "Esta conta tem fatura em aberto e não pode ser excluída.");
+
     /// <summary>CNPJ errado ou menos de 2 de 3 conferidos (RN-172).</summary>
     public static FalhaDeUsuarios ConferenciaIncompleta() =>
         new(GrupoDeFalha.DadosInvalidos, "CONFERENCIA_INCOMPLETA", "Os dados conferidos não batem com o cadastro.");

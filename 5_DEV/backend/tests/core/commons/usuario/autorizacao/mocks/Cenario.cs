@@ -20,7 +20,7 @@ public sealed class Cenario
     /// <summary>Monta o mundo.</summary>
     public Cenario()
     {
-        Modulo("MOD-01", "Contas", TipoDeModulo.DaConta, (Master, Hub), (Autonomo, Hub));
+        Modulo("MOD-01", "Pagamento", TipoDeModulo.DaConta, (Master, Hub), (Autonomo, Hub), (Staff, Hub));
         Modulo("MOD-02", "SAC", TipoDeModulo.DaConta, (Master, Hub), (Autonomo, Hub), (MembroTime, Hub));
         Modulo("MOD-03", "Usuários", TipoDeModulo.DaConta, (Administrador, Hub), (MembroTime, Hub), (Master, Hub), (Autonomo, Hub), (Staff, Hub));
         Modulo("MOD-04", "Sugestão", TipoDeModulo.DaConta, (Staff, Hub), (Master, Hub));

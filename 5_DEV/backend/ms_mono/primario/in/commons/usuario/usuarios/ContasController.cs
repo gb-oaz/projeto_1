@@ -98,7 +98,7 @@ public sealed class ContasController : ControllerBase
     /// <param name="ct">Cancelamento do pedido.</param>
     /// <response code="200">A página de contas.</response>
     /// <response code="401">Token de acesso ausente ou inválido.</response>
-    /// <response code="403">Sem MOD-03 · U ou fora do time deboaz.</response>
+    /// <response code="403">Sem MOD-03 · U, ou fora do time deboaz pedindo algo além de desativar a própria conta.</response>
     /// <response code="422">Filtro ou página inválidos.</response>
     [HttpGet("", Name = "listarContas")]
     [ComAcesso(Usuarios, nameof(Abas.U))]
@@ -121,7 +121,7 @@ public sealed class ContasController : ControllerBase
     /// <param name="ct">Cancelamento do pedido.</param>
     /// <response code="200">O cadastro da conta.</response>
     /// <response code="401">Token de acesso ausente ou inválido.</response>
-    /// <response code="403">Sem MOD-03 · U ou fora do time deboaz.</response>
+    /// <response code="403">Sem MOD-03 · U, ou fora do time deboaz pedindo algo além de desativar a própria conta.</response>
     /// <response code="404">Conta inexistente.</response>
     [HttpGet("{id}", Name = "lerConta")]
     [ComAcesso(Usuarios, nameof(Abas.U))]
@@ -134,8 +134,9 @@ public sealed class ContasController : ControllerBase
 
     /// <summary>Suspender, desativar, reativar ou encerrar uma conta</summary>
     /// <remarks>
-    /// Só o time deboaz, com MOD-03 · U (RF-113, RN-173, RN-174, RN-175, RNF-203). Fora de ATIVA ninguém da conta
-    /// entra e as sessões terminam; encerrada não volta.
+    /// O time deboaz, com MOD-03 · U (RF-113, RN-173, RN-174, RN-175, RNF-203); a conta master e o autônomo só põem a
+    /// própria conta em DESATIVADA. Fora de ATIVA ninguém da conta entra e as sessões terminam; encerrada não volta, e a
+    /// conta com fatura do Pagamento a pagar ou vencida não se encerra (19 RN-313).
     /// </remarks>
     /// <param name="id">O id da conta.</param>
     /// <param name="corpo">O estado novo.</param>
@@ -143,9 +144,9 @@ public sealed class ContasController : ControllerBase
     /// <param name="ct">Cancelamento do pedido.</param>
     /// <response code="200">A conta com o estado novo.</response>
     /// <response code="401">Token de acesso ausente ou inválido.</response>
-    /// <response code="403">Sem MOD-03 · U ou fora do time deboaz.</response>
+    /// <response code="403">Sem MOD-03 · U, ou fora do time deboaz pedindo algo além de desativar a própria conta.</response>
     /// <response code="404">Conta inexistente.</response>
-    /// <response code="409">A mudança não vale a partir do estado atual.</response>
+    /// <response code="409">A mudança não vale a partir do estado atual, ou FATURA_EM_ABERTO ao encerrar.</response>
     /// <response code="422">Dados inválidos.</response>
     [HttpPost("{id}/estado", Name = "mudarEstadoDaConta")]
     [ComAcessoAuditado(Usuarios, nameof(Abas.U), AcaoAuditada.MudarEstadoConta, Alvo = AlvoAuditado.IdDaRota)]
@@ -173,7 +174,7 @@ public sealed class ContasController : ControllerBase
     /// <param name="ct">Cancelamento do pedido.</param>
     /// <response code="201">Código da conta master gerado.</response>
     /// <response code="401">Token de acesso ausente ou inválido.</response>
-    /// <response code="403">Sem MOD-03 · U ou fora do time deboaz.</response>
+    /// <response code="403">Sem MOD-03 · U, ou fora do time deboaz pedindo algo além de desativar a própria conta.</response>
     /// <response code="404">Conta inexistente.</response>
     /// <response code="422">Dados inválidos ou que não conferem com o cadastro.</response>
     [HttpPost("{id}/codigo-master", Name = "gerarCodigoDaMaster")]

@@ -25,7 +25,7 @@ public class CalcularPermissoesTests
     {
         var token = await mundo.Token("usr-dboaz-admin");
         Assert.Equal("ADMINISTRADOR", token.Papel);
-        Assert.Equal(Texto(("MOD-02", "CU"), ("MOD-03", "CU"), ("MOD-14", "CU")), token.Mods);
+        Assert.Equal(Texto(("MOD-01", "U"), ("MOD-02", "CU"), ("MOD-03", "CU"), ("MOD-14", "CU")), token.Mods);
         Assert.Equal(1, token.Pv);
     }
 
@@ -45,7 +45,9 @@ public class CalcularPermissoesTests
         var token = await mundo.Token("usr-ebfga-master");
         Assert.Equal("MASTER", token.Papel);
         Assert.Equal(["MOD-01", "MOD-02", "MOD-03", "MOD-04", "MOD-05", "MOD-06", "MOD-08", "MOD-09"], token.Mods.Keys.Order());
-        Assert.All(token.Mods.Values, abas => Assert.Equal("CU", abas));
+        // o Pagamento só tem a Utilização (17-b RN-233-api)
+        Assert.Equal("U", token.Mods["MOD-01"]);
+        Assert.All(token.Mods.Where(m => m.Key != "MOD-01").Select(m => m.Value), abas => Assert.Equal("CU", abas));
     }
 
     [Fact]
@@ -54,6 +56,7 @@ public class CalcularPermissoesTests
         var token = await mundo.Token("usr-preis-pedro");
         Assert.Equal("AUTONOMO", token.Papel);
         Assert.Equal(["MOD-01", "MOD-02", "MOD-03", "MOD-04", "MOD-08", "MOD-09"], token.Mods.Keys.Order());
+        Assert.Equal("U", token.Mods["MOD-01"]);
     }
 
     [Fact]
