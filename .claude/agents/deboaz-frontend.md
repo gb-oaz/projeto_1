@@ -7,6 +7,8 @@ skills:
   - gherkin-bdd
   - engenharia-software
   - frontend-vue
+model: sonnet
+effort: high
 color: cyan
 ---
 

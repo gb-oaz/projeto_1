@@ -5,6 +5,8 @@ skills:
   - desenvolvimento
   - gherkin-bdd
   - engenharia-software
+model: sonnet
+effort: high
 color: purple
 ---
 

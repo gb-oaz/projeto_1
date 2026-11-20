@@ -6,6 +6,8 @@ skills:
   - gherkin-bdd
   - engenharia-software
   - estrategia-qa
+model: sonnet
+effort: medium
 color: green
 ---
 

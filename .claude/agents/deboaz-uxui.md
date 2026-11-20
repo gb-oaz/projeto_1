@@ -6,6 +6,8 @@ skills:
   - diagrama-dev
   - gherkin-bdd
   - ux-usabilidade
+model: opus
+effort: high
 color: pink
 ---
 

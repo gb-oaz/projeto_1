@@ -15,6 +15,8 @@ skills:
   - estrategia-qa
   - frontend-vue
   - ux-usabilidade
+model: opus
+effort: high
 color: blue
 ---
 
