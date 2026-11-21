@@ -184,39 +184,39 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^a coleção ""auditoria"" ganha 2 registros da ação ""(\w+)"" com o mesmo traceId$")]
     public async Task DoisRegistros(string acao)
     {
-        var todos = await execucoes.Novos(Auditoria.Registros);
-        var novos = todos.Where(d => Auditoria.Texto(d, "acao") == acao).ToList();
-        Assert.True(novos.Count == 2, $"esperava 2 registros de {acao} em \"auditoria\", vieram {Auditoria.Resumo(todos)}");
-        Assert.True(todos.All(d => Auditoria.Texto(d, "acao") == acao || Auditoria.Interna(d)),
-            $"além de {acao}, só as ações internas da RN-275: {Auditoria.Resumo(todos)}");
-        Auditoria.MesmoTraceId(novos);
+        var todos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        var novos = todos.Where(d => Suporte.Auditoria.Texto(d, "acao") == acao).ToList();
+        Assert.True(novos.Count == 2, $"esperava 2 registros de {acao} em \"auditoria\", vieram {Suporte.Auditoria.Resumo(todos)}");
+        Assert.True(todos.All(d => Suporte.Auditoria.Texto(d, "acao") == acao || Suporte.Auditoria.Interna(d)),
+            $"além de {acao}, só as ações internas da RN-275: {Suporte.Auditoria.Resumo(todos)}");
+        Suporte.Auditoria.MesmoTraceId(novos);
     }
 
     [Then(@"^os registros das ações internas da RN-275, quando há, vêm à parte, com o mesmo traceId$")]
     public async Task InternasAParte()
     {
-        var todos = await execucoes.Novos(Auditoria.Registros);
-        var traceId = Auditoria.MesmoTraceId(await execucoes.Proprios());
-        Assert.All(todos.Where(Auditoria.Interna), d => Assert.Equal(traceId, Auditoria.TraceId(d)));
+        var todos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        var traceId = Suporte.Auditoria.MesmoTraceId(await execucoes.Proprios());
+        Assert.All(todos.Where(Suporte.Auditoria.Interna), d => Assert.Equal(traceId, Suporte.Auditoria.TraceId(d)));
     }
 
     // o aviso das permissões novas do João (RN-275), na execução do PUT
     [Then(@"^à parte, ""INICIADO"" e ""CONCLUIDO"" de ""(\w+)"", como na RN-275$")]
     public async Task InternaDoPut(string interna)
     {
-        var todos = await execucoes.Novos(Auditoria.Registros);
-        var dela = todos.Where(d => Auditoria.Texto(d, "acao") == interna).ToList();
-        Assert.True(dela.Select(d => Auditoria.Texto(d, "etapa")).SequenceEqual(["INICIADO", "CONCLUIDO"]),
-            $"esperava INICIADO e CONCLUIDO de {interna} em \"auditoria\", vieram {Auditoria.Resumo(todos)}");
-        var traceId = Auditoria.MesmoTraceId(await execucoes.Proprios());
-        Assert.All(dela, d => Assert.Equal(traceId, Auditoria.TraceId(d)));
+        var todos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        var dela = todos.Where(d => Suporte.Auditoria.Texto(d, "acao") == interna).ToList();
+        Assert.True(dela.Select(d => Suporte.Auditoria.Texto(d, "etapa")).SequenceEqual(["INICIADO", "CONCLUIDO"]),
+            $"esperava INICIADO e CONCLUIDO de {interna} em \"auditoria\", vieram {Suporte.Auditoria.Resumo(todos)}");
+        var traceId = Suporte.Auditoria.MesmoTraceId(await execucoes.Proprios());
+        Assert.All(dela, d => Assert.Equal(traceId, Suporte.Auditoria.TraceId(d)));
     }
 
     [Then(@"^o primeiro com a etapa ""(\w+)"", o segundo com a etapa ""(\w+)""$")]
     public async Task Etapas(string primeira, string segunda)
     {
         var novos = await execucoes.Proprios();
-        Assert.Equal(new[] { primeira, segunda }, novos.Select(d => Auditoria.Texto(d, "etapa")).ToArray());
+        Assert.Equal(new[] { primeira, segunda }, novos.Select(d => Suporte.Auditoria.Texto(d, "etapa")).ToArray());
     }
 
     [Then(@"^os dois com a Maria, a ação ""(\w+)"", o alvo e a hora, guardados até 5 anos depois$")]
@@ -230,11 +230,11 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         Assert.NotEmpty(novos);
         Assert.All(novos, d =>
         {
-            Assert.Equal(maria.Id, Auditoria.Texto(d, "quem"));
-            Assert.Equal(acao, Auditoria.Texto(d, "acao"));
-            Assert.Equal(alvo, Auditoria.Texto(d, "alvo"));
+            Assert.Equal(maria.Id, Suporte.Auditoria.Texto(d, "quem"));
+            Assert.Equal(acao, Suporte.Auditoria.Texto(d, "acao"));
+            Assert.Equal(alvo, Suporte.Auditoria.Texto(d, "alvo"));
             execucoes.NaHoraDoPedido(d);
-            Auditoria.GuardadoCincoAnos(d);
+            Suporte.Auditoria.GuardadoCincoAnos(d);
         });
     }
 
@@ -245,15 +245,15 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         // a Pessoa da conta master não guarda o id: ele vem do sub do token dela
         var master = await mundo.Traduzir("usr-ebfga-master");
         var novos = await execucoes.Proprios();
-        Assert.Equal(new[] { primeira, segunda }, novos.Select(d => Auditoria.Texto(d, "etapa")).ToArray());
-        Auditoria.MesmoTraceId(novos);
+        Assert.Equal(new[] { primeira, segunda }, novos.Select(d => Suporte.Auditoria.Texto(d, "etapa")).ToArray());
+        Suporte.Auditoria.MesmoTraceId(novos);
         Assert.All(novos, d =>
         {
-            Assert.Equal(master, Auditoria.Texto(d, "quem"));
-            Assert.Equal(acao, Auditoria.Texto(d, "acao"));
-            Assert.Equal(alvo, Auditoria.Texto(d, "alvo"));
+            Assert.Equal(master, Suporte.Auditoria.Texto(d, "quem"));
+            Assert.Equal(acao, Suporte.Auditoria.Texto(d, "acao"));
+            Assert.Equal(alvo, Suporte.Auditoria.Texto(d, "alvo"));
             execucoes.NaHoraDoPedido(d);
-            Auditoria.GuardadoCincoAnos(d);
+            Suporte.Auditoria.GuardadoCincoAnos(d);
         });
     }
 
@@ -272,20 +272,20 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^a coleção ""auditoria"" ganha o registro ""(\w+)"" da ação ""(\w+)""$")]
     public async Task GanhaORegistro(string etapa, string acao)
     {
-        var novos = await execucoes.Novos(Auditoria.Registros);
-        registro = novos.FirstOrDefault(d => Auditoria.Texto(d, "etapa") == etapa && Auditoria.Texto(d, "acao") == acao);
-        Assert.True(registro is not null, $"esperava o registro {etapa} de {acao} em \"auditoria\", vieram {Auditoria.Resumo(novos)}");
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        registro = novos.FirstOrDefault(d => Suporte.Auditoria.Texto(d, "etapa") == etapa && Suporte.Auditoria.Texto(d, "acao") == acao);
+        Assert.True(registro is not null, $"esperava o registro {etapa} de {acao} em \"auditoria\", vieram {Suporte.Auditoria.Resumo(novos)}");
         execucoes.NaHoraDoPedido(registro);
-        Auditoria.GuardadoCincoAnos(registro);
+        Suporte.Auditoria.GuardadoCincoAnos(registro);
     }
 
     [Then(@"^esse registro vai sem quem, sem contaId e sem alvo$")]
     public void SemQuemContaEAlvo()
     {
         Assert.NotNull(registro);
-        Assert.Null(Auditoria.Texto(registro, "quem"));
-        Assert.Null(Auditoria.Texto(registro, "contaId"));
-        Assert.Null(Auditoria.Texto(registro, "alvo"));
+        Assert.Null(Suporte.Auditoria.Texto(registro, "quem"));
+        Assert.Null(Suporte.Auditoria.Texto(registro, "contaId"));
+        Assert.Null(Suporte.Auditoria.Texto(registro, "alvo"));
     }
 
     [Then(@"^o registro ""CONCLUIDO"", com o mesmo traceId, vai com contaId e alvo ""(.+)"", sem quem$")]
@@ -293,57 +293,57 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     {
         Assert.NotNull(registro);
         var conta = await mundo.Traduzir(exemplo);
-        var novos = await execucoes.Novos(Auditoria.Registros);
-        var concluido = novos.FirstOrDefault(d => Auditoria.Texto(d, "etapa") == "CONCLUIDO");
-        Assert.True(concluido is not null, $"esperava o registro CONCLUIDO em \"auditoria\", vieram {Auditoria.Resumo(novos)}");
-        Assert.Equal(Auditoria.TraceId(registro), Auditoria.TraceId(concluido));
-        Assert.Equal(conta, Auditoria.Texto(concluido, "contaId"));
-        Assert.Equal(conta, Auditoria.Texto(concluido, "alvo"));
-        Assert.Null(Auditoria.Texto(concluido, "quem"));
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        var concluido = novos.FirstOrDefault(d => Suporte.Auditoria.Texto(d, "etapa") == "CONCLUIDO");
+        Assert.True(concluido is not null, $"esperava o registro CONCLUIDO em \"auditoria\", vieram {Suporte.Auditoria.Resumo(novos)}");
+        Assert.Equal(Suporte.Auditoria.TraceId(registro), Suporte.Auditoria.TraceId(concluido));
+        Assert.Equal(conta, Suporte.Auditoria.Texto(concluido, "contaId"));
+        Assert.Equal(conta, Suporte.Auditoria.Texto(concluido, "alvo"));
+        Assert.Null(Suporte.Auditoria.Texto(concluido, "quem"));
     }
 
     // ── erros e alertas (RN-270) ───────────────────────────────────────────
     [Then(@"^a coleção ""auditoria"" fica só com o registro ""(\w+)"" da ação ""(\w+)""$")]
     public async Task SoORegistro(string etapa, string acao)
     {
-        var novos = await execucoes.Novos(Auditoria.Registros);
-        Assert.True(novos.Count == 1, $"esperava só o registro {etapa} em \"auditoria\", vieram {Auditoria.Resumo(novos)}");
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        Assert.True(novos.Count == 1, $"esperava só o registro {etapa} em \"auditoria\", vieram {Suporte.Auditoria.Resumo(novos)}");
         registro = novos[0];
-        Assert.Equal(etapa, Auditoria.Texto(registro, "etapa"));
-        Assert.Equal(acao, Auditoria.Texto(registro, "acao"));
+        Assert.Equal(etapa, Suporte.Auditoria.Texto(registro, "etapa"));
+        Assert.Equal(acao, Suporte.Auditoria.Texto(registro, "acao"));
     }
 
     [Then(@"^a coleção ""auditoriaErros"" ganha 1 registro com o código ""(\w+)"" e o nivel ""(\w+)""$")]
     public async Task UmErro(string codigo, string nivel)
     {
         var erro = await execucoes.UmNovoErro();
-        Assert.Equal(codigo, Auditoria.Texto(erro, "codigo"));
-        Assert.Equal(nivel, Auditoria.Texto(erro, "nivel"));
+        Assert.Equal(codigo, Suporte.Auditoria.Texto(erro, "codigo"));
+        Assert.Equal(nivel, Suporte.Auditoria.Texto(erro, "nivel"));
     }
 
     [Then(@"^os dois registros têm o mesmo traceId$")]
     public async Task MesmoTraceIdNasDuas()
     {
         Assert.NotNull(registro);
-        Assert.Equal(Auditoria.TraceId(registro), Auditoria.TraceId(await execucoes.UmNovoErro()));
+        Assert.Equal(Suporte.Auditoria.TraceId(registro), Suporte.Auditoria.TraceId(await execucoes.UmNovoErro()));
     }
 
     [Then(@"^nenhum registro ""CONCLUIDO"" é gravado com esse traceId$")]
     public async Task SemConcluido()
     {
         Assert.NotNull(registro);
-        var traceId = Auditoria.TraceId(registro);
-        var concluidos = (await Auditoria.Todos(Auditoria.Registros))
-            .Where(d => Auditoria.Texto(d, "traceId") == traceId && Auditoria.Texto(d, "etapa") == "CONCLUIDO").ToList();
-        Assert.True(concluidos.Count == 0, $"a execução recusada gravou {Auditoria.Resumo(concluidos)}");
+        var traceId = Suporte.Auditoria.TraceId(registro);
+        var concluidos = (await Suporte.Auditoria.Todos(Suporte.Auditoria.Registros))
+            .Where(d => Suporte.Auditoria.Texto(d, "traceId") == traceId && Suporte.Auditoria.Texto(d, "etapa") == "CONCLUIDO").ToList();
+        Assert.True(concluidos.Count == 0, $"a execução recusada gravou {Suporte.Auditoria.Resumo(concluidos)}");
     }
 
     [Then(@"^""auditoriaErros"" ganha o registro com o código ""(\w+)"" e o nivel ""(\w+)""$")]
     public async Task ErroComCodigoENivel(string codigo, string nivel)
     {
         erro = await execucoes.UmNovoErro();
-        Assert.Equal(codigo, Auditoria.Texto(erro, "codigo"));
-        Assert.Equal(nivel, Auditoria.Texto(erro, "nivel"));
+        Assert.Equal(codigo, Suporte.Auditoria.Texto(erro, "codigo"));
+        Assert.Equal(nivel, Suporte.Auditoria.Texto(erro, "nivel"));
     }
 
     // "antes de a recusa sair do caso de uso": o registro já está gravado
@@ -368,7 +368,7 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public void GuardadoComoAAuditoria()
     {
         Assert.NotNull(registro);
-        Auditoria.GuardadoCincoAnos(registro);
+        Suporte.Auditoria.GuardadoCincoAnos(registro);
     }
 
     [Then(@"^não pode ser alterado nem apagado, como na RNF-206$")]
@@ -383,9 +383,9 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         var traceIds = new List<string>();
         for (var i = 0; i < execucoes.Resultados.Count; i++)
         {
-            var novos = await execucoes.Novos(Auditoria.Registros, i);
+            var novos = await execucoes.Novos(Suporte.Auditoria.Registros, i);
             Assert.True(novos.Count > 0, $"a execução {i + 1} não gravou nada em \"auditoria\"");
-            traceIds.Add(Auditoria.MesmoTraceId(novos));
+            traceIds.Add(Suporte.Auditoria.MesmoTraceId(novos));
         }
         Assert.NotEqual(traceIds[0], traceIds[1]);
     }
@@ -395,30 +395,30 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     {
         for (var i = 0; i < execucoes.Resultados.Count; i++)
         {
-            var novos = await execucoes.Novos(Auditoria.Registros, i);
-            Assert.Equal(new[] { primeira, segunda }, novos.Select(d => Auditoria.Texto(d, "etapa")).ToArray());
-            Auditoria.MesmoTraceId(novos);
+            var novos = await execucoes.Novos(Suporte.Auditoria.Registros, i);
+            Assert.Equal(new[] { primeira, segunda }, novos.Select(d => Suporte.Auditoria.Texto(d, "etapa")).ToArray());
+            Suporte.Auditoria.MesmoTraceId(novos);
         }
     }
 
     [Then(@"^o valor de X-Trace-Id é o traceId gravado em ""INICIADO"" e ""CONCLUIDO""$")]
     public async Task TraceIdDosRegistros()
     {
-        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
-        var novos = await execucoes.Novos(Auditoria.Registros);
-        Assert.Equal(new[] { "INICIADO", "CONCLUIDO" }, novos.Select(d => Auditoria.Texto(d, "etapa")).ToArray());
-        Assert.All(novos, d => Assert.Equal(traceId, Auditoria.TraceId(d)));
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        Assert.Equal(new[] { "INICIADO", "CONCLUIDO" }, novos.Select(d => Suporte.Auditoria.Texto(d, "etapa")).ToArray());
+        Assert.All(novos, d => Assert.Equal(traceId, Suporte.Auditoria.TraceId(d)));
     }
 
     [Then(@"^o valor de X-Trace-Id é o traceId gravado em ""INICIADO"" e ""auditoriaErros""$")]
     public async Task TraceIdDoErro()
     {
-        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
-        var novos = await execucoes.Novos(Auditoria.Registros);
-        var iniciado = novos.FirstOrDefault(d => Auditoria.Texto(d, "etapa") == "INICIADO");
-        Assert.True(iniciado is not null, $"esperava o registro INICIADO em \"auditoria\", vieram {Auditoria.Resumo(novos)}");
-        Assert.Equal(traceId, Auditoria.TraceId(iniciado));
-        Assert.Equal(traceId, Auditoria.TraceId(await execucoes.UmNovoErro()));
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        var iniciado = novos.FirstOrDefault(d => Suporte.Auditoria.Texto(d, "etapa") == "INICIADO");
+        Assert.True(iniciado is not null, $"esperava o registro INICIADO em \"auditoria\", vieram {Suporte.Auditoria.Resumo(novos)}");
+        Assert.Equal(traceId, Suporte.Auditoria.TraceId(iniciado));
+        Assert.Equal(traceId, Suporte.Auditoria.TraceId(await execucoes.UmNovoErro()));
     }
 
     // "sem log" é conferido por inspeção do caso de uso, não por teste
@@ -442,28 +442,28 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public async Task IniciadoDaMaria(string acao, string conta)
     {
         registro = await execucoes.Etapa("INICIADO", acao);
-        Assert.Equal((await mundo.Maria()).Id, Auditoria.Texto(registro, "quem"));
-        Assert.Equal(await mundo.Traduzir(conta), Auditoria.Texto(registro, "contaId"));
+        Assert.Equal((await mundo.Maria()).Id, Suporte.Auditoria.Texto(registro, "quem"));
+        Assert.Equal(await mundo.Traduzir(conta), Suporte.Auditoria.Texto(registro, "contaId"));
         execucoes.NaHoraDoPedido(registro);
-        Auditoria.GuardadoCincoAnos(registro);
+        Suporte.Auditoria.GuardadoCincoAnos(registro);
     }
 
     [Then(@"^esse registro vai sem alvo, porque o Lucas ainda não existe$")]
     public void IniciadoSemAlvo()
     {
         Assert.NotNull(registro);
-        Assert.True(Auditoria.Texto(registro, "alvo") is null, $"o INICIADO não devia trazer alvo: {registro.ToJson()}");
+        Assert.True(Suporte.Auditoria.Texto(registro, "alvo") is null, $"o INICIADO não devia trazer alvo: {registro.ToJson()}");
     }
 
     [Then(@"^o ""CONCLUIDO"", com o mesmo traceId, vai com a Maria, a ""(conta-ebfga)"" e o alvo ""(usr-ebfga-lucas)""$")]
     public async Task ConcluidoComOAlvo(string conta, string exemploAlvo)
     {
         Assert.NotNull(registro);
-        var concluido = await execucoes.Etapa("CONCLUIDO", Auditoria.Texto(registro, "acao")!);
-        Assert.Equal(Auditoria.TraceId(registro), Auditoria.TraceId(concluido));
-        Assert.Equal((await mundo.Maria()).Id, Auditoria.Texto(concluido, "quem"));
-        Assert.Equal(await mundo.Traduzir(conta), Auditoria.Texto(concluido, "contaId"));
-        Assert.Equal(await mundo.Traduzir(exemploAlvo), Auditoria.Texto(concluido, "alvo"));
+        var concluido = await execucoes.Etapa("CONCLUIDO", Suporte.Auditoria.Texto(registro, "acao")!);
+        Assert.Equal(Suporte.Auditoria.TraceId(registro), Suporte.Auditoria.TraceId(concluido));
+        Assert.Equal((await mundo.Maria()).Id, Suporte.Auditoria.Texto(concluido, "quem"));
+        Assert.Equal(await mundo.Traduzir(conta), Suporte.Auditoria.Texto(concluido, "contaId"));
+        Assert.Equal(await mundo.Traduzir(exemploAlvo), Suporte.Auditoria.Texto(concluido, "alvo"));
     }
 
     // o Rafael é criado pela conta master, antes da marca
@@ -478,21 +478,21 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^""auditoria"" fica só com o ""INICIADO"" da ação ""(\w+)"", sem alvo$")]
     public async Task SoOIniciadoSemAlvo(string acao)
     {
-        var novos = await execucoes.Novos(Auditoria.Registros);
-        Assert.True(novos.Count == 1 && Auditoria.Texto(novos[0], "etapa") == "INICIADO" && Auditoria.Texto(novos[0], "acao") == acao,
-            $"esperava só o INICIADO de {acao} em \"auditoria\", vieram {Auditoria.Resumo(novos)}");
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        Assert.True(novos.Count == 1 && Suporte.Auditoria.Texto(novos[0], "etapa") == "INICIADO" && Suporte.Auditoria.Texto(novos[0], "acao") == acao,
+            $"esperava só o INICIADO de {acao} em \"auditoria\", vieram {Suporte.Auditoria.Resumo(novos)}");
         registro = novos[0];
-        Assert.True(Auditoria.Texto(registro, "alvo") is null, $"o INICIADO não devia trazer alvo: {registro.ToJson()}");
+        Assert.True(Suporte.Auditoria.Texto(registro, "alvo") is null, $"o INICIADO não devia trazer alvo: {registro.ToJson()}");
     }
 
     [Then(@"^o registro de ""auditoriaErros"" vai com a Maria e a ""(conta-ebfga)"", sem alvo$")]
     public async Task ErroDaMariaSemAlvo(string conta)
     {
         erro = await execucoes.UmNovoErro();
-        Assert.Equal((await mundo.Maria()).Id, Auditoria.Texto(erro, "quem"));
-        Assert.Equal(await mundo.Traduzir(conta), Auditoria.Texto(erro, "contaId"));
-        Assert.True(Auditoria.Texto(erro, "alvo") is null, $"o registro de \"auditoriaErros\" não devia trazer alvo: {erro.ToJson()}");
-        if (registro is not null) Assert.Equal(Auditoria.TraceId(registro), Auditoria.TraceId(erro));
+        Assert.Equal((await mundo.Maria()).Id, Suporte.Auditoria.Texto(erro, "quem"));
+        Assert.Equal(await mundo.Traduzir(conta), Suporte.Auditoria.Texto(erro, "contaId"));
+        Assert.True(Suporte.Auditoria.Texto(erro, "alvo") is null, $"o registro de \"auditoriaErros\" não devia trazer alvo: {erro.ToJson()}");
+        if (registro is not null) Assert.Equal(Suporte.Auditoria.TraceId(registro), Suporte.Auditoria.TraceId(erro));
     }
 
     // ── corpo que não é JSON (RN-271) ──────────────────────────────────────
@@ -507,11 +507,11 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     {
         var r = await mundo.EnviarComo(await mundo.Maria(), "POST", "/usuarios", Participante("Pedro"));
         Respostas.Confere(r, 201);
-        Auditoria.TraceIdDoCabecalho(r);
+        Suporte.Auditoria.TraceIdDoCabecalho(r);
         await AnaSemOModulo("MOD-03", "U");
         var semModulo = await mundo.EnviarComo(mundo.Sujeito!, "POST", "/usuarios", Participante("Rafael"));
         Respostas.Confere(semModulo, 403, "ACESSO_NEGADO");
-        Auditoria.TraceIdDoCabecalho(semModulo);
+        Suporte.Auditoria.TraceIdDoCabecalho(semModulo);
     }
 
     // ── pedido de ajuda da conta master (RN-274) ───────────────────────────
@@ -529,13 +529,13 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^os dois com o traceId de X-Trace-Id, sem quem e sem contaId$")]
     public async Task SemQuemNemConta()
     {
-        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
-        var novos = await execucoes.Novos(Auditoria.Registros);
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
         Assert.NotEmpty(novos);
         Assert.All(novos, d =>
         {
-            Assert.Equal(traceId, Auditoria.TraceId(d));
-            Assert.True(Auditoria.Texto(d, "quem") is null && Auditoria.Texto(d, "contaId") is null,
+            Assert.Equal(traceId, Suporte.Auditoria.TraceId(d));
+            Assert.True(Suporte.Auditoria.Texto(d, "quem") is null && Suporte.Auditoria.Texto(d, "contaId") is null,
                 $"esperava quem e contaId null, veio {d.ToJson()}");
         });
     }
@@ -547,7 +547,7 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public async Task ConcluidoComOPedido()
     {
         var concluido = await execucoes.Etapa("CONCLUIDO", "ESQUECI_SENHA_MASTER");
-        Assert.False(string.IsNullOrWhiteSpace(Auditoria.Texto(concluido, "alvo")), $"o CONCLUIDO veio sem alvo: {concluido.ToJson()}");
+        Assert.False(string.IsNullOrWhiteSpace(Suporte.Auditoria.Texto(concluido, "alvo")), $"o CONCLUIDO veio sem alvo: {concluido.ToJson()}");
     }
 
     // 17 v109: o id do pedido é "ajuda-" com o número do chamado (contrato sac
@@ -557,7 +557,7 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^o id do pedido é ""ajuda-"" com o número do chamado, e o campo chamado é ""SAC-000087""$")]
     public async Task PedidoComONumeroDoChamado()
     {
-        var alvo = Auditoria.Texto(await execucoes.Etapa("CONCLUIDO", "ESQUECI_SENHA_MASTER"), "alvo") ?? "";
+        var alvo = Suporte.Auditoria.Texto(await execucoes.Etapa("CONCLUIDO", "ESQUECI_SENHA_MASTER"), "alvo") ?? "";
         Assert.Matches("^ajuda-[0-9]{6}$", alvo);
         var caio = await mundo.Caio();
         await mundo.Conceder(caio, new() { ["MOD-02"] = "U" });
@@ -586,21 +586,21 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public async Task IniciadoVazio(string acao)
     {
         registro = await execucoes.Etapa("INICIADO", acao);
-        Assert.True(Auditoria.Texto(registro, "quem") is null && Auditoria.Texto(registro, "contaId") is null && Auditoria.Texto(registro, "alvo") is null,
+        Assert.True(Suporte.Auditoria.Texto(registro, "quem") is null && Suporte.Auditoria.Texto(registro, "contaId") is null && Suporte.Auditoria.Texto(registro, "alvo") is null,
             $"o INICIADO devia ir sem quem, sem contaId e sem alvo: {registro.ToJson()}");
         execucoes.NaHoraDoPedido(registro);
-        Auditoria.GuardadoCincoAnos(registro);
+        Suporte.Auditoria.GuardadoCincoAnos(registro);
     }
 
     [Then(@"^o ""CONCLUIDO"", com o mesmo traceId, vai com a ""(conta-ebfga)"" e o alvo ""(usr-ebfga-maria)"", sem quem$")]
     public async Task ConcluidoSemQuem(string conta, string exemploAlvo)
     {
         Assert.NotNull(registro);
-        var concluido = await execucoes.Etapa("CONCLUIDO", Auditoria.Texto(registro, "acao")!);
-        Assert.Equal(Auditoria.TraceId(registro), Auditoria.TraceId(concluido));
-        Assert.Equal(await mundo.Traduzir(conta), Auditoria.Texto(concluido, "contaId"));
-        Assert.Equal(await mundo.Traduzir(exemploAlvo), Auditoria.Texto(concluido, "alvo"));
-        Assert.True(Auditoria.Texto(concluido, "quem") is null, $"o CONCLUIDO devia ir sem quem: {concluido.ToJson()}");
+        var concluido = await execucoes.Etapa("CONCLUIDO", Suporte.Auditoria.Texto(registro, "acao")!);
+        Assert.Equal(Suporte.Auditoria.TraceId(registro), Suporte.Auditoria.TraceId(concluido));
+        Assert.Equal(await mundo.Traduzir(conta), Suporte.Auditoria.Texto(concluido, "contaId"));
+        Assert.Equal(await mundo.Traduzir(exemploAlvo), Suporte.Auditoria.Texto(concluido, "alvo"));
+        Assert.True(Suporte.Auditoria.Texto(concluido, "quem") is null, $"o CONCLUIDO devia ir sem quem: {concluido.ToJson()}");
     }
 
     // o Caio com o MOD-03 em "U" e a conferência certa (CNPJ, responsável e
@@ -625,22 +625,22 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public async Task IniciadoDoCaio(string acao, string quem, string conta)
     {
         registro = await execucoes.Etapa("INICIADO", acao);
-        Assert.Equal(await mundo.Traduzir(quem), Auditoria.Texto(registro, "quem"));
-        Assert.Equal(await mundo.Traduzir(conta), Auditoria.Texto(registro, "contaId"));
-        Assert.True(Auditoria.Texto(registro, "alvo") is null, $"o INICIADO não devia trazer alvo: {registro.ToJson()}");
+        Assert.Equal(await mundo.Traduzir(quem), Suporte.Auditoria.Texto(registro, "quem"));
+        Assert.Equal(await mundo.Traduzir(conta), Suporte.Auditoria.Texto(registro, "contaId"));
+        Assert.True(Suporte.Auditoria.Texto(registro, "alvo") is null, $"o INICIADO não devia trazer alvo: {registro.ToJson()}");
         execucoes.NaHoraDoPedido(registro);
-        Auditoria.GuardadoCincoAnos(registro);
+        Suporte.Auditoria.GuardadoCincoAnos(registro);
     }
 
     [Then(@"^o ""CONCLUIDO"", com o mesmo traceId, repete os dois e vai com o alvo ""(usr-ebfga-master)""$")]
     public async Task ConcluidoComAMaster(string exemploAlvo)
     {
         Assert.NotNull(registro);
-        var concluido = await execucoes.Etapa("CONCLUIDO", Auditoria.Texto(registro, "acao")!);
-        Assert.Equal(Auditoria.TraceId(registro), Auditoria.TraceId(concluido));
-        Assert.Equal(Auditoria.Texto(registro, "quem"), Auditoria.Texto(concluido, "quem"));
-        Assert.Equal(Auditoria.Texto(registro, "contaId"), Auditoria.Texto(concluido, "contaId"));
-        Assert.Equal(await mundo.Traduzir(exemploAlvo), Auditoria.Texto(concluido, "alvo"));
+        var concluido = await execucoes.Etapa("CONCLUIDO", Suporte.Auditoria.Texto(registro, "acao")!);
+        Assert.Equal(Suporte.Auditoria.TraceId(registro), Suporte.Auditoria.TraceId(concluido));
+        Assert.Equal(Suporte.Auditoria.Texto(registro, "quem"), Suporte.Auditoria.Texto(concluido, "quem"));
+        Assert.Equal(Suporte.Auditoria.Texto(registro, "contaId"), Suporte.Auditoria.Texto(concluido, "contaId"));
+        Assert.Equal(await mundo.Traduzir(exemploAlvo), Suporte.Auditoria.Texto(concluido, "alvo"));
     }
 
     // o tempo do time pede a aba Configuração (MOD-03 · C), como na RF-152
@@ -656,13 +656,13 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public async Task OsDoisDoCaio(string quem, string conta, string alvoEsperado)
     {
         var id = await mundo.Traduzir(quem);
-        var novos = await execucoes.Novos(Auditoria.Registros);
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
         Assert.Equal(2, novos.Count);
         Assert.All(novos, d =>
         {
-            Assert.Equal(id, Auditoria.Texto(d, "quem"));
-            Assert.Equal(conta, Auditoria.Texto(d, "contaId"));
-            Assert.Equal(alvoEsperado, Auditoria.Texto(d, "alvo"));
+            Assert.Equal(id, Suporte.Auditoria.Texto(d, "quem"));
+            Assert.Equal(conta, Suporte.Auditoria.Texto(d, "contaId"));
+            Assert.Equal(alvoEsperado, Suporte.Auditoria.Texto(d, "alvo"));
         });
     }
 
@@ -852,9 +852,9 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public async Task ErroDoCodigoComOTraceId(string codigo, string nivel)
     {
         erro = await execucoes.UmNovoErro();
-        Assert.Equal(codigo, Auditoria.Texto(erro, "codigo"));
-        Assert.Equal(nivel, Auditoria.Texto(erro, "nivel"));
-        Assert.Equal(Auditoria.TraceIdDoCabecalho(mundo.Ultima), Auditoria.TraceId(erro));
+        Assert.Equal(codigo, Suporte.Auditoria.Texto(erro, "codigo"));
+        Assert.Equal(nivel, Suporte.Auditoria.Texto(erro, "nivel"));
+        Assert.Equal(Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima), Suporte.Auditoria.TraceId(erro));
         execucoes.NaHoraDoPedido(erro);
     }
 
@@ -869,9 +869,9 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         var esperado = alvoDoExemplo == "nenhum" ? null : await mundo.Traduzir(alvoDoExemplo.Trim('"'));
         foreach (var d in new[] { registro, erro })
         {
-            Assert.Equal(id, Auditoria.Texto(d, "quem"));
-            Assert.Equal(contaId, Auditoria.Texto(d, "contaId"));
-            Assert.True(Auditoria.Texto(d, "alvo") == esperado, $"esperava o alvo {esperado ?? "null"}: {d.ToJson()}");
+            Assert.Equal(id, Suporte.Auditoria.Texto(d, "quem"));
+            Assert.Equal(contaId, Suporte.Auditoria.Texto(d, "contaId"));
+            Assert.True(Suporte.Auditoria.Texto(d, "alvo") == esperado, $"esperava o alvo {esperado ?? "null"}: {d.ToJson()}");
         }
     }
 
@@ -889,10 +889,10 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         var (metodo, caminho, corpo) = pedido;
         var r = await execucoes.Executar(() => mundo.Enviar(metodo, caminho, corpo, vencido));
         Respostas.Confere(r, 401);
-        var registros = await execucoes.Novos(Auditoria.Registros);
-        var erros = await execucoes.Novos(Auditoria.Erros);
+        var registros = await execucoes.Novos(Suporte.Auditoria.Registros);
+        var erros = await execucoes.Novos(Suporte.Auditoria.Erros);
         Assert.True(registros.Count == 0 && erros.Count == 0,
-            $"o 401 gravou {Auditoria.Resumo(registros)} em \"auditoria\" e {Auditoria.Resumo(erros)} em \"auditoriaErros\"");
+            $"o 401 gravou {Suporte.Auditoria.Resumo(registros)} em \"auditoria\" e {Suporte.Auditoria.Resumo(erros)} em \"auditoriaErros\"");
     }
 
     // ── casos de uso internos (RN-275) ─────────────────────────────────────
@@ -902,14 +902,14 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     public async Task InternaDentroDaExecucao()
     {
         var (iniciado, concluido, internas) = await PedidoEInternas();
-        var traceId = Auditoria.TraceId(iniciado);
-        Assert.Equal(traceId, Auditoria.TraceId(concluido));
+        var traceId = Suporte.Auditoria.TraceId(iniciado);
+        Assert.Equal(traceId, Suporte.Auditoria.TraceId(concluido));
         Assert.All(internas, d =>
         {
-            Assert.Equal(traceId, Auditoria.TraceId(d));
-            var quando = Auditoria.Data(d, "quando");
-            Assert.True(quando >= Auditoria.Data(iniciado, "quando") && quando <= Auditoria.Data(concluido, "quando"),
-                $"a ação interna devia ficar entre o INICIADO e o CONCLUIDO do pedido: {d.ToJson()}, pedido {Auditoria.Resumo([iniciado, concluido])}");
+            Assert.Equal(traceId, Suporte.Auditoria.TraceId(d));
+            var quando = Suporte.Auditoria.Data(d, "quando");
+            Assert.True(quando >= Suporte.Auditoria.Data(iniciado, "quando") && quando <= Suporte.Auditoria.Data(concluido, "quando"),
+                $"a ação interna devia ficar entre o INICIADO e o CONCLUIDO do pedido: {d.ToJson()}, pedido {Suporte.Auditoria.Resumo([iniciado, concluido])}");
         });
     }
 
@@ -920,21 +920,21 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
         var (iniciado, _, internas) = await PedidoEInternas();
         Assert.All(internas, d =>
         {
-            Assert.Equal(Auditoria.Texto(iniciado, "quem"), Auditoria.Texto(d, "quem"));
-            Assert.Equal(Auditoria.Texto(iniciado, "contaId"), Auditoria.Texto(d, "contaId"));
-            Assert.Equal(alvo, Auditoria.Texto(d, "alvo"));
+            Assert.Equal(Suporte.Auditoria.Texto(iniciado, "quem"), Suporte.Auditoria.Texto(d, "quem"));
+            Assert.Equal(Suporte.Auditoria.Texto(iniciado, "contaId"), Suporte.Auditoria.Texto(d, "contaId"));
+            Assert.Equal(alvo, Suporte.Auditoria.Texto(d, "alvo"));
         });
     }
 
     async Task<(BsonDocument Iniciado, BsonDocument Concluido, List<BsonDocument> Internas)> PedidoEInternas()
     {
         Assert.NotNull(registro);
-        var acao = Auditoria.Texto(registro, "acao");
-        var novos = await execucoes.Novos(Auditoria.Registros);
-        var internas = novos.Where(d => Auditoria.Texto(d, "acao") == acao).ToList();
+        var acao = Suporte.Auditoria.Texto(registro, "acao");
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        var internas = novos.Where(d => Suporte.Auditoria.Texto(d, "acao") == acao).ToList();
         var proprios = await execucoes.Proprios();
-        Assert.True(proprios.Count == 2 && Auditoria.Texto(proprios[0], "etapa") == "INICIADO" && Auditoria.Texto(proprios[1], "etapa") == "CONCLUIDO",
-            $"esperava o INICIADO e o CONCLUIDO do pedido, vieram {Auditoria.Resumo(proprios)}");
+        Assert.True(proprios.Count == 2 && Suporte.Auditoria.Texto(proprios[0], "etapa") == "INICIADO" && Suporte.Auditoria.Texto(proprios[1], "etapa") == "CONCLUIDO",
+            $"esperava o INICIADO e o CONCLUIDO do pedido, vieram {Suporte.Auditoria.Resumo(proprios)}");
         return (proprios[0], proprios[1], internas);
     }
 
@@ -959,29 +959,29 @@ public sealed class AuditoriaPassos(Mundo mundo, Execucoes execucoes)
     [Then(@"^""auditoriaErros"" ganha (\d+) registros ""([A-Z_]+)"" com o nivel ""(\w+)"" e esse traceId$")]
     public async Task ErrosDaExecucao(int quantos, string codigo, string nivel)
     {
-        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
-        var erros = await execucoes.Novos(Auditoria.Erros);
-        Assert.True(erros.Count == quantos, $"esperava {quantos} registros em \"auditoriaErros\", vieram {Auditoria.Resumo(erros)}");
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var erros = await execucoes.Novos(Suporte.Auditoria.Erros);
+        Assert.True(erros.Count == quantos, $"esperava {quantos} registros em \"auditoriaErros\", vieram {Suporte.Auditoria.Resumo(erros)}");
         Assert.All(erros, d =>
         {
-            Assert.Equal(codigo, Auditoria.Texto(d, "codigo"));
-            Assert.Equal(nivel, Auditoria.Texto(d, "nivel"));
-            Assert.Equal(traceId, Auditoria.TraceId(d));
+            Assert.Equal(codigo, Suporte.Auditoria.Texto(d, "codigo"));
+            Assert.Equal(nivel, Suporte.Auditoria.Texto(d, "nivel"));
+            Assert.Equal(traceId, Suporte.Auditoria.TraceId(d));
         });
     }
 
     [Then(@"^um da ação ""(\w+)"", o outro de ""(\w+)""$")]
     public async Task UmDeCadaAcao(string interna, string doPedido)
     {
-        var acoes = (await execucoes.Novos(Auditoria.Erros)).Select(d => Auditoria.Texto(d, "acao")).Order().ToArray();
+        var acoes = (await execucoes.Novos(Suporte.Auditoria.Erros)).Select(d => Suporte.Auditoria.Texto(d, "acao")).Order().ToArray();
         Assert.Equal(new[] { interna, doPedido }.Order().ToArray(), acoes);
     }
 
     [Then(@"^nenhuma das duas ações ganha ""CONCLUIDO""$")]
     public async Task NenhumConcluido()
     {
-        var concluidos = (await execucoes.Novos(Auditoria.Registros)).Where(d => Auditoria.Texto(d, "etapa") == "CONCLUIDO").ToList();
-        Assert.True(concluidos.Count == 0, $"a execução que falhou gravou {Auditoria.Resumo(concluidos)}");
+        var concluidos = (await execucoes.Novos(Suporte.Auditoria.Registros)).Where(d => Suporte.Auditoria.Texto(d, "etapa") == "CONCLUIDO").ToList();
+        Assert.True(concluidos.Count == 0, $"a execução que falhou gravou {Suporte.Auditoria.Resumo(concluidos)}");
     }
 
     // ── apoio da RN-178 e da RN-270 ────────────────────────────────────────

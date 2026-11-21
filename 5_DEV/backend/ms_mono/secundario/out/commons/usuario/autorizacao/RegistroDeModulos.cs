@@ -31,6 +31,7 @@ public sealed class RegistroDeModulos(Armazenamento armazenamento) : IModulos
         Modulo("MOD-12", "Agenda", TipoDeModulo.Contratavel, (Master, Hub), (Participante, Quest), (Responsavel, Quest)),
         Modulo("MOD-13", "Perfil", TipoDeModulo.DaConta, (Participante, Quest), (Responsavel, Quest)),
         Modulo("MOD-14", "Catálogo", TipoDeModulo.DoTime, (Administrador, Hub), (MembroTime, Hub)),
+        Modulo("MOD-17", "Auditoria", TipoDeModulo.DoTime, (Administrador, Hub), (MembroTime, Hub)),
     ];
 
     static readonly Dictionary<string, ModuloRegistrado> PorId = Todos.ToDictionary(m => m.Id);

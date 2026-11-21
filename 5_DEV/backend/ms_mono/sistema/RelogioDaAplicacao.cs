@@ -10,14 +10,26 @@ namespace Boaz.MsMono.Sistema;
 public sealed partial class RelogioDaAplicacao : TimeProvider
 {
     long deslocamento;
+    long ajustes;
+
+    // quantas vezes o relógio de teste foi trocado à força (Definir e Real): um salto de hora não é a virada do dia (FechamentoDosCards)
+    public long Ajustes => Interlocked.Read(ref ajustes);
 
     public override DateTimeOffset GetUtcNow() => System.GetUtcNow() + TimeSpan.FromTicks(Interlocked.Read(ref deslocamento));
 
     // a aplicação passa a contar a partir de agora
-    public void Definir(DateTimeOffset agora) => Interlocked.Exchange(ref deslocamento, (agora - System.GetUtcNow()).Ticks);
+    public void Definir(DateTimeOffset agora)
+    {
+        Interlocked.Exchange(ref deslocamento, (agora - System.GetUtcNow()).Ticks);
+        Interlocked.Increment(ref ajustes);
+    }
 
     // volta ao relógio real
-    public void Real() => Interlocked.Exchange(ref deslocamento, 0);
+    public void Real()
+    {
+        Interlocked.Exchange(ref deslocamento, 0);
+        Interlocked.Increment(ref ajustes);
+    }
 
     // O relógio de teste só existe em homologação, com Teste__Relogio=sim (o
     // backend do qa no ci.sh); no Azure o Terraform fixa "nao".

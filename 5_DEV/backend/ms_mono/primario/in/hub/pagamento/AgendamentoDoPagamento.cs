@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Ports.Out;
 using Boaz.Core.Hub.Pagamento.Faturas.Ports.In;
 using Boaz.MsMono.Secundario.Out.Hub.Pagamento;
 using Boaz.MsMono.Sistema;
@@ -27,6 +28,9 @@ public sealed class AgendamentoDoPagamento(IServiceProvider servicos, TravaDoAge
                 await Task.Delay(Passo, relogio, stoppingToken);
                 if (!await trava.Pegar(stoppingToken)) continue;
                 await servicos.GetRequiredService<IRodarAgendamentoDoPagamento>().Executar(stoppingToken);
+                // a rodada fica dita à Auditoria, que verifica o agendamento por ela (20 RN-315)
+                await servicos.GetRequiredService<IUltimaExecucaoDosAgendamentos>()
+                    .Gravar(IUltimaExecucaoDosAgendamentos.Pagamento, relogio.GetUtcNow(), stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {

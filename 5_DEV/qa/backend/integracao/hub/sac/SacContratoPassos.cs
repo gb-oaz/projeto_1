@@ -187,7 +187,7 @@ public sealed class SacContratoPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
     public void ComTraceIdComoOExemplo(int status, string? codigo)
     {
         Respostas.Confere(mundo.Ultima, status, codigo);
-        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
         Assert.Matches("^trc-[0-9a-f]{8}$", traceId);
     }
 
@@ -198,18 +198,18 @@ public sealed class SacContratoPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
     [Then(@"^esse é o traceId de ""INICIADO"" em ""auditoria"" e de ""auditoriaErros"" com (ALERTA|ERRO)$")]
     public async Task MesmoTraceId(string? nivel)
     {
-        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
-        var novos = await execucoes.Novos(Auditoria.Registros);
-        Assert.True(novos.Any(d => Auditoria.Texto(d, "etapa") == "INICIADO" && Auditoria.Texto(d, "traceId") == traceId),
-            $"esperava o INICIADO com o traceId {traceId}, vieram {Auditoria.Resumo(novos)}");
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
+        Assert.True(novos.Any(d => Suporte.Auditoria.Texto(d, "etapa") == "INICIADO" && Suporte.Auditoria.Texto(d, "traceId") == traceId),
+            $"esperava o INICIADO com o traceId {traceId}, vieram {Suporte.Auditoria.Resumo(novos)}");
         if (nivel is null)
         {
-            Assert.True(novos.Any(d => Auditoria.Texto(d, "etapa") == "CONCLUIDO" && Auditoria.TraceId(d) == traceId),
-                $"esperava o CONCLUIDO com o traceId {traceId}, vieram {Auditoria.Resumo(novos)}");
+            Assert.True(novos.Any(d => Suporte.Auditoria.Texto(d, "etapa") == "CONCLUIDO" && Suporte.Auditoria.TraceId(d) == traceId),
+                $"esperava o CONCLUIDO com o traceId {traceId}, vieram {Suporte.Auditoria.Resumo(novos)}");
             return;
         }
         var erro = await execucoes.UmNovoErro();
-        Assert.Equal((traceId, nivel), (Auditoria.TraceId(erro), Auditoria.Texto(erro, "nivel")));
+        Assert.Equal((traceId, nivel), (Suporte.Auditoria.TraceId(erro), Suporte.Auditoria.Texto(erro, "nivel")));
     }
 
     [Then(@"^a resposta não traz X-Trace-Id e nada é gravado em ""auditoria""$")]
@@ -217,16 +217,16 @@ public sealed class SacContratoPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
     public async Task SemAuditoria()
     {
         SemTraceId();
-        var novos = (await execucoes.Novos(Auditoria.Registros)).Where(d => !Auditoria.Interna(d)).ToList();
-        Assert.True(novos.Count == 0, $"nada devia ser gravado em \"auditoria\", vieram {Auditoria.Resumo(novos)}");
+        var novos = (await execucoes.Novos(Suporte.Auditoria.Registros)).Where(d => !Suporte.Auditoria.Interna(d)).ToList();
+        Assert.True(novos.Count == 0, $"nada devia ser gravado em \"auditoria\", vieram {Suporte.Auditoria.Resumo(novos)}");
     }
 
     [Then(@"^sem X-Trace-Id, nada é gravado em ""auditoria"" nem em ""auditoriaErros""$")]
     public async Task SemAuditoriaNemErro()
     {
         await SemAuditoria();
-        var erros = await execucoes.Novos(Auditoria.Erros);
-        Assert.True(erros.Count == 0, $"nada devia ser gravado em \"auditoriaErros\", vieram {Auditoria.Resumo(erros)}");
+        var erros = await execucoes.Novos(Suporte.Auditoria.Erros);
+        Assert.True(erros.Count == 0, $"nada devia ser gravado em \"auditoriaErros\", vieram {Suporte.Auditoria.Resumo(erros)}");
     }
 
     // o token tirado antes de o pv subir (17 RNF-224), como o TokenAntigo de

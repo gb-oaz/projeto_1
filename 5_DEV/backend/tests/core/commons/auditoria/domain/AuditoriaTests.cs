@@ -42,6 +42,8 @@ public class AuditoriaTests
             "SALVAR_PRAZOS_SAC", "FECHAR_POR_PRAZO",
             // 19 RN-309: as ações do Pagamento
             "PAGAMENTO_CRIADO", "PAGAMENTO_CANCELADO", "FATURA_CANCELADA", "ESTORNO_PEDIDO", "CONFIGURACAO_SALVA", "AVISO_DO_BANCO",
-            "FATURA_VENCIDA"],
+            "FATURA_VENCIDA",
+            // 20 RN-325: a consulta à Auditoria
+            "CONSULTAR_AUDITORIA"],
             Enum.GetValues<AcaoAuditada>().Select(a => a.Texto()));
 }

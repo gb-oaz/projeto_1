@@ -38,6 +38,15 @@ public sealed class ArquivosNoBlob(BlobContainerClient conteiner, bool criarCont
         return null;
     }
 
+    // a sonda da Auditoria (20 RN-315): o armazenamento responde e o contêiner existe. No Azurite o backend cria o contêiner (como no
+    // primeiro anexo), porque contêiner que ainda ninguém usou não é serviço com erro; na Azure ele é do Terraform e a falta dele
+    // continua sendo falha. Sem o Lazy do Guardar: uma falha da sonda não pode ficar guardada para sempre.
+    public async Task Verificar(CancellationToken ct = default)
+    {
+        if (criarConteiner) await conteiner.CreateIfNotExistsAsync(cancellationToken: ct);
+        if (!(await conteiner.ExistsAsync(ct)).Value) throw new InvalidOperationException("O contêiner dos anexos não existe.");
+    }
+
     // o contêiner, na partida (só quando a conexão é do Azurite)
     public Task Preparar() => conteinerPronto.Value;
 

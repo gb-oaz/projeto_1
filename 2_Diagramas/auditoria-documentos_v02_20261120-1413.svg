@@ -1,0 +1,345 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1760 1620" width="1760" height="1620">
+  <title>Auditoria · documentos</title>
+  <desc>Modelo de documentos da Auditoria (MOD-17): verificacoesSaude, quedasServico, medicoesMinuto, medicoesHora e cardAuditoria gravadas pela Auditoria, com guarda e índices; auditoria, auditoriaErros, usuarios e contas do 17, só lidas, com os índices novos; chaves auditoria:instancia, auditoria:agendamento, o canal auditoria:registros e aoVivo do commons. v01: criação. v02: ocorrencias, chaves das ocorrências e da consulta auditada, faixa f3000.</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <!-- ── markers, filtro e gradiente da marca d'água: copie sempre ── -->
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+
+  </defs>
+  <rect class="bg" x="0" y="0" width="1760" height="1620"/>
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="1760" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="1760" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · MODELO DE DOCUMENTOS</text>
+    <text class="title" x="40" y="72">Auditoria · documentos</text>
+    <text class="subtitle" x="40" y="94">Coleções gravadas pela Auditoria, ocorrências, as lidas do 17 com os índices novos e as chaves no Redis</text>
+    <text class="wm-meta-label" x="1472" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1472" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1496" y="71" text-anchor="middle">v02</text>
+    <line class="wm-sep" x1="1544" y1="32" x2="1544" y2="80"/>
+    <text class="wm-meta-label" x="1568" y="44">DATA</text>
+    <text class="wm-meta-value" x="1568" y="72">2026-11-20 · 14:13</text>
+  </g>
+  <g id="verificacoesSaude" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="152" width="536" height="496" rx="10"/>
+    <text class="uml-keyword" x="56" y="174">«coleção»</text>
+    <text class="label-strong" x="56" y="196">verificacoesSaude</text>
+    <rect class="chip" x="435" y="180" width="125" height="20" rx="10"/><text class="chip-text" x="497.5" y="194" text-anchor="middle">RF-195 · RNF-246</text>
+    <text class="muted" x="56" y="214">grava: Auditoria, só a instância com a trava auditoria:agendamento</text>
+    <text class="mono" x="56" y="236">_id: GUID (32 hex)</text>
+    <text class="mono" x="56" y="254">servico: banco | cache | armazenamento-anexos |</text>
+    <text class="mono" x="70" y="272">verificacao-anexos | intermediador-pagamento |</text>
+    <text class="mono" x="70" y="290">agendamento-sac | agendamento-pagamento | aplicacao</text>
+    <text class="mono" x="56" y="308">quando · instancia (quem verificou)</text>
+    <text class="mono" x="56" y="326">estado: NO_AR | LENTO | FORA_DO_AR |</text>
+    <text class="mono" x="70" y="344" xml:space="preserve">SEM_VERIFICACAO | DESLIGADO  (RN-315)</text>
+    <text class="mono" x="56" y="362">tempoMs [0..1] · ultimaExecucao [0..1] (agendamentos)</text>
+    <text class="mono" x="56" y="380">falha [0..1]: SEM_RESPOSTA | CONEXAO_RECUSADA |</text>
+    <text class="mono" x="70" y="398">RESPOSTA_COM_ERRO</text>
+    <text class="mono" x="56" y="416">guardarAte (quando + 31 dias, RNF-248)</text>
+    <line class="divider" x1="52" y1="430" x2="564" y2="430"/>
+    <text class="boundary-label" x="56" y="450">EXEMPLO</text>
+    <text class="mono" x="56" y="468">{</text>
+    <text class="mono" x="70" y="486">&quot;servico&quot;: &quot;intermediador-pagamento&quot;,</text>
+    <text class="mono" x="70" y="504">&quot;quando&quot;: &quot;2026-11-20T13:30:00Z&quot;,</text>
+    <text class="mono" x="70" y="522">&quot;estado&quot;: &quot;FORA_DO_AR&quot;,</text>
+    <text class="mono" x="70" y="540">&quot;tempoMs&quot;: null,</text>
+    <text class="mono" x="70" y="558">&quot;falha&quot;: &quot;SEM_RESPOSTA&quot;</text>
+    <text class="mono" x="56" y="576">}</text>
+    <line class="divider" x1="52" y1="590" x2="564" y2="590"/>
+    <text class="boundary-label" x="56" y="610">ÍNDICES</text>
+    <text class="mono" x="56" y="628">servico + quando↓ · guardarAte</text>
+  </g>
+  <g id="quedasServico" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="680" width="536" height="228" rx="10"/>
+    <text class="uml-keyword" x="56" y="702">«coleção»</text>
+    <text class="label-strong" x="56" y="724">quedasServico</text>
+    <rect class="chip" x="503" y="708" width="57" height="20" rx="10"/><text class="chip-text" x="531.5" y="722" text-anchor="middle">RF-195</text>
+    <text class="muted" x="56" y="742">aberta ao ficar Fora do ar, com o início da 1ª falha; fechada na volta</text>
+    <text class="mono" x="56" y="764">_id: GUID (32 hex) · servico</text>
+    <text class="mono" x="56" y="782" xml:space="preserve">inicio · fim [0..1]  (null: queda aberta)</text>
+    <text class="mono" x="56" y="800">falha: SEM_RESPOSTA | CONEXAO_RECUSADA | …</text>
+    <text class="mono" x="56" y="818">guardarAte (inicio + 31 dias)</text>
+    <line class="divider" x1="52" y1="832" x2="564" y2="832"/>
+    <text class="boundary-label" x="56" y="852">ÍNDICES</text>
+    <text class="mono" x="56" y="870">servico + inicio↓ · guardarAte</text>
+    <text class="muted" x="56" y="888">disponibilidade = 1 − soma das quedas / período</text>
+  </g>
+  <g id="ocorrencias" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="940" width="536" height="264" rx="10"/>
+    <text class="uml-keyword" x="56" y="962">«coleção»</text>
+    <text class="label-strong" x="56" y="984">ocorrencias</text>
+    <rect class="chip" x="442" y="968" width="118" height="20" rx="10"/><text class="chip-text" x="501" y="982" text-anchor="middle">RF-205 · RN-324</text>
+    <text class="muted" x="56" y="1002">uma por mudança de estado; grava só a instância com a trava</text>
+    <text class="mono" x="56" y="1024">_id: GUID (32 hex) · tipo: SERVICO | MODULO</text>
+    <text class="mono" x="56" y="1042">alvo (&quot;cache&quot; | &quot;MOD-01&quot; …) · nome</text>
+    <text class="mono" x="56" y="1060">de · para: NO_AR | LENTO | FORA_DO_AR</text>
+    <text class="mono" x="56" y="1078">inicio (saiu de NO_AR) · quando (a mudança)</text>
+    <text class="mono" x="56" y="1096">falha [0..1] · duracaoMin [0..1] (só na volta)</text>
+    <text class="mono" x="56" y="1114">guardarAte (quando + 31 dias, RNF-248)</text>
+    <line class="divider" x1="52" y1="1128" x2="564" y2="1128"/>
+    <text class="boundary-label" x="56" y="1148">ÍNDICES</text>
+    <text class="mono" x="56" y="1166">quando↓ · alvo + quando↓ · para + quando↓ · guardarAte</text>
+    <text class="muted" x="56" y="1184">banco fora: fica pendente em memória e entra na volta</text>
+  </g>
+  <g id="cardAuditoria" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="1236" width="536" height="228" rx="10"/>
+    <text class="uml-keyword" x="56" y="1258">«coleção»</text>
+    <text class="label-strong" x="56" y="1280">cardAuditoria</text>
+    <rect class="chip" x="503" y="1264" width="57" height="20" rx="10"/><text class="chip-text" x="531.5" y="1278" text-anchor="middle">RN-322</text>
+    <text class="muted" x="56" y="1298">grava: o agendamento, a cada 1 min, com o minuto fechado</text>
+    <text class="mono" x="56" y="1320" xml:space="preserve">_id: &quot;deboaz:2026-11-20&quot;  (dia de Brasília)</text>
+    <text class="mono" x="56" y="1338">dia · erros · alertas · interrompidas · versao</text>
+    <text class="mono" x="56" y="1356">guardarAte (dia + 400 dias, 15 RN-278)</text>
+    <text class="muted" x="56" y="1374">semana e mês somados na leitura (RN-277)</text>
+    <text class="muted" x="56" y="1392">selo e Fora do ar: da última verificação, na leitura</text>
+    <line class="divider" x1="52" y1="1406" x2="564" y2="1406"/>
+    <text class="boundary-label" x="56" y="1426">ÍNDICES</text>
+    <text class="mono" x="56" y="1444">guardarAte</text>
+  </g>
+  <g id="medicoesMinuto" filter="url(#sombra)">
+    <rect class="node-blue" x="624" y="152" width="536" height="478" rx="10"/>
+    <text class="uml-keyword" x="640" y="174">«coleção»</text>
+    <text class="label-strong" x="640" y="196">medicoesMinuto</text>
+    <rect class="chip" x="1019" y="180" width="125" height="20" rx="10"/><text class="chip-text" x="1081.5" y="194" text-anchor="middle">RF-197 · RNF-247</text>
+    <text class="muted" x="640" y="214">cada instância soma ($inc, upsert) o seu minuto, a cada 1 min</text>
+    <text class="mono" x="640" y="236">_id: &quot;&lt;minuto&gt;|&lt;metodo&gt; &lt;endereco&gt;&quot;</text>
+    <text class="mono" x="640" y="254">minuto (UTC) · metodo · endereco (modelo da rota)</text>
+    <text class="mono" x="640" y="272" xml:space="preserve">modulo: &quot;MOD-01&quot; | … | null  (RN-316)</text>
+    <text class="mono" x="640" y="290">pedidos · ok (1xx a 3xx) · erros4xx · erros5xx</text>
+    <text class="mono" x="640" y="308">f50 · f100 · f250 · f500 · f1000 · f3000 ·</text>
+    <text class="mono" x="654" y="326" xml:space="preserve">f5000 · f10000 · fMais   (faixas, RN-317)</text>
+    <text class="mono" x="640" y="344">guardarAte (minuto + 2 dias)</text>
+    <line class="divider" x1="636" y1="358" x2="1148" y2="358"/>
+    <text class="boundary-label" x="640" y="378">EXEMPLO</text>
+    <text class="mono" x="640" y="396">{</text>
+    <text class="mono" x="654" y="414">&quot;_id&quot;: &quot;2026-11-20T13:41|POST /pagamento/faturas/{id}/pagamentos&quot;,</text>
+    <text class="mono" x="654" y="432">&quot;modulo&quot;: &quot;MOD-01&quot;,</text>
+    <text class="mono" x="654" y="450">&quot;pedidos&quot;: 3,</text>
+    <text class="mono" x="654" y="468">&quot;ok&quot;: 2,</text>
+    <text class="mono" x="654" y="486">&quot;erros5xx&quot;: 1,</text>
+    <text class="mono" x="654" y="504">&quot;f500&quot;: 1,</text>
+    <text class="mono" x="654" y="522">&quot;f3000&quot;: 2</text>
+    <text class="mono" x="640" y="540">}</text>
+    <line class="divider" x1="636" y1="554" x2="1148" y2="554"/>
+    <text class="boundary-label" x="640" y="574">ÍNDICES</text>
+    <text class="mono" x="640" y="592">minuto · modulo + minuto · guardarAte</text>
+    <text class="muted" x="640" y="610">nunca: quem, conta, corpo ou id do endereço</text>
+  </g>
+  <g id="medicoesHora" filter="url(#sombra)">
+    <rect class="node-blue" x="624" y="662" width="536" height="246" rx="10"/>
+    <text class="uml-keyword" x="640" y="684">«coleção»</text>
+    <text class="label-strong" x="640" y="706">medicoesHora</text>
+    <rect class="chip" x="1026" y="690" width="118" height="20" rx="10"/><text class="chip-text" x="1085" y="704" text-anchor="middle">RF-197 · RF-198</text>
+    <text class="muted" x="640" y="724">os mesmos campos, somados por hora no mesmo $inc</text>
+    <text class="mono" x="640" y="746" xml:space="preserve">_id: &quot;&lt;hora&gt;|&lt;metodo&gt; &lt;endereco&gt;&quot;  (2026-11-20T13|…)</text>
+    <text class="mono" x="640" y="764">hora (UTC) · metodo · endereco · modulo</text>
+    <text class="mono" x="640" y="782">pedidos · ok · erros4xx · erros5xx · f50 … fMais</text>
+    <text class="mono" x="640" y="800">guardarAte (hora + 90 dias)</text>
+    <line class="divider" x1="636" y1="814" x2="1148" y2="814"/>
+    <text class="boundary-label" x="640" y="834">ÍNDICES</text>
+    <text class="mono" x="640" y="852">hora · modulo + hora · guardarAte</text>
+    <text class="muted" x="640" y="870">1h: medicoesMinuto · 24h, 7d e 30d: medicoesHora</text>
+    <text class="muted" x="640" y="888">somadas no banco ($group), RNF-250</text>
+  </g>
+  <g id="redis" filter="url(#sombra)">
+    <rect class="node-orange" x="624" y="940" width="536" height="446" rx="10"/>
+    <text class="uml-keyword" x="640" y="962">«chaves no Redis»</text>
+    <text class="label-strong" x="640" y="984">auditoria:*</text>
+    <rect class="chip" x="1012" y="968" width="132" height="20" rx="10"/><text class="chip-text" x="1078" y="982" text-anchor="middle">RNF-246 · RNF-249</text>
+    <text class="label" x="640" y="1006">auditoria:instancia:&lt;id&gt;</text>
+    <text class="mono" x="654" y="1024">hash versao · inicio · ultimoSinal · TTL 90 s</text>
+    <text class="mono" x="654" y="1042">renovada a cada 30 s por cada instância</text>
+    <text class="label" x="640" y="1060">auditoria:agendamento</text>
+    <text class="mono" x="654" y="1078">trava SET NX PX 55000: guarda as verificações,</text>
+    <text class="mono" x="654" y="1096">fecha o card e descarta o vencido</text>
+    <text class="label" x="640" y="1114">auditoria:registros  (canal)</text>
+    <text class="mono" x="654" y="1132">PUBLISH depois de gravar auditoria e auditoriaErros</text>
+    <text class="mono" x="654" y="1150">falha no PUBLISH: aviso no log, a ação segue</text>
+    <text class="label" x="640" y="1168">auditoria:ultimaExecucao:&lt;agendamento&gt;</text>
+    <text class="mono" x="654" y="1186">sac | pagamento: gravada a cada rodada do</text>
+    <text class="mono" x="654" y="1204">agendamento, lida pela sonda (RN-315) · TTL 1 dia</text>
+    <text class="label" x="640" y="1222">auditoria:ocorrencias:abertas  (hash alvo → item)</text>
+    <text class="mono" x="654" y="1240">a última mudança de cada alvo fora de NO_AR</text>
+    <text class="label" x="640" y="1258">auditoria:ocorrencias:voltaram  (sorted set, 10 min)</text>
+    <text class="label" x="640" y="1276">auditoria:ocorrencias  (canal)</text>
+    <text class="mono" x="654" y="1294">PUBLISH a cada mudança, para todo ao vivo da Auditoria</text>
+    <text class="label" x="640" y="1312">auditoria:consulta:&lt;usuarioId&gt;:&lt;hash do alvo&gt;</text>
+    <text class="mono" x="654" y="1330">SET NX PX 300000: a mesma consulta em 5 min não grava</text>
+    <text class="label" x="640" y="1348">aoVivo:&lt;usuarioId&gt;  (do commons, 15 RN-279)</text>
+    <text class="mono" x="654" y="1366">até 3 conexões ao vivo por usuário</text>
+  </g>
+  <g id="auditoria" filter="url(#sombra)">
+    <rect class="node-external" x="1208" y="152" width="536" height="228" rx="10"/>
+    <text class="uml-keyword" x="1224" y="174">«coleção de outro requisito» · 17 RN-178</text>
+    <text class="label-strong" x="1224" y="196">auditoria</text>
+    <rect class="chip" x="1664" y="180" width="64" height="20" rx="10"/><text class="chip-text" x="1696" y="194" text-anchor="middle">só lida</text>
+    <text class="mono" x="1224" y="218">_id · traceId · etapa: INICIADO | CONCLUIDO</text>
+    <text class="mono" x="1224" y="236">contaId → contas · quem → usuarios</text>
+    <text class="mono" x="1224" y="254">acao · alvo [0..1] · quando · guardarAte (+5 anos)</text>
+    <line class="divider" x1="1220" y1="268" x2="1732" y2="268"/>
+    <text class="boundary-label" x="1224" y="288">ÍNDICES QUE A AUDITORIA CRIA (RNF-251)</text>
+    <text class="mono" x="1224" y="306">quando↓ · acao + quando↓ · quem + quando↓</text>
+    <text class="muted" x="1224" y="324">já existem: traceId · contaId + quando</text>
+    <text class="muted" x="1224" y="342">nunca alterada nem apagada (17 RNF-206)</text>
+    <text class="muted" x="1224" y="360">ganha CONSULTAR_AUDITORIA, alvo = endereço lido (RN-325)</text>
+  </g>
+  <g id="auditoriaErros" filter="url(#sombra)">
+    <rect class="node-external" x="1208" y="412" width="536" height="192" rx="10"/>
+    <text class="uml-keyword" x="1224" y="434">«coleção de outro requisito» · 17 RN-270</text>
+    <text class="label-strong" x="1224" y="456">auditoriaErros</text>
+    <rect class="chip" x="1664" y="440" width="64" height="20" rx="10"/><text class="chip-text" x="1696" y="454" text-anchor="middle">só lida</text>
+    <text class="mono" x="1224" y="478">_id · traceId · contaId · quem · acao · alvo</text>
+    <text class="mono" x="1224" y="496">codigo · nivel: ALERTA | ERRO · quando · guardarAte</text>
+    <line class="divider" x1="1220" y1="510" x2="1732" y2="510"/>
+    <text class="boundary-label" x="1224" y="530">ÍNDICES QUE A AUDITORIA CRIA (RNF-251)</text>
+    <text class="mono" x="1224" y="548">quando↓ · nivel + quando↓ · codigo + quando↓ ·</text>
+    <text class="mono" x="1238" y="566">acao + quando↓</text>
+    <text class="muted" x="1224" y="584">já existem: traceId · contaId + quando</text>
+  </g>
+  <g id="usuarios-contas" filter="url(#sombra)">
+    <rect class="node-external" x="1208" y="636" width="536" height="140" rx="10"/>
+    <text class="uml-keyword" x="1224" y="658">«coleções de outro requisito» · 17</text>
+    <text class="label-strong" x="1224" y="680">usuarios · contas</text>
+    <rect class="chip" x="1657" y="664" width="71" height="20" rx="10"/><text class="chip-text" x="1692.5" y="678" text-anchor="middle">só lidas</text>
+    <text class="mono" x="1224" y="702" xml:space="preserve">usuarios._id · nome   → quem.nome</text>
+    <text class="mono" x="1224" y="720" xml:space="preserve">contas._id · sigla    → conta.sigla</text>
+    <text class="muted" x="1224" y="738">?conta=ebfga: sigla → contaId, sem caixa</text>
+    <text class="muted" x="1224" y="756">lidos em lote por página, nunca um a um</text>
+  </g>
+  <g id="execucao" filter="url(#sombra)">
+    <rect class="node-note" x="1208" y="808" width="536" height="142" rx="10"/>
+    <text class="label-strong" x="1224" y="836">Execução = registros do mesmo traceId</text>
+    <rect class="chip" x="1671" y="820" width="57" height="20" rx="10"/><text class="chip-text" x="1699.5" y="834" text-anchor="middle">RN-318</text>
+    <text class="muted" x="1224" y="858">não é coleção: montada na leitura, em ordem de quando</text>
+    <text class="muted" x="1224" y="876">ação principal: a do 1º INICIADO; as outras, internas</text>
+    <text class="muted" x="1224" y="894">CONCLUIDA: CONCLUIDO da principal · RECUSADA: ALERTA</text>
+    <text class="muted" x="1224" y="912">FALHOU: ERRO · INTERROMPIDA: só INICIADO há ≥ 5 min</text>
+    <text class="muted" x="1224" y="930">lista: $group por traceId no período (até 7 dias)</text>
+  </g>
+  <g id="descarte" filter="url(#sombra)">
+    <rect class="node-note" x="1208" y="982" width="536" height="124" rx="10"/>
+    <text class="label-strong" x="1224" y="1010">Descarte pela guarda</text>
+    <rect class="chip" x="1664" y="994" width="64" height="20" rx="10"/><text class="chip-text" x="1696" y="1008" text-anchor="middle">RNF-248</text>
+    <text class="muted" x="1224" y="1032">o agendamento apaga, a cada 1 h, o que passou de</text>
+    <text class="muted" x="1224" y="1050">guardarAte, nas 6 coleções da Auditoria; sem TTL do</text>
+    <text class="muted" x="1224" y="1068">banco, para valer no MongoDB e no Cosmos DB (RU)</text>
+    <text class="muted" x="1224" y="1086">auditoria e auditoriaErros nunca são apagadas</text>
+  </g>
+  <g id="marca-rodape" transform="translate(0,1504)">
+    <rect class="wm-band" x="0" y="0" width="1760" height="116"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="1760" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">coleção gravada pela Auditoria (MongoDB)</text>
+    <rect class="node-external" x="378" y="47" width="14" height="14" rx="3"/><text class="label" x="400" y="58">coleção de outro requisito, só lida</text>
+    <rect class="node-orange" x="680" y="47" width="14" height="14" rx="3"/><text class="label" x="702" y="58">chave no Redis</text>
+    <rect class="node-note" x="831" y="47" width="14" height="14" rx="3"/><text class="label" x="853" y="58">nota</text>
+    <line class="divider" x1="40" y1="76" x2="1720" y2="76"/>
+    <text class="footer" x="40" y="100">v02 · coleção ocorrencias, chaves das ocorrências e da consulta auditada, CONSULTAR_AUDITORIA e faixa f3000</text>
+    <text class="wm-file" x="1720" y="100" text-anchor="end">auditoria-documentos_v02_20261120-1413.svg</text>
+  </g>
+</svg>

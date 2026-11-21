@@ -2,6 +2,7 @@ using Boaz.MsMono.Primario.In.Commons;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Autenticacao;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Autorizacao;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Primario.In.Hub.Auditoria;
 using Boaz.MsMono.Primario.In.Hub.Pagamento;
 using Boaz.MsMono.Primario.In.Hub.Sac;
 using Microsoft.OpenApi;
@@ -29,6 +30,7 @@ public static class DocumentacaoApi
     public const string DocumentoAutorizacao = "autorizacao";
     public const string DocumentoSac = "sac";
     public const string DocumentoPagamento = "pagamento";
+    public const string DocumentoAuditoria = "auditoria";
     public const string Versao = "v1";
     public const string Titulo = "deboaz · catálogo de APIs";
     public const string EsquemaBearer = "Bearer";
@@ -79,6 +81,15 @@ public static class DocumentacaoApi
             new(RecebimentosController.Tag, RecebimentosController.Descricao),
             new(CardDoPagamentoController.Tag, CardDoPagamentoController.Descricao),
         ], ComTraceId: true),
+        new(DocumentoAuditoria, "Auditoria",
+        [
+            new(SaudeDaAuditoriaController.Tag, SaudeDaAuditoriaController.Descricao),
+            new(MetricasDaAuditoriaController.Tag, MetricasDaAuditoriaController.Descricao),
+            new(RegistrosDaAuditoriaController.Tag, RegistrosDaAuditoriaController.Descricao),
+            new(ExecucoesDaAuditoriaController.Tag, ExecucoesDaAuditoriaController.Descricao),
+            new(OcorrenciasDaAuditoriaController.Tag, OcorrenciasDaAuditoriaController.Descricao),
+            new(CardDaAuditoriaController.Tag, CardDaAuditoriaController.Descricao),
+        ]),
     ];
 
     public static bool Habilitada(IConfiguration configuracao) => configuracao.GetValue<bool>("Swagger:Habilitado");

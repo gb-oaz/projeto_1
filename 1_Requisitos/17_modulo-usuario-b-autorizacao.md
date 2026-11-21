@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "17_modulo-usuario-b-autorizacao"
 tipo: "Funcionalidade"
 titulo: "Módulo Usuários · Autorização"
-versao: "v36"
-data: "2026-11-15 01:06"
+versao: "v37"
+data: "2026-11-21 01:15"
 status: "Em revisão"
 objetivo: "definir o que cada papel pode ver e fazer em cada módulo, como isso viaja no token de acesso e como a web e o mobile montam a casca a partir dele."
 ---
 
-> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v36** · 2026-11-15 01:06 · **Em revisão**
+> **boaz · Funcionalidade** · `17_modulo-usuario-b-autorizacao` · **v37** · 2026-11-21 01:15 · **Em revisão**
 
 # Módulo Usuários · Autorização
 
@@ -520,8 +520,8 @@ Esquema do Cenário: módulos de cada papel
 
   Exemplos:
     | quem           | frente | módulos                                               | abas     |
-    | administrador  | hub    | SAC, Usuários, Catálogo e Pagamento                   | C e U    |
-    | membro do time | hub    | os marcados entre SAC, Usuários e Catálogo            | marcadas |
+    | administrador  | hub    | SAC, Usuários, Catálogo, Pagamento e Auditoria        | C e U    |
+    | membro do time | hub    | os marcados entre SAC, Usuários, Catálogo e Auditoria | marcadas |
     | conta master   | hub    | todos os da conta e os contratados usados no hub      | C e U    |
     | autônomo       | hub    | todos os da conta e os contratados usados no hub      | C e U    |
     | staff          | hub    | os marcados pela conta master                         | marcadas |
@@ -1090,7 +1090,8 @@ Cenário: o que este documento não trata
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v36** | 2026-11-15 01:06 | Vistas de Permissões pwa e mobile v06 → v07; a web segue na v06 |
+| **v37** | 2026-11-21 01:15 | Auditoria ([20_modulo-auditoria](20_modulo-auditoria.md), `MOD-17`) no token: o administrador com "C" e "U" e o membro do time quando marcada (`RN-233-api`) |
+| v36 | 2026-11-15 01:06 | Vistas de Permissões pwa e mobile v06 → v07; a web segue na v06 |
 | v35 | 2026-11-15 00:48 | Pagamento ([19_modulo-pagamento](19_modulo-pagamento.md), `MOD-01`): só a conta master o concede, só com a aba Utilização (`RF-160`, `RF-160-api`), recusas 422 iguais às do 19 `RN-299-api` (`RF-161-api`), "MOD-01" com "U" no token do administrador, da conta master, do autônomo e da staff delegada (`RN-233-api`); vistas de Permissões v04 → v06 |
 | v34 | 2026-11-12 02:03 | Diagramas: contrato de API v10 → v11 (endereços de teste POST /_teste/contratacao, que roda o aviso de [17 `RN-275`](17_modulo-usuario.md#RN-275), e GET /_teste/modulo/{mod}, para o 401 e o 403 de `RN-285-api`; só com AMBIENTE=hml e Teste__Relogio=sim) e sequência v06 → v07 (nota do teste); cenários sem mudança |
 | v33 | 2026-11-12 01:59 | Dados explícitos nos cenários de API: `RN-286` "só a contratação suspende" com a Maria (versão 7) e o João, os dois com "MOD-06" com "U"; a Presença da Maria suspensa fica com "MOD-03" com "CU" e "MOD-05" com "U" em mods (`RN-285`, `RN-286`, `RN-287`) |
@@ -1099,12 +1100,7 @@ Cenário: o que este documento não trata
 | v30 | 2026-11-11 23:31 | Telas: vistas hub-usuarios web, pwa e mobile v03 → v04 (card do autônomo com "usuários ativos", [17 `RN-189`](17_modulo-usuario.md#RN-189)), sem mudança de fluxo |
 | v29 | 2026-11-09 01:17 | Diagrama: autorizacao-sequencia v05 com as telas das vistas hub-time-deboaz e hub-usuarios pwa v03, sem mudança de fluxo |
 | v28 | 2026-11-09 00:58 | Telas: vistas hub-usuarios web, pwa e mobile v02 → v03 (números de exemplo do card, [17 `RN-189`](17_modulo-usuario.md#RN-189)); permissões sem mudança |
-| v27 | 2026-11-08 23:45 | Telas: vistas hub-usuarios web, pwa e mobile v01 → v02 (card do módulo com a alternância Dia, Semana e Mês e os perfis staff e autônomo, [17 `RN-189`](17_modulo-usuario.md#RN-189)); permissões sem mudança |
-| v26 | 2026-11-08 12:02 | Diagramas (17 `RN-270`, `RN-275`): sequência v03 → v04 (AVISAR_PERMISSOES_NOVAS no traceId do PUT, 403 sem MOD-03 · U auditado; setas restauradas), contrato de API v08 → v09 (403 sem o módulo com INICIADO e ALERTA e X-Trace-Id; falha na interna com 2 ERRO); cenários sem mudança |
-| v25 | 2026-11-08 11:35 | Diagramas (17 `RN-178`, `RN-270`, `RN-271`): sequência v02 → v03 (PUT permissões com auditoria INICIADO e CONCLUIDO de EDITAR_PERMISSOES, recusas em "auditoriaErros" com ALERTA, 500 ERRO_INESPERADO com ERRO, X-Trace-Id; renovação auditada como RENOVAR_SESSAO), contrato de API v07 → v08 (403 sem MOD-03 · U antes do caso de uso, sem X-Trace-Id nem registros); cenários sem mudança |
-| v24 | 2026-11-08 09:50 | Contrato de API v06 → v07 (17 `RN-178`): EDITAR_PERMISSOES com contaId da conta de quem pede e alvo a pessoa, desde o INICIADO; cenários sem mudança |
-| v23 | 2026-11-08 02:15 | `RN-233-api`: tabela de exemplos com linhas de até 100 caracteres (célula do participante reescrita, mesmo sentido); regras sem mudança |
 
 ---
 
-<sub>boaz · v36 · 2026-11-15 01:06 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>
+<sub>boaz · v37 · 2026-11-21 01:15 · `1_Requisitos/17_modulo-usuario-b-autorizacao.md`</sub>

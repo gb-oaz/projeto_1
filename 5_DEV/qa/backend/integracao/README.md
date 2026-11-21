@@ -115,6 +115,12 @@ integracao/
     ├── CardDoPagamentoPassos.cs    a versão e as séries do card (RN-307)
     ├── FaturasDoExemplo.cs         faturas, pagamentos e estornos dos exemplos; relógio e agendamento do Pagamento
     └── BancoFalso.cs               o intermediador falso: ganchos /_teste/pagamento/banco e o aviso assinado
+└── hub/auditoria/                  20_modulo-auditoria.md (saúde, métricas, registros, execuções, ocorrências, card; ganchos /_teste/auditoria)
+    ├── auditoria.feature
+    ├── AuditoriaDoTime.cs          pessoas, relógio, ganchos, ao vivo e dados de exemplo
+    ├── DadosPassos.cs              os Dado e a partida (RNF-251)
+    ├── QuandoPassos.cs             "<quem> envia <MÉTODO> /auditoria/…" e os ganchos
+    └── EntaoPassos.cs, EntaoRegistrosPassos.cs   os Então (JSON, registros, ao vivo, formato comum)
 ```
 
 A pasta segue o core: `<contexto>/<feature>/` (`commons/autenticacao`,
@@ -144,6 +150,7 @@ Os outros requisitos, do mesmo jeito:
 | `15_modulos.md` | `hub/usuarios/modulos.feature` | `Módulos · card do Usuários` |
 | `18_modulo-sac.md` | `hub/sac/sac.feature` | `SAC` |
 | `19_modulo-pagamento.md` | `hub/pagamento/pagamento.feature` | `Pagamento` |
+| `20_modulo-auditoria.md` | `hub/auditoria/auditoria.feature` | `Auditoria` |
 
 `hub/usuarios/contrato.feature` não é cópia: traz as respostas do contrato
 (`usuarios-contrato-api` v15) que o requisito ainda não tem como cenário, com a

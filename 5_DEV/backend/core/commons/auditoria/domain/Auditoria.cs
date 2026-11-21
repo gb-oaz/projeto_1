@@ -110,6 +110,7 @@ public static class TextosDaAuditoria
         AcaoAuditada.ConfiguracaoSalva => "CONFIGURACAO_SALVA",
         AcaoAuditada.AvisoDoBanco => "AVISO_DO_BANCO",
         AcaoAuditada.FaturaVencida => "FATURA_VENCIDA",
+        AcaoAuditada.ConsultarAuditoria => "CONSULTAR_AUDITORIA",
         _ => "ESQUECI_SENHA_MASTER",
     };
 }

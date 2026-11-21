@@ -690,7 +690,7 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
     [Then(@"^o ""traceId"" do corpo é o mesmo do cabeçalho X-Trace-Id.*$")]
     public void TraceIdDoCorpo()
     {
-        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
         Assert.Matches("^trc-[0-9a-f]{8}$", traceId);
         Assert.True(Campo(mundo.Ultima.Corpo, "traceId") == traceId, $"esperava o traceId {traceId} no corpo: {mundo.Ultima}");
     }
@@ -764,7 +764,7 @@ public sealed partial class PagamentoPassos(Mundo mundo, Api api, FaturasDoExemp
         Respostas.Confere(sucesso, 200);
         var erro = await fat.Ler(rita, "/pagamento/faturas/FAT-999999");
         Respostas.Confere(erro, 404, "FATURA_INEXISTENTE");
-        Assert.All(new[] { sucesso, erro }, r => Assert.Matches("^trc-[0-9a-f]{8}$", Auditoria.TraceIdDoCabecalho(r)));
+        Assert.All(new[] { sucesso, erro }, r => Assert.Matches("^trc-[0-9a-f]{8}$", Suporte.Auditoria.TraceIdDoCabecalho(r)));
     }
 
     // ── Então · RF-182 lista ───────────────────────────────────────────────

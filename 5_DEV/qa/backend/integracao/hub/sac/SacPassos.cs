@@ -148,7 +148,7 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
             ["instituicao"] = "Escola Bento Freitas",
             ["contato"] = "(51) 99999-0000",
         }.ToJsonString())), 202, "POST /contas/esqueci-senha-master");
-        var alvo = Auditoria.Texto(await execucoes.Etapa("CONCLUIDO", "ESQUECI_SENHA_MASTER"), "alvo") ?? "";
+        var alvo = Suporte.Auditoria.Texto(await execucoes.Etapa("CONCLUIDO", "ESQUECI_SENHA_MASTER"), "alvo") ?? "";
         Assert.True(Pedido().IsMatch(alvo), $"preparo: o alvo do pedido devia ser \"ajuda-<número>\", veio \"{alvo}\"");
         mundo.Apelidos["ajuda-000087"] = () => Task.FromResult(alvo);
         var id = "SAC-" + alvo["ajuda-".Length..];
@@ -528,10 +528,10 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
     [Then(@"^""auditoria"" ganha a ação ""(\w+)"", sem quem, com o alvo ""(SAC-\d{6})""$")]
     public async Task AuditadoSemQuem(string acao, string exemplo)
     {
-        var novos = (await execucoes.Novos(Auditoria.Registros)).Where(d => Auditoria.Texto(d, "acao") == acao).ToList();
+        var novos = (await execucoes.Novos(Suporte.Auditoria.Registros)).Where(d => Suporte.Auditoria.Texto(d, "acao") == acao).ToList();
         Assert.True(novos.Count > 0, $"esperava a ação {acao} em \"auditoria\"");
-        Assert.All(novos, d => Assert.True(Auditoria.Texto(d, "quem") is null, $"{acao} devia ir sem quem: {d}"));
-        Assert.Contains(novos, d => Auditoria.Texto(d, "alvo") == sac.Real(exemplo));
+        Assert.All(novos, d => Assert.True(Suporte.Auditoria.Texto(d, "quem") is null, $"{acao} devia ir sem quem: {d}"));
+        Assert.Contains(novos, d => Suporte.Auditoria.Texto(d, "alvo") == sac.Real(exemplo));
     }
 
     // ── anexos (RN-292) ────────────────────────────────────────────────────
@@ -591,9 +591,13 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
     }
 
     // as frases do card são as mesmas no 18 e no 19 (15 RN-276, RN-279): o
-    // módulo sai do endereço pedido (/pagamento/card → MOD-01; /sac/card → MOD-02)
-    static string ModuloDoCard(string? caminho) =>
-        caminho?.StartsWith("/pagamento/", StringComparison.Ordinal) == true ? "MOD-01" : "MOD-02";
+    // módulo sai do endereço pedido (/pagamento/card → MOD-01; /sac/card → MOD-02; /auditoria/card → MOD-17)
+    static string ModuloDoCard(string? caminho) => caminho switch
+    {
+        _ when caminho?.StartsWith("/pagamento/", StringComparison.Ordinal) == true => "MOD-01",
+        _ when caminho?.StartsWith("/auditoria/", StringComparison.Ordinal) == true => "MOD-17",
+        _ => "MOD-02",
+    };
 
     // ── configuração (RF-181) ──────────────────────────────────────────────
     [Then(@"^a resposta é 200 e GET /sac/configuracao traz os prazos novos$")]

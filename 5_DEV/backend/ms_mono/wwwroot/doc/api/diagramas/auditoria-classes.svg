@@ -1,0 +1,490 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1992 2080" width="1992" height="2080">
+  <title>Auditoria · classes</title>
+  <desc>Diagrama de classes da Auditoria (MOD-17): pacotes core/hub/auditoria saude (Servico, EstadoDoServico, ResultadoDaSonda, Verificacao, Queda, SaudeDoModulo, Saude), metricas (FaixaDeTempo, Histograma, Medicao, AcumuladorDeMedicoes, ModuloDoEndereco, Janela), registros e execucoes (RegistroLido, Periodo, FiltroDosRegistros, CatalogoDeAcoes, Execucao, ResultadoDaExecucao), card e comum (CardDaAuditoria, FalhaDaAuditoria, casos de uso e portas de saída); adaptadores primários (controllers, ganchos, agendamento, middleware) e secundários (sondas, banco, Redis, AuditoriaComAviso) no ms_mono. v01: criação. v02: ocorrências, consulta auditada, limites dos estados e faixa Ate3000. v03: tempo limite das sondas em 3 s (RNF-246).</desc>
+  <style>
+    /* ── base ─────────────────────────────────────────── */
+    .bg            { fill: #0d1117; }
+    :root          { background: #0d1117; } /* aberto sozinho no navegador, o fundo escuro cobre a janela toda */
+    text           { font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; fill: #e6edf3; }
+    .title         { font-size: 22px; font-weight: 700; fill: #f0f6fc; }
+    .subtitle      { font-size: 13px; fill: #8b949e; }
+    .section       { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; fill: #58a6ff; }
+    .label         { font-size: 13px; fill: #e6edf3; }
+    .label-strong  { font-size: 14px; font-weight: 600; fill: #f0f6fc; }
+    .label-underline { text-decoration: underline; }
+    .muted         { font-size: 12px; fill: #8b949e; }
+    .mono          { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; fill: #8b949e; }
+    .divider       { stroke: #21262d; stroke-width: 1; }
+    .panel         { fill: #10151c; stroke: #21262d; stroke-width: 1; }
+
+    /* ── nós: uma cor por papel, no máximo 4 por diagrama ── */
+    .node          { fill: #161b22; stroke: #30363d; stroke-width: 1.5; }
+    .node-face     { fill: #21262d; stroke: #30363d; stroke-width: 1.5; stroke-linejoin: round; }
+    .node-blue     { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1.5; }
+    .node-green    { fill: #0f2e1b; stroke: #3fb950; stroke-width: 1.5; }
+    .node-purple   { fill: #271a45; stroke: #bc8cff; stroke-width: 1.5; }
+    .node-orange   { fill: #3a2410; stroke: #f0883e; stroke-width: 1.5; }
+    .node-red      { fill: #3b1219; stroke: #f85149; stroke-width: 1.5; }
+    .node-external { fill: #1c2128; stroke: #6e7681; stroke-width: 1.5; }
+
+    /* ── fronteiras (conta, região, rede, módulo) ─────── */
+    .boundary       { fill: #161b22; fill-opacity: 0.35; stroke: #484f58; stroke-width: 1.2; stroke-dasharray: 6 4; }
+    .boundary-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: #8b949e; }
+
+    /* ── arestas e comunicação ─────────────────────────── */
+    .edge          { fill: none; stroke: #8b949e; stroke-width: 1.5; }
+    .edge-accent   { fill: none; stroke: #58a6ff; stroke-width: 1.8; }
+    .edge-async    { stroke-dasharray: 6 4; }
+    .edge-data     { stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 2.2; }
+    .edge-label-bg { fill: #0d1117; }
+    .arrow-head    { fill: #8b949e; }
+    .arrow-accent  { fill: #58a6ff; }
+    .lifeline      { stroke: #30363d; stroke-width: 1.2; stroke-dasharray: 4 4; }
+    .chip          { fill: #21262d; stroke: #30363d; stroke-width: 1; }
+    .chip-text     { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; }
+
+    /* ── ícones neutros (#ic-*, #uml-*) ───────────────── */
+    .ico           { fill: none; stroke: #c9d1d9; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-fill      { fill: #c9d1d9; }
+    .ico-solid     { fill: #161b22; stroke: #c9d1d9; stroke-width: 1.5; stroke-linejoin: round; }
+
+    /* ── notação UML ───────────────────────────────────── */
+    .ink           { fill: #e6edf3; }
+    .ink-ring      { fill: none; stroke: #e6edf3; stroke-width: 1.5; }
+    .node-note     { fill: #2b2311; stroke: #d29922; stroke-width: 1.2; }
+    .uml-keyword   { font-size: 11px; font-style: italic; fill: #8b949e; }
+    .activation    { fill: #21262d; stroke: #8b949e; stroke-width: 1.2; }
+    .frame-tag     { fill: #21262d; stroke: #484f58; stroke-width: 1.2; }
+    .frame-op      { font-size: 11px; font-weight: 700; fill: #c9d1d9; }
+    .arrow-open    { fill: none; stroke: #8b949e; stroke-width: 1.4; stroke-linejoin: round; }
+    .arrow-hollow  { fill: #0d1117; stroke: #8b949e; stroke-width: 1.2; stroke-linejoin: round; }
+
+    /* ── marca d'água: topo e rodapé (seção 7) ────────── */
+    .wm-band       { fill: #11161e; }
+    .wm-accent     { fill: url(#marca-acento); }
+    .wm-sep        { stroke: #30363d; stroke-width: 1; }
+    .wm-frame      { fill: none; stroke: #30363d; stroke-width: 1; }
+    .wm-eyebrow    { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; fill: #58a6ff; }
+    .wm-meta-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; fill: #6e7681; }
+    .wm-meta-value { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #e6edf3; }
+    .wm-badge      { fill: #0c2d4a; stroke: #58a6ff; stroke-width: 1; }
+    .wm-badge-text { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; fill: #79c0ff; }
+    .wm-file       { font-family: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #6e7681; }
+    .footer        { font-size: 12px; fill: #6e7681; }
+  </style>
+  <defs>
+    <!-- ── markers, filtro e gradiente da marca d'água: copie sempre ── -->
+    <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-head"/>
+    </marker>
+    <marker id="seta-destaque" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="arrow-accent"/>
+    </marker>
+    <marker id="seta-aberta" viewBox="-1 -1 12 12" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" class="arrow-open"/>
+    </marker>
+    <marker id="heranca" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="extensao" viewBox="-1 -1 14 14" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M0,0 L12,6 L0,12 z" class="arrow-head"/>
+    </marker>
+    <marker id="composicao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-head"/>
+    </marker>
+    <marker id="agregacao" viewBox="-1 -1 16 10" refX="14" refY="4" markerWidth="16" markerHeight="11" orient="auto-start-reverse">
+      <path d="M0,4 L7,0 L14,4 L7,8 z" class="arrow-hollow"/>
+    </marker>
+    <marker id="er-um" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M6,0 V12 M10,0 V12" class="arrow-open"/>
+    </marker>
+    <marker id="er-muitos" viewBox="0 0 16 12" refX="16" refY="6" markerWidth="16" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M4,0 V12 M6,6 L16,0 M6,6 L16,12" class="arrow-open"/>
+    </marker>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="marca-acento" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="0.5" stop-color="#bc8cff"/>
+      <stop offset="1" stop-color="#bc8cff" stop-opacity="0"/>
+    </linearGradient>
+
+  </defs>
+  <rect class="bg" x="0" y="0" width="1992" height="2080"/>
+  <g id="marca-topo">
+    <rect class="wm-band" x="0" y="0" width="1992" height="112"/>
+    <rect class="wm-accent" x="0" y="110" width="1992" height="2"/>
+    <text class="wm-eyebrow" x="40" y="40">BOAZ · DIAGRAMA DE CLASSES</text>
+    <text class="title" x="40" y="72">Auditoria · classes</text>
+    <text class="subtitle" x="40" y="94">core/hub/auditoria (saude, metricas, registros, execucoes, ocorrencias, card) com as portas; adaptadores no ms_mono</text>
+    <text class="wm-meta-label" x="1704" y="44">VERSÃO</text>
+    <rect class="wm-badge" x="1704" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1728" y="71" text-anchor="middle">v03</text>
+    <line class="wm-sep" x1="1776" y1="32" x2="1776" y2="80"/>
+    <text class="wm-meta-label" x="1800" y="44">DATA</text>
+    <text class="wm-meta-value" x="1800" y="72">2026-11-20 · 19:14</text>
+  </g>
+  <g id="pacote-0"><rect class="boundary" x="28" y="156" width="472" height="1396" rx="12"/><text class="boundary-label" x="44" y="180">CORE/HUB/AUDITORIA/SAUDE</text></g>
+  <g id="pacote-1"><rect class="boundary" x="516" y="156" width="472" height="1396" rx="12"/><text class="boundary-label" x="532" y="180">CORE/HUB/AUDITORIA/METRICAS</text></g>
+  <g id="pacote-2"><rect class="boundary" x="1004" y="156" width="472" height="1396" rx="12"/><text class="boundary-label" x="1020" y="180">CORE/HUB/AUDITORIA/REGISTROS · EXECUCOES · OCORRENCIAS</text></g>
+  <g id="pacote-3"><rect class="boundary" x="1492" y="156" width="472" height="1396" rx="12"/><text class="boundary-label" x="1508" y="180">CORE/HUB/AUDITORIA/CARD · COMUM</text></g>
+  <g id="Servico" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="200" width="448" height="192" rx="10"/>
+    <text class="uml-keyword" x="56" y="222">«enum»</text>
+    <text class="label-strong" x="56" y="244">Servico</text>
+    <rect class="chip" x="415" y="228" width="57" height="20" rx="10"/><text class="chip-text" x="443.5" y="242" text-anchor="middle">RN-315</text>
+    <text class="mono" x="56" y="266">Aplicacao · Banco · Cache · ArmazenamentoAnexos ·</text>
+    <text class="mono" x="56" y="284">VerificacaoAnexos · IntermediadorPagamento ·</text>
+    <text class="mono" x="56" y="302">AgendamentoSac · AgendamentoPagamento</text>
+    <line class="divider" x1="52" y1="316" x2="476" y2="316"/>
+    <text class="boundary-label" x="56" y="336">OPERAÇÕES</text>
+    <text class="mono" x="56" y="354">+ Id(): &quot;banco&quot; … · + Nome(): &quot;Banco de dados&quot; …</text>
+    <text class="mono" x="56" y="372" xml:space="preserve">+ DeId(id): Servico   ✗ SERVICO_INEXISTENTE</text>
+  </g>
+  <g id="EstadoDoServico" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="416" width="448" height="104" rx="10"/>
+    <text class="uml-keyword" x="56" y="438">«enum»</text>
+    <text class="label-strong" x="56" y="460">EstadoDoServico · FalhaDaVerificacao</text>
+    <text class="mono" x="56" y="482">NoAr · Lento · ForaDoAr · SemVerificacao · Desligado</text>
+    <text class="mono" x="56" y="500">SemResposta · ConexaoRecusada · RespostaComErro</text>
+  </g>
+  <g id="ResultadoDaSonda" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="544" width="448" height="104" rx="10"/>
+    <text class="uml-keyword" x="56" y="566">«record»</text>
+    <text class="label-strong" x="56" y="588">ResultadoDaSonda</text>
+    <text class="mono" x="56" y="610">TempoMs: int? · Falha: FalhaDaVerificacao?</text>
+    <text class="mono" x="56" y="628">UltimaExecucao: DateTimeOffset? · Desligado: bool</text>
+  </g>
+  <g id="Verificacao" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="672" width="448" height="210" rx="10"/>
+    <text class="uml-keyword" x="56" y="694">«entidade»</text>
+    <text class="label-strong" x="56" y="716">Verificacao</text>
+    <rect class="chip" x="415" y="700" width="57" height="20" rx="10"/><text class="chip-text" x="443.5" y="714" text-anchor="middle">RN-315</text>
+    <text class="mono" x="56" y="738">Servico · Quando · Instancia · Estado · TempoMs?</text>
+    <text class="mono" x="56" y="756">Falha? · UltimaExecucao? · FalhasSeguidas · Desde</text>
+    <line class="divider" x1="52" y1="770" x2="476" y2="770"/>
+    <text class="boundary-label" x="56" y="790">OPERAÇÕES</text>
+    <text class="mono" x="56" y="808">+ Seguinte(anterior?, sonda, agora): Verificacao</text>
+    <text class="muted" x="56" y="826">No ar até 1 s · Lento até 3 s ou na 1ª e 2ª falha ·</text>
+    <text class="muted" x="56" y="844">Fora sem resposta em 3 s ou na 3ª falha, Desde na 1ª ·</text>
+    <text class="muted" x="56" y="862">agendamentos: até 2 min No ar, até 5 min Lento</text>
+  </g>
+  <g id="Queda" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="906" width="448" height="156" rx="10"/>
+    <text class="uml-keyword" x="56" y="928">«entidade»</text>
+    <text class="label-strong" x="56" y="950">Queda</text>
+    <rect class="chip" x="415" y="934" width="57" height="20" rx="10"/><text class="chip-text" x="443.5" y="948" text-anchor="middle">RF-195</text>
+    <text class="mono" x="56" y="972">Id · Servico · Inicio · Fim? · Falha</text>
+    <line class="divider" x1="52" y1="986" x2="476" y2="986"/>
+    <text class="boundary-label" x="56" y="1006">OPERAÇÕES</text>
+    <text class="mono" x="56" y="1024">+ Fechar(fim) · + DuracaoMin: int</text>
+    <text class="mono" x="56" y="1042">+ Disponibilidade(quedas, de, ate): decimal</text>
+  </g>
+  <g id="SaudeDoModulo" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="1086" width="448" height="192" rx="10"/>
+    <text class="uml-keyword" x="56" y="1108">«record»</text>
+    <text class="label-strong" x="56" y="1130">SaudeDoModulo · EstadoDoModulo</text>
+    <rect class="chip" x="415" y="1114" width="57" height="20" rx="10"/><text class="chip-text" x="443.5" y="1128" text-anchor="middle">RN-316</text>
+    <text class="mono" x="56" y="1152">Modulo · Pedidos · Erros5xx · TaxaErro5xx · P95Ms?</text>
+    <text class="mono" x="56" y="1170">NoAr · Lento · ForaDoAr · SemPedidos · FalhasSeguidas</text>
+    <line class="divider" x1="52" y1="1184" x2="476" y2="1184"/>
+    <text class="boundary-label" x="56" y="1204">OPERAÇÕES</text>
+    <text class="mono" x="56" y="1222">+ Seguinte(anterior?, medicao5min): SaudeDoModulo</text>
+    <text class="muted" x="56" y="1240">falha: 5xx &gt; 1 % ou p95 &gt; 3 s · Lento: p95 &gt; 1 s ou</text>
+    <text class="muted" x="56" y="1258">1ª e 2ª falha · ForaDoAr: 3ª falha seguida</text>
+  </g>
+  <g id="Saude" filter="url(#sombra)">
+    <rect class="node-blue" x="40" y="1302" width="448" height="122" rx="10"/>
+    <text class="uml-keyword" x="56" y="1324">«record»</text>
+    <text class="label-strong" x="56" y="1346">Saude · Instancia</text>
+    <rect class="chip" x="415" y="1330" width="57" height="20" rx="10"/><text class="chip-text" x="443.5" y="1344" text-anchor="middle">RF-194</text>
+    <text class="mono" x="56" y="1368">Ambiente · VerificadoEm · Geral · ForaDoAr · Lentos</text>
+    <text class="mono" x="56" y="1386">Servicos · Modulos · Instancias</text>
+    <text class="mono" x="56" y="1404">Instancia: Id · Versao · Inicio · UltimoSinal</text>
+  </g>
+  <g id="FaixaDeTempo" filter="url(#sombra)">
+    <rect class="node-blue" x="528" y="200" width="448" height="156" rx="10"/>
+    <text class="uml-keyword" x="544" y="222">«enum»</text>
+    <text class="label-strong" x="544" y="244">FaixaDeTempo</text>
+    <rect class="chip" x="903" y="228" width="57" height="20" rx="10"/><text class="chip-text" x="931.5" y="242" text-anchor="middle">RN-317</text>
+    <text class="mono" x="544" y="266">Ate50 · Ate100 · Ate250 · Ate500 · Ate1000 ·</text>
+    <text class="mono" x="544" y="284">Ate3000 · Ate5000 · Ate10000 · Mais</text>
+    <line class="divider" x1="540" y1="298" x2="964" y2="298"/>
+    <text class="boundary-label" x="544" y="318">OPERAÇÕES</text>
+    <text class="mono" x="544" y="336">+ De(duracaoMs): FaixaDeTempo · + FimMs: int?</text>
+  </g>
+  <g id="Histograma" filter="url(#sombra)">
+    <rect class="node-blue" x="528" y="380" width="448" height="174" rx="10"/>
+    <text class="uml-keyword" x="544" y="402">«objeto de valor»</text>
+    <text class="label-strong" x="544" y="424">Histograma</text>
+    <rect class="chip" x="903" y="408" width="57" height="20" rx="10"/><text class="chip-text" x="931.5" y="422" text-anchor="middle">RN-317</text>
+    <text class="mono" x="544" y="446">Contagens: long[9]</text>
+    <line class="divider" x1="540" y1="460" x2="964" y2="460"/>
+    <text class="boundary-label" x="544" y="480">OPERAÇÕES</text>
+    <text class="mono" x="544" y="498">+ Somar(outro): Histograma</text>
+    <text class="mono" x="544" y="516">+ Percentil(50|95|99): int?</text>
+    <text class="muted" x="544" y="534">fim da faixa onde cai o percentil; Mais → null</text>
+  </g>
+  <g id="Medicao" filter="url(#sombra)">
+    <rect class="node-blue" x="528" y="578" width="448" height="174" rx="10"/>
+    <text class="uml-keyword" x="544" y="600">«entidade»</text>
+    <text class="label-strong" x="544" y="622">Medicao</text>
+    <rect class="chip" x="842" y="606" width="118" height="20" rx="10"/><text class="chip-text" x="901" y="620" text-anchor="middle">RF-197 · RF-198</text>
+    <text class="mono" x="544" y="644">Inicio (minuto | hora) · Metodo · Endereco</text>
+    <text class="mono" x="544" y="662">Modulo? · Pedidos · Ok · Erros4xx · Erros5xx</text>
+    <text class="mono" x="544" y="680">Tempos: Histograma</text>
+    <line class="divider" x1="540" y1="694" x2="964" y2="694"/>
+    <text class="boundary-label" x="544" y="714">OPERAÇÕES</text>
+    <text class="mono" x="544" y="732">+ TaxaErro5xx: decimal · + Lento: bool (p95 &gt; 1 s)</text>
+  </g>
+  <g id="AcumuladorDeMedicoes" filter="url(#sombra)">
+    <rect class="node-blue" x="528" y="776" width="448" height="140" rx="10"/>
+    <text class="uml-keyword" x="544" y="798">«serviço de domínio» · singleton</text>
+    <text class="label-strong" x="544" y="820">AcumuladorDeMedicoes</text>
+    <rect class="chip" x="896" y="804" width="64" height="20" rx="10"/><text class="chip-text" x="928" y="818" text-anchor="middle">RNF-247</text>
+    <text class="mono" x="544" y="842">+ Somar(metodo, endereco, status, duracaoMs)</text>
+    <text class="mono" x="544" y="860">+ Retirar(minuto): IReadOnlyList&lt;Medicao&gt;</text>
+    <text class="muted" x="544" y="878">em memória, sem trava (ConcurrentDictionary);</text>
+    <text class="muted" x="544" y="896">fora: /health, /_teste, ao vivo e rota inexistente</text>
+  </g>
+  <g id="ModuloDoEndereco" filter="url(#sombra)">
+    <rect class="node-blue" x="528" y="940" width="448" height="122" rx="10"/>
+    <text class="uml-keyword" x="544" y="962">«serviço de domínio»</text>
+    <text class="label-strong" x="544" y="984">ModuloDoEndereco</text>
+    <rect class="chip" x="903" y="968" width="57" height="20" rx="10"/><text class="chip-text" x="931.5" y="982" text-anchor="middle">RN-316</text>
+    <text class="mono" x="544" y="1006">/auth /usuarios /contas → MOD-03 · /sac → MOD-02</text>
+    <text class="mono" x="544" y="1024">/pagamento → MOD-01 · /catalogo → MOD-14</text>
+    <text class="mono" x="544" y="1042">/auditoria → MOD-17 · outro → null</text>
+  </g>
+  <g id="Janela" filter="url(#sombra)">
+    <rect class="node-blue" x="528" y="1086" width="448" height="104" rx="10"/>
+    <text class="uml-keyword" x="544" y="1108">«enum»</text>
+    <text class="label-strong" x="544" y="1130">Janela</text>
+    <rect class="chip" x="903" y="1114" width="57" height="20" rx="10"/><text class="chip-text" x="931.5" y="1128" text-anchor="middle">RF-197</text>
+    <text class="mono" x="544" y="1152">H1 · H24 · D7 · D30</text>
+    <text class="mono" x="544" y="1170">+ Pontos: 60 | 24 | 7 | 30 · + PorHora: bool</text>
+  </g>
+  <g id="RegistroLido" filter="url(#sombra)">
+    <rect class="node-blue" x="1016" y="200" width="448" height="122" rx="10"/>
+    <text class="uml-keyword" x="1032" y="222">«record»</text>
+    <text class="label-strong" x="1032" y="244">RegistroLido</text>
+    <rect class="chip" x="1391" y="228" width="57" height="20" rx="10"/><text class="chip-text" x="1419.5" y="242" text-anchor="middle">RF-199</text>
+    <text class="mono" x="1032" y="266">Id · Tipo (Auditoria | Erro) · TraceId · Etapa?</text>
+    <text class="mono" x="1032" y="284">Nivel? · Codigo? · Acao · AcaoNome · Modulo?</text>
+    <text class="mono" x="1032" y="302">Quem? (Id, Nome) · Conta? (Id, Sigla) · Alvo? · Quando</text>
+  </g>
+  <g id="Periodo" filter="url(#sombra)">
+    <rect class="node-blue" x="1016" y="346" width="448" height="174" rx="10"/>
+    <text class="uml-keyword" x="1032" y="368">«objeto de valor»</text>
+    <text class="label-strong" x="1032" y="390">Periodo</text>
+    <rect class="chip" x="1391" y="374" width="57" height="20" rx="10"/><text class="chip-text" x="1419.5" y="388" text-anchor="middle">RN-321</text>
+    <text class="mono" x="1032" y="412">De · Ate</text>
+    <line class="divider" x1="1028" y1="426" x2="1452" y2="426"/>
+    <text class="boundary-label" x="1032" y="446">OPERAÇÕES</text>
+    <text class="mono" x="1032" y="464">+ Criar(de?, ate?, maxDias, agora): Periodo</text>
+    <text class="muted" x="1032" y="482">padrão: últimas 24 h · registros 31 dias,</text>
+    <text class="muted" x="1032" y="500">execuções 7 dias ✗ PERIODO_LONGO · PERIODO_INVERTIDO</text>
+  </g>
+  <g id="FiltroDosRegistros" filter="url(#sombra)">
+    <rect class="node-blue" x="1016" y="544" width="448" height="122" rx="10"/>
+    <text class="uml-keyword" x="1032" y="566">«record»</text>
+    <text class="label-strong" x="1032" y="588">FiltroDosRegistros</text>
+    <rect class="chip" x="1391" y="572" width="57" height="20" rx="10"/><text class="chip-text" x="1419.5" y="586" text-anchor="middle">RF-200</text>
+    <text class="mono" x="1032" y="610">Tipo? · Nivel? · Modulo? · Acao? · Conta? · Quem?</text>
+    <text class="mono" x="1032" y="628">Codigo? · TraceId? · Depois? · Limite (1–200, 50)</text>
+    <text class="mono" x="1032" y="646" xml:space="preserve">+ Aceita(RegistroLido): bool   (ao vivo)</text>
+  </g>
+  <g id="CatalogoDeAcoes" filter="url(#sombra)">
+    <rect class="node-blue" x="1016" y="690" width="448" height="140" rx="10"/>
+    <text class="uml-keyword" x="1032" y="712">«serviço de domínio»</text>
+    <text class="label-strong" x="1032" y="734">CatalogoDeAcoes · SemQuem</text>
+    <rect class="chip" x="1391" y="718" width="57" height="20" rx="10"/><text class="chip-text" x="1419.5" y="732" text-anchor="middle">RN-319</text>
+    <text class="mono" x="1032" y="756">+ Nome(acao) · + Modulo(acao)? · + SemQuem(acao)?</text>
+    <text class="mono" x="1032" y="774">+ Todas(): 41 ações de AcaoAuditada</text>
+    <text class="mono" x="1032" y="792">SemQuem: SemLogin · Sistema · Banco</text>
+    <text class="muted" x="1032" y="810">ação fora do catálogo: nome = código, módulo null</text>
+  </g>
+  <g id="Execucao" filter="url(#sombra)">
+    <rect class="node-blue" x="1016" y="854" width="448" height="192" rx="10"/>
+    <text class="uml-keyword" x="1032" y="876">«entidade»</text>
+    <text class="label-strong" x="1032" y="898">Execucao · Passo</text>
+    <rect class="chip" x="1330" y="882" width="118" height="20" rx="10"/><text class="chip-text" x="1389" y="896" text-anchor="middle">RF-202 · RN-318</text>
+    <text class="mono" x="1032" y="920">TraceId · Principal: RegistroLido · Passos · Resultado</text>
+    <text class="mono" x="1032" y="938">Inicio · Fim? · DuracaoMs? · Codigo?</text>
+    <text class="mono" x="1032" y="956">Passo: Registro · Interna: bool</text>
+    <line class="divider" x1="1028" y1="970" x2="1452" y2="970"/>
+    <text class="boundary-label" x="1032" y="990">OPERAÇÕES</text>
+    <text class="mono" x="1032" y="1008">+ Montar(registros, agora): Execucao</text>
+    <text class="muted" x="1032" y="1026">principal: a do 1º INICIADO; as outras, internas</text>
+  </g>
+  <g id="ResultadoDaExecucao" filter="url(#sombra)">
+    <rect class="node-blue" x="1016" y="1070" width="448" height="104" rx="10"/>
+    <text class="uml-keyword" x="1032" y="1092">«enum»</text>
+    <text class="label-strong" x="1032" y="1114">ResultadoDaExecucao</text>
+    <rect class="chip" x="1391" y="1098" width="57" height="20" rx="10"/><text class="chip-text" x="1419.5" y="1112" text-anchor="middle">RN-318</text>
+    <text class="mono" x="1032" y="1136">Concluida · Recusada · Falhou · EmAndamento ·</text>
+    <text class="mono" x="1032" y="1154">Interrompida (só INICIADO há ≥ 5 min)</text>
+  </g>
+  <g id="Ocorrencia" filter="url(#sombra)">
+    <rect class="node-blue" x="1016" y="1198" width="448" height="192" rx="10"/>
+    <text class="uml-keyword" x="1032" y="1220">«entidade»</text>
+    <text class="label-strong" x="1032" y="1242">Ocorrencia · TipoDoAlvo</text>
+    <rect class="chip" x="1330" y="1226" width="118" height="20" rx="10"/><text class="chip-text" x="1389" y="1240" text-anchor="middle">RF-204 · RN-324</text>
+    <text class="mono" x="1032" y="1264">Id · Tipo (Servico | Modulo) · Alvo · Nome · De · Para</text>
+    <text class="mono" x="1032" y="1282">Inicio · Quando · Falha? · DuracaoMin?</text>
+    <line class="divider" x1="1028" y1="1296" x2="1452" y2="1296"/>
+    <text class="boundary-label" x="1032" y="1316">OPERAÇÕES</text>
+    <text class="mono" x="1032" y="1334">+ Detectar(anterior, atual, agora): Ocorrencia?</text>
+    <text class="muted" x="1032" y="1352">só quando o estado muda entre NoAr, Lento e ForaDoAr;</text>
+    <text class="muted" x="1032" y="1370">SemPedidos, Desligado e SemVerificacao não abrem</text>
+  </g>
+  <g id="ConsultaDaAuditoria" filter="url(#sombra)">
+    <rect class="node-blue" x="1016" y="1414" width="448" height="122" rx="10"/>
+    <text class="uml-keyword" x="1032" y="1436">«objeto de valor»</text>
+    <text class="label-strong" x="1032" y="1458">ConsultaDaAuditoria</text>
+    <rect class="chip" x="1391" y="1442" width="57" height="20" rx="10"/><text class="chip-text" x="1419.5" y="1456" text-anchor="middle">RN-325</text>
+    <text class="mono" x="1032" y="1480">Quem · Alvo</text>
+    <text class="mono" x="1032" y="1498">+ De(endereco, parametros): ConsultaDaAuditoria</text>
+    <text class="muted" x="1032" y="1516">alvo com os parâmetros em ordem, sem depois e limite</text>
+  </g>
+  <g id="CardDaAuditoria" filter="url(#sombra)">
+    <rect class="node-blue" x="1504" y="200" width="448" height="174" rx="10"/>
+    <text class="uml-keyword" x="1520" y="222">«entidade»</text>
+    <text class="label-strong" x="1520" y="244">CardDaAuditoria</text>
+    <rect class="chip" x="1879" y="228" width="57" height="20" rx="10"/><text class="chip-text" x="1907.5" y="242" text-anchor="middle">RN-322</text>
+    <text class="mono" x="1520" y="266">Dia · Erros · Alertas · Interrompidas · Versao</text>
+    <line class="divider" x1="1516" y1="280" x2="1940" y2="280"/>
+    <text class="boundary-label" x="1520" y="300">OPERAÇÕES</text>
+    <text class="mono" x="1520" y="318">+ Montar(dias, foraDoAr, agora): CardDoModulo</text>
+    <text class="muted" x="1520" y="336">selo e reduzida: serviços fora do ar · normal:</text>
+    <text class="muted" x="1520" y="354">erros hoje · vazio: &quot;Tudo no ar&quot;</text>
+  </g>
+  <g id="FalhaDaAuditoria" filter="url(#sombra)">
+    <rect class="node-blue" x="1504" y="398" width="448" height="158" rx="10"/>
+    <text class="uml-keyword" x="1520" y="420">«exceção»</text>
+    <text class="label-strong" x="1520" y="442">FalhaDaAuditoria</text>
+    <rect class="chip" x="1831" y="426" width="105" height="20" rx="10"/><text class="chip-text" x="1883.5" y="440" text-anchor="middle">formato-comum</text>
+    <text class="mono" x="1520" y="464">Codigo · Campo? · Limite?</text>
+    <text class="mono" x="1520" y="482">ACESSO_NEGADO · SERVICO_INEXISTENTE ·</text>
+    <text class="mono" x="1520" y="500">EXECUCAO_INEXISTENTE · DADOS_INVALIDOS ·</text>
+    <text class="mono" x="1520" y="518">PERIODO_LONGO · PERIODO_INVERTIDO ·</text>
+    <text class="mono" x="1520" y="536">BANCO_DE_DADOS_FORA</text>
+  </g>
+  <g id="PortasIn" filter="url(#sombra)">
+    <rect class="node-purple" x="1504" y="580" width="448" height="338" rx="10"/>
+    <text class="uml-keyword" x="1520" y="602">«portas de entrada» · ports/in · usecases</text>
+    <text class="label-strong" x="1520" y="624">Casos de uso</text>
+    <text class="mono" x="1520" y="646">IVerSaude → VerSaude (sem o banco, RNF-252)</text>
+    <text class="mono" x="1520" y="664">IVerHistoricoDoServico → VerHistoricoDoServico</text>
+    <text class="mono" x="1520" y="682">IAcompanharSaudeAoVivo → AcompanharSaudeAoVivo</text>
+    <text class="mono" x="1520" y="700">IVerificarServicos → VerificarServicos (30 s)</text>
+    <text class="mono" x="1520" y="718">IVerMetricas · IVerTempoDosEnderecos</text>
+    <text class="mono" x="1520" y="736">IGravarMedicoes → GravarMedicoes (1 min)</text>
+    <text class="mono" x="1520" y="754">IConsultarRegistros · IAcompanharRegistrosAoVivo</text>
+    <text class="mono" x="1520" y="772">IListarExecucoes · IVerExecucao · IListarAcoes</text>
+    <text class="mono" x="1520" y="790">IVerCardDaAuditoria · IAcompanharCardAoVivo</text>
+    <text class="mono" x="1520" y="808">IFecharCardEDescartar (1 min · descarte 1 h)</text>
+    <text class="mono" x="1520" y="826">IVerOcorrenciasAbertas · IListarOcorrencias</text>
+    <text class="mono" x="1520" y="844">IAcompanharOcorrenciasAoVivo</text>
+    <text class="mono" x="1520" y="862">IRegistrarConsulta (usado por toda consulta, RN-325)</text>
+    <text class="muted" x="1520" y="880">todos conferem RN-314 (ConferirAcesso do commons:</text>
+    <text class="muted" x="1520" y="898">ADMINISTRADOR ou MEMBRO_TIME com MOD-17 U)</text>
+  </g>
+  <g id="PortasOut" filter="url(#sombra)">
+    <rect class="node-orange" x="1504" y="942" width="448" height="410" rx="10"/>
+    <text class="uml-keyword" x="1520" y="964">«portas de saída» · ports/out</text>
+    <text class="label-strong" x="1520" y="986">Interfaces</text>
+    <text class="mono" x="1520" y="1008">ISondaDeServico { Servico; Verificar(ct) }</text>
+    <text class="mono" x="1520" y="1026" xml:space="preserve">IUltimaVerificacao   (memória da instância)</text>
+    <text class="mono" x="1520" y="1044">IHistoricoDaSaude { Gravar · AbrirQueda ·</text>
+    <text class="mono" x="1534" y="1062">FecharQueda · Quedas · Serie }</text>
+    <text class="mono" x="1520" y="1080">IInstancias { Anunciar · Listar }</text>
+    <text class="mono" x="1520" y="1098">ITravaDaAuditoria { Tentar(prazo) }</text>
+    <text class="mono" x="1520" y="1116">IMedicoes { Somar · Resumo · Serie · PorEndereco }</text>
+    <text class="mono" x="1520" y="1134">ILeituraDaAuditoria { Registros · DoTrace ·</text>
+    <text class="mono" x="1534" y="1152">Execucoes · Contagem }</text>
+    <text class="mono" x="1520" y="1170">INomesDaAuditoria { Usuarios · Contas · Sigla }</text>
+    <text class="mono" x="1520" y="1188">IAvisosDaAuditoria { Publicar · Assinar(ct) }</text>
+    <text class="mono" x="1520" y="1206">ICardDaAuditoria { Somar · Dias }</text>
+    <text class="mono" x="1520" y="1224">IDescarteDaAuditoria { ApagarVencidos(agora) }</text>
+    <text class="mono" x="1520" y="1242">IOcorrencias { Gravar · Listar }</text>
+    <text class="mono" x="1520" y="1260">IOcorrenciasAbertas { Mudar · Abertas · Voltaram }</text>
+    <text class="mono" x="1520" y="1278">IAvisosDeOcorrencias { Publicar · Assinar(ct) }</text>
+    <text class="mono" x="1520" y="1296">IConsultasRecentes { Primeira(quem, alvo, 5 min) }</text>
+    <text class="muted" x="1520" y="1314">do commons: IAuditoria · IAuditoriaDeErros ·</text>
+    <text class="muted" x="1520" y="1332">IConexoesAoVivo · IUltimaExecucaoDosAgendamentos</text>
+  </g>
+  <g id="faixa-adaptadores"><line class="divider" x1="40" y1="1588" x2="1952" y2="1588" stroke-dasharray="6 4"/><text class="boundary-label" x="40" y="1616">MS_MONO · ADAPTADORES · O NÚCLEO SÓ USA .NET</text></g>
+  <g id="dependencias">
+    <path class="edge edge-async" d="M440,1636 L440,1556" marker-end="url(#seta-aberta)"/>
+    <path class="edge edge-async" d="M928,1636 L928,1556" marker-end="url(#seta-aberta)"/>
+    <path class="edge edge-async" d="M1416,1636 L1416,1556" marker-end="url(#seta-aberta)"/>
+    <path class="edge edge-async" d="M1904,1636 L1904,1556" marker-end="url(#seta-aberta)"/>
+  </g>
+  <g id="primario" filter="url(#sombra)">
+    <rect class="node-external" x="40" y="1640" width="448" height="212" rx="10"/>
+    <text class="uml-keyword" x="56" y="1662">«adaptadores primários» · ms_mono/primario/in/hub/auditoria</text>
+    <text class="label-strong" x="56" y="1684">Entrada</text>
+    <text class="mono" x="56" y="1706" xml:space="preserve">SaudeDaAuditoriaController   /auditoria/saude…</text>
+    <text class="mono" x="56" y="1724" xml:space="preserve">MetricasDaAuditoriaController   /metricas…</text>
+    <text class="mono" x="56" y="1742" xml:space="preserve">RegistrosDaAuditoriaController   /registros…</text>
+    <text class="mono" x="56" y="1760" xml:space="preserve">ExecucoesDaAuditoriaController   /execucoes…</text>
+    <text class="mono" x="56" y="1778" xml:space="preserve">AcoesDaAuditoriaController   /acoes</text>
+    <text class="mono" x="56" y="1796" xml:space="preserve">OcorrenciasDaAuditoriaController   /ocorrencias…</text>
+    <text class="mono" x="56" y="1814" xml:space="preserve">CardDaAuditoriaController   /card…</text>
+    <text class="mono" x="56" y="1832" xml:space="preserve">GanchosDaAuditoria   /_teste/auditoria/*</text>
+  </g>
+  <g id="relogio" filter="url(#sombra)">
+    <rect class="node-external" x="528" y="1640" width="448" height="176" rx="10"/>
+    <text class="uml-keyword" x="544" y="1662">«adaptadores primários» · BackgroundService · middleware</text>
+    <text class="label-strong" x="544" y="1684">Relógio e pedidos</text>
+    <text class="mono" x="544" y="1706">AgendamentoDaAuditoria</text>
+    <text class="mono" x="558" y="1724">30 s: VerificarServicos · renova a instância</text>
+    <text class="mono" x="558" y="1742">1 min: GravarMedicoes · FecharCardEDescartar</text>
+    <text class="mono" x="544" y="1760">MedicaoDosPedidos (middleware, modelo da rota)</text>
+    <text class="mono" x="558" y="1778">→ AcumuladorDeMedicoes.Somar</text>
+    <text class="mono" x="544" y="1796">IndicesDaAuditoria (na partida, RNF-251)</text>
+  </g>
+  <g id="sondas" filter="url(#sombra)">
+    <rect class="node-external" x="1016" y="1640" width="448" height="194" rx="10"/>
+    <text class="uml-keyword" x="1032" y="1662">«adaptadores secundários» · implementam ISondaDeServico</text>
+    <text class="label-strong" x="1032" y="1684">Sondas</text>
+    <text class="mono" x="1032" y="1706">SondaDoBanco (ping) · SondaDoCache (PING)</text>
+    <text class="mono" x="1032" y="1724">SondaDoArmazenamento (Blob | GridFS)</text>
+    <text class="mono" x="1032" y="1742">SondaDaVerificacao (IVerificacaoDeArquivos)</text>
+    <text class="mono" x="1032" y="1760">SondaDoIntermediador (IntermediadoresDoPagamento)</text>
+    <text class="mono" x="1032" y="1778">SondaDoAgendamento ×2 (ultimaExecucao)</text>
+    <text class="mono" x="1032" y="1796">SondaFalsa (ganchos; DESLIGADO sem o serviço)</text>
+    <text class="muted" x="1032" y="1814">cada uma com até 3 s (RNF-246)</text>
+  </g>
+  <g id="secundarios" filter="url(#sombra)">
+    <rect class="node-external" x="1504" y="1640" width="448" height="284" rx="10"/>
+    <text class="uml-keyword" x="1520" y="1662">«adaptadores secundários» · ms_mono/secundario/out</text>
+    <text class="label-strong" x="1520" y="1684">Banco, cache e aviso</text>
+    <text class="mono" x="1520" y="1706">UltimaVerificacaoEmMemoria · InstanciasNoRedis</text>
+    <text class="mono" x="1520" y="1724">TravaDaAuditoriaNoRedis · HistoricoDaSaudeNoBanco</text>
+    <text class="mono" x="1520" y="1742">MedicoesNoBanco · LeituraDaAuditoriaNoBanco</text>
+    <text class="mono" x="1520" y="1760">NomesDaAuditoriaNoBanco · CardDaAuditoriaNoBanco</text>
+    <text class="mono" x="1520" y="1778">DescarteDaAuditoriaNoBanco</text>
+    <text class="mono" x="1520" y="1796">AvisosDaAuditoriaPeloRedis (auditoria:registros)</text>
+    <text class="mono" x="1520" y="1814">AuditoriaComAviso : IAuditoria, IAuditoriaDeErros</text>
+    <text class="mono" x="1534" y="1832">decora AuditoriaNoBanco e publica depois de gravar</text>
+    <text class="mono" x="1520" y="1850">UltimaExecucaoNoRedis (usada pelo SAC e Pagamento)</text>
+    <text class="mono" x="1520" y="1868">OcorrenciasNoBanco · OcorrenciasAbertasNoRedis</text>
+    <text class="mono" x="1520" y="1886">AvisosDeOcorrenciasPeloRedis (auditoria:ocorrencias)</text>
+    <text class="mono" x="1520" y="1904">ConsultasRecentesNoRedis</text>
+  </g>
+  <g id="marca-rodape" transform="translate(0,1964)">
+    <rect class="wm-band" x="0" y="0" width="1992" height="116"/>
+    <line class="wm-sep" x1="0" y1="0.5" x2="1992" y2="0.5"/>
+    <text class="wm-eyebrow" x="40" y="30">LEGENDA</text>
+    <rect class="node-blue" x="40" y="47" width="14" height="14" rx="3"/><text class="label" x="62" y="58">domínio (classe, enum, record, valor)</text>
+    <rect class="node-purple" x="357" y="47" width="14" height="14" rx="3"/><text class="label" x="379" y="58">porta de entrada e caso de uso</text>
+    <rect class="node-orange" x="623" y="47" width="14" height="14" rx="3"/><text class="label" x="645" y="58">porta de saída</text>
+    <rect class="node-external" x="774" y="47" width="14" height="14" rx="3"/><text class="label" x="796" y="58">adaptador no ms_mono</text>
+    <line class="edge edge-async" x1="968" y1="54" x2="996" y2="54" marker-end="url(#seta-aberta)"/><text class="label" x="1008" y="58">depende de / implementa</text>
+    <line class="divider" x1="40" y1="76" x2="1952" y2="76"/>
+    <text class="footer" x="40" y="100">v03 · tempo limite das sondas corrigido para 3 s (RNF-246)</text>
+    <text class="wm-file" x="1952" y="100" text-anchor="end">auditoria-classes_v03_20261120-1914.svg</text>
+  </g>
+</svg>

@@ -39,8 +39,10 @@ public sealed class Respostas(Mundo mundo)
     {
         Confere(mundo.Ultima, status);
         var esperado = JsonNode.Parse(await mundo.Traduzir(json));
+        var completo = esperado?.DeepClone();
         if (esperado is JsonObject campos) foreach (var campo in mundo.CamposSemConferir) campos.Remove(campo);
         Comparacao.Confere(esperado, mundo.Ultima.Corpo, folga: mundo.FolgaDasDatas);
+        if (mundo.ConferirDoExemplo is { } extra) await extra(completo);
     }
 
     [Then(@"^a resposta é (\d{3}) ([A-Z_]+) com:$")]

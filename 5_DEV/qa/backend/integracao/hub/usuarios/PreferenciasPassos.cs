@@ -16,7 +16,7 @@ public sealed class PreferenciasPassos(Mundo mundo)
     const string Caminho = "/usuarios/eu/preferencias";
 
     Sessao? outroAparelho;
-    Auditoria.Marca? marca;
+    Suporte.Auditoria.Marca? marca;
 
     // o participante entra pelo código, no quest (Mundo.SessaoParaPedido)
     [Given(@"^o participante Lucas Andrade com o token de acesso, sem escolha salva$")]
@@ -36,7 +36,7 @@ public sealed class PreferenciasPassos(Mundo mundo)
         await mundo.TokenDe(master);
         outroAparelho = await mundo.Entrar(master, App);
         mundo.Sujeito = master;
-        marca = await Auditoria.Marcar();
+        marca = await Suporte.Auditoria.Marcar();
     }
 
     [Then(@"^a resposta é (\d{3}), sem o cabeçalho X-Trace-Id, com:$")]
@@ -44,6 +44,8 @@ public sealed class PreferenciasPassos(Mundo mundo)
     {
         Respostas.Confere(mundo.Ultima, status);
         SemTraceId();
+        // a Auditoria (20 RF-204) confere o que o ambiente reproduz: Mundo.ConferirDoExemplo
+        if (mundo.ConferirDoExemplo is { } extra) { await extra(JsonNode.Parse(await mundo.Traduzir(json))); return; }
         Comparacao.Confere(JsonNode.Parse(await mundo.Traduzir(json)), mundo.Ultima.Corpo, exato: true);
     }
 
@@ -66,10 +68,10 @@ public sealed class PreferenciasPassos(Mundo mundo)
     [Then(@"^as coleções ""auditoria"" e ""auditoriaErros"" não ganham registro, nem no GET nem no PUT$")]
     public async Task SemAuditoria()
     {
-        foreach (var colecao in new[] { Auditoria.Registros, Auditoria.Erros })
+        foreach (var colecao in new[] { Suporte.Auditoria.Registros, Suporte.Auditoria.Erros })
         {
-            var novos = await Auditoria.Novos(colecao, marca!);
-            Assert.True(novos.Count == 0, $"\"{colecao}\" ganhou registro: {Auditoria.Resumo(novos)}");
+            var novos = await Suporte.Auditoria.Novos(colecao, marca!);
+            Assert.True(novos.Count == 0, $"\"{colecao}\" ganhou registro: {Suporte.Auditoria.Resumo(novos)}");
         }
     }
 

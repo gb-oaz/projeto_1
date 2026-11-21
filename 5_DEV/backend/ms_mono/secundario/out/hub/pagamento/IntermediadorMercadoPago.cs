@@ -60,6 +60,14 @@ public sealed class IntermediadorMercadoPago(HttpClient http, IOptions<OpcoesDoM
 
     public string ChavePublica => mp.PublicKey;
 
+    // a sonda da Auditoria (20 RN-315): o status e o tempo de uma consulta leve à API; status null, o banco não respondeu
+    public async Task<(int? Status, int TempoMs)> Sondar(CancellationToken ct = default)
+    {
+        var relogio = System.Diagnostics.Stopwatch.StartNew();
+        var resposta = await Enviar(HttpMethod.Get, "/v1/payment_methods", null, null, null, ct);
+        return (resposta?.Status, (int)relogio.ElapsedMilliseconds);
+    }
+
     public async Task<ResultadoDaCobranca> Cobrar(PedidoDeCobranca pedido, CancellationToken ct = default)
     {
         var corpo = new JsonObject

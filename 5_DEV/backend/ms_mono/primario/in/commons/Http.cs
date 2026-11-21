@@ -9,6 +9,7 @@ using Boaz.Core.Commons.Usuario.Autorizacao.Domain;
 using Boaz.Core.Commons.Usuario.Autorizacao.Dtos;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
+using Boaz.Core.Hub.Auditoria.Card.Domain;
 using Boaz.Core.Hub.Pagamento.Faturas.Domain;
 using Boaz.Core.Hub.Sac.Chamados.Domain;
 using GrupoAutenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Domain.GrupoDeFalha;
@@ -153,6 +154,7 @@ public static class Http
         FalhaDeAutorizacao f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Mod: f.Mod, Abas: f.Abas, Versao: f.Versao)),
         FalhaDoSac f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Minimo: f.Minimo, Maximo: f.Maximo, Responsavel: f.Responsavel)),
         FalhaDoPagamento f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo, Saldo: f.Saldo)),
+        FalhaDaAuditoria f => (Status(f.Grupo), new Erro(f.Codigo, f.Message, f.Campo)),
         BadHttpRequestException => (StatusCodes.Status422UnprocessableEntity, CorpoInvalido),
         OperationCanceledException => null,
         _ => (StatusCodes.Status500InternalServerError, ErroInesperado),
@@ -189,6 +191,14 @@ public static class Http
         GrupoDaFalhaDoPagamento.VersaoDesatualizada => StatusCodes.Status412PreconditionFailed,
         GrupoDaFalhaDoPagamento.VersaoAusente => StatusCodes.Status428PreconditionRequired,
         GrupoDaFalhaDoPagamento.DadosInvalidos => StatusCodes.Status422UnprocessableEntity,
+        _ => StatusCodes.Status503ServiceUnavailable,
+    };
+
+    static int Status(GrupoDaFalhaDaAuditoria grupo) => grupo switch
+    {
+        GrupoDaFalhaDaAuditoria.Proibido => StatusCodes.Status403Forbidden,
+        GrupoDaFalhaDaAuditoria.NaoEncontrado => StatusCodes.Status404NotFound,
+        GrupoDaFalhaDaAuditoria.DadosInvalidos => StatusCodes.Status422UnprocessableEntity,
         _ => StatusCodes.Status503ServiceUnavailable,
     };
 

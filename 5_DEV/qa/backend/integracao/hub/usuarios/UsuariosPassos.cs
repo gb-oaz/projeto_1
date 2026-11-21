@@ -280,14 +280,14 @@ public sealed partial class UsuariosPassos(Mundo mundo, Partida partida, Execuco
     [Then(@"^os dois vão com contaId ""(.+)"" e alvo ""(.+)""$")]
     public async Task OsDoisComContaEAlvo(string conta, string alvoEsperado)
     {
-        var novos = await execucoes.Novos(Auditoria.Registros);
+        var novos = await execucoes.Novos(Suporte.Auditoria.Registros);
         var id = await mundo.Traduzir(conta);
         var esperado = await mundo.Traduzir(alvoEsperado);
         Assert.Equal(2, novos.Count);
         Assert.All(novos, d =>
         {
-            Assert.Equal(id, Auditoria.Texto(d, "contaId"));
-            Assert.Equal(esperado, Auditoria.Texto(d, "alvo"));
+            Assert.Equal(id, Suporte.Auditoria.Texto(d, "contaId"));
+            Assert.Equal(esperado, Suporte.Auditoria.Texto(d, "alvo"));
         });
     }
 

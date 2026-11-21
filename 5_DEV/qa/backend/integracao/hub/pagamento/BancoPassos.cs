@@ -275,7 +275,7 @@ public sealed partial class PagamentoPassos
         Assert.True(eventos.Count > 0, $"nenhum evento \"pagamento\": {aoVivo.Ultimo}");
         Assert.All(eventos, e => Assert.Matches("^trc-[0-9a-f]{8}$", Campo(e.Corpo, "traceId") ?? ""));
         var pago = eventos.Last(e => Campo(e.Corpo, "status") == "PAGO");
-        Assert.Equal(Auditoria.TraceIdDoCabecalho(banco.RespostaDoAviso!), Campo(pago.Corpo, "traceId"));
+        Assert.Equal(Suporte.Auditoria.TraceIdDoCabecalho(banco.RespostaDoAviso!), Campo(pago.Corpo, "traceId"));
     }
 
     [Then(@"^o evento ""pagamento"" traz:$")]
@@ -294,34 +294,34 @@ public sealed partial class PagamentoPassos
     public async Task Auditado(string acao)
     {
         var novos = await DaAcao(acao);
-        var etapas = novos.Select(d => Auditoria.Texto(d, "etapa")).ToList();
+        var etapas = novos.Select(d => Suporte.Auditoria.Texto(d, "etapa")).ToList();
         Assert.True(etapas.Contains("INICIADO") && etapas.Contains("CONCLUIDO"),
-            $"esperava INICIADO e CONCLUIDO de {acao} em \"auditoria\", vieram {Auditoria.Resumo(novos)}");
-        var traceId = Auditoria.MesmoTraceId(novos);
-        if (acao != "FATURA_VENCIDA") Assert.Equal(Auditoria.TraceIdDoCabecalho(mundo.Ultima), traceId);
+            $"esperava INICIADO e CONCLUIDO de {acao} em \"auditoria\", vieram {Suporte.Auditoria.Resumo(novos)}");
+        var traceId = Suporte.Auditoria.MesmoTraceId(novos);
+        if (acao != "FATURA_VENCIDA") Assert.Equal(Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima), traceId);
     }
 
     async Task<List<BsonDocument>> DaAcao(string acao, int? execucao = null) =>
-        [.. (execucao is { } i ? await execucoes.Novos(Auditoria.Registros, i) : await execucoes.Novos(Auditoria.Registros))
-            .Where(d => Auditoria.Texto(d, "acao") == acao)];
+        [.. (execucao is { } i ? await execucoes.Novos(Suporte.Auditoria.Registros, i) : await execucoes.Novos(Suporte.Auditoria.Registros))
+            .Where(d => Suporte.Auditoria.Texto(d, "acao") == acao)];
 
     // ── Então · RNF-243 X-Trace-Id ─────────────────────────────────────────
     [Then(@"^a resposta é 200, na abertura, com o cabeçalho X-Trace-Id$")]
     public void AberturaComTraceId()
     {
         Assert.True(aoVivo.Ultimo.Status == 200 && aoVivo.Ultimo.TipoDoConteudo == "text/event-stream", $"esperava o fluxo aberto: {aoVivo.Ultimo}");
-        Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
     }
 
     [Then(@"^o valor segue o formato ""trc-"" mais 8 hexadecimais, como ""trc-1d6e3f08""$")]
-    public void FormatoDoTraceId() => Assert.Matches("^trc-[0-9a-f]{8}$", Auditoria.TraceIdDoCabecalho(mundo.Ultima));
+    public void FormatoDoTraceId() => Assert.Matches("^trc-[0-9a-f]{8}$", Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima));
 
     // mais uma execução, de outro pedido: nenhum traceId se repete
     [Then(@"^cada execução tem o seu, diferente do de qualquer outra$")]
     public async Task UmPorExecucao()
     {
         var outra = await fat.Ler(await fat.Rita(), "/pagamento/formas");
-        var traceIds = execucoes.Resultados.Append(outra).Select(Auditoria.TraceIdDoCabecalho).ToList();
+        var traceIds = execucoes.Resultados.Append(outra).Select(Suporte.Auditoria.TraceIdDoCabecalho).ToList();
         Assert.True(traceIds.Distinct().Count() == traceIds.Count, $"esperava um traceId por execução, vieram {string.Join(", ", traceIds)}");
     }
 
@@ -330,7 +330,7 @@ public sealed partial class PagamentoPassos
     public async Task ErroComOMesmoTraceId(int status, string json)
     {
         Respostas.Confere(mundo.Ultima, status);
-        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
         Assert.Matches("^trc-[0-9a-f]{8}$", traceId);
         Comparacao.Confere(JsonNode.Parse(json.Replace("trc-7f3a9c21", traceId, StringComparison.Ordinal)), mundo.Ultima.Corpo);
     }
@@ -344,13 +344,13 @@ public sealed partial class PagamentoPassos
         var r = await mundo.EnviarComo(await fat.Rita(), "POST", $"/pagamento/faturas/{fat.Real("FAT-000402")}/pagamentos",
             FaturasDoExemplo.Corpo("PIX").ToJsonString());
         Respostas.Confere(r, 503, "BANCO_INDISPONIVEL");
-        Assert.True(Campo(r.Corpo, "traceId") == Auditoria.TraceIdDoCabecalho(r), $"esperava o traceId do cabeçalho no corpo do 503: {r}");
+        Assert.True(Campo(r.Corpo, "traceId") == Suporte.Auditoria.TraceIdDoCabecalho(r), $"esperava o traceId do cabeçalho no corpo do 503: {r}");
     }
 
     [Then(@"^a resposta traz um X-Trace-Id novo, ""trc-1d6e3f08""$")]
     public void TraceIdNovo()
     {
-        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
         Assert.Matches("^trc-[0-9a-f]{8}$", traceId);
         Assert.True(traceId != origem, $"a execução nova devia ter o seu traceId, veio o recebido ({origem})");
     }
@@ -388,11 +388,11 @@ public sealed partial class PagamentoPassos
     {
         var id = fat.Real("PAG-000773");
         var registros = await DaAcao("PAGAMENTO_CRIADO", execucaoDoPagamento);
-        Assert.True(registros.Count > 0 && registros.All(d => Auditoria.TraceId(d) == fat.ExecucaoDe(id)),
-            $"esperava a auditoria PAGAMENTO_CRIADO com o traceId {fat.ExecucaoDe(id)}, vieram {Auditoria.Resumo(registros)}");
+        Assert.True(registros.Count > 0 && registros.All(d => Suporte.Auditoria.TraceId(d) == fat.ExecucaoDe(id)),
+            $"esperava a auditoria PAGAMENTO_CRIADO com o traceId {fat.ExecucaoDe(id)}, vieram {Suporte.Auditoria.Resumo(registros)}");
         await Executar(await fat.Rita(), "POST", $"/pagamento/faturas/{fat.FaturaDo(id)}/pagamentos", FaturasDoExemplo.Corpo("PIX").ToJsonString());
         Respostas.Confere(mundo.Ultima, 409, "FATURA_PAGA");
-        Assert.Equal(Auditoria.TraceIdDoCabecalho(mundo.Ultima), Auditoria.TraceId(await execucoes.UmNovoErro()));
+        Assert.Equal(Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima), Suporte.Auditoria.TraceId(await execucoes.UmNovoErro()));
     }
 
     // o que o intermediador falso recebeu na cobrança
@@ -418,7 +418,7 @@ public sealed partial class PagamentoPassos
     public void AvisoComTraceIdNovo()
     {
         Respostas.Confere(mundo.Ultima, 200);
-        var traceId = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
         Assert.Matches("^trc-[0-9a-f]{8}$", traceId);
         Assert.True(traceId != fat.ExecucaoDe(fat.Real("PAG-000781")), $"o aviso devia ter um traceId novo, veio o da criação ({traceId})");
     }
@@ -429,11 +429,11 @@ public sealed partial class PagamentoPassos
     {
         var pix = fat.Real("PAG-000781");
         var aviso = await AvisoGuardado(DoBackend(AvisosDoBanco), mundo.Ultima);
-        Assert.True(Auditoria.Texto(aviso, "idExterno") == await banco.IdExterno(pix) && Auditoria.Texto(aviso, "pagamentoId") == pix,
+        Assert.True(Suporte.Auditoria.Texto(aviso, "idExterno") == await banco.IdExterno(pix) && Suporte.Auditoria.Texto(aviso, "pagamentoId") == pix,
             $"esperava o aviso com o id externo do {pix} e o pagamentoId {pix}: {aviso.ToJson()}");
         var registros = await DaAcao("AVISO_DO_BANCO");
-        Assert.True(registros.Count > 0 && registros.All(d => Auditoria.TraceId(d) == Auditoria.TraceIdDoCabecalho(mundo.Ultima)),
-            $"esperava a auditoria AVISO_DO_BANCO com o traceId do aviso, vieram {Auditoria.Resumo(registros)}");
+        Assert.True(registros.Count > 0 && registros.All(d => Suporte.Auditoria.TraceId(d) == Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima)),
+            $"esperava a auditoria AVISO_DO_BANCO com o traceId do aviso, vieram {Suporte.Auditoria.Resumo(registros)}");
     }
 
     // o traceId da criação, devolvido pelo banco nos metadados, vira o traceIdOrigem do aviso
@@ -442,7 +442,7 @@ public sealed partial class PagamentoPassos
     {
         var pix = fat.Real("PAG-000781");
         var aviso = await AvisoGuardado(DoBackend(AvisosDoBanco), mundo.Ultima);
-        Assert.True(Auditoria.Texto(aviso, "traceIdOrigem") == fat.ExecucaoDe(pix),
+        Assert.True(Suporte.Auditoria.Texto(aviso, "traceIdOrigem") == fat.ExecucaoDe(pix),
             $"esperava em \"avisosDoBanco\" o traceIdOrigem {fat.ExecucaoDe(pix)}, o da criação do {pix}: {aviso.ToJson()}");
     }
 
@@ -460,7 +460,7 @@ public sealed partial class PagamentoPassos
     {
         var registros = await DaAcao("FATURA_VENCIDA");
         Assert.True(registros.Count > 0, "esperava a auditoria FATURA_VENCIDA do agendamento");
-        var traceId = Auditoria.MesmoTraceId(registros);
+        var traceId = Suporte.Auditoria.MesmoTraceId(registros);
         Assert.Matches("^trc-[0-9a-f]{8}$", traceId);
         Assert.DoesNotContain(traceId, execucoes.Resultados.Select(r => r.Cabecalho("X-Trace-Id")));
     }
@@ -471,8 +471,8 @@ public sealed partial class PagamentoPassos
     {
         var fatura = fat.Real("FAT-000371");
         var registros = await DaAcao("FATURA_VENCIDA");
-        Assert.True(registros.Any(d => Auditoria.Texto(d, "alvo") == fatura),
-            $"esperava a auditoria FATURA_VENCIDA com o alvo {fatura}, vieram {Auditoria.Resumo(registros)}");
+        Assert.True(registros.Any(d => Suporte.Auditoria.Texto(d, "alvo") == fatura),
+            $"esperava a auditoria FATURA_VENCIDA com o alvo {fatura}, vieram {Suporte.Auditoria.Resumo(registros)}");
     }
 }
 

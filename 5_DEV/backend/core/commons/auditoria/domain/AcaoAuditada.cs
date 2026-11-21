@@ -86,5 +86,7 @@ public enum AcaoAuditada
     AvisoDoBanco,
     /// <summary>Sem quem: o agendamento do Pagamento vira a fatura vencida e abre o aviso de atraso (19 RN-301, RN-309, RN-311).</summary>
     FaturaVencida,
+    /// <summary>GET /auditoria/...: a consulta à Auditoria, lida e registrada (20 RN-325).</summary>
+    ConsultarAuditoria,
 }
 
