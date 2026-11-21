@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "20_modulo-auditoria"
 tipo: "Funcionalidade"
 titulo: "Auditoria"
-versao: "v08"
-data: "2026-11-21 00:14"
+versao: "v10"
+data: "2026-11-21 08:25"
 status: "Rascunho"
 objetivo: "permitir que o time deboaz veja, num só lugar, a saúde de cada serviço, o tempo de resposta de cada módulo e cada registro da auditoria, ao vivo ou por período, para achar o que está fora do ar e validar o caminho de cada execução."
 ---
 
-> **boaz · Funcionalidade** · `20_modulo-auditoria` · **v08** · 2026-11-21 00:14 · **Rascunho**
+> **boaz · Funcionalidade** · `20_modulo-auditoria` · **v10** · 2026-11-21 08:25 · **Rascunho**
 
 # Auditoria
 
@@ -1790,6 +1790,8 @@ Esquema do Cenário: onde os ganchos respondem
     | homologação | "sim"   | PUT    | …/sondas/fila    | 404 SERVICO_INEXISTENTE                  |
     | produção    | "sim"   | POST   | …/agendamento    | 404                                      |
     | homologação | "sim"   | POST   | …/agendamento    | 204, card do minuto e descarte já feitos |
+    | produção    | "sim"   | POST   | …/reiniciar      | 404                                      |
+    | homologação | "sim"   | POST   | …/reiniciar      | 204, sondas trocadas e medições zeradas  |
 
 Esquema do Cenário: corpo do gancho das sondas
   Dado a aplicação de homologação, com Teste__Relogio "sim"
@@ -1884,7 +1886,7 @@ Esquema do Cenário: resultado pelos registros
   Dado a aplicação de homologação, com Teste__Relogio "sim", às 13:42:00
   E POST /_teste/auditoria/registros gravou para "trc-90ab12cd": <registros>
   E todos com "acao": "MUDAR_ESTADO_CONTA"
-  Quando envia GET /auditoria/execucoes/trc-90ab12cd
+  Quando envia GET /auditoria/execucoes/trc-90ab12cd às 13:42:00
   Então a resposta é 200 com "resultado": "<resultado>" e "duracaoMs": <duracao>
 
   Exemplos:
@@ -2202,6 +2204,8 @@ Cenário: consulta gravada na auditoria
   E "traceId" é o do cabeçalho dessa resposta; "id" e "traceId" mudam a cada pedido
 
 Esquema do Cenário: o que é gravado
+  Dado os 4 passos de "trc-1d6e3f08" gravados por POST /_teste/auditoria/registros
+  E cada um como na execução concluída do RF-202-api
   Quando o Caio envia GET <endereco> e a resposta é 200
   Então <resultado>
 
@@ -2254,7 +2258,11 @@ Cenário: saúde ao vivo
   Então a resposta é 200 com Content-Type "text/event-stream" e Cache-Control "no-store"
   E o 1º evento "saude" chega logo ao abrir, com o corpo de GET /auditoria/saude
   E depois um evento "saude" a cada verificação, a cada 30 s, com "verificadoEm" novo
-  E a 4ª conexão do mesmo usuário fecha a mais antiga com "encerrado" e "LIMITE_CONEXOES"
+
+Cenário: quarta conexão na saúde ao vivo
+  Dado o Caio com 3 conexões em /auditoria/saude/ao-vivo
+  Quando abre a 4ª
+  Então a 4ª recebe 200 e a mais antiga recebe "encerrado" com "LIMITE_CONEXOES" e fecha
 
 Cenário: tempo limite da verificação
   Dado PUT /_teste/auditoria/sondas/banco com "resposta": "NENHUMA", em homologação
@@ -2464,9 +2472,9 @@ Cenário: o que a Auditoria não faz
 
 [![Sequência da Auditoria com as telas pwa: abrir com o acesso conferido, a consulta auditada e a faixa das ocorrências abertas; verificação de 30 s com a trava e sondas de até 3 s, ocorrência gravada, publicada e entregue ao vivo em todas as abas, e a volta com Dispensar; lista de ocorrências em tela cheia com filtros e ao vivo; registros por período e ao vivo com a consulta auditada e o limite de 3 aparelhos; execuções e uma execução pelo traceId; métricas medidas por pedido, gravadas por minuto e lidas por janela; e o banco de dados fora, com a saúde respondida, 503 nas leituras e as ocorrências gravadas na volta](../2_Diagramas/auditoria-sequencia_v03_20261120-1936.svg)](../2_Diagramas/auditoria-sequencia_v03_20261120-1936.svg)
 
-**Auditoria · contrato de API** — `2_Diagramas/auditoria-contrato-api_v04_20261120-1924.svg`
+**Auditoria · contrato de API** — `2_Diagramas/auditoria-contrato-api_v05_20261121-0825.svg`
 
-[![Contrato de API da Auditoria: formato comum e mensagens de erro, saúde, histórico de um serviço e saúde ao vivo, métricas e endereços, ações, card e card ao vivo, registros e registros ao vivo, execuções e execução pelo traceId, ocorrências abertas, ao vivo e por período, a consulta auditada com X-Trace-Id e os ganchos de teste em /_teste/auditoria](../2_Diagramas/auditoria-contrato-api_v04_20261120-1924.svg)](../2_Diagramas/auditoria-contrato-api_v04_20261120-1924.svg)
+[![Contrato de API da Auditoria: formato comum e mensagens de erro, saúde, histórico de um serviço e saúde ao vivo, métricas e endereços, ações, card e card ao vivo, registros e registros ao vivo, execuções e execução pelo traceId, ocorrências abertas, ao vivo e por período, a consulta auditada com X-Trace-Id e os ganchos de teste em /_teste/auditoria](../2_Diagramas/auditoria-contrato-api_v05_20261121-0825.svg)](../2_Diagramas/auditoria-contrato-api_v05_20261121-0825.svg)
 
 **Auditoria · classes** — `2_Diagramas/auditoria-classes_v03_20261120-1914.svg`
 
@@ -2484,7 +2492,9 @@ Cenário: o que a Auditoria não faz
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v08** | 2026-11-21 00:14 | Lacunas do backend: agendamento conta só a hora da última execução e ignora a falha (`RN-315`, `RN-315-api`); Sem pedidos, Sem verificação e Desligado contam como No ar nas ocorrências e fecham a aberta (`RN-324`, `RN-324-api`) |
+| **v10** | 2026-11-21 08:25 | Gancho POST /_teste/auditoria/reiniciar (204 em homologação com o relógio de teste, 404 fora dele), que esvazia a memória da instância antes de cada cenário (`RN-315-api`); contrato de API v04 → v05 |
+| v09 | 2026-11-21 01:15 | Lacunas do backend nos cenários de API: Dado com os passos de trc-1d6e3f08 (`RN-325-api`), 4ª conexão da saúde ao vivo num cenário com as 3 já abertas (`RNF-246-api`), GET às 13:42:00 (`RN-318-api`) |
+| v08 | 2026-11-21 00:14 | Lacunas do backend: agendamento conta só a hora da última execução e ignora a falha (`RN-315`, `RN-315-api`); Sem pedidos, Sem verificação e Desligado contam como No ar nas ocorrências e fecham a aberta (`RN-324`, `RN-324-api`) |
 | v07 | 2026-11-20 19:37 | Telas: vistas da saúde (Web, PWA e Mobile) e de ocorrências (Web) v02, com a faixa de status no topo dos cards; sequência com as telas v03 |
 | v06 | 2026-11-20 19:28 | Gherkin: "E," sem vírgula depois da palavra-chave em `RF-202` e `RF-194-api`, para o parser do qa |
 | v05 | 2026-11-20 19:25 | Lacunas do qa nos cenários de API: ordem dos serviços no mesmo estado (`RF-194-api`); páginas num período fechado, sem a própria consulta (`RF-199-api`); preparo pelo gancho com a ação, quem, conta e alvo (`RF-202-api`, `RN-318-api`); limite de 31 dias com o fim explícito (`RF-205-api`); ganchos separados do corpo das sondas (`RN-315-api`); medição injetada já gravada e lista vazia (`RN-317-api`); traceId de exemplo (`RN-325-api`); contrato v04 (ganchos), sequência v02 e vistas de execuções e ocorrências v02 (Caio Lima · EBFGA) |
@@ -2495,4 +2505,4 @@ Cenário: o que a Auditoria não faz
 
 ---
 
-<sub>boaz · v08 · 2026-11-21 00:14 · `1_Requisitos/20_modulo-auditoria.md`</sub>
+<sub>boaz · v10 · 2026-11-21 08:25 · `1_Requisitos/20_modulo-auditoria.md`</sub>

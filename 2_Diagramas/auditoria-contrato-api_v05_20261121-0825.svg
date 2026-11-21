@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1888 4244" width="1888" height="4244">
   <title>Auditoria · contrato de API</title>
-  <desc>Contrato de API da Auditoria (MOD-17): bloco comum (só GET, consulta auditada com X-Trace-Id, login, datas, ao vivo, erro e mensagens), GET /auditoria/saude, histórico de um serviço, saúde ao vivo, métricas, endereços, ações, card e card ao vivo, registros, registros ao vivo, execuções e execução por traceId, ocorrências abertas, ao vivo e por período, e os ganchos /_teste/auditoria. v01: criação. v02: ocorrências, consulta auditada, limites dos estados e faixa de 3 s. v03: métricas e endereços respondem 503 BANCO_DE_DADOS_FORA com o banco fora. v04: ganchos com quem, conta e alvo nos registros, medições gravadas direto e 422 para lista vazia.</desc>
+  <desc>Contrato de API da Auditoria (MOD-17): bloco comum (só GET, consulta auditada com X-Trace-Id, login, datas, ao vivo, erro e mensagens), GET /auditoria/saude, histórico de um serviço, saúde ao vivo, métricas, endereços, ações, card e card ao vivo, registros, registros ao vivo, execuções e execução por traceId, ocorrências abertas, ao vivo e por período, e os ganchos /_teste/auditoria. v01: criação. v02: ocorrências, consulta auditada, limites dos estados e faixa de 3 s. v03: métricas e endereços respondem 503 BANCO_DE_DADOS_FORA com o banco fora. v04: ganchos com quem, conta e alvo nos registros, medições gravadas direto e 422 para lista vazia. v05: gancho POST /_teste/auditoria/reiniciar (204), que esvazia as medições pendentes, a última verificação e as sondas trocadas da instância.</desc>
   <style>
     /* ── base ─────────────────────────────────────────── */
     .bg            { fill: #0d1117; }
@@ -119,10 +119,10 @@
     <text class="title" x="40" y="72">Auditoria · contrato de API</text>
     <text class="subtitle" x="40" y="94">MOD-17 · saúde, métricas, registros, execuções, ocorrências, ações, card e os ganchos de teste; tudo GET</text>
     <text class="wm-meta-label" x="1600" y="44">VERSÃO</text>
-    <rect class="wm-badge" x="1600" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1624" y="71" text-anchor="middle">v04</text>
+    <rect class="wm-badge" x="1600" y="56" width="48" height="22" rx="11"/><text class="wm-badge-text" x="1624" y="71" text-anchor="middle">v05</text>
     <line class="wm-sep" x1="1672" y1="32" x2="1672" y2="80"/>
     <text class="wm-meta-label" x="1696" y="44">DATA</text>
-    <text class="wm-meta-value" x="1696" y="72">2026-11-20 · 19:24</text>
+    <text class="wm-meta-value" x="1696" y="72">2026-11-21 · 08:25</text>
   </g>
   <g id="comum" filter="url(#sombra)">
     <rect class="node-note" x="40" y="152" width="1808" height="480" rx="10"/>
@@ -634,7 +634,7 @@
     <text class="mono" x="1288" y="4068">503 BANCO_DE_DADOS_FORA</text>
   </g>
   <g id="ganchos" filter="url(#sombra)">
-    <rect class="node-orange" x="656" y="3030" width="576" height="374" rx="10"/>
+    <rect class="node-orange" x="656" y="3030" width="576" height="428" rx="10"/>
     <text class="uml-keyword" x="672" y="3052">«ganchos de teste» · só homologação com Teste__Relogio &quot;sim&quot;; fora disso, 404</text>
     <text class="label-strong" x="672" y="3074">/_teste/auditoria/*</text>
     <rect class="chip" x="1138" y="3058" width="78" height="20" rx="10"/><text class="chip-text" x="1177" y="3072" text-anchor="middle">sem login</text>
@@ -651,10 +651,13 @@
     <text class="mono" x="881" y="3276">acao, codigo, quem?, conta?,</text>
     <text class="mono" x="881" y="3294" xml:space="preserve">alvo?, quando}]                   → 201</text>
     <text class="mono" x="672" y="3312" xml:space="preserve">POST   /agendamento        card do minuto e descarte           → 204</text>
-    <text class="muted" x="672" y="3330">404 SERVICO_INEXISTENTE · 422 DADOS_INVALIDOS (resposta, tempoMs,</text>
-    <text class="muted" x="672" y="3348">duracaoMs, acao, quem, conta)</text>
-    <text class="muted" x="672" y="3366">lista vazia: 422 DADOS_INVALIDOS com o campo &quot;medicoes&quot; ou &quot;registros&quot;</text>
-    <text class="muted" x="672" y="3384">RN-315-api · RN-316-api · RN-317-api · RN-318-api · RN-322-api · RN-324-api · RNF-247-api</text>
+    <text class="mono" x="672" y="3330" xml:space="preserve">POST   /reiniciar          esvazia a memória da instância      → 204</text>
+    <text class="mono" x="881" y="3348">(medições pendentes, última</text>
+    <text class="mono" x="881" y="3366">verificação e sondas trocadas)</text>
+    <text class="muted" x="672" y="3384">404 SERVICO_INEXISTENTE · 422 DADOS_INVALIDOS (resposta, tempoMs,</text>
+    <text class="muted" x="672" y="3402">duracaoMs, acao, quem, conta)</text>
+    <text class="muted" x="672" y="3420">lista vazia: 422 DADOS_INVALIDOS com o campo &quot;medicoes&quot; ou &quot;registros&quot;</text>
+    <text class="muted" x="672" y="3438">RN-315-api · RN-316-api · RN-317-api · RN-318-api · RN-322-api · RN-324-api · RNF-247-api</text>
   </g>
   <g id="marca-rodape" transform="translate(0,4128)">
     <rect class="wm-band" x="0" y="0" width="1888" height="116"/>
@@ -664,7 +667,7 @@
     <rect class="node-orange" x="285" y="47" width="14" height="14" rx="3"/><text class="label" x="307" y="58">gancho de teste</text>
     <rect class="node-note" x="443" y="47" width="14" height="14" rx="3"/><text class="label" x="465" y="58">regra comum</text>
     <line class="divider" x1="40" y1="76" x2="1848" y2="76"/>
-    <text class="footer" x="40" y="100">v04 · ganchos: quem, conta e alvo nos registros, medições gravadas direto e 422 para lista vazia</text>
-    <text class="wm-file" x="1848" y="100" text-anchor="end">auditoria-contrato-api_v04_20261120-1924.svg</text>
+    <text class="footer" x="40" y="100">v05 · gancho POST /_teste/auditoria/reiniciar, que esvazia a memória da instância antes de cada cenário</text>
+    <text class="wm-file" x="1848" y="100" text-anchor="end">auditoria-contrato-api_v05_20261121-0825.svg</text>
   </g>
 </svg>

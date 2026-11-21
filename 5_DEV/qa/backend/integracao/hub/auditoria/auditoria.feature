@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/20_modulo-auditoria.md (v08), copiados do requisito:
+# Cenários de API de 1_Requisitos/20_modulo-auditoria.md (v10), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Auditoria
   1_Requisitos/20_modulo-auditoria.md · Cenários de API
@@ -815,6 +815,8 @@ Funcionalidade: Auditoria
       | homologação | "sim"   | PUT    | …/sondas/fila    | 404 SERVICO_INEXISTENTE                  |
       | produção    | "sim"   | POST   | …/agendamento    | 404                                      |
       | homologação | "sim"   | POST   | …/agendamento    | 204, card do minuto e descarte já feitos |
+      | produção    | "sim"   | POST   | …/reiniciar      | 404                                      |
+      | homologação | "sim"   | POST   | …/reiniciar      | 204, sondas trocadas e medições zeradas  |
 
   @RN-315
   Esquema do Cenário: corpo do gancho das sondas
@@ -898,7 +900,7 @@ Funcionalidade: Auditoria
     Dado a aplicação de homologação, com Teste__Relogio "sim", às 13:42:00
     E POST /_teste/auditoria/registros gravou para "trc-90ab12cd": <registros>
     E todos com "acao": "MUDAR_ESTADO_CONTA"
-    Quando envia GET /auditoria/execucoes/trc-90ab12cd
+    Quando envia GET /auditoria/execucoes/trc-90ab12cd às 13:42:00
     Então a resposta é 200 com "resultado": "<resultado>" e "duracaoMs": <duracao>
 
     Exemplos:
@@ -1199,6 +1201,8 @@ Funcionalidade: Auditoria
 
   @RN-325
   Esquema do Cenário: o que é gravado
+    Dado os 4 passos de "trc-1d6e3f08" gravados por POST /_teste/auditoria/registros
+    E cada um como na execução concluída do RF-202-api
     Quando o Caio envia GET <endereco> e a resposta é 200
     Então <resultado>
 
@@ -1249,7 +1253,12 @@ Funcionalidade: Auditoria
     Então a resposta é 200 com Content-Type "text/event-stream" e Cache-Control "no-store"
     E o 1º evento "saude" chega logo ao abrir, com o corpo de GET /auditoria/saude
     E depois um evento "saude" a cada verificação, a cada 30 s, com "verificadoEm" novo
-    E a 4ª conexão do mesmo usuário fecha a mais antiga com "encerrado" e "LIMITE_CONEXOES"
+
+  @RNF-246
+  Cenário: quarta conexão na saúde ao vivo
+    Dado o Caio com 3 conexões em /auditoria/saude/ao-vivo
+    Quando abre a 4ª
+    Então a 4ª recebe 200 e a mais antiga recebe "encerrado" com "LIMITE_CONEXOES" e fecha
 
   @RNF-246
   Cenário: tempo limite da verificação

@@ -42,6 +42,9 @@ public sealed class AcumuladorDeMedicoes
         return retiradas;
     }
 
+    /// <summary>Esquece o que espera para gravar (só o reinício de teste entre cenários).</summary>
+    public void Limpar() => medicoes.Clear();
+
     /// <summary>Quantas medições esperam para gravar.</summary>
     public int Esperando => medicoes.Count;
 }

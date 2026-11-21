@@ -37,6 +37,9 @@ public sealed class UltimaVerificacaoEmMemoria : IUltimaVerificacao
 
     public void Guardar(DateTimeOffset em, IReadOnlyList<Verificacao> servicos, IReadOnlyList<SaudeDoModulo> modulos) =>
         atual = new Estado(em, servicos, modulos);
+
+    // como numa instância recém-subida: a próxima leitura verifica na hora (só o reinício de teste entre cenários)
+    public void Limpar() => atual = null;
 }
 
 // As instâncias no ar: o hash auditoria:instancia:<id> (versao, inicio, ultimoSinal) com TTL de 90 s, renovado a cada

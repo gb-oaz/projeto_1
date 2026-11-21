@@ -111,10 +111,11 @@ public sealed partial class EntaoPassos
     [Then(@"^a consulta atendida traz o cabeçalho X-Trace-Id e fica na auditoria, como na RN-325$")]
     public async Task ConsultaAuditada()
     {
-        var r = await a.Pedir(await a.Caio(), "GET", "/auditoria/registros");
+        // um alvo que os Então anteriores deste cenário não consultaram: o mesmo GET do mesmo usuário em menos de 5 min não se grava de novo (RN-325)
+        var r = await a.Pedir(await a.Caio(), "GET", "/auditoria/saude/banco/historico?periodo=7d");
         Respostas.Confere(r, 200);
         Auditoria_TraceId();
-        await Gravou(null);
+        await Gravou("/auditoria/saude/banco/historico?periodo=7d");
     }
 
     // ── consulta auditada (RN-325) ─────────────────────────────────────────
@@ -403,6 +404,10 @@ public sealed partial class EntaoPassos
     [Then(@"^a 4ª conexão do mesmo usuário fecha a mais antiga com ""encerrado"" e ""LIMITE_CONEXOES""$")]
     public async Task LimiteDeConexoes()
     {
+        // o cenário da saúde ao vivo só abre a 1ª no Quando: as outras duas e a 4ª abrem aqui, do mesmo usuário e no mesmo endereço (RNF-246)
+        var caminho = a.UltimoFluxo.Caminho;
+        var caio = await a.Caio();
+        while (a.Fluxos.Count < 4) await a.Abrir(caio, caminho);
         Assert.Equal(200, a.UltimoFluxo.Status);
         var antiga = a.Fluxos[0];
         var e = await antiga.EsperarTipo("encerrado", Cinco);
@@ -508,7 +513,6 @@ public sealed partial class EntaoPassos
     {
         var f = a.UltimoFluxo;
         Assert.Equal(200, f.Status);
-        await a.RegistrosRecentes(0);
         var maria = await a.MariaDoUsuarios();
         await mundo.SessaoParaPedido(maria);
         Exigir(await mundo.EnviarComo(maria, "POST", "/usuarios", new JsonObject

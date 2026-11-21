@@ -44,10 +44,10 @@ public sealed class AuditoriaDoTime(Mundo mundo, Api api, Relogio relogio, Execu
     public static string Iso(DateTimeOffset d) => d.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss'Z'", CultureInfo.InvariantCulture);
     public static string IsoMs(DateTimeOffset d) => d.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fff'Z'", CultureInfo.InvariantCulture);
 
-    // "13:42", "13:42:05", "13:20:00.184" (dia 2026-11-20) ou ISO completo
+    // "13:42", "13:42:05", "13:20:00.184", "13:42:00Z" (dia 2026-11-20) ou ISO completo
     public static DateTimeOffset Hora(string texto) => texto.Contains('T')
         ? DateTimeOffset.Parse(texto, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal)
-        : Dia + TimeSpan.Parse(texto, CultureInfo.InvariantCulture);
+        : Dia + TimeSpan.Parse(texto.TrimEnd('Z'), CultureInfo.InvariantCulture);
 
     public DateTimeOffset Agora() =>
         relogioEm is { } em && relogioReal is { } real ? em + (DateTimeOffset.UtcNow - real) : DateTimeOffset.UtcNow;
@@ -150,7 +150,8 @@ public sealed class AuditoriaDoTime(Mundo mundo, Api api, Relogio relogio, Execu
     public IReadOnlyList<Fluxo> Fluxos => aoVivo.Fluxos;
 
     // ── ganchos ────────────────────────────────────────────────────────────
-    public async Task Sonda(string servico, string corpo)
+    // o corpo já em JSON; nome próprio para não colidir com Sonda(servico, "LENTA"), que o C# ligaria a esta
+    public async Task SondaComCorpo(string servico, string corpo)
     {
         sondas.Add(servico);
         Exigir(await api.Enviar("PUT", $"{Gancho}/sondas/{servico}", corpo), 204, $"PUT {Gancho}/sondas/{servico}");
@@ -161,7 +162,7 @@ public sealed class AuditoriaDoTime(Mundo mundo, Api api, Relogio relogio, Execu
         var o = new JsonObject { ["resposta"] = resposta };
         if (tempoMs is { } t) o["tempoMs"] = t;
         if (ultima is { } u) o["ultimaExecucao"] = Iso(u);
-        return Sonda(servico, o.ToJsonString());
+        return SondaComCorpo(servico, o.ToJsonString());
     }
 
     public async Task SondaFim(string servico)
@@ -239,6 +240,24 @@ public sealed class AuditoriaDoTime(Mundo mundo, Api api, Relogio relogio, Execu
     // quem e conta vêm do gancho de registros (v05): ids reais da Maria, da conta EBFGA e da conta master
     public async Task<(string Maria, string Conta, string Master)> Ids() =>
         ((await MariaDoUsuarios()).Id, await mundo.Conta(), await mundo.Traduzir("usr-ebfga-master"));
+
+    // os 4 passos de DESATIVAR_USUARIO da Maria sobre o Paulo, com o traceId do exemplo de RF-202 (o gancho aceita quem, conta e alvo).
+    // Uma vez por cenário: o RF-202 e o "o que é gravado" (RN-325, v09) trazem o mesmo Dado.
+    bool passosGravados;
+
+    public async Task GravarPassosDoExemplo()
+    {
+        if (passosGravados) return;
+        passosGravados = true;
+        var (maria, conta, _) = await Ids();
+        var paulo = await mundo.Traduzir("usr-ebfga-paulo");
+        var passos = new[]
+        {
+            ("DESATIVAR_USUARIO", "INICIADO", "13:20:14.102"), ("ENCERRAR_SESSOES_DO_USUARIO", "INICIADO", "13:20:14.190"),
+            ("ENCERRAR_SESSOES_DO_USUARIO", "CONCLUIDO", "13:20:14.251"), ("DESATIVAR_USUARIO", "CONCLUIDO", "13:20:14.286"),
+        };
+        await Registrar(passos.Select(p => (JsonNode)Registro("trc-1d6e3f08", p.Item2, p.Item1, Hora(p.Item3), null, maria, conta, paulo)));
+    }
 
     // registros para os filtros (RF-200): ações da Maria na EBFGA, um alerta, um erro e uma ação do SAC
     public async Task SemearRegistros()

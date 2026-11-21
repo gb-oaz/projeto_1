@@ -126,13 +126,14 @@ public sealed record RespostaDaSondaDeTeste(string Resposta, int? TempoMs, DateT
     // NORMAL sem o tempo: 10 ms
     public const int TempoDaNormal = 10;
 
+    // A última execução vai em todas as respostas: os agendamentos usam só ela e ignoram a "resposta", mesmo a de falha (RN-315)
     public ResultadoDaSonda Resultado() => Resposta switch
     {
         "NORMAL" => new ResultadoDaSonda(TempoMs ?? TempoDaNormal, UltimaExecucao: UltimaExecucao),
         "LENTA" => new ResultadoDaSonda(TempoMs ?? TempoDaLenta, UltimaExecucao: UltimaExecucao),
-        "NENHUMA" => ResultadoDaSonda.Falhou(FalhaDaVerificacao.SemResposta),
-        "RECUSADA" => ResultadoDaSonda.Falhou(FalhaDaVerificacao.ConexaoRecusada),
-        _ => ResultadoDaSonda.Falhou(FalhaDaVerificacao.RespostaComErro),
+        "NENHUMA" => ResultadoDaSonda.Falhou(FalhaDaVerificacao.SemResposta) with { UltimaExecucao = UltimaExecucao },
+        "RECUSADA" => ResultadoDaSonda.Falhou(FalhaDaVerificacao.ConexaoRecusada) with { UltimaExecucao = UltimaExecucao },
+        _ => ResultadoDaSonda.Falhou(FalhaDaVerificacao.RespostaComErro) with { UltimaExecucao = UltimaExecucao },
     };
 }
 
@@ -145,6 +146,8 @@ public sealed class SondasDeTeste
     public void Definir(Servico servico, RespostaDaSondaDeTeste resposta) => respostas[servico.Id] = resposta;
 
     public void Remover(Servico servico) => respostas.TryRemove(servico.Id, out _);
+
+    public void Limpar() => respostas.Clear();
 
     public RespostaDaSondaDeTeste? De(Servico servico) => respostas.GetValueOrDefault(servico.Id);
 }

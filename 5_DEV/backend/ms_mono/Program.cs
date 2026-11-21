@@ -229,7 +229,8 @@ var identidade = new IdentidadeDaInstancia(
     Environment.GetEnvironmentVariable("CONTAINER_APP_REPLICA_NAME") is { Length: > 0 } replica ? replica : Environment.MachineName,
     typeof(Program).Assembly.GetName().Version?.ToString(3) ?? "0.0.0", DateTimeOffset.UtcNow, emProducao ? "PRODUCAO" : "HOMOLOGACAO");
 servicos.AddSingleton(identidade);
-servicos.AddSingleton<IUltimaVerificacao, UltimaVerificacaoEmMemoria>();
+servicos.AddSingleton<UltimaVerificacaoEmMemoria>();
+servicos.AddSingleton<IUltimaVerificacao>(s => s.GetRequiredService<UltimaVerificacaoEmMemoria>());
 servicos.AddSingleton<IInstancias, InstanciasNoRedis>();
 servicos.AddSingleton<ITravaDaAuditoria, TravaDaAuditoriaNoRedis>();
 servicos.AddSingleton<IHistoricoDaSaude, HistoricoDaSaudeNoBanco>();

@@ -129,6 +129,18 @@ public sealed class MetricasTests
     }
 
     [Fact]
+    public void RNF_247_acumulador_limpo_nao_guarda_mais_nada_para_gravar()
+    {
+        var acumulador = new AcumuladorDeMedicoes();
+        acumulador.Somar("GET", "/sac/chamados", 200, 10, new DateTimeOffset(2026, 11, 20, 13, 31, 30, TimeSpan.Zero));
+
+        acumulador.Limpar();
+
+        Assert.Equal(0, acumulador.Esperando);
+        Assert.Empty(acumulador.Retirar(DateTimeOffset.MaxValue));
+    }
+
+    [Fact]
     public void RF_197_janelas_pontos_passos_e_limites()
     {
         var agora = new DateTimeOffset(2026, 11, 20, 13, 42, 20, TimeSpan.Zero);

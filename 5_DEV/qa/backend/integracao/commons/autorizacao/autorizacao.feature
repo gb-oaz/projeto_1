@@ -1,5 +1,5 @@
 # language: pt
-# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.md (v35), copiados do requisito:
+# Cenários de API de 1_Requisitos/17_modulo-usuario-b-autorizacao.md (v37), copiados do requisito:
 # mudou lá, muda aqui. Cada cenário leva a tag do ID que cobre.
 Funcionalidade: Autorização
   1_Requisitos/17_modulo-usuario-b-autorizacao.md · Cenários de API
@@ -210,8 +210,8 @@ Funcionalidade: Autorização
 
     Exemplos:
       | quem           | frente | módulos                                               | abas     |
-      | administrador  | hub    | SAC, Usuários, Catálogo e Pagamento                   | C e U    |
-      | membro do time | hub    | os marcados entre SAC, Usuários e Catálogo            | marcadas |
+      | administrador  | hub    | SAC, Usuários, Catálogo, Pagamento e Auditoria        | C e U    |
+      | membro do time | hub    | os marcados entre SAC, Usuários, Catálogo e Auditoria | marcadas |
       | conta master   | hub    | todos os da conta e os contratados usados no hub      | C e U    |
       | autônomo       | hub    | todos os da conta e os contratados usados no hub      | C e U    |
       | staff          | hub    | os marcados pela conta master                         | marcadas |

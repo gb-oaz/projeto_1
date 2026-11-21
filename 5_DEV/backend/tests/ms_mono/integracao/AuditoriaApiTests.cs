@@ -1,5 +1,8 @@
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 using Boaz.Core.Hub.Auditoria.Metricas.Ports.In;
+using Boaz.MsMono.Secundario.Out.Commons;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Boaz.MsMono.Tests.Integracao;
@@ -16,6 +19,10 @@ public class AuditoriaApiTests(Backend backend) : IClassFixture<Backend>
     {
         var admin = await preparo.Admin();
         using var cliente = backend.Cliente();
+        // O Redis é o de verdade e o admin é sempre o mesmo: a consulta de uma rodada anterior, há menos de 5 min,
+        // tornaria esta repetida (RN-325) e nada seria gravado. Apaga só a chave que os próprios testes criaram.
+        var alvo = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes("/auditoria/saude")))[..16];
+        await backend.Services.GetRequiredService<Armazenamento>().Cache.KeyDeleteAsync($"auditoria:consulta:{admin.Id}:{alvo}");
 
         var saude = await cliente.Enviar("GET", "/auditoria/saude", token: admin.Token);
 
@@ -170,7 +177,7 @@ public class AuditoriaApiTests(Backend backend) : IClassFixture<Backend>
         using var cliente = backend.Cliente();
 
         foreach (var (metodo, caminho) in new[] { ("PUT", "/_teste/auditoria/sondas/cache"), ("POST", "/_teste/auditoria/verificacao"), ("POST", "/_teste/auditoria/agendamento"),
-            ("POST", "/_teste/auditoria/registros"), ("POST", "/_teste/auditoria/medicoes") })
+            ("POST", "/_teste/auditoria/registros"), ("POST", "/_teste/auditoria/medicoes"), ("POST", "/_teste/auditoria/reiniciar") })
         {
             Assert.Equal(HttpStatusCode.NotFound, (await cliente.Enviar(metodo, caminho, "{}")).Status);
         }

@@ -161,7 +161,8 @@ public sealed class MedicoesNoBanco(Armazenamento armazenamento) : IMedicoes
     static (string Colecao, string Campo) De(Janela janela) => janela.PorHora() ? (Colecoes.MedicoesHora, "hora") : (Colecoes.MedicoesMinuto, "minuto");
 
     // 1h: os minutos de de até ate (exclusive; a série para aí, com os 60 pontos); as outras: as horas de de até ate, a atual inclusive.
-    // Os totais da janela (resumo e endereços) incluem também o minuto de agora, para o pedido recém-feito já contar.
+    // O resumo vai só de "de" até "ate", como a série (RF-197: 1.240 pedidos entre 12:42 e 13:42); só o tempo de cada endereço (RF-198)
+    // inclui também o minuto de agora (comAtual), para o pedido recém-feito já contar.
     static BsonDocument Periodo(string campo, bool porHora, DateTimeOffset de, DateTimeOffset ate, string? modulo, bool comAtual = false)
     {
         var filtro = new BsonDocument(campo, new BsonDocument
@@ -212,7 +213,7 @@ public sealed class MedicoesNoBanco(Armazenamento armazenamento) : IMedicoes
         BancoDaAuditoria.Lendo(async () =>
         {
             var (colecao, campo) = De(janela);
-            var grupos = await Agrupar(colecao, Periodo(campo, janela.PorHora(), de, ate, modulo, comAtual: true), BsonNull.Value, ct);
+            var grupos = await Agrupar(colecao, Periodo(campo, janela.PorHora(), de, ate, modulo), BsonNull.Value, ct);
             return grupos.Count == 0 ? ResumoDeMedicoes.Vazio : Resumo(grupos[0]);
         });
 

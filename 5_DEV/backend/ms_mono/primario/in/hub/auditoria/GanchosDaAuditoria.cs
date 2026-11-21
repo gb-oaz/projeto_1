@@ -110,6 +110,20 @@ public sealed partial class GanchosDaAuditoria(TimeProvider relogio) : Controlle
         return StatusCode(StatusCodes.Status201Created);
     }
 
+    /// <summary>
+    /// Esquece o estado em memória desta instância: as sondas trocadas, a última verificação e as medições que esperam para gravar. O qa o
+    /// chama a cada cenário, junto com a limpeza do banco e do Redis, para nada de um cenário aparecer no seguinte.
+    /// </summary>
+    [HttpPost("reiniciar")]
+    public IActionResult Reiniciar([FromServices] SondasDeTeste sondas, [FromServices] UltimaVerificacaoEmMemoria ultima,
+        [FromServices] AcumuladorDeMedicoes acumulador)
+    {
+        sondas.Limpar();
+        ultima.Limpar();
+        acumulador.Limpar();
+        return NoContent();
+    }
+
     /// <summary>Roda agora o fechamento do minuto do card e o descarte do que passou da guarda.</summary>
     [HttpPost("agendamento")]
     public async Task<IActionResult> Agendamento([FromServices] IFecharCardEDescartar fechar, CancellationToken ct)

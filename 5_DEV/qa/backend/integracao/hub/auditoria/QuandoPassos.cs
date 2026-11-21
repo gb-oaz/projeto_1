@@ -282,6 +282,10 @@ public sealed partial class QuandoPassos(Mundo mundo, Api api, Partida partida, 
     public async Task ChegaEGravado(string metodo, string endereco)
     {
         var caio = await a.Caio();
+        // a conta master e a sessão dela (POST /contas, POST /auth/hub/entrar) nascem antes do "antes": o preparo não é o pedido do cenário
+        if (!endereco.StartsWith("/auditoria", StringComparison.Ordinal) && !endereco.StartsWith("/_teste", StringComparison.Ordinal))
+            await mundo.SessaoParaPedido(await mundo.Master());
+        await a.GravarMedicoes();
         var antes = Chaves((await a.Pedir(caio, "GET", "/auditoria/metricas/enderecos?janela=1h&limite=100")).Corpo);
         await a.GravarMedicoes();
         await Enviar(metodo, endereco);

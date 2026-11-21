@@ -131,7 +131,7 @@ public sealed partial class DadosPassos(Mundo mundo, Partida partida, AuditoriaD
         var json = corpo.StartsWith("\"ultimaExecucao\"", StringComparison.Ordinal)
             ? "{\"resposta\": \"NORMAL\", " + corpo + "}"
             : "{" + corpo + "}";
-        await a.Sonda(servico, json);
+        await a.SondaComCorpo(servico, json);
         a.Definidos.Add(servico);
         if (servico == "agendamento-sac") ultimaDoAgendamento = Regex.Match(corpo, @"""ultimaExecucao"": ""([^""]+)""").Groups[1].Value;
     }
@@ -141,7 +141,7 @@ public sealed partial class DadosPassos(Mundo mundo, Partida partida, AuditoriaD
     // RN-315: para os agendamentos a sonda usa só "ultimaExecucao" e ignora "resposta"
     [Given(@"^""resposta"": ""ERRO"" no mesmo corpo$")]
     public async Task RespostaNoMesmoCorpo() =>
-        await a.Sonda("agendamento-sac", "{\"resposta\": \"ERRO\", \"ultimaExecucao\": \"" + ultimaDoAgendamento + "\"}");
+        await a.SondaComCorpo("agendamento-sac", "{\"resposta\": \"ERRO\", \"ultimaExecucao\": \"" + ultimaDoAgendamento + "\"}");
 
     // RN-324: o MOD-01 LENTO pelas medições injetadas (1ª falha seguida) e depois sem pedidos
     [Given(@"^o MOD-01 LENTO desde (\S+), com a ocorrência aberta pelas medições injetadas$")]
@@ -334,6 +334,9 @@ public sealed partial class DadosPassos(Mundo mundo, Partida partida, AuditoriaD
             .Select(m => (JsonNode)Registro(traceId, m.Groups[1].Value, "MUDAR_ESTADO_CONTA", Hora(m.Groups[2].Value),
                 m.Groups[1].Value switch { "ALERTA" => "MATRICULA_EM_USO", "ERRO" => "BANCO_INDISPONIVEL", _ => null }));
         await a.Registrar(itens);
+        // o GET seguinte ("envia GET …") é o passo genérico da Autorização, que não acerta a hora: o relógio já marca o "às 13:42:00"
+        // do cenário (e não 10 s antes), para o limite de 5 min da execução interrompida (RN-318)
+        if (a.HoraFixa is { } hora) await a.Acertar(hora);
     }
 
     [Given(@"^todos com ""acao"": ""MUDAR_ESTADO_CONTA""$")]
@@ -377,18 +380,13 @@ public sealed partial class DadosPassos(Mundo mundo, Partida partida, AuditoriaD
     [Given(@"^cada um com a ""acao"", a ""etapa"" e o ""quando"" do passo esperado abaixo$")]
     public static void PassosDoExemplo() { }
 
+    // RN-325 (v09): o mesmo Dado do RF-202, "cada um como na execução concluída"
+    [Given(@"^cada um como na execução concluída do RF-202-api$")]
     [Given(@"^todos com ""quem"": ""usr-ebfga-maria"", ""conta"": ""conta-ebfga"" e ""alvo"": ""usr-ebfga-paulo""$")]
     public async Task PassosGravados()
     {
         mundo.Sujeito = await a.Caio();
-        var (maria, conta, _) = await a.Ids();
-        var paulo = await mundo.Traduzir("usr-ebfga-paulo");
-        var passos = new[]
-        {
-            ("DESATIVAR_USUARIO", "INICIADO", "13:20:14.102"), ("ENCERRAR_SESSOES_DO_USUARIO", "INICIADO", "13:20:14.190"),
-            ("ENCERRAR_SESSOES_DO_USUARIO", "CONCLUIDO", "13:20:14.251"), ("DESATIVAR_USUARIO", "CONCLUIDO", "13:20:14.286"),
-        };
-        await a.Registrar(passos.Select(p => (JsonNode)Registro("trc-1d6e3f08", p.Item2, p.Item1, Hora(p.Item3), null, maria, conta, paulo)));
+        await a.GravarPassosDoExemplo();
         mundo.FolgaDasDatas = TimeSpan.FromMinutes(1);
     }
 
@@ -457,7 +455,7 @@ public sealed partial class DadosPassos(Mundo mundo, Partida partida, AuditoriaD
     [Given(@"^o Caio com GET (/auditoria/\S+) aberto$")]
     public async Task CaioConectado(string caminho) => await a.Abrir(await a.Caio(), caminho);
 
-    [Given(@"^o Caio com 3 conexões em (/auditoria/registros/ao-vivo)$")]
+    [Given(@"^o Caio com 3 conexões em (/auditoria/(?:registros|saude)/ao-vivo)$")]
     public async Task TresConexoes(string caminho)
     {
         var caio = await a.Caio();

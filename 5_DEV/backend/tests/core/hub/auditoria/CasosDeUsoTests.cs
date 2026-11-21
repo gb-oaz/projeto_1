@@ -538,7 +538,7 @@ public sealed class CasosDeUsoTests
             ("alvo", () => listar.Executar(null, null, null, "fila", null, null, null, Consulta())),
             ("para", () => listar.Executar(null, null, null, null, "COM_FALHAS", null, null, Consulta())),
             ("limite", () => listar.Executar(null, null, null, null, null, null, "201", Consulta())),
-            ("ate", () => listar.Executar("2026-10-20T13:59:59Z", null, null, null, null, null, null, Consulta())),
+            ("ate", () => listar.Executar("2026-10-20T13:59:59Z", "2026-11-20T14:00:00Z", null, null, null, null, null, Consulta())),
         })
         {
             Assert.Equal(campo, (await Assert.ThrowsAsync<FalhaDaAuditoria>(chamada)).Campo);

@@ -558,6 +558,9 @@ public sealed partial class EntaoPassos(Mundo mundo, AuditoriaDoTime a, Execucoe
     [Then(@"^a resposta é 204, card do minuto e descarte já feitos$")]
     public void Sem204Agendamento() => Respostas.Confere(mundo.Ultima, 204);
 
+    [Then(@"^a resposta é 204, sondas trocadas e medições zeradas$")]
+    public void Sem204Reiniciar() => Respostas.Confere(mundo.Ultima, 204);
+
     [Then(@"^a resposta é 422 DADOS_INVALIDOS sem ""resposta""$")]
     public void SemResposta() { Respostas.Confere(mundo.Ultima, 422, "DADOS_INVALIDOS"); Assert.Equal("resposta", Txt(Corpo, "campo")); }
 

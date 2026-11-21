@@ -435,8 +435,9 @@ public sealed partial class AutorizacaoPassos(Mundo mundo, Execucoes execucoes)
         switch (quemEntrou)
         {
             case "administrador":
-                // SAC, Usuários e Catálogo com as duas abas; o Pagamento só com "U", para o card (RN-233)
-                Comparacao.Confere(ComoJson(new() { ["MOD-01"] = "U", ["MOD-02"] = "CU", ["MOD-03"] = "CU", ["MOD-14"] = "CU" }), mods, exato: true);
+                // SAC, Usuários e Catálogo com as duas abas; o Pagamento só com "U", para o card (RN-233); e a Auditoria (MOD-17, do time,
+                // 20 RN-314), que o administrador também usa e o 17 RN-233 ainda não cita
+                Comparacao.Confere(ComoJson(new() { ["MOD-01"] = "U", ["MOD-02"] = "CU", ["MOD-03"] = "CU", ["MOD-14"] = "CU", ["MOD-17"] = "CU" }), mods, exato: true);
                 break;
             case "membro do time":
                 Comparacao.Confere(ComoJson(new() { ["MOD-02"] = "U" }), mods, exato: true);

@@ -591,9 +591,13 @@ public sealed partial class SacPassos(Mundo mundo, ChamadosDoExemplo sac, Execuc
     }
 
     // as frases do card são as mesmas no 18 e no 19 (15 RN-276, RN-279): o
-    // módulo sai do endereço pedido (/pagamento/card → MOD-01; /sac/card → MOD-02)
-    static string ModuloDoCard(string? caminho) =>
-        caminho?.StartsWith("/pagamento/", StringComparison.Ordinal) == true ? "MOD-01" : "MOD-02";
+    // módulo sai do endereço pedido (/pagamento/card → MOD-01; /sac/card → MOD-02; /auditoria/card → MOD-17)
+    static string ModuloDoCard(string? caminho) => caminho switch
+    {
+        _ when caminho?.StartsWith("/pagamento/", StringComparison.Ordinal) == true => "MOD-01",
+        _ when caminho?.StartsWith("/auditoria/", StringComparison.Ordinal) == true => "MOD-17",
+        _ => "MOD-02",
+    };
 
     // ── configuração (RF-181) ──────────────────────────────────────────────
     [Then(@"^a resposta é 200 e GET /sac/configuracao traz os prazos novos$")]
