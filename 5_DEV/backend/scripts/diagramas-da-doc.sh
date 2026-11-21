@@ -21,6 +21,7 @@ legendas=(
   autorizacao-casos-de-uso autorizacao-sequencia autorizacao-contrato-api autorizacao-classes autorizacao-documentos
   sac-casos-de-uso sac-sequencia sac-inicializacao-sequencia sac-contrato-api sac-classes sac-hexagonal sac-documentos
   pagamento-casos-de-uso pagamento-sequencia pagamento-contrato-api pagamento-classes pagamento-hexagonal pagamento-documentos
+  auditoria-casos-de-uso auditoria-sequencia auditoria-contrato-api auditoria-classes auditoria-documentos
 )
 
 mkdir -p "$destino"

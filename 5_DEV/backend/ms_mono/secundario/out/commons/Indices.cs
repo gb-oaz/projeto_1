@@ -97,6 +97,31 @@ public sealed class Indices(Armazenamento armazenamento, ILogger<Indices> log)
         (Colecoes.AvisosDoBanco, Comum(Chave.Ascending("traceId"), "traceId")),
         (Colecoes.AvisosPagamento, Comum(Chave.Ascending("contaId").Ascending("encerradoEm"), "contaId_encerradoEm")),
         (Colecoes.Cobrancas, Comum(Chave.Ascending("competencia"), "competencia")),
+        // Auditoria (auditoria-documentos v02, RNF-251): nenhum é único, então nenhum para a partida. As leituras vão do mais novo
+        // ao mais antigo; auditoria e auditoriaErros ganham os índices por hora, por ação, por conta, por quem, por nível e por código
+        (Colecoes.VerificacoesSaude, Comum(Chave.Ascending("servico").Descending("quando"), "servico_quando")),
+        (Colecoes.VerificacoesSaude, Comum(Chave.Ascending("guardarAte"), "guardarAte")),
+        (Colecoes.QuedasServico, Comum(Chave.Ascending("servico").Descending("inicio"), "servico_inicio")),
+        (Colecoes.QuedasServico, Comum(Chave.Ascending("guardarAte"), "guardarAte")),
+        (Colecoes.MedicoesMinuto, Comum(Chave.Ascending("minuto"), "minuto")),
+        (Colecoes.MedicoesMinuto, Comum(Chave.Ascending("modulo").Ascending("minuto"), "modulo_minuto")),
+        (Colecoes.MedicoesMinuto, Comum(Chave.Ascending("guardarAte"), "guardarAte")),
+        (Colecoes.MedicoesHora, Comum(Chave.Ascending("hora"), "hora")),
+        (Colecoes.MedicoesHora, Comum(Chave.Ascending("modulo").Ascending("hora"), "modulo_hora")),
+        (Colecoes.MedicoesHora, Comum(Chave.Ascending("guardarAte"), "guardarAte")),
+        (Colecoes.CardAuditoria, Comum(Chave.Ascending("guardarAte"), "guardarAte")),
+        (Colecoes.Ocorrencias, Comum(Chave.Descending("quando"), "quando_desc")),
+        (Colecoes.Ocorrencias, Comum(Chave.Ascending("alvo").Descending("quando"), "alvo_quando")),
+        (Colecoes.Ocorrencias, Comum(Chave.Ascending("para").Descending("quando"), "para_quando")),
+        (Colecoes.Ocorrencias, Comum(Chave.Ascending("guardarAte"), "guardarAte")),
+        (Colecoes.Auditoria, Comum(Chave.Descending("quando"), "quando_desc")),
+        (Colecoes.Auditoria, Comum(Chave.Ascending("acao").Descending("quando"), "acao_quando")),
+        (Colecoes.Auditoria, Comum(Chave.Ascending("contaId").Descending("quando"), "contaId_quando_desc")),
+        (Colecoes.Auditoria, Comum(Chave.Ascending("quem").Descending("quando"), "quem_quando")),
+        (Colecoes.AuditoriaErros, Comum(Chave.Descending("quando"), "quando_desc")),
+        (Colecoes.AuditoriaErros, Comum(Chave.Ascending("nivel").Descending("quando"), "nivel_quando")),
+        (Colecoes.AuditoriaErros, Comum(Chave.Ascending("codigo").Descending("quando"), "codigo_quando")),
+        (Colecoes.AuditoriaErros, Comum(Chave.Ascending("acao").Descending("quando"), "acao_quando")),
     ];
 
     // Cria os índices; devolve quantos não únicos não puderam ser criados.

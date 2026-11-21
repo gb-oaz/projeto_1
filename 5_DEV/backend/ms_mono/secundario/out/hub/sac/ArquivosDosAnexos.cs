@@ -32,6 +32,10 @@ public sealed class ArquivosDosAnexos : IArquivos
         return Destino;
     }
 
+    // a sonda da Auditoria (20 RN-315): o armazenamento do destino responde
+    public Task Verificar(CancellationToken ct = default) =>
+        Destino == ArmazenamentoDoAnexo.Blob ? blob!.Verificar(ct) : gridFs.Verificar(ct);
+
     public Task<Stream?> Abrir(ArmazenamentoDoAnexo armazenamento, string objeto, CancellationToken ct = default) =>
         armazenamento == ArmazenamentoDoAnexo.Blob
             ? blob?.Abrir(objeto, ct) ?? Task.FromResult<Stream?>(null)

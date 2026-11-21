@@ -14,6 +14,7 @@ Todas rodam no **ms_mono**, o backend único do deboaz (contextos `landing_page`
 | **Autorização** | `/usuarios/{id}/permissoes` | Permissões por módulo e aba, com If-Match, e o registro de mudanças |
 | **SAC** | `/sac/chamados`, `/sac/anexos`, `/sac/configuracao`, `/sac/card` | Chamados da conta com o time deboaz: conversa (e ao vivo), anexos, atendimento, avaliação, prazos por categoria e o card |
 | **Pagamento** | `/pagamento/faturas`, `/pagamento/pagamentos`, `/pagamento/recebimentos`, `/pagamento/card`, `/pagamento/notificacoes` | Faturas mensais da conta, pagamento por PIX, cartão ou boleto (e ao vivo), PDFs, aviso do banco, recebimentos, estornos, configuração e o card |
+| **Auditoria** | `/auditoria/saude`, `/auditoria/metricas`, `/auditoria/registros`, `/auditoria/execucoes`, `/auditoria/ocorrencias`, `/auditoria/card` | Saúde dos serviços e dos módulos, tempo de resposta, registros e execuções da auditoria, ocorrências (e ao vivo) e o card, só para o time deboaz |
 
 ### Por onde começar
 

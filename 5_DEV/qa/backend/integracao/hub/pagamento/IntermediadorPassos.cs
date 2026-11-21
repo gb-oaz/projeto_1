@@ -46,10 +46,10 @@ public sealed partial class PagamentoPassos
     // o aviso que "avisosDoBanco" guardou com o traceId da resposta
     static async Task<BsonDocument> AvisoGuardado(IMongoCollection<BsonDocument> colecao, Resposta r)
     {
-        var traceId = Auditoria.TraceIdDoCabecalho(r);
+        var traceId = Suporte.Auditoria.TraceIdDoCabecalho(r);
         var avisos = await Documentos(colecao);
-        var aviso = avisos.FirstOrDefault(d => Auditoria.Texto(d, "traceId") == traceId);
-        Assert.True(aviso is not null, $"esperava em \"{AvisosDoBanco}\" o aviso com o traceId {traceId} do X-Trace-Id, vieram {Auditoria.Resumo(avisos)}");
+        var aviso = avisos.FirstOrDefault(d => Suporte.Auditoria.Texto(d, "traceId") == traceId);
+        Assert.True(aviso is not null, $"esperava em \"{AvisosDoBanco}\" o aviso com o traceId {traceId} do X-Trace-Id, vieram {Suporte.Auditoria.Resumo(avisos)}");
         return aviso;
     }
 
@@ -58,15 +58,15 @@ public sealed partial class PagamentoPassos
 
     static void ConfereAviso(BsonDocument aviso, string intermediador, bool assinaturaValida, string resultado, string? idExterno = null)
     {
-        Assert.True(Auditoria.Texto(aviso, "intermediador") == intermediador && Booleano(aviso, "assinaturaValida") == assinaturaValida
-            && Auditoria.Texto(aviso, "resultado") == resultado && (idExterno is null || Auditoria.Texto(aviso, "idExterno") == idExterno),
+        Assert.True(Suporte.Auditoria.Texto(aviso, "intermediador") == intermediador && Booleano(aviso, "assinaturaValida") == assinaturaValida
+            && Suporte.Auditoria.Texto(aviso, "resultado") == resultado && (idExterno is null || Suporte.Auditoria.Texto(aviso, "idExterno") == idExterno),
             $"esperava o aviso de {intermediador}, assinaturaValida {assinaturaValida.ToString().ToLowerInvariant()}, resultado {resultado}"
             + (idExterno is null ? "" : $" e idExterno {idExterno}") + $": {aviso.ToJson()}");
     }
 
     async Task<BsonDocument> DocumentoDoPagamento(string id)
     {
-        var doc = (await Documentos(DoBackend("pagamentos"))).FirstOrDefault(d => Auditoria.Texto(d, "_id") == id);
+        var doc = (await Documentos(DoBackend("pagamentos"))).FirstOrDefault(d => Suporte.Auditoria.Texto(d, "_id") == id);
         Assert.True(doc is not null, $"esperava o pagamento {id} na coleção \"pagamentos\"");
         return doc;
     }
@@ -183,9 +183,9 @@ public sealed partial class PagamentoPassos
         if (ocorrencias.Count > 0) return;
         await AvisoSemEfeito("com a assinatura inválida");
         execucaoRecusada = execucoes.Resultados.Count - 1;
-        ocorrencias["RECUSADO"] = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        ocorrencias["RECUSADO"] = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
         await AvisoSemEfeito("de pagamento externo desconhecido");
-        ocorrencias["DESCONHECIDO"] = Auditoria.TraceIdDoCabecalho(mundo.Ultima);
+        ocorrencias["DESCONHECIDO"] = Suporte.Auditoria.TraceIdDoCabecalho(mundo.Ultima);
     }
 
     [Then(@"^os avisos ""RECUSADO"" e ""DESCONHECIDO"" de ""avisosDoBanco"" são o que o time deboaz confere$")]
@@ -195,8 +195,8 @@ public sealed partial class PagamentoPassos
         var avisos = await Documentos(DoBackend(AvisosDoBanco));
         foreach (var (resultado, traceId) in ocorrencias)
         {
-            Assert.True(avisos.Any(d => Auditoria.Texto(d, "resultado") == resultado && Auditoria.Texto(d, "traceId") == traceId),
-                $"esperava em \"{AvisosDoBanco}\" o aviso {resultado} com o traceId {traceId}, vieram {Auditoria.Resumo(avisos)}");
+            Assert.True(avisos.Any(d => Suporte.Auditoria.Texto(d, "resultado") == resultado && Suporte.Auditoria.Texto(d, "traceId") == traceId),
+                $"esperava em \"{AvisosDoBanco}\" o aviso {resultado} com o traceId {traceId}, vieram {Suporte.Auditoria.Resumo(avisos)}");
         }
     }
 
@@ -205,9 +205,9 @@ public sealed partial class PagamentoPassos
     {
         await Ocorrencias();
         Respostas.Confere(execucoes.Resultados[execucaoRecusada], 401, "ASSINATURA_INVALIDA");
-        var erros = await execucoes.Novos(Auditoria.Erros, execucaoRecusada);
-        Assert.True(erros.Any(d => Auditoria.Texto(d, "traceId") == ocorrencias["RECUSADO"]),
-            $"esperava em \"auditoriaErros\" o 401 com o traceId {ocorrencias["RECUSADO"]}, vieram {Auditoria.Resumo(erros)}");
+        var erros = await execucoes.Novos(Suporte.Auditoria.Erros, execucaoRecusada);
+        Assert.True(erros.Any(d => Suporte.Auditoria.Texto(d, "traceId") == ocorrencias["RECUSADO"]),
+            $"esperava em \"auditoriaErros\" o 401 com o traceId {ocorrencias["RECUSADO"]}, vieram {Suporte.Auditoria.Resumo(erros)}");
     }
 
     [Then(@"^o aviso repetido não soma nada em dobro$")]
@@ -257,7 +257,7 @@ public sealed partial class PagamentoPassos
         await PagarComPix(await mundo.Pedro(), await fat.Fat371(vencida: false));
         Respostas.Confere(mundo.Ultima, 201);
         var id = Texto(mundo.Ultima, "id");
-        Assert.True(Auditoria.Texto(await DocumentoDoPagamento(id), "intermediador") == "FALSO", $"esperava o {id} com \"intermediador\": \"FALSO\"");
+        Assert.True(Suporte.Auditoria.Texto(await DocumentoDoPagamento(id), "intermediador") == "FALSO", $"esperava o {id} com \"intermediador\": \"FALSO\"");
         await banco.PedidoDe(id);
     }
 
@@ -380,7 +380,7 @@ public sealed partial class PagamentoPassos
         if (caso == "MERCADO_PAGO")
         {
             var aviso = await AvisoGuardado(BancoDaPartida.Colecao(AvisosDoBanco), r);
-            Assert.True(Auditoria.Texto(aviso, "pagamentoId") is null, $"o aviso do Mercado Pago não podia achar pagamento nenhum: {aviso.ToJson()}");
+            Assert.True(Suporte.Auditoria.Texto(aviso, "pagamentoId") is null, $"o aviso do Mercado Pago não podia achar pagamento nenhum: {aviso.ToJson()}");
             return;
         }
         var (id, pagamento, _) = antes ?? throw new InvalidOperationException("o Quando não guardou o PIX");
@@ -388,12 +388,12 @@ public sealed partial class PagamentoPassos
         var agora = await fat.Pagamento(id);
         if (caso == "FALSO")
         {
-            Assert.True(Auditoria.Texto(guardado, "pagamentoId") == id && Auditoria.Texto(guardado, "idExterno") == await banco.IdExterno(id)
+            Assert.True(Suporte.Auditoria.Texto(guardado, "pagamentoId") == id && Suporte.Auditoria.Texto(guardado, "idExterno") == await banco.IdExterno(id)
                 && Campo(agora, "status") == "PAGO",
                 $"esperava o aviso ligado ao {id} pelo id externo e o pagamento PAGO: {guardado.ToJson()} {agora.ToJsonString()}");
             return;
         }
-        Assert.True(Auditoria.Texto(guardado, "pagamentoId") is null && JsonNode.DeepEquals(pagamento, agora),
+        Assert.True(Suporte.Auditoria.Texto(guardado, "pagamentoId") is null && JsonNode.DeepEquals(pagamento, agora),
             $"o aviso sem assinatura não podia achar nem mudar o {id}: {guardado.ToJson()} {agora.ToJsonString()}");
     }
 

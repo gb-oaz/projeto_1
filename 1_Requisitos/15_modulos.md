@@ -3,13 +3,13 @@ projeto: "boaz"
 documento: "15_modulos"
 tipo: "Funcionalidade"
 titulo: "Módulos"
-versao: "v32"
-data: "2026-11-15 00:41"
+versao: "v33"
+data: "2026-11-20 12:24"
 status: "Em revisão"
 objetivo: "definir como um módulo do deboaz é construído, para que todo módulo siga o mesmo molde antes de entrar no catálogo."
 ---
 
-> **boaz · Funcionalidade** · `15_modulos` · **v32** · 2026-11-15 00:41 · **Em revisão**
+> **boaz · Funcionalidade** · `15_modulos` · **v33** · 2026-11-20 12:24 · **Em revisão**
 
 # Módulos
 
@@ -842,6 +842,22 @@ Esquema do Cenário: registro do Mensagens
     | a conta master e o staff       | hub    | conversar com os participantes e os responsáveis |
 ```
 
+<a id="MOD-17"></a>
+
+### `MOD-17` Auditoria
+
+```gherkin
+Esquema do Cenário: registro da Auditoria
+  Dado o módulo "MOD-17" Auditoria, do time, sem custo, Especificado
+  E o documento 20_modulo-auditoria
+  Então <perfil> o usa no <frente> para <objetivo>
+
+  Exemplos:
+    | perfil                         | frente | objetivo                                         |
+    | o administrador                | hub    | ver a saúde, o tempo de resposta e os registros  |
+    | o membro do time com Auditoria | hub    | achar o que está fora e validar as execuções     |
+```
+
 <a id="ficha-do-modulo"></a>
 
 ### Ficha do módulo
@@ -1001,7 +1017,8 @@ Cenário: quarta conexão do mesmo usuário
 
 | Versão | Data | Mudança |
 |---|---|---|
-| **v32** | 2026-11-15 00:41 | `MOD-01` passa de Contas a Pagamento, Especificado, com o documento [19_modulo-pagamento](19_modulo-pagamento.md): a conta master, o autônomo e a staff delegada pagam a fatura; o administrador do deboaz acompanha os recebimentos |
+| **v33** | 2026-11-20 12:24 | `MOD-17` Auditoria registrado e Especificado, do time, sem custo, com o documento [20_modulo-auditoria](20_modulo-auditoria.md): o administrador e o membro do time com a Auditoria veem a saúde dos serviços, o tempo de resposta, os registros e as execuções |
+| v32 | 2026-11-15 00:41 | `MOD-01` passa de Contas a Pagamento, Especificado, com o documento [19_modulo-pagamento](19_modulo-pagamento.md): a conta master, o autônomo e a staff delegada pagam a fatura; o administrador do deboaz acompanha os recebimentos |
 | v31 | 2026-11-12 16:58 | `MOD-02` SAC Especificado, com o documento [18_modulo-sac](18_modulo-sac.md) |
 | v30 | 2026-11-09 09:05 | Gherkin sem vírgula logo depois de Dado, Então ou E (`RF-129`, `RF-133`, `RN-278`, `RN-279`, `RN-282`), sem mudar o comportamento |
 | v29 | 2026-11-09 03:21 | `RN-279`: a linha "Intervalo" só aparece com "Ao vivo" marcado; `RN-282`: aviso em snackbar sem ação que some sozinho, com "Na abertura" visível no seletor; "reconectando…" nos cards sem travar a tela; SESSAO_TERMINADA leva à tela de entrada, sem aviso de pausa |
@@ -1010,9 +1027,7 @@ Cenário: quarta conexão do mesmo usuário
 | v26 | 2026-11-08 23:16 | Card comum de todo módulo: `RN-276` (perfis da ficha, o participante pode ser um; ícone do Catálogo; GET /<modulo>/card com todos os tamanhos), `RN-277` recortes dia, semana e mês, `RN-278` números guardados prontos, `RN-279` na abertura e ao vivo (GET /<modulo>/card/ao-vivo, 5 a 300 s, até 3 conexões); `RF-128` quatro tamanhos; `RF-133`, `RN-218`, `RN-220` e a ficha do módulo ajustados; seção Cenários vira Cenários de tela e ganha Cenários de API; status → Em revisão |
 | v25 | 2026-11-05 12:34 | Formato `.md`: migrado de `.html` sem mudar cenários, telas nem diagramas; links entre documentos apontam para `.md`; a [porta de entrada](#porta-de-entrada) cita os documentos em `.md` |
 | v24 | 2026-11-03 22:11 | Aprovado, sem pendências em aberto |
-| v23 | 2026-11-03 22:01 | Imagem enviada em SVG: toda imagem é convertida em SVG no hub ou no quest e enviada como texto (`RN-260`) |
-| v22 | 2026-11-03 10:48 | Registro do Catálogo (`MOD-14`) aponta para o documento renomeado 16_modulo-catalogo |
 
 ---
 
-<sub>boaz · v32 · 2026-11-15 00:41 · `1_Requisitos/15_modulos.md`</sub>
+<sub>boaz · v33 · 2026-11-20 12:24 · `1_Requisitos/15_modulos.md`</sub>

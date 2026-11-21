@@ -38,6 +38,12 @@ public sealed class ArquivosNoBlob(BlobContainerClient conteiner, bool criarCont
         return null;
     }
 
+    // a sonda da Auditoria (20 RN-315): o contêiner existe e responde
+    public async Task Verificar(CancellationToken ct = default)
+    {
+        if (!(await conteiner.ExistsAsync(ct)).Value) throw new InvalidOperationException("O contêiner dos anexos não existe.");
+    }
+
     // o contêiner, na partida (só quando a conexão é do Azurite)
     public Task Preparar() => conteinerPronto.Value;
 

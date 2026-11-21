@@ -1,3 +1,4 @@
+using Boaz.Core.Commons.Auditoria.Ports.Out;
 using Boaz.Core.Commons.Usuario.Usuarios.Domain;
 using Boaz.Core.Hub.Sac.Anexos.Ports.In;
 using Boaz.Core.Hub.Sac.Card.Ports.In;
@@ -12,7 +13,8 @@ namespace Boaz.MsMono.Primario.In.Hub.Sac;
 // expiraEm vencido, no Blob ou no GridFS (RN-292, RNF-234) e, quando o dia de
 // Brasília vira, o fechamento do card
 // (15 RN-278). Falha vai para o log e o minuto seguinte tenta de novo. O
-// relógio de teste roda as rotinas na hora (POST /_teste/sac/agendamento).
+// relógio de teste roda as rotinas na hora (POST /_teste/sac/agendamento). A cada rodada grava
+// a hora dela para a Auditoria (auditoria:ultimaExecucao:sac).
 public sealed class AgendamentoDoSac(IServiceProvider servicos, TravaDoAgendamentoNoRedis trava, TimeProvider relogio,
     ILogger<AgendamentoDoSac> log) : BackgroundService
 {
@@ -23,6 +25,9 @@ public sealed class AgendamentoDoSac(IServiceProvider servicos, TravaDoAgendamen
     {
         await servicos.GetRequiredService<IAplicarPrazos>().Executar(ct);
         await servicos.GetRequiredService<IDescartarAnexosVencidos>().Executar(ct);
+        // a rodada fica dita à Auditoria, que verifica o agendamento por ela (20 RN-315)
+        await servicos.GetRequiredService<IUltimaExecucaoDosAgendamentos>()
+            .Gravar(IUltimaExecucaoDosAgendamentos.Sac, servicos.GetRequiredService<TimeProvider>().GetUtcNow(), ct);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

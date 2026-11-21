@@ -1,4 +1,19 @@
 using Boaz.Core.Commons.Auditoria.Ports.Out;
+using Boaz.Core.Hub.Auditoria.Card.Ports.In;
+using Boaz.Core.Hub.Auditoria.Card.UseCases;
+using Boaz.Core.Hub.Auditoria.Execucoes.Ports.In;
+using Boaz.Core.Hub.Auditoria.Execucoes.UseCases;
+using Boaz.Core.Hub.Auditoria.Metricas.Domain;
+using Boaz.Core.Hub.Auditoria.Metricas.Ports.In;
+using Boaz.Core.Hub.Auditoria.Metricas.UseCases;
+using Boaz.Core.Hub.Auditoria.Ocorrencias.Ports.In;
+using Boaz.Core.Hub.Auditoria.Ocorrencias.UseCases;
+using Boaz.Core.Hub.Auditoria.Registros.Ports.In;
+using Boaz.Core.Hub.Auditoria.Registros.UseCases;
+using Boaz.Core.Hub.Auditoria.Saude.Domain;
+using Boaz.Core.Hub.Auditoria.Saude.Ports.In;
+using Boaz.Core.Hub.Auditoria.Saude.Ports.Out;
+using Boaz.Core.Hub.Auditoria.Saude.UseCases;
 using Boaz.Core.Commons.Usuario.Autenticacao.Ports.In;
 using Boaz.Core.Commons.Usuario.Autenticacao.UseCases;
 using Boaz.Core.Commons.Usuario.Autorizacao.Ports.In;
@@ -25,6 +40,7 @@ using Boaz.Core.Hub.Sac.Chamados.UseCases;
 using Boaz.Core.Hub.Sac.Configuracao.Ports.In;
 using Boaz.Core.Hub.Sac.Configuracao.UseCases;
 using Boaz.MsMono.Primario.In.Commons;
+using Boaz.MsMono.Primario.In.Hub.Auditoria;
 using Boaz.MsMono.Primario.In.Hub.Pagamento;
 using Boaz.MsMono.Primario.In.Hub.Sac;
 using Boaz.MsMono.Primario.In.Commons.Usuario.Usuarios;
@@ -37,10 +53,15 @@ using Boaz.MsMono.Secundario.Out.Commons.Usuario;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autenticacao;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario.Autorizacao;
 using Boaz.MsMono.Secundario.Out.Commons.Usuario.Usuarios;
+using Boaz.MsMono.Secundario.Out.Hub.Auditoria;
 using Boaz.MsMono.Secundario.Out.Hub.Pagamento;
 using Boaz.MsMono.Secundario.Out.Hub.Sac;
 using Boaz.MsMono.Sistema;
 using Microsoft.Extensions.Options;
+using AudCard = Boaz.Core.Hub.Auditoria.Card.Ports.Out;
+using AudMetricas = Boaz.Core.Hub.Auditoria.Metricas.Ports.Out;
+using AudOcorrencias = Boaz.Core.Hub.Auditoria.Ocorrencias.Ports.Out;
+using AudRegistros = Boaz.Core.Hub.Auditoria.Registros.Ports.Out;
 using Autenticacao = Boaz.Core.Commons.Usuario.Autenticacao.Ports.Out;
 using Autorizacao = Boaz.Core.Commons.Usuario.Autorizacao.Ports.Out;
 using PagConfiguracao = Boaz.Core.Hub.Pagamento.Configuracao.Ports.Out;
@@ -74,9 +95,12 @@ servicos.AddSingleton<Indices>();
 servicos.AddSingleton<RegistroDeModulos>();
 
 // commons/auditoria: auditoria e auditoriaErros, de todos os módulos
+// (decorada com o aviso ao vivo da Auditoria, 20 RNF-249: publica depois de gravar)
 servicos.AddSingleton<AuditoriaNoBanco>();
-servicos.AddSingleton<IAuditoria>(s => s.GetRequiredService<AuditoriaNoBanco>());
-servicos.AddSingleton<IAuditoriaDeErros>(s => s.GetRequiredService<AuditoriaNoBanco>());
+servicos.AddSingleton<AuditoriaComAviso>();
+servicos.AddSingleton<IAuditoria>(s => s.GetRequiredService<AuditoriaComAviso>());
+servicos.AddSingleton<IAuditoriaDeErros>(s => s.GetRequiredService<AuditoriaComAviso>());
+servicos.AddSingleton<IUltimaExecucaoDosAgendamentos, UltimaExecucaoNoRedis>();
 
 // commons/usuario/usuarios
 servicos.AddSingleton<IUsuarios, UsuariosNoBanco>();
@@ -200,6 +224,43 @@ servicos.AddSingleton<PagPagamentos.IDesenhoDoQrCode, DesenhoDoQrCode>();
 // a conta com fatura em aberto não é encerrada (17 RN-173, 19 RN-313): o 17 pergunta ao Pagamento
 servicos.AddSingleton<Boaz.Core.Commons.Usuario.Usuarios.Ports.Out.IContaTemFaturaEmAberto, ContaTemFaturaEmAbertoNoPagamento>();
 
+// hub/auditoria (auditoria-classes v03, auditoria-documentos v02): a saúde, as medições, os registros, as ocorrências e o card
+var identidade = new IdentidadeDaInstancia(
+    Environment.GetEnvironmentVariable("CONTAINER_APP_REPLICA_NAME") is { Length: > 0 } replica ? replica : Environment.MachineName,
+    typeof(Program).Assembly.GetName().Version?.ToString(3) ?? "0.0.0", DateTimeOffset.UtcNow, emProducao ? "PRODUCAO" : "HOMOLOGACAO");
+servicos.AddSingleton(identidade);
+servicos.AddSingleton<IUltimaVerificacao, UltimaVerificacaoEmMemoria>();
+servicos.AddSingleton<IInstancias, InstanciasNoRedis>();
+servicos.AddSingleton<ITravaDaAuditoria, TravaDaAuditoriaNoRedis>();
+servicos.AddSingleton<IHistoricoDaSaude, HistoricoDaSaudeNoBanco>();
+servicos.AddSingleton<AudMetricas.IMedicoes, MedicoesNoBanco>();
+servicos.AddSingleton<AcumuladorDeMedicoes>();
+servicos.AddSingleton<AudRegistros.ILeituraDaAuditoria, LeituraDaAuditoriaNoBanco>();
+servicos.AddSingleton<AudRegistros.INomesDaAuditoria, NomesDaAuditoriaNoBanco>();
+servicos.AddSingleton<AudRegistros.IAvisosDaAuditoria, AvisosDaAuditoriaPeloRedis>();
+servicos.AddSingleton<AudRegistros.IConsultasRecentes, ConsultasRecentesNoRedis>();
+servicos.AddSingleton<AudOcorrencias.IOcorrencias, OcorrenciasNoBanco>();
+servicos.AddSingleton<AudOcorrencias.IOcorrenciasAbertas, OcorrenciasAbertasNoRedis>();
+servicos.AddSingleton<AudOcorrencias.IAvisosDeOcorrencias, AvisosDeOcorrenciasPeloRedis>();
+servicos.AddSingleton<AudCard.ICardDaAuditoria, CardDaAuditoriaNoBanco>();
+servicos.AddSingleton<AudCard.IDescarteDaAuditoria, DescarteDaAuditoriaNoBanco>();
+servicos.AddSingleton<AudCard.IAcessoDoAoVivo, AcessoDoAoVivoDaAuditoria>();
+servicos.AddSingleton<SondasDeTeste>();
+servicos.AddSingleton<RegistrosDeTeste>();
+servicos.AddSingleton<ObservadoresDaSaude>();
+// uma sonda por serviço; com o relógio de teste, o gancho PUT /_teste/auditoria/sondas troca a resposta de cada uma
+var comSondasDeTeste = RelogioDaAplicacao.DeTesteLigado(builder.Configuration);
+void Sonda(Func<IServiceProvider, ISondaDeServico> criar) =>
+    servicos.AddSingleton<ISondaDeServico>(s => comSondasDeTeste ? new SondaComGancho(criar(s), s.GetRequiredService<SondasDeTeste>()) : criar(s));
+Sonda(_ => new SondaDaAplicacao());
+Sonda(s => new SondaDoBanco(s.GetRequiredService<Armazenamento>()));
+Sonda(s => new SondaDoCache(s.GetRequiredService<Armazenamento>()));
+Sonda(s => new SondaDoArmazenamento(s.GetRequiredService<ArquivosDosAnexos>()));
+Sonda(s => new SondaDaVerificacao(s.GetRequiredService<SacAnexos.IVerificacaoDeArquivos>()));
+Sonda(s => new SondaDoIntermediador(s.GetRequiredService<PagPagamentos.IIntermediadores>()));
+Sonda(s => new SondaDoAgendamento(Servico.AgendamentoSac, IUltimaExecucaoDosAgendamentos.Sac, s.GetRequiredService<IUltimaExecucaoDosAgendamentos>()));
+Sonda(s => new SondaDoAgendamento(Servico.AgendamentoPagamento, IUltimaExecucaoDosAgendamentos.Pagamento, s.GetRequiredService<IUltimaExecucaoDosAgendamentos>()));
+
 // ── core: cada porta de entrada ligada ao caso de uso dela ───────────────────
 // commons/usuario/autenticacao
 servicos.AddSingleton<IEntrarNoHub, EntrarNoHub>();
@@ -302,6 +363,30 @@ servicos.AddSingleton<ILerFormas, LerFormas>();
 servicos.AddSingleton<ILerCardDoPagamento, LerCardDoPagamento>();
 servicos.AddSingleton<IAcompanharCardDoPagamento, AcompanharCardDoPagamento>();
 
+// hub/auditoria
+servicos.AddSingleton<AoVivoDaAuditoria>();
+servicos.AddSingleton<LeitorDeRegistros>();
+servicos.AddSingleton<LeitorDaSaude>();
+servicos.AddSingleton<IRegistrarConsulta, RegistrarConsulta>();
+servicos.AddSingleton<IVerificarServicos, VerificarServicos>();
+servicos.AddSingleton<IVerSaude, VerSaude>();
+servicos.AddSingleton<IVerHistoricoDoServico, VerHistoricoDoServico>();
+servicos.AddSingleton<IAcompanharSaudeAoVivo, AcompanharSaudeAoVivo>();
+servicos.AddSingleton<IVerMetricas, VerMetricas>();
+servicos.AddSingleton<IVerTempoDosEnderecos, VerTempoDosEnderecos>();
+servicos.AddSingleton<IGravarMedicoes, GravarMedicoes>();
+servicos.AddSingleton<IConsultarRegistros, ConsultarRegistros>();
+servicos.AddSingleton<IAcompanharRegistrosAoVivo, AcompanharRegistrosAoVivo>();
+servicos.AddSingleton<IListarAcoes, ListarAcoes>();
+servicos.AddSingleton<IListarExecucoes, ListarExecucoes>();
+servicos.AddSingleton<IVerExecucao, VerExecucao>();
+servicos.AddSingleton<IVerOcorrenciasAbertas, VerOcorrenciasAbertas>();
+servicos.AddSingleton<IListarOcorrencias, ListarOcorrencias>();
+servicos.AddSingleton<IAcompanharOcorrenciasAoVivo, AcompanharOcorrenciasAoVivo>();
+servicos.AddSingleton<IVerCardDaAuditoria, VerCardDaAuditoria>();
+servicos.AddSingleton<IAcompanharCardDaAuditoriaAoVivo, AcompanharCardDaAuditoriaAoVivo>();
+servicos.AddSingleton<IFecharCardEDescartar, FecharCardEDescartar>();
+
 // ── primario: a partida, antes do primeiro pedido ────────────────────────────
 servicos.AddSingleton<Partida>();
 // o fechamento da 00:00 de Brasília, em segundo plano (15 RN-278)
@@ -312,7 +397,13 @@ servicos.AddHostedService<AgendamentoDoSac>();
 // o fechamento, a virada para vencida e a expiração do Pagamento, a cada 1 min (19 RN-300 a RN-302, RN-311)
 servicos.AddHostedService<AgendamentoDoPagamento>();
 
+// a verificação dos serviços a cada 30 s e, a cada 1 min, as medições, o card e o descarte da Auditoria (20 RNF-246, RNF-247, RNF-248)
+servicos.AddHostedService<AgendamentoDaAuditoria>();
+
 var app = builder.Build();
+
+// a medição de todo pedido aos módulos, a primeira da fila: mede também as respostas de erro (20 RNF-247)
+app.UseMiddleware<MedicaoDosPedidos>();
 
 app.UseRespostasDeErro();
 

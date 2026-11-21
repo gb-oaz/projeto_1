@@ -14,6 +14,10 @@ public sealed class ArquivosNoGridFs(Armazenamento armazenamento)
 {
     GridFSBucket Balde => new(armazenamento.Banco, new GridFSBucketOptions { BucketName = "sacAnexos" });
 
+    // a sonda da Auditoria (20 RN-315): o balde responde a uma busca de um arquivo
+    public async Task Verificar(CancellationToken ct = default) =>
+        await (await Balde.FindAsync(Builders<GridFSFileInfo<ObjectId>>.Filter.Empty, new GridFSFindOptions<ObjectId> { Limit = 1 }, ct)).ToListAsync(ct);
+
     public Task Guardar(string objeto, byte[] conteudo, CancellationToken ct = default) =>
         Balde.UploadFromBytesAsync(objeto, conteudo, cancellationToken: ct);
 

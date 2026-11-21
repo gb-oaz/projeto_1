@@ -40,6 +40,16 @@ public sealed class Armazenamento
     // Mensagens entre as réplicas (pub/sub do Redis): o canal aoVivo:encerrar.
     public ISubscriber Mensagens => cache.Value.GetSubscriber();
 
+    // As chaves do cache que casam com o padrão (SCAN em cada servidor que não é réplica), do banco em uso.
+    public async IAsyncEnumerable<RedisKey> Chaves(string padrao)
+    {
+        var banco = Cache.Database;
+        foreach (var servidor in cache.Value.GetServers().Where(s => !s.IsReplica && s.IsConnected))
+        {
+            await foreach (var chave in servidor.KeysAsync(banco, padrao)) yield return chave;
+        }
+    }
+
     // O servidor aceita transação: replica set (setName no hello) ou mongos
     // (msg isdbgrid). Um MongoDB standalone, como o do job backend do GitHub
     // Actions, não aceita. Perguntado uma vez por processo.
@@ -98,6 +108,14 @@ public static class Colecoes
     public const string AvisosDoBanco = "avisosDoBanco";
     public const string AvisosPagamento = "avisosPagamento";
     public const string Cobrancas = "cobrancas";
+
+    // Auditoria (auditoria-documentos v02); auditoria e auditoriaErros, de cima, só são lidas por ela
+    public const string VerificacoesSaude = "verificacoesSaude";
+    public const string QuedasServico = "quedasServico";
+    public const string Ocorrencias = "ocorrencias";
+    public const string CardAuditoria = "cardAuditoria";
+    public const string MedicoesMinuto = "medicoesMinuto";
+    public const string MedicoesHora = "medicoesHora";
 }
 
 // Leitura e escrita de campos de BsonDocument com nulos e datas.

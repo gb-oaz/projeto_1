@@ -9,10 +9,15 @@ namespace Boaz.MsMono.Secundario.Out.Commons.Auditoria;
 // inclusão: nada é alterado nem apagado (RNF-206).
 public sealed class AuditoriaNoBanco(Armazenamento armazenamento) : IAuditoria, IAuditoriaDeErros
 {
-    public Task Registrar(RegistroDeAuditoria registro, CancellationToken ct = default) =>
-        armazenamento.Colecao(Colecoes.Auditoria).InsertOneAsync(new BsonDocument
+    public Task Registrar(RegistroDeAuditoria registro, CancellationToken ct = default) => RegistrarComId(registro, ct);
+
+    // grava e devolve o _id, que o aviso ao vivo da Auditoria leva (AuditoriaComAviso)
+    public async Task<string> RegistrarComId(RegistroDeAuditoria registro, CancellationToken ct = default)
+    {
+        var id = Guid.NewGuid().ToString("N");
+        await armazenamento.Colecao(Colecoes.Auditoria).InsertOneAsync(new BsonDocument
         {
-            ["_id"] = Guid.NewGuid().ToString("N"),
+            ["_id"] = id,
             ["contaId"] = Bson.Valor(registro.ContaId),
             ["quem"] = Bson.Valor(registro.Quem),
             ["acao"] = registro.Acao.Texto(),
@@ -22,11 +27,17 @@ public sealed class AuditoriaNoBanco(Armazenamento armazenamento) : IAuditoria, 
             ["quando"] = Bson.Valor(registro.Quando),
             ["guardarAte"] = Bson.Valor(registro.GuardarAte),
         }, cancellationToken: ct);
+        return id;
+    }
 
-    public Task Registrar(RegistroDeErro registro, CancellationToken ct = default) =>
-        armazenamento.Colecao(Colecoes.AuditoriaErros).InsertOneAsync(new BsonDocument
+    public Task Registrar(RegistroDeErro registro, CancellationToken ct = default) => RegistrarComId(registro, ct);
+
+    public async Task<string> RegistrarComId(RegistroDeErro registro, CancellationToken ct = default)
+    {
+        var id = Guid.NewGuid().ToString("N");
+        await armazenamento.Colecao(Colecoes.AuditoriaErros).InsertOneAsync(new BsonDocument
         {
-            ["_id"] = Guid.NewGuid().ToString("N"),
+            ["_id"] = id,
             ["traceId"] = registro.TraceId.Valor,
             ["contaId"] = Bson.Valor(registro.ContaId),
             ["quem"] = Bson.Valor(registro.Quem),
@@ -37,4 +48,6 @@ public sealed class AuditoriaNoBanco(Armazenamento armazenamento) : IAuditoria, 
             ["quando"] = Bson.Valor(registro.Quando),
             ["guardarAte"] = Bson.Valor(registro.GuardarAte),
         }, cancellationToken: ct);
+        return id;
+    }
 }
